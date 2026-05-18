@@ -1,0 +1,7 @@
+data/.github-pat
+data/.dashboard-auth-hash
+data/.github-pat-created
+logs/
+*.log
+.DS_Store
+node_modules/

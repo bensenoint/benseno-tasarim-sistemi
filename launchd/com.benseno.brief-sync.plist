@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.benseno.brief-sync</string>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/gorkemkaya/benseno-tasarim-sistemi</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/zsh</string>
+        <string>/Users/gorkemkaya/benseno-tasarim-sistemi/scripts/run-brief-sync.sh</string>
+    </array>
+
+    <!-- Her dakika çalışır; script içinde :15/:45 ve mesai saati kontrolü yapılır -->
+    <key>StartInterval</key>
+    <integer>60</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/gorkemkaya/benseno-tasarim-sistemi/logs/brief-sync.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/gorkemkaya/benseno-tasarim-sistemi/logs/brief-sync.err</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <!-- Sistem uyanınca atladığı çalışmaları tetikle -->
+    <key>StartOnMount</key>
+    <false/>
+</dict>
+</plist>
