@@ -1,0 +1,137 @@
+// dashboard/app/live-data.js — Work Tracking Slack Bot tarafından yazıldı.
+// Bot her 30 saniyede + her reaction/yeni brief event'inde bu dosyayı yeniden üretir.
+// Kaynak: Slack Canvas F0B1B6XUD44 (parse + brief queue birleşim)
+// data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
+
+window.EMBEDDED_DATA = {
+  "now": "2026-05-19T21:59:07.457Z",
+  "last_sync": "2026-05-19T21:59:07.457Z",
+  "source": "work-tracking-bot",
+  "reason": "interval",
+  "bns_briefs": [
+    {
+      "id": "br_live_1779099416366989",
+      "no": 1,
+      "marka": "JNJ Vision TR",
+      "baslik": "24 Haziran Kontakt Lens Davetiyesi",
+      "leadId": "U0AN6DD79M0",
+      "contribIds": [
+        "U4XCE3532",
+        "U02SZQDAFPF",
+        "U055EDESLSE",
+        "U030C48PL23",
+        "U0AAC3YK20G",
+        "U09BZHR25NG"
+      ],
+      "reviewerId": "U08NQJ27G5S",
+      "acilma": "2026-05-18T10:16:56.366+00:00",
+      "deadline": "2026-05-18T16:00:00+03:00",
+      "durum": "incelemede",
+      "revision": 1,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
+      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · Melis 17:26 \"İletiyorum\" → bakanlık onayı bekleniyor) · <@U08NQJ27G5S>",
+      "_oncelik": "\ud83d"
+    },
+    {
+      "id": "br_live_1779104369515529",
+      "no": 2,
+      "marka": "Hasvet",
+      "baslik": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
+      "leadId": "U4XCE3532",
+      "contribIds": [
+        "U055EDESLSE",
+        "U02SZQDAFPF",
+        "U030C48PL23",
+        "U063T8M5HL4",
+        "U0AAC3YK20G"
+      ],
+      "reviewerId": "U08NQJ27G5S",
+      "acilma": "2026-05-18T11:39:29.515+00:00",
+      "deadline": "2026-05-21T16:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C081GAK936J/p1779104369515529",
+      "notes": "⏳ Sırada (tasarımcı atanmadı — İpek dispatch bekleniyor) · <@U08NQJ27G5S>",
+      "_oncelik": "\ud83d"
+    },
+    {
+      "id": "br_live_1779167651759819",
+      "no": 3,
+      "marka": "Bauhaus",
+      "baslik": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "leadId": "U06J26R1XCJ",
+      "contribIds": [
+        "U09BZHR25NG"
+      ],
+      "reviewerId": "U030C48PL23",
+      "acilma": "2026-05-19T05:14:11.759+00:00",
+      "deadline": "2026-05-20T10:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": true,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
+      "notes": "⏳ Sırada (Aykut başlamayı bekliyor · 🎨 reaction yok · 🔴 manuel override Görkem 08:26 + STALE 🔴 · 7sa 11dk pasif) · <@U030C48PL23>",
+      "_oncelik": "\ud83d"
+    },
+    {
+      "id": "br_live_1779167921567269",
+      "no": 4,
+      "marka": "Bauhaus",
+      "baslik": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "leadId": "U055EDESLSE",
+      "contribIds": [
+        "U030C48PL23"
+      ],
+      "reviewerId": "U030C48PL23",
+      "acilma": "2026-05-19T05:18:41.567+00:00",
+      "deadline": "2026-05-21T13:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": true,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
+      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem'e DM gönderildi · İpek dispatch bekleniyor) · <@U030C48PL23>",
+      "_oncelik": "\ud83d"
+    },
+    {
+      "id": "br_live_1779187350819039",
+      "no": 5,
+      "marka": "Bauhaus",
+      "baslik": "Broşür (Print · AI · Eren self-assign)",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [],
+      "reviewerId": "U0AP31SAA1W",
+      "acilma": "2026-05-19T10:42:30.819+00:00",
+      "deadline": "2026-05-21T13:42:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
+      "notes": "⏳ Yeni açıldı (Eren self-assign · 1sa 43dk önce · henüz 🤖 reaction yok) · <@U0AP31SAA1W>",
+      "_oncelik": "\ud83d"
+    }
+  ],
+  "bns_completed": [
+    {
+      "id": "cb_live_1779104723477199",
+      "no": 1,
+      "marka": "Bauhaus",
+      "baslik": "Gökhan Ünver - İngilizce Altyazı /2",
+      "leadId": "U09BFPBKQG7",
+      "contribIds": [
+        "U06J26R1XCJ"
+      ],
+      "reviewerId": null,
+      "acilma": null,
+      "baslangic": null,
+      "bitis": null,
+      "deadline": "2026-05-19T12:00:00+03:00",
+      "sureH": 2.75,
+      "revision": 0,
+      "rating": null,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779104723477199",
+      "notes": "Erken teslim (deadline'dan 18+ saat önce)"
+    }
+  ]
+};

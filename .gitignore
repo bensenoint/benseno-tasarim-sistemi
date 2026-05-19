@@ -1,12 +1,26 @@
+# Sensitive — ASLA commit etme
 data/.github-pat
 data/.github-pat-sistem
 data/.slack-app-token
 data/.slack-bot-token
 data/.dashboard-auth-hash
 data/.github-pat-created
+
+# Runtime cache
 data/canvas_cache.md
+dashboard/app/live-data.json
+app/live-data.json
+
+# Logs & build artifacts
 logs/
 *.log
 .DS_Store
 node_modules/
 github-prep/
+
+# Yedek + paket dosyaları (local-only)
+*.legacy.html.bak
+dashboard/index.legacy.html.bak
+benseno-claude-design-package.zip
+claude-design-package/
+claude-design-package 2/
