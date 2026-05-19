@@ -18,13 +18,48 @@
          Script içinde "bugün ayın son günü mü?" kontrolü yapılır. -->
     <key>StartCalendarInterval</key>
     <array>
-        <dict><key>Day</key><integer>25</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Day</key><integer>26</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Day</key><integer>27</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Day</key><integer>28</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Day</key><integer>29</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Day</key><integer>30</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Day</key><integer>31</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Day</key><integer>25</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer>  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+        <dict><key>Day</key><integer>26</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer>  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+        <dict><key>Day</key><integer>27</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer>  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+        <dict><key>Day</key><integer>28</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer>  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+        <dict><key>Day</key><integer>29</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer>  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+        <dict><key>Day</key><integer>30</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer>  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+        <dict><key>Day</key><integer>31</integer><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer>  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
     </array>
 
     <key>StandardOutPath</key>
@@ -34,5 +69,10 @@
 
     <key>RunAtLoad</key>
     <false/>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
 </dict>
 </plist>

@@ -849,10 +849,156 @@ tr:hover .rxn-hint, .rxn-hint:hover { opacity: 1; }
 // Cowork artifact'ta çalışırken bu blok yoksayılır (gerçek window.cowork bridge zaten tanımlı).
 // GitHub Pages'te ise window.cowork mock'u kurulur ve EMBEDDED_DATA.canvas_markdown okunur.
 window.EMBEDDED_DATA = {
-  canvas_markdown: `# Benseno Tasarım İş Takip Panosu\n\n> ⏳ İlk dashboard üretimi bekleniyor... Brief Sync sıradaki :15 veya :45 run'ında veriyi dolduracak.`,
-  generated_at: "2026-05-16T13:30:00+03:00",
-  sync_ts: 0,
-  source: "cowork-artifact-template"
+  canvas_markdown: `# Benseno Tasarım İş Takip Panosu
+
+> 💡 **3 departmanın merkezi iş takip noktası** · 16 kişi · v7.13 · 🌅 **Salı 19 Mayıs 14:45 — scheduled :45 sync (delta 30dk · 14:15 → 14:45). Hareket: 0 yeni brief, 0 yeni reaction, 0 yeni thread mesajı. Durum 14:15 sync'i ile aynı.** 🚨 Bauhaus bahar STALE 🔴 işareti sürüyor (deadline 19sa 15dk kaldı · Görkem override 🔴 kalıcı · ⚠️ Aykut hâlâ başlamamış — 6sa 31dk pasif). Bauhaus mayıs atama disiplini uyarısı sürüyor (1g 22sa 15dk · İpek+Görkem'den cevap yok). JNJ Vision bakanlık onayı bekleniyor (22sa 45dk geride, teyit edilmiş). Hasvet cam giydirme hâlâ atama bekliyor (2g 1sa 15dk).
+
+## 📊 Canlı Dashboard Linkleri (her 30 dk · :15 ve :45)
+
+🔒 [Birleşik Dashboard](https://bensenoint.github.io/dashboard/) ← şifre korumalı, ekipten al · 🏷️ [Marka Kitabı](https://benseno.slack.com/docs/T4Y3R6RAN/F0B2ANKBBFV) · 🎓 [Lessons Learned](https://benseno.slack.com/docs/T4Y3R6RAN/F0B2H49SXPC) · 📐 [Şablonlar](https://benseno.slack.com/docs/T4Y3R6RAN/F0B2F2REETG)
+
+🔄 Üretildi: 19 Mayıs 2026 14:45 (TR · scheduled :45 · delta 30dk · 0 değişiklik) · 🔴 **5 aktif brief (1 🔴 JNJ GEÇMİŞ teyit · 1 🔴 Bauhaus bahar — Görkem override + STALE 🔴 · 1 🟡 Hasvet · 1 🟡 Bauhaus mayıs · 1 🟡 Bauhaus broşür) · 1 tamamlanan (Bauhaus formal ✅) · marka mode silent_log_only**
+
+## 🎨 Tasarımcı İş Yükü (7 kişi)
+
+|Tasarımcı|Aktif|Acil|Lead|Yoğunluk|
+|  ---  |  ---  |  ---  |  ---  |  ---  |
+|<@U0AN6DD79M0> Aylin Tozkoparan|1|1|0|🟡 Normal (JNJ v2 teslim · Melis bakanlığa iletti · bakanlık onayı bekleniyor)|
+|<@U06J26R1XCJ> Aykut Arslan|1|1|0|🟠 Riskli (Bauhaus bahar 🔴 Acil — Görkem override + STALE 🔴 · sıralı 1️⃣ → Eda T · 19sa 15dk kaldı · 🎨 reaction yok · 6sa 31dk pasif)|
+|<@U09BFPBKQG7> Hasan Serdar Arda|0|0|0|🟢 Müsait (Bauhaus formal ✅ · tamamlandı)|
+|<@U0B3K2WE7SB> Pelin Özdemir ✨|0|0|0|🟢 Müsait (Day 2/5 onboarding · FipetOnline banner informal — Q&A devam)|
+|<@U055EDESLSE> İpek Akdeniz 🎯|0|0|3|🟡 Normal (3 aktif brief'te lead/dispatch · Hasvet + Bauhaus mayıs dispatch bekliyor · FipetOnline thread aktif)|
+|<@U0AK8U7L57F> İrem Özkan|0|0|0|🟢 Müsait (Hasvet/Bauhaus mayıs dispatch potansiyeli)|
+|<@U08HLMHTGEL> Serhat|0|0|0|🟢 Müsait (Hasvet/Bauhaus mayıs dispatch potansiyeli)|
+
+
+**Eşikler:** 🟢 0-1 · 🟡 2-3 · 🟠 4-5 · 🔴 6+ · **🎯 = Lead · ✨ = Yeni katılan**
+
+## ✍️ Editör İş Yükü (8 kişi)
+
+|Editör|Atanan|Acil|Yazdığı|Yoğunluk|
+|  ---  |  ---  |  ---  |  ---  |  ---  |
+|<@U4XCE3532> Cansu Kazgan 👑|2|1|0|🟡 Normal (Hasvet+JNJ · "Kim alanı sadece ilgili kişi" uyarısı verdi · Bauhaus mayıs için tekrar gerekli)|
+|<@U02SZQDAFPF> erdem akoğlu 🏅|1|0|0|🟢 Müsait (Bauhaus formal ✅ verdi · 1 yazdığı→arşivde)|
+|<@U09BZHR25NG> Eda Tireli|2|2|0|🟡 Normal (Bauhaus bahar 🔴 Acil — sıralı 2️⃣ + JNJ · DM gönderildi)|
+|<@U07PV0RA9L2> Eda Ayral|0|0|0|🟢 Müsait|
+|<@U08NQJ27G5S> Melis|0|0|2|🟢 Müsait (JNJ v2 bakanlığa iletildi · Hasvet brief açtı · FipetOnline Q&A aktif)|
+|<@U05PP70GQTX> Aylin Canel|0|0|0|🟢 Müsait|
+|<@U063T8M5HL4> Buse Gürbüzer|1|0|0|🟢 Müsait|
+|<@U0AAC3YK20G> Simge Acar|2|1|0|🟡 Normal|
+
+
+**👑 = Direktör (3 dept) · 🏅 = Editör Yöneticisi**
+
+## 🤖 AI Teknolojileri İş Yükü (1 kişi)
+
+|AI|Aktif|Acil|Yoğunluk|
+|  ---  |  ---  |  ---  |  ---  |
+|<@U0AP31SAA1W> Eren Mahzunlar 🤖|1|0|🟡 Normal (Bauhaus broşür · self-assign · 1g 22sa 57dk kaldı · brief açıldı 13:42 — 1sa 3dk önce, henüz 🤖 reaction yok)|
+
+
+## 📋 Aktif İşler (3 departman · 5 brief) · STALE eşiği: 🔴=1g · 🟠=3g · 🟡=7g · 🟢=14g
+
+||Dept|Marka|İş|Atanan|Editör|Öncelik|Deadline|Saat|Durum|Rev|Geçmiş|Link|
+|  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |
+|1|📋|JNJ Vision TR|24 Haziran Kontakt Lens Davetiyesi|<@U4XCE3532> <@U02SZQDAFPF> <@U055EDESLSE> <@U030C48PL23> <@U0AAC3YK20G> <@U09BZHR25NG> · ↪️ İpek dispatch → <@U0AN6DD79M0>|<@U08NQJ27G5S>|🔴 Acil|18 May 2026|16:00 TR ⚠️ GEÇMİŞ (22sa 45dk geride · ✓ teyit edilmiş — bakanlık süreci)|👀 Revize bekliyor (v2 teslim 18May17:22 · Melis 17:26 "İletiyorum" → bakanlık onayı bekleniyor)|1|⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22|[link](https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989)|
+|2|📋|Hasvet|MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME|<@U4XCE3532> <@U055EDESLSE> <@U02SZQDAFPF> <@U030C48PL23> <@U063T8M5HL4> <@U0AAC3YK20G>|<@U08NQJ27G5S>|🟡 Normal|21 May 2026|16:00 TR (2g 1sa 15dk kaldı)|⏳ Sırada (tasarımcı atanmadı — İpek dispatch bekleniyor)|0|⏳18May14:39→📈19May08:01 öncelik 🟢→🟡|[link](https://benseno.slack.com/archives/C081GAK936J/p1779104369515529)|
+|3|📋|Bauhaus|bahar kampanyası (%10 indirim · Sosyal Medya Post)|<@U06J26R1XCJ> > <@U09BZHR25NG>|<@U030C48PL23>|🔴 Acil|20 May 2026|10:00 TR (19sa 15dk kaldı · 🚨 STALE 🔴 işareti sürüyor · otomatik hesap şu an 🟠 olurdu)|⏳ Sırada (Aykut başlamayı bekliyor · 🎨 reaction yok · 🔴 manuel override Görkem 08:26 + STALE 🔴 · 6sa 31dk pasif)|0|⏳19May08:14 (Görkem GM açtı) / 🔴Yön08:26 / ⚠️STALE🔴 19May~10:00|[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819)|
+|4|📋|Bauhaus|🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)|<@U055EDESLSE> 🎯 dispatch · <@U030C48PL23> GM · ⚠️ tasarımcı YOK — atama disiplini uyarısı|<@U030C48PL23>|🟡 Normal|21 May 2026|13:00 TR (1g 22sa 15dk kaldı)|⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem'e DM gönderildi · İpek dispatch bekleniyor)|0|⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini)|[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269)|
+|5|🤖|Bauhaus|Broşür (Print · AI · Eren self-assign)|<@U0AP31SAA1W>|<@U0AP31SAA1W>|🟡 Normal|21 May 2026|13:42 TR (1g 22sa 57dk kaldı)|⏳ Yeni açıldı (Eren self-assign · 1sa 3dk önce · henüz 🤖 reaction yok)|0|⏳19May13:42 (Eren AI açtı · self-assign)|[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039)|
+
+
+## ✅ Tamamlanan İşler (son 90 gün)
+
+||Marka|İş|Atanan|Deadline|Başlangıç|Bitiş|Süre|Rev|Gecikme Nedeni|Link|
+|  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |  ---  |
+|1|Bauhaus|Gökhan Ünver - İngilizce Altyazı /2|<@U09BFPBKQG7> <@U06J26R1XCJ>|19 May 2026 12:00 TR|18 May 14:45 TR|18 May ~17:30 TR (formal ✅)|~2h 45m (Arda etkin çalışma ~1h 55m, erdem 16:40 "Ok'dir" + formal ✅ ~17:30)|0|Erken teslim (deadline'dan 18+ saat önce)|[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779104723477199)|
+
+
+## 💬 Thread Özetleri
+
+* **JNJ Vision TR — 24 Haziran Kontakt Lens Davetiyesi:** 14:45 sync'te thread'de yeni hareket yok (son hareket 18 May 17:26 TR — Melis "İletiyorum"). Aylin 18 May 17:22 TR'de v2 teslim etti, bakanlık onayına gönderildi. **Bugün bakanlık dönüşü bekleniyor.** Bakanlık ✅ verince Aylin parent'a ✅ reaction ekleyerek formal kapatacak. Deadline (18 May 16:00) ~22sa 45dk geride — teyit edilmiş geç brief (bakanlık süreci açık).
+* **Bauhaus — Gökhan Ünver Altyazı (✅ TAMAMLANDI):** Dün 18 May 17:30 civarı formal ✅ aldı, Tamamlanan'a taşındı.
+* **Bauhaus — bahar kampanyası (08:14 brief · 🔴 Acil — Görkem GM override 08:26 + 🚨 STALE 🔴 işareti):** 14:45 sync'te thread'de hâlâ hareket yok, parent'ta sadece Görkem'in 🔴 reaction'ı. Sıralı akış: *Aykut tasarım → Eda Tireli copywriting*. Tip Sosyal Medya Post, %10 indirim, referans bauhaus.com.tr + ek görsel. Deadline 20 May 10:00 TR — **19 saat 15 dk kaldı.** Otomatik hesap şu an 🟠 olurdu, ancak Görkem override kalıcı (🔴). 🚨 **Brief 6sa 31dk önce açıldı, Aykut hâlâ 🎨 reaction veya v1 teslim göstermedi.** **Yönetici eskalasyonu önerilir** — Aykut+Eda T'ye ekstra ping atılmalı.
+* **Bauhaus — mayıs kampanyası (08:18 brief · 🟡 Normal · ⚠️ atama disiplini):** 14:45 sync'te thread'de hareket yok, parent'ta reaction yok. **Kim alanı problematik:** *@İpek (dispatcher) + @Görkem (kendisi)* — fiili tasarımcı yok. Görkem'in DM'sine cevap gelmemiş, İpek'in dispatch DM'sine de cevap yok.
+* **Bauhaus — Broşür (🤖 AI · 13:42 brief · 🟡 Normal · self-assign):** Eren Mahzunlar 13:42 TR'de marka-bauhaus kanalında workflow brief açtı. Kim ve Kimden ikisi de kendisi — *self-assign AI işi*. İş tanımı yalın: "Broşür" (Tip: Print / Broşür · Akış/Ref/Not boş). Deadline 21 May 13:42 TR (1g 22sa 57dk kaldı). 1sa 3dk önce açıldı, henüz 🤖 başlama reaction yok. **Self-assign'da DM tetiklenmedi** (atanan = brief sahibi). Bauhaus marka istatistiği yok (n=0) → marka kıyaslama atlandı (yetersiz veri · log only).
+* **Hasvet — Menteşe Veteriner Cam Giydirme:** Dün 14:39'dan beri yeni hareket yok. Cansu "Kim alanında sadece ilgili kişi etiketle" uyarısı verdi. **Tasarımcı hâlâ atanmadı.** Cuma 16:00 TR deadline — şu an 2g 1sa 15dk (49sa 15dk) kaldı. İpek bugün dispatch yapmalı.
+* **Hasvet (eski thread · FipetOnline banner) — Q&A:** 11:21'den beri yeni hareket yok. Pelin Day 2/5 onboarding'de bu işle uğraşıyor.
+
+## ⚠️ Yönetici Dikkat — Atama Uyarıları (v7.13)
+
+* **🚨 Bauhaus bahar kampanyası — STALE 🔴 ESKALASYON ÖNERİLİR:** Görkem GM manuel override (08:26) + STALE 🔴 işareti sürüyor · şu an 19sa 15dk kaldı. Brief 19 May 08:14'te açıldı, **6sa 31dk geçti, hâlâ 🎨 reaction yok, v1 teslim yok**. **Aksiyon:** Aykut'a ve Eda T'ye ekstra ping/DM önerilir.
+* **🚨 Bauhaus mayıs kampanyası (atama disiplini ihlali):** Görkem 08:18'de açtı, Kim alanına @İpek + @Görkem yazdı — gerçek tasarımcı yok. **Görkem'e DM 08:30'da gönderildi: cevap gelmedi.** İpek'e DM 08:30: dispatch bekleniyor.
+* **JNJ Vision (🔴 acil, 22sa 45dk geride):** Bakanlık onayı dönüşü bekleniyor. Süreç açık, blokaj yok.
+* **Hasvet — Menteşe (🟡 normal, 2g 1sa 15dk kaldı):** Tasarımcı hâlâ atanmadı. **İpek bugün dispatch yapmalı**.
+* **Bauhaus Broşür (🤖 AI · self-assign):** Eren Mahzunlar kendine atadı — uyarı yok, normal AI workflow. Marka istatistiği boş (n=0) → kıyaslama atlandı. Eren'in iş yükü 0 → 1.
+* **Aksiyon (Cansu için):** Görkem'in disiplin paterni karışık. Cansu/Reyhan bugün Görkem ile *Kim alanı sadece tasarımcı için* kuralını netleştirmeli.
+
+## 🧪 Tespit Edilen Test Mesajları (log · yoksayıldı)
+
+* **Bauhaus — Workflow test brief #1** (Görkem, 18 May 19:16 TR · ts 1779121012): İş="deneme" · Süre=13 May 2026 (5g geride) · Not="deneme" · Files=jpg. ✅ Doğru davranış.
+* **Bauhaus — Workflow test brief #2** (Görkem, 19 May 07:43 TR · ts 1779165802): İş="deneme" · Süre=14 May 2026 (5g geride) · Not="denemeeeeeee" · Reaction=🔴. ✅ Doğru davranış.
+
+## 🚀 Production Launch — Salı 19 Mayıs · Day 2 Status
+
+🌅 **Day 2 14:45 scheduled :45 sync — 0 değişiklik (30dk delta):**
+
+* ✅ 08:15 sync: ilk gerçek workflow brief (Bauhaus bahar) yakalandı
+* ⚠️ 08:30 sync: ikinci Bauhaus brief (mayıs) yakalandı — *atama disiplini ihlali*
+* 🔴 08:26 reaction override: Görkem GM, Bauhaus bahar brief'ine 🔴 verdi → öncelik 🟡→🔴
+* ✅ 08:45-09:24 sync: 0 yeni brief/thread aktivitesi
+* ⚠️ 09:45-10:46 arası: cron'lar "out of extra usage" hatasıyla bloke oldu — usage reset 12:40 TR
+* 🚨 10:46 manuel "run now" sync: Bauhaus bahar STALE 🔴 işareti aktif edildi
+* ✅ 10:54 → 12:47 arası 7 sync: 0 yeni brief, 0 yeni reaction
+* ✅ 13:47 manuel "run now" sync: 1 yeni brief (Bauhaus broşür AI · Eren self-assign)
+* ✅ 13:54 scheduled run now sync: 0 değişiklik
+* ✅ 14:15 scheduled :15 sync: 0 değişiklik
+* 🌅 **14:45 scheduled :45 sync (bu run · delta 30dk):** Queue boş · Slack search 0 yeni brief · 5 aktif brief threadinde 0 yeni mesaj · 0 yeni reaction. Aktif brief sayısı 5'te sabit. Tüm bekleyen durumlar değişmedi.
+* ⚠️ Bauhaus bahar 19sa 15dk · STALE 🔴 işareti + Görkem override 🔴
+* ✅ Hasvet 2g 1sa 15dk — öncelik 🟡 doğru
+* ✅ Bauhaus mayıs 1g 22sa 15dk — öncelik 🟡 doğru
+* ✅ Bauhaus broşür 1g 22sa 57dk — öncelik 🟡 doğru (otomatik hesap)
+* ✅ JNJ Vision 22sa 45dk geride — bakanlık dönüşü bekleniyor
+* ✅ Marka istatistikleri: \`marka_stats.json\` mode=**silent_log_only** · brands={} · Bauhaus kıyas atlandı (n=0)
+* ✅ PAT: file tarih=2026-05-13 (84 gün kaldı)
+* 🔄 GitHub push: $HOME clone yöntemi ile deneniyor
+
+## 📖 Kullanım Kılavuzu
+
+### Brief Açma
+
+* **Workflow ile (önerilen):** Marka kanal bookmark \`📋 Yeni Brief Aç\` → form doldur → otomatik canvas'a düşer
+* **🔔 Kim alanı dikkat:** Sadece **işi yapacak kişiyi** etiketle, editör/yöneticileri ekleme. *Dispatch için* @auto yaz veya boş bırak. **GM/Direktör'ün kendisini de yazma**.
+* **Manuel brief:** \`📋 İş özeti\` (📋/✍️/🤖 dept prefix · marka kanal'dan otomatik)
+* Çoklu: \`@A @B\` paralel · \`@A > @B\` sıralı (seçim sırası)
+* 🔴 acilde \`@auto\` kullanma → manuel @kişi yaz
+* **Akıllı atama (P7-C1):** \`@auto\` veya @ boş → sistem öneri, ✅ ile onayla (max 30 dk)
+* **v7.12:** Öncelik form'da yok — deadline süresinden otomatik (≤8sa 🔴 · ≤24sa 🟠 · ≤72sa 🟡 · >72sa 🟢). Yönetici 🔴🟠🟡🟢 reaction ile manuel override yapabilir.
+
+### Reaction & Komut
+
+🎨/✍️/🤖 başla · 👀 revize · ✅ onay · ⛔ engel · ♻️ yeniden aç · **🔒 force-close** (lead/editör/yönetici/tasarımcı kendi adına) · Thread komutu: \`force-close\` veya \`🔒 close\` veya \`kapat\` · **Tüm atananlar ✅ verince tamamlanır.** ⭐+1-5 memnuniyet · 🎓 ders ekle
+
+**v7.13 hatırlatma:**
+
+* Reaction'lar PARENT mesaja (thread'e değil) — sistem otomatik düzeltir
+* 🔒 sonrası 60 sn içinde sebep yaz → Geçmiş'e kaydedilir
+* Workflow ile açılan brief'te marka kanal'dan otomatik türetilir
+* UTC saat varsa otomatik TR'ye çevrilir
+* **Marka davranış öğrenmesi (v7.13):** Şu an silent · brands={} · veri toplama 18 May 08:15'te başladı. 1 Haziran'dan itibaren aktif olur (12g 9sa 15dk kaldı).
+
+### Sınırlar
+
+* Max 6 aktif · Max 2 acil/kişi · 3+ fark uyarısı
+* **STALE eşiği:** 🔴=1g · 🟠=3g · 🟡=7g · 🟢=14g
+
+---
+
+> 🔄 **Son sync:** 19 Mayıs 2026 14:45 (scheduled :45 · delta 30dk · **0 yeni brief, 0 değişiklik** · 5 aktif brief: 2 🔴 + 3 🟡 · 🚨 Bauhaus bahar STALE 🔴 işareti sürüyor · Canvas full replace · LAST_SYNC_TS yenilendi · GitHub push deneniyor) · Sonraki otomatik sync: 19 May 15:15 (her 30 dk · :15 ve :45) · \`LAST_SYNC_TS=1779191153 ARCHIVE_CANVAS_ID=null\` · v7.13 marka mode: \`silent_log_only\` (active_from 2026-06-01 · 12g 9sa 15dk kaldı) · **Sistem :15 ve :45'te otomatik güncellenir (her 30 dk).** Kanal: <#C02SZRJGY0M> 🔒 Dashboard: https://bensenoint.github.io/dashboard/ (şifre korumalı)
+`,
+  generated_at: "2026-05-19T14:46:00.000+03:00",
+  sync_ts: 1779191578,
+  source: "brief-sync-run-1779191578"
 };
 
 // Cowork bridge mock — GitHub Pages'te window.cowork yok, EMBEDDED_DATA üzerinden veri sağla.
@@ -1616,17 +1762,23 @@ function parseTableRows(md) {
   return rows;
 }
 
+function isDeptCell(s) {
+  if (!s) return false;
+  const t = shortcodeToEmoji(s);
+  return t.startsWith('📋') || t.startsWith('✍️') || t.startsWith('🤖');
+}
+
 function classifyAndExtract(rows) {
-  // Active: 12 columns, 1st numeric, 2nd has priority keyword
-  // Completed: 11 columns, 1st numeric, 2nd has brand (NO priority keyword)
+  // Canvas aktif format: # | Dept | Marka | İş | Atanan | Editör | Öncelik | Deadline | Saat | Durum | Rev | Geçmiş | Link (13 col)
+  // Canvas tamamlanan format: # | Marka | İş | Atanan | Deadline | Başlangıç | Bitiş | Süre | Rev | Gecikme | Link (11 col)
   const active = [];
   const completed = [];
   for (const r of rows) {
     const first = r[0];
     if (!/^\d+$/.test(first || '')) continue;
-    if (r.length >= 11 && isPriorityCell(r[1])) {
+    if (r.length >= 12 && isDeptCell(r[1])) {
       active.push(r);
-    } else if (r.length >= 9 && !isPriorityCell(r[1])) {
+    } else if (r.length <= 12 && !isDeptCell(r[1])) {
       completed.push(r);
     }
   }
@@ -1782,11 +1934,11 @@ function deptLabel(d) {
 
 function buildJob(row, type) {
   if (type === 'active') {
-    // P1.5: 13 sütun yeni format → # | Öncelik | Departman | Marka | İş | Atananlar | Editör | Deadline | Saat | Durum | Rev | Geçmiş | Slack
+    // Canvas aktif format: # | Dept | Marka | İş | Atanan | Editör | Öncelik | Deadline | Saat | Durum | Rev | Geçmiş | Link (13 col)
     // P3: Atananlar = multi-assignee (virgül-ayrılmış USER_ID + rol)
     const isV2 = row.length >= 13; // yeni format
     if (isV2) {
-      const assignees = parseAssignees(row[5]);
+      const assignees = parseAssignees(row[4]);
       const lead = assignees.find(a => a.role === 'lead') || assignees[0] || null;
       const history = parseHistory(row[11]);
       const approval = computeApprovalStatus(assignees, history);
@@ -1798,14 +1950,14 @@ function buildJob(row, type) {
       return {
         id: row[0],
         type: 'active',
-        priority: priorityOf(row[1]),
-        dept: detectDept(row[2]),
-        brand: row[3] || '',
-        desc: row[4] || '',
+        priority: priorityOf(row[6]),
+        dept: detectDept(row[1]),
+        brand: row[2] || '',
+        desc: row[3] || '',
         assignees,
         lead,
-        assignee: lead ? lead.name : cleanName(row[5]), // Backward compat
-        editor: cleanName(row[6]),
+        assignee: lead ? lead.name : cleanName(row[4]), // Backward compat
+        editor: cleanName(row[5]),
         deadline: row[7] || '',
         time: row[8] || '',
         status,

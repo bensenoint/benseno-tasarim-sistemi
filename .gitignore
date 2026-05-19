@@ -1,7 +1,12 @@
 data/.github-pat
+data/.github-pat-sistem
+data/.slack-app-token
+data/.slack-bot-token
 data/.dashboard-auth-hash
 data/.github-pat-created
+data/canvas_cache.md
 logs/
 *.log
 .DS_Store
 node_modules/
+github-prep/

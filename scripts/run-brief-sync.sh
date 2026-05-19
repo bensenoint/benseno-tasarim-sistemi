@@ -15,11 +15,13 @@ MIN=$(date +%M)
 [[ "$MIN" != "15" && "$MIN" != "45" ]] && exit 0
 
 cd ~/benseno-tasarim-sistemi
+# Homebrew PATH (launchd ortamında gerekli)
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 source ~/.zshrc 2>/dev/null
 
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "[$TIMESTAMP] Brief Sync başlatıldı..." >> logs/brief-sync.log
 
-claude -p "Skill: benseno-brief-sync — run now" --print >> logs/brief-sync.log 2>&1
+/opt/homebrew/bin/claude -p "Skill: benseno-brief-sync — run now" --print --dangerously-skip-permissions >> logs/brief-sync.log 2>&1
 
 echo "[$TIMESTAMP] Brief Sync tamamlandı." >> logs/brief-sync.log

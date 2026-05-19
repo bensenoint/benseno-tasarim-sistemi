@@ -30,13 +30,6 @@ description: v7.13 · Brief Sync. v7.12 + E3 marka davranış öğrenmesi. marka
   - `> 3 gün` → 🟢 Düşük
 - **Yönetici reaction override:** brief mesajına `🔴`/`🟠`/`🟡`/`🟢` reaction ekleyen yönetici (Görkem/Reyhan/Cansu/İpek/erdem) sistemde öncelik manuel set eder. Override Geçmiş'e kaydedilir (`🔴Yön15:30`). Yönetici dışı reaction yoksayılır.
 
-**v7.12 yeni:**
-- **🔔 Öncelik alanı workflow form'undan kaldırıldı.** Brief Sync deadline'dan otomatik hesaplar:
-  - `deadline - now ≤ 8 saat` → 🔴 Acil
-  - `8h < ≤ 24 saat` → 🟠 Yüksek
-  - `24h < ≤ 72 saat (3 gün)` → 🟡 Normal
-  - `> 3 gün` → 🟢 Düşük
-- **Yönetici reaction override:** brief mesajına `🔴`/`🟠`/`🟡`/`🟢` reaction ekleyen yönetici (Görkem/Reyhan/Cansu/İpek/erdem) sistemde öncelik manuel set eder. Override Geçmiş'e kaydedilir (`🔴Yön15:30`). Yönetici dışı reaction yoksayılır.
 - **Geçmiş tarih uyarı sistemi** (`deadline < now` ise):
   - Dashboard'da Süre sütununa `⚠️ GEÇMİŞ` prefix
   - Brief satırı kırmızı yarı-saydam zemin (CSS `.deadline-past`)
@@ -69,7 +62,7 @@ description: v7.13 · Brief Sync. v7.12 + E3 marka davranış öğrenmesi. marka
 - **Marka kanal'dan türetilir** (v7.10'dan değişmedi)
 - **Departman** önce ilk satırdan (📋/✍️/🤖 varsa), sonra atanan heuristic
 - **UTC → TR çevirme:** "May 21st, 2026 at 4:05 PM UTC" → "21 Mayıs 2026 19:05 TR"
-- **5 katmanlı parser:** v7.12 workflow (Öncelik'siz) → v7.11 workflow (Öncelik'li, fallback) → v7.10 yalın → v7.9 [marka]sonu → v7.8 [marka]baş → v7.7 flat
+- **2 katmanlı parser:** v7.12 workflow (emoji-label, `🎀 İş:` imzalı) → Manuel brief fallback (📋/✍️/🤖 prefix)
 
 ## SABİTLER
 ```
@@ -306,27 +299,47 @@ Yönetici user'lardan herhangi biri brief'e şu reaction'lardan birini ekleyince
 - Dashboard'da öncelik hücresinin yanına ✋ ikonu (override işareti) — hover'da "Görkem 15:30'da manuel set etti".
 - Override sonrası deadline değişirse otomatik hesap **bir daha çalışmaz** (override kalıcı, deadline değişimi yoksayılır). Yeniden otomatik hale döndürmek için yönetici aynı emoji'yi remove + yeniden add yapar (toggle).
 
-## PARSING — Geriye dönük (5 katmanlı)
+## PARSING — Format önceliği
 
 Brief Sync sırayla dener; ilk eşleşeni kullanır:
 
-1. **v7.11 (öncelikli):** workflow brief — emoji-label format
-2. **v7.10 fallback:** `📋 İş özeti` (yalın, marka kanal'dan)
-3. **v7.9 fallback:** `📋 İş özeti [Marka]`
-4. **v7.8 fallback:** `📋 [Marka] İş özeti`
-5. **v7.7 ve öncesi:** flat `📋 İş, 🔴, deadline, @kişi`
+1. **v7.11+ (öncelikli):** workflow brief — emoji-label format (`🎀 İş:` imzalı)
+2. **Manuel brief fallback:** ilk satır `📋/✍️/🤖` ile başlıyor (nadiren kullanılır)
 
 ## CANVAS YAPISI (14 sütun) — değişmedi.
 
 # ADIM ADIM
 
-### 1. Canvas oku · 1a-1g — değişmedi.
+### 1. Canvas oku — CACHE ÖNCELİKLİ (v7.14)
 
-### 2. Yeni brief'leri ara
+**⚡ Önce `~/benseno-tasarim-sistemi/data/canvas_cache.md` dosyasını kontrol et:**
+- Dosya varsa ve son değişiklik zamanı 30 dakikadan eskiyse → `slack_read_canvas` çağır, cache'i güncelle
+- Dosya varsa ve 30 dakikadan yeni ise → cache'i kullan, `slack_read_canvas` ÇAĞIRMA (token tasarrufu)
+- `LAST_SYNC_TS`'yi cache'den oku
+
+**Canvas'a yazmadan önce değişiklik kontrolü:**
+- Yeni brief eklenmiyorsa VE override değişikliği yoksa → `slack_update_canvas` ÇAĞIRMA
+- Sadece gerçek değişiklik varsa Canvas'ı güncelle ve cache'i yenile
+
+**1a-1g — değişmedi.**
+
+### 2. Yeni brief'leri ara — QUEUE ÖNCELİKLİ (v7.14)
+
+**⚡ Önce `~/benseno-tasarim-sistemi/data/brief-queue.json` dosyasını oku (lokal dosya, bedava):**
+- Dosya yoksa veya boşsa → fallback: `slack_search_public` ile normal tarama yap (aşağıdaki eski yöntem)
+- Dosya doluysa → sadece queue'daki brief'leri işle, Slack kanallarını TARAMA (token tasarrufu)
+- Queue'yu işledikten sonra dosyayı temizle: `[]` yaz
+
+Queue entry formatı: `{ts, channel, text, user, is, queued_at}`
+- `channel` → kanal ID'si (C…), CHANNEL→MARKA mapping'den marka adını türet
+- `text` → ham Slack mesajı, normal brief parse akışına sok (aşağıdaki adımlar)
+- Zaten Canvas'ta olan ts'ler atlanır (duplicate önleme)
+
+**Fallback — Queue boşsa eski yöntem:**
 `slack_search_public` query: `in:#marka-*` after:LAST_SYNC_TS limit:30
 **Workflow bot mesajlarını da dahil et** (filter ekleme — eskiden manuel-only varsayılıyordu).
 
-Her brief için:
+Her brief için (queue veya search fark etmez):
 1. **Marka türet** (kanal'dan)
 2. **Brief mı?** (workflow bot veya 🎀 İş imzası veya 📋/✍️/🤖 prefix)
 3. **Format dedektör (5 katman)** — sırayla dene
@@ -345,71 +358,20 @@ Her brief için:
 
 ### 9b. GitHub push — EMBEDDED_DATA inject (v7.x kritik adım, açıklamalı)
 
-**Amaç:** Cowork artifact'tan kopyalanan HTML'i ekip için **standalone çalışır hale** getirmek.
-
-**Sorun:** Cowork artifact'ta `window.cowork` mevcut → `loadCanvas()` cowork bridge ile çalışır. Ama GitHub Pages'te `window.cowork` yok → bridge YOK uyarısı. Çözüm: HTML'e EMBEDDED_DATA + cowork mock inject edilmiş olmalı.
-
-**Cowork artifact'ta ZATEN var (kalıcı yapı — v7.13'te eklendi, line ~847 civarı):**
-
-```html
-<script>
-window.EMBEDDED_DATA = {
-  canvas_markdown: `... placeholder veya gerçek veri ...`,
-  generated_at: "ISO 8601 timestamp",
-  sync_ts: unix_ts,
-  source: "cowork-artifact-template" veya "brief-sync-run-{timestamp}"
-};
-if (typeof window.cowork === 'undefined') {
-  window.cowork = { callMcpTool: async function(toolName, args) {
-    if (toolName.includes('slack_read_canvas')) {
-      return [{ type:'text', text: JSON.stringify({ markdown_content: window.EMBEDDED_DATA.canvas_markdown })}];
-    }
-    return [{type:'text', text:'{}'}];
-  }};
-}
-</script>
-```
-
 **Brief Sync her run'da yapması gereken:**
 
-1. HTML dosyasını oku (Cowork artifact'tan: `~/benseno-tasarim-sistemi/dashboard/index.html`)
-2. **EMBEDDED_DATA bloğunu güncelle** — sed/string replace ile:
-   - `canvas_markdown:` değerini → bu run'da Brief Sync'in yazdığı **YENİ Canvas markdown** ile değiştir (template literal escape dikkat: backticks ve `${}` escape edilmeli)
-   - `generated_at:` → şimdiki ISO 8601 timestamp
-   - `sync_ts:` → şimdiki unix timestamp
-   - `source:` → `"brief-sync-run-{unix_ts}"`
-3. HTML'i `~/benseno-tasarim-sistemi/github-prep/dashboard/index.html` dosyasına yaz
-4. Git: `cd github-prep/dashboard && git add index.html marka_stats.json && git commit -m "Brief Sync v7.13 run ({ISO_timestamp})" && git push origin main`
-5. GitHub Pages 1-2 dk içinde otomatik deploy eder (bensenoint.github.io/dashboard/)
-
-**Sed replace örnek (JavaScript regex ile):**
-
-```javascript
-// Cowork artifact HTML'i oku
-let html = fs.readFileSync(artifactPath, 'utf8');
-
-// canvas_markdown bloğunu değiştir
-const canvasMd = await slack_read_canvas(CANVAS_ID); // bu run'da yeni Canvas
-const escapedMd = canvasMd.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-
-html = html.replace(
-  /window\.EMBEDDED_DATA\s*=\s*\{[\s\S]*?\};/m,
-  `window.EMBEDDED_DATA = {
-    canvas_markdown: \`${escapedMd}\`,
-    generated_at: "${new Date().toISOString()}",
-    sync_ts: ${Math.floor(Date.now()/1000)},
-    source: "brief-sync-run-${Math.floor(Date.now()/1000)}"
-  };`
-);
-
-// GitHub deploy dizinine yaz
-fs.writeFileSync(githubPrepPath, html);
-```
+1. `~/benseno-tasarim-sistemi/dashboard/index.html` oku
+2. `window.EMBEDDED_DATA = {…}` bloğunu regex replace et:
+   - `canvas_markdown`: bu run'daki yeni Canvas markdown (backtick + `${}` escape)
+   - `generated_at`: şimdiki ISO 8601
+   - `sync_ts`: şimdiki unix timestamp
+   - `source`: `"brief-sync-run-{unix_ts}"`
+3. Dosyayı `~/benseno-tasarim-sistemi/github-prep/dashboard/index.html`'e yaz
+4. Git push: `git add index.html marka_stats.json && git commit -m "Brief Sync v7.13 run" && git push origin main`
+5. GitHub Pages 1-2 dk içinde deploy eder (bensenoint.github.io/dashboard/)
 
 **Hata kontrolü:**
-
-- Cowork artifact'ta `window.EMBEDDED_DATA = {` pattern'i yoksa → Görkem'e DM "Dashboard EMBEDDED_DATA bloğu kayıp, manuel ekle"
-- Sed replace başarısız → eski HTML'i koru (rollback), Görkem'e DM
+- `EMBEDDED_DATA` pattern bulunamazsa → Görkem'e DM
 - GitHub push 401/403 → PAT yenileme gerekli, Görkem'e DM
 
 ### 10. CANVAS FULL REPLACE template
@@ -522,7 +484,7 @@ Büyük bir iş (dergi kapağı, kampanya seti vb) ise normal. İş tipini ve ka
 ## ÇIKTI
 ```
 Brief Sync v7.13 OK · :15/:45
-Format parser: v7.12_workflow={N} v7.11_workflow={F} v7.10={A} v7.9={B} v7.8={C} eski={D}
+Format parser: v7.12_workflow={N} manuel_fallback={F}
 Marka türetme: kanal={N} çelişki={C}
 Departman: ilk_satır={A} heuristic={B} belirsiz={C}
 UTC→TR çeviri: {N} brief
