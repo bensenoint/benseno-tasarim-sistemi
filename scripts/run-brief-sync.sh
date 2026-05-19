@@ -26,6 +26,9 @@ echo "[$TIMESTAMP] Brief Sync başlatıldı..." >> logs/brief-sync.log
 
 echo "[$TIMESTAMP] Brief Sync tamamlandı." >> logs/brief-sync.log
 
+# Root index.html'yi dashboard/index.html ile senkronize et (GitHub Pages için)
+cp ~/benseno-tasarim-sistemi/dashboard/index.html ~/benseno-tasarim-sistemi/index.html 2>/dev/null
+
 # GitHub'a push (değişiklik varsa)
 GITHUB_PAT=$(cat ~/benseno-tasarim-sistemi/data/.github-pat-sistem 2>/dev/null)
 if [[ -n "$GITHUB_PAT" ]]; then
