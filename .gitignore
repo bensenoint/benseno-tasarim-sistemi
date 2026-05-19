@@ -8,8 +8,9 @@ data/.github-pat-created
 
 # Runtime cache
 data/canvas_cache.md
-dashboard/app/live-data.json
-app/live-data.json
+# NOT: app/live-data.{js,json} BİLİNÇLİ commit edilir — GitHub Pages bu dosyaları
+# serve etmeli ki production'da canlı veri görünsün. Bot her writeDashboardData
+# OK'den sonra 5 dakikada bir auto-push eder (BENSENO_AUTO_PUSH=1).
 
 # Logs & build artifacts
 logs/
