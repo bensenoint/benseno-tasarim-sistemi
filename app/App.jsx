@@ -79,6 +79,10 @@ function App() {
           window.BNS_DATA.BRANDS = ed.bns_brands;
           window.BNS_DATA.BR = Object.fromEntries(ed.bns_brands.map(b => [b.name, b]));
         }
+        // User list (Slack workspace) — briefs hidrasyonundan ÖNCE
+        if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
+          window.BNS_DATA.USERS = ed.bns_users;
+        }
         // Brief'leri yeniden hidrate et + state'i güncelle
         if (Array.isArray(ed.bns_briefs) && window.bnsHydrateBrief) {
           const fresh = ed.bns_briefs.map(window.bnsHydrateBrief);
@@ -161,7 +165,7 @@ function App() {
         theme={t.theme} setTheme={(v) => setTweak("theme", v)}
         onOpenPalette={() => setPalette(true)}
         onNewBrief={() => setNewBrief(true)}
-        defaultUsers={Object.assign(data.USERS.slice(0, 5), { onPick: (u) => setUser(u) })}
+        defaultUsers={Object.assign([...data.USERS], { onPick: (u) => setUser(u) })}
       />
       <TabBar active={tab} onChange={setTab} style={t.tabStyle}/>
 
