@@ -1,8 +1,8 @@
 {
-  "now": "2026-05-20T06:10:25.420Z",
-  "last_sync": "2026-05-20T06:10:25.420Z",
+  "now": "2026-05-20T06:11:32.048Z",
+  "last_sync": "2026-05-20T06:11:32.048Z",
   "source": "work-tracking-bot",
-  "reason": "interval",
+  "reason": "startup",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -388,6 +388,170 @@
       "wheelIdx": 11,
       "channel_id": "C0AQLPY4TUM",
       "channel_name": "marka-vdm-petdent"
+    }
+  ],
+  "bns_users": [
+    {
+      "id": "U4XCE3532",
+      "name": "Cansu Kazgan",
+      "mono": "CK",
+      "rol": "yonetici",
+      "title": "Direktör",
+      "email": "cansu@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2022-02-06/3074982778881_56f0ee4af5ae0874974d_48.png"
+    },
+    {
+      "id": "U02SZQDAFPF",
+      "name": "Erdem Akoğlu",
+      "mono": "EA",
+      "rol": "yonetici",
+      "title": "Editör Yöneticisi",
+      "email": "erdem@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2022-09-14/4080503601554_d17c44a1e9768aa32da1_48.jpg"
+    },
+    {
+      "id": "U030C48PL23",
+      "name": "Görkem Kaya",
+      "mono": "GK",
+      "rol": "yonetici",
+      "title": "Genel Müdür",
+      "email": "gorkem@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2022-01-30/3022922875062_3596299fa4fa2aeef202_48.png"
+    },
+    {
+      "id": "U055EDESLSE",
+      "name": "İpek Akdeniz",
+      "mono": "İA",
+      "rol": "yonetici",
+      "title": "Tasarım Yöneticisi",
+      "email": "ipek@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2024-11-25/8065632518247_d9a7f62eddc039d221fc_48.jpg"
+    },
+    {
+      "id": "UD96GH76E",
+      "name": "Reyhan Nur Pınar",
+      "mono": "RP",
+      "rol": "yonetici",
+      "title": "GMY",
+      "email": "reyhan@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2022-09-19/4099349563362_f3d061b4ae01984687f8_48.jpg"
+    },
+    {
+      "id": "U06J26R1XCJ",
+      "name": "Aykut Arslan",
+      "mono": "AA",
+      "rol": "tasarim",
+      "title": "",
+      "email": "aykut@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-05-08/11087497583474_382529bcfff132000e84_48.jpg"
+    },
+    {
+      "id": "U0AN6DD79M0",
+      "name": "Aylin Tozkoparan",
+      "mono": "AT",
+      "rol": "tasarim",
+      "title": "",
+      "email": "aylin.tozkoparan@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-03-22/10767363456801_131bb8d890fffabd7f9d_48.png"
+    },
+    {
+      "id": "U09BFPBKQG7",
+      "name": "Hasan Serdar Arda",
+      "mono": "HA",
+      "rol": "tasarim",
+      "title": "",
+      "email": "hasan@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-02-17/10521653754198_76cd9169c0de61761ca1_48.png"
+    },
+    {
+      "id": "U0AK8U7L57F",
+      "name": "İrem Özkan",
+      "mono": "İÖ",
+      "rol": "tasarim",
+      "title": "",
+      "email": "irem.ozkan@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-04-04/10846213494178_f3184de650b89d696bf5_48.png"
+    },
+    {
+      "id": "U0B3K2WE7SB",
+      "name": "Pelin Özdemir",
+      "mono": "PÖ",
+      "rol": "tasarim",
+      "title": "",
+      "email": "pelin@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-05-18/11181439585392_bcffefa6a78a07174922_48.jpg"
+    },
+    {
+      "id": "U08HLMHTGEL",
+      "name": "Serhat",
+      "mono": "SE",
+      "rol": "tasarim",
+      "title": "",
+      "email": "serhat@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-03-19/10717738141031_f24cdc1b64fdba2f98f5_48.jpg"
+    },
+    {
+      "id": "U05PP70GQTX",
+      "name": "Aylin Canel",
+      "mono": "AC",
+      "rol": "editor",
+      "title": "",
+      "email": "aylin@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-05-06/11095356754000_efb75f04fa7cbb120d00_48.jpg"
+    },
+    {
+      "id": "U063T8M5HL4",
+      "name": "Buse Gürbüzer",
+      "mono": "BG",
+      "rol": "editor",
+      "title": "",
+      "email": "buse@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-02-10/10478034928134_eb6a76be3e6444608164_48.jpg"
+    },
+    {
+      "id": "U07PV0RA9L2",
+      "name": "Eda Ayral",
+      "mono": "EA",
+      "rol": "editor",
+      "title": "",
+      "email": "eda@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2025-10-02/9609999100215_04354fd310c41d6b3f05_48.jpg"
+    },
+    {
+      "id": "U09BZHR25NG",
+      "name": "Eda Tireli",
+      "mono": "ET",
+      "rol": "editor",
+      "title": "",
+      "email": "eda.tireli@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-05-11/11095464031059_961d5fc71a21ed787ed6_48.jpg"
+    },
+    {
+      "id": "U08NQJ27G5S",
+      "name": "Melis",
+      "mono": "ME",
+      "rol": "editor",
+      "title": "",
+      "email": "melis@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2025-04-18/8796094156448_bc5b225f397ebdecc9b4_48.jpg"
+    },
+    {
+      "id": "U0AAC3YK20G",
+      "name": "Simge Acar",
+      "mono": "SA",
+      "rol": "editor",
+      "title": "",
+      "email": "simge@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-01-18/10327428181572_774f8f8bc3086db0605e_48.png"
+    },
+    {
+      "id": "U0AP31SAA1W",
+      "name": "Eren Mahzunlar",
+      "mono": "EM",
+      "rol": "ai",
+      "title": "AI Operatör",
+      "email": "eren@benseno.com.tr",
+      "avatar": "https://avatars.slack-edge.com/2026-03-23/10750415091379_fb2faeca4147cf266198_48.png"
     }
   ],
   "bns_dept_stats": {
