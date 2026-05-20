@@ -1,8 +1,8 @@
 {
-  "now": "2026-05-20T11:13:43.422Z",
-  "last_sync": "2026-05-20T11:13:43.422Z",
+  "now": "2026-05-20T11:19:08.440Z",
+  "last_sync": "2026-05-20T11:19:08.440Z",
   "source": "work-tracking-bot",
-  "reason": "startup",
+  "reason": "interval",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -221,6 +221,35 @@
       "gecmis": "",
       "_from_queue": true,
       "_kimden_id": "U05PP70GQTX"
+    },
+    {
+      "id": "br_queue_1779275673657199",
+      "no": 11,
+      "marka": "Cureffect",
+      "brand": {
+        "name": "Cureffect",
+        "color": "#B79100",
+        "wheelIdx": 15,
+        "channel_id": "C05DF8RFQ77",
+        "channel_name": "marka-cureffect"
+      },
+      "baslik": "CurEffect SM Haziran Ayı İçerikleri",
+      "leadId": "U0AAC3YK20G",
+      "contribIds": [
+        "U08HLMHTGEL",
+        "U055EDESLSE"
+      ],
+      "reviewerId": null,
+      "acilma": "2026-05-20T11:14:33.657+00:00",
+      "deadline": "2026-05-21T12:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C05DF8RFQ77/p1779275673657199",
+      "notes": "Sosyal Medya Post · Marka için haziran sosyal medya içeriklerini buraya ekliyorum. <@U02SZQDAFPF> bakabilir misin?",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U0AAC3YK20G"
     }
   ],
   "bns_completed": [
@@ -684,9 +713,9 @@
     "editor": {
       "name": "Editör",
       "people": 8,
-      "active": 2,
+      "active": 3,
       "overdue": 0,
-      "capacity": 13,
+      "capacity": 19,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -745,7 +774,7 @@
       "wheelIdx": 15,
       "channel_id": "C05DF8RFQ77",
       "channel_name": "marka-cureffect",
-      "active": 0,
+      "active": 1,
       "done30": 0,
       "overdue": 0,
       "stale": false,
