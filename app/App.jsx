@@ -27,24 +27,49 @@ function App() {
   const [toast, setToast] = React.useState(null);
 
   // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
-  // Bana / Departman / Tümü filtresi briefs ve completed'a uygulanır,
-  // böylece her sekme (Kanban/Plan/Tamamlananlar/Marka/Profil/...) viewMode'a
-  // göre otomatik filtrelenir. Screen'ler kendi filter mantığını yapmaz.
+  // Bana / Departman / Tümü filtresi briefs ve completed'a uygulanır.
+  // DEFENSIVE: brief'ler farklı kaynaklardan gelir → bazılarında lead={id,rol,..} (obj),
+  // bazılarında leadId="U..." (string). Her iki durumu da kapsa.
   const filterByViewMode = React.useCallback((items) => {
     if (!Array.isArray(items)) return items;
-    if (viewMode === "mine" && user) {
-      return items.filter(b =>
-        (b.lead && b.lead.id === user.id) ||
-        (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === user.id)) ||
-        (b.reviewer && b.reviewer.id === user.id)
-      );
+    if (viewMode === "all" || !user) return items;
+
+    // USERS lookup (ID → rol) — sadece string ID gelen brief'ler için
+    const usersById = ((window.BNS_DATA && window.BNS_DATA.USERS) || []).reduce(
+      (acc, u) => { acc[u.id] = u; return acc; }, {}
+    );
+
+    // Brief'in tüm ilişkili user ID'lerini topla
+    const collectIds = (b) => {
+      const ids = new Set();
+      if (b.lead?.id) ids.add(b.lead.id);
+      if (b.leadId) ids.add(b.leadId);
+      (b.contributors || []).forEach(c => c?.id && ids.add(c.id));
+      (b.contribIds || []).forEach(id => id && ids.add(id));
+      if (b.reviewer?.id) ids.add(b.reviewer.id);
+      if (b.reviewerId) ids.add(b.reviewerId);
+      return ids;
+    };
+    // Brief'in tüm ilişkili rol'lerini topla (obj'den + ID lookup'tan)
+    const collectRoles = (b) => {
+      const roles = new Set();
+      if (b.lead?.rol) roles.add(b.lead.rol);
+      (b.contributors || []).forEach(c => c?.rol && roles.add(c.rol));
+      if (b.reviewer?.rol) roles.add(b.reviewer.rol);
+      // String ID-only field'lardan rol türet
+      const idsForRole = [b.leadId, ...(b.contribIds || []), b.reviewerId].filter(Boolean);
+      idsForRole.forEach(id => {
+        const u = usersById[id];
+        if (u?.rol) roles.add(u.rol);
+      });
+      return roles;
+    };
+
+    if (viewMode === "mine") {
+      return items.filter(b => collectIds(b).has(user.id));
     }
-    if (viewMode === "dept" && user) {
-      return items.filter(b =>
-        (b.lead && b.lead.rol === user.rol) ||
-        (Array.isArray(b.contributors) && b.contributors.some(c => c && c.rol === user.rol)) ||
-        (b.reviewer && b.reviewer.rol === user.rol)
-      );
+    if (viewMode === "dept") {
+      return items.filter(b => collectRoles(b).has(user.rol));
     }
     return items;
   }, [viewMode, user]);
