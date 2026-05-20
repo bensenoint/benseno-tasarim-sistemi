@@ -4,10 +4,10 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T11:11:03.262Z",
-  "last_sync": "2026-05-20T11:11:03.262Z",
+  "now": "2026-05-20T11:13:43.422Z",
+  "last_sync": "2026-05-20T11:13:43.422Z",
   "source": "work-tracking-bot",
-  "reason": "interval",
+  "reason": "startup",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -30,7 +30,7 @@ window.EMBEDDED_DATA = {
       "revision": 1,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · son aktivite 1g 19sa 51dk önce) · <@U08NQJ27G5S>",
+      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · son aktivite 1g 20sa 20dk önce) · <@U08NQJ27G5S>",
       "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22",
       "_oncelik": "\ud83d"
     },
@@ -75,8 +75,8 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 29sa 3dk pasif · ⏰ deadline kaçtı · eskalasyon DM ~5.5sa cevapsız · YÖNETİCİ MÜDAHALESİ ŞART) · <@U030C48PL23>",
-      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (3sa 17dk geride)",
+      "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 29sa 32dk pasif · ⏰ deadline kaçtı · eskalasyon DM ~6sa cevapsız · YÖNETİCİ MÜDAHALESİ ŞART) · <@U030C48PL23>",
+      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (3sa 46dk geride)",
       "_oncelik": "\ud83d"
     },
     {
@@ -95,7 +95,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM ~28sa cevapsız · İpek dispatch bekleniyor — Serhat müsait, İrem Hasvet'te · 🟠 Yüksek'e geçti, kapasite kararı acil) · <@U030C48PL23>",
+      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM ~28.5sa cevapsız · İpek dispatch bekleniyor — Serhat müsait, İrem Hasvet'te · 🟠 Yüksek, kapasite kararı acil) · <@U030C48PL23>",
       "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini) / 📈20May13:17 öncelik 🟡→🟠 (auto-recalc · 23sa 43dk ≤24sa)",
       "_oncelik": "\ud83d"
     },
@@ -113,8 +113,8 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-      "notes": "⏳ Yeni açıldı (Eren self-assign · sabah hatırlatma DM gönderildi · Eren bugün Bauhaus 20 May İçerik thread'inde aktif) · <@U0AP31SAA1W>",
-      "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign)",
+      "notes": "⏳ Yeni açıldı (Eren self-assign · sabah hatırlatma DM gönderildi · Eren bugün Bauhaus 20 May İçerik thread'inde aktif · 🟡→🟠 transition tetiklendi) · <@U0AP31SAA1W>",
+      "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 (auto-recalc · 23sa 56dk ≤24sa)",
       "_oncelik": "\ud83d"
     },
     {
@@ -131,15 +131,15 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "notes": "⏳ Yeni açıldı (1sa 44dk önce · thread aktif: Eda T → Görkem → Eren \"kontrol ediyorum\" · Arda henüz 🎨 vermedi · İlk post hazır, diğer tarihlerde düzeltme yapacak) · <@U09BZHR25NG>",
-      "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [4sa 43dk≤8sa])",
+      "notes": "⏳ Yeni açıldı (2sa 13dk önce · thread aktif: Eda T → Görkem → Eren \"kontrol ediyorum\" · Arda henüz 🎨 vermedi · İlk post hazır, diğer tarihlerde düzeltme yapacak) · <@U09BZHR25NG>",
+      "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [4sa 14dk≤8sa])",
       "_oncelik": "\ud83d"
     },
     {
       "id": "br_live_1779271830010029",
       "no": 7,
       "marka": "KMR Serve",
-      "baslik": "🆕 Haziran SM Planı 26' (Sosyal Medya Post · aylık plan)",
+      "baslik": "Haziran SM Planı 26' (Sosyal Medya Post · aylık plan)",
       "leadId": "U055EDESLSE",
       "contribIds": [],
       "reviewerId": "U063T8M5HL4",
@@ -154,8 +154,26 @@ window.EMBEDDED_DATA = {
       "_oncelik": "\ud83d"
     },
     {
-      "id": "br_queue_1779266803180509",
+      "id": "br_live_1779272694698569",
       "no": 8,
+      "marka": "VDM Petdent",
+      "baslik": "🆕 GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "leadId": "U09BFPBKQG7",
+      "contribIds": [],
+      "reviewerId": "U0AP31SAA1W",
+      "acilma": "2026-05-20T10:24:54.698+00:00",
+      "deadline": "2026-05-21T13:24:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569",
+      "notes": "⏳ Yeni açıldı (Eren 13:24 TR · workflow · Arda tek atanan · 22 dk önce · queue'da 22dk bekledi · Tip \"Veri analizi\" — AI tarzı iş ama Tasarım'a atanmış · Cansu/İpek dikkat) · <@U0AP31SAA1W>",
+      "gecmis": "⏳20May13:24 (Eren AI açtı · workflow · 🔔 otomatik 🟠 [23sa 38dk≤24sa])",
+      "_oncelik": "\ud83d"
+    },
+    {
+      "id": "br_queue_1779266803180509",
+      "no": 9,
       "marka": "KMR Serve",
       "brand": {
         "name": "KMR Serve",
@@ -183,7 +201,7 @@ window.EMBEDDED_DATA = {
     },
     {
       "id": "br_queue_1779271340778199",
-      "no": 9,
+      "no": 10,
       "marka": "KZY Everclean",
       "brand": {
         "name": "KZY Everclean",
@@ -661,9 +679,9 @@ window.EMBEDDED_DATA = {
     "tasarim": {
       "name": "Tasarım",
       "people": 7,
-      "active": 6,
+      "active": 7,
       "overdue": 2,
-      "capacity": 43,
+      "capacity": 50,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
