@@ -341,7 +341,9 @@ function bnsHydrateBrief(raw, idx) {
     revision:     raw.revision != null ? raw.revision : 0,
     stale:        !!raw.stale,
     slack_url:    raw.slack_url || "#",
-    notes:        raw.notes || ""
+    notes:        raw.notes || "",
+    gecmis:       raw.gecmis || "",      // Canvas Geçmiş kolonu ham string (BriefDrawer parse eder)
+    _kimden_id:   raw._kimden_id || null // brief açanın ID'si (queue brief'lerinde; obj zaten lead'de)
   };
 }
 function bnsHydrateCompleted(raw, idx) {
@@ -388,6 +390,17 @@ try {
     if (Array.isArray(ed.bns_brands) && ed.bns_brands.length > 0) {
       window.BNS_DATA.BRANDS = ed.bns_brands;
       window.BNS_DATA.BR = Object.fromEntries(ed.bns_brands.map(b => [b.name, b]));
+    }
+    // User list (Slack workspace) — bots/silinmiş hariç tüm aktif kişiler
+    if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
+      window.BNS_DATA.USERS = ed.bns_users;
+      // ME varsa koru, yoksa Görkem'i bul, yoksa ilk yönetici
+      const meId = window.BNS_DATA.ME?.id;
+      const me = ed.bns_users.find(u => u.id === meId) ||
+                 ed.bns_users.find(u => u.id === 'U030C48PL23') ||
+                 ed.bns_users.find(u => u.rol === 'yonetici') ||
+                 ed.bns_users[0];
+      if (me) window.BNS_DATA.ME = me;
     }
     if (Array.isArray(ed.bns_briefs) && ed.bns_briefs.length > 0) {
       window.BNS_DATA.briefs = ed.bns_briefs.map(bnsHydrateBrief);

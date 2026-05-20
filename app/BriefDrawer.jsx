@@ -329,14 +329,84 @@ function formatRel(ts) {
   return `${d.getDate()} ${months[d.getMonth()]}`;
 }
 
+// Canvas Geçmiş kolonu emoji → human-readable etiket
+const GECMIS_LABELS = {
+  '⏳': 'sıraya alındı',
+  '🎨': 'tasarımcı başladı',
+  '✍️': 'editör başladı',
+  '🤖': 'AI başladı',
+  '👀': 'incelemeye gönderildi',
+  '👌': 'onaylandı',
+  '✅': 'tamamlandı',
+  '🔴': '🔴 acil yapıldı',
+  '🟠': '🟠 yüksek yapıldı',
+  '🟡': '🟡 normal yapıldı',
+  '🟢': '🟢 düşük yapıldı',
+  '📈': 'öncelik yükseldi',
+  '📉': 'öncelik düştü',
+  '🚨': 'kritik uyarı',
+  '⚠️': 'uyarı',
+  '🔁': 'revize edildi',
+  '⛔': 'engellendi',
+  '⏰': 'deadline geçti',
+};
+const TR_MONTHS_SHORT = { Oca: 0, Ock: 0, Şub: 1, Sub: 1, Mar: 2, Nis: 3, May: 4, Haz: 5, Tem: 6, Ağu: 7, Agu: 7, Eyl: 8, Eki: 9, Ekm: 9, Kas: 10, Ara: 11 };
+
+/**
+ * Canvas Geçmiş kolonu string'ini parse eder.
+ * Örnek: "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22"
+ * Veya:  "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00"
+ *
+ * Döner: [{ ts, emoji, label, context, day, month, time }]
+ */
+function parseGecmisString(gecmis) {
+  if (!gecmis) return [];
+  const parts = gecmis.split(/\s*[→\/]\s*/).map(s => s.trim()).filter(Boolean);
+  const events = [];
+  const now = new Date();
+  const year = now.getFullYear();
+
+  for (const p of parts) {
+    // Emoji'leri parse — Türkçe karakter ve emoji çoklu kod noktası destekli
+    const emojiMatch = p.match(/([\p{Extended_Pictographic}]+(?:️)?)/u);
+    if (!emojiMatch) continue;
+    const emoji = emojiMatch[1];
+
+    // Tarih + saat: "18May13:16" veya "19May~10:00"
+    const dm = p.match(/(\d{1,2})([A-Za-zŞşĞğÜüÇçÖöİı]+)\s*~?\s*(\d{1,2}:\d{2})/);
+    if (!dm) continue;
+    const day = parseInt(dm[1], 10);
+    const monAbbr = dm[2].slice(0, 3);
+    const mon = TR_MONTHS_SHORT[monAbbr];
+    if (mon == null) continue;
+    const [hh, mm] = dm[3].split(':').map(n => parseInt(n, 10));
+
+    // Açıklama (parantez içi veya emoji+date sonrası kalan text)
+    let context = p
+      .replace(emojiMatch[0], '')
+      .replace(dm[0], '')
+      .replace(/[()]/g, '')
+      .trim();
+
+    // TR timezone (UTC+3) varsayım — local Date constructor TR ortamında çalışacak
+    const ts = new Date(year, mon, day, hh, mm, 0).getTime();
+    const label = GECMIS_LABELS[emoji] || emoji;
+    events.push({ ts, emoji, label, context, day, mon, time: dm[3] });
+  }
+  return events;
+}
+
 /**
  * Brief'in kendi verisinden gerçek aktivite akışı üretir.
  * En yeni en üstte (descending), brief açılışı en altta.
+ *
+ * Canvas brief'lerinde `b.gecmis` Canvas Geçmiş kolonu ham string'i içerir —
+ * bu gerçek event timeline'ı sağlar (timestamps dahil).
  */
 function buildActivity(b) {
   const items = [];
 
-  // 1) Mevcut durum (en yeni, üstte)
+  // ─── Mevcut durum (en yeni, üstte) ───
   const durumLabel = {
     yeni:        "⏳ Sırada",
     calisiliyor: "🎨 Çalışılıyor",
@@ -345,52 +415,59 @@ function buildActivity(b) {
     tamamlandi:  "✅ Tamamlandı",
   };
   if (durumLabel[b.durum]) {
+    const tail = b.notes && b.notes.length < 120 ? b.notes : '';
     items.push({
       when: b.durum === "tamamlandi" && b.bitis ? formatRel(b.bitis) : "şimdi",
       who:  "",
       verb: durumLabel[b.durum],
-      tail: b.notes && b.notes.length < 80 ? b.notes : "",
+      tail,
     });
   }
 
-  // 2) STALE / Geçmiş işareti
-  if (b.stale) {
-    items.push({ when: "", who: "", verb: "🚨 STALE", tail: "uzun süre pasif" });
-  }
+  // ─── Acil uyarılar ───
+  if (b.stale) items.push({ when: "", who: "", verb: "🚨 STALE", tail: "uzun süre pasif" });
   if (b.deltaH !== undefined && b.deltaH <= 0) {
     items.push({ when: "", who: "", verb: "⏰ Deadline geçti", tail: "" });
   }
 
-  // 3) Revize
-  if (b.revision && b.revision > 0) {
-    items.push({
-      when: "", who: "",
-      verb: `🔁 Revize ×${b.revision}`,
-      tail: "",
-    });
+  // ─── Canvas Geçmiş kolonu (Görkem'in skill'inin yazdığı timeline) ───
+  // Bu en zengin event kaynağı: gerçek timestamp + her durum değişimi
+  const gecmisEvents = parseGecmisString(b.gecmis);
+  if (gecmisEvents.length > 0) {
+    // En yeni en üstte sırala
+    gecmisEvents.sort((a, b) => b.ts - a.ts);
+    for (const ev of gecmisEvents) {
+      items.push({
+        when: `${ev.day} ${["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][ev.mon]} ${ev.time}`,
+        who:  "",
+        verb: ev.label,
+        tail: ev.context && ev.context.length < 80 ? ev.context : "",
+      });
+    }
+  } else {
+    // ─── Geçmiş yoksa fallback — brief field'larından çıkarım ───
+    if (b.revision && b.revision > 0) {
+      items.push({ when: "", who: "", verb: `🔁 Revize ×${b.revision}`, tail: "" });
+    }
+    if (b.reviewer) {
+      items.push({
+        when: "", who: b.lead?.name?.split(" ")[0] || "",
+        verb: "inceleyici atadı",
+        tail: b.reviewer.name,
+      });
+    }
+    const contribs = (b.contributors || []).filter(Boolean);
+    if (contribs.length > 0) {
+      items.push({
+        when: "",
+        who:  b.lead?.name?.split(" ")[0] || "",
+        verb: "atadı",
+        tail: contribs.map(c => c.name?.split(" ")[0] || c.name).join(", "),
+      });
+    }
   }
 
-  // 4) İnceleyici
-  if (b.reviewer) {
-    items.push({
-      when: "", who: b.lead?.name?.split(" ")[0] || "",
-      verb: "inceleyici atadı",
-      tail: b.reviewer.name,
-    });
-  }
-
-  // 5) Atananlar
-  const contribs = (b.contributors || []).filter(Boolean);
-  if (contribs.length > 0) {
-    items.push({
-      when: "",
-      who:  b.lead?.name?.split(" ")[0] || "",
-      verb: "atadı",
-      tail: contribs.map(c => c.name?.split(" ")[0] || c.name).join(", "),
-    });
-  }
-
-  // 6) Brief açıldı (en eski, altta)
+  // ─── Brief açıldı (en eski, altta) — her zaman gösterilir ───
   items.push({
     when: formatRel(b.acilma),
     who:  b.lead?.name?.split(" ")[0] || "Bilinmiyor",
