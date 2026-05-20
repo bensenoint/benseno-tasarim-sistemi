@@ -1,6 +1,6 @@
 {
-  "now": "2026-05-20T10:06:57.938Z",
-  "last_sync": "2026-05-20T10:06:57.938Z",
+  "now": "2026-05-20T10:12:13.951Z",
+  "last_sync": "2026-05-20T10:12:13.951Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
@@ -25,7 +25,7 @@
       "revision": 1,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · Melis 17:26 \"İletiyorum\" → bakanlık onayı bekleniyor · son aktivite 1g 16sa 50dk önce) · <@U08NQJ27G5S>",
+      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · son aktivite 1g 19sa 25dk önce) · <@U08NQJ27G5S>",
       "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22",
       "_oncelik": "\ud83d"
     },
@@ -34,8 +34,9 @@
       "no": 2,
       "marka": "Hasvet",
       "baslik": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
-      "leadId": "U4XCE3532",
+      "leadId": "U0AK8U7L57F",
       "contribIds": [
+        "U4XCE3532",
         "U055EDESLSE",
         "U02SZQDAFPF",
         "U030C48PL23",
@@ -45,12 +46,12 @@
       "reviewerId": "U08NQJ27G5S",
       "acilma": "2026-05-18T11:39:29.515+00:00",
       "deadline": "2026-05-21T16:00:00+03:00",
-      "durum": "yeni",
+      "durum": "tamamlandi",
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C081GAK936J/p1779104369515529",
-      "notes": "⏳ Sırada (tasarımcı atanmadı — İpek dispatch bekleniyor · sabah aksiyon DM'sinde öncelikli) · <@U08NQJ27G5S>",
-      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡",
+      "notes": "🎨 Dispatch tamamlandı (İpek 10:22 → İrem 10:35 ✅ kabul · İrem JnJ bitince başlayacak) · <@U08NQJ27G5S>",
+      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡→↪️20May10:22 İpek dispatch İrem→✅20May10:35 İrem kabul",
       "_oncelik": "\ud83d"
     },
     {
@@ -69,8 +70,8 @@
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 26sa 2dk pasif · ⏰ deadline kaçtı · eskalasyon DM 145dk cevapsız) · <@U030C48PL23>",
-      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00",
+      "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 28sa 37dk pasif · ⏰ deadline kaçtı · eskalasyon DM 5sa cevapsız · YÖNETİCİ MÜDAHALESİ ŞART) · <@U030C48PL23>",
+      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (2sa 51dk geride)",
       "_oncelik": "\ud83d"
     },
     {
@@ -89,7 +90,7 @@
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM gönderildi, cevap yok · 26sa pasif · İpek dispatch bekleniyor) · <@U030C48PL23>",
+      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM ~28sa cevapsız · İpek dispatch bekleniyor — Serhat müsait, İrem Hasvet'te) · <@U030C48PL23>",
       "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini)",
       "_oncelik": "\ud83d"
     },
@@ -107,13 +108,31 @@
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-      "notes": "⏳ Yeni açıldı (Eren self-assign · sabah günaydın DM'sinde başlama hatırlatması) · <@U0AP31SAA1W>",
+      "notes": "⏳ Yeni açıldı (Eren self-assign · sabah hatırlatma DM gönderildi · Eren bugün Bauhaus 20 May İçerik thread'inde aktif) · <@U0AP31SAA1W>",
       "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign)",
       "_oncelik": "\ud83d"
     },
     {
-      "id": "br_queue_1779264440453199",
+      "id": "br_live_1779266016085909",
       "no": 6,
+      "marka": "Bauhaus",
+      "baslik": "🆕 20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "leadId": "U09BFPBKQG7",
+      "contribIds": [],
+      "reviewerId": "U09BZHR25NG",
+      "acilma": "2026-05-20T08:33:36.085+00:00",
+      "deadline": "2026-05-20T18:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
+      "notes": "⏳ Yeni açıldı (1sa 18dk önce · thread aktif: Eda T → Görkem → Eren \"kontrol ediyorum\" · Arda henüz 🎨 vermedi · İlk post hazır, diğer tarihlerde düzeltme yapacak) · <@U09BZHR25NG>",
+      "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [5sa 9dk≤8sa])",
+      "_oncelik": "\ud83d"
+    },
+    {
+      "id": "br_queue_1779264440453199",
+      "no": 7,
       "marka": "Vdm Petdent",
       "brand": {
         "name": "Vdm Petdent",
@@ -136,34 +155,6 @@
       "gecmis": "",
       "_from_queue": true,
       "_kimden_id": "U0AP31SAA1W"
-    },
-    {
-      "id": "br_queue_1779266016085909",
-      "no": 7,
-      "marka": "Bauhaus",
-      "brand": {
-        "name": "Bauhaus",
-        "color": "#00786F",
-        "wheelIdx": 13,
-        "channel_id": "C4Y43AW2E",
-        "channel_name": "marka-bauhaus"
-      },
-      "baslik": "BAUHAUS / 20 Mayıs İçerik",
-      "leadId": "U09BZHR25NG",
-      "contribIds": [
-        "U09BFPBKQG7"
-      ],
-      "reviewerId": null,
-      "acilma": "2026-05-20T08:33:36.085+00:00",
-      "deadline": "2026-05-20T18:00:00+03:00",
-      "durum": "yeni",
-      "revision": 0,
-      "stale": false,
-      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "notes": "Sosyal Medya Post · Video içerik",
-      "gecmis": "",
-      "_from_queue": true,
-      "_kimden_id": "U09BZHR25NG"
     },
     {
       "id": "br_queue_1779266803180509",
@@ -673,9 +664,9 @@
     "tasarim": {
       "name": "Tasarım",
       "people": 7,
-      "active": 4,
+      "active": 5,
       "overdue": 2,
-      "capacity": 29,
+      "capacity": 36,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -683,9 +674,9 @@
     "editor": {
       "name": "Editör",
       "people": 8,
-      "active": 3,
+      "active": 2,
       "overdue": 0,
-      "capacity": 19,
+      "capacity": 13,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
