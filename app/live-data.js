@@ -4,10 +4,10 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T09:06:18.014Z",
-  "last_sync": "2026-05-20T09:06:18.014Z",
+  "now": "2026-05-20T09:11:25.868Z",
+  "last_sync": "2026-05-20T09:11:25.868Z",
   "source": "work-tracking-bot",
-  "reason": "interval",
+  "reason": "startup",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -31,6 +31,7 @@ window.EMBEDDED_DATA = {
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
       "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · Melis 17:26 \"İletiyorum\" → bakanlık onayı bekleniyor · son aktivite 1g 16sa 50dk önce) · <@U08NQJ27G5S>",
+      "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22",
       "_oncelik": "\ud83d"
     },
     {
@@ -54,6 +55,7 @@ window.EMBEDDED_DATA = {
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C081GAK936J/p1779104369515529",
       "notes": "⏳ Sırada (tasarımcı atanmadı — İpek dispatch bekleniyor · sabah aksiyon DM'sinde öncelikli) · <@U08NQJ27G5S>",
+      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡",
       "_oncelik": "\ud83d"
     },
     {
@@ -73,6 +75,7 @@ window.EMBEDDED_DATA = {
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
       "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 26sa 2dk pasif · ⏰ deadline kaçtı · eskalasyon DM 145dk cevapsız) · <@U030C48PL23>",
+      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00",
       "_oncelik": "\ud83d"
     },
     {
@@ -92,6 +95,7 @@ window.EMBEDDED_DATA = {
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
       "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM gönderildi, cevap yok · 26sa pasif · İpek dispatch bekleniyor) · <@U030C48PL23>",
+      "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini)",
       "_oncelik": "\ud83d"
     },
     {
@@ -109,6 +113,7 @@ window.EMBEDDED_DATA = {
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
       "notes": "⏳ Yeni açıldı (Eren self-assign · sabah günaydın DM'sinde başlama hatırlatması) · <@U0AP31SAA1W>",
+      "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign)",
       "_oncelik": "\ud83d"
     },
     {
