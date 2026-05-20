@@ -1,7 +1,8 @@
 // app/screens/Manager.jsx — komuta merkezi for 5 yöneticiler.
 
 function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange }) {
-  const briefs = data.briefs;
+  // Yönetici komuta merkezi tüm sistemi izler — viewMode (mine/dept/all) etkilemez.
+  const briefs = data._allBriefs || data.briefs;
   const overdue = briefs.filter(b => b.deltaH <= 0);
   const review  = briefs.filter(b => b.durum === "incelemede");
   const blocked = briefs.filter(b => b.durum === "blokeli");

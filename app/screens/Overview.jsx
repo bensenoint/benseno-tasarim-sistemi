@@ -2,24 +2,8 @@
 // Variants: "editorial" (default) | "dense" | "story"
 
 function OverviewScreen({ data, user, viewMode, onOpenBrief, onSwitchTab, layout = "editorial", kpiVariant = "plain" }) {
-  // viewMode kapsam filtresi:
-  //   "mine" → sadece kullanıcının lead/contributor/reviewer olduğu briefler
-  //   "dept" → aynı departmandaki herhangi birinin briefler
-  //   "all"  → tüm briefler
-  let active = data.briefs;
-  if (viewMode === "mine" && user) {
-    active = active.filter(b =>
-      (b.lead && b.lead.id === user.id) ||
-      (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === user.id)) ||
-      (b.reviewer && b.reviewer.id === user.id)
-    );
-  } else if (viewMode === "dept" && user) {
-    active = active.filter(b =>
-      (b.lead && b.lead.rol === user.rol) ||
-      (Array.isArray(b.contributors) && b.contributors.some(c => c && c.rol === user.rol)) ||
-      (b.reviewer && b.reviewer.rol === user.rol)
-    );
-  }
+  // viewMode filtresi App.jsx'te merkezi olarak uygulanıyor — data.briefs zaten filtered.
+  const active = data.briefs;
 
   const overdue = active.filter(b => b.deltaH <= 0);
   const today = active.filter(b => b.deltaH > 0 && b.deltaH <= 24);

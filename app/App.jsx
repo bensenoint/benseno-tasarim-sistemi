@@ -26,8 +26,34 @@ function App() {
   const [newBrief, setNewBrief] = React.useState(false);
   const [toast, setToast] = React.useState(null);
 
-  // Live data shape
-  const liveData = { ...data, briefs };
+  // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
+  // Bana / Departman / Tümü filtresi briefs ve completed'a uygulanır,
+  // böylece her sekme (Kanban/Plan/Tamamlananlar/Marka/Profil/...) viewMode'a
+  // göre otomatik filtrelenir. Screen'ler kendi filter mantığını yapmaz.
+  const filterByViewMode = React.useCallback((items) => {
+    if (!Array.isArray(items)) return items;
+    if (viewMode === "mine" && user) {
+      return items.filter(b =>
+        (b.lead && b.lead.id === user.id) ||
+        (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === user.id)) ||
+        (b.reviewer && b.reviewer.id === user.id)
+      );
+    }
+    if (viewMode === "dept" && user) {
+      return items.filter(b =>
+        (b.lead && b.lead.rol === user.rol) ||
+        (Array.isArray(b.contributors) && b.contributors.some(c => c && c.rol === user.rol)) ||
+        (b.reviewer && b.reviewer.rol === user.rol)
+      );
+    }
+    return items;
+  }, [viewMode, user]);
+
+  const filteredBriefs    = React.useMemo(() => filterByViewMode(briefs),         [filterByViewMode, briefs]);
+  const filteredCompleted = React.useMemo(() => filterByViewMode(data.completed), [filterByViewMode, data.completed, briefs]);
+
+  // Live data shape — briefs ve completed artık filtered (viewMode'a göre)
+  const liveData = { ...data, briefs: filteredBriefs, completed: filteredCompleted, _allBriefs: briefs, _allCompleted: data.completed };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
   React.useEffect(() => { document.documentElement.setAttribute("data-theme", t.theme); }, [t.theme]);

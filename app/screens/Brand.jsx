@@ -14,9 +14,11 @@ function BrandScreen({ data, onOpenBrief }) {
     return b[sort] - a[sort];
   });
 
-  const totalActive = data.briefs.length;
+  // Marka istatistikleri tüm sistem briefler'inden hesaplanır — viewMode etkilemez.
+  const allBriefs = data._allBriefs || data.briefs;
+  const totalActive = allBriefs.length;
   const busiest = [...data.brandStats].sort((a,b) => b.active - a.active)[0];
-  const avg = (totalActive / data.brandStats.length).toFixed(1);
+  const avg = (totalActive / Math.max(1, data.brandStats.length)).toFixed(1);
 
   return (
     <div className="bn-tab-in">
