@@ -1,6 +1,6 @@
 {
-  "now": "2026-05-20T06:57:26.226Z",
-  "last_sync": "2026-05-20T06:57:26.226Z",
+  "now": "2026-05-20T07:02:26.245Z",
+  "last_sync": "2026-05-20T07:02:26.245Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
@@ -559,7 +559,7 @@
       "name": "Tasarım",
       "people": 7,
       "active": 4,
-      "overdue": 1,
+      "overdue": 2,
       "capacity": 29,
       "completed30": 0,
       "avgComplete": null,
@@ -595,9 +595,9 @@
       "channel_name": "marka-bauhaus",
       "active": 3,
       "done30": 0,
-      "overdue": 0,
+      "overdue": 1,
       "stale": true,
-      "problem_label": "STALE 🔴"
+      "problem_label": "1 geciken"
     },
     {
       "name": "Beta",
