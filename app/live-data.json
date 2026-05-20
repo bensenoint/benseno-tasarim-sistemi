@@ -1,6 +1,6 @@
 {
-  "now": "2026-05-20T11:35:13.085Z",
-  "last_sync": "2026-05-20T11:35:13.085Z",
+  "now": "2026-05-20T11:44:29.764Z",
+  "last_sync": "2026-05-20T11:44:29.764Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
@@ -25,7 +25,7 @@
       "revision": 1,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · son aktivite 1g 20sa 20dk önce) · <@U08NQJ27G5S>",
+      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · son aktivite 1g 20sa 49dk önce) · <@U08NQJ27G5S>",
       "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22",
       "_oncelik": "\ud83d"
     },
@@ -70,8 +70,8 @@
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 29sa 32dk pasif · ⏰ deadline kaçtı · eskalasyon DM ~6sa cevapsız · YÖNETİCİ MÜDAHALESİ ŞART) · <@U030C48PL23>",
-      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (3sa 46dk geride)",
+      "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 30sa 1dk pasif · ⏰ deadline kaçtı · eskalasyon DM ~6.5sa cevapsız · YÖNETİCİ MÜDAHALESİ ŞART) · <@U030C48PL23>",
+      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (4sa 15dk geride)",
       "_oncelik": "\ud83d"
     },
     {
@@ -90,7 +90,7 @@
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM ~28.5sa cevapsız · İpek dispatch bekleniyor — Serhat müsait, İrem Hasvet'te · 🟠 Yüksek, kapasite kararı acil) · <@U030C48PL23>",
+      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM ~29sa cevapsız · İpek dispatch bekleniyor — Serhat müsait, İrem Hasvet'te · 🟠 Yüksek, kapasite kararı acil) · <@U030C48PL23>",
       "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini) / 📈20May13:17 öncelik 🟡→🟠 (auto-recalc · 23sa 43dk ≤24sa)",
       "_oncelik": "\ud83d"
     },
@@ -108,7 +108,7 @@
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-      "notes": "⏳ Yeni açıldı (Eren self-assign · sabah hatırlatma DM gönderildi · Eren bugün Bauhaus 20 May İçerik thread'inde aktif · 🟡→🟠 transition tetiklendi) · <@U0AP31SAA1W>",
+      "notes": "⏳ Yeni açıldı (Eren self-assign · sabah hatırlatma DM gönderildi · Eren bugün Bauhaus 20 May İçerik thread'inde aktif · VDM iki brief de bugün açıldı) · <@U0AP31SAA1W>",
       "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 (auto-recalc · 23sa 56dk ≤24sa)",
       "_oncelik": "\ud83d"
     },
@@ -126,8 +126,8 @@
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "notes": "⏳ Yeni açıldı (2sa 13dk önce · thread aktif: Eda T → Görkem → Eren \"kontrol ediyorum\" · Arda henüz 🎨 vermedi · İlk post hazır, diğer tarihlerde düzeltme yapacak) · <@U09BZHR25NG>",
-      "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [4sa 14dk≤8sa])",
+      "notes": "⏳ Yeni açıldı (2sa 42dk önce · thread aktif: Eda T → Görkem → Eren \"kontrol ediyorum\" · Arda henüz 🎨 vermedi · İlk post hazır, diğer tarihlerde düzeltme yapacak) · <@U09BZHR25NG>",
+      "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [3sa 45dk≤8sa])",
       "_oncelik": "\ud83d"
     },
     {
@@ -152,7 +152,7 @@
       "id": "br_live_1779272694698569",
       "no": 8,
       "marka": "VDM Petdent",
-      "baslik": "🆕 GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "baslik": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
       "leadId": "U09BFPBKQG7",
       "contribIds": [],
       "reviewerId": "U0AP31SAA1W",
@@ -162,13 +162,31 @@
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569",
-      "notes": "⏳ Yeni açıldı (Eren 13:24 TR · workflow · Arda tek atanan · 22 dk önce · queue'da 22dk bekledi · Tip \"Veri analizi\" — AI tarzı iş ama Tasarım'a atanmış · Cansu/İpek dikkat) · <@U0AP31SAA1W>",
+      "notes": "⏳ Yeni açıldı (Eren 13:24 TR · workflow · Arda tek atanan · 51 dk önce · cross-dept — AI tarzı iş ama Tasarım'a atanmış · Cansu/İpek dikkat) · <@U0AP31SAA1W>",
       "gecmis": "⏳20May13:24 (Eren AI açtı · workflow · 🔔 otomatik 🟠 [23sa 38dk≤24sa])",
       "_oncelik": "\ud83d"
     },
     {
-      "id": "br_queue_1779266803180509",
+      "id": "br_live_1779275121721279",
       "no": 9,
+      "marka": "VDM Petdent",
+      "baslik": "🆕 Whatsapp Business Kurulumu (Otomasyon · Eren self-assign · bugünün 2. VDM brief'i)",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [],
+      "reviewerId": "U0AP31SAA1W",
+      "acilma": "2026-05-20T11:05:21.721+00:00",
+      "deadline": "2026-05-22T23:59:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
+      "notes": "⏳ Yeni açıldı (Eren 14:05 TR · workflow · self-assign · 10 dk önce · queue'da 10dk bekledi · bugünün 2. VDM brief'i) · <@U0AP31SAA1W>",
+      "gecmis": "⏳20May14:05 (Eren AI açtı · workflow · self-assign · 🔔 otomatik 🟡 [~58sa≤72sa])",
+      "_oncelik": "\ud83d"
+    },
+    {
+      "id": "br_queue_1779266803180509",
+      "no": 10,
       "marka": "KMR Serve",
       "brand": {
         "name": "KMR Serve",
@@ -196,7 +214,7 @@
     },
     {
       "id": "br_queue_1779271340778199",
-      "no": 10,
+      "no": 11,
       "marka": "KZY Everclean",
       "brand": {
         "name": "KZY Everclean",
@@ -224,7 +242,7 @@
     },
     {
       "id": "br_queue_1779275673657199",
-      "no": 11,
+      "no": 12,
       "marka": "Cureffect",
       "brand": {
         "name": "Cureffect",
@@ -723,9 +741,9 @@
     "ai": {
       "name": "AI",
       "people": 1,
-      "active": 1,
+      "active": 2,
       "overdue": 0,
-      "capacity": 50,
+      "capacity": 100,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
