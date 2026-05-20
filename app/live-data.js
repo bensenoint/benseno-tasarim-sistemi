@@ -4,8 +4,8 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T08:45:44.245Z",
-  "last_sync": "2026-05-20T08:45:44.245Z",
+  "now": "2026-05-20T08:47:20.615Z",
+  "last_sync": "2026-05-20T08:47:20.615Z",
   "source": "work-tracking-bot",
   "reason": "startup",
   "bns_briefs": [
@@ -148,7 +148,7 @@ window.EMBEDDED_DATA = {
         "channel_name": "marka-bauhaus"
       },
       "baslik": "BAUHAUS / 20 Mayıs İçerik",
-      "leadId": "U09BZHR25NG",
+      "leadId": "U09BFPBKQG7",
       "contribIds": [],
       "reviewerId": null,
       "acilma": "2026-05-20T08:33:36.085+00:00",
@@ -160,6 +160,31 @@ window.EMBEDDED_DATA = {
       "notes": "⏳ Yeni · Canvas'a henüz işlenmedi (bot queue'sundan)",
       "_from_queue": true,
       "_kimden_id": "U09BZHR25NG"
+    },
+    {
+      "id": "br_queue_1779266803180509",
+      "no": 8,
+      "marka": "KMR Serve",
+      "brand": {
+        "name": "KMR Serve",
+        "color": "#F28E2B",
+        "wheelIdx": 1,
+        "channel_id": "C03M070G8HY",
+        "channel_name": "marka-kmr-serve"
+      },
+      "baslik": "Serve | Mayıs SM Planı 26'",
+      "leadId": "U06J26R1XCJ",
+      "contribIds": [],
+      "reviewerId": null,
+      "acilma": "2026-05-20T08:46:43.180+00:00",
+      "deadline": "2026-05-31T17:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C03M070G8HY/p1779266803180509",
+      "notes": "⏳ Yeni · Canvas'a henüz işlenmedi (bot queue'sundan)",
+      "_from_queue": true,
+      "_kimden_id": "U063T8M5HL4"
     }
   ],
   "bns_completed": [
@@ -613,9 +638,9 @@ window.EMBEDDED_DATA = {
     "tasarim": {
       "name": "Tasarım",
       "people": 7,
-      "active": 4,
+      "active": 6,
       "overdue": 2,
-      "capacity": 29,
+      "capacity": 43,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -623,9 +648,9 @@ window.EMBEDDED_DATA = {
     "editor": {
       "name": "Editör",
       "people": 8,
-      "active": 1,
+      "active": 0,
       "overdue": 0,
-      "capacity": 6,
+      "capacity": 0,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -900,7 +925,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 1,
       "channel_id": "C03M070G8HY",
       "channel_name": "marka-kmr-serve",
-      "active": 0,
+      "active": 1,
       "done30": 0,
       "overdue": 0,
       "stale": false,
