@@ -4,10 +4,10 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T07:44:51.116Z",
-  "last_sync": "2026-05-20T07:44:51.116Z",
+  "now": "2026-05-20T07:48:36.235Z",
+  "last_sync": "2026-05-20T07:48:36.235Z",
   "source": "work-tracking-bot",
-  "reason": "interval",
+  "reason": "startup",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -110,6 +110,31 @@ window.EMBEDDED_DATA = {
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
       "notes": "⏳ Yeni açıldı (Eren self-assign · sabah günaydın DM'sinde başlama hatırlatması) · <@U0AP31SAA1W>",
       "_oncelik": "\ud83d"
+    },
+    {
+      "id": "br_queue_1779261843022099",
+      "no": 6,
+      "marka": "Vdm Petdent",
+      "brand": {
+        "name": "Vdm Petdent",
+        "color": "#6A8E3D",
+        "wheelIdx": 11,
+        "channel_id": "C0AQLPY4TUM",
+        "channel_name": "marka-vdm-petdent"
+      },
+      "baslik": "GA4 Analiz",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [],
+      "reviewerId": null,
+      "acilma": "2026-05-20T07:24:03.022+00:00",
+      "deadline": null,
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779261843022099",
+      "notes": "⏳ Yeni · Canvas'a henüz işlenmedi (bot queue'sundan)",
+      "_from_queue": true,
+      "_kimden_id": "U0AP31SAA1W"
     }
   ],
   "bns_completed": [
@@ -583,9 +608,9 @@ window.EMBEDDED_DATA = {
     "ai": {
       "name": "AI",
       "people": 1,
-      "active": 1,
+      "active": 2,
       "overdue": 0,
-      "capacity": 50,
+      "capacity": 100,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -1030,7 +1055,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 11,
       "channel_id": "C0AQLPY4TUM",
       "channel_name": "marka-vdm-petdent",
-      "active": 0,
+      "active": 1,
       "done30": 0,
       "overdue": 0,
       "stale": false,
