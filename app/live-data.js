@@ -4,8 +4,8 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T08:29:17.457Z",
-  "last_sync": "2026-05-20T08:29:17.457Z",
+  "now": "2026-05-20T08:34:17.683Z",
+  "last_sync": "2026-05-20T08:34:17.683Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
@@ -135,6 +135,31 @@ window.EMBEDDED_DATA = {
       "notes": "⏳ Yeni · Canvas'a henüz işlenmedi (bot queue'sundan)",
       "_from_queue": true,
       "_kimden_id": "U0AP31SAA1W"
+    },
+    {
+      "id": "br_queue_1779266016085909",
+      "no": 7,
+      "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
+      "baslik": "BAUHAUS / 20 Mayıs İçerik",
+      "leadId": "U09BZHR25NG",
+      "contribIds": [],
+      "reviewerId": null,
+      "acilma": "2026-05-20T08:33:36.085+00:00",
+      "deadline": "2026-05-20T18:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
+      "notes": "⏳ Yeni · Canvas'a henüz işlenmedi (bot queue'sundan)",
+      "_from_queue": true,
+      "_kimden_id": "U09BZHR25NG"
     }
   ],
   "bns_completed": [
@@ -598,9 +623,9 @@ window.EMBEDDED_DATA = {
     "editor": {
       "name": "Editör",
       "people": 8,
-      "active": 0,
+      "active": 1,
       "overdue": 0,
-      "capacity": 0,
+      "capacity": 6,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -623,7 +648,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 13,
       "channel_id": "C4Y43AW2E",
       "channel_name": "marka-bauhaus",
-      "active": 3,
+      "active": 4,
       "done30": 0,
       "overdue": 1,
       "stale": true,
