@@ -109,10 +109,9 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers }) {
 
           <Eyebrow>Aktivite</Eyebrow>
           <div style={{display:"flex", flexDirection:"column", gap: 0, marginTop: 8}}>
-            <Tick when="14:18" who="Aylin" verb="durumu değiştirdi" tail="çalışılıyor → incelemede"/>
-            <Tick when="13:02" who="Aykut" verb="rev push" tail="rev 02"/>
-            <Tick when="11:45" who="İpek" verb="atadı" tail="reviewer olarak"/>
-            <Tick when="dün"   who="Görkem" verb="açtı" tail="brief oluşturuldu" last/>
+            {buildActivity(b).map((it, i, arr) => (
+              <Tick key={i} when={it.when} who={it.who} verb={it.verb} tail={it.tail} last={i === arr.length - 1}/>
+            ))}
           </div>
 
           <Hr/>
@@ -305,6 +304,101 @@ function formatFull(ts) {
   const d = new Date(ts);
   const months = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+
+// Bir zaman damgasını "5dk önce" / "dün 14:30" / "12 May" gibi göreceli format'a çevirir.
+function formatRel(ts) {
+  if (!ts) return "—";
+  const d = new Date(ts);
+  if (isNaN(d.getTime())) return "—";
+  const now = Date.now();
+  const diffMs = now - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffH   = Math.floor(diffMs / 3600000);
+  const diffD   = Math.floor(diffMs / 86400000);
+  if (diffMin < 1) return "şimdi";
+  if (diffMin < 60) return `${diffMin}dk`;
+  if (diffH < 24) {
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
+  }
+  if (diffD === 1) return "dün";
+  if (diffD < 7) return `${diffD}g önce`;
+  const months = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+  return `${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+/**
+ * Brief'in kendi verisinden gerçek aktivite akışı üretir.
+ * En yeni en üstte (descending), brief açılışı en altta.
+ */
+function buildActivity(b) {
+  const items = [];
+
+  // 1) Mevcut durum (en yeni, üstte)
+  const durumLabel = {
+    yeni:        "⏳ Sırada",
+    calisiliyor: "🎨 Çalışılıyor",
+    incelemede:  "👀 İncelemede",
+    blokeli:     "⛔ Blokeli",
+    tamamlandi:  "✅ Tamamlandı",
+  };
+  if (durumLabel[b.durum]) {
+    items.push({
+      when: b.durum === "tamamlandi" && b.bitis ? formatRel(b.bitis) : "şimdi",
+      who:  "",
+      verb: durumLabel[b.durum],
+      tail: b.notes && b.notes.length < 80 ? b.notes : "",
+    });
+  }
+
+  // 2) STALE / Geçmiş işareti
+  if (b.stale) {
+    items.push({ when: "", who: "", verb: "🚨 STALE", tail: "uzun süre pasif" });
+  }
+  if (b.deltaH !== undefined && b.deltaH <= 0) {
+    items.push({ when: "", who: "", verb: "⏰ Deadline geçti", tail: "" });
+  }
+
+  // 3) Revize
+  if (b.revision && b.revision > 0) {
+    items.push({
+      when: "", who: "",
+      verb: `🔁 Revize ×${b.revision}`,
+      tail: "",
+    });
+  }
+
+  // 4) İnceleyici
+  if (b.reviewer) {
+    items.push({
+      when: "", who: b.lead?.name?.split(" ")[0] || "",
+      verb: "inceleyici atadı",
+      tail: b.reviewer.name,
+    });
+  }
+
+  // 5) Atananlar
+  const contribs = (b.contributors || []).filter(Boolean);
+  if (contribs.length > 0) {
+    items.push({
+      when: "",
+      who:  b.lead?.name?.split(" ")[0] || "",
+      verb: "atadı",
+      tail: contribs.map(c => c.name?.split(" ")[0] || c.name).join(", "),
+    });
+  }
+
+  // 6) Brief açıldı (en eski, altta)
+  items.push({
+    when: formatRel(b.acilma),
+    who:  b.lead?.name?.split(" ")[0] || "Bilinmiyor",
+    verb: "açtı",
+    tail: "brief oluşturuldu",
+  });
+
+  return items;
 }
 
 window.BriefDrawer = BriefDrawer;

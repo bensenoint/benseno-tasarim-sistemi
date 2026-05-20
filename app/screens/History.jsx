@@ -4,16 +4,26 @@ function HistoryScreen({ data }) {
   const [filter, setFilter] = React.useState("all");
   // Expand: combine activity + synthesize more from briefs/completed
   const extras = [];
-  data.briefs.slice(0, 20).forEach((b, i) => {
+  // YENİ SEMANTİK:
+  //   "açıldı" eylemini brief'i AÇAN kişiye (b.lead → eski Cowork lead = açan) atfet.
+  //   "tamamlandı" eylemini gerçek tamamlayana (ilk atanan, varsa) atfet.
+  data.briefs.slice(0, 20).forEach((b) => {
+    const acan = b.lead || (b.leadId ? { id: b.leadId } : null);
+    if (!acan) return;
     extras.push({
-      t: b.acilma + i * 3600 * 1000, who: b.lead.id, verb: "açıldı", target: b.baslik,
+      t: typeof b.acilma === 'string' ? Date.parse(b.acilma) : b.acilma,
+      who: acan.id, verb: "açtı", target: b.baslik,
       brand: b.brand, _type: "open"
     });
   });
-  data.completed.slice(0, 12).forEach((c, i) => {
+  data.completed.slice(0, 12).forEach((c) => {
+    const tamamlayan = (c.contributors && c.contributors[0]) || c.lead;
+    if (!tamamlayan) return;
     extras.push({
-      t: c.bitis, who: c.lead.id, verb: "tamamlandı", target: c.baslik,
-      brand: c.brand, meta: c.sure + " sa", _type: "done"
+      t: typeof c.bitis === 'string' ? Date.parse(c.bitis) : c.bitis,
+      who: tamamlayan.id, verb: "tamamladı", target: c.baslik,
+      brand: c.brand, meta: c.sureH ? c.sureH.toFixed(1) + " sa" : "",
+      _type: "done"
     });
   });
   let all = [
