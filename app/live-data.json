@@ -1,8 +1,8 @@
 {
-  "now": "2026-05-20T13:21:10.099Z",
-  "last_sync": "2026-05-20T13:21:10.099Z",
+  "now": "2026-05-20T13:26:34.217Z",
+  "last_sync": "2026-05-20T13:26:34.217Z",
   "source": "work-tracking-bot",
-  "reason": "startup",
+  "reason": "interval",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
