@@ -4,10 +4,10 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T07:39:26.109Z",
-  "last_sync": "2026-05-20T07:39:26.109Z",
+  "now": "2026-05-20T07:44:51.116Z",
+  "last_sync": "2026-05-20T07:44:51.116Z",
   "source": "work-tracking-bot",
-  "reason": "startup",
+  "reason": "interval",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -30,7 +30,7 @@ window.EMBEDDED_DATA = {
       "revision": 1,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · Melis 17:26 \"İletiyorum\" → bakanlık onayı bekleniyor · son aktivite 1g 15sa 52dk önce) · <@U08NQJ27G5S>",
+      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · Melis 17:26 \"İletiyorum\" → bakanlık onayı bekleniyor · son aktivite 1g 16sa 50dk önce) · <@U08NQJ27G5S>",
       "_oncelik": "\ud83d"
     },
     {
@@ -72,7 +72,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "notes": "⏳ Sırada (Aykut başlamayı bekliyor · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 25sa 4dk pasif · sabah eskalasyon DM cevapsız) · <@U030C48PL23>",
+      "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 26sa 2dk pasif · ⏰ deadline kaçtı · eskalasyon DM 145dk cevapsız) · <@U030C48PL23>",
       "_oncelik": "\ud83d"
     },
     {
@@ -91,7 +91,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM gönderildi, cevap yok · 25sa pasif · İpek dispatch bekleniyor) · <@U030C48PL23>",
+      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM gönderildi, cevap yok · 26sa pasif · İpek dispatch bekleniyor) · <@U030C48PL23>",
       "_oncelik": "\ud83d"
     },
     {
