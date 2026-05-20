@@ -4,8 +4,8 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T10:01:47.871Z",
-  "last_sync": "2026-05-20T10:01:47.871Z",
+  "now": "2026-05-20T10:06:57.938Z",
+  "last_sync": "2026-05-20T10:06:57.938Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
@@ -197,6 +197,34 @@ window.EMBEDDED_DATA = {
       "gecmis": "",
       "_from_queue": true,
       "_kimden_id": "U063T8M5HL4"
+    },
+    {
+      "id": "br_queue_1779271340778199",
+      "no": 9,
+      "marka": "KZY Everclean",
+      "brand": {
+        "name": "KZY Everclean",
+        "color": "#E15759",
+        "wheelIdx": 5,
+        "channel_id": "C01EJSS20K0",
+        "channel_name": "marka-kzy-everclean"
+      },
+      "baslik": "Ever Clean - Ekranda Yayınlanacak Video",
+      "leadId": "U05PP70GQTX",
+      "contribIds": [
+        "U08HLMHTGEL"
+      ],
+      "reviewerId": null,
+      "acilma": "2026-05-20T10:02:20.778+00:00",
+      "deadline": "2026-05-21T17:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C01EJSS20K0/p1779271340778199",
+      "notes": "Video",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U05PP70GQTX"
     }
   ],
   "bns_completed": [
@@ -660,9 +688,9 @@ window.EMBEDDED_DATA = {
     "editor": {
       "name": "Editör",
       "people": 8,
-      "active": 2,
+      "active": 3,
       "overdue": 0,
-      "capacity": 13,
+      "capacity": 19,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -985,7 +1013,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 5,
       "channel_id": "C01EJSS20K0",
       "channel_name": "marka-kzy-everclean",
-      "active": 0,
+      "active": 1,
       "done30": 0,
       "overdue": 0,
       "stale": false,
