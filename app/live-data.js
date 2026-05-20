@@ -4,8 +4,8 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T10:33:43.768Z",
-  "last_sync": "2026-05-20T10:33:43.768Z",
+  "now": "2026-05-20T10:39:13.765Z",
+  "last_sync": "2026-05-20T10:39:13.765Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
@@ -277,6 +277,13 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 5,
       "channel_id": "C081GAK936J",
       "channel_name": "marka-hasvet"
+    },
+    {
+      "name": "İş Takip Test",
+      "color": "#8E5BA1",
+      "wheelIdx": 12,
+      "channel_id": "C0B4ULSMPNF",
+      "channel_name": "iştakip-app-deneme"
     },
     {
       "name": "JNJ",
@@ -775,6 +782,18 @@ window.EMBEDDED_DATA = {
       "channel_id": "C081GAK936J",
       "channel_name": "marka-hasvet",
       "active": 1,
+      "done30": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "İş Takip Test",
+      "color": "#8E5BA1",
+      "wheelIdx": 12,
+      "channel_id": "C0B4ULSMPNF",
+      "channel_name": "iştakip-app-deneme",
+      "active": 0,
       "done30": 0,
       "overdue": 0,
       "stale": false,
