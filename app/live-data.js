@@ -4,8 +4,8 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T09:16:59.494Z",
-  "last_sync": "2026-05-20T09:16:59.494Z",
+  "now": "2026-05-20T09:19:39.813Z",
+  "last_sync": "2026-05-20T09:19:39.813Z",
   "source": "work-tracking-bot",
   "reason": "startup",
   "bns_briefs": [
@@ -137,7 +137,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779264440453199",
-      "notes": ":arrows_counterclockwise: Akış: · :link: Ref: · :3367-cat-jump: Kimden: <@U0AP31SAA1W>",
+      "notes": "",
       "gecmis": "",
       "_from_queue": true,
       "_kimden_id": "U0AP31SAA1W"
@@ -165,7 +165,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "notes": "Sosyal Medya Post · :link: Ref: <https://docs.google.com/document/d/1CfPgcW76DYt0_1ilASZZiczdR2fVc4HJpE9nwRRHbMw/edit?usp=sharing> · Video içerik",
+      "notes": "Sosyal Medya Post · Video içerik",
       "gecmis": "",
       "_from_queue": true,
       "_kimden_id": "U09BZHR25NG"
@@ -193,7 +193,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C03M070G8HY/p1779266803180509",
-      "notes": "Sosyal Medya Post · :link: Ref: · :3367-cat-jump: Kimden: <@U063T8M5HL4>",
+      "notes": "Sosyal Medya Post",
       "gecmis": "",
       "_from_queue": true,
       "_kimden_id": "U063T8M5HL4"
