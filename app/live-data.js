@@ -4,8 +4,8 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T09:30:34.802Z",
-  "last_sync": "2026-05-20T09:30:34.802Z",
+  "now": "2026-05-20T09:35:34.825Z",
+  "last_sync": "2026-05-20T09:35:34.825Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
