@@ -4,8 +4,8 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T13:26:34.217Z",
-  "last_sync": "2026-05-20T13:26:34.217Z",
+  "now": "2026-05-20T13:32:32.965Z",
+  "last_sync": "2026-05-20T13:32:32.965Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
@@ -152,119 +152,6 @@ window.EMBEDDED_DATA = {
       "notes": "⏳ Yeni açıldı (Buse 13:10 TR · workflow · İpek tek atanan · uzun lead time normal · aylık SM planı) · <@U063T8M5HL4>",
       "gecmis": "⏳20May13:10 (Buse açtı · workflow · 🔔 otomatik 🟢 [>72sa])",
       "_oncelik": "\ud83d"
-    },
-    {
-      "id": "br_queue_1779266803180509",
-      "no": 10,
-      "marka": "KMR Serve",
-      "brand": {
-        "name": "KMR Serve",
-        "color": "#F28E2B",
-        "wheelIdx": 1,
-        "channel_id": "C03M070G8HY",
-        "channel_name": "marka-kmr-serve"
-      },
-      "baslik": "Serve | Mayıs SM Planı 26'",
-      "leadId": "U063T8M5HL4",
-      "contribIds": [
-        "U06J26R1XCJ"
-      ],
-      "reviewerId": null,
-      "acilma": "2026-05-20T08:46:43.180+00:00",
-      "deadline": "2026-05-31T17:00:00+03:00",
-      "durum": "yeni",
-      "revision": 0,
-      "stale": false,
-      "slack_url": "https://benseno.slack.com/archives/C03M070G8HY/p1779266803180509",
-      "notes": "Sosyal Medya Post",
-      "gecmis": "",
-      "_from_queue": true,
-      "_kimden_id": "U063T8M5HL4"
-    },
-    {
-      "id": "br_queue_1779271340778199",
-      "no": 11,
-      "marka": "KZY Everclean",
-      "brand": {
-        "name": "KZY Everclean",
-        "color": "#E15759",
-        "wheelIdx": 5,
-        "channel_id": "C01EJSS20K0",
-        "channel_name": "marka-kzy-everclean"
-      },
-      "baslik": "Ever Clean - Ekranda Yayınlanacak Video",
-      "leadId": "U05PP70GQTX",
-      "contribIds": [
-        "U08HLMHTGEL"
-      ],
-      "reviewerId": null,
-      "acilma": "2026-05-20T10:02:20.778+00:00",
-      "deadline": "2026-05-21T17:00:00+03:00",
-      "durum": "yeni",
-      "revision": 0,
-      "stale": false,
-      "slack_url": "https://benseno.slack.com/archives/C01EJSS20K0/p1779271340778199",
-      "notes": "Video",
-      "gecmis": "",
-      "_from_queue": true,
-      "_kimden_id": "U05PP70GQTX"
-    },
-    {
-      "id": "br_queue_1779275673657199",
-      "no": 12,
-      "marka": "Cureffect",
-      "brand": {
-        "name": "Cureffect",
-        "color": "#B79100",
-        "wheelIdx": 15,
-        "channel_id": "C05DF8RFQ77",
-        "channel_name": "marka-cureffect"
-      },
-      "baslik": "CurEffect SM Haziran Ayı İçerikleri",
-      "leadId": "U0AAC3YK20G",
-      "contribIds": [
-        "U08HLMHTGEL",
-        "U055EDESLSE"
-      ],
-      "reviewerId": null,
-      "acilma": "2026-05-20T11:14:33.657+00:00",
-      "deadline": "2026-05-21T12:00:00+03:00",
-      "durum": "yeni",
-      "revision": 0,
-      "stale": false,
-      "slack_url": "https://benseno.slack.com/archives/C05DF8RFQ77/p1779275673657199",
-      "notes": "Sosyal Medya Post · Marka için haziran sosyal medya içeriklerini buraya ekliyorum. <@U02SZQDAFPF> bakabilir misin?",
-      "gecmis": "",
-      "_from_queue": true,
-      "_kimden_id": "U0AAC3YK20G"
-    },
-    {
-      "id": "br_queue_1779277830269149",
-      "no": 13,
-      "marka": "Vdm Petdent",
-      "brand": {
-        "name": "Vdm Petdent",
-        "color": "#6A8E3D",
-        "wheelIdx": 11,
-        "channel_id": "C0AQLPY4TUM",
-        "channel_name": "marka-vdm-petdent"
-      },
-      "baslik": "Whatsapp Business Kurulumu",
-      "leadId": "U0AP31SAA1W",
-      "contribIds": [
-        "U0AP31SAA1W"
-      ],
-      "reviewerId": null,
-      "acilma": "2026-05-20T11:50:30.269+00:00",
-      "deadline": "2026-05-22T14:50:00+03:00",
-      "durum": "yeni",
-      "revision": 0,
-      "stale": false,
-      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779277830269149",
-      "notes": "Otomasyon",
-      "gecmis": "",
-      "_from_queue": true,
-      "_kimden_id": "U0AP31SAA1W"
     }
   ],
   "bns_completed": [
@@ -728,9 +615,9 @@ window.EMBEDDED_DATA = {
     "editor": {
       "name": "Editör",
       "people": 8,
-      "active": 3,
+      "active": 0,
       "overdue": 0,
-      "capacity": 19,
+      "capacity": 0,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -738,9 +625,9 @@ window.EMBEDDED_DATA = {
     "ai": {
       "name": "AI",
       "people": 1,
-      "active": 2,
+      "active": 1,
       "overdue": 0,
-      "capacity": 100,
+      "capacity": 50,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -789,7 +676,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 15,
       "channel_id": "C05DF8RFQ77",
       "channel_name": "marka-cureffect",
-      "active": 1,
+      "active": 0,
       "done30": 0,
       "overdue": 0,
       "stale": false,
@@ -1005,7 +892,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 1,
       "channel_id": "C03M070G8HY",
       "channel_name": "marka-kmr-serve",
-      "active": 2,
+      "active": 1,
       "done30": 0,
       "overdue": 0,
       "stale": false,
@@ -1053,7 +940,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 5,
       "channel_id": "C01EJSS20K0",
       "channel_name": "marka-kzy-everclean",
-      "active": 1,
+      "active": 0,
       "done30": 0,
       "overdue": 0,
       "stale": false,
@@ -1185,7 +1072,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 11,
       "channel_id": "C0AQLPY4TUM",
       "channel_name": "marka-vdm-petdent",
-      "active": 1,
+      "active": 0,
       "done30": 0,
       "overdue": 0,
       "stale": false,
