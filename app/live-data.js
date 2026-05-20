@@ -4,8 +4,8 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T10:28:14.005Z",
-  "last_sync": "2026-05-20T10:28:14.005Z",
+  "now": "2026-05-20T10:33:43.768Z",
+  "last_sync": "2026-05-20T10:33:43.768Z",
   "source": "work-tracking-bot",
   "reason": "interval",
   "bns_briefs": [
@@ -136,34 +136,8 @@ window.EMBEDDED_DATA = {
       "_oncelik": "\ud83d"
     },
     {
-      "id": "br_queue_1779264440453199",
-      "no": 7,
-      "marka": "Vdm Petdent",
-      "brand": {
-        "name": "Vdm Petdent",
-        "color": "#6A8E3D",
-        "wheelIdx": 11,
-        "channel_id": "C0AQLPY4TUM",
-        "channel_name": "marka-vdm-petdent"
-      },
-      "baslik": "Web Sitesi",
-      "leadId": "U0AP31SAA1W",
-      "contribIds": [],
-      "reviewerId": null,
-      "acilma": "2026-05-20T08:07:20.453+00:00",
-      "deadline": "2026-05-21T01:00:00+03:00",
-      "durum": "yeni",
-      "revision": 0,
-      "stale": false,
-      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779264440453199",
-      "notes": "",
-      "gecmis": "",
-      "_from_queue": true,
-      "_kimden_id": "U0AP31SAA1W"
-    },
-    {
       "id": "br_queue_1779266803180509",
-      "no": 8,
+      "no": 7,
       "marka": "KMR Serve",
       "brand": {
         "name": "KMR Serve",
@@ -191,7 +165,7 @@ window.EMBEDDED_DATA = {
     },
     {
       "id": "br_queue_1779271340778199",
-      "no": 9,
+      "no": 8,
       "marka": "KZY Everclean",
       "brand": {
         "name": "KZY Everclean",
@@ -689,9 +663,9 @@ window.EMBEDDED_DATA = {
     "ai": {
       "name": "AI",
       "people": 1,
-      "active": 2,
+      "active": 1,
       "overdue": 0,
-      "capacity": 100,
+      "capacity": 50,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -1136,7 +1110,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 11,
       "channel_id": "C0AQLPY4TUM",
       "channel_name": "marka-vdm-petdent",
-      "active": 1,
+      "active": 0,
       "done30": 0,
       "overdue": 0,
       "stale": false,
