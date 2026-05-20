@@ -4,10 +4,10 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T08:09:01.285Z",
-  "last_sync": "2026-05-20T08:09:01.285Z",
+  "now": "2026-05-20T08:13:52.621Z",
+  "last_sync": "2026-05-20T08:13:52.621Z",
   "source": "work-tracking-bot",
-  "reason": "interval",
+  "reason": "startup",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -112,33 +112,8 @@ window.EMBEDDED_DATA = {
       "_oncelik": "\ud83d"
     },
     {
-      "id": "br_queue_1779261843022099",
-      "no": 6,
-      "marka": "Vdm Petdent",
-      "brand": {
-        "name": "Vdm Petdent",
-        "color": "#6A8E3D",
-        "wheelIdx": 11,
-        "channel_id": "C0AQLPY4TUM",
-        "channel_name": "marka-vdm-petdent"
-      },
-      "baslik": "GA4 Analiz",
-      "leadId": "U0AP31SAA1W",
-      "contribIds": [],
-      "reviewerId": null,
-      "acilma": "2026-05-20T07:24:03.022+00:00",
-      "deadline": null,
-      "durum": "yeni",
-      "revision": 0,
-      "stale": false,
-      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779261843022099",
-      "notes": "⏳ Yeni · Canvas'a henüz işlenmedi (bot queue'sundan)",
-      "_from_queue": true,
-      "_kimden_id": "U0AP31SAA1W"
-    },
-    {
       "id": "br_queue_1779264440453199",
-      "no": 7,
+      "no": 6,
       "marka": "Vdm Petdent",
       "brand": {
         "name": "Vdm Petdent",
@@ -152,7 +127,7 @@ window.EMBEDDED_DATA = {
       "contribIds": [],
       "reviewerId": null,
       "acilma": "2026-05-20T08:07:20.453+00:00",
-      "deadline": null,
+      "deadline": "2026-05-21T01:00:00+03:00",
       "durum": "yeni",
       "revision": 0,
       "stale": false,
@@ -633,7 +608,7 @@ window.EMBEDDED_DATA = {
     "ai": {
       "name": "AI",
       "people": 1,
-      "active": 3,
+      "active": 2,
       "overdue": 0,
       "capacity": 100,
       "completed30": 0,
@@ -1080,7 +1055,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 11,
       "channel_id": "C0AQLPY4TUM",
       "channel_name": "marka-vdm-petdent",
-      "active": 2,
+      "active": 1,
       "done30": 0,
       "overdue": 0,
       "stale": false,
