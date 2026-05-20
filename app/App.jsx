@@ -26,8 +26,59 @@ function App() {
   const [newBrief, setNewBrief] = React.useState(false);
   const [toast, setToast] = React.useState(null);
 
-  // Live data shape
-  const liveData = { ...data, briefs };
+  // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
+  // Bana / Departman / Tümü filtresi briefs ve completed'a uygulanır.
+  // DEFENSIVE: brief'ler farklı kaynaklardan gelir → bazılarında lead={id,rol,..} (obj),
+  // bazılarında leadId="U..." (string). Her iki durumu da kapsa.
+  const filterByViewMode = React.useCallback((items) => {
+    if (!Array.isArray(items)) return items;
+    if (viewMode === "all" || !user) return items;
+
+    // USERS lookup (ID → rol) — sadece string ID gelen brief'ler için
+    const usersById = ((window.BNS_DATA && window.BNS_DATA.USERS) || []).reduce(
+      (acc, u) => { acc[u.id] = u; return acc; }, {}
+    );
+
+    // Brief'in tüm ilişkili user ID'lerini topla
+    const collectIds = (b) => {
+      const ids = new Set();
+      if (b.lead?.id) ids.add(b.lead.id);
+      if (b.leadId) ids.add(b.leadId);
+      (b.contributors || []).forEach(c => c?.id && ids.add(c.id));
+      (b.contribIds || []).forEach(id => id && ids.add(id));
+      if (b.reviewer?.id) ids.add(b.reviewer.id);
+      if (b.reviewerId) ids.add(b.reviewerId);
+      return ids;
+    };
+    // Brief'in tüm ilişkili rol'lerini topla (obj'den + ID lookup'tan)
+    const collectRoles = (b) => {
+      const roles = new Set();
+      if (b.lead?.rol) roles.add(b.lead.rol);
+      (b.contributors || []).forEach(c => c?.rol && roles.add(c.rol));
+      if (b.reviewer?.rol) roles.add(b.reviewer.rol);
+      // String ID-only field'lardan rol türet
+      const idsForRole = [b.leadId, ...(b.contribIds || []), b.reviewerId].filter(Boolean);
+      idsForRole.forEach(id => {
+        const u = usersById[id];
+        if (u?.rol) roles.add(u.rol);
+      });
+      return roles;
+    };
+
+    if (viewMode === "mine") {
+      return items.filter(b => collectIds(b).has(user.id));
+    }
+    if (viewMode === "dept") {
+      return items.filter(b => collectRoles(b).has(user.rol));
+    }
+    return items;
+  }, [viewMode, user]);
+
+  const filteredBriefs    = React.useMemo(() => filterByViewMode(briefs),         [filterByViewMode, briefs]);
+  const filteredCompleted = React.useMemo(() => filterByViewMode(data.completed), [filterByViewMode, data.completed, briefs]);
+
+  // Live data shape — briefs ve completed artık filtered (viewMode'a göre)
+  const liveData = { ...data, briefs: filteredBriefs, completed: filteredCompleted, _allBriefs: briefs, _allCompleted: data.completed };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
   React.useEffect(() => { document.documentElement.setAttribute("data-theme", t.theme); }, [t.theme]);
@@ -74,6 +125,15 @@ function App() {
         // NOW + lastSync güncelle
         if (typeof ed.now === "string")        window.BNS_DATA.NOW = Date.parse(ed.now);
         if (typeof ed.last_sync === "string")  window.BNS_DATA.lastSync = ed.last_sync;
+        // Brand list (Slack channels) — briefs hidrasyonundan ÖNCE override et
+        if (Array.isArray(ed.bns_brands) && ed.bns_brands.length > 0) {
+          window.BNS_DATA.BRANDS = ed.bns_brands;
+          window.BNS_DATA.BR = Object.fromEntries(ed.bns_brands.map(b => [b.name, b]));
+        }
+        // User list (Slack workspace) — briefs hidrasyonundan ÖNCE
+        if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
+          window.BNS_DATA.USERS = ed.bns_users;
+        }
         // Brief'leri yeniden hidrate et + state'i güncelle
         if (Array.isArray(ed.bns_briefs) && window.bnsHydrateBrief) {
           const fresh = ed.bns_briefs.map(window.bnsHydrateBrief);
@@ -82,6 +142,13 @@ function App() {
         }
         if (Array.isArray(ed.bns_completed) && window.bnsHydrateCompleted) {
           window.BNS_DATA.completed = ed.bns_completed.map(window.bnsHydrateCompleted);
+        }
+        // Departman + marka istatistikleri
+        if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object") {
+          window.BNS_DATA.deptStats = ed.bns_dept_stats;
+        }
+        if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
+          window.BNS_DATA.brandStats = ed.bns_brand_stats;
         }
         window.BNS_DATA.__lastPoll = Date.now();
         console.info("[BNS] poll OK · source=" + ed.source + " · reason=" + ed.reason +
@@ -149,7 +216,7 @@ function App() {
         theme={t.theme} setTheme={(v) => setTweak("theme", v)}
         onOpenPalette={() => setPalette(true)}
         onNewBrief={() => setNewBrief(true)}
-        defaultUsers={Object.assign(data.USERS.slice(0, 5), { onPick: (u) => setUser(u) })}
+        defaultUsers={Object.assign([...data.USERS], { onPick: (u) => setUser(u) })}
       />
       <TabBar active={tab} onChange={setTab} style={t.tabStyle}/>
 

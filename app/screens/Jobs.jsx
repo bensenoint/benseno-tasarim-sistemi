@@ -5,9 +5,8 @@ function JobsScreen({ data, user, viewMode, tableMode, onOpenBrief, onStatusChan
   const [search, setSearch] = React.useState("");
   const [prioFilter, setPrioFilter] = React.useState("all");
 
+  // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
   let rows = data.briefs;
-  if (viewMode === "mine") rows = rows.filter(b => b.lead.id === user.id || b.contributors.some(c => c.id === user.id) || (b.reviewer && b.reviewer.id === user.id));
-  if (viewMode === "dept") rows = rows.filter(b => b.lead.rol === user.rol || b.contributors.some(c => c.rol === user.rol));
   if (scope === "overdue") rows = rows.filter(b => b.deltaH <= 0);
   if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor");
   if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");

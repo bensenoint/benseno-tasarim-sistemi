@@ -8,14 +8,16 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
   };
   const r = roleMap[role];
   const people = data.USERS.filter(u => u.rol === role);
-  const rows = data.briefs.filter(b => b.lead.rol === role || b.contributors.some(c => c.rol === role));
+  // Department her zaman bu rolün tüm briefler'ini gösterir — viewMode (mine/dept/all) etkilemez.
+  const allBriefs = data._allBriefs || data.briefs;
+  const rows = allBriefs.filter(b => (b.lead && b.lead.rol === role) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.rol === role)));
   const overdueCount = rows.filter(b => b.deltaH <= 0).length;
   const reviewCount = rows.filter(b => b.durum === "incelemede").length;
   const thisWeek = rows.filter(b => b.deltaH > 0 && b.deltaH <= 168).length;
 
   // Load per person
   const loadByPerson = people.map(p => {
-    const my = data.briefs.filter(b => b.lead.id === p.id || b.contributors.some(c => c.id === p.id));
+    const my = allBriefs.filter(b => (b.lead && b.lead.id === p.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id)));
     const myOverdue = my.filter(b => b.deltaH <= 0).length;
     return {
       user: p,

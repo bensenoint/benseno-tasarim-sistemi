@@ -109,10 +109,9 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers }) {
 
           <Eyebrow>Aktivite</Eyebrow>
           <div style={{display:"flex", flexDirection:"column", gap: 0, marginTop: 8}}>
-            <Tick when="14:18" who="Aylin" verb="durumu değiştirdi" tail="çalışılıyor → incelemede"/>
-            <Tick when="13:02" who="Aykut" verb="rev push" tail="rev 02"/>
-            <Tick when="11:45" who="İpek" verb="atadı" tail="reviewer olarak"/>
-            <Tick when="dün"   who="Görkem" verb="açtı" tail="brief oluşturuldu" last/>
+            {buildActivity(b).map((it, i, arr) => (
+              <Tick key={i} when={it.when} who={it.who} verb={it.verb} tail={it.tail} last={i === arr.length - 1}/>
+            ))}
           </div>
 
           <Hr/>
@@ -234,7 +233,7 @@ function AddRoleRow({ onAddContrib, onAddReviewer, allUsers, hasReviewer }) {
   return (
     <div style={{position:"relative", display:"flex", gap: 8, marginTop: 4}}>
       <button onClick={() => setMode(mode === "contrib" ? null : "contrib")} style={ghostBtn}>
-        <I.Plus size={12}/> Contributor ekle
+        <I.Plus size={12}/> Atanan ekle
       </button>
       {!hasReviewer && (
         <button onClick={() => setMode(mode === "reviewer" ? null : "reviewer")} style={ghostBtn}>
@@ -305,6 +304,178 @@ function formatFull(ts) {
   const d = new Date(ts);
   const months = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+
+// Bir zaman damgasını "5dk önce" / "dün 14:30" / "12 May" gibi göreceli format'a çevirir.
+function formatRel(ts) {
+  if (!ts) return "—";
+  const d = new Date(ts);
+  if (isNaN(d.getTime())) return "—";
+  const now = Date.now();
+  const diffMs = now - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffH   = Math.floor(diffMs / 3600000);
+  const diffD   = Math.floor(diffMs / 86400000);
+  if (diffMin < 1) return "şimdi";
+  if (diffMin < 60) return `${diffMin}dk`;
+  if (diffH < 24) {
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
+  }
+  if (diffD === 1) return "dün";
+  if (diffD < 7) return `${diffD}g önce`;
+  const months = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+  return `${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+// Canvas Geçmiş kolonu emoji → human-readable etiket
+const GECMIS_LABELS = {
+  '⏳': 'sıraya alındı',
+  '🎨': 'tasarımcı başladı',
+  '✍️': 'editör başladı',
+  '🤖': 'AI başladı',
+  '👀': 'incelemeye gönderildi',
+  '👌': 'onaylandı',
+  '✅': 'tamamlandı',
+  '🔴': '🔴 acil yapıldı',
+  '🟠': '🟠 yüksek yapıldı',
+  '🟡': '🟡 normal yapıldı',
+  '🟢': '🟢 düşük yapıldı',
+  '📈': 'öncelik yükseldi',
+  '📉': 'öncelik düştü',
+  '🚨': 'kritik uyarı',
+  '⚠️': 'uyarı',
+  '🔁': 'revize edildi',
+  '⛔': 'engellendi',
+  '⏰': 'deadline geçti',
+};
+const TR_MONTHS_SHORT = { Oca: 0, Ock: 0, Şub: 1, Sub: 1, Mar: 2, Nis: 3, May: 4, Haz: 5, Tem: 6, Ağu: 7, Agu: 7, Eyl: 8, Eki: 9, Ekm: 9, Kas: 10, Ara: 11 };
+
+/**
+ * Canvas Geçmiş kolonu string'ini parse eder.
+ * Örnek: "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22"
+ * Veya:  "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00"
+ *
+ * Döner: [{ ts, emoji, label, context, day, month, time }]
+ */
+function parseGecmisString(gecmis) {
+  if (!gecmis) return [];
+  const parts = gecmis.split(/\s*[→\/]\s*/).map(s => s.trim()).filter(Boolean);
+  const events = [];
+  const now = new Date();
+  const year = now.getFullYear();
+
+  for (const p of parts) {
+    // Emoji'leri parse — Türkçe karakter ve emoji çoklu kod noktası destekli
+    const emojiMatch = p.match(/([\p{Extended_Pictographic}]+(?:️)?)/u);
+    if (!emojiMatch) continue;
+    const emoji = emojiMatch[1];
+
+    // Tarih + saat: "18May13:16" veya "19May~10:00"
+    const dm = p.match(/(\d{1,2})([A-Za-zŞşĞğÜüÇçÖöİı]+)\s*~?\s*(\d{1,2}:\d{2})/);
+    if (!dm) continue;
+    const day = parseInt(dm[1], 10);
+    const monAbbr = dm[2].slice(0, 3);
+    const mon = TR_MONTHS_SHORT[monAbbr];
+    if (mon == null) continue;
+    const [hh, mm] = dm[3].split(':').map(n => parseInt(n, 10));
+
+    // Açıklama (parantez içi veya emoji+date sonrası kalan text)
+    let context = p
+      .replace(emojiMatch[0], '')
+      .replace(dm[0], '')
+      .replace(/[()]/g, '')
+      .trim();
+
+    // TR timezone (UTC+3) varsayım — local Date constructor TR ortamında çalışacak
+    const ts = new Date(year, mon, day, hh, mm, 0).getTime();
+    const label = GECMIS_LABELS[emoji] || emoji;
+    events.push({ ts, emoji, label, context, day, mon, time: dm[3] });
+  }
+  return events;
+}
+
+/**
+ * Brief'in kendi verisinden gerçek aktivite akışı üretir.
+ * En yeni en üstte (descending), brief açılışı en altta.
+ *
+ * Canvas brief'lerinde `b.gecmis` Canvas Geçmiş kolonu ham string'i içerir —
+ * bu gerçek event timeline'ı sağlar (timestamps dahil).
+ */
+function buildActivity(b) {
+  const items = [];
+
+  // ─── Mevcut durum (en yeni, üstte) ───
+  const durumLabel = {
+    yeni:        "⏳ Sırada",
+    calisiliyor: "🎨 Çalışılıyor",
+    incelemede:  "👀 İncelemede",
+    blokeli:     "⛔ Blokeli",
+    tamamlandi:  "✅ Tamamlandı",
+  };
+  if (durumLabel[b.durum]) {
+    const tail = b.notes && b.notes.length < 120 ? b.notes : '';
+    items.push({
+      when: b.durum === "tamamlandi" && b.bitis ? formatRel(b.bitis) : "şimdi",
+      who:  "",
+      verb: durumLabel[b.durum],
+      tail,
+    });
+  }
+
+  // ─── Acil uyarılar ───
+  if (b.stale) items.push({ when: "", who: "", verb: "🚨 STALE", tail: "uzun süre pasif" });
+  if (b.deltaH !== undefined && b.deltaH <= 0) {
+    items.push({ when: "", who: "", verb: "⏰ Deadline geçti", tail: "" });
+  }
+
+  // ─── Canvas Geçmiş kolonu (Görkem'in skill'inin yazdığı timeline) ───
+  // Bu en zengin event kaynağı: gerçek timestamp + her durum değişimi
+  const gecmisEvents = parseGecmisString(b.gecmis);
+  if (gecmisEvents.length > 0) {
+    // En yeni en üstte sırala
+    gecmisEvents.sort((a, b) => b.ts - a.ts);
+    for (const ev of gecmisEvents) {
+      items.push({
+        when: `${ev.day} ${["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][ev.mon]} ${ev.time}`,
+        who:  "",
+        verb: ev.label,
+        tail: ev.context && ev.context.length < 80 ? ev.context : "",
+      });
+    }
+  } else {
+    // ─── Geçmiş yoksa fallback — brief field'larından çıkarım ───
+    if (b.revision && b.revision > 0) {
+      items.push({ when: "", who: "", verb: `🔁 Revize ×${b.revision}`, tail: "" });
+    }
+    if (b.reviewer) {
+      items.push({
+        when: "", who: b.lead?.name?.split(" ")[0] || "",
+        verb: "inceleyici atadı",
+        tail: b.reviewer.name,
+      });
+    }
+    const contribs = (b.contributors || []).filter(Boolean);
+    if (contribs.length > 0) {
+      items.push({
+        when: "",
+        who:  b.lead?.name?.split(" ")[0] || "",
+        verb: "atadı",
+        tail: contribs.map(c => c.name?.split(" ")[0] || c.name).join(", "),
+      });
+    }
+  }
+
+  // ─── Brief açıldı (en eski, altta) — her zaman gösterilir ───
+  items.push({
+    when: formatRel(b.acilma),
+    who:  b.lead?.name?.split(" ")[0] || "Bilinmiyor",
+    verb: "açtı",
+    tail: "brief oluşturuldu",
+  });
+
+  return items;
 }
 
 window.BriefDrawer = BriefDrawer;

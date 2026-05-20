@@ -317,7 +317,9 @@ function bnsHydrateBrief(raw, idx) {
   const deadline= typeof raw.deadline === "string" ? Date.parse(raw.deadline) : raw.deadline;
   const liveNow = window.BNS_DATA.NOW || NOW;
   const deltaH  = (deadline - liveNow) / H;
-  const brand   = BR[raw.marka] || {
+  // Önce live BR (Slack'ten gelen), yoksa mock BR, yoksa fallback
+  const liveBr  = (window.BNS_DATA && window.BNS_DATA.BR) || BR;
+  const brand   = liveBr[raw.marka] || {
     name: raw.marka,
     color: WHEEL[brandHash(raw.marka)],
     wheelIdx: brandHash(raw.marka)
@@ -339,7 +341,9 @@ function bnsHydrateBrief(raw, idx) {
     revision:     raw.revision != null ? raw.revision : 0,
     stale:        !!raw.stale,
     slack_url:    raw.slack_url || "#",
-    notes:        raw.notes || ""
+    notes:        raw.notes || "",
+    gecmis:       raw.gecmis || "",      // Canvas Geçmiş kolonu ham string (BriefDrawer parse eder)
+    _kimden_id:   raw._kimden_id || null // brief açanın ID'si (queue brief'lerinde; obj zaten lead'de)
   };
 }
 function bnsHydrateCompleted(raw, idx) {
@@ -382,12 +386,36 @@ try {
     if (typeof ed.now === "string") {
       window.BNS_DATA.NOW = Date.parse(ed.now);
     }
+    // Önce brand list'i override et (briefs hidrasyonu lookup yapacak)
+    if (Array.isArray(ed.bns_brands) && ed.bns_brands.length > 0) {
+      window.BNS_DATA.BRANDS = ed.bns_brands;
+      window.BNS_DATA.BR = Object.fromEntries(ed.bns_brands.map(b => [b.name, b]));
+    }
+    // User list (Slack workspace) — bots/silinmiş hariç tüm aktif kişiler
+    if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
+      window.BNS_DATA.USERS = ed.bns_users;
+      // ME varsa koru, yoksa Görkem'i bul, yoksa ilk yönetici
+      const meId = window.BNS_DATA.ME?.id;
+      const me = ed.bns_users.find(u => u.id === meId) ||
+                 ed.bns_users.find(u => u.id === 'U030C48PL23') ||
+                 ed.bns_users.find(u => u.rol === 'yonetici') ||
+                 ed.bns_users[0];
+      if (me) window.BNS_DATA.ME = me;
+    }
     if (Array.isArray(ed.bns_briefs) && ed.bns_briefs.length > 0) {
       window.BNS_DATA.briefs = ed.bns_briefs.map(bnsHydrateBrief);
       window.BNS_DATA.__source = "live_briefs";
     }
     if (Array.isArray(ed.bns_completed) && ed.bns_completed.length > 0) {
       window.BNS_DATA.completed = ed.bns_completed.map(bnsHydrateCompleted);
+    }
+    // Departman istatistikleri (canlı brief'lerden bot tarafından hesaplandı)
+    if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object") {
+      window.BNS_DATA.deptStats = ed.bns_dept_stats;
+    }
+    // Marka istatistikleri (problemli markalar paneli için)
+    if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
+      window.BNS_DATA.brandStats = ed.bns_brand_stats;
     }
     if (typeof ed.last_sync === "string") {
       window.BNS_DATA.lastSync = ed.last_sync;

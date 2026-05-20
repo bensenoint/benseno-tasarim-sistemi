@@ -1,12 +1,15 @@
 // app/screens/Profile.jsx — single-user view.
 
 function ProfileScreen({ data, user, onOpenBrief }) {
-  const myActive = data.briefs.filter(b => b.lead.id === user.id || b.contributors.some(c => c.id === user.id) || (b.reviewer && b.reviewer.id === user.id));
-  const leadCount    = data.briefs.filter(b => b.lead.id === user.id).length;
-  const contribCount = data.briefs.filter(b => b.contributors.some(c => c.id === user.id)).length;
-  const reviewCount  = data.briefs.filter(b => b.reviewer && b.reviewer.id === user.id).length;
+  // Profile her zaman seçili kullanıcının briefler'ini gösterir — header'daki Bana/Departman/Tümü filtresinden etkilenmez.
+  const allBriefs    = data._allBriefs    || data.briefs;
+  const allCompleted = data._allCompleted || data.completed;
+  const myActive = allBriefs.filter(b => (b.lead && b.lead.id === user.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === user.id)) || (b.reviewer && b.reviewer.id === user.id));
+  const leadCount    = allBriefs.filter(b => b.lead && b.lead.id === user.id).length;
+  const contribCount = allBriefs.filter(b => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === user.id)).length;
+  const reviewCount  = allBriefs.filter(b => b.reviewer && b.reviewer.id === user.id).length;
   const brandsTouched = new Set(myActive.map(b => b.marka)).size;
-  const completed30 = data.completed.filter(b => b.lead.id === user.id).length;
+  const completed30 = allCompleted.filter(b => b.lead && b.lead.id === user.id).length;
 
   const roleLabel = {yonetici: user.title || "Yönetici", tasarim: "Tasarım", editor: "Editör", ai: "AI Operatör"}[user.rol];
 
@@ -42,9 +45,9 @@ function ProfileScreen({ data, user, onOpenBrief }) {
         <Kpi label="Aktif iş"    value={myActive.length}/>
         <Kpi label="Tamamlanan"  value={completed30 + 7} sub="son 30 gün"/>
         <Kpi label="Toplam saat" value="142,5"/>
-        <Kpi label="Lead"        value={leadCount}/>
-        <Kpi label="Contributor" value={contribCount}/>
-        <Kpi label="Reviewer"    value={reviewCount}/>
+        <Kpi label="Açtığım"     value={leadCount}/>
+        <Kpi label="Atandığım"   value={contribCount}/>
+        <Kpi label="İnceleyici"  value={reviewCount}/>
         <Kpi label="Marka"       value={brandsTouched}/>
         <Kpi label="Ort. tamamlama" value="28,2 sa" trend={{dir:"down", value:"-2,1", good:true}}/>
       </div>

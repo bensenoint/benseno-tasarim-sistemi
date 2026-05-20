@@ -120,26 +120,66 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
             <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink)"}}>{user.name.split(" ")[0]}</span>
             <I.ChevronDown size={11}/>
           </button>
-          {userMenu && (
-            <div onMouseLeave={() => setUserMenu(false)} style={{
-              position:"absolute", top: 38, right: 0, zIndex: 50,
-              minWidth: 220, padding: 4,
-              background:"var(--surface)", border:"1px solid var(--line)",
-              borderRadius: 10, boxShadow:"var(--shadow-1)"
-            }}>
-              <div style={{padding:"8px 10px 4px", font:"600 11px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)"}}>Kullanıcı geç</div>
-              {(defaultUsers || []).map(u => (
-                <button key={u.id} onClick={() => { defaultUsers && defaultUsers.onPick && defaultUsers.onPick(u); setUserMenu(false); }} style={{
-                  display:"flex", width:"100%", textAlign:"left", alignItems:"center", gap:8,
-                  padding:"7px 8px", border:0, background:"transparent", cursor:"pointer", borderRadius: 6
-                }}>
-                  <Avatar user={u} size={22}/>
-                  <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)"}}>{u.name}</span>
-                  <span style={{marginLeft:"auto", font:"500 10px/1 var(--font-mono)", color:"var(--ink-4)"}}>{u.rol}</span>
-                </button>
-              ))}
-            </div>
-          )}
+          {userMenu && (() => {
+            const ROL_LABELS = {
+              yonetici: "Yönetici",
+              tasarim:  "Tasarım",
+              editor:   "Editör",
+              ai:       "AI",
+              diger:    "Diğer",
+            };
+            const ROL_ORDER = ["yonetici", "tasarim", "editor", "ai", "diger"];
+            const grouped = {};
+            for (const u of (defaultUsers || [])) {
+              const rol = u.rol || "diger";
+              (grouped[rol] = grouped[rol] || []).push(u);
+            }
+            const onPick = defaultUsers && defaultUsers.onPick;
+            return (
+              <div onMouseLeave={() => setUserMenu(false)} style={{
+                position:"absolute", top: 38, right: 0, zIndex: 50,
+                minWidth: 260, maxHeight: 480, padding: 4,
+                background:"var(--surface)", border:"1px solid var(--line)",
+                borderRadius: 10, boxShadow:"var(--shadow-1)",
+                overflowY: "auto", overflowX: "hidden",
+              }}>
+                <div style={{padding:"8px 10px 4px", font:"600 11px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)"}}>
+                  Görünümü değiştir · {(defaultUsers||[]).length} kişi
+                </div>
+                {ROL_ORDER.map(rol => {
+                  const list = grouped[rol];
+                  if (!list || list.length === 0) return null;
+                  return (
+                    <div key={rol} style={{marginTop: 4}}>
+                      <div style={{padding:"6px 10px 2px", font:"600 10px/1 var(--font-sans)", letterSpacing:"0.08em", textTransform:"uppercase", color:"var(--ink-4)"}}>
+                        {ROL_LABELS[rol]} · {list.length}
+                      </div>
+                      {list.map(u => {
+                        const active = user && user.id === u.id;
+                        return (
+                          <button key={u.id} onClick={() => { onPick && onPick(u); setUserMenu(false); }} style={{
+                            display:"flex", width:"100%", textAlign:"left", alignItems:"center", gap:8,
+                            padding:"7px 8px", border:0,
+                            background: active ? "var(--paper-2)" : "transparent",
+                            cursor:"pointer", borderRadius: 6
+                          }}>
+                            <Avatar user={u} size={22}/>
+                            <span style={{font:"500 13px/1.2 var(--font-sans)", color:"var(--ink)", flex:1, minWidth:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>
+                              {u.name}
+                            </span>
+                            {u.title ? (
+                              <span style={{font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)", whiteSpace:"nowrap"}}>{u.title}</span>
+                            ) : null}
+                            {active && <I.Check size={12}/>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       </div>
       <style>{`@keyframes bn-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }`}</style>
