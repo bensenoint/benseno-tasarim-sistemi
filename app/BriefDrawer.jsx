@@ -234,7 +234,7 @@ function AddRoleRow({ onAddContrib, onAddReviewer, allUsers, hasReviewer }) {
   return (
     <div style={{position:"relative", display:"flex", gap: 8, marginTop: 4}}>
       <button onClick={() => setMode(mode === "contrib" ? null : "contrib")} style={ghostBtn}>
-        <I.Plus size={12}/> Contributor ekle
+        <I.Plus size={12}/> Atanan ekle
       </button>
       {!hasReviewer && (
         <button onClick={() => setMode(mode === "reviewer" ? null : "reviewer")} style={ghostBtn}>

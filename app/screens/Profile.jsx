@@ -45,9 +45,9 @@ function ProfileScreen({ data, user, onOpenBrief }) {
         <Kpi label="Aktif iş"    value={myActive.length}/>
         <Kpi label="Tamamlanan"  value={completed30 + 7} sub="son 30 gün"/>
         <Kpi label="Toplam saat" value="142,5"/>
-        <Kpi label="Lead"        value={leadCount}/>
-        <Kpi label="Contributor" value={contribCount}/>
-        <Kpi label="Reviewer"    value={reviewCount}/>
+        <Kpi label="Açtığım"     value={leadCount}/>
+        <Kpi label="Atandığım"   value={contribCount}/>
+        <Kpi label="İnceleyici"  value={reviewCount}/>
         <Kpi label="Marka"       value={brandsTouched}/>
         <Kpi label="Ort. tamamlama" value="28,2 sa" trend={{dir:"down", value:"-2,1", good:true}}/>
       </div>

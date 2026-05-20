@@ -74,9 +74,9 @@ function NewBriefModal({ open, onClose, onCreate, data }) {
               placeholder="Örn. Mart kampanya görselleri" style={inputCss}/>
           </Field>
           <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap: 12}}>
-            <Field label="Lead">
+            <Field label="Açan">
               <select value={leadId} onChange={(e) => setLeadId(e.target.value)} style={inputCss}>
-                <option value="">Lead seç…</option>
+                <option value="">Açan seç…</option>
                 {data.USERS.filter(u => u.rol !== "yonetici" || true).map(u => (
                   <option key={u.id} value={u.id}>{u.name} · {u.rol}</option>
                 ))}

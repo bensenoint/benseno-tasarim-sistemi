@@ -11,12 +11,12 @@ function MultiScreen({ data, onOpenBrief }) {
     <div className="bn-tab-in">
       <PageHead
         title="Multi-atama"
-        subtitle="Lead · Contributor · Reviewer — birden fazla rolün atandığı brief'ler"/>
+        subtitle="Açan · Atanan · İnceleyici — birden fazla rolün atandığı brief'ler"/>
 
       <div style={{display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Multi-atama" value={multi.length} sub={`${data.briefs.length} brief'in ${Math.round(multi.length/data.briefs.length*100)}%'si`}/>
-        <Kpi label="Contributor var" value={withContrib}/>
-        <Kpi label="Reviewer var"    value={withReviewer}/>
+        <Kpi label="Atanan var"    value={withContrib}/>
+        <Kpi label="İnceleyici var" value={withReviewer}/>
         <Kpi label="3 rol birden"    value={triRole} accent="var(--ember)"/>
       </div>
 
@@ -29,7 +29,7 @@ function MultiScreen({ data, onOpenBrief }) {
           <table style={{width:"100%", borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)"}}>
             <thead>
               <tr style={{background:"var(--surface-sub)"}}>
-                {["#","Marka","İş","Lead","Contributor","Reviewer","Öncelik","Durum"].map((h, i) => (
+                {["#","Marka","İş","Açan","Atanan","İnceleyici","Öncelik","Durum"].map((h, i) => (
                   <th key={i} style={{
                     font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
                     letterSpacing:"0.04em", textTransform:"uppercase",
