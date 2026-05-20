@@ -64,10 +64,8 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
             <DeptRow s={data.deptStats.ai}      color="var(--bw-14)" last/>
           </Card>
           <Card>
-            <CardHead title="Sorunlu markalar" sub="median + MAD eşiği aşıldı"/>
-            <BrandRow name="Demir Çelik"      note="2× medyan deadline"          color={data.BRANDS.find(b => b.name==="Demir Çelik").color}      v={3}/>
-            <BrandRow name="Mor Salkım"        note="rev oranı %50"                color={data.BRANDS.find(b => b.name==="Mor Salkım").color}        v={3}/>
-            <BrandRow name="Konya Un"          note="bloke + 16 sa gecikme"        color={data.BRANDS.find(b => b.name==="Konya Un").color}          v={1} last/>
+            <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
+            <ProblemBrands data={data}/>
           </Card>
         </div>
       </div>
@@ -249,6 +247,39 @@ function DeptRow({ s, color, last, compact }) {
         <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-2)", minWidth: 32, textAlign:"right"}}>%{s.capacity}</span>
       </div>
     </div>
+  );
+}
+
+// ─── ProblemBrands — canlı brand_stats'tan ilk 3 sorunlu marka ─────────────
+function ProblemBrands({ data }) {
+  const list = (data.brandStats || [])
+    .filter(b => b.problem_label || b.overdue > 0 || b.stale || (b.active || 0) >= 3)
+    .sort((a, b) =>
+      ((b.overdue || 0) - (a.overdue || 0)) ||
+      ((b.stale ? 1 : 0) - (a.stale ? 1 : 0)) ||
+      ((b.active || 0) - (a.active || 0))
+    )
+    .slice(0, 3);
+  if (list.length === 0) {
+    return (
+      <div style={{padding:"12px 4px", font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>
+        Sorunlu marka yok — tüm markalar normal akışta ✓
+      </div>
+    );
+  }
+  return (
+    <>
+      {list.map((b, i) => (
+        <BrandRow
+          key={b.name}
+          name={b.name}
+          note={b.problem_label || (b.active + ' aktif')}
+          color={b.color}
+          v={b.active || 0}
+          last={i === list.length - 1}
+        />
+      ))}
+    </>
   );
 }
 

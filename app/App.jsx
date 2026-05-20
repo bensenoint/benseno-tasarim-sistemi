@@ -74,6 +74,11 @@ function App() {
         // NOW + lastSync güncelle
         if (typeof ed.now === "string")        window.BNS_DATA.NOW = Date.parse(ed.now);
         if (typeof ed.last_sync === "string")  window.BNS_DATA.lastSync = ed.last_sync;
+        // Brand list (Slack channels) — briefs hidrasyonundan ÖNCE override et
+        if (Array.isArray(ed.bns_brands) && ed.bns_brands.length > 0) {
+          window.BNS_DATA.BRANDS = ed.bns_brands;
+          window.BNS_DATA.BR = Object.fromEntries(ed.bns_brands.map(b => [b.name, b]));
+        }
         // Brief'leri yeniden hidrate et + state'i güncelle
         if (Array.isArray(ed.bns_briefs) && window.bnsHydrateBrief) {
           const fresh = ed.bns_briefs.map(window.bnsHydrateBrief);
@@ -82,6 +87,13 @@ function App() {
         }
         if (Array.isArray(ed.bns_completed) && window.bnsHydrateCompleted) {
           window.BNS_DATA.completed = ed.bns_completed.map(window.bnsHydrateCompleted);
+        }
+        // Departman + marka istatistikleri
+        if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object") {
+          window.BNS_DATA.deptStats = ed.bns_dept_stats;
+        }
+        if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
+          window.BNS_DATA.brandStats = ed.bns_brand_stats;
         }
         window.BNS_DATA.__lastPoll = Date.now();
         console.info("[BNS] poll OK · source=" + ed.source + " · reason=" + ed.reason +
