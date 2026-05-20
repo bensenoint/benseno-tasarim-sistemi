@@ -4,10 +4,10 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T08:57:45.559Z",
-  "last_sync": "2026-05-20T08:57:45.559Z",
+  "now": "2026-05-20T09:00:53.132Z",
+  "last_sync": "2026-05-20T09:00:53.132Z",
   "source": "work-tracking-bot",
-  "reason": "interval",
+  "reason": "startup",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -148,8 +148,10 @@ window.EMBEDDED_DATA = {
         "channel_name": "marka-bauhaus"
       },
       "baslik": "BAUHAUS / 20 Mayıs İçerik",
-      "leadId": "U09BFPBKQG7",
-      "contribIds": [],
+      "leadId": "U09BZHR25NG",
+      "contribIds": [
+        "U09BFPBKQG7"
+      ],
       "reviewerId": null,
       "acilma": "2026-05-20T08:33:36.085+00:00",
       "deadline": "2026-05-20T18:00:00+03:00",
@@ -173,8 +175,10 @@ window.EMBEDDED_DATA = {
         "channel_name": "marka-kmr-serve"
       },
       "baslik": "Serve | Mayıs SM Planı 26'",
-      "leadId": "U06J26R1XCJ",
-      "contribIds": [],
+      "leadId": "U063T8M5HL4",
+      "contribIds": [
+        "U06J26R1XCJ"
+      ],
       "reviewerId": null,
       "acilma": "2026-05-20T08:46:43.180+00:00",
       "deadline": "2026-05-31T17:00:00+03:00",
@@ -638,9 +642,9 @@ window.EMBEDDED_DATA = {
     "tasarim": {
       "name": "Tasarım",
       "people": 7,
-      "active": 6,
+      "active": 4,
       "overdue": 2,
-      "capacity": 43,
+      "capacity": 29,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
@@ -648,9 +652,9 @@ window.EMBEDDED_DATA = {
     "editor": {
       "name": "Editör",
       "people": 8,
-      "active": 0,
+      "active": 2,
       "overdue": 0,
-      "capacity": 0,
+      "capacity": 13,
       "completed30": 0,
       "avgComplete": null,
       "revRate": null
