@@ -4,10 +4,10 @@
 // data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
 
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T05:36:58.382Z",
-  "last_sync": "2026-05-20T05:36:58.382Z",
+  "now": "2026-05-20T05:51:02.149Z",
+  "last_sync": "2026-05-20T05:51:02.149Z",
   "source": "work-tracking-bot",
-  "reason": "interval",
+  "reason": "startup",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -30,7 +30,7 @@ window.EMBEDDED_DATA = {
       "revision": 1,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · Melis 17:26 \"İletiyorum\" → bakanlık onayı bekleniyor) · <@U08NQJ27G5S>",
+      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · Melis 17:26 \"İletiyorum\" → bakanlık onayı bekleniyor · son aktivite 1g 14sa 53dk önce) · <@U08NQJ27G5S>",
       "_oncelik": "\ud83d"
     },
     {
@@ -53,7 +53,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C081GAK936J/p1779104369515529",
-      "notes": "⏳ Sırada (tasarımcı atanmadı — İpek dispatch bekleniyor) · <@U08NQJ27G5S>",
+      "notes": "⏳ Sırada (tasarımcı atanmadı — İpek dispatch bekleniyor · sabah aksiyon DM'sinde öncelikli) · <@U08NQJ27G5S>",
       "_oncelik": "\ud83d"
     },
     {
@@ -72,7 +72,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "notes": "⏳ Sırada (Aykut başlamayı bekliyor · 🎨 reaction yok · 🔴 manuel override Görkem 08:26 + STALE 🔴 · 7sa 11dk pasif) · <@U030C48PL23>",
+      "notes": "⏳ Sırada (Aykut başlamayı bekliyor · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 24sa 5dk pasif · sabah eskalasyon DM 5 yönetici) · <@U030C48PL23>",
       "_oncelik": "\ud83d"
     },
     {
@@ -91,7 +91,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem'e DM gönderildi · İpek dispatch bekleniyor) · <@U030C48PL23>",
+      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM gönderildi, cevap yok · 24sa 1dk pasif · İpek dispatch bekleniyor) · <@U030C48PL23>",
       "_oncelik": "\ud83d"
     },
     {
@@ -108,7 +108,7 @@ window.EMBEDDED_DATA = {
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-      "notes": "⏳ Yeni açıldı (Eren self-assign · 1sa 43dk önce · henüz 🤖 reaction yok) · <@U0AP31SAA1W>",
+      "notes": "⏳ Yeni açıldı (Eren self-assign · sabah günaydın DM'sinde başlama hatırlatması) · <@U0AP31SAA1W>",
       "_oncelik": "\ud83d"
     }
   ],
