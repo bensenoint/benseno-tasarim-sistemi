@@ -694,6 +694,101 @@ app.event('message', async ({ event, client }) => {
   }
 });
 
+// ─── Slack List Güncelleme ────────────────────────────────────────────────────
+
+const LIVE_DATA_PATH   = path.join(PROJECT_DIR, 'dashboard/app/live-data.json');
+const SLACK_LIST_SCRIPT = path.join(PROJECT_DIR, 'scripts/create-slack-list.js');
+const SLACK_LIST_ID_PATH = path.join(PROJECT_DIR, 'data/.slack-list-id');
+
+// Güncelleme kilidi — Brief Sync 30sn'de bir çalışabilir, çakışmayı önle
+let listUpdateRunning = false;
+
+async function updateSlackList(reason) {
+  if (listUpdateRunning) {
+    log(`Slack List güncelleme zaten çalışıyor, atlandı (${reason})`);
+    return;
+  }
+  listUpdateRunning = true;
+
+  // Mevcut list ID varsa --update, yoksa yeni oluştur
+  const listIdExists = fs.existsSync(SLACK_LIST_ID_PATH) &&
+    fs.readFileSync(SLACK_LIST_ID_PATH, 'utf8').trim().length > 0;
+
+  const args  = listIdExists ? ['--update'] : [];
+  const label = listIdExists ? '--update' : 'yeni list';
+
+  log(`Slack List güncelleniyor (${reason} · ${label})...`);
+
+  try {
+    await new Promise((resolve, reject) => {
+      // LIST_ID env'e geçir (--update için)
+      const env = { ...process.env };
+      if (listIdExists) env.LIST_ID = fs.readFileSync(SLACK_LIST_ID_PATH, 'utf8').trim();
+
+      execFile(process.execPath, [SLACK_LIST_SCRIPT, ...args], { cwd: PROJECT_DIR, timeout: 120000, env },
+        (err, stdout, stderr) => {
+          if (err) { log(`Slack List hata: ${err.message}\n${stderr}`); reject(err); }
+          else      { log(`Slack List güncellendi ✅\n${stdout.trim().slice(0, 200)}`); resolve(); }
+        }
+      );
+    });
+  } catch (_) {
+    // Hata loglandı — devam et
+  } finally {
+    listUpdateRunning = false;
+  }
+}
+
+// /slack-list-guncelle — yöneticiye özel manuel tetikleme
+app.command('/slack-list-guncelle', async ({ command, ack, respond, client }) => {
+  await ack();
+
+  if (!MANAGER_IDS.has(command.user_id)) {
+    await respond({ response_type: 'ephemeral', text: '⛔ Bu komut sadece yöneticiler içindir.' });
+    return;
+  }
+
+  await respond({ response_type: 'ephemeral', text: '🔄 Slack List güncelleniyor…' });
+
+  const listIdExists = fs.existsSync(SLACK_LIST_ID_PATH) &&
+    fs.readFileSync(SLACK_LIST_ID_PATH, 'utf8').trim().length > 0;
+  const listId = listIdExists ? fs.readFileSync(SLACK_LIST_ID_PATH, 'utf8').trim() : null;
+
+  await updateSlackList('manuel komut');
+
+  const url = listId
+    ? `https://benseno.slack.com/lists/T4Y3R6RAN/${listId}`
+    : (fs.existsSync(SLACK_LIST_ID_PATH) ? `https://benseno.slack.com/lists/T4Y3R6RAN/${fs.readFileSync(SLACK_LIST_ID_PATH,'utf8').trim()}` : '');
+
+  try {
+    await client.chat.postEphemeral({
+      channel: command.channel_id,
+      user: command.user_id,
+      text: `✅ Slack List güncellendi!${url ? `\n🔗 ${url}` : ''}`,
+    });
+  } catch (_) {}
+});
+
+// live-data.json değişince otomatik güncelle
+// (Brief Sync her :15/:45'te bu dosyayı günceller)
+function watchLiveData() {
+  if (!fs.existsSync(LIVE_DATA_PATH)) {
+    log('live-data.json henüz yok — 60sn sonra tekrar denenecek');
+    setTimeout(watchLiveData, 60000);
+    return;
+  }
+
+  fs.watchFile(LIVE_DATA_PATH, { interval: 15000 }, (curr, prev) => {
+    // Dosya değiştiyse (mtime veya boyut farklıysa) güncelle
+    if (curr.mtimeMs !== prev.mtimeMs) {
+      log('live-data.json değişti → Slack List otomatik güncelleniyor...');
+      updateSlackList('live-data.json değişimi');
+    }
+  });
+
+  log(`live-data.json izleniyor (${LIVE_DATA_PATH})`);
+}
+
 // ─── Başlat ───────────────────────────────────────────────────────────────────
 
 (async () => {
@@ -702,4 +797,7 @@ app.event('message', async ({ event, client }) => {
 
   await app.start();
   log('Benseno Slack Bot başlatıldı (Socket Mode)');
+
+  // live-data.json izlemeyi başlat
+  watchLiveData();
 })();

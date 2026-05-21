@@ -1,148 +1,192 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+---
+
 # Benseno Tasarım Sistemi — Claude Code Workspace
 
-> **Sistem versiyonu:** v7.13
-> **Cowork'ten geçiş tarihi:** 18 Mayıs 2026
-> **Production launch:** 18 Mayıs 2026
+**Sistem:** v7.13 · 16 kişilik dijital ajans brief takip sistemi · 39 marka · 3 departman
+**Dashboard:** https://bensenoint.github.io/benseno-tasarim-sistemi/
+**Slack Workspace:** `T4Y3R6RAN`
 
-## Bu Workspace Nedir?
-16 kişilik dijital ajansın brief takip sistemi. 5 aktif scheduled task,
-1 dashboard, 4 MCP entegrasyonu (Slack, Gmail, Calendar, Drive).
+---
 
-## Önemli Yollar
-- Skills: `.claude/skills/`
-- Dashboard (local): `dashboard/index.html`
-- Dashboard (GitHub Pages): https://bensenoint.github.io/dashboard/
-- Dashboard (deploy source): `github-prep/dashboard/`
-- Data files: `data/`
-- Master Prompt: `docs/CLAUDE_CODE_BENSENO_MASTER_PROMPT.md`
-- Log dosyaları: `logs/`
-- Wrapper scripts: `scripts/`
+## Mimari Genel Bakış
+
+Sistem 4 katmanlı agent mimarisine bölünmüştür (Mayıs 2026):
+
+```
+launchd (her dakika)
+  └─ run-orchestrator.sh
+       └─ Skill: benseno-orchestrator
+            ├─ Skill: benseno-data-agent      → canvas_cache.md, live-data.json, notification-flags.json
+            ├─ Skill: benseno-notification-agent → DM'ler, thread cevapları, calendar events
+            └─ Skill: benseno-dashboard-agent → EMBEDDED_DATA inject, GitHub push
+```
+
+**Haberleşme dosyaları (agent'lar arası):**
+- `data/canvas_cache.md` — Canvas içeriği (30dk TTL cache)
+- `dashboard/app/live-data.json` — React dashboard + Slack Bot ortak veri kaynağı
+- `data/notification-flags.json` — Data Agent → Notification Agent flag'leri
+- `data/brief-queue.json` — Slack Bot → Data Agent yeni brief queue'su
+- `data/agent-state.json` — Son run durumu
+
+**Slack Bot** (`scripts/slack-bot.js`) ayrı bir process olarak Socket Mode'da çalışır:
+- `live-data.json` değişince Slack List'i otomatik günceller
+- Slash commands: `/brief-durum`, `/kapasite`, `/slack-list-guncelle`
+- Reaction override'ları anında işler
+- Brief validation ephemeral mesajları gönderir
+
+**Dashboard** React + esbuild bundle (`dashboard/app/bundle.js`):
+- Kaynak JSX dosyaları: `dashboard/app/*.jsx` ve `dashboard/app/screens/*.jsx`
+- Bundle rebuild: `bash scripts/build-dashboard.sh`
+- `window.EMBEDDED_DATA` → `data.js` bridge → `window.BNS_DATA` → React
+- Her 30sn `app/live-data.json` polling yapar
+
+---
+
+## Komutlar
+
+```bash
+# Dashboard bundle'ı yeniden derle (JSX değişikliği sonrası)
+bash scripts/build-dashboard.sh
+
+# Manuel sync (test)
+claude -p "Skill: benseno-orchestrator — run" --dangerously-skip-permissions
+
+# Sadece data agent
+claude -p "Skill: benseno-data-agent — run" --dangerously-skip-permissions
+
+# Sabah raporu manuel
+claude -p "Skill: benseno-dashboard-agent — sabah-raporu" --dangerously-skip-permissions
+
+# Slack Bot yeniden başlat
+pkill -f "slack-bot.js"; bash scripts/run-slack-bot.sh &
+
+# Slack List manuel güncelle
+node scripts/create-slack-list.js --update
+
+# Aktif launchd job'ları
+launchctl list | grep benseno
+
+# Canlı log izle
+tail -f logs/orchestrator.log
+tail -f logs/slack-bot.log
+```
+
+---
 
 ## Sistem Sabitleri
-- Slack Canvas ID: `F0B1B6XUD44`
-- Marka Kitabı Canvas: `F0B2ANKBBFV`
-- Lessons Learned Canvas: `F0B2H49SXPC`
-- Şablonlar Canvas: `F0B2F2REETG`
-- Grafik kanal: `C02SZRJGY0M` (#benseno-grafik)
-- GitHub repo: `bensenoint/dashboard`
-- Slack Workspace: `T4Y3R6RAN`
-- Timezone: `Europe/Istanbul` (UTC+3)
-- 39 marka, 16 kişi, 5 yönetici
 
-## Yöneticiler (5 kişi)
-| İsim | Slack ID | Rol |
-|---|---|---|
-| Görkem Kaya | U030C48PL23 | Genel Müdür (gorkem@benseno.com.tr) |
-| Reyhan Nur Pınar | UD96GH76E | GMY |
-| Cansu Kazgan | U4XCE3532 | Direktör (3 dept) |
-| İpek Akdeniz | U055EDESLSE | Tasarım Yöneticisi |
-| erdem akoğlu | U02SZQDAFPF | Editör Yöneticisi |
-
-## Tasarım Ekibi (7 kişi)
-| İsim | Slack ID | Not |
-|---|---|---|
-| Aylin Tozkoparan | U0AN6DD79M0 | |
-| Aykut Arslan | U06J26R1XCJ | |
-| Hasan Serdar Arda | U09BFPBKQG7 | |
-| Pelin Özdemir | U0B3K2WE7SB | YENİ — 15 May 2026 katıldı |
-| İpek Akdeniz | U055EDESLSE | Hem yönetici hem tasarımcı |
-| İrem Özkan | U0AK8U7L57F | |
-| Serhat | U08HLMHTGEL | |
-
-## Editör Ekibi (8 kişi)
-| İsim | Slack ID | Not |
-|---|---|---|
-| Cansu Kazgan | U4XCE3532 | Hem Direktör hem editör |
-| erdem akoğlu | U02SZQDAFPF | Hem Editör Yön. hem editör |
-| Eda Tireli | U09BZHR25NG | Bauhaus uzmanı |
-| Eda Ayral | U07PV0RA9L2 | |
-| Melis | U08NQJ27G5S | |
-| Aylin Canel | U05PP70GQTX | |
-| Buse Gürbüzer | U063T8M5HL4 | |
-| Simge Acar | U0AAC3YK20G | |
-
-## AI Ekibi (1 kişi)
-| İsim | Slack ID |
-|---|---|
-| Eren Mahzunlar | U0AP31SAA1W |
-
-## Aktif Scheduled Task'lar
-| Task | Zamanlama | Script |
-|---|---|---|
-| benseno-brief-sync | Hft içi :15/:45 (08:00-17:30) | `scripts/run-brief-sync.sh` |
-| benseno-gunluk-performans | Hft içi 07:50 | `scripts/run-sabah-raporu.sh` |
-| benseno-haftalik-retrospektif | Cuma 17:00 | `scripts/run-haftalik-retro.sh` |
-| benseno-aylik-strateji | Ay sonu 17:00 | `scripts/run-aylik-strateji.sh` |
-| benseno-onboarding | Manuel | `claude -p "Skill: benseno-onboarding — başlat: {ID} {İsim} {Tarih}"` |
-
-## KRİTİK Çalışma Kuralları (Claude için — ASLA İHLAL ETME)
-
-### Canvas Kuralları
-1. `slack_update_canvas` çağrısında **`section_id` parametresini ASLA geçme** — Slack Canvas API bug'ı, blockquote/footer çoğalır
-2. Canvas'a **H1 başlık YAZMA** — `# Benseno Tasarım İş Takip Panosu` yazılmamalı, title API tarafından ayrıca set edilir
-3. Canvas update'i her zaman **full replace** yap (tüm içerik tek seferde)
-4. Aktif İşler tablosu (11 sütun) ile Tamamlanan İşler tablosunu (12 sütun) **KARIŞTRIMA**
-   - Ayırt etme: 2. hücrede öncelik emoji (🔴/🟠/🟡/🟢) varsa → Aktif tablo
-
-### Dashboard Kuralları
-5. `dashboard/index.html` içindeki `<script>window.EMBEDDED_DATA = {...}</script>` bloğunu **ASLA SILME**
-6. `window.cowork` mock bloğunu da koru — bu olmadan ekip "Cowork bridge YOK" hatası görür
-7. Brief Sync her run'da sadece `canvas_markdown` alanını update eder, yapının geri kalanı kalır
-
-### GitHub Push Kuralları
-8. PAT dosyası: `data/.github-pat` — her push'ta 90 günlük expiry kontrol et
-9. PAT süresi dolmadan 7 gün önce Görkem'e DM at
-10. PAT-created tarihi: `data/.github-pat-created` (ISO format string)
-
-### Brief Sync Kuralları
-11. Brief önceliği **otomatik hesaplanır** (deadline'dan) — form'dan okuma, manuel set etme
-12. Yönetici reaction override'ı (🔴/🟠/🟡/🟢) **en son eklenen yönetici kazanır**
-13. Slack emoji arama'da unicode değil **shortcode kullan**: `:clipboard:` not `📋`
-14. Slack `after:BUGÜN` bugünü dahil etmez — `after:DÜN` veya Unix timestamp kullan
-15. UTC → TR çevrimi (+3 saat) zorunlu — Slack form datetime'ı UTC verir
-16. `marka_stats.json` mode kontrolü: `silent_log_only` ise DM gönderme, sadece log
-
-### Öncelik Hesabı (v7.12)
-- `delta ≤ 0h` → 🔴 Acil + GEÇMİŞ flag
-- `delta ≤ 8h` → 🔴 Acil
-- `delta ≤ 24h` → 🟠 Yüksek
-- `delta ≤ 72h` → 🟡 Normal
-- `delta > 72h` → 🟢 Düşük
-
-## MCP Tool İsimleri (Claude Code)
 ```
-mcp__claude_ai_Slack__slack_read_canvas
-mcp__claude_ai_Slack__slack_update_canvas  (section_id KULLANMA!)
-mcp__claude_ai_Slack__slack_read_channel
-mcp__claude_ai_Slack__slack_read_thread
-mcp__claude_ai_Slack__slack_search_public
-mcp__claude_ai_Slack__slack_search_public_and_private
-mcp__claude_ai_Slack__slack_send_message
-mcp__claude_ai_Slack__slack_send_message_draft
-mcp__claude_ai_Slack__slack_schedule_message
-mcp__claude_ai_Slack__slack_search_users
-mcp__claude_ai_Slack__slack_search_channels
-mcp__claude_ai_Slack__slack_read_user_profile
-mcp__claude_ai_Slack__slack_create_canvas
-mcp__claude_ai_Google_Calendar__create_event
-mcp__claude_ai_Google_Calendar__list_events
-mcp__claude_ai_Google_Calendar__update_event
-mcp__claude_ai_Google_Calendar__delete_event
-mcp__claude_ai_Gmail__search_threads
-mcp__claude_ai_Gmail__get_thread
-mcp__claude_ai_Gmail__create_draft
-mcp__claude_ai_Google_Drive__search_files
-mcp__claude_ai_Google_Drive__read_file_content
+CANVAS_ID          = F0B1B6XUD44          (Ana iş takip canvas)
+BRAND_BOOK         = F0B2ANKBBFV
+LESSONS_LEARNED    = F0B2H49SXPC
+TEMPLATES          = F0B2F2REETG
+GRAFIK_CHANNEL     = C02SZRJGY0M          (#benseno-grafik)
+GITHUB_REPO        = bensenoint/benseno-tasarim-sistemi
+DASHBOARD_URL      = https://bensenoint.github.io/benseno-tasarim-sistemi/
+TIMEZONE           = Europe/Istanbul (UTC+3)
 ```
-> Not: MCP tool isimleri `claude mcp list` çıktısına göre değişebilir. Yukarıdakiler beklenen isimler.
 
-## İlk Çalıştırma Sırası
-1. `claude mcp list` — Slack ve Google MCP'lerin aktif olduğunu doğrula
-2. `claude -p "Canvas F0B1B6XUD44'ü oku, footer'dan LAST_SYNC_TS değerini söyle"`
-3. `claude -p "Skill: benseno-brief-sync — dry run, sadece ne yapacağını söyle"`
-4. `launchctl list | grep benseno` — tüm job'ların aktif olduğunu doğrula
-5. `tail -f logs/brief-sync.log` — canlı log izle
+**Token dosyaları** (`data/` — git'e commit edilmez):
+- `.slack-bot-token` — xoxb-... (bot token)
+- `.slack-user-token` — xoxp-... (user token, lists:write için)
+- `.slack-app-token` — xapp-... (Socket Mode)
+- `.github-pat-sistem` — GitHub PAT (90 gün)
+- `.slack-list-id` — Aktif Slack List ID
 
-## Detaylı Sistem Bilgisi
-Bkz: `docs/CLAUDE_CODE_BENSENO_MASTER_PROMPT.md` — SİSTEMİN TAMAMI orada.
-Sorularını cevaplamadan önce ilgili bölümü oku.
+---
+
+## Ekip
+
+**Yöneticiler:** Görkem (U030C48PL23) · Reyhan (UD96GH76E) · Cansu (U4XCE3532) · İpek (U055EDESLSE) · erdem (U02SZQDAFPF)
+
+**Tasarım (7):** Aylin T (U0AN6DD79M0) · Aykut (U06J26R1XCJ) · Hasan Serdar (U09BFPBKQG7) · Pelin (U0B3K2WE7SB) · İpek (U055EDESLSE) · İrem (U0AK8U7L57F) · Serhat (U08HLMHTGEL)
+
+**Editör (8):** Cansu (U4XCE3532) · erdem (U02SZQDAFPF) · Eda T (U09BZHR25NG) · Eda A (U07PV0RA9L2) · Melis (U08NQJ27G5S) · Aylin C (U05PP70GQTX) · Buse (U063T8M5HL4) · Simge (U0AAC3YK20G)
+
+**AI (1):** Eren (U0AP31SAA1W)
+
+---
+
+## KRİTİK Çalışma Kuralları — ASLA İHLAL ETME
+
+### Canvas
+1. `slack_update_canvas`'ta **`section_id` parametresini KULLANMA** — Slack API bug'ı, blockquote/footer çoğalır
+2. Canvas'a **H1 başlık YAZMA** — title API tarafından ayrıca set edilir
+3. Canvas update her zaman **full replace** — kısmi güncelleme yok
+4. Değişiklik yoksa `slack_update_canvas` **ÇAĞIRMA** (idempotent kontrol)
+5. Aktif İşler (14 sütun) ile Tamamlanan İşler (12 sütun) tablolarını **KARIŞTRIMA**
+
+### Dashboard
+6. `dashboard/index.html`'deki `window.EMBEDDED_DATA = {` bloğunu **ASLA SILME**
+7. `bns_dept_stats` boş `{}` **GÖNDERMEsın** — mock data devreye girer, hatalı görünür
+8. `dashboard/app/` değişikliği sonrası mutlaka `build-dashboard.sh` çalıştır
+
+### GitHub
+9. PAT dosyası: `data/.github-pat-sistem` — 90 günlük expiry
+10. Push'tan önce remote URL'yi PAT ile set et: `https://{PAT}@github.com/bensenoint/benseno-tasarim-sistemi.git`
+
+### Brief Sync
+11. Brief önceliği **deadline'dan otomatik hesaplanır** (v7.12) — forma bakma
+12. Yönetici reaction override: en son eklenen yönetici kazanır
+13. UTC → TR çevirimi zorunlu (+3 saat) — Slack form datetime UTC verir
+14. Canvas cache TTL: 30dk — `canvas_cache.md` <30dk ise `slack_read_canvas` ÇAĞIRMA
+15. `marka_stats.json` mode `silent_log_only` ise E3 DM gönderme, sadece log yaz
+
+### Öncelik Hesabı
+- `delta ≤ 0h` → 🔴 + GEÇMİŞ | `≤ 8h` → 🔴 | `≤ 24h` → 🟠 | `≤ 72h` → 🟡 | `> 72h` → 🟢
+
+---
+
+## MCP Tool İsimleri
+
+Bu session'daki aktif Slack MCP ID: `8d40c455-2f52-4946-b26f-009e54bc2168`
+
+```
+mcp__8d40c455-...__slack_read_canvas
+mcp__8d40c455-...__slack_update_canvas   ← section_id KULLANMA!
+mcp__8d40c455-...__slack_read_channel
+mcp__8d40c455-...__slack_read_thread
+mcp__8d40c455-...__slack_search_public_and_private
+mcp__8d40c455-...__slack_send_message
+mcp__8d40c455-...__slack_schedule_message
+mcp__8d40c455-...__slack_search_users
+mcp__8d40c455-...__slack_read_user_profile
+```
+
+> MCP ID değişirse `claude mcp list` çıktısına bak.
+
+---
+
+## Scheduled Task'lar
+
+| Task | Zamanlama | Script | Skill |
+|---|---|---|---|
+| Orchestrator (Brief Sync) | Hft içi :15/:45 (08-17) | `run-orchestrator.sh` | `benseno-orchestrator` |
+| Sabah Raporu | Hft içi 07:50 | `run-sabah-raporu.sh` | `benseno-dashboard-agent — sabah-raporu` |
+| Haftalık Retro | Cuma 17:00 | `run-haftalik-retro.sh` | `benseno-dashboard-agent — haftalik-retro` |
+| Aylık Strateji | Ay sonu 17:00 | `run-aylik-strateji.sh` | `benseno-dashboard-agent — aylik-strateji` |
+| Slack Bot | Her zaman | `run-slack-bot.sh` | — |
+| Onboarding | Manuel | — | `benseno-onboarding — başlat: {ID} {İsim} {Tarih}` |
+
+---
+
+## Sıkça Karşılaşılan Sorunlar
+
+**Dashboard yüklenmiyor / loading screen'de kalıyor:**
+→ `build-dashboard.sh` çalıştır, `rsync -av --delete dashboard/app/ app/` yap, GitHub'a push et.
+
+**"DeptRow: cannot read properties of undefined":**
+→ `bns_dept_stats: {}` boş gönderilmiş. `data.js`'deki guard'ı kontrol et.
+
+**Canvas cache stale:**
+→ `data/canvas_cache.md`'yi sil, bir sonraki sync'te yenilenir.
+
+**Slack Bot ölmüş:**
+→ `ps aux | grep slack-bot` kontrol et, `bash scripts/run-slack-bot.sh &` ile yeniden başlat.
+
+**GitHub push 401:**
+→ `data/.github-pat-sistem` yenile, 90 günlük expiry dolmuş.

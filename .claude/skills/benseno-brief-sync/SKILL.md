@@ -1,7 +1,13 @@
 ---
 name: benseno-brief-sync
-description: v7.13 · Brief Sync. v7.12 + E3 marka davranış öğrenmesi. marka_stats.json okunur — yeni brief'in deadline'ı markanın medyan ± 1× MAD aralığı dışındaysa yumuşak uyarı (Şablon 27/28). Silent mode: 18 May - 31 May (log only), 1 Haziran'dan itibaren tam aktif (DM + dashboard etiketi).
+description: "⚠️ DEPRECATED — Mayıs 2026den itibaren benseno-orchestrator kullanılıyor. Sadece referans/fallback."
 ---
+
+> ⚠️ **DEPRECATED** — Bu skill artık doğrudan çağrılmaz.
+> Yerine: `Skill: benseno-orchestrator — run`
+> Alt skill'ler: benseno-data-agent, benseno-notification-agent, benseno-dashboard-agent
+
+
 
 # Benseno — Brief Sync v7.13 (marka davranış öğrenmesi)
 
@@ -74,7 +80,7 @@ TEMPLATES_CANVAS_ID = F0B2F2REETG
 GRAFIK_CHANNEL_ID = C02SZRJGY0M
 TIMEZONE = Europe/Istanbul (UTC+3)
 PRIMARY_CALENDAR = gorkem@benseno.com.tr
-DASHBOARD_URL = https://bensenoint.github.io/dashboard/
+DASHBOARD_URL = https://bensenoint.github.io/benseno-tasarim-sistemi/
 GITHUB_REPO = bensenoint/dashboard
 GITHUB_PAT_FILE = ~/benseno-tasarim-sistemi/data/.github-pat
 DASHBOARD_AUTH_HASH_FILE = ~/benseno-tasarim-sistemi/data/.dashboard-auth-hash
@@ -396,7 +402,7 @@ Her brief için (queue veya search fark etmez):
 > 💡 v7.11 · workflow ile tam senkron · 16 kişi.
 
 ## 📊 Canlı Dashboard
-🔒 [Birleşik Dashboard](https://bensenoint.github.io/dashboard/) ← şifre korumalı
+🔒 [Birleşik Dashboard](https://bensenoint.github.io/benseno-tasarim-sistemi/) ← şifre korumalı
 🏷️ [Marka Kitabı](...) · 🎓 [Lessons](...) · 📐 [Templates](...)
 
 ## 🎨 Tasarımcı (7) | ✍️ Editör (8) | 🤖 AI (1)
@@ -412,7 +418,7 @@ Her brief için (queue veya search fark etmez):
 
 ---
 > 🔄 Son sync: {şimdi} · `LAST_SYNC_TS={unix}`
-🔒 Dashboard: https://bensenoint.github.io/dashboard/
+🔒 Dashboard: https://bensenoint.github.io/benseno-tasarim-sistemi/
 ```
 
 ### 11. Calendar — yeni format
@@ -518,7 +524,7 @@ PAT: {days}/90
 P7-C1/C2/C3 · 🔒 Force:{N} · 👻 Ghost:{N}
 Thread→Parent:{N} · 🔴+@auto:{N} · Eren OOO:{N}
 Pelin atama:{N}
-Dashboard: https://bensenoint.github.io/dashboard/
+Dashboard: https://bensenoint.github.io/benseno-tasarim-sistemi/
 ```
 
 ## HATA KURTARMA
