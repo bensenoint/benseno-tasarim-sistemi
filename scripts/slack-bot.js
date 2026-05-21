@@ -125,26 +125,24 @@ const CANVAS_CACHE_PATH = path.join(PROJECT_DIR, 'data/canvas_cache.md');
 const CANVAS_CACHE_TTL_MS = 30 * 60 * 1000; // 30 dk — Brief Sync ritmiyle uyumlu
 
 async function fetchCanvas(_client) {
-  // 1) Cache fresh ise dön
+  // 1) Cache her zaman önce dön (Brief Sync zaten :15/:45'te günceller)
   try {
     const stat = fs.statSync(CANVAS_CACHE_PATH);
     const age = Date.now() - stat.mtimeMs;
     if (age < CANVAS_CACHE_TTL_MS) {
       return fs.readFileSync(CANVAS_CACHE_PATH, 'utf8');
     }
-  } catch (_) { /* cache yok — devam et */ }
+    // Cache var ama eski — yine de dön (Claude CLI'den daha güvenilir)
+    const staleContent = fs.readFileSync(CANVAS_CACHE_PATH, 'utf8');
+    if (staleContent && staleContent.length > 100) {
+      log(`canvas cache stale (${Math.round(age/60000)}dk) — stale cache döndürülüyor`);
+      return staleContent;
+    }
+  } catch (_) { /* cache yok */ }
 
-  // 2) Claude CLI ile çek (yavaş yol)
-  const { stdout } = await execFileAsync(
-    '/bin/sh',
-    ['-c', `/opt/homebrew/bin/claude -p "Canvas ${CANVAS_ID}'i oku ve içeriğini olduğu gibi döndür. Sadece canvas metni, açıklama ekleme." --print --dangerously-skip-permissions < /dev/null`],
-    { cwd: PROJECT_DIR, timeout: 180000, env: { ...process.env, PATH: '/opt/homebrew/bin:/usr/local/bin:' + process.env.PATH } }
-  );
-
-  // 3) Cache'i yaz (en kötü ihtimalle stale döneriz, hiç yoktan iyi)
-  try { fs.writeFileSync(CANVAS_CACHE_PATH, stdout, 'utf8'); } catch (e) { log(`canvas cache yazılamadı: ${e.message}`); }
-
-  return stdout;
+  // 2) Cache yoksa boş string dön — Claude CLI'yi çağırma (çalışmıyor)
+  log('canvas cache yok — boş döndürülüyor, Brief Sync bekleniyor');
+  return '';
 }
 
 /**
