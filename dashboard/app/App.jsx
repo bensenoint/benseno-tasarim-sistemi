@@ -1,7 +1,7 @@
 // app/App.jsx — root, owns global state and tweaks.
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "theme": "dark",
+  "theme": "light",
   "density": "comfortable",
   "defaultView": "all",
   "tableMode": "table",
