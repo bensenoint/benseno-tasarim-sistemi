@@ -1,7 +1,7 @@
 {
-  "now": "2026-05-20T13:52:17.571092+00:00",
-  "last_sync": "2026-05-20T13:36:00.708Z",
-  "source": "manual-full-rebuild",
+  "now": "2026-05-21T11:55:01.137311+00:00",
+  "last_sync": "2026-05-21T11:55:01.137311+00:00",
+  "source": "brief-sync-run-1779364501",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
@@ -368,6 +368,35 @@
       "gecmis": "",
       "_from_queue": true,
       "_kimden_id": "U0AP31SAA1W"
+    },
+    {
+      "id": "br_live_1779363838575629",
+      "no": 14,
+      "marka": "VDM Petdent",
+      "brand": {
+        "name": "Vdm Petdent",
+        "color": "#6A8E3D",
+        "wheelIdx": 11,
+        "channel_id": "C0AQLPY4TUM",
+        "channel_name": "marka-vdm-petdent"
+      },
+      "baslik": "bahar video (Video · Paralel Cansu+Görkem+Eren)",
+      "leadId": "U030C48PL23",
+      "contribIds": [
+        "U4XCE3532",
+        "U030C48PL23",
+        "U0AP31SAA1W"
+      ],
+      "reviewerId": "U030C48PL23",
+      "acilma": "2026-05-21T14:43:58.575+03:00",
+      "deadline": "2026-05-23T14:42:00+03:00",
+      "durum": "yeni",
+      "priority": "🟡",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629",
+      "notes": "23 May 2026 14:42 TR (1g 23sa 57dk lead · Tip Video · Ref www.benseno.com.tr · Not: bahar dönemini anlatan bir video · 📎 logo png · cross-dept · dept ambiguity (📋 default) · marka VDM Petdent n=0 → kıyas atlandı · silent_log)",
+      "gecmis": "⏳21May14:43 (Görkem GM açtı · workflow · 🔔 otomatik 🟡 [47sa 57dk≤72sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log)"
     }
   ],
   "bns_completed": [],
@@ -399,20 +428,6 @@
       "wheelIdx": 15,
       "channel_id": "C05DF8RFQ77",
       "channel_name": "marka-cureffect"
-    },
-    {
-      "name": "Dermaqual",
-      "color": "#8E5BA1",
-      "wheelIdx": 12,
-      "channel_id": "C08QEE4GPFW",
-      "channel_name": "marka-dermaqual"
-    },
-    {
-      "name": "Efor Eforçay",
-      "color": "#B79100",
-      "wheelIdx": 15,
-      "channel_id": "C07MY8EFG0Z",
-      "channel_name": "marka-efor-eforçay"
     },
     {
       "name": "Egosport",
@@ -525,13 +540,6 @@
       "wheelIdx": 1,
       "channel_id": "C03M070G8HY",
       "channel_name": "marka-kmr-serve"
-    },
-    {
-      "name": "Krups",
-      "color": "#F28E2B",
-      "wheelIdx": 1,
-      "channel_id": "C04RSD57ZMK",
-      "channel_name": "marka-krups"
     },
     {
       "name": "Kuzeypet",
@@ -847,28 +855,6 @@
       "problem_label": null
     },
     {
-      "name": "Dermaqual",
-      "color": "#8E5BA1",
-      "wheelIdx": 12,
-      "channel_id": "C08QEE4GPFW",
-      "channel_name": "marka-dermaqual",
-      "active": 0,
-      "overdue": 0,
-      "stale": false,
-      "problem_label": null
-    },
-    {
-      "name": "Efor Eforçay",
-      "color": "#B79100",
-      "wheelIdx": 15,
-      "channel_id": "C07MY8EFG0Z",
-      "channel_name": "marka-efor-eforçay",
-      "active": 0,
-      "overdue": 0,
-      "stale": false,
-      "problem_label": null
-    },
-    {
       "name": "Egosport",
       "color": "#9C755F",
       "wheelIdx": 7,
@@ -1039,17 +1025,6 @@
       "wheelIdx": 1,
       "channel_id": "C03M070G8HY",
       "channel_name": "marka-kmr-serve",
-      "active": 0,
-      "overdue": 0,
-      "stale": false,
-      "problem_label": null
-    },
-    {
-      "name": "Krups",
-      "color": "#F28E2B",
-      "wheelIdx": 1,
-      "channel_id": "C04RSD57ZMK",
-      "channel_name": "marka-krups",
       "active": 0,
       "overdue": 0,
       "stale": false,

@@ -430,20 +430,6 @@
       "channel_name": "marka-cureffect"
     },
     {
-      "name": "Dermaqual",
-      "color": "#8E5BA1",
-      "wheelIdx": 12,
-      "channel_id": "C08QEE4GPFW",
-      "channel_name": "marka-dermaqual"
-    },
-    {
-      "name": "Efor Eforçay",
-      "color": "#B79100",
-      "wheelIdx": 15,
-      "channel_id": "C07MY8EFG0Z",
-      "channel_name": "marka-efor-eforçay"
-    },
-    {
       "name": "Egosport",
       "color": "#9C755F",
       "wheelIdx": 7,
@@ -554,13 +540,6 @@
       "wheelIdx": 1,
       "channel_id": "C03M070G8HY",
       "channel_name": "marka-kmr-serve"
-    },
-    {
-      "name": "Krups",
-      "color": "#F28E2B",
-      "wheelIdx": 1,
-      "channel_id": "C04RSD57ZMK",
-      "channel_name": "marka-krups"
     },
     {
       "name": "Kuzeypet",
@@ -876,28 +855,6 @@
       "problem_label": null
     },
     {
-      "name": "Dermaqual",
-      "color": "#8E5BA1",
-      "wheelIdx": 12,
-      "channel_id": "C08QEE4GPFW",
-      "channel_name": "marka-dermaqual",
-      "active": 0,
-      "overdue": 0,
-      "stale": false,
-      "problem_label": null
-    },
-    {
-      "name": "Efor Eforçay",
-      "color": "#B79100",
-      "wheelIdx": 15,
-      "channel_id": "C07MY8EFG0Z",
-      "channel_name": "marka-efor-eforçay",
-      "active": 0,
-      "overdue": 0,
-      "stale": false,
-      "problem_label": null
-    },
-    {
       "name": "Egosport",
       "color": "#9C755F",
       "wheelIdx": 7,
@@ -1068,17 +1025,6 @@
       "wheelIdx": 1,
       "channel_id": "C03M070G8HY",
       "channel_name": "marka-kmr-serve",
-      "active": 0,
-      "overdue": 0,
-      "stale": false,
-      "problem_label": null
-    },
-    {
-      "name": "Krups",
-      "color": "#F28E2B",
-      "wheelIdx": 1,
-      "channel_id": "C04RSD57ZMK",
-      "channel_name": "marka-krups",
       "active": 0,
       "overdue": 0,
       "stale": false,

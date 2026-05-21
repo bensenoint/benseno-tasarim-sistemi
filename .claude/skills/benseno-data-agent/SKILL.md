@@ -22,14 +22,12 @@ TIMEZONE           = Europe/Istanbul (UTC+3)
 WORKFLOW_BOT_NAME  = "Yeni Brief Aç"
 ```
 
-## CHANNEL → MARKA MAPPING (39 marka)
+## CHANNEL → MARKA MAPPING (35 marka)
 ```
 marka-bauhaus → Bauhaus
 marka-beta → Beta
 marka-cimporglobal → Cimporglobal
 marka-cureffect → Cureffect
-marka-dermaqual → Dermaqual
-marka-efor-eforçay → Efor (Eforçay)
 marka-efor-ofçay → Efor (Ofçay)
 marka-egosport → Egosport
 marka-gursoy → Gürsoy
@@ -45,9 +43,7 @@ marka-kmr-lamy → KMR Lamy
 marka-kmr-marshmallow → KMR Marshmallow
 marka-kmr-max → KMR Max
 marka-kmr-panfix → KMR Panfix
-marka-kmr-scase → KMR S-Case
 marka-kmr-serve → KMR Serve
-marka-krups → Krups
 marka-kuzeypet → Kuzeypet
 marka-kzy-bark → KZY Bark
 marka-kzy-everclean → KZY Everclean

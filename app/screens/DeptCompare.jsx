@@ -1,7 +1,17 @@
 // app/screens/DeptCompare.jsx — bar charts comparing Tasarım / Editör / AI.
 
 function DeptCompareScreen({ data }) {
-  const d = data.deptStats;
+  const raw = data.deptStats || {};
+  const DEPT_DEF = {
+    tasarim: { name: "Tasarım", people: 7, active: 0, overdue: 0, capacity: 0, completed30: 0, avgComplete: 0, revRate: 0 },
+    editor:  { name: "Editör",  people: 8, active: 0, overdue: 0, capacity: 0, completed30: 0, avgComplete: 0, revRate: 0 },
+    ai:      { name: "AI",      people: 1, active: 0, overdue: 0, capacity: 0, completed30: 0, avgComplete: 0, revRate: 0 },
+  };
+  const d = {
+    tasarim: { ...DEPT_DEF.tasarim, ...(raw.tasarim || {}) },
+    editor:  { ...DEPT_DEF.editor,  ...(raw.editor  || {}) },
+    ai:      { ...DEPT_DEF.ai,      ...(raw.ai      || {}) },
+  };
   const metrics = [
     { key: "completed30", label: "Tamamlanan iş (30 gün)", unit: "" },
     { key: "avgComplete", label: "Ort. tamamlama süresi",   unit: "sa" },
