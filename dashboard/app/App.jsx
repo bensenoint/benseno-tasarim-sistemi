@@ -19,6 +19,7 @@ function App() {
   // App state
   const [user, setUser] = React.useState(data.ME);
   const [tab, setTab] = React.useState("overview");
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [viewMode, setViewMode] = React.useState(t.defaultView);
   const [openBrief, setOpenBrief] = React.useState(null);
   const [briefs, setBriefs] = React.useState(data.briefs); // mutable for live edits
@@ -209,7 +210,7 @@ function App() {
   else Screen = <div>Not found</div>;
 
   return (
-    <div data-screen-label={tab}>
+    <div data-screen-label={tab} style={{display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden"}}>
       <Header
         user={user}
         viewMode={viewMode} setViewMode={setViewMode}
@@ -218,14 +219,30 @@ function App() {
         onNewBrief={() => setNewBrief(true)}
         defaultUsers={Object.assign([...data.USERS], { onPick: (u) => setUser(u) })}
       />
-      <TabBar active={tab} onChange={setTab} style={t.tabStyle}/>
-
-      <main key={tab + t.overviewLayout} style={{
-        maxWidth: 1440, margin: "0 auto",
-        padding: "8px 24px 64px"
-      }}>
-        {Screen}
-      </main>
+      <div style={{display:"flex", flex:1, overflow:"hidden"}}>
+        <Sidebar
+          active={tab} onChange={setTab}
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(v => !v)}
+          data={liveData}
+        />
+        <main key={tab + t.overviewLayout} style={{
+          flex: 1, overflowY: "auto", overflowX: "hidden",
+          background: "var(--paper)",
+        }}>
+          <div style={{maxWidth: 1400, margin: "0 auto", padding: "16px 28px 72px"}}>
+            {Screen}
+          </div>
+          <footer style={{
+            padding: "14px 28px 28px", maxWidth: 1400, margin: "0 auto",
+            display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8,
+            font: "400 11px/1 var(--font-sans)", color: "var(--ink-5)"
+          }}>
+            <span>{data.fmtTr ? data.fmtTr(data.lastSync ? Date.parse(data.lastSync) : data.NOW, {style:"footer"}) : "Son senkron · 21 May 2026 · 14:45 (Europe/Istanbul)"}</span>
+            <span style={{fontFamily:"var(--font-mono)"}}>Benseno v7.13 · GitHub Pages</span>
+          </footer>
+        </main>
+      </div>
 
       {openBrief && (
         <BriefDrawer brief={openBrief} onClose={onCloseBrief}
@@ -250,15 +267,6 @@ function App() {
 
       <ShortcutsHint/>
 
-      <footer style={{
-        padding: "16px 24px 32px", maxWidth: 1440, margin: "0 auto",
-        display: "flex", justifyContent: "space-between", alignItems:"center", flexWrap: "wrap", gap: 8,
-        font: "400 12px/1 var(--font-sans)", color:"var(--ink-4)"
-      }}>
-        <span>{data.fmtTr ? data.fmtTr(data.lastSync ? Date.parse(data.lastSync) : data.NOW, {style:"footer"}) : "Son senkron · 18 May 2026 · 14:30 (Europe/Istanbul)"}</span>
-        <span style={{fontFamily:"var(--font-mono)"}}>Benseno v7.13 · GitHub Pages</span>
-      </footer>
-
       <BenseoTweaks t={t} setTweak={setTweak}/>
     </div>
   );
@@ -277,11 +285,6 @@ function BenseoTweaks({ t, setTweak }) {
         onChange={(v) => setTweak("density", v)}/>
       <TweakToggle label="Paper noise" value={t.noise}
         onChange={(v) => setTweak("noise", v)}/>
-
-      <TweakSection label="Tab bar"/>
-      <TweakRadio  label="Stil" value={t.tabStyle}
-        options={["underline", "pill", "hairline"]}
-        onChange={(v) => setTweak("tabStyle", v)}/>
 
       <TweakSection label="Aktif işler"/>
       <TweakRadio  label="Görünüm" value={t.tableMode}
