@@ -7,10 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="app/tokens.css">
-<!-- React + Babel Standalone (build-stepless) -->
+<!-- React (pre-built — no Babel runtime overhead) -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
 /* Loading screen */
 #bns-loading {
@@ -72,37 +71,13 @@ window.EMBEDDED_DATA = {
 <!-- data.js: EMBEDDED_DATA → window.BNS_DATA bridge (plain script, no Babel) -->
 <script src="app/data.js"></script>
 
-<!-- JSX Components — Babel transpiles at runtime -->
-<!-- Load order: primitives → atoms → composite → screens → root -->
-<script type="text/babel" src="app/Icons.jsx" data-type="module"></script>
-<script type="text/babel" src="app/Atoms.jsx" data-type="module"></script>
-<script type="text/babel" src="app/Cards.jsx" data-type="module"></script>
-<script type="text/babel" src="app/BriefTable.jsx" data-type="module"></script>
-<script type="text/babel" src="app/BriefDrawer.jsx" data-type="module"></script>
-<script type="text/babel" src="app/CommandPalette.jsx" data-type="module"></script>
-<script type="text/babel" src="app/NewBrief.jsx" data-type="module"></script>
-<script type="text/babel" src="app/tweaks-panel.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Overview.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Manager.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Jobs.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Plan.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Kanban.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Completed.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/DeptCompare.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Department.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/History.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Gallery.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Multi.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Brand.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Team.jsx" data-type="module"></script>
-<script type="text/babel" src="app/screens/Profile.jsx" data-type="module"></script>
-<script type="text/babel" src="app/Chrome.jsx" data-type="module"></script>
-<script type="text/babel" src="app/App.jsx" data-type="module"></script>
+<!-- Pre-built bundle (esbuild — no Babel runtime) -->
+<script src="app/bundle.js"></script>
 
-<!-- Bootstrap: mount React app after all scripts load -->
-<script type="text/babel" data-type="module">
+<!-- Bootstrap: mount React app -->
+<script>
   const root = ReactDOM.createRoot(document.getElementById("root"));
-  root.render(<App />);
+  root.render(React.createElement(App));
 </script>
 
 <!-- Loading screen hide — plain script, polls until React has mounted (#root has children) -->
