@@ -363,16 +363,33 @@ Her brief için (queue veya search fark etmez):
 1. `~/benseno-tasarim-sistemi/dashboard/index.html` oku
 2. `window.EMBEDDED_DATA = {…}` bloğunu regex replace et:
    - `canvas_markdown`: bu run'daki yeni Canvas markdown (backtick + `${}` escape)
+   - `bns_briefs`: aktif brief'ler (JSON array)
+   - `bns_completed`: son 90 günde tamamlananlar (JSON array)
+   - `bns_brands`: 39 marka listesi (JSON array)
+   - `bns_users`: 16+ kullanıcı listesi (JSON array)
+   - `bns_dept_stats`: departman istatistikleri (JSON object — tasarim/editor/ai key'leri zorunlu, her biri: name/people/active/overdue/capacity/completed30/avgComplete/revRate)
+   - `bns_brand_stats`: marka istatistikleri (JSON array)
    - `generated_at`: şimdiki ISO 8601
    - `sync_ts`: şimdiki unix timestamp
    - `source`: `"brief-sync-run-{unix_ts}"`
-3. Dosyayı `~/benseno-tasarim-sistemi/github-prep/dashboard/index.html`'e yaz
-4. Git push: `git add index.html marka_stats.json && git commit -m "Brief Sync v7.13 run" && git push origin main`
-5. GitHub Pages 1-2 dk içinde deploy eder (bensenoint.github.io/dashboard/)
+3. Aynı JSON'u `~/benseno-tasarim-sistemi/dashboard/app/live-data.json` dosyasına da yaz (App.jsx her 30sn polling yapar)
+4. `cp dashboard/index.html index.html` ile root kopyasını güncelle
+5. Git push: `git add dashboard/index.html dashboard/app/live-data.json index.html marka_stats.json && git commit -m "Brief Sync v7.13 run" && git push origin main`
+6. GitHub Pages 1-2 dk içinde deploy eder (bensenoint.github.io/benseno-tasarim-sistemi/)
+
+**bns_dept_stats örnek format:**
+```json
+{
+  "tasarim": { "name": "Tasarım", "people": 6, "active": 8, "overdue": 2, "capacity": 78, "completed30": 24, "avgComplete": 26.4, "revRate": 18 },
+  "editor":  { "name": "Editör",  "people": 6, "active": 6, "overdue": 1, "capacity": 65, "completed30": 18, "avgComplete": 34.1, "revRate": 22 },
+  "ai":      { "name": "AI",      "people": 1, "active": 4, "overdue": 0, "capacity": 90, "completed30": 12, "avgComplete": 18.7, "revRate": 11 }
+}
+```
 
 **Hata kontrolü:**
 - `EMBEDDED_DATA` pattern bulunamazsa → Görkem'e DM
 - GitHub push 401/403 → PAT yenileme gerekli, Görkem'e DM
+- `bns_dept_stats` boş `{}` gönderilmez — mock data devreye girer ama eksik veri olur
 
 ### 10. CANVAS FULL REPLACE template
 ```

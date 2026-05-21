@@ -410,7 +410,7 @@ try {
       window.BNS_DATA.completed = ed.bns_completed.map(bnsHydrateCompleted);
     }
     // Departman istatistikleri (canlı brief'lerden bot tarafından hesaplandı)
-    if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object") {
+    if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object" && Object.keys(ed.bns_dept_stats).length > 0) {
       window.BNS_DATA.deptStats = ed.bns_dept_stats;
     }
     // Marka istatistikleri (problemli markalar paneli için)

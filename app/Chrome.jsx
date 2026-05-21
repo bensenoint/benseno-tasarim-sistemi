@@ -41,11 +41,8 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       borderBottom: "1px solid var(--line)"
     }}>
       <div style={{display:"flex", alignItems:"center", gap:8}}>
-        <I.Mark size={22}/>
-        <span style={{
-          fontFamily: "var(--font-display)", fontStyle: "italic",
-          fontSize: 22, lineHeight: 1, color: "var(--ink)", letterSpacing: "-0.01em"
-        }}>Benseno</span>
+
+        <img src="app/logo.png" alt="Benseno" style={{height: 44, width: "auto", objectFit: "contain", display: "block", mixBlendMode: "multiply"}}/>
         <span style={{
           font:"500 10px/1 var(--font-mono)", color:"var(--ink-4)",
           marginLeft: 4, padding: "3px 6px", borderRadius: 4, background: "var(--paper-2)"

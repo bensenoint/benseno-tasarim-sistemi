@@ -1,181 +1,376 @@
-// dashboard/app/live-data.js — Work Tracking Slack Bot tarafından yazıldı.
-// Bot her 30 saniyede + her reaction/yeni brief event'inde bu dosyayı yeniden üretir.
-// Kaynak: Slack Canvas F0B1B6XUD44 (parse + brief queue birleşim)
-// data.js içindeki LIVE DATA BRIDGE bu objeyi okur, BNS_DATA'yı override eder.
-
 window.EMBEDDED_DATA = {
-  "now": "2026-05-20T13:32:32.965Z",
-  "last_sync": "2026-05-20T13:32:32.965Z",
-  "source": "work-tracking-bot",
-  "reason": "interval",
+  "now": "2026-05-20T13:52:17.571092+00:00",
+  "last_sync": "2026-05-20T13:36:00.708Z",
+  "source": "manual-full-rebuild",
   "bns_briefs": [
     {
       "id": "br_live_1779099416366989",
       "no": 1,
       "marka": "JNJ Vision TR",
+      "brand": {
+        "name": "JNJ Vision TR",
+        "color": "#76B7B2",
+        "wheelIdx": 4,
+        "channel_id": "C4Y58FEUU",
+        "channel_name": "marka-jnj-vision-tr"
+      },
       "baslik": "24 Haziran Kontakt Lens Davetiyesi",
-      "leadId": "U0AN6DD79M0",
+      "leadId": "U08NQJ27G5S",
       "contribIds": [
         "U4XCE3532",
         "U02SZQDAFPF",
         "U055EDESLSE",
         "U030C48PL23",
         "U0AAC3YK20G",
-        "U09BZHR25NG"
+        "U09BZHR25NG",
+        "U0AN6DD79M0"
       ],
       "reviewerId": "U08NQJ27G5S",
-      "acilma": "2026-05-18T10:16:56.366+00:00",
+      "acilma": "2026-05-18T10:16:56.366989+00:00",
       "deadline": "2026-05-18T16:00:00+03:00",
-      "durum": "incelemede",
+      "durum": "yeni",
+      "priority": "🔴",
       "revision": 1,
-      "stale": false,
+      "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "notes": "👀 Revize bekliyor (v2 teslim 18May17:22 · son aktivite 1g 20sa 49dk önce) · <@U08NQJ27G5S>",
-      "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22",
-      "_oncelik": "\ud83d"
+      "notes": "18 May 2026 16:00 TR ⚠️ GEÇMİŞ (1g 22sa 15dk geride · ✓ teyit edilmiş — bakanlık süreci)",
+      "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22"
     },
     {
       "id": "br_live_1779104369515529",
       "no": 2,
       "marka": "Hasvet",
+      "brand": {
+        "name": "Hasvet",
+        "color": "#E15759",
+        "wheelIdx": 5,
+        "channel_id": "C081GAK936J",
+        "channel_name": "marka-hasvet"
+      },
       "baslik": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
-      "leadId": "U0AK8U7L57F",
+      "leadId": "U08NQJ27G5S",
       "contribIds": [
         "U4XCE3532",
         "U055EDESLSE",
         "U02SZQDAFPF",
         "U030C48PL23",
         "U063T8M5HL4",
-        "U0AAC3YK20G"
+        "U0AAC3YK20G",
+        "U0AK8U7L57F"
       ],
       "reviewerId": "U08NQJ27G5S",
-      "acilma": "2026-05-18T11:39:29.515+00:00",
+      "acilma": "2026-05-18T11:39:29.515529+00:00",
       "deadline": "2026-05-21T16:00:00+03:00",
-      "durum": "tamamlandi",
+      "durum": "yeni",
+      "priority": "🟡",
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C081GAK936J/p1779104369515529",
-      "notes": "🎨 Dispatch tamamlandı (İpek 10:22 → İrem 10:35 ✅ kabul · İrem JnJ bitince başlayacak) · <@U08NQJ27G5S>",
-      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡→↪️20May10:22 İpek dispatch İrem→✅20May10:35 İrem kabul",
-      "_oncelik": "\ud83d"
+      "notes": "21 May 2026 16:00 TR (1g 1sa 45dk kaldı · son hareket 3sa 40dk önce · pasif değil)",
+      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡→↪️20May10:22 İpek dispatch İrem→✅20May10:35 İrem kabul"
     },
     {
       "id": "br_live_1779167651759819",
       "no": 3,
       "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
       "baslik": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
-      "leadId": "U06J26R1XCJ",
+      "leadId": "U030C48PL23",
       "contribIds": [
+        "U06J26R1XCJ",
         "U09BZHR25NG"
       ],
       "reviewerId": "U030C48PL23",
-      "acilma": "2026-05-19T05:14:11.759+00:00",
+      "acilma": "2026-05-19T05:14:11.759819+00:00",
       "deadline": "2026-05-20T10:00:00+03:00",
       "durum": "yeni",
+      "priority": "🔴",
       "revision": 0,
       "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "notes": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · 30sa 1dk pasif · ⏰ deadline kaçtı · eskalasyon DM ~6.5sa cevapsız · YÖNETİCİ MÜDAHALESİ ŞART) · <@U030C48PL23>",
-      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (4sa 15dk geride)",
-      "_oncelik": "\ud83d"
+      "notes": "20 May 2026 10:00 TR ⚠️ GEÇMİŞ (4sa 15dk geride 🚨🚨🚨) · STALE 🔴 sürüyor",
+      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (4sa 15dk geride)"
     },
     {
       "id": "br_live_1779167921567269",
       "no": 4,
       "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
       "baslik": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
-      "leadId": "U055EDESLSE",
+      "leadId": "U030C48PL23",
       "contribIds": [
+        "U055EDESLSE",
         "U030C48PL23"
       ],
       "reviewerId": "U030C48PL23",
-      "acilma": "2026-05-19T05:18:41.567+00:00",
+      "acilma": "2026-05-19T05:18:41.567269+00:00",
       "deadline": "2026-05-21T13:00:00+03:00",
       "durum": "yeni",
+      "priority": "🟠",
       "revision": 0,
-      "stale": true,
+      "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "notes": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Görkem+İpek'e DM ~29sa cevapsız · İpek dispatch bekleniyor — Serhat müsait, İrem Hasvet'te · 🟠 Yüksek, kapasite kararı acil) · <@U030C48PL23>",
-      "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini) / 📈20May13:17 öncelik 🟡→🟠 (auto-recalc · 23sa 43dk ≤24sa)",
-      "_oncelik": "\ud83d"
+      "notes": "21 May 2026 13:00 TR (22sa 45dk kaldı · 🟠 Yüksek — transition 13:17)",
+      "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini) / 📈20May13:17 öncelik 🟡→🟠 (auto-recalc · 23sa 43dk ≤24sa)"
     },
     {
       "id": "br_live_1779187350819039",
       "no": 5,
       "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
       "baslik": "Broşür (Print · AI · Eren self-assign)",
       "leadId": "U0AP31SAA1W",
-      "contribIds": [],
+      "contribIds": [
+        "U0AP31SAA1W"
+      ],
       "reviewerId": "U0AP31SAA1W",
-      "acilma": "2026-05-19T10:42:30.819+00:00",
+      "acilma": "2026-05-19T10:42:30.819039+00:00",
       "deadline": "2026-05-21T13:42:00+03:00",
       "durum": "yeni",
+      "priority": "🟠",
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-      "notes": "⏳ Yeni açıldı (Eren self-assign · sabah hatırlatma DM gönderildi · Eren bugün Bauhaus 20 May İçerik thread'inde aktif · VDM iki brief de bugün açıldı) · <@U0AP31SAA1W>",
-      "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 (auto-recalc · 23sa 56dk ≤24sa)",
-      "_oncelik": "\ud83d"
+      "notes": "21 May 2026 13:42 TR (23sa 27dk kaldı · 🟠 Yüksek — 13:46 transition · 24sa 33dk önce açıldı, henüz 🤖 reaction yok)",
+      "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 (auto-recalc · 23sa 56dk ≤24sa)"
     },
     {
       "id": "br_live_1779266016085909",
       "no": 6,
       "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
       "baslik": "20 Mayıs İçerik (Sosyal Medya Post · video)",
-      "leadId": "U09BFPBKQG7",
-      "contribIds": [],
+      "leadId": "U09BZHR25NG",
+      "contribIds": [
+        "U09BFPBKQG7"
+      ],
       "reviewerId": "U09BZHR25NG",
-      "acilma": "2026-05-20T08:33:36.085+00:00",
+      "acilma": "2026-05-20T08:33:36.085909+00:00",
       "deadline": "2026-05-20T18:00:00+03:00",
       "durum": "yeni",
+      "priority": "🔴",
       "revision": 0,
-      "stale": false,
+      "stale": true,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "notes": "⏳ Yeni açıldı (2sa 42dk önce · thread aktif: Eda T → Görkem → Eren \"kontrol ediyorum\" · Arda henüz 🎨 vermedi · İlk post hazır, diğer tarihlerde düzeltme yapacak) · <@U09BZHR25NG>",
-      "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [3sa 45dk≤8sa])",
-      "_oncelik": "\ud83d"
+      "notes": "20 May 2026 18:00 TR 🌙 Mesai dışı (17:30 sonrası · yumuşak uyarı) · 3sa 45dk kaldı",
+      "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [3sa 45dk≤8sa])"
     },
     {
       "id": "br_live_1779271830010029",
       "no": 7,
       "marka": "KMR Serve",
+      "brand": {
+        "name": "KMR Serve",
+        "color": "#F28E2B",
+        "wheelIdx": 1,
+        "channel_id": "C03M070G8HY",
+        "channel_name": "marka-kmr-serve"
+      },
       "baslik": "Haziran SM Planı 26' (Sosyal Medya Post · aylık plan)",
-      "leadId": "U055EDESLSE",
-      "contribIds": [],
+      "leadId": "U063T8M5HL4",
+      "contribIds": [
+        "U055EDESLSE"
+      ],
       "reviewerId": "U063T8M5HL4",
-      "acilma": "2026-05-20T10:10:30.010+00:00",
+      "acilma": "2026-05-20T10:10:30.010029+00:00",
       "deadline": "2026-06-21T17:00:00+03:00",
       "durum": "yeni",
+      "priority": "🟢",
       "revision": 0,
       "stale": false,
       "slack_url": "https://benseno.slack.com/archives/C03M070G8HY/p1779271830010029",
-      "notes": "⏳ Yeni açıldı (Buse 13:10 TR · workflow · İpek tek atanan · uzun lead time normal · aylık SM planı) · <@U063T8M5HL4>",
-      "gecmis": "⏳20May13:10 (Buse açtı · workflow · 🔔 otomatik 🟢 [>72sa])",
-      "_oncelik": "\ud83d"
-    }
-  ],
-  "bns_completed": [
+      "notes": "21 Haziran 2026 17:00 TR (32g 2sa 45dk kaldı · workflow · marka n=0 → kıyas atlandı)",
+      "gecmis": "⏳20May13:10 (Buse açtı · workflow · 🔔 otomatik 🟢 [>72sa])"
+    },
     {
-      "id": "cb_live_1779104723477199",
-      "no": 1,
-      "marka": "Bauhaus",
-      "baslik": "Gökhan Ünver - İngilizce Altyazı /2",
-      "leadId": "U09BFPBKQG7",
+      "id": "br_live_1779272694698569",
+      "no": 8,
+      "marka": "Vdm Petdent",
+      "brand": {
+        "name": "Vdm Petdent",
+        "color": "#6A8E3D",
+        "wheelIdx": 11,
+        "channel_id": "C0AQLPY4TUM",
+        "channel_name": "marka-vdm-petdent"
+      },
+      "baslik": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "leadId": "U0AP31SAA1W",
       "contribIds": [
-        "U06J26R1XCJ"
+        "U09BFPBKQG7"
+      ],
+      "reviewerId": "U0AP31SAA1W",
+      "acilma": "2026-05-20T10:24:54.698569+00:00",
+      "deadline": "2026-05-21T13:24:00+03:00",
+      "durum": "yeni",
+      "priority": "🟠",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569",
+      "notes": "21 May 2026 13:24 TR (23sa 9dk kaldı · workflow · marka n=0 → kıyas atlandı · departman heuristic 📋 · Tip \"Veri analizi\" ambiguous)",
+      "gecmis": "⏳20May13:24 (Eren AI açtı · workflow · 🔔 otomatik 🟠 [23sa 38dk≤24sa])"
+    },
+    {
+      "id": "br_live_1779275121721279",
+      "no": 9,
+      "marka": "Vdm Petdent",
+      "brand": {
+        "name": "Vdm Petdent",
+        "color": "#6A8E3D",
+        "wheelIdx": 11,
+        "channel_id": "C0AQLPY4TUM",
+        "channel_name": "marka-vdm-petdent"
+      },
+      "baslik": "🆕 Whatsapp Business Kurulumu (Otomasyon · Eren self-assign · bugünün 2. VDM brief'i)",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [
+        "U0AP31SAA1W"
+      ],
+      "reviewerId": "U0AP31SAA1W",
+      "acilma": "2026-05-20T11:05:21.721279+00:00",
+      "deadline": "2026-05-22T23:59:00+03:00",
+      "durum": "yeni",
+      "priority": "🟡",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
+      "notes": "22 May 2026 (tüm gün · saat seçilmemiş → 23:59 TR varsayıldı · 2g 9sa 44dk kaldı · workflow · marka n=0 → kıyas atlandı · Otomasyon kapsamı net · self-assign — tipik AI iş)",
+      "gecmis": "⏳20May14:05 (Eren AI açtı · workflow · self-assign · 🔔 otomatik 🟡 [~58sa≤72sa])"
+    },
+    {
+      "id": "br_queue_1779266803180509",
+      "no": 10,
+      "marka": "Kmr Serve",
+      "brand": {
+        "name": "KMR Serve",
+        "color": "#F28E2B",
+        "wheelIdx": 1,
+        "channel_id": "C03M070G8HY",
+        "channel_name": "marka-kmr-serve"
+      },
+      "baslik": "Serve | Mayıs SM Planı 26'",
+      "leadId": "U063T8M5HL4",
+      "contribIds": [],
+      "reviewerId": null,
+      "acilma": "2026-05-20T08:46:43.180509+00:00",
+      "deadline": "2026-05-31T17:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C03M070G8HY/p1779266803180509",
+      "notes": "Sosyal Medya Post",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U063T8M5HL4"
+    },
+    {
+      "id": "br_queue_1779271340778199",
+      "no": 11,
+      "marka": "Kzy Everclean",
+      "brand": {
+        "name": "KZY Everclean",
+        "color": "#E15759",
+        "wheelIdx": 5,
+        "channel_id": "C01EJSS20K0",
+        "channel_name": "marka-kzy-everclean"
+      },
+      "baslik": "Ever Clean - Ekranda Yayınlanacak Video",
+      "leadId": "U05PP70GQTX",
+      "contribIds": [],
+      "reviewerId": null,
+      "acilma": "2026-05-20T10:02:20.778199+00:00",
+      "deadline": "2026-05-21T17:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C01EJSS20K0/p1779271340778199",
+      "notes": "Video",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U05PP70GQTX"
+    },
+    {
+      "id": "br_queue_1779275673657199",
+      "no": 12,
+      "marka": "Cureffect",
+      "brand": {
+        "name": "Cureffect",
+        "color": "#B79100",
+        "wheelIdx": 15,
+        "channel_id": "C05DF8RFQ77",
+        "channel_name": "marka-cureffect"
+      },
+      "baslik": "CurEffect SM Haziran Ayı İçerikleri",
+      "leadId": "U0AAC3YK20G",
+      "contribIds": [
+        "U08HLMHTGEL",
+        "U055EDESLSE"
       ],
       "reviewerId": null,
-      "acilma": null,
-      "baslangic": null,
-      "bitis": null,
-      "deadline": "2026-05-19T12:00:00+03:00",
-      "sureH": 2.75,
+      "acilma": "2026-05-20T11:14:33.657199+00:00",
+      "deadline": "2026-05-21T12:00:00+03:00",
+      "durum": "yeni",
       "revision": 0,
-      "rating": null,
-      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779104723477199",
-      "notes": "Erken teslim (deadline'dan 18+ saat önce)"
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C05DF8RFQ77/p1779275673657199",
+      "notes": "Sosyal Medya Post",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U0AAC3YK20G"
+    },
+    {
+      "id": "br_queue_1779277830269149",
+      "no": 13,
+      "marka": "Vdm Petdent",
+      "brand": {
+        "name": "Vdm Petdent",
+        "color": "#6A8E3D",
+        "wheelIdx": 11,
+        "channel_id": "C0AQLPY4TUM",
+        "channel_name": "marka-vdm-petdent"
+      },
+      "baslik": "Whatsapp Business Kurulumu",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [
+        "U0AP31SAA1W"
+      ],
+      "reviewerId": null,
+      "acilma": "2026-05-20T11:50:30.269149+00:00",
+      "deadline": "2026-05-22T14:50:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779277830269149",
+      "notes": "Otomasyon",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U0AP31SAA1W"
     }
   ],
+  "bns_completed": [],
   "bns_brands": [
     {
       "name": "Bauhaus",
@@ -444,8 +639,7 @@ window.EMBEDDED_DATA = {
       "mono": "CK",
       "rol": "yonetici",
       "title": "Direktör",
-      "email": "cansu@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2022-02-06/3074982778881_56f0ee4af5ae0874974d_48.png"
+      "email": "cansu@benseno.com.tr"
     },
     {
       "id": "U02SZQDAFPF",
@@ -453,8 +647,7 @@ window.EMBEDDED_DATA = {
       "mono": "EA",
       "rol": "yonetici",
       "title": "Editör Yöneticisi",
-      "email": "erdem@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2022-09-14/4080503601554_d17c44a1e9768aa32da1_48.jpg"
+      "email": "erdem@benseno.com.tr"
     },
     {
       "id": "U030C48PL23",
@@ -462,8 +655,7 @@ window.EMBEDDED_DATA = {
       "mono": "GK",
       "rol": "yonetici",
       "title": "Genel Müdür",
-      "email": "gorkem@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2022-01-30/3022922875062_3596299fa4fa2aeef202_48.png"
+      "email": "gorkem@benseno.com.tr"
     },
     {
       "id": "U055EDESLSE",
@@ -471,8 +663,7 @@ window.EMBEDDED_DATA = {
       "mono": "İA",
       "rol": "yonetici",
       "title": "Tasarım Yöneticisi",
-      "email": "ipek@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2024-11-25/8065632518247_d9a7f62eddc039d221fc_48.jpg"
+      "email": "ipek@benseno.com.tr"
     },
     {
       "id": "UD96GH76E",
@@ -480,8 +671,7 @@ window.EMBEDDED_DATA = {
       "mono": "RP",
       "rol": "yonetici",
       "title": "GMY",
-      "email": "reyhan@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2022-09-19/4099349563362_f3d061b4ae01984687f8_48.jpg"
+      "email": "reyhan@benseno.com.tr"
     },
     {
       "id": "U06J26R1XCJ",
@@ -489,8 +679,7 @@ window.EMBEDDED_DATA = {
       "mono": "AA",
       "rol": "tasarim",
       "title": "",
-      "email": "aykut@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-05-08/11087497583474_382529bcfff132000e84_48.jpg"
+      "email": "aykut@benseno.com.tr"
     },
     {
       "id": "U0AN6DD79M0",
@@ -498,8 +687,7 @@ window.EMBEDDED_DATA = {
       "mono": "AT",
       "rol": "tasarim",
       "title": "",
-      "email": "aylin.tozkoparan@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-03-22/10767363456801_131bb8d890fffabd7f9d_48.png"
+      "email": "aylin.tozkoparan@benseno.com.tr"
     },
     {
       "id": "U09BFPBKQG7",
@@ -507,8 +695,7 @@ window.EMBEDDED_DATA = {
       "mono": "HA",
       "rol": "tasarim",
       "title": "",
-      "email": "hasan@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-02-17/10521653754198_76cd9169c0de61761ca1_48.png"
+      "email": "hasan@benseno.com.tr"
     },
     {
       "id": "U0AK8U7L57F",
@@ -516,8 +703,7 @@ window.EMBEDDED_DATA = {
       "mono": "İÖ",
       "rol": "tasarim",
       "title": "",
-      "email": "irem.ozkan@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-04-04/10846213494178_f3184de650b89d696bf5_48.png"
+      "email": "irem.ozkan@benseno.com.tr"
     },
     {
       "id": "U0B3K2WE7SB",
@@ -525,8 +711,7 @@ window.EMBEDDED_DATA = {
       "mono": "PÖ",
       "rol": "tasarim",
       "title": "",
-      "email": "pelin@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-05-18/11181439585392_bcffefa6a78a07174922_48.jpg"
+      "email": "pelin@benseno.com.tr"
     },
     {
       "id": "U08HLMHTGEL",
@@ -534,8 +719,7 @@ window.EMBEDDED_DATA = {
       "mono": "SE",
       "rol": "tasarim",
       "title": "",
-      "email": "serhat@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-03-19/10717738141031_f24cdc1b64fdba2f98f5_48.jpg"
+      "email": "serhat@benseno.com.tr"
     },
     {
       "id": "U05PP70GQTX",
@@ -543,8 +727,7 @@ window.EMBEDDED_DATA = {
       "mono": "AC",
       "rol": "editor",
       "title": "",
-      "email": "aylin@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-05-06/11095356754000_efb75f04fa7cbb120d00_48.jpg"
+      "email": "aylin@benseno.com.tr"
     },
     {
       "id": "U063T8M5HL4",
@@ -552,8 +735,7 @@ window.EMBEDDED_DATA = {
       "mono": "BG",
       "rol": "editor",
       "title": "",
-      "email": "buse@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-02-10/10478034928134_eb6a76be3e6444608164_48.jpg"
+      "email": "buse@benseno.com.tr"
     },
     {
       "id": "U07PV0RA9L2",
@@ -561,8 +743,7 @@ window.EMBEDDED_DATA = {
       "mono": "EA",
       "rol": "editor",
       "title": "",
-      "email": "eda@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2025-10-02/9609999100215_04354fd310c41d6b3f05_48.jpg"
+      "email": "eda@benseno.com.tr"
     },
     {
       "id": "U09BZHR25NG",
@@ -570,8 +751,7 @@ window.EMBEDDED_DATA = {
       "mono": "ET",
       "rol": "editor",
       "title": "",
-      "email": "eda.tireli@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-05-11/11095464031059_961d5fc71a21ed787ed6_48.jpg"
+      "email": "eda.tireli@benseno.com.tr"
     },
     {
       "id": "U08NQJ27G5S",
@@ -579,8 +759,7 @@ window.EMBEDDED_DATA = {
       "mono": "ME",
       "rol": "editor",
       "title": "",
-      "email": "melis@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2025-04-18/8796094156448_bc5b225f397ebdecc9b4_48.jpg"
+      "email": "melis@benseno.com.tr"
     },
     {
       "id": "U0AAC3YK20G",
@@ -588,8 +767,7 @@ window.EMBEDDED_DATA = {
       "mono": "SA",
       "rol": "editor",
       "title": "",
-      "email": "simge@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-01-18/10327428181572_774f8f8bc3086db0605e_48.png"
+      "email": "simge@benseno.com.tr"
     },
     {
       "id": "U0AP31SAA1W",
@@ -597,40 +775,30 @@ window.EMBEDDED_DATA = {
       "mono": "EM",
       "rol": "ai",
       "title": "AI Operatör",
-      "email": "eren@benseno.com.tr",
-      "avatar": "https://avatars.slack-edge.com/2026-03-23/10750415091379_fb2faeca4147cf266198_48.png"
+      "email": "eren@benseno.com.tr"
     }
   ],
   "bns_dept_stats": {
     "tasarim": {
       "name": "Tasarım",
       "people": 7,
-      "active": 6,
-      "overdue": 2,
-      "capacity": 43,
-      "completed30": 0,
-      "avgComplete": null,
-      "revRate": null
+      "active": 0,
+      "overdue": 0,
+      "capacity": 0
     },
     "editor": {
       "name": "Editör",
       "people": 8,
       "active": 0,
       "overdue": 0,
-      "capacity": 0,
-      "completed30": 0,
-      "avgComplete": null,
-      "revRate": null
+      "capacity": 0
     },
     "ai": {
       "name": "AI",
       "people": 1,
-      "active": 1,
+      "active": 0,
       "overdue": 0,
-      "capacity": 50,
-      "completed30": 0,
-      "avgComplete": null,
-      "revRate": null
+      "capacity": 0
     }
   },
   "bns_brand_stats": [
@@ -640,11 +808,10 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 13,
       "channel_id": "C4Y43AW2E",
       "channel_name": "marka-bauhaus",
-      "active": 4,
-      "done30": 0,
-      "overdue": 1,
-      "stale": true,
-      "problem_label": "1 geciken"
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
     },
     {
       "name": "Beta",
@@ -653,7 +820,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C03QUBW5659",
       "channel_name": "marka-beta",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -665,7 +831,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C08N311GBHP",
       "channel_name": "marka-cimporglobal",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -677,7 +842,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C05DF8RFQ77",
       "channel_name": "marka-cureffect",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -689,7 +853,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C08QEE4GPFW",
       "channel_name": "marka-dermaqual",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -701,7 +864,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C07MY8EFG0Z",
       "channel_name": "marka-efor-eforçay",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -713,7 +875,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C0ANY1ZMH2A",
       "channel_name": "marka-egosport",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -725,7 +886,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "CCVCC4KQU",
       "channel_name": "marka-gursoy",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -736,8 +896,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 5,
       "channel_id": "C081GAK936J",
       "channel_name": "marka-hasvet",
-      "active": 1,
-      "done30": 0,
+      "active": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -749,7 +908,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C01ERQV89R9",
       "channel_name": "marka-jnj",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -761,7 +919,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "CCUS6KJG0",
       "channel_name": "marka-jnj-acuvue-me",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -772,11 +929,10 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 4,
       "channel_id": "C4Y58FEUU",
       "channel_name": "marka-jnj-vision-tr",
-      "active": 1,
-      "done30": 0,
-      "overdue": 1,
+      "active": 0,
+      "overdue": 0,
       "stale": false,
-      "problem_label": "1 geciken"
+      "problem_label": null
     },
     {
       "name": "Jungleous",
@@ -785,7 +941,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C0ANHBGKJQJ",
       "channel_name": "marka-jungleous",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -797,7 +952,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C01ERJUEECA",
       "channel_name": "marka-kmr-amos",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -809,7 +963,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C0AJW8X06KB",
       "channel_name": "marka-kmr-copic",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -821,7 +974,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "CCVJ74S1G",
       "channel_name": "marka-kmr-lamy",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -833,7 +985,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C083EB519E2",
       "channel_name": "marka-kmr-lamy-faq",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -845,7 +996,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C099PUJB4QZ",
       "channel_name": "marka-kmr-marshmallow",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -857,7 +1007,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C088BEZEH8F",
       "channel_name": "marka-kmr-max",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -869,7 +1018,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C0A5CQ7RSJJ",
       "channel_name": "marka-kmr-panfix",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -881,7 +1029,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C05MC1ECLKB",
       "channel_name": "marka-kmr-scase",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -892,8 +1039,7 @@ window.EMBEDDED_DATA = {
       "wheelIdx": 1,
       "channel_id": "C03M070G8HY",
       "channel_name": "marka-kmr-serve",
-      "active": 1,
-      "done30": 0,
+      "active": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -905,7 +1051,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C04RSD57ZMK",
       "channel_name": "marka-krups",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -917,7 +1062,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C03MCS7R0KB",
       "channel_name": "marka-kuzeypet",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -929,7 +1073,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C0A5TTK1W64",
       "channel_name": "marka-kzy-bark",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -941,7 +1084,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C01EJSS20K0",
       "channel_name": "marka-kzy-everclean",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -953,7 +1095,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C01FFE7DYL8",
       "channel_name": "marka-kzy-ferplast",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -965,7 +1106,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C0A5CEXDGC9",
       "channel_name": "marka-kzy-flamingo",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -977,7 +1117,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C01F47Z7LSD",
       "channel_name": "marka-kzy-simplesolution",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -989,7 +1128,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C05KKSV6EF7",
       "channel_name": "marka-kzy-supreme",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -1001,7 +1139,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C042SGZ4N3W",
       "channel_name": "marka-kzy-vetsbest",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -1013,7 +1150,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C09EWGL9249",
       "channel_name": "marka-marmaraholding",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -1025,7 +1161,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C092B2GCDAT",
       "channel_name": "marka-muffik",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -1037,7 +1172,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C047C3MCW9G",
       "channel_name": "marka-polisan",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -1049,7 +1183,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C02SZRFPARK",
       "channel_name": "marka-splenda",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -1061,7 +1194,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C05J5PXBPGS",
       "channel_name": "marka-tour2america",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null
@@ -1073,7 +1205,6 @@ window.EMBEDDED_DATA = {
       "channel_id": "C0AQLPY4TUM",
       "channel_name": "marka-vdm-petdent",
       "active": 0,
-      "done30": 0,
       "overdue": 0,
       "stale": false,
       "problem_label": null

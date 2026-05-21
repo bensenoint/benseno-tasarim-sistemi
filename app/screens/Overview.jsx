@@ -227,6 +227,7 @@ function KpiGrid({ children, cols = 6 }) {
 }
 
 function DeptRow({ s, color, last, compact }) {
+  if (!s) return null;
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: 8,
