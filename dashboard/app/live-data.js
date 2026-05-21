@@ -1,4 +1,4 @@
-{
+window.EMBEDDED_DATA = {
   "now": "2026-05-20T13:52:17.571092+00:00",
   "last_sync": "2026-05-20T13:36:00.708Z",
   "source": "manual-full-rebuild",
@@ -1210,4 +1210,4 @@
       "problem_label": null
     }
   ]
-}
+};
