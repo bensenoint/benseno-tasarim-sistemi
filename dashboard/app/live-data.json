@@ -21,7 +21,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "18 May 2026",
-      "saat": "16:00 TR ⚠️ GEÇMİŞ (2g 22sa geride · ✓ teyit edilmiş — bakanlık süreci · blokaj değil)",
+      "saat": "16:00 TR ⚠️ GEÇMİŞ (3g 1sa 19dk geride · ✓ teyit edilmiş — bakanlık süreci · blokaj değil)",
       "durum": "👀 Revize bekliyor (v2 teslim 18May17:22 · bakanlık geri dönüşü)",
       "rev": "1",
       "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22",
@@ -48,10 +48,10 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
-      "saat": "16:00 TR (1sa 9dk kaldı · 🔴 sürüyor · İrem JnJ bitince başlayacak)",
-      "durum": "🎨 Dispatch tamamlandı (İrem kabul · v1 bekleniyor · JnJ tamamlanmamış · KRİTİK pencere)",
+      "saat": "16:00 TR ⚠️ **GEÇMİŞ (1sa 25dk geride) ANCAK v1 TESLİM** (İrem 14:30 TR · Mockup_01+02 · müşteriye iletiliyor)",
+      "durum": "🎨 v1 teslim (İrem 21May14:30 TR · Mockup_01+02) · 📧 Cansu+Buse müşteriye iletiyor (21May14:58) · ✅ teyit bekleniyor",
       "rev": "0",
-      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡→↪️20May10:22 İpek dispatch İrem→✅20May10:35 İrem kabul→📈21May09:00 öncelik 🟡→🔴 (auto-recalc)",
+      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡→↪️20May10:22 İpek dispatch İrem→✅20May10:35 İrem kabul→📈21May09:00 öncelik 🟡→🔴 (auto-recalc) / ⏰GEÇMİŞ21May16:00 (21May17:20 sync'inde 1sa 19dk geride) / 🎨21May14:30 İrem v1 teslim (Mockup_01+02) / 📧21May14:58 Buse müşteriye iletiyor",
       "link": "[link](https://benseno.slack.com/archives/C081GAK936J/p1779104369515529)"
     },
     {
@@ -70,7 +70,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "20 May 2026",
-      "saat": "10:00 TR ⚠️ **GEÇMİŞ (1g 4sa geride · 28+ sa · STALE 🔴 sürüyor 🚨🚨🚨)**",
+      "saat": "10:00 TR ⚠️ **GEÇMİŞ (1g 7sa 19dk geride · 31+sa · STALE 🔴 sürüyor 🚨🚨🚨)**",
       "durum": "⏳ Sırada (Aykut başlamadı · 🎨 reaction yok · 🔴 manuel override Görkem 19May08:26 + STALE 🔴 · **2g 6sa pasif** · eskalasyon DM cevapsız ~30sa · YÖNETİCİ MÜDAHALESİ ZORUNLU)",
       "rev": "0",
       "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (28+sa geride · 21May14:51 sync'inde)",
@@ -92,7 +92,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
-      "saat": "13:00 TR ⚠️ **GEÇMİŞ (1sa 51dk geride · STALE 🔴 başladı 🚨)**",
+      "saat": "13:00 TR ⚠️ **GEÇMİŞ (4sa 19dk geride · STALE 🔴 sürüyor 🚨)**",
       "durum": "⏳ Sırada (🚨 Kim alanı disiplin ihlali · Serhat dolu (Kuzey Pet) · 🔴 Acil seviyesinde · dispatch penceresi KAPANDI · deadline aşıldı)",
       "rev": "0",
       "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini) / 📈20May13:17 öncelik 🟡→🟠 / 📈21May~04:00 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:00 (21May14:51 sync'inde 1sa 51dk geride)",
@@ -113,7 +113,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
-      "saat": "13:42 TR ⚠️ **GEÇMİŞ (1sa 9dk geride · STALE 🔴 başladı 🚨)**",
+      "saat": "13:42 TR ⚠️ **GEÇMİŞ (3sa 37dk geride · STALE 🔴 sürüyor 🚨)**",
       "durum": "⏳ Kritik (Eren self-assign · 🔴 Acil seviyesinde · v1 hâlâ yok · Eren'in 5 aktif işi var şu an — VDM bahar video da eklendi · cap 4 aşıldı)",
       "rev": "0",
       "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 / 📈21May~04:42 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:42 (21May14:51 sync'inde 1sa 9dk geride)",
@@ -134,7 +134,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "20 May 2026",
-      "saat": "18:00 TR 🌙 **Mesai dışı**<br>* ⚠️<br>**GEÇMİŞ (20sa 51dk geride · STALE 🔴 başladı · 🚨)**",
+      "saat": "18:00 TR 🌙 **Mesai dışı**<br>* ⚠️<br>**GEÇMİŞ (23sa 19dk geride · STALE 🔴 sürüyor · 🚨)**",
       "durum": "⏳ KRİTİK (Arda 🎨 vermedi · v1 hâlâ yok · 27sa pasif · yayın 22 May için kayma riski)",
       "rev": "0",
       "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [3sa 45dk≤8sa]) / ⏰GEÇMİŞ20May18:00 (21May14:51 sync'inde 20sa 51dk geride)",
@@ -155,7 +155,7 @@
       "priority": "🟢",
       "priority_label": "🟢 Düşük",
       "deadline": "21 Haziran 2026",
-      "saat": "17:00 TR (30g 2sa kaldı · workflow · marka n=0 → kıyas atlandı)",
+      "saat": "17:00 TR (30g 23sa 40dk kaldı · workflow · marka n=0 → kıyas atlandı)",
       "durum": "⏳ Yeni açıldı (Buse 20May13:10 TR · workflow · İpek tek atanan · uzun lead time aylık plan için normal)",
       "rev": "0",
       "gecmis": "⏳20May13:10 (Buse açtı · workflow · 🔔 otomatik 🟢 [>72sa])",
@@ -176,7 +176,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
-      "saat": "13:24 TR ⚠️ **GEÇMİŞ (1sa 27dk geride · STALE 🔴 başladı · 🚨 · marka n=0 → kıyas atlandı)**",
+      "saat": "13:24 TR ⚠️ **GEÇMİŞ (3sa 55dk geride · STALE 🔴 sürüyor · 🚨 · marka n=0 → kıyas atlandı)**",
       "durum": "⏳ Kritik (Eren 20May13:24 TR · cross-dept · departman heuristic 📋 · Tip 'Veri analizi' ambiguous · 🔴 Acil seviyesinde · deadline aşıldı)",
       "rev": "0",
       "gecmis": "⏳20May13:24 (Eren AI açtı · workflow · 🔔 otomatik 🟠 [23sa 38dk≤24sa]) / 📈21May~04:24 öncelik 🟠→🔴 (auto-recalc) / ⏰GEÇMİŞ21May13:24 (21May14:51 sync'inde 1sa 27dk geride)",
@@ -197,7 +197,7 @@
       "priority": "🟡",
       "priority_label": "🟡 Normal",
       "deadline": "22 May 2026",
-      "saat": "(tüm gün · saat seçilmemiş → 23:59 TR varsayıldı · 1g 9sa kaldı · marka n=0 → kıyas atlandı)",
+      "saat": "(tüm gün · saat seçilmemiş → 23:59 TR varsayıldı · 1g 6sa 39dk kaldı · marka n=0 → kıyas atlandı)",
       "durum": "⏳ Yeni açıldı (Eren 20May14:05 TR · workflow · self-assign · 1g 0sa önce)",
       "rev": "0",
       "gecmis": "⏳20May14:05 (Eren AI açtı · workflow · self-assign · 🔔 otomatik 🟡 [~58sa≤72sa])",
@@ -216,13 +216,13 @@
       "editor_ids": [
         "U09BZHR25NG"
       ],
-      "priority": "🟡",
-      "priority_label": "🟡 Normal",
+      "priority": "🟠",
+      "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "12:00 TR (21sa 9dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 1/7)",
+      "saat": "12:00 TR (18sa 40dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 1/7 · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Eda T 20May16:12 TR · workflow · paralel Arda+Aykut · içerik 22 May yayın)",
       "rev": "0",
-      "gecmis": "⏳20May16:12 (Eda T açtı · workflow · 🔔 otomatik 🟡 [43sa≤72sa])",
+      "gecmis": "⏳20May16:12 (Eda T açtı · workflow · 🔔 otomatik 🟡 [43sa≤72sa]) / 📈21May17:20 öncelik 🟡→🟠 (auto-recalc [18sa 40dk≤24sa])",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779282760860839)"
     },
     {
@@ -238,13 +238,13 @@
       "editor_ids": [
         "U09BZHR25NG"
       ],
-      "priority": "🟡",
-      "priority_label": "🟡 Normal",
+      "priority": "🟠",
+      "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (1g 2sa kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 2/7)",
+      "saat": "17:00 TR (23sa 40dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 2/7 · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Eda T 20May16:14 TR · workflow · paralel Arda+Aykut · içerik 23 May yayın)",
       "rev": "0",
-      "gecmis": "⏳20May16:14 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa])",
+      "gecmis": "⏳20May16:14 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa]) / 📈21May17:20 öncelik 🟡→🟠 (auto-recalc [23sa 40dk≤24sa])",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779282859178849)"
     },
     {
@@ -260,13 +260,13 @@
       "editor_ids": [
         "U09BZHR25NG"
       ],
-      "priority": "🟡",
-      "priority_label": "🟡 Normal",
+      "priority": "🟠",
+      "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (1g 2sa kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 3/7)",
+      "saat": "17:00 TR (23sa 40dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 3/7 · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Eda T 20May16:15 TR · workflow · paralel Arda+Aykut · içerik 24 May yayın)",
       "rev": "0",
-      "gecmis": "⏳20May16:15 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa])",
+      "gecmis": "⏳20May16:15 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa]) / 📈21May17:20 öncelik 🟡→🟠 (auto-recalc [23sa 40dk≤24sa])",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779282928074819)"
     },
     {
@@ -282,13 +282,13 @@
       "editor_ids": [
         "U09BZHR25NG"
       ],
-      "priority": "🟡",
-      "priority_label": "🟡 Normal",
+      "priority": "🟠",
+      "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (1g 2sa kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 4/7)",
+      "saat": "17:00 TR (23sa 40dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 4/7 · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Eda T 20May16:16 TR · workflow · paralel Arda+Aykut · içerik 26 May yayın)",
       "rev": "0",
-      "gecmis": "⏳20May16:16 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa])",
+      "gecmis": "⏳20May16:16 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa]) / 📈21May17:20 öncelik 🟡→🟠 (auto-recalc [23sa 40dk≤24sa])",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779283006745819)"
     },
     {
@@ -307,7 +307,7 @@
       "priority": "🟠",
       "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "14:00 TR (23sa 9dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 5/7 · 🟡→🟠 auto-recalc)",
+      "saat": "14:00 TR (20sa 40dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 5/7 · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Eda T 20May16:20 TR · workflow · paralel Aykut+Arda · içerik 28 May yayın)",
       "rev": "0",
       "gecmis": "⏳20May16:20 (Eda T açtı · workflow · 🔔 otomatik 🟡 [45sa≤72sa]) / 📈21May14:51 öncelik 🟡→🟠 (auto-recalc [23sa 9dk≤24sa])",
@@ -329,7 +329,7 @@
       "priority": "🟠",
       "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "14:00 TR (23sa 9dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 6/7 · 🟡→🟠 auto-recalc)",
+      "saat": "14:00 TR (20sa 40dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 6/7 · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Eda T 20May16:21 TR · workflow · paralel Aykut+Arda · içerik 30 May yayın)",
       "rev": "0",
       "gecmis": "⏳20May16:21 (Eda T açtı · workflow · 🔔 otomatik 🟡 [45sa≤72sa]) / 📈21May14:51 öncelik 🟡→🟠 (auto-recalc [23sa 9dk≤24sa])",
@@ -348,13 +348,13 @@
       "editor_ids": [
         "U09BZHR25NG"
       ],
-      "priority": "🟡",
-      "priority_label": "🟡 Normal",
+      "priority": "🟠",
+      "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (1g 2sa kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 7/7 · yayın tarihi belirsiz)",
+      "saat": "17:00 TR (23sa 40dk kaldı · workflow · marka n=0 → kıyas atlandı · weekly batch 7/7 · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Eda T 20May16:22 TR · workflow · paralel Aykut+Arda · son brief)",
       "rev": "0",
-      "gecmis": "⏳20May16:22 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa])",
+      "gecmis": "⏳20May16:22 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa]) / 📈21May17:20 öncelik 🟡→🟠 (auto-recalc [23sa 40dk≤24sa])",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309)"
     },
     {
@@ -373,7 +373,7 @@
       "priority": "🟠",
       "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "08:46 TR (17sa 55dk lead · workflow · marka VDM Petdent n=0 → kıyas atlandı · silent_log)",
+      "saat": "08:46 TR (15sa 26dk kaldı · workflow · marka VDM Petdent n=0 → kıyas atlandı · silent_log)",
       "durum": "⏳ Yeni açıldı (Görkem 21May08:47 TR · workflow · Sıralı 1️⃣ Eren · Tip Sosyal Medya Post · Ref www.benseno.com.tr · Not: bayramın ne kadar güzel bir şey olduğunu anlatan bir post)",
       "rev": "0",
       "gecmis": "⏳21May08:47 (Görkem GM açtı · workflow · 🔔 otomatik 🟠 [20sa 11dk≤24sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log)",
@@ -391,13 +391,13 @@
       "editor_ids": [
         "U05PP70GQTX"
       ],
-      "priority": "🟡",
-      "priority_label": "🟡 Normal",
+      "priority": "🟠",
+      "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (26sa 9dk lead · workflow · marka Kuzeypet n=0 → kıyas atlandı · silent_log)",
+      "saat": "17:00 TR (23sa 40dk kaldı · workflow · marka Kuzeypet n=0 → kıyas atlandı · silent_log · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Aylin Canel 21May11:34 TR · workflow · tek atanan Serhat · boş alanlar — brief'i thread'de zenginleştirmesi gerekebilir)",
       "rev": "0",
-      "gecmis": "⏳21May11:34 (Aylin Canel açtı · workflow · 🔔 otomatik 🟡 [28sa 25dk≤72sa] · 📊 marka_kiyasla: Kuzeypet n=0 · skip · yetersiz_veri · silent_log)",
+      "gecmis": "⏳21May11:34 (Aylin Canel açtı · workflow · 🔔 otomatik 🟡 [28sa 25dk≤72sa] · 📊 marka_kiyasla: Kuzeypet n=0 · skip · yetersiz_veri · silent_log) / 📈21May17:20 öncelik 🟡→🟠 (auto-recalc [23sa 40dk≤24sa])",
       "link": "[link](https://benseno.slack.com/archives/C03MCS7R0KB/p1779352449496569)"
     },
     {
@@ -412,13 +412,13 @@
       "editor_ids": [
         "U05PP70GQTX"
       ],
-      "priority": "🟡",
-      "priority_label": "🟡 Normal",
+      "priority": "🟠",
+      "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (26sa 2dk lead · workflow · marka Kuzeypet n=0 → kıyas atlandı · silent_log)",
+      "saat": "17:00 TR (23sa 40dk kaldı · workflow · marka Kuzeypet n=0 → kıyas atlandı · silent_log · 🟡→🟠 auto-recalc)",
       "durum": "⏳ Yeni açıldı (Aylin Canel 21May11:40 TR · workflow · ⚠️ 6dk içinde 2. atama Reyhan'a — muhtemel hata · Cansu Direktör/İpek kontrol etsin · Serhat zaten alıyor — duplicate riski)",
       "rev": "0",
-      "gecmis": "⏳21May11:40 (Aylin Canel açtı · workflow · 🔔 otomatik 🟡 [28sa 18dk≤72sa] · 📊 marka_kiyasla: Kuzeypet n=0 · skip · yetersiz_veri · silent_log · ⚠️ DUPLICATE? brief #18 ile aynı içerik 6dk önce)",
+      "gecmis": "⏳21May11:40 (Aylin Canel açtı · workflow · 🔔 otomatik 🟡 [28sa 18dk≤72sa] · 📊 marka_kiyasla: Kuzeypet n=0 · skip · yetersiz_veri · silent_log · ⚠️ DUPLICATE? brief #18 ile aynı içerik 6dk önce) / 📈21May17:20 öncelik 🟡→🟠 (auto-recalc [23sa 40dk≤24sa])",
       "link": "[link](https://benseno.slack.com/archives/C03MCS7R0KB/p1779352849311019)"
     },
     {
@@ -437,7 +437,7 @@
       "priority": "🟢",
       "priority_label": "🟢 Düşük",
       "deadline": "1 Haziran 2026",
-      "saat": "12:31 TR (10g 21sa 40dk lead · workflow · marka Tour2America n=0 → kıyas atlandı · silent_log)",
+      "saat": "12:31 TR (10g 19sa 11dk kaldı · workflow · marka Tour2America n=0 → kıyas atlandı · silent_log)",
       "durum": "⏳ Yeni açıldı (Görkem 21May12:32 TR · workflow · Paralel Eren+Görkem · Tip Sosyal Medya Post · Ref www.benseno.com.tr · Not: bayram coskusunu anlatan bri iecerik lazım)",
       "rev": "0",
       "gecmis": "⏳21May12:32 (Görkem GM açtı · workflow · 🔔 otomatik 🟢 [>72sa] · 📊 marka_kiyasla: Tour2America n=0 · skip · yetersiz_veri · silent_log)",
@@ -460,7 +460,7 @@
       "priority": "🟡",
       "priority_label": "🟡 Normal",
       "deadline": "23 May 2026",
-      "saat": "14:42 TR (1g 23sa 51dk lead · workflow · marka VDM Petdent n=0 → kıyas atlandı · silent_log)",
+      "saat": "14:42 TR (1g 21sa 22dk kaldı · workflow · marka VDM Petdent n=0 → kıyas atlandı · silent_log)",
       "durum": "⏳ Yeni açıldı (Görkem 21May14:43 TR · workflow · Paralel Cansu+Görkem+Eren · Tip Video · Ref www.benseno.com.tr · Not: bahar dönemini anlatan bir video · ⚠️ 3 yönetici/AI atanması — fiili üretim Eren'de varsayılıyor)",
       "rev": "0",
       "gecmis": "⏳21May14:43 (Görkem GM açtı · workflow · 🔔 otomatik 🟡 [47sa 51dk≤72sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log · ⚠️ Eren'in 5. aktif iş'i — KAPASİTE AŞIMI başladı)",
@@ -591,38 +591,32 @@
     "tasarim": {
       "name": "Tasarım",
       "people": 7,
-      "active": 21,
-      "overdue": 5,
+      "active": 17,
+      "overdue": 6,
       "capacity": 42,
-      "completed30": 0,
-      "avgComplete": 0,
-      "revRate": 0,
-      "acil": 5,
-      "lead": 3
+      "completed30": 1,
+      "avgComplete": 2.7,
+      "revRate": 0.14
     },
     "editor": {
       "name": "Editör",
       "people": 8,
-      "active": 25,
-      "overdue": 6,
+      "active": 0,
+      "overdue": 0,
       "capacity": 48,
       "completed30": 0,
       "avgComplete": 0,
-      "revRate": 0,
-      "acil": 11,
-      "lead": 4
+      "revRate": 0
     },
     "ai": {
       "name": "AI",
       "people": 1,
-      "active": 5,
+      "active": 4,
       "overdue": 1,
-      "capacity": 6,
+      "capacity": 4,
       "completed30": 0,
       "avgComplete": 0,
-      "revRate": 0,
-      "acil": 1,
-      "lead": 0
+      "revRate": 0
     }
   },
   "bns_brand_stats": [
@@ -774,8 +768,8 @@
     "🟢": 2
   },
   "overdue_count": 6,
-  "last_sync": "2026-05-21T17:09:26.996002+03:00",
-  "sync_ts": 1779372566,
+  "last_sync": "2026-05-21T17:32:42+03:00",
+  "sync_ts": 1779373962,
   "now": "2026-05-21T17:09:26.996002+03:00",
-  "source": "data-agent-run-1779372566"
+  "source": "data-agent-run-1779373962-hasvet-fix"
 }

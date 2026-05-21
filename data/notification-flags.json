@@ -6,5 +6,57 @@
   "dept_belirsiz": [],
   "marka_yetersiz_sure": [],
   "marka_anormal_uzun": [],
-  "calendar_events": []
+  "calendar_events": [],
+  "auto_recalc": [
+    {
+      "no": "10",
+      "marka": "Bauhaus",
+      "from": "🟡",
+      "to": "🟠",
+      "saat_kaldi": "18sa 40dk"
+    },
+    {
+      "no": "11",
+      "marka": "Bauhaus",
+      "from": "🟡",
+      "to": "🟠",
+      "saat_kaldi": "23sa 40dk"
+    },
+    {
+      "no": "12",
+      "marka": "Bauhaus",
+      "from": "🟡",
+      "to": "🟠",
+      "saat_kaldi": "23sa 40dk"
+    },
+    {
+      "no": "13",
+      "marka": "Bauhaus",
+      "from": "🟡",
+      "to": "🟠",
+      "saat_kaldi": "23sa 40dk"
+    },
+    {
+      "no": "16",
+      "marka": "Bauhaus",
+      "from": "🟡",
+      "to": "🟠",
+      "saat_kaldi": "23sa 40dk"
+    },
+    {
+      "no": "18",
+      "marka": "Kuzeypet",
+      "from": "🟡",
+      "to": "🟠",
+      "saat_kaldi": "23sa 40dk"
+    },
+    {
+      "no": "19",
+      "marka": "Kuzeypet",
+      "from": "🟡",
+      "to": "🟠",
+      "saat_kaldi": "23sa 40dk"
+    }
+  ],
+  "_note": "Hasvet past_deadline cleared: v1 teslim 14:30 TR + müşteriye iletiliyor 14:58 (Cansu+Buse koordinasyonu)"
 }
