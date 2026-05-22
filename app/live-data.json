@@ -616,6 +616,15 @@
       "avatar": null,
       "initials": "RY",
       "color": "#8B5CF6"
+    },
+    {
+      "id": "U030C48PL23",
+      "name": "Görkem Kaya",
+      "rol": "yonetici",
+      "dept": "yonetici",
+      "avatar": null,
+      "initials": "GK",
+      "color": "#7C3AED"
     }
   ],
   "bns_dept_stats": {

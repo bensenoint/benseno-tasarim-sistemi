@@ -161,7 +161,14 @@ Footer: `> 🔄 Son sync: {şimdi TR} · LAST_SYNC_TS={unix}`
   "bns_briefs": [...],
   "bns_completed": [...],
   "bns_brands": [...],
-  "bns_users": [...],
+  "bns_users": [
+    { "id": "U030C48PL23", "name": "Görkem Kaya",      "rol": "yonetici", "initials": "GK", "color": "#7C3AED" },
+    { "id": "U4XCE3532",   "name": "Cansu Kazgan 👑",  "rol": "editor",   "initials": "CK", "color": "#10B981" },
+    { "id": "U09BFPBKQG7", "name": "Hasan Serdar Arda","rol": "tasarim",  "initials": "HA", "color": "#6366F1" },
+    ...tüm aktif ekip üyeleri (YÖNETİCİLER dahil — U030C48PL23 Görkem HER ZAMAN dahil edilmeli)
+  ],
+  // bns_users formatı: her user { id, name, rol (tasarim|editor|ai|yonetici), initials, color, avatar? }
+  // YÖNETİCİLER (her zaman dahil et): U030C48PL23 Görkem, UD96GH76E Reyhan
   "bns_dept_stats": {
     "tasarim": { "name": "Tasarım", "people": N, "active": N, "overdue": N, "capacity": N, "completed30": N, "avgComplete": N, "revRate": N },
     "editor":  { "name": "Editör",  "people": N, "active": N, "overdue": N, "capacity": N, "completed30": N, "avgComplete": N, "revRate": N },
