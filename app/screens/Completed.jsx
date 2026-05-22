@@ -2,20 +2,24 @@
 
 function CompletedScreen({ data }) {
   const [range, setRange] = React.useState("30");
-  const now = data.NOW || Date.now();
+  const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
+  const allCompleted = data._allCompleted || data.completed || [];
 
   // Range filtresi
   const cutoff = now - parseInt(range) * 24 * 3600 * 1000;
-  const rows = data.completed.filter(c => {
+  const rows = allCompleted.filter(c => {
     const ts = c.bitis || c.deadline || 0;
     return ts >= cutoff;
   });
 
-  // KPI hesaplamaları gerçek veriden
-  const avgSure   = rows.length ? (rows.reduce((s,c) => s + (c.sure || 0), 0) / rows.length) : 0;
-  const avgGecikme = rows.length ? (rows.filter(c => c.gecikme > 0).reduce((s,c) => s + c.gecikme, 0) / Math.max(1, rows.filter(c => c.gecikme > 0).length)) : 0;
-  const avgRev    = rows.length ? (rows.reduce((s,c) => s + (c.revision || 0), 0) / rows.length) : 0;
-  const avgRating = rows.length ? (rows.filter(c => c.rating > 0).reduce((s,c) => s + c.rating, 0) / Math.max(1, rows.filter(c => c.rating > 0).length)) : 0;
+  // KPI hesaplamaları gerçek veriden (sureH, gecikmeH alanları kullan)
+  const withSure   = rows.filter(c => c.sureH > 0);
+  const withGecikme = rows.filter(c => c.gecikmeH > 0);
+  const withRating  = rows.filter(c => c.rating > 0);
+  const avgSure    = withSure.length   ? withSure.reduce((s,c) => s + c.sureH, 0) / withSure.length : 0;
+  const avgGecikme = withGecikme.length ? withGecikme.reduce((s,c) => s + c.gecikmeH, 0) / withGecikme.length : 0;
+  const avgRev     = rows.length ? rows.reduce((s,c) => s + (c.revision || 0), 0) / rows.length : 0;
+  const avgRating  = withRating.length  ? withRating.reduce((s,c) => s + c.rating, 0) / withRating.length : 0;
 
   const fmtNum = (n) => n.toFixed(1).replace(".", ",");
 
@@ -77,12 +81,12 @@ function CompletedScreen({ data }) {
                 <td style={{...cs(), maxWidth: 240, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{c.baslik}</td>
                 <td style={cs()}><Avatar user={c.lead} size={20}/></td>
                 <td style={cs(true)}>{fmt(c.deadline)}</td>
-                <td style={cs(true)}>{fmt(c.basla)}</td>
-                <td style={cs(true)}>{fmt(c.bitis)}</td>
-                <td style={cs(true, "right")}>{c.sure} sa</td>
-                <td style={cs(true, "right")}>{String(c.revision).padStart(2,"0")}</td>
-                <td style={{...cs(true, "right"), color: c.gecikme > 0 ? "var(--prio-red)" : "var(--ink-4)"}}>
-                  {c.gecikme > 0 ? c.gecikme + " sa" : "—"}
+                <td style={cs(true)}>{c.baslangic ? fmt(c.baslangic) : "—"}</td>
+                <td style={cs(true)}>{c.bitis ? fmt(c.bitis) : "—"}</td>
+                <td style={cs(true, "right")}>{c.sureH != null && c.sureH > 0 ? c.sureH.toFixed(1) + " sa" : "—"}</td>
+                <td style={cs(true, "right")}>{String(c.revision || 0).padStart(2,"0")}</td>
+                <td style={{...cs(true, "right"), color: c.gecikmeH > 0 ? "var(--prio-red)" : "var(--ink-4)"}}>
+                  {c.gecikmeH > 0 ? c.gecikmeH.toFixed(1) + " sa" : "—"}
                 </td>
                 <td style={cs()}><Stars n={c.rating}/></td>
                 <td style={cs()}><a href="#" style={{color:"var(--ink-4)", display:"inline-flex"}}><I.Link size={14}/></a></td>

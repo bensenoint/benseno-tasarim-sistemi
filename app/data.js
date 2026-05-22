@@ -455,7 +455,8 @@ function bnsHydrateCompleted(raw, idx) {
   const baslangic = typeof raw.baslangic === "string" ? Date.parse(raw.baslangic) : raw.baslangic;
   const bitis = typeof raw.bitis === "string" ? Date.parse(raw.bitis) : raw.bitis;
   const sureH = raw.sureH != null ? raw.sureH : (bitis && baslangic && !isNaN(bitis) && !isNaN(baslangic) ? (bitis - baslangic) / H : null);
-  const gecikme = bitis > deadline ? ((bitis - deadline) / H).toFixed(1) + "h" : "—";
+  const gecikmeH = (bitis && deadline && bitis > deadline) ? Math.round((bitis - deadline) / H * 10) / 10 : 0;
+  const gecikme  = gecikmeH > 0 ? gecikmeH.toFixed(1) + "h" : "—";
   const brand = BR[raw.marka] || {
     name: raw.marka, color: WHEEL[brandHash(raw.marka)], wheelIdx: brandHash(raw.marka)
   };
@@ -473,6 +474,7 @@ function bnsHydrateCompleted(raw, idx) {
     sureH,
     revision: raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
     gecikme,
+    gecikmeH,
     rating: raw.rating != null ? raw.rating : null,
     slack_url:  raw.slack_url || "#",
     image_url:  raw.image_url || null,  // Slack thread'indeki ilk görsel (Brief Sync tarafından doldurulur)
