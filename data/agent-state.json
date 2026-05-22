@@ -1,8 +1,8 @@
 {
-  "last_run": "2026-05-22T16:45:00+03:00",
-  "last_run_ts": 1779457571,
-  "last_run_completed_at": "2026-05-22T16:50:00+03:00",
-  "run_type": "launchd_1645_ara_sync_8sa_esigi_asildi_17_imminent_window_16_23",
+  "last_run": "2026-05-22T17:15:00+03:00",
+  "last_run_ts": 1779459350,
+  "last_run_completed_at": "2026-05-22T17:32:00+03:00",
+  "run_type": "launchd_1715_ara_sync_23_v1v2_yari_onay_24_aykut_hazir_2_hasvet_v1_16_23_deadline_transition",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
@@ -12,40 +12,45 @@
   "postponed_this_run": 0,
   "new_briefs_this_run": 0,
   "priority_distribution": {"red": 13, "orange": 1, "yellow": 0, "green": 3},
-  "overdue_count": 9,
-  "priority_upgrades_this_run": 1,
+  "overdue_count": 11,
+  "priority_upgrades_this_run": 0,
   "priority_demotes_this_run": 0,
-  "threshold_transitions_this_run": 1,
-  "github_pushed_sha": "64dc49d",
+  "threshold_transitions_this_run": 0,
+  "deadline_transitions_this_run": 2,
+  "status_improvements_this_run": 3,
+  "github_pushed_sha": "9d86aad",
   "errors": [],
   "pat_age_days": 4,
   "pat_expires_in_days": 86,
-  "notes": "16:45 launchd ara sync. **PREDICTED 8sa eşiği AŞILDI #17** (16:25 sync'inde 8sa eşiğine 20dk vardı; 16:46'da tam 8sa 0dk GEÇMİŞ). Şablon 4 DM Görkem'e gönderildi (msg_ts 1779458052.803289). #9 priority transition 🟠→🔴 (8sa eşiği aşıldı 7sa 13dk). #16+#23 14dk kala 17:00 deadline KRİTİK pencere — #16 v1 verildi 1sa 56dk onay pasif · #23 v1 YOK Arda 1sa 58dk pasif. #24 1sa 14dk · Arda 6/6 cap 100% sürüyor. Canvas SLACK update YAPILDI. canvas_cache.md REFRESHED. live-data.json REWRITTEN. EMBEDDED_DATA inject + GitHub push pending. Sonraki sync 17:15 launchd — bu pencerede #16/#23 deadline geçer · #16 onay gelir mi · #23 v1 var mı kritik karar noktası.",
+  "notes": "17:15 launchd ara sync. 3 MAJOR STATUS IMPROVEMENT: (1) #23 Bauhaus Kaçırılmayacak Fırsatlar — Arda 16:25 v1 🌸 (canvas 16:45 sync'te missed) → Eda T 16:49 'Salıncak alınmasın' minor revize → Eda T 16:51 'okidir ellerine sağlıkk' yarı onay → Arda 16:58 v2 → 17:00 deadline GEÇMİŞ 15dk onay bekleniyor. (2) #24 Bauhaus Bayrama Özel — Aykut 17:02 'burası hazırrr' (45dk to 18:00 · Arda meşgul #23'te). (3) #2 Hasvet Menteşe Cam Giydirme — İrem v1 verildi · Buse 17:00 'Eline sağlık mockup iste' (İrem JNJ bitmeden başlamış pozitif sürpriz). 2 deadline transition: #16+#23 17:00 → GEÇMİŞ 15dk (her ikisi v1 verildi). #17 8sa 29dk GEÇMİŞ devam (16:45 Görkem DM stabilized). Notification Agent: 0 DM (tüm flags skip — pozitif status improvements + spam riski + 16:45 sync zaten uyardı). Canvas SLACK update YAPILDI · canvas_cache.md REFRESHED · live-data.json REWRITTEN · EMBEDDED_DATA inject DONE · GitHub push 9d86aad. Sonraki sync 17:45 — kritik karar noktaları: #24 18:00 deadline (Arda kısmı geldi mi · 15dk kala) · #16+#23 onay komutu geldi mi (tamamlananlar) · #17 9sa eşiği aşılır.",
   "canvas_update": {
-    "status": "DONE_8sa_esigi_asildi_17_imminent_window_16_23",
-    "reason": "Major: #17 8sa eşiği AŞILDI threshold transition + #16/#23 14dk kala 17:00 deadline imminent + time deltas refresh"
+    "status": "DONE_status_improvements_deadline_transitions",
+    "reason": "Major: 3 status improvement (#23 v1+v2 yarı onay · #24 Aykut hazır · #2 Hasvet v1) + 2 deadline transition (#16+#23 17:00) + time deltas refresh"
   },
   "new_briefs_processed": [],
   "still_open_critical": [
-    {"no":"17","marka":"VDM Petdent","delta_h":-8.0,"note":"8sa 0dk GEÇMİŞ · 8sa eşiği AŞILDI · Görkem DM tetiklendi"},
-    {"no":"16","marka":"Bauhaus","delta_h":0.23,"note":"14dk kaldı · v1 verildi · 1sa 56dk pasif onay · KRİTİK pencere"},
-    {"no":"23","marka":"Bauhaus","delta_h":0.23,"note":"14dk kaldı · Arda 1sa 58dk pasif · v1 YOK · KRİTİK"},
-    {"no":"24","marka":"Bauhaus","delta_h":1.23,"note":"1sa 14dk · Aykut+Arda · Arda 6/6 cap"},
-    {"no":"9","marka":"VDM Petdent","delta_h":7.22,"note":"🟠→🔴 transition · 8sa eşiği aşıldı"}
+    {"no":"17","marka":"VDM Petdent","delta_h":-8.48,"note":"8sa 29dk GEÇMİŞ devam · 16:45 Görkem DM gönderildi · 12sa eşiğine kadar bekle (20:46)"},
+    {"no":"16","marka":"Bauhaus","delta_h":-0.25,"note":"15dk GEÇMİŞ · v1 verildi · onay 2sa 25dk pasif · Bauhaus batch 7/7 final"},
+    {"no":"23","marka":"Bauhaus","delta_h":-0.25,"note":"15dk GEÇMİŞ · v1+v2 verildi · Eda T yarı onay 'okidir' · POZİTİF onay bekleniyor"},
+    {"no":"24","marka":"Bauhaus","delta_h":0.75,"note":"45dk to 18:00 · Aykut tamam · Arda meşgul #23'te"},
+    {"no":"9","marka":"VDM Petdent","delta_h":6.73,"note":"6sa 44dk · Eren · 8sa eşiği aşıldı (önceki sync'te)"}
   ],
-  "notification_dms_sent": [
-    {"brief":"17","template":"4_threshold_8h_escalation","target":"U030C48PL23","msg_ts":"1779458052.803289","reason":"predicted 16:45 8sa eşiği trigger fired"}
-  ],
+  "notification_dms_sent": [],
   "notification_skips_logged": [
-    {"brief":"23","reason":"Eda T 14:49 thread ping aktif · Arda 1sa 58dk pasif · ek DM spam riski · 17:15 sync sonrası eskalasyon kararı"},
-    {"brief":"16","reason":"v1 verildi · Eda T 'ellerine sağlıkk' kabul · onay sadece zaman · DM gerekmez"},
-    {"brief":"24","reason":"16:25 sync'inde Şablon 1 DM Aykut+Arda gönderildi 20dk önce · tekrar spam"}
+    {"brief":"16","reason":"v1 verildi onay bekleniyor pasif · uyarı zaten 16:45 sync'te verildi"},
+    {"brief":"23","reason":"POZİTİF status improvement · v2 verildi yarı onay · DM spam riski"},
+    {"brief":"24","reason":"16:25 Şablon 1 DM gönderildi 50dk önce · pozitif progress · ekstra DM gereksiz"},
+    {"brief":"2","reason":"POZİTİF status improvement · İrem v1 verildi · onay flow başladı · ekstra DM gereksiz"},
+    {"brief":"17","reason":"Görkem DM 16:45 sync'te zaten gönderildi · 12sa eşiğine kadar bekle (20:46)"}
   ],
-  "priority_transitions_this_run": [
-    {"no":"9","from":"🟠","to":"🔴","reason":"8sa eşiği aşıldı (7sa 13dk)"}
+  "status_improvements_log": [
+    {"no":"23","old":"v1 yok 14dk KRİTİK","new":"v1+v2 verildi · Eda T 'okidir' yarı onay","events":["16:25 Arda v1 🌸","16:49 Eda T Salıncak minor revize","16:51 Eda T yarı onay","16:58 Arda v2"]},
+    {"no":"24","old":"yeni açıldı 1sa 14dk to 18:00","new":"Aykut 17:02 'burası hazırrr' · 45dk to 18:00","events":["16:33 ekip sarı şerit netleştirdi · Video kararı","17:02 Aykut tamamladı"]},
+    {"no":"2","old":"v1 yok · İrem JNJ bitince başlayacak · STALE 🔴 23sa+","new":"v1 verildi · onay flow başladı · mockup talep","events":["17:00 İrem v1 verdi","17:00 Buse mockup talep"]}
   ],
-  "threshold_transitions_log": [
-    {"no":"17","from":"6sa GEÇMİŞ","to":"8sa GEÇMİŞ","at":"16:46 TR","triggered":"Şablon 4 DM Görkem"}
+  "deadline_transitions_log": [
+    {"no":"16","from":"14dk to 17:00","to":"GEÇMİŞ 15dk","note":"v1 verildi onay yok 2sa 25dk pasif"},
+    {"no":"23","from":"14dk to 17:00","to":"GEÇMİŞ 15dk","note":"v1+v2 verildi yarı onay POZİTİF"}
   ],
   "capacity_state": {
     "arda_active": 6,
@@ -57,11 +62,12 @@
     "eren_active": 5,
     "eren_cap": 4,
     "eren_pct": 125,
-    "note": "🚨 Arda 6/6 sabit (100% cap aşıldı) · #6+#8+#15+#16+#23+#24 · 14dk içinde #16+#23 deadline (17:00) · 1sa 14dk içinde #24 deadline (18:00) · Aykut 5/6 (83%) · Eren 5/4 (+25%)"
+    "note": "🚨 Arda 6/6 sabit (100%) · #6+#8+#15+#16+#23+#24 · #23 v2 yarı onay yakın · #24 Arda kısmı pending (Aykut tamam) · #16 onay bekleniyor · Aykut 5/6 #24 sonrası 4/6'a düşebilir · Eren 5/4 (+25% aşım)"
   },
   "next_sync_decision_points": [
-    "17:15: #16/#23 deadline 17:00 geçti — completed mi yoksa yeni GEÇMİŞ mi?",
-    "17:15: #24 son 45dk pencere · v1 var mı?",
-    "17:15: #17 9sa eşiği aşılır — bayram öncesi son sync için ertele/iptal kararı"
+    "17:45: #24 deadline 18:00 — 15dk kala · Arda kısmı geldi mi?",
+    "17:45: #16 + #23 onay komutu geldi mi (tamamlanan slot)?",
+    "17:45: #17 9sa eşiği aşılır (17:46) · bayram öncesi son izleme",
+    "17:45: #9 VDM Whatsapp 6sa 14dk · 8sa eşiği aşıldı sonrası ek eskalasyon?"
   ]
 }

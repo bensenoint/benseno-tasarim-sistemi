@@ -339,17 +339,31 @@ window.BNS_DATA = {
 function bnsNormalizeDurum(durum, status) {
   // Zaten kısa kod mu?
   const SHORT = ["yeni","calisiliyor","incelemede","blokeli","tamamlandi","tamamlandı"];
-  const d = (durum || status || "").toLowerCase().trim();
+  const raw = (durum || status || "").trim();
+  const d = raw.toLowerCase();
   if (SHORT.includes(d)) return d === "tamamlandı" ? "tamamlandi" : d;
 
-  // Uzun string içindeki anahtar kelimelere bak
-  if (/tamamland[ıi]/i.test(d))                          return "tamamlandi";
-  if (/blokel[ıi]|blokland[ıi]|bekleniyor/i.test(d))    return "blokeli";
-  if (/incelem|review|revize bekl/i.test(d))             return "incelemede";
-  if (/çalışıl|calisil|devam|sürd|started/i.test(d))    return "calisiliyor";
-  // ⏳ işareti + "Sırada" veya "Kritik" gibi → henüz atanmış ama başlanmamış = yeni
+  // 1. 🎨 teslim / v1-v2 verildi / onay bekleniyor → incelemede (tamamlandi'dan ÖNCE bak)
+  if (/🎨[^(]*verildi|🎨[^(]*tamamladı|v\d+\s*verildi|v\d+\s*teslim|resmi onay|onay bekl/i.test(raw)) return "incelemede";
+
+  // 2. Tamamlandı — sadece cümle BAŞINDA güçlü sinyal (yan cümledeki "tamamlandığında" gibi değil)
+  if (/^(✅|tamamland[ıi]|bitti|done)/i.test(raw)) return "tamamlandi";
+
+  // 3. Ertelendi / ⏸ → blokeli
+  if (/ertelendi|ertelend|⏸|iptal/i.test(raw)) return "blokeli";
+
+  // 4. Blokeli
+  if (/blokel[ıi]|blokland[ıi]/i.test(d)) return "blokeli";
+
+  // 5. İncelemede / revize
+  if (/incelem|review|revize bekl/i.test(d)) return "incelemede";
+
+  // 6. Çalışılıyor
+  if (/çalışıl|calisil|devam|sürd|started/i.test(d)) return "calisiliyor";
+
+  // 7. Yeni / sırada
   if (/⏳|yeni|sırada|açıldı|acildi|dispatch/i.test(d)) return "yeni";
-  // Fallback
+
   return "yeni";
 }
 
@@ -404,7 +418,7 @@ function bnsHydrateBrief(raw, idx) {
     priority:     prio(deltaH),   // backwards compat
     deltaH,
     revision:     raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
-    stale:        !!raw.stale,
+    stale:        !!raw.stale || /stale|pasif|hareketsiz|\*\*\d+g.*pasif/i.test(raw.durum || raw.status || ""),
     slack_url:    raw.link ? raw.link.replace(/^\[link\]\((.+)\)$/, "$1") : (raw.slack_url || "#"),
     notes:        raw.notes || raw.saat || "",
     gecmis:       raw.gecmis || "",
