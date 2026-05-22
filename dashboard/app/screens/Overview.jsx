@@ -75,9 +75,16 @@ function FilterPanel({ open, onClose, deptFilter, setDeptFilter, prioFilter, set
 }
 
 // ─── EDITORIAL ──────────────────────────────────────────────────────────────
+function calcAvgCapPct(data) {
+  const ds = data.deptStats || {};
+  const vals = Object.values(ds).map(s => s.capacity_pct != null ? s.capacity_pct : bnsCapPct(s)).filter(v => v > 0);
+  return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : null;
+}
+
 function EditorialLayout({ data, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
+  const avgCapPct = calcAvgCapPct(data);
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -100,7 +107,7 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
         <Kpi label="Bugün teslim" value={today.length} variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil"/>
         <Kpi label="Onay bekleyen" value={review.length} color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri"/>
         <Kpi label="Hareketsiz" value={stale.length} variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok"/>
-        <Kpi label="Kapasite" value="%87" variant={kpiVariant} spark={[72,75,78,80,82,85,87]} trend={{dir:"up", value:"+%5", bad:true}} sub="ekip ortalaması"/>
+        <Kpi label="Kapasite" value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması"/>
       </KpiGrid>
 
       <div style={{display:"grid", gridTemplateColumns:"1.7fr 1fr", gap:"var(--grid-gap)", marginTop: "var(--section-gap)"}} className="bn-grid-2">
@@ -140,6 +147,7 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
 
 // ─── DENSE ──────────────────────────────────────────────────────────────────
 function DenseLayout({ data, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+  const avgCapPct = calcAvgCapPct(data);
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -162,7 +170,7 @@ function DenseLayout({ data, active, overdue, today, week, stale, review, blocke
         <Kpi label="İncelemede"   value={review.length} color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]}/>
         <Kpi label="Blokeli"      value={blocked.length} color="var(--danger)" variant={kpiVariant}/>
         <Kpi label="Hareketsiz"        value={stale.length} variant={kpiVariant}/>
-        <Kpi label="Kapasite"     value="%87" variant={kpiVariant} spark={[72,75,78,80,82,85,87]}/>
+        <Kpi label="Kapasite"     value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant}/>
       </div>
 
       <div style={{display:"grid", gridTemplateColumns:"2fr 1fr", gap: 12}} className="bn-grid-2">
@@ -248,7 +256,7 @@ function StoryLayout({ data, active, overdue, today, week, stale, review, blocke
         <Kpi label="Bugün teslim"  value={today.length} variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}}/>
         <Kpi label="Onay bekleyen" value={review.length} color="var(--warning)" variant={kpiVariant} trend={{dir:"up", value:"+3"}}/>
         <Kpi label="Bu hafta"      value={week.length} variant={kpiVariant} trend={{dir:"up", value:"+12"}}/>
-        <Kpi label="Kapasite"      value="%87" variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:true}}/>
+        <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}}/>
       </KpiGrid>
 
       <div style={{marginTop: "var(--section-gap)", display:"grid", gridTemplateColumns:"1.6fr 1fr", gap:"var(--grid-gap)"}} className="bn-grid-2">
@@ -311,9 +319,9 @@ function DeptRow({ s, color, last, compact }) {
       </div>
       <div style={{display:"flex", alignItems:"center", gap: 8, flex: 1, marginLeft:"auto"}}>
         <div style={{flex:1, height: 6, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
-          <div style={{width: s.capacity+"%", height:"100%", background: s.capacity > 85 ? "var(--warning)" : "var(--ink-2)", borderRadius:999}}/>
+          <div style={{width: s.capacity_pct+"%", height:"100%", background: s.capacity_pct > 85 ? "var(--warning)" : "var(--ink-2)", borderRadius:999}}/>
         </div>
-        <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-2)", minWidth: 32, textAlign:"right"}}>%{s.capacity}</span>
+        <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-2)", minWidth: 32, textAlign:"right"}}>%{s.capacity_pct}</span>
       </div>
     </div>
   );

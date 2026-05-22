@@ -39,10 +39,10 @@ function DeptCompareScreen({ data }) {
               </div>
               <div style={{font:"500 12px/1.4 var(--font-sans)", color:"var(--ink-3)", marginTop: 6}}>
                 <span style={{color:"var(--prio-red)", fontWeight: 600}}>{s.overdue}</span> geciken ·{" "}
-                <span style={{color:"var(--ink)", fontWeight: 600}}>%{s.capacity}</span> kapasite
+                <span style={{color: (s.capacity_pct||bnsCapPct(s)) > 85 ? "var(--warning)" : "var(--ink)", fontWeight: 600}}>%{s.capacity_pct != null ? s.capacity_pct : bnsCapPct(s)}</span> kapasite
               </div>
               <div style={{marginTop: 12, height: 6, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
-                <div style={{width: s.capacity + "%", height:"100%", background: palette[k]}}/>
+                <div style={{width: (s.capacity_pct != null ? s.capacity_pct : bnsCapPct(s)) + "%", height:"100%", background: palette[k]}}/>
               </div>
             </Card>
           );

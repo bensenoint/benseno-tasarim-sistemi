@@ -482,7 +482,7 @@ try {
     }
     // Departman istatistikleri (canlı brief'lerden bot tarafından hesaplandı)
     if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object" && Object.keys(ed.bns_dept_stats).length > 0) {
-      window.BNS_DATA.deptStats = ed.bns_dept_stats;
+      window.BNS_DATA.deptStats = bnsNormDeptStats(ed.bns_dept_stats);
     }
     // Marka istatistikleri (problemli markalar paneli için)
     if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {

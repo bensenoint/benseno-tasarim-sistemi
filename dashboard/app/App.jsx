@@ -155,7 +155,7 @@ function App() {
         }
         // Departman + marka istatistikleri
         if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object") {
-          window.BNS_DATA.deptStats = ed.bns_dept_stats;
+          window.BNS_DATA.deptStats = typeof bnsNormDeptStats === "function" ? bnsNormDeptStats(ed.bns_dept_stats) : ed.bns_dept_stats;
         }
         if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
           window.BNS_DATA.brandStats = ed.bns_brand_stats;

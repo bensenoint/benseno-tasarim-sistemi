@@ -7,6 +7,13 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
   const review  = briefs.filter(b => b.durum === "incelemede");
   const blocked = briefs.filter(b => b.durum === "blokeli");
 
+  // Kapasite: live dept stats'tan tasarım departmanı (en kritik)
+  const ds = data.deptStats || {};
+  const tasarimCap = ds.tasarim ? (ds.tasarim.capacity_pct != null ? ds.tasarim.capacity_pct : bnsCapPct(ds.tasarim)) : null;
+  const capLabel = tasarimCap != null ? `Tasarım kapasitesi %${tasarimCap}` : "Tasarım kapasitesi";
+  const capMetric = tasarimCap != null ? `%${tasarimCap}` : "—";
+  const capTone = tasarimCap != null && tasarimCap > 85 ? "warn" : "info";
+
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -27,11 +34,11 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
           body="Şu an deadline'ı geçmiş aktif brief'ler. İlk eylem: yeniden ata veya Slack thread'ini aç."
           action={<Button kind="ink" size="sm" onClick={() => onSwitchTab("jobs")}>Listeyi aç</Button>}
           metric={overdue.length}/>
-        <Alert tone="warn" Icon={I.Info}
-          title="Tasarım kapasitesi %92"
-          body="Eşik %85. Yeni atama önerilmez. Aylin'in yükü 4, Pelin onboarding'de."
+        <Alert tone={capTone} Icon={I.Info}
+          title={capLabel}
+          body={tasarimCap > 85 ? "Eşik %85 aşıldı. Yeni atama önerilmez." : tasarimCap != null ? `Eşik %85. Kapasite müsait (%${tasarimCap}).` : "Kapasite verisi bekleniyor."}
           action={<Button kind="secondary" size="sm" onClick={() => onSwitchTab("design")}>Tasarım sekmesi</Button>}
-          metric="%92"/>
+          metric={capMetric}/>
         <Alert tone="info" Icon={I.Check}
           title={`${review.length} brief onay bekliyor`}
           body="rev tamamlandı · yöneticiler gözden geçirmeli. Tıkla, drawer'da hızlıca onayla."

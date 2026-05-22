@@ -7,6 +7,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
     ai:      { name: "AI",      emoji: "🤖", stats: data.deptStats.ai,      accent: "var(--bw-14)" }
   };
   const r = roleMap[role];
+  const capPct = r.stats ? (r.stats.capacity_pct != null ? r.stats.capacity_pct : bnsCapPct(r.stats)) : 0;
   const people = data.USERS.filter(u => u.rol === role);
   // Department her zaman bu rolün tüm briefler'ini gösterir — viewMode (mine/dept/all) etkilemez.
   const allBriefs = data._allBriefs || data.briefs;
@@ -32,14 +33,14 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
       <PageHead
         eyebrow={`Departman · ${r.stats.people} kişi`}
         title={`${r.name} departmanı`}
-        subtitle={`${r.stats.active} aktif iş · %${r.stats.capacity} kapasite · ${overdueCount} geciken`}
+        subtitle={`${r.stats.active} aktif iş · %${capPct} kapasite · ${overdueCount} geciken`}
         actions={<Button kind="primary" size="sm" icon={<I.Plus size={13}/>}>Departmana brief ata</Button>}
       />
 
       <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Aktif iş"     value={r.stats.active} accent={r.accent}/>
         <Kpi label="Bu hafta"     value={thisWeek}/>
-        <Kpi label="Kapasite"     value={`%${r.stats.capacity}`} color={r.stats.capacity > 85 ? "var(--warning)" : "var(--ink)"}/>
+        <Kpi label="Kapasite"     value={`%${capPct}`} color={capPct > 85 ? "var(--warning)" : "var(--ink)"}/>
         <Kpi label="Geciken"      value={overdueCount} color="var(--prio-red)"/>
         <Kpi label="Onay bekleyen" value={reviewCount} color="var(--warning)"/>
       </div>
