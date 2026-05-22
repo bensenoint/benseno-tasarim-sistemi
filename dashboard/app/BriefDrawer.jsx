@@ -183,7 +183,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             <Button kind="ghost" icon={<I.User size={13}/>} onClick={handleAssignMe}>Bana ata</Button>
             {assignedMe && !saved && (
               <span style={{font:"500 11px/1 var(--font-sans)", color:"var(--ember)", paddingLeft:2, display:"flex", alignItems:"center", gap:4}}>
-                <I.ArrowRight size={10}/> Kaydet'e bas
+                <I.ChevronRight size={10}/> Kaydet'e bas
               </span>
             )}
           </div>
