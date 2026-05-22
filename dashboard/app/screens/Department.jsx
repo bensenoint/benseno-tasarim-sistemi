@@ -38,9 +38,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
         eyebrow={`Departman · ${r.stats.people} kişi`}
         title={`${r.name} departmanı`}
         subtitle={`${r.stats.active} aktif iş · %${capPct} kapasite · ${overdueCount} geciken`}
-        actions={<Button kind="primary" size="sm" icon={<I.Plus size={13}/>}
-          onClick={() => typeof window.openNewBriefModal === "function" && window.openNewBriefModal()}>
-          Yeni brief aç</Button>}
+        actions={null}
       />
 
       <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
