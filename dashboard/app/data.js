@@ -464,7 +464,8 @@ try {
     }
     // User list (Slack workspace) — bots/silinmiş hariç tüm aktif kişiler
     if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
-      window.BNS_DATA.USERS = ed.bns_users;
+      // live-data'da alan adı "dept", mock'ta "rol" — ikisini normalize et
+      window.BNS_DATA.USERS = ed.bns_users.map(u => ({ ...u, rol: u.rol || u.dept || "" }));
       // ME varsa koru, yoksa Görkem'i bul, yoksa ilk yönetici
       const meId = window.BNS_DATA.ME?.id;
       const me = ed.bns_users.find(u => u.id === meId) ||
