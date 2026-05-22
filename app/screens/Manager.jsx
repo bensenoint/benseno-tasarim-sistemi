@@ -35,7 +35,7 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
         <Alert tone="info" Icon={I.Check}
           title={`${review.length} brief onay bekliyor`}
           body="rev tamamlandı · yöneticiler gözden geçirmeli. Tıkla, drawer'da hızlıca onayla."
-          action={<Button kind="secondary" size="sm">Onay kuyruğu</Button>}
+          action={<Button kind="secondary" size="sm" onClick={() => onSwitchTab("jobs")}>Onay kuyruğu</Button>}
           metric={review.length}/>
       </div>
 
