@@ -1,58 +1,61 @@
 {
-  "sync_ts": 1779439868,
-  "sync_iso": "2026-05-22T11:51:08+03:00",
-  "run_type": "ara_sync_launchd_REAL_brief_22_splenda_uk",
-  "new_briefs": [
+  "sync_ts": 1779441357,
+  "sync_iso": "2026-05-22T12:15:57+03:00",
+  "run_type": "launchd_1215_real_brief_10_becomes_9th_overdue",
+  "new_briefs": [],
+  "priority_upgrades": [],
+  "past_deadline": [
     {
-      "no": "22",
-      "marka": "Splenda",
-      "is": "SPLENDA UK / Summer Newsletter",
-      "dept": "editor",
-      "dept_emoji": "✍️",
-      "atanan_ids": ["U06J26R1XCJ","U02SZQDAFPF","U4XCE3532"],
-      "submitter": "U09BZHR25NG",
-      "deadline_tr": "22 May 2026 17:00",
-      "delta_h": 5.15,
-      "priority": "🔴",
-      "channel_id": "C02SZRFPARK",
-      "ts": "1779439428.236359",
-      "ref": "https://docs.google.com/document/d/1QtKZJH_B7p5lKjki3EPl7FqkIAZx9gwP6HGCHmHooW4/edit?usp=sharing",
-      "tip": "E-posta / Newsletter",
-      "akis": "Paralel",
-      "note": "DM gönderilecek: Aykut+erdem+Cansu (Şablon 9 yeni brief) + Eda T submitter confirm DM"
+      "no": "10",
+      "marka": "Bauhaus",
+      "is": "Bahçe Düzen / 22 Mayıs (Sosyal Medya Post · weekly content batch 1/7)",
+      "channel_id": "C4Y43AW2E",
+      "thread_ts": "1779282760.860839",
+      "delta_h": -0.27,
+      "delta_label": "16dk geride (9. GEÇMİŞ brief)",
+      "atanan_ids": ["U09BFPBKQG7", "U06J26R1XCJ"],
+      "editor_ids": ["U09BZHR25NG"],
+      "deadline_tr": "22 May 2026 12:00",
+      "context": "Arda 'Okitto' 09:24 sonrası 2sa 51dk sessiz. v1 hâlâ yok. 12:00 deadline 16dk önce geçti. 9. GEÇMİŞ brief.",
+      "action": "Şablon 17 GEÇMİŞ DM Arda+Aykut+Eda T. Manager summary Cansu Direktör'e."
     }
   ],
-  "priority_upgrades": [],
-  "past_deadline": [],
   "past_confirmed": [],
   "saat_eksik": [],
   "dept_belirsiz": [],
   "marka_yetersiz_sure": [],
   "marka_anormal_uzun": [],
   "gecmis_growing": [
-    {"no": "1", "marka": "JNJ Vision TR", "is": "24 Haziran Kontakt Lens Davetiyesi", "delta_h": -91.8, "note": "teyit edilmiş — bakanlık süreci · DM gerekmiyor"},
-    {"no": "2", "marka": "Hasvet", "is": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME", "delta_h": -19.8, "note": "İrem JnJ bitince başlayacak, v1 yok"},
-    {"no": "3", "marka": "Bauhaus", "is": "bahar kampanyası", "delta_h": -49.8, "note": "2g 9sa+ pasif, dispatch yok, eskalasyon cevapsız ~36sa"},
-    {"no": "4", "marka": "Bauhaus", "is": "mayıs kampanyası", "delta_h": -22.8, "note": "tasarımcı yok"},
-    {"no": "5", "marka": "Bauhaus", "is": "Broşür (AI)", "delta_h": -22.1, "note": "Eren self-assign, v1 yok"},
-    {"no": "6", "marka": "Bauhaus", "is": "20 Mayıs İçerik", "delta_h": -41.8, "note": "Arda 🎨 yok, kayma riski"},
-    {"no": "8", "marka": "VDM Petdent", "is": "GA4 Analiz", "delta_h": -22.4, "note": "Eren açtı Arda atadı, dept ambiguity"},
-    {"no": "17", "marka": "VDM Petdent", "is": "Yeni bayram postu", "delta_h": -3.08, "note": "⚠️ 3sa EŞİĞİ GEÇİLDİ (3sa 5dk GEÇMİŞ) · 08:49+09:18 escalation cevapsız · CANSU DİREKTÖR MÜDAHALESİ ÖNERİLİR (yeni eşik aşımı)"}
+    {"no": "1", "marka": "JNJ Vision TR", "is": "24 Haziran Kontakt Lens Davetiyesi", "delta_h": -92.25, "note": "teyit edilmiş — bakanlık süreci · DM gerekmiyor"},
+    {"no": "2", "marka": "Hasvet", "is": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME", "delta_h": -20.25, "note": "İrem JnJ bitince başlayacak, v1 yok"},
+    {"no": "3", "marka": "Bauhaus", "is": "bahar kampanyası", "delta_h": -50.25, "note": "2g 9sa+ pasif, dispatch yok, eskalasyon cevapsız ~36sa+"},
+    {"no": "4", "marka": "Bauhaus", "is": "mayıs kampanyası", "delta_h": -23.25, "note": "tasarımcı yok"},
+    {"no": "5", "marka": "Bauhaus", "is": "Broşür (AI)", "delta_h": -22.55, "note": "Eren self-assign, v1 yok"},
+    {"no": "6", "marka": "Bauhaus", "is": "20 Mayıs İçerik", "delta_h": -42.25, "note": "Arda 🎨 yok, kayma riski"},
+    {"no": "8", "marka": "VDM Petdent", "is": "GA4 Analiz", "delta_h": -22.85, "note": "Eren açtı Arda atadı, dept ambiguity"},
+    {"no": "10", "marka": "Bauhaus", "is": "Bahçe Düzen / 22 Mayıs", "delta_h": -0.27, "note": "🆕 9. GEÇMİŞ brief (12:00 deadline 16dk önce geçti · v1 yok · Arda Okitto sonrası 2sa 51dk sessiz)"},
+    {"no": "17", "marka": "VDM Petdent", "is": "Yeni bayram postu", "delta_h": -3.5, "note": "3sa 30dk GEÇMİŞ · 08:49+09:18+11:51 escalation cevapsız · CANSU DİREKTÖR MÜDAHALESİ ÖNERİLİR (yine eşik aşımı sürüyor)"}
   ],
   "thread_activity": [
-    {"no": "10", "marka": "Bauhaus", "is": "Bahçe Düzen / 22 Mayıs", "channel_id": "C4Y43AW2E", "activity": "Son hareket 2sa 27dk önce (Arda 'Okitto'). v1 deadline 9dk kaldı — henüz teslim yok.", "action": "DM atılmıyor — re-ping çok geç · doğal akış · 12:00'da GEÇMİŞ'e düşerse 9. GEÇMİŞ olur · 12:15 sync'inde retrospektif"}
+    {"no": "10", "marka": "Bauhaus", "is": "Bahçe Düzen / 22 Mayıs", "channel_id": "C4Y43AW2E", "activity": "Son hareket Arda 'Okitto' 09:24 (2sa 51dk önce). v1 yok. Deadline 12:00 → 16dk geçti.", "action": "Thread'de yumuşak ping (Şablon 17 light) — Arda'ya 'v1 nasıl?' check"}
   ],
   "calendar_events": [],
   "imminent_deadlines": [
-    {"no": "10", "marka": "Bauhaus", "is": "Bahçe Düzen / 22 Mayıs (batch 1/7)", "delta_h": 0.15, "atanan_ids": ["U09BFPBKQG7","U06J26R1XCJ"], "thread_activity": "PASİF — Arda son 2sa 27dk sessiz, v1 yok · 9dk kaldı"},
-    {"no": "14", "marka": "Bauhaus", "is": "Evinize Düzen / 28 Mayıs (batch 5/7)", "delta_h": 2.15, "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "thread_activity": "Hareket yok"},
-    {"no": "15", "marka": "Bauhaus", "is": "Bahçeniz / 30 Mayıs (batch 6/7)", "delta_h": 2.15, "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "thread_activity": "Hareket yok"},
-    {"no": "22", "marka": "Splenda", "is": "SPLENDA UK / Summer Newsletter", "delta_h": 5.15, "atanan_ids": ["U06J26R1XCJ","U02SZQDAFPF","U4XCE3532"], "thread_activity": "Yeni açıldı (Eda T 11:43)"}
+    {"no": "14", "marka": "Bauhaus", "is": "Evinize Düzen / 28 Mayıs (batch 5/7)", "delta_h": 1.73, "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "thread_activity": "Hareket yok"},
+    {"no": "15", "marka": "Bauhaus", "is": "Bahçeniz / 30 Mayıs (batch 6/7)", "delta_h": 1.73, "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "thread_activity": "Hareket yok"},
+    {"no": "11", "marka": "Bauhaus", "is": "Evde Ferahlık / 23 Mayıs", "delta_h": 4.73, "atanan_ids": ["U09BFPBKQG7","U06J26R1XCJ"], "thread_activity": "Hareket yok"},
+    {"no": "12", "marka": "Bauhaus", "is": "Düzenli Alanlar / 24 Mayıs", "delta_h": 4.73, "atanan_ids": ["U09BFPBKQG7","U06J26R1XCJ"], "thread_activity": "Hareket yok"},
+    {"no": "13", "marka": "Bauhaus", "is": "Güneşli Günler / 26 Mayıs", "delta_h": 4.73, "atanan_ids": ["U09BFPBKQG7","U06J26R1XCJ"], "thread_activity": "Hareket yok"},
+    {"no": "16", "marka": "Bauhaus", "is": "Banyo Şık (batch 7/7)", "delta_h": 4.73, "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "thread_activity": "Hareket yok"},
+    {"no": "18", "marka": "Kuzeypet", "is": "Org Şeması (Serhat)", "delta_h": 4.73, "atanan_ids": ["U08HLMHTGEL"], "thread_activity": "Hareket yok"},
+    {"no": "19", "marka": "Kuzeypet", "is": "Org Şeması (Reyhan GMY)", "delta_h": 4.73, "atanan_ids": ["UD96GH76E"], "thread_activity": "Hareket yok · DUPLICATE?"},
+    {"no": "22", "marka": "Splenda", "is": "SPLENDA UK / Summer Newsletter", "delta_h": 4.73, "atanan_ids": ["U06J26R1XCJ","U02SZQDAFPF","U4XCE3532"], "thread_activity": "Yeni açıldı 11:43 · 32dk önce"}
   ],
   "manager_summary_recommended": {
     "to": "U4XCE3532",
-    "trigger": "#17 VDM bayram 3sa eşiği geçildi (3sa 5dk GEÇMİŞ · 8. GEÇMİŞ brief · escalation cevapsız)",
-    "recommend": "Cansu Direktör müdahalesi DM (Şablon 18 'GEÇMİŞ derinleşiyor · 3sa eşiği aşıldı')"
+    "trigger": "#10 Bauhaus Bahçe Düzen 9. GEÇMİŞ brief oldu (12:00 deadline 16dk önce geçti · Arda v1 vermedi · 2sa 51dk sessiz)",
+    "recommend": "Cansu Direktör DM: 8 → 9 GEÇMİŞ + #17 hâlâ 3sa 30dk GEÇMİŞ (escalation cevapsız) + #10 yeni · Şablon 18 GEÇMİŞ derinleşme briefingi",
+    "secondary": "#17 update — 3sa eşiğinden 30dk daha geçti, hâlâ cevap yok"
   },
   "test_queue_drained": []
 }
