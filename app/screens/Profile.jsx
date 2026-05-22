@@ -383,10 +383,10 @@ function ProfileScreen({ data, user, onOpenBrief }) {
                   {myCompleted.slice(0,12).map((b,i) => {
                     const isLead = b.lead && b.lead.id === u.id;
                     return (
-                      <tr key={b.id} style={{borderTop:"1px solid var(--line-soft)", cursor:"pointer"}}
+                      <tr key={b.id} style={{borderTop:"1px solid var(--line-soft)", cursor: b.slack_url && b.slack_url !== "#" ? "pointer" : "default"}}
                         onMouseEnter={e=>e.currentTarget.style.background="var(--surface-sub)"}
                         onMouseLeave={e=>e.currentTarget.style.background=""}
-                        onClick={() => onOpenBrief && onOpenBrief(b)}>
+                        onClick={() => b.slack_url && b.slack_url !== "#" && window.open(b.slack_url, "_blank")}>
                         <td style={{padding:"8px 12px", whiteSpace:"nowrap"}}>
                           <div style={{display:"flex", alignItems:"center", gap:6}}>
                             <span style={{width:7,height:7,borderRadius:999,background:(data.BRANDS||[]).find(br=>br.name===b.marka)?.color||"#888",flexShrink:0}}/>
