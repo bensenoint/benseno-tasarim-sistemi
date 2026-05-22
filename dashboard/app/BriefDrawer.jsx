@@ -86,9 +86,12 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
 
           <Eyebrow>Atama</Eyebrow>
           <div style={{display:"flex", flexDirection:"column", gap:8, marginTop:10}}>
-            <RoleRow tag="LEAD" user={b.lead} users={allUsers} onChange={(u) => set({ lead: u })}/>
-            {b.contributors.map((u, i) => (
-              <RoleRow key={u.id} tag="CONTRIB" user={u} users={allUsers}
+            {b.lead
+              ? <RoleRow tag="LEAD" user={b.lead} users={allUsers} onChange={(u) => set({ lead: u })}/>
+              : <div style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-4)", padding:"4px 0"}}>— Lead atanmamış</div>
+            }
+            {(b.contributors || []).filter(Boolean).map((u, i) => (
+              <RoleRow key={u.id || i} tag="CONTRIB" user={u} users={allUsers}
                 onChange={(nu) => {
                   const next = [...b.contributors]; next[i] = nu; set({ contributors: next });
                 }}
@@ -101,9 +104,9 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
               onChange={(u) => set({ reviewer: u })}
               onRemove={() => set({ reviewer: null })}/>}
             <AddRoleRow
-              onAddContrib={(u) => set({ contributors: [...b.contributors, u] })}
+              onAddContrib={(u) => set({ contributors: [...(b.contributors||[]), u] })}
               onAddReviewer={(u) => set({ reviewer: u })}
-              allUsers={allUsers}
+              allUsers={allUsers || []}
               hasReviewer={!!b.reviewer}/>
           </div>
 
@@ -264,6 +267,7 @@ function StatusEditor({ current, onPick }) {
 
 function RoleRow({ tag, user, users, onChange, onRemove }) {
   const [open, setOpen] = React.useState(false);
+  if (!user) return null;
   return (
     <div style={{display:"flex", alignItems:"center", gap:10, padding:"4px 0", position:"relative"}}>
       <span style={{
@@ -276,7 +280,7 @@ function RoleRow({ tag, user, users, onChange, onRemove }) {
         borderRadius: 999, border:"1px solid var(--line)", background:"var(--surface)", cursor:"pointer"
       }}>
         <Avatar user={user} size={22}/>
-        <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)"}}>{user.name}</span>
+        <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)"}}>{user.name || "—"}</span>
         <I.ChevronDown size={11} style={{color:"var(--ink-4)"}}/>
       </button>
       {onRemove && (
