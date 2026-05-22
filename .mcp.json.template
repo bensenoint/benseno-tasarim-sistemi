@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "slack": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-slack"
+      ],
+      "env": {
+        "SLACK_BOT_TOKEN": "BURAYA_TOKEN_YAZ",
+        "SLACK_TEAM_ID": "T4Y3R6RAN"
+      }
+    }
+  }
+}

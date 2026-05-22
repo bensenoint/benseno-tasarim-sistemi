@@ -314,9 +314,11 @@ window.BNS_DATA = {
 // EMBEDDED_DATA yoksa yukarıdaki mock veri kalır.
 function bnsHydrateBrief(raw, idx) {
   const acilma  = typeof raw.acilma === "string"   ? Date.parse(raw.acilma)   : raw.acilma;
-  const deadline= typeof raw.deadline === "string" ? Date.parse(raw.deadline) : raw.deadline;
+  // deadline: "18 May 2026" formatı veya ISO string'i veya ms — hepsini destekle
+  let deadlineRaw = raw.deadline || raw.deadlineISO;
+  const deadline = typeof deadlineRaw === "string" ? Date.parse(deadlineRaw) : (deadlineRaw || 0);
   const liveNow = window.BNS_DATA.NOW || NOW;
-  const deltaH  = (deadline - liveNow) / H;
+  const deltaH  = deadline > 0 ? (deadline - liveNow) / H : 999;
   // Önce live BR (Slack'ten gelen), yoksa mock BR, yoksa fallback
   const liveBr  = (window.BNS_DATA && window.BNS_DATA.BR) || BR;
   const brand   = liveBr[raw.marka] || {
@@ -324,26 +326,33 @@ function bnsHydrateBrief(raw, idx) {
     color: WHEEL[brandHash(raw.marka)],
     wheelIdx: brandHash(raw.marka)
   };
+  // Lead: leadId (eski format) veya atanan_ids[0] (yeni data-agent formatı)
+  const liveUsers = (window.BNS_DATA && window.BNS_DATA.USERS) || USERS;
+  const leadId = raw.leadId || (Array.isArray(raw.atanan_ids) && raw.atanan_ids[0]) || null;
+  const contribIds = raw.contribIds || (Array.isArray(raw.atanan_ids) ? raw.atanan_ids.slice(1) : []);
+  const editorIds = Array.isArray(raw.editor_ids) ? raw.editor_ids : [];
   return {
     id:           raw.id || ("br_live_" + idx),
     no:           raw.no != null ? raw.no : (200 - idx),
     marka:        raw.marka,
     brand,
-    baslik:       raw.baslik,
-    lead:         USERS.find(u => u.id === raw.leadId)     || null,
-    contributors: (raw.contribIds || []).map(id => USERS.find(u => u.id === id)).filter(Boolean),
-    reviewer:     raw.reviewerId ? (USERS.find(u => u.id === raw.reviewerId) || null) : null,
+    baslik:       raw.baslik || raw.is || "",
+    lead:         liveUsers.find(u => u.id === leadId) || null,
+    contributors: [...contribIds, ...editorIds].map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
+    reviewer:     raw.reviewerId ? (liveUsers.find(u => u.id === raw.reviewerId) || null) : null,
     acilma,
     deadline,
-    durum:        raw.durum,
-    priority:     prio(deltaH),
+    dept:         raw.dept || "",
+    durum:        raw.durum || "",
+    prio:         prio(deltaH),   // prio objesi: {code, label, color}
+    priority:     prio(deltaH),   // backwards compat
     deltaH,
-    revision:     raw.revision != null ? raw.revision : 0,
+    revision:     raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
     stale:        !!raw.stale,
-    slack_url:    raw.slack_url || "#",
-    notes:        raw.notes || "",
-    gecmis:       raw.gecmis || "",      // Canvas Geçmiş kolonu ham string (BriefDrawer parse eder)
-    _kimden_id:   raw._kimden_id || null // brief açanın ID'si (queue brief'lerinde; obj zaten lead'de)
+    slack_url:    raw.link ? raw.link.replace(/^\[link\]\((.+)\)$/, "$1") : (raw.slack_url || "#"),
+    notes:        raw.notes || raw.saat || "",
+    gecmis:       raw.gecmis || "",
+    _kimden_id:   raw._kimden_id || null
   };
 }
 function bnsHydrateCompleted(raw, idx) {

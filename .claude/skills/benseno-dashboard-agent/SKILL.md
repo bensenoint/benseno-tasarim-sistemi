@@ -79,6 +79,8 @@ GitHub Pages ~1-2dk sonra güncellenir: {DASHBOARD_URL}
 
 Orkestratör tarafından ayrıca tetiklenir: `claude -p "Skill: benseno-dashboard-agent — sabah-raporu"`
 
+⚠️ **ÖNEMLI:** Bu skill `--dangerously-skip-permissions` ile çalışır. Kullanıcıdan onay ALMA. Tüm DM ve kanal mesajlarını doğrudan gönder. "Devam edeyim mi?" veya "Göstereyim mi?" gibi sorular sorma — hepsini otomatik gönder.
+
 ### Veri Kaynağı
 `live-data.json` + `canvas_cache.md` + `marka_stats.json`
 
