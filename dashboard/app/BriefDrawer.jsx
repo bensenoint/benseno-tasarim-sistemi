@@ -3,21 +3,40 @@
 function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
   const [b, setB] = React.useState(brief);
   const [saved, setSaved] = React.useState(false);
-  React.useEffect(() => { setB(brief); setSaved(false); }, [brief]);
+  const [assignedMe, setAssignedMe] = React.useState(false);
+  React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); }, [brief]);
   if (!b) return null;
 
   function set(patch) { const next = { ...b, ...patch }; setB(next); setSaved(false); }
   function changeStatus(s) { set({ durum: s }); }
 
+  const [inlineToast, setInlineToast] = React.useState(null);
+
+  function showToast(msg, duration) {
+    setInlineToast(msg);
+    setTimeout(() => setInlineToast(null), duration || 3500);
+  }
+
   function handleSave() {
     onUpdate && onUpdate(b);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setAssignedMe(false);
+    setTimeout(() => setSaved(false), 2500);
+    if (assignedMe) {
+      const hasSlack = b.slack_url && b.slack_url !== "#";
+      showToast(
+        hasSlack
+          ? "✓ Atandın · Slack thread'inde teyit etmeyi unutma"
+          : "✓ Atandın · Kayıt güncellendi",
+        3500
+      );
+    }
   }
 
   function handleAssignMe() {
     if (!currentUser) return;
     set({ lead: currentUser });
+    setAssignedMe(true);
   }
 
   function handleSlackOpen() {
@@ -144,14 +163,39 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             }}/>
         </div>
 
+        {inlineToast && (
+          <div style={{
+            padding:"10px 20px", background:"var(--ink)", color:"#fff",
+            font:"500 13px/1.4 var(--font-sans)", display:"flex", alignItems:"center", gap:8,
+            animation:"bn-slide-up 180ms var(--ease-out-quart)"
+          }}>
+            {inlineToast}
+            {b.slack_url && b.slack_url !== "#" && assignedMe === false && (
+              <button onClick={handleSlackOpen} style={{
+                marginLeft:"auto", font:"500 12px/1 var(--font-sans)",
+                color:"var(--ember)", background:"transparent", border:"none", cursor:"pointer"
+              }}>Slack'te aç →</button>
+            )}
+          </div>
+        )}
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <Button kind="ghost" icon={<I.User size={13}/>} onClick={handleAssignMe}>Bana ata</Button>
+          <div style={{display:"flex", flexDirection:"column", alignItems:"flex-start", gap:4}}>
+            <Button kind="ghost" icon={<I.User size={13}/>} onClick={handleAssignMe}>Bana ata</Button>
+            {assignedMe && !saved && (
+              <span style={{font:"500 11px/1 var(--font-sans)", color:"var(--ember)", paddingLeft:2, display:"flex", alignItems:"center", gap:4}}>
+                <I.ArrowRight size={10}/> Kaydet'e bas
+              </span>
+            )}
+          </div>
           <div style={{display:"flex", gap:8}}>
             <Button kind="secondary" icon={<I.Slack size={13}/>} onClick={handleSlackOpen}>Slack'te aç</Button>
-            <Button kind="primary" icon={saved ? <I.Check size={13}/> : <I.Check size={13}/>}
+            <Button kind="primary" icon={<I.Check size={13}/>}
               onClick={handleSave}
-              style={saved ? {background:"var(--prio-green)", borderColor:"var(--prio-green)"} : {}}>
+              style={{
+                ...(saved ? {background:"var(--prio-green)", borderColor:"var(--prio-green)"} : {}),
+                ...(assignedMe && !saved ? {boxShadow:"0 0 0 2px var(--ember)", animation:"bn-pulse 1s ease infinite"} : {})
+              }}>
               {saved ? "Kaydedildi ✓" : "Kaydet"}
             </Button>
           </div>
