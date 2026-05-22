@@ -1,92 +1,53 @@
-// app/NewBrief.jsx — modal for creating a new brief.
+// app/NewBrief.jsx — marka seç → Slack kanalını aç.
 
-function NewBriefModal({ open, onClose, onCreate, data }) {
+const MARKA_KANAL = {
+  "Bauhaus":             "marka-bauhaus",
+  "Beta":                "marka-beta",
+  "Cimporglobal":        "marka-cimporglobal",
+  "Cureffect":           "marka-cureffect",
+  "Egosport":            "marka-egosport",
+  "Gürsoy":              "marka-gursoy",
+  "Hasvet":              "marka-hasvet",
+  "Hendex":              "marka-hendex",
+  "JNJ":                 "marka-jnj",
+  "JNJ Acuvue ME":       "marka-jnj-acuvue-me",
+  "JNJ Vision TR":       "marka-jnj-vision-tr",
+  "Jungleous":           "marka-jungleous",
+  "KMR Amos":            "marka-kmr-amos",
+  "KMR Copic":           "marka-kmr-copic",
+  "KMR Lamy":            "marka-kmr-lamy",
+  "KMR Marshmallow":     "marka-kmr-marshmallow",
+  "KMR Max":             "marka-kmr-max",
+  "KMR Panfix":          "marka-kmr-panfix",
+  "KMR Serve":           "marka-kmr-serve",
+  "Kuzeypet":            "marka-kuzeypet",
+  "KZY Bark":            "marka-kzy-bark",
+  "KZY Everclean":       "marka-kzy-everclean",
+  "KZY Ferplast":        "marka-kzy-ferplast",
+  "KZY Flamingo":        "marka-kzy-flamingo",
+  "KZY Simple Solution": "marka-kzy-simplesolution",
+  "KZY Supreme":         "marka-kzy-supreme",
+  "KZY Vet's Best":      "marka-kzy-vetsbest",
+  "Marmara Holding":     "marka-marmaraholding",
+  "Muffik":              "marka-muffik",
+  "Polisan":             "marka-polisan",
+  "Splenda":             "marka-splenda",
+  "Tour2America":        "marka-tour2america",
+  "VDM Petdent":        "marka-vdm-petdent",
+};
+
+function NewBriefModal({ open, onClose, data }) {
   const [marka, setMarka] = React.useState("");
-  const [baslik, setBaslik] = React.useState("");
-  const [leadId, setLeadId] = React.useState("");
-  const [contribIds, setContribIds] = React.useState([]);
-  const [reviewerId, setReviewerId] = React.useState("");
-  const [deadlineH, setDeadlineH] = React.useState(48);
-  const [clipboardDone, setClipboardDone] = React.useState(false);
-  React.useEffect(() => {
-    if (open) {
-      setMarka(""); setBaslik(""); setLeadId(""); setContribIds([]); setReviewerId(""); setDeadlineH(48); setClipboardDone(false);
-    }
-  }, [open]);
+  React.useEffect(() => { if (open) setMarka(""); }, [open]);
   if (!open) return null;
 
-  const valid = marka && baslik && leadId;
+  const kanal = MARKA_KANAL[marka];
+  const kanalUrl = kanal ? `https://benseno.slack.com/app_redirect?channel=${kanal}` : null;
 
-  // Marka adı → Slack kanal adı mapping
-  const MARKA_KANAL = {
-    "Bauhaus":              "marka-bauhaus",
-    "Beta":                 "marka-beta",
-    "Cimporglobal":         "marka-cimporglobal",
-    "Cureffect":            "marka-cureffect",
-    "Egosport":             "marka-egosport",
-    "Gürsoy":               "marka-gursoy",
-    "Hasvet":               "marka-hasvet",
-    "Hendex":               "marka-hendex",
-    "JNJ":                  "marka-jnj",
-    "JNJ Acuvue ME":        "marka-jnj-acuvue-me",
-    "JNJ Vision TR":        "marka-jnj-vision-tr",
-    "Jungleous":            "marka-jungleous",
-    "KMR Amos":             "marka-kmr-amos",
-    "KMR Copic":            "marka-kmr-copic",
-    "KMR Lamy":             "marka-kmr-lamy",
-    "KMR Marshmallow":      "marka-kmr-marshmallow",
-    "KMR Max":              "marka-kmr-max",
-    "KMR Panfix":           "marka-kmr-panfix",
-    "KMR Serve":            "marka-kmr-serve",
-    "Kuzeypet":             "marka-kuzeypet",
-    "KZY Bark":             "marka-kzy-bark",
-    "KZY Everclean":        "marka-kzy-everclean",
-    "KZY Ferplast":         "marka-kzy-ferplast",
-    "KZY Flamingo":         "marka-kzy-flamingo",
-    "KZY Simple Solution":  "marka-kzy-simplesolution",
-    "KZY Supreme":          "marka-kzy-supreme",
-    "KZY Vet's Best":       "marka-kzy-vetsbest",
-    "Marmara Holding":      "marka-marmaraholding",
-    "Muffik":               "marka-muffik",
-    "Polisan":              "marka-polisan",
-    "Splenda":              "marka-splenda",
-    "Tour2America":         "marka-tour2america",
-    "VDM Petdent":          "marka-vdm-petdent",
-  };
-
-  function slackKanalUrl(markaAdi) {
-    const kanal = MARKA_KANAL[markaAdi];
-    if (!kanal) return null;
-    return `https://benseno.slack.com/app_redirect?channel=${kanal}`;
-  }
-
-  function submit() {
-    if (!valid) return;
-    const lead = data.USERS.find(u => u.id === leadId);
-    const contributors = contribIds.map(id => data.USERS.find(u => u.id === id)).filter(Boolean);
-    const dh = Number(deadlineH);
-    const deadlineDate = new Date(Date.now() + dh * 3600 * 1000);
-    const deadlineStr = deadlineDate.toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric", timeZone:"Europe/Istanbul" });
-
-    // Slack kanalına yönlendir
-    const kanalUrl = slackKanalUrl(marka);
-    if (kanalUrl) {
-      window.open(kanalUrl, "_blank");
-    }
-
-    // Kopyalanabilir brief metni oluştur
-    const leadName = lead ? lead.name : "—";
-    const contribNames = contributors.map(u => u.name).join(", ");
-    const briefText = [
-      `📋 ${baslik}`,
-      `🎀 İş: ${baslik}`,
-      `⏰ Süre: ${deadlineStr}`,
-      `👷 Kim: ${leadName}${contribNames ? " + " + contribNames : ""}`,
-    ].join("\n");
-
-    navigator.clipboard?.writeText(briefText).catch(() => {});
-    setClipboardDone(true);
-    setTimeout(() => { setClipboardDone(false); onClose(); }, 2800);
+  function handleOpen() {
+    if (!kanalUrl) return;
+    window.open(kanalUrl, "_blank");
+    onClose();
   }
 
   return (
@@ -96,106 +57,61 @@ function NewBriefModal({ open, onClose, onCreate, data }) {
         animation: "bn-fade 180ms var(--ease-out-quart)"
       }}/>
       <div style={{
-        position:"fixed", top:"10vh", left:"50%", transform:"translateX(-50%)",
-        width:"min(560px, 92vw)", zIndex: 93,
+        position:"fixed", top:"20vh", left:"50%", transform:"translateX(-50%)",
+        width:"min(400px, 92vw)", zIndex: 93,
         background:"var(--surface)", border:"1px solid var(--line)",
         borderRadius: 14, boxShadow:"var(--shadow-2)",
         animation: "bn-slide-up 220ms var(--ease-out-quart)"
       }}>
+        {/* Header */}
         <div style={{padding:"14px 18px", borderBottom:"1px solid var(--line)", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
           <div>
             <div style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.08em", textTransform:"uppercase", color:"var(--ink-3)"}}>Yeni brief</div>
             <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:18, color:"var(--ink-2)", marginTop:4}}>
-              Formu doldur → Slack kanalı açılır, brief metni kopyalanır.
+              Marka seç → Slack'te aç.
             </div>
           </div>
-          <button onClick={onClose} style={{
-            border:0, background:"transparent", cursor:"pointer",
-            padding:4, color:"var(--ink-3)"
-          }}><I.X size={16}/></button>
+          <button onClick={onClose} style={{border:0, background:"transparent", cursor:"pointer", padding:4, color:"var(--ink-3)"}}>
+            <I.X size={16}/>
+          </button>
         </div>
-        <div style={{padding:"16px 18px", display:"grid", gap: 14}}>
-          <Field label="Marka">
-            <select value={marka} onChange={(e) => setMarka(e.target.value)} style={inputCss}>
+
+        {/* Body */}
+        <div style={{padding:"20px 18px"}}>
+          <label style={{display:"flex", flexDirection:"column", gap:8}}>
+            <span style={{font:"500 11px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)"}}>Marka</span>
+            <select value={marka} onChange={(e) => setMarka(e.target.value)} style={{
+              font:"500 15px/1.3 var(--font-sans)", color:"var(--ink)",
+              background:"var(--surface-sub)", border:"1px solid var(--line)",
+              borderRadius: 8, padding:"10px 12px", outline:"none", width:"100%"
+            }}>
               <option value="">Marka seç…</option>
-              {data.BRANDS.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
+              {(data.BRANDS || []).map(b => (
+                <option key={b.name} value={b.name}>{b.name}</option>
+              ))}
             </select>
-          </Field>
-          <Field label="İş başlığı">
-            <input value={baslik} onChange={(e) => setBaslik(e.target.value)}
-              placeholder="Örn. Mart kampanya görselleri" style={inputCss}/>
-          </Field>
-          <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap: 12}}>
-            <Field label="Açan">
-              <select value={leadId} onChange={(e) => setLeadId(e.target.value)} style={inputCss}>
-                <option value="">Açan seç…</option>
-                {data.USERS.filter(u => u.rol !== "yonetici" || true).map(u => (
-                  <option key={u.id} value={u.id}>{u.name} · {u.rol}</option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Reviewer (ops.)">
-              <select value={reviewerId} onChange={(e) => setReviewerId(e.target.value)} style={inputCss}>
-                <option value="">—</option>
-                {data.USERS.filter(u => u.rol === "yonetici").map(u => (
-                  <option key={u.id} value={u.id}>{u.name}</option>
-                ))}
-              </select>
-            </Field>
-          </div>
-          <Field label={`Deadline · ${deadlineH < 24 ? deadlineH + " sa" : Math.round(deadlineH/24) + " gün"} sonra`}>
-            <input type="range" min="2" max="240" step="1" value={deadlineH} onChange={(e) => setDeadlineH(+e.target.value)}
-              style={{width:"100%", accentColor:"var(--ember)"}}/>
-            <div style={{display:"flex", justifyContent:"space-between", font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", marginTop: 4}}>
-              <span>2 sa</span><span>10 gün</span>
+          </label>
+
+          {marka && (
+            <div style={{marginTop:14, padding:"10px 12px", background:"var(--paper-2)", borderRadius:8, font:"500 12px/1.4 var(--font-mono)", color:"var(--ink-3)", display:"flex", alignItems:"center", gap:8}}>
+              <I.Slack size={13}/>
+              #{kanal || "—"}
             </div>
-            <div style={{marginTop:8, display:"flex", alignItems:"center", gap:8}}>
-              <PriorityBadge p={priorityFromDh(deadlineH)} deltaH={deadlineH}/>
-              <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
-                otomatik öncelik (deadline'a göre)
-              </span>
-            </div>
-          </Field>
+          )}
         </div>
-        {clipboardDone && (
-          <div style={{padding:"10px 18px", background:"var(--ink)", color:"#fff", font:"500 12px/1.4 var(--font-sans)", display:"flex", alignItems:"center", gap:8}}>
-            ✓ Slack kanalı açıldı · Brief metni panoya kopyalandı — kanalda yapıştır ve gönder
-          </div>
-        )}
-        <div style={{padding:"12px 18px", borderTop:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center", gap: 8}}>
-          <span style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>
-            {marka ? `#${(MARKA_KANAL[marka] || "?")}` : "Marka seçince kanal görünür"}
-          </span>
-          <div style={{display:"flex", gap:8}}>
-            <Button kind="secondary" onClick={onClose}>İptal</Button>
-            <Button kind="primary" icon={<I.Slack size={13}/>} onClick={submit}
-              style={!valid ? { opacity: 0.5, pointerEvents:"none" } : {}}>
-              Slack'te Aç
-            </Button>
-          </div>
+
+        {/* Footer */}
+        <div style={{padding:"12px 18px", borderTop:"1px solid var(--line)", display:"flex", justifyContent:"flex-end", gap:8}}>
+          <Button kind="secondary" onClick={onClose}>İptal</Button>
+          <Button kind="primary" icon={<I.Slack size={13}/>} onClick={handleOpen}
+            style={!marka ? {opacity:0.5, pointerEvents:"none"} : {}}>
+            Slack'te Aç
+          </Button>
         </div>
       </div>
     </>
   );
 }
-
-function Field({ label, children }) {
-  return (
-    <label style={{display:"flex", flexDirection:"column", gap:6}}>
-      <span style={{
-        font:"500 11px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase",
-        color:"var(--ink-3)"
-      }}>{label}</span>
-      {children}
-    </label>
-  );
-}
-
-const inputCss = {
-  font:"500 14px/1.3 var(--font-sans)", color:"var(--ink)",
-  background:"var(--surface-sub)", border:"1px solid var(--line)",
-  borderRadius: 8, padding:"9px 11px", outline:"none", width:"100%"
-};
 
 function priorityFromDh(dh) {
   if (dh <= 0)  return { code:"over", label:"GEÇMİŞ", color:"var(--prio-red)" };
