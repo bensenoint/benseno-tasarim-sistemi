@@ -7,7 +7,8 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
     ai:      { name: "AI",      emoji: "🤖", stats: data.deptStats.ai,      accent: "var(--bw-14)" }
   };
   const r = roleMap[role];
-  const capPct = r.stats ? (r.stats.capacity_pct != null ? r.stats.capacity_pct : bnsCapPct(r.stats)) : 0;
+  // rows henüz hesaplanmadı — capPct rows.length ile override edilecek (aşağıda)
+  const _capPctFromStats = r.stats ? (r.stats.capacity_pct != null ? r.stats.capacity_pct : bnsCapPct(r.stats)) : 0;
   const people = data.USERS.filter(u => (u.rol || u.dept) === role);
   // Department her zaman bu rolün tüm briefler'ini gösterir — viewMode (mine/dept/all) etkilemez.
   const allBriefs = data._allBriefs || data.briefs;
@@ -17,6 +18,8 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
     (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.rol || c.dept) === role))
   );
   const overdueCount = rows.filter(b => b.deltaH <= 0).length;
+  // Kapasite: rows.length / (people × 6 slot) — deptStats.active yerine gerçek satır sayısı
+  const capPct = r.stats && r.stats.capacity ? Math.min(100, Math.round((rows.length / r.stats.capacity) * 100)) : _capPctFromStats;
   const reviewCount = rows.filter(b => b.durum === "incelemede").length;
   const thisWeek = rows.filter(b => b.deltaH > 0 && b.deltaH <= 168).length;
 
@@ -37,12 +40,12 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
       <PageHead
         eyebrow={`Departman · ${r.stats.people} kişi`}
         title={`${r.name} departmanı`}
-        subtitle={`${r.stats.active} aktif iş · %${capPct} kapasite · ${overdueCount} geciken`}
+        subtitle={`${rows.length} aktif iş · %${capPct} kapasite · ${overdueCount} geciken`}
         actions={null}
       />
 
       <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
-        <Kpi label="Aktif iş"     value={r.stats.active} accent={r.accent}/>
+        <Kpi label="Aktif iş"     value={rows.length} accent={r.accent}/>
         <Kpi label="Bu hafta"     value={thisWeek}/>
         <Kpi label="Kapasite"     value={`%${capPct}`} color={capPct > 85 ? "var(--warning)" : "var(--ink)"}/>
         <Kpi label="Geciken"      value={overdueCount} color="var(--prio-red)"/>
