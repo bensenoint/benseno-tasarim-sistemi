@@ -1,24 +1,81 @@
 // app/screens/Overview.jsx — landing tab · 3 layout variants.
 // Variants: "editorial" (default) | "dense" | "story"
 
-function OverviewScreen({ data, user, viewMode, onOpenBrief, onSwitchTab, layout = "editorial", kpiVariant = "plain" }) {
+function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwitchTab, onRefresh, layout = "editorial", kpiVariant = "plain" }) {
   // viewMode filtresi App.jsx'te merkezi olarak uygulanıyor — data.briefs zaten filtered.
   const active = data.briefs;
+  const [filterOpen, setFilterOpen] = React.useState(false);
+  const [deptFilter, setDeptFilter] = React.useState("all");
+  const [prioFilter, setPrioFilter] = React.useState("all");
 
-  const overdue = active.filter(b => b.deltaH <= 0);
-  const today = active.filter(b => b.deltaH > 0 && b.deltaH <= 24);
-  const week = active.filter(b => b.deltaH > 0 && b.deltaH <= 168);
-  const stale = active.filter(b => b.stale);
-  const review = active.filter(b => b.durum === "incelemede");
-  const blocked = active.filter(b => b.durum === "blokeli");
+  // Local filtreler (dept + prio) — viewMode üstüne ek
+  const filtered = active.filter(b => {
+    if (deptFilter !== "all" && b.dept !== deptFilter) return false;
+    if (prioFilter !== "all" && b.priority?.code !== prioFilter) return false;
+    return true;
+  });
 
-  if (layout === "dense") return <DenseLayout {...{data,user,viewMode,active,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,kpiVariant}}/>;
-  if (layout === "story") return <StoryLayout {...{data,user,viewMode,active,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,kpiVariant}}/>;
-  return <EditorialLayout {...{data,user,viewMode,active,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,kpiVariant}}/>;
+  const overdue = filtered.filter(b => b.deltaH <= 0);
+  const today = filtered.filter(b => b.deltaH > 0 && b.deltaH <= 24);
+  const week = filtered.filter(b => b.deltaH > 0 && b.deltaH <= 168);
+  const stale = filtered.filter(b => b.stale);
+  const review = filtered.filter(b => b.durum === "incelemede");
+  const blocked = filtered.filter(b => b.durum === "blokeli");
+
+  const filterActive = deptFilter !== "all" || prioFilter !== "all";
+  const shared = {data,user,viewMode,setViewMode,active:filtered,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,onRefresh,filterOpen,setFilterOpen,deptFilter,setDeptFilter,prioFilter,setPrioFilter,filterActive,kpiVariant};
+
+  if (layout === "dense") return <DenseLayout {...shared}/>;
+  if (layout === "story") return <StoryLayout {...shared}/>;
+  return <EditorialLayout {...shared}/>;
+}
+
+// ─── FILTER PANEL ──────────────────────────────────────────────────────────
+function FilterPanel({ open, onClose, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive }) {
+  if (!open) return null;
+  const deptOpts = [["all","Tüm departmanlar"],["tasarim","🎨 Tasarım"],["editor","✍️ Editör"],["ai","🤖 AI"]];
+  const prioOpts = [["all","Tüm öncelikler"],["over","🔴 Geçmiş"],["red","🔴 Acil"],["org","🟠 Yüksek"],["ylw","🟡 Normal"],["grn","🟢 Düşük"]];
+  return (
+    <>
+      <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:88}}/>
+      <div style={{
+        position:"absolute", top:"100%", right:0, marginTop:6, zIndex:89,
+        background:"var(--surface)", border:"1px solid var(--line)",
+        borderRadius:12, boxShadow:"var(--shadow-2)", padding:16, minWidth:220,
+        display:"flex", flexDirection:"column", gap:14
+      }}>
+        <div style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.07em", textTransform:"uppercase", color:"var(--ink-3)"}}>Filtrele</div>
+        <div>
+          <div style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-3)", marginBottom:6}}>Departman</div>
+          {deptOpts.map(([v,l]) => (
+            <label key={v} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0",cursor:"pointer"}}>
+              <input type="radio" name="dept" value={v} checked={deptFilter===v} onChange={() => setDeptFilter(v)} style={{accentColor:"var(--ember)"}}/>
+              <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink-2)"}}>{l}</span>
+            </label>
+          ))}
+        </div>
+        <div>
+          <div style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-3)", marginBottom:6}}>Öncelik</div>
+          {prioOpts.map(([v,l]) => (
+            <label key={v} style={{display:"flex",alignItems:"center",gap:8,padding:"5px 0",cursor:"pointer"}}>
+              <input type="radio" name="prio" value={v} checked={prioFilter===v} onChange={() => setPrioFilter(v)} style={{accentColor:"var(--ember)"}}/>
+              <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink-2)"}}>{l}</span>
+            </label>
+          ))}
+        </div>
+        {filterActive && (
+          <button onClick={() => { setDeptFilter("all"); setPrioFilter("all"); }} style={{
+            font:"500 12px/1 var(--font-sans)", color:"var(--ember)",
+            background:"transparent", border:"none", cursor:"pointer", textAlign:"left", padding:0
+          }}>✕ Filtreyi temizle</button>
+        )}
+      </div>
+    </>
+  );
 }
 
 // ─── EDITORIAL ──────────────────────────────────────────────────────────────
-function EditorialLayout({ data, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, kpiVariant }) {
+function EditorialLayout({ data, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   return (
@@ -27,10 +84,13 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
         eyebrow={data.fmtTr ? data.fmtTr(data.NOW) : `18 Mayıs · Cuma · 14:30 ${greetingTimezone()}`}
         title={`${greeting}, ${firstName}.`}
         subtitle={`bugün ${overdue.length} geciken, ${today.length} bugün teslim. önce bunlar.`}
-        actions={<>
-          <Button kind="secondary" icon={<I.Filter size={14}/>}>Filtrele</Button>
-          <Button kind="ghost" icon={<I.Refresh size={14}/>}>Yenile</Button>
-        </>}
+        actions={<div style={{position:"relative",display:"flex",gap:6}}>
+          <Button kind={filterActive ? "primary" : "secondary"} icon={<I.Filter size={14}/>} onClick={() => setFilterOpen(o=>!o)}>
+            {filterActive ? "Filtre aktif" : "Filtrele"}
+          </Button>
+          <FilterPanel open={filterOpen} onClose={() => setFilterOpen(false)} deptFilter={deptFilter} setDeptFilter={setDeptFilter} prioFilter={prioFilter} setPrioFilter={setPrioFilter} filterActive={filterActive}/>
+          <Button kind="ghost" icon={<I.Refresh size={14}/>} onClick={onRefresh}>Yenile</Button>
+        </div>}
       />
 
       {/* KPI grid */}
@@ -75,16 +135,19 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
 }
 
 // ─── DENSE ──────────────────────────────────────────────────────────────────
-function DenseLayout({ data, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, kpiVariant }) {
+function DenseLayout({ data, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   return (
     <div className="bn-tab-in">
       <PageHead
         title="Genel bakış"
-        subtitle="60 aktif brief · sıkı görünüm"
-        actions={<>
-          <Button kind="secondary" size="sm" icon={<I.Filter size={13}/>}>Filtrele</Button>
-          <Button kind="ghost" size="sm" icon={<I.Refresh size={13}/>}>Yenile</Button>
-        </>}
+        subtitle={`${active.length} aktif brief · sıkı görünüm`}
+        actions={<div style={{position:"relative",display:"flex",gap:6}}>
+          <Button kind={filterActive ? "primary" : "secondary"} size="sm" icon={<I.Filter size={13}/>} onClick={() => setFilterOpen(o=>!o)}>
+            {filterActive ? "Filtre aktif" : "Filtrele"}
+          </Button>
+          <FilterPanel open={filterOpen} onClose={() => setFilterOpen(false)} deptFilter={deptFilter} setDeptFilter={setDeptFilter} prioFilter={prioFilter} setPrioFilter={setPrioFilter} filterActive={filterActive}/>
+          <Button kind="ghost" size="sm" icon={<I.Refresh size={13}/>} onClick={onRefresh}>Yenile</Button>
+        </div>}
       />
 
       <div style={{display:"grid", gridTemplateColumns:"repeat(8, 1fr)", gap: 10, marginBottom: 16}}>

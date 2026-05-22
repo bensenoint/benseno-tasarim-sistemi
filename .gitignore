@@ -3,6 +3,8 @@ data/.github-pat
 data/.github-pat-sistem
 data/.slack-app-token
 data/.slack-bot-token
+data/.slack-user-token
+data/.slack-list-id
 data/.dashboard-auth-hash
 data/.github-pat-created
 

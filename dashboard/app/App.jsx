@@ -26,6 +26,7 @@ function App() {
   const [palette, setPalette] = React.useState(false);
   const [newBrief, setNewBrief] = React.useState(false);
   const [toast, setToast] = React.useState(null);
+  const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
 
   // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
   // Bana / Departman / Tümü filtresi briefs ve completed'a uygulanır.
@@ -128,8 +129,14 @@ function App() {
         if (typeof ed.last_sync === "string")  window.BNS_DATA.lastSync = ed.last_sync;
         // Brand list (Slack channels) — briefs hidrasyonundan ÖNCE override et
         if (Array.isArray(ed.bns_brands) && ed.bns_brands.length > 0) {
-          window.BNS_DATA.BRANDS = ed.bns_brands;
-          window.BNS_DATA.BR = Object.fromEntries(ed.bns_brands.map(b => [b.name, b]));
+          // Normalize: string[] veya {name,...}[] her ikisini de destekle
+          const normB = ed.bns_brands.map(b =>
+            typeof b === "string"
+              ? { name: b, color: window.WHEEL?.[window.brandHash?.(b)||0] || "#888" }
+              : b
+          );
+          window.BNS_DATA.BRANDS = normB;
+          window.BNS_DATA.BR = Object.fromEntries(normB.map(b => [b.name, b]));
         }
         // User list (Slack workspace) — briefs hidrasyonundan ÖNCE
         if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
@@ -162,6 +169,11 @@ function App() {
     poll(); // ilk çağrı hemen (initial script load'dan farklı timestamp olabilir)
     const id = setInterval(poll, 30_000);
     return () => { cancelled = true; clearInterval(id); };
+  }, [pollTick]); // pollTick değişince yeni interval başlar → manual refresh
+
+  const onRefresh = React.useCallback(() => {
+    setPollTick(n => n + 1);
+    setToast("Veri güncelleniyor…");
   }, []);
 
   // ─── Handlers ─────────────────────────────────────────────────────────
@@ -188,9 +200,9 @@ function App() {
 
   // ─── Pick screen ──────────────────────────────────────────────────────
   let Screen;
-  if (tab === "overview")   Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode}
+  if (tab === "overview")   Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode}
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
-                                       onOpenBrief={onOpenBrief} onSwitchTab={setTab}/>;
+                                       onOpenBrief={onOpenBrief} onSwitchTab={setTab} onRefresh={onRefresh}/>;
   else if (tab === "manager")  Screen = <ManagerScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} onSwitchTab={setTab} onStatusChange={onStatusChange}/>;
   else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} tableMode={t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief}/>;

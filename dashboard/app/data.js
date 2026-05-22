@@ -397,8 +397,14 @@ try {
     }
     // Önce brand list'i override et (briefs hidrasyonu lookup yapacak)
     if (Array.isArray(ed.bns_brands) && ed.bns_brands.length > 0) {
-      window.BNS_DATA.BRANDS = ed.bns_brands;
-      window.BNS_DATA.BR = Object.fromEntries(ed.bns_brands.map(b => [b.name, b]));
+      // Normalize: string[] veya {name,...}[] her ikisini de destekle
+      const normalized = ed.bns_brands.map(b =>
+        typeof b === "string"
+          ? { name: b, color: WHEEL[brandHash(b)], wheelIdx: brandHash(b) }
+          : b
+      );
+      window.BNS_DATA.BRANDS = normalized;
+      window.BNS_DATA.BR = Object.fromEntries(normalized.map(b => [b.name, b]));
     }
     // User list (Slack workspace) — bots/silinmiş hariç tüm aktif kişiler
     if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
