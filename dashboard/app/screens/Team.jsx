@@ -7,7 +7,7 @@ function TeamScreen({ data }) {
 
   // Find max value for color scale
   let max = 1;
-  users.forEach(u => brands.forEach(b => { if (m[u.id][b.name] > max) max = m[u.id][b.name]; }));
+  users.forEach(u => brands.forEach(b => { const v = (m[u.id] || {})[b.name] || 0; if (v > max) max = v; }));
 
   function cell(v) {
     if (v === 0) return { bg: "transparent", color: "var(--ink-4)" };
@@ -87,7 +87,7 @@ function TeamScreen({ data }) {
                   <span style={{marginLeft:"auto", font:"500 10px/1 var(--font-mono)", color:"var(--ink-4)"}}>{u.rol}</span>
                 </td>
                 {brands.map(b => {
-                  const v = m[u.id][b.name];
+                  const v = (m[u.id] || {})[b.name] || 0;
                   const c = cell(v);
                   return (
                     <td key={b.name} title={`${u.name} × ${b.name}: ${v} iş`} style={{

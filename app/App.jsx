@@ -159,6 +159,29 @@ function App() {
         if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object") {
           window.BNS_DATA.deptStats = typeof bnsNormDeptStats === "function" ? bnsNormDeptStats(ed.bns_dept_stats) : ed.bns_dept_stats;
         }
+        // Ekip matrisi — tamamlanan işlerden kullanıcı × marka sayısı
+        {
+          const allC = window.BNS_DATA.completed || [];
+          const allB = window.BNS_DATA.briefs    || [];
+          const users  = window.BNS_DATA.USERS   || [];
+          const brands = window.BNS_DATA.BRANDS  || [];
+          const mx = {};
+          users.forEach(u => {
+            mx[u.id] = {};
+            brands.forEach(b => { mx[u.id][b.name] = 0; });
+          });
+          // tamamlananlardan say
+          allC.forEach(c => {
+            const uid = c.lead?.id;
+            const mn  = c.marka || c.brand?.name;
+            if (uid && mn && mx[uid] && mx[uid][mn] !== undefined) mx[uid][mn]++;
+            (c.contributors || []).forEach(cu => {
+              if (cu?.id && mn && mx[cu.id] && mx[cu.id][mn] !== undefined) mx[cu.id][mn]++;
+            });
+          });
+          // aktif brief'leri de göster (daha az ağırlık — 0.5 gibi değil, sadece tamamlanmış say)
+          window.BNS_DATA.matrix = mx;
+        }
         if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
           window.BNS_DATA.brandStats = ed.bns_brand_stats;
         } else if (window.BNS_DATA.BRANDS && window.BNS_DATA.briefs) {
