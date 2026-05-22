@@ -158,5 +158,19 @@
     "channel_id": "D030L2UD7KQ",
     "message_ts": "1779449377.477259",
     "note": "POZİTİF CLOSURE — 12:15 manager_summary stres DM'sinin doğal cevabı. #10 Bauhaus Bahçe Düzen yayına alındı (Eda T 'onaylandı'). 4 batch (#11-#14) + #19 Reyhan TR org tamamlandı. #22 Splenda ertelemesi doğrulandı. Açık tek stres #17 VDM bayram (Görkem self-aware). Hafta sonu girişi pozitif tonda kapatıldı."
+  },
+  {
+    "brief_ts": "1779450529.976979",
+    "template": "1_new_brief_skipped_eda_t_thread_ping",
+    "sent_at": "2026-05-22T15:15:48+03:00",
+    "user_id": "skip-U09BFPBKQG7-arda",
+    "reason": "#23 Bauhaus Kaçırılmayacak Fırsatlar! · YENİ brief Arda atanan · Şablon 1 DM SKIPPED — Eda T 14:49 'çıkışa kadar yardımcı olabilir misinn' Arda'ya thread ping zaten yaptı · bot DM spam riski · Arda 5 aktif iş (cap 6 · 83%) son 1.5sa'da batch mega üretim sonrası yorgun · Bauhaus channel'da Arda zaten haberdar"
+  },
+  {
+    "brief_ts": "1779342432.583659",
+    "template": "threshold_6sa_warning_skipped_gorkem_self_aware",
+    "sent_at": "2026-05-22T15:15:48+03:00",
+    "user_id": "skip-U030C48PL23-gorkem",
+    "reason": "#17 VDM bayram postu · 6sa eşiği AŞILDI (6sa 29dk GEÇMİŞ) · Threshold transition · Görkem GM'ye uyarı DM SKIPPED — Görkem self-aware (orchestrator çıktısı + 09:04 TR thread otomatik uyarı) · Cansu Direktör 12:15+14:15 2 DM zaten gönderildi spam riski · 4 raunt thread escalation cevapsız · ek DM faydasız"
   }
 ]

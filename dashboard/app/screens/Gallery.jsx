@@ -16,14 +16,22 @@ function GalleryScreen({ data }) {
 }
 
 function GalleryTile({ c, idx }) {
-  // Generate a deterministic "thumbnail" SVG from brand color + index
+  const [hovered, setHovered] = React.useState(false);
   const seed = (c.no || 0) + idx;
   const pattern = idx % 5;
+  const slackUrl = c.slack_url || "#";
   return (
-    <div style={{
-      border:"1px solid var(--line)", borderRadius: 10, background:"var(--surface)",
-      overflow:"hidden", cursor:"pointer"
-    }}>
+    <div
+      onClick={() => slackUrl !== "#" && window.open(slackUrl, "_blank")}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        border:"1px solid var(--line)", borderRadius: 10, background:"var(--surface)",
+        overflow:"hidden", cursor: slackUrl !== "#" ? "pointer" : "default",
+        transform: hovered ? "translateY(-2px)" : "none",
+        boxShadow: hovered ? "var(--shadow-2)" : "none",
+        transition: "transform 120ms, box-shadow 120ms"
+      }}>
       <div style={{
         aspectRatio:"4/3", background: `linear-gradient(135deg, ${c.brand.color} 0%, ${shade(c.brand.color, -0.25)} 100%)`,
         position:"relative", overflow:"hidden"
@@ -63,6 +71,21 @@ function GalleryTile({ c, idx }) {
           padding:"4px 8px", borderRadius: 4,
           font:"500 11px/1 var(--font-mono)"
         }}>#{c.no}</div>
+        {hovered && slackUrl !== "#" && (
+          <div style={{
+            position:"absolute", inset:0, background:"rgba(0,0,0,0.45)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            transition:"opacity 120ms"
+          }}>
+            <div style={{
+              display:"inline-flex", alignItems:"center", gap:6,
+              background:"rgba(255,255,255,0.95)", borderRadius:8,
+              padding:"8px 14px", font:"600 12px/1 var(--font-sans)", color:"var(--ink)"
+            }}>
+              <I.Slack size={13}/> Slack'te gör
+            </div>
+          </div>
+        )}
       </div>
       <div style={{padding:"10px 12px"}}>
         <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginBottom: 6}}>
