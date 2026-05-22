@@ -175,6 +175,8 @@ function App() {
             deltas.sort((a,b2) => a - b2);
             const medH = deltas.length ? deltas[Math.floor(deltas.length/2)] : null;
             const madH = deltas.length ? Math.round(deltas.reduce((s,v) => s + Math.abs(v - (medH||0)), 0) / deltas.length) : null;
+            const hasStale = allB.some(x => x.marka === b.name && x.stale);
+            const hasOverdue = allB.some(x => x.marka === b.name && x.deltaH <= 0);
             return {
               ...b,
               active,
@@ -183,7 +185,7 @@ function App() {
               madH:    madH,
               avgRev:  null,
               rating:  null,
-              stale:   active > 0 && deltas.some(d => d <= 0)
+              stale:   hasStale || hasOverdue
             };
           });
         }
