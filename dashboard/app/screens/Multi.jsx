@@ -3,9 +3,9 @@
 // durum string'inden atama tipini çıkar
 function getAssignType(durum) {
   if (!durum) return "sirali";
-  const d = durum.toLowerCase();
-  if (/paralel|parallel/i.test(d)) return "paralel";
-  if (/sıralı|sirali|sequential/i.test(d)) return "sirali";
+  // "Paralel" sadece açık atama formatında: "Paralel X+Y", "Paralel X tek atanan", "Paralel X+Y+Z"
+  if (/Paralel\s+\w[^·)]*(\+\w|\s+tek)/i.test(durum)) return "paralel";
+  if (/sıralı|sirali|sequential/i.test(durum)) return "sirali";
   return "sirali"; // tip belirtilmemişse sıralı varsayılan
 }
 

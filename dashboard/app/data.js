@@ -407,7 +407,8 @@ function bnsHydrateBrief(raw, idx) {
     brand,
     baslik:       raw.baslik || raw.is || "",
     lead:         liveUsers.find(u => u.id === leadId) || null,
-    contributors: [...contribIds, ...editorIds].map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
+    contributors: [...new Set([...contribIds, ...editorIds].filter(id => id !== leadId))]
+                    .map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
     reviewer:     raw.reviewerId ? (liveUsers.find(u => u.id === raw.reviewerId) || null) : null,
     acilma,
     deadline,
