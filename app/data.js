@@ -393,8 +393,15 @@ function bnsHydrateBrief(raw, idx) {
                    Eylül:8,Eyl:8,Ekim:9,Eki:9,Kasım:10,Kasim:10,Kas:10,Aralık:11,Aralik:11,Ara:11};
     const trMatch = deadlineRaw.match(/^(\d{1,2})\s+([A-Za-zÇĞİÖŞÜçğışöü]+)\s+(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
     if (trMatch && TR_DL[trMatch[2]] != null) {
-      const [, day, , year, hh, mm] = trMatch;
-      deadline = new Date(parseInt(year), TR_DL[trMatch[2]], parseInt(day), parseInt(hh||23), parseInt(mm||59), 0).getTime();
+      // Saat belirtilmemişse raw.saat alanından "HH:MM" çıkarmaya çalış
+      let finalHH = trMatch[4] != null ? parseInt(trMatch[4]) : null;
+      let finalMM = trMatch[5] != null ? parseInt(trMatch[5]) : null;
+      if (finalHH == null && raw.saat) {
+        const saatM = String(raw.saat).match(/^(\d{1,2}):(\d{2})/);
+        if (saatM) { finalHH = parseInt(saatM[1]); finalMM = parseInt(saatM[2]); }
+      }
+      const [, day, , year] = trMatch;
+      deadline = new Date(parseInt(year), TR_DL[trMatch[2]], parseInt(day), finalHH ?? 23, finalMM ?? 59, 0).getTime();
     } else {
       deadline = Date.parse(deadlineRaw) || 0;
     }
