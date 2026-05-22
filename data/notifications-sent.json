@@ -56,5 +56,55 @@
     "user_id": "U0AP31SAA1W",
     "message_ts": "1779429885.068579",
     "reason": "#17 VDM Petdent — DM to Eren (primary sıralı 1️⃣ assignee, blocker). Warned about 3dk geride + cap 4 aşımı + broşür also still GEÇMİŞ. Asked for fast v1 or hand-off."
+  },
+  {
+    "brief_ts": "sync-1779430683",
+    "template": "priority_upgrade_summary_to_director",
+    "sent_at": "2026-05-22T09:18:00+03:00",
+    "user_id": "U4XCE3532",
+    "message_ts": "1779431542.717629",
+    "reason": "09:18 ara sync — 6 brief 🟠→🔴 auto-upgrade (Cuma 17:00 deadline ortak): #11/12/13/16 (4× Bauhaus weekly batch) + #18/19 (2× Kuzeypet Org). Single summary DM to Cansu Direktör instead of individual DMs (12 would be noisy). Includes capacity impossibility flag + erteleme/dispatch öneri."
+  },
+  {
+    "brief_ts": "1779282859.178849",
+    "template": "priority_upgrade_🟠_to_🔴_logged_only",
+    "sent_at": "2026-05-22T09:18:00+03:00",
+    "user_id": "skip-aggregated-to-director-summary",
+    "reason": "#11 Bauhaus Evde Ferahlık 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+  },
+  {
+    "brief_ts": "1779282928.074819",
+    "template": "priority_upgrade_🟠_to_🔴_logged_only",
+    "sent_at": "2026-05-22T09:18:00+03:00",
+    "user_id": "skip-aggregated-to-director-summary",
+    "reason": "#12 Bauhaus Düzenli Alanlar 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+  },
+  {
+    "brief_ts": "1779283006.745819",
+    "template": "priority_upgrade_🟠_to_🔴_logged_only",
+    "sent_at": "2026-05-22T09:18:00+03:00",
+    "user_id": "skip-aggregated-to-director-summary",
+    "reason": "#13 Bauhaus Güneşli Günler 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+  },
+  {
+    "brief_ts": "1779283377.829309",
+    "template": "priority_upgrade_🟠_to_🔴_logged_only",
+    "sent_at": "2026-05-22T09:18:00+03:00",
+    "user_id": "skip-aggregated-to-director-summary",
+    "reason": "#16 Bauhaus Banyo Şık 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+  },
+  {
+    "brief_ts": "1779352449.496569",
+    "template": "priority_upgrade_🟠_to_🔴_logged_only",
+    "sent_at": "2026-05-22T09:18:00+03:00",
+    "user_id": "skip-aggregated-to-director-summary",
+    "reason": "#18 Kuzeypet Org (Serhat) 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+  },
+  {
+    "brief_ts": "1779352849.311019",
+    "template": "priority_upgrade_🟠_to_🔴_logged_only",
+    "sent_at": "2026-05-22T09:18:00+03:00",
+    "user_id": "skip-aggregated-to-director-summary",
+    "reason": "#19 Kuzeypet Org (Reyhan GMY ⚠️ duplicate) 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
   }
 ]

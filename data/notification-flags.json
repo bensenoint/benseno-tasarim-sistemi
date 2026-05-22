@@ -1,48 +1,44 @@
 {
+  "sync_ts": 1779430683,
+  "sync_iso": "2026-05-22T09:18:03+03:00",
+  "run_type": "ara_sync_manuel",
   "new_briefs": [],
-  "priority_upgrades": [],
-  "past_deadline": [
-    {
-      "no": "17",
-      "marka": "VDM Petdent",
-      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
-      "dept": "tasarim",
-      "atanan_ids": ["U0AP31SAA1W", "U030C48PL23"],
-      "editor_ids": ["U030C48PL23"],
-      "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659)",
-      "delta_h": -0.05,
-      "first_overdue_at": 1779428760,
-      "first_overdue_at_iso": "2026-05-22T08:46:00+03:00",
-      "note": "Yeni GEÇMİŞ — deadline 3dk önce aştı. Sıralı 1️⃣ Eren v1 yok. 🚨 8. GEÇMİŞ brief."
-    }
+  "priority_upgrades": [
+    {"no": "11", "marka": "Bauhaus", "is": "Evde Ferahlık / 23 Mayıs (batch 2/7)", "from": "🟠", "to": "🔴", "delta_h": 7.7, "deadline": "22 May 17:00 TR", "atanan_ids": ["U09BFPBKQG7","U06J26R1XCJ"], "editor_ids": ["U09BZHR25NG"]},
+    {"no": "12", "marka": "Bauhaus", "is": "Düzenli Alanlar / 24 Mayıs (batch 3/7)", "from": "🟠", "to": "🔴", "delta_h": 7.7, "deadline": "22 May 17:00 TR", "atanan_ids": ["U09BFPBKQG7","U06J26R1XCJ"], "editor_ids": ["U09BZHR25NG"]},
+    {"no": "13", "marka": "Bauhaus", "is": "Güneşli Günler / 26 Mayıs (batch 4/7)", "from": "🟠", "to": "🔴", "delta_h": 7.7, "deadline": "22 May 17:00 TR", "atanan_ids": ["U09BFPBKQG7","U06J26R1XCJ"], "editor_ids": ["U09BZHR25NG"]},
+    {"no": "16", "marka": "Bauhaus", "is": "Banyo Şık ve Pratik (batch 7/7)", "from": "🟠", "to": "🔴", "delta_h": 7.7, "deadline": "22 May 17:00 TR", "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "editor_ids": ["U09BZHR25NG"]},
+    {"no": "18", "marka": "Kuzeypet", "is": "Org Şeması (Serhat)", "from": "🟠", "to": "🔴", "delta_h": 7.7, "deadline": "22 May 17:00 TR", "atanan_ids": ["U08HLMHTGEL"], "editor_ids": ["U05PP70GQTX"]},
+    {"no": "19", "marka": "Kuzeypet", "is": "Org Şeması (Reyhan GMY ⚠️ duplicate)", "from": "🟠", "to": "🔴", "delta_h": 7.7, "deadline": "22 May 17:00 TR", "atanan_ids": ["UD96GH76E"], "editor_ids": ["U05PP70GQTX"]}
   ],
+  "past_deadline": [],
   "past_confirmed": [],
   "saat_eksik": [],
   "dept_belirsiz": [],
   "marka_yetersiz_sure": [],
   "marka_anormal_uzun": [],
   "gecmis_growing": [
-    {"no": "1", "marka": "JNJ Vision TR", "is": "24 Haziran Kontakt Lens Davetiyesi", "delta_h": -88.8},
-    {"no": "2", "marka": "Hasvet", "is": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME", "delta_h": -16.8},
-    {"no": "3", "marka": "Bauhaus", "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)", "delta_h": -46.8},
-    {"no": "4", "marka": "Bauhaus", "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)", "delta_h": -19.8},
-    {"no": "5", "marka": "Bauhaus", "is": "Broşür (Print · AI · Eren self-assign)", "delta_h": -19.1},
-    {"no": "6", "marka": "Bauhaus", "is": "20 Mayıs İçerik (Sosyal Medya Post · video)", "delta_h": -38.8},
-    {"no": "8", "marka": "VDM Petdent", "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)", "delta_h": -19.4}
+    {"no": "1", "marka": "JNJ Vision TR", "is": "24 Haziran Kontakt Lens Davetiyesi", "delta_h": -89.3, "note": "teyit edilmiş — bakanlık süreci"},
+    {"no": "2", "marka": "Hasvet", "is": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME", "delta_h": -17.3, "note": "İrem JnJ bitince başlayacak, v1 yok"},
+    {"no": "3", "marka": "Bauhaus", "is": "bahar kampanyası", "delta_h": -47.3, "note": "2g 8sa pasif, dispatch yok, eskalasyon cevapsız ~34sa"},
+    {"no": "4", "marka": "Bauhaus", "is": "mayıs kampanyası", "delta_h": -20.3, "note": "tasarımcı yok, Serhat dolu"},
+    {"no": "5", "marka": "Bauhaus", "is": "Broşür (AI)", "delta_h": -19.6, "note": "Eren self-assign, v1 yok, cap 4 aşıldı"},
+    {"no": "6", "marka": "Bauhaus", "is": "20 Mayıs İçerik", "delta_h": -39.3, "note": "Arda 🎨 yok, 22 May yayın kayma riski"},
+    {"no": "8", "marka": "VDM Petdent", "is": "GA4 Analiz", "delta_h": -19.9, "note": "Eren açtı Arda atadı, dept ambiguity"},
+    {"no": "17", "marka": "VDM Petdent", "is": "Yeni bayram postu", "delta_h": -0.53, "note": "Sıralı 1️⃣ Eren bloke, 08:49 sync'inde uyarı thread post gönderildi, cevap yok"}
+  ],
+  "thread_activity": [
+    {"no": "10", "marka": "Bauhaus", "is": "Bahçe Düzen / 22 Mayıs", "channel_id": "C4Y43AW2E", "message_ts": "1779282760.860839", "activity": "Arda 22May~08:30+ 'burdan devam ediyorum 🍒', parantezleri kaldırdı; Eda T 'bugün yayna alacağım' + 'diğer dolap kapaklarını da aç'; Arda 'Okitto'. v1 yaklaşıyor — henüz teslim yok. 2sa 42dk kaldı.", "action": "DM gerekmiyor — doğal akış"}
   ],
   "calendar_events": [],
   "imminent_deadlines": [
-    {
-      "no": "10",
-      "marka": "Bauhaus",
-      "is": "Bahçe Düzen / 22 Mayıs (Sosyal Medya Post · weekly content batch 1/7)",
-      "dept": "tasarim",
-      "atanan_ids": ["U09BFPBKQG7", "U06J26R1XCJ"],
-      "editor_ids": ["U09BZHR25NG"],
-      "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779282760860839)",
-      "priority": "🔴",
-      "delta_h": 3.2,
-      "thread_activity": "Arda aktif çalışıyor (parantezleri kaldırdı), Eda T koordinasyon yapıyor — '22 Mayıs yayna alacağım'. v1 yaklaşıyor."
-    }
-  ]
+    {"no": "10", "marka": "Bauhaus", "is": "Bahçe Düzen / 22 Mayıs (batch 1/7)", "delta_h": 2.7, "atanan_ids": ["U09BFPBKQG7","U06J26R1XCJ"], "thread_activity": "AKTİF — Arda dolap kapakları üzerinde, v1 yaklaşıyor"},
+    {"no": "14", "marka": "Bauhaus", "is": "Evinize Düzen / 28 Mayıs (batch 5/7)", "delta_h": 4.7, "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "thread_activity": "Hareket yok"},
+    {"no": "15", "marka": "Bauhaus", "is": "Bahçeniz / 30 Mayıs (batch 6/7)", "delta_h": 4.7, "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "thread_activity": "Hareket yok"}
+  ],
+  "manager_summary_recommended": {
+    "to_user": "U4XCE3532",
+    "to_name": "Cansu Direktör",
+    "reason": "6 brief 🟠→🔴 auto-upgrade — 17:00 deadline'a 7sa 42dk kaldı, 4× Bauhaus batch + 2× Kuzeypet aynı saatte. Kapasite imkânsız (Arda 9, Aykut 8, Serhat 1, Reyhan 1). Yönetim kararı gerekli: erteleme, dispatch veya ek tasarımcı talebi."
+  }
 }

@@ -182,14 +182,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         )}
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <div style={{display:"flex", flexDirection:"column", alignItems:"flex-start", gap:4}}>
-            <Button kind="ghost" icon={<I.User size={13}/>} onClick={handleAssignMe}>Bana ata</Button>
-            {assignedMe && !saved && (
-              <span style={{font:"500 11px/1 var(--font-sans)", color:"var(--ember)", paddingLeft:2, display:"flex", alignItems:"center", gap:4}}>
-                <I.ChevronRight size={10}/> Kaydet'e bas
-              </span>
-            )}
-          </div>
+          <div/>
           <div style={{display:"flex", gap:8}}>
             <Button kind="secondary" icon={<I.Slack size={13}/>} onClick={handleSlackOpen}>Slack'te aç</Button>
             <Button kind="primary" icon={<I.Check size={13}/>}
