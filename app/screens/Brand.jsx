@@ -36,7 +36,6 @@ function BrandScreen({ data, onOpenBrief }) {
               style={{border:0, outline:"none", background:"transparent", color:"var(--ink)",
                 font:"400 12px/1.2 var(--font-sans)", minWidth: 140}}/>
           </div>
-          <Button kind="secondary" size="sm" icon={<I.Plus size={13}/>}>Marka ekle</Button>
         </>}
       />
 
@@ -89,11 +88,11 @@ function BrandScreen({ data, onOpenBrief }) {
                     </span>
                   </td>
                   <td style={bCs(true, "right", b.active > 2 ? "var(--ink)" : "var(--ink-3)")}>{b.active}</td>
-                  <td style={bCs(true, "right")}>{b.done30}</td>
-                  <td style={bCs(true, "right")}>{b.medianH} sa</td>
-                  <td style={bCs(true, "right")}>± {b.madH} sa</td>
-                  <td style={bCs(true, "right")}>{b.avgRev}</td>
-                  <td style={bCs(true, "right")}><span style={{color:"var(--prio-yellow)"}}>{b.rating}</span></td>
+                  <td style={bCs(true, "right")}>{b.done30 != null ? b.done30 : "—"}</td>
+                  <td style={bCs(true, "right")}>{b.medianH != null ? b.medianH + " sa" : "—"}</td>
+                  <td style={bCs(true, "right")}>{b.madH != null ? "± " + b.madH + " sa" : "—"}</td>
+                  <td style={bCs(true, "right")}>{b.avgRev != null ? b.avgRev : "—"}</td>
+                  <td style={bCs(true, "right")}>{b.rating != null ? <span style={{color:"var(--prio-yellow)"}}>{b.rating}</span> : "—"}</td>
                   <td style={bCs()}>
                     {b.stale ? <span style={{
                       font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase",

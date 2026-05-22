@@ -161,6 +161,31 @@ function App() {
         }
         if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
           window.BNS_DATA.brandStats = ed.bns_brand_stats;
+        } else if (window.BNS_DATA.BRANDS && window.BNS_DATA.briefs) {
+          // bns_brand_stats henüz doldurulmamışsa live brief'lerden hesapla
+          const allB = window.BNS_DATA.briefs;
+          const allC = window.BNS_DATA.completed || [];
+          const now  = Date.now();
+          const cutoff30 = now - 30 * 24 * 3600 * 1000;
+          window.BNS_DATA.brandStats = window.BNS_DATA.BRANDS.map(b => {
+            const active = allB.filter(x => x.marka === b.name).length;
+            const done30 = allC.filter(x => x.marka === b.name && (x.bitis||0)*1000 >= cutoff30).length;
+            // deadline istatistikleri — brief'lerin deltaH'larından medyan
+            const deltas = allB.filter(x => x.marka === b.name && x.deltaH != null).map(x => x.deltaH);
+            deltas.sort((a,b2) => a - b2);
+            const medH = deltas.length ? deltas[Math.floor(deltas.length/2)] : null;
+            const madH = deltas.length ? Math.round(deltas.reduce((s,v) => s + Math.abs(v - (medH||0)), 0) / deltas.length) : null;
+            return {
+              ...b,
+              active,
+              done30,
+              medianH: medH != null ? Math.round(Math.abs(medH)) : null,
+              madH:    madH,
+              avgRev:  null,
+              rating:  null,
+              stale:   active > 0 && deltas.some(d => d <= 0)
+            };
+          });
         }
         window.BNS_DATA.__lastPoll = Date.now();
         console.info("[BNS] poll OK · source=" + ed.source + " · reason=" + ed.reason +
