@@ -313,7 +313,21 @@ window.BNS_DATA = {
 //
 // EMBEDDED_DATA yoksa yukarıdaki mock veri kalır.
 function bnsHydrateBrief(raw, idx) {
-  const acilma  = typeof raw.acilma === "string"   ? Date.parse(raw.acilma)   : raw.acilma;
+  // acilma: önce raw.acilma, yoksa gecmis'ten ilk ⏳ zaman damgasını çıkar
+  let acilma = typeof raw.acilma === "string" ? Date.parse(raw.acilma) : (raw.acilma || null);
+  if (!acilma && raw.gecmis) {
+    // "⏳18May13:16→..." formatından ilk tarihi çıkar
+    const m = raw.gecmis.match(/(\d{1,2})([A-Za-z]{3})(\d{1,2}:\d{2})/);
+    if (m) {
+      const TR_MON = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,
+                      Oca:0,Sub:1,Mar:2,Nis:3,Haz:5,Tem:6,Agu:7,Eyl:8,Eki:9,Kas:10,Ara:11};
+      const mon = TR_MON[m[2]];
+      if (mon != null) {
+        const [hh,mm] = m[3].split(":").map(Number);
+        acilma = new Date(new Date().getFullYear(), mon, parseInt(m[1]), hh, mm, 0).getTime();
+      }
+    }
+  }
   // deadline: "18 May 2026" formatı veya ISO string'i veya ms — hepsini destekle
   let deadlineRaw = raw.deadline || raw.deadlineISO;
   const deadline = typeof deadlineRaw === "string" ? Date.parse(deadlineRaw) : (deadlineRaw || 0);

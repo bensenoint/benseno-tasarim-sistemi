@@ -1,14 +1,29 @@
 // app/BriefDrawer.jsx — interactive slide-in panel.
 
-function BriefDrawer({ brief, onClose, onUpdate, allUsers }) {
+function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
   const [b, setB] = React.useState(brief);
-  React.useEffect(() => setB(brief), [brief]);
+  const [saved, setSaved] = React.useState(false);
+  React.useEffect(() => { setB(brief); setSaved(false); }, [brief]);
   if (!b) return null;
 
-  function set(patch) { const next = { ...b, ...patch }; setB(next); onUpdate && onUpdate(next); }
+  function set(patch) { const next = { ...b, ...patch }; setB(next); setSaved(false); }
   function changeStatus(s) { set({ durum: s }); }
-  function rolePick(role) {
-    const u = window.prompt ? null : null; // we'll show inline picker instead
+
+  function handleSave() {
+    onUpdate && onUpdate(b);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  function handleAssignMe() {
+    if (!currentUser) return;
+    set({ lead: currentUser });
+  }
+
+  function handleSlackOpen() {
+    const url = b.slack_url && b.slack_url !== "#" ? b.slack_url : null;
+    if (url) { window.open(url, "_blank"); }
+    else { alert("Bu brief için Slack linki bulunamadı."); }
   }
 
   return (
@@ -131,10 +146,14 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers }) {
 
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <Button kind="ghost" icon={<I.User size={13}/>}>Bana ata</Button>
+          <Button kind="ghost" icon={<I.User size={13}/>} onClick={handleAssignMe}>Bana ata</Button>
           <div style={{display:"flex", gap:8}}>
-            <Button kind="secondary" icon={<I.Slack size={13}/>}>Slack'te aç</Button>
-            <Button kind="primary" icon={<I.Check size={13}/>}>Kaydet</Button>
+            <Button kind="secondary" icon={<I.Slack size={13}/>} onClick={handleSlackOpen}>Slack'te aç</Button>
+            <Button kind="primary" icon={saved ? <I.Check size={13}/> : <I.Check size={13}/>}
+              onClick={handleSave}
+              style={saved ? {background:"var(--prio-green)", borderColor:"var(--prio-green)"} : {}}>
+              {saved ? "Kaydedildi ✓" : "Kaydet"}
+            </Button>
           </div>
         </footer>
       </aside>
@@ -301,7 +320,9 @@ function Tick({ when, who, verb, tail, last }) {
 }
 
 function formatFull(ts) {
+  if (!ts || isNaN(ts)) return "—";
   const d = new Date(ts);
+  if (isNaN(d.getTime())) return "—";
   const months = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }

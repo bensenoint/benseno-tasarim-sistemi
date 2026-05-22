@@ -40,5 +40,21 @@
     "sent_at": "2026-05-22T08:28:34+03:00",
     "user_id": "skip-no-template-defined",
     "reason": "#17 VDM Petdent Yeni bayram postu (Sosyal Medya Post · 🐷 🟠->🔴 (delta_h=0.4). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+  },
+  {
+    "brief_ts": "1779342432.583659",
+    "template": "24_past_deadline_thread_reply",
+    "sent_at": "2026-05-22T08:49:00+03:00",
+    "user_id": "C0AQLPY4TUM",
+    "message_ts": "1779429879.970299",
+    "reason": "#17 VDM Petdent Yeni bayram postu — new GEÇMİŞ (deadline 08:46 → 3dk geride at 08:49 sync). Thread reply sent warning about deadline passed + Eren sıralı 1️⃣ blocking + Görkem 2️⃣ waiting. Action: Eren v1 fast or hand to Görkem."
+  },
+  {
+    "brief_ts": "1779342432.583659",
+    "template": "25_past_deadline_dm_eren_assignee",
+    "sent_at": "2026-05-22T08:49:00+03:00",
+    "user_id": "U0AP31SAA1W",
+    "message_ts": "1779429885.068579",
+    "reason": "#17 VDM Petdent — DM to Eren (primary sıralı 1️⃣ assignee, blocker). Warned about 3dk geride + cap 4 aşımı + broşür also still GEÇMİŞ. Asked for fast v1 or hand-off."
   }
 ]

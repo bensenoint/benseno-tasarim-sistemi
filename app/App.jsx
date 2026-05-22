@@ -260,7 +260,7 @@ function App() {
 
       {openBrief && (
         <BriefDrawer brief={openBrief} onClose={onCloseBrief}
-          onUpdate={onUpdateBrief} allUsers={data.USERS}/>
+          onUpdate={onUpdateBrief} allUsers={data.USERS} currentUser={user}/>
       )}
 
       <CommandPalette
