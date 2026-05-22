@@ -428,7 +428,7 @@ function bnsHydrateCompleted(raw, idx) {
     marka: raw.marka,
     brand,
     baslik: raw.baslik,
-    lead: liveUsers.find(u => u.id === raw.leadId) || null,
+    lead: liveUsers.find(u => u.id === raw.leadId) || (raw.leadId ? { id: raw.leadId, name: raw.leadName || raw.leadId.slice(-4), initials: "?", color: "#999", rol: "", dept: "" } : null),
     contributors: (raw.contribIds || []).map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
     deadline,
     baslangic,

@@ -607,6 +607,15 @@
       "id": "U0AP31SAA1W",
       "name": "Eren Mahzunlar",
       "dept": "ai"
+    },
+    {
+      "id": "UD96GH76E",
+      "name": "Reyhan",
+      "rol": "yonetici",
+      "dept": "yonetici",
+      "avatar": null,
+      "initials": "RY",
+      "color": "#8B5CF6"
     }
   ],
   "bns_dept_stats": {
