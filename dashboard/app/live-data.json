@@ -6,8 +6,18 @@
       "dept_emoji": "📋",
       "marka": "JNJ Vision TR",
       "is": "24 Haziran Kontakt Lens Davetiyesi",
-      "atanan_ids": ["U4XCE3532","U02SZQDAFPF","U055EDESLSE","U030C48PL23","U0AAC3YK20G","U09BZHR25NG","U0AN6DD79M0"],
-      "editor_ids": ["U08NQJ27G5S"],
+      "atanan_ids": [
+        "U4XCE3532",
+        "U02SZQDAFPF",
+        "U055EDESLSE",
+        "U030C48PL23",
+        "U0AAC3YK20G",
+        "U09BZHR25NG",
+        "U0AN6DD79M0"
+      ],
+      "editor_ids": [
+        "U08NQJ27G5S"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "18 May 2026",
@@ -23,8 +33,18 @@
       "dept_emoji": "📋",
       "marka": "Hasvet",
       "is": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
-      "atanan_ids": ["U4XCE3532","U055EDESLSE","U02SZQDAFPF","U030C48PL23","U063T8M5HL4","U0AAC3YK20G","U0AK8U7L57F"],
-      "editor_ids": ["U08NQJ27G5S"],
+      "atanan_ids": [
+        "U4XCE3532",
+        "U055EDESLSE",
+        "U02SZQDAFPF",
+        "U030C48PL23",
+        "U063T8M5HL4",
+        "U0AAC3YK20G",
+        "U0AK8U7L57F"
+      ],
+      "editor_ids": [
+        "U08NQJ27G5S"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
@@ -40,8 +60,13 @@
       "dept_emoji": "📋",
       "marka": "Bauhaus",
       "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
-      "atanan_ids": ["U06J26R1XCJ","U09BZHR25NG"],
-      "editor_ids": ["U030C48PL23"],
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BZHR25NG"
+      ],
+      "editor_ids": [
+        "U030C48PL23"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "20 May 2026",
@@ -57,8 +82,13 @@
       "dept_emoji": "📋",
       "marka": "Bauhaus",
       "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
-      "atanan_ids": ["U055EDESLSE","U030C48PL23"],
-      "editor_ids": ["U030C48PL23"],
+      "atanan_ids": [
+        "U055EDESLSE",
+        "U030C48PL23"
+      ],
+      "editor_ids": [
+        "U030C48PL23"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
@@ -74,8 +104,12 @@
       "dept_emoji": "🤖",
       "marka": "Bauhaus",
       "is": "Broşür (Print · AI · Eren self-assign)",
-      "atanan_ids": ["U0AP31SAA1W"],
-      "editor_ids": ["U0AP31SAA1W"],
+      "atanan_ids": [
+        "U0AP31SAA1W"
+      ],
+      "editor_ids": [
+        "U0AP31SAA1W"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
@@ -91,8 +125,12 @@
       "dept_emoji": "📋",
       "marka": "Bauhaus",
       "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
-      "atanan_ids": ["U09BFPBKQG7"],
-      "editor_ids": ["U09BZHR25NG"],
+      "atanan_ids": [
+        "U09BFPBKQG7"
+      ],
+      "editor_ids": [
+        "U09BZHR25NG"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "20 May 2026",
@@ -108,8 +146,12 @@
       "dept_emoji": "📋",
       "marka": "KMR Serve",
       "is": "Haziran SM Planı 26' (Sosyal Medya Post · aylık plan)",
-      "atanan_ids": ["U055EDESLSE"],
-      "editor_ids": ["U063T8M5HL4"],
+      "atanan_ids": [
+        "U055EDESLSE"
+      ],
+      "editor_ids": [
+        "U063T8M5HL4"
+      ],
       "priority": "🟢",
       "priority_label": "🟢 Düşük",
       "deadline": "21 Haziran 2026",
@@ -125,8 +167,12 @@
       "dept_emoji": "📋",
       "marka": "VDM Petdent",
       "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
-      "atanan_ids": ["U09BFPBKQG7"],
-      "editor_ids": ["U0AP31SAA1W"],
+      "atanan_ids": [
+        "U09BFPBKQG7"
+      ],
+      "editor_ids": [
+        "U0AP31SAA1W"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
@@ -142,12 +188,16 @@
       "dept_emoji": "🤖",
       "marka": "VDM Petdent",
       "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
-      "atanan_ids": ["U0AP31SAA1W"],
-      "editor_ids": ["U0AP31SAA1W"],
+      "atanan_ids": [
+        "U0AP31SAA1W"
+      ],
+      "editor_ids": [
+        "U0AP31SAA1W"
+      ],
       "priority": "🟠",
       "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "(tüm gün · saat seçilmemiş → 23:59 TR varsayıldı · 8sa 43dk kaldı · marka n=0 → kıyas atlandı)",
+      "saat": "23:59 TR (8sa 13dk · Eren · sorunsuz)",
       "durum": "⏳ Yeni açıldı (Eren 20May14:05 TR · workflow · self-assign · 2g önce)",
       "rev": "0",
       "gecmis": "⏳20May14:05 (Eren AI açtı · workflow · self-assign · 🔔 otomatik 🟡 [~58sa≤72sa])",
@@ -159,12 +209,17 @@
       "dept_emoji": "📋",
       "marka": "Bauhaus",
       "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
-      "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"],
-      "editor_ids": ["U09BZHR25NG"],
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "editor_ids": [
+        "U09BZHR25NG"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "14:00 TR ⚠️ **GEÇMİŞ (1sa 15dk geride · v1 verildi 13:28 Arda 🌸 · Eda T 14:04 'ellerine sağlık canoo' kabul · resmi onay/yayın komutu bekleniyor)**",
+      "saat": "14:00 TR ⚠️ **GEÇMİŞ (1sa 45dk geride · v1 verildi 13:28 Arda 🌸 · Eda T 14:04 'ellerine sağlık canoo' kabul · resmi onay/yayın komutu bekleniyor)**",
       "durum": "🎨 v1 verildi (Arda 13:28 cherry_blossom · Eda T 14:04 'ellerine sağlık canoo' + cherry_blossom reaction · 'onaylandı' denmedi · 1sa 11dk pasif onay bekleniyor)",
       "rev": "0",
       "gecmis": "⏳20May16:21 (Eda T açtı · workflow · 🔔 otomatik 🟡 [45sa≤72sa]) / 📈21May14:51 öncelik 🟡→🟠 (auto-recalc [23sa 9dk≤24sa]) / 📈22May~06:00 öncelik 🟠→🔴 (auto-recalc [8sa≤8sa]) / 🎨22May13:28 Arda v1 verdi 🌸 / 💬22May14:04 Eda T 'ellerine sağlık canoo' + 🌸 reaction / ⏰GEÇMİŞ22May14:00 (22May15:15 sync'inde 1sa 15dk geride · v1 sonrası teknik)",
@@ -176,12 +231,17 @@
       "dept_emoji": "📋",
       "marka": "Bauhaus",
       "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
-      "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"],
-      "editor_ids": ["U09BZHR25NG"],
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "editor_ids": [
+        "U09BZHR25NG"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (1sa 44dk kaldı · v1 verildi Arda 14:40 'sonuncuya geldik sanırım, burdayım' 🌸 · Eda T 14:50 'ellerine sağlıkk' kabul · resmi onay bekleniyor)",
+      "saat": "17:00 TR (1sa 14dk kaldı · v1 verildi Arda 14:40 'sonuncuya geldik sanırım, burdayım' 🌸 · Eda T 14:50 'ellerine sağlıkk' kabul · resmi onay bekleniyor)",
       "durum": "🎨 v1 verildi (Arda 14:40 'sonuncuya geldik sanırım, burdayım' + cherry_blossom · son brief batch 7/7 · Eda T 14:50 'ellerine sağlıkk' + 25dk pasif · 'onaylandı' denmedi · resmi onay bekleniyor)",
       "rev": "0",
       "gecmis": "⏳20May16:22 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa]) / 📈21May17:25 öncelik 🟡→🟠 (auto-recalc [23sa 40dk≤24sa]) / 📈22May09:18 öncelik 🟠→🔴 (auto-recalc [7sa 42dk≤8sa]) / 🎨22May14:40 Arda v1 verdi 🌸 / 💬22May14:50 Eda T 'ellerine sağlıkk'",
@@ -193,12 +253,17 @@
       "dept_emoji": "📋",
       "marka": "VDM Petdent",
       "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
-      "atanan_ids": ["U0AP31SAA1W","U030C48PL23"],
-      "editor_ids": ["U030C48PL23"],
+      "atanan_ids": [
+        "U0AP31SAA1W",
+        "U030C48PL23"
+      ],
+      "editor_ids": [
+        "U030C48PL23"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "08:46 TR ⚠️ **GEÇMİŞ (6sa 29dk geride · 6sa eşiği AŞILDI · v1 yok · 🤖 reaction yok · Eren 5 aktif iş · Sıralı 1️⃣ Eren bloke ediyor · 9 GEÇMİŞ brief)**",
+      "saat": "08:46 TR ⚠️ **GEÇMİŞ (6sa 59dk geride · 6sa eşiği aşıldı · v1 yok · 🤖 reaction yok · Eren 5 aktif iş · Sıralı 1️⃣ Eren bloke ediyor · 9 GEÇMİŞ brief)**",
       "durum": "⏳ KRİTİK GEÇMİŞ (Görkem 21May08:47 TR · workflow · Sıralı 1️⃣ Eren · v1 hâlâ yok · 6sa eşiği AŞILDI · 3 raunt escalation cevapsız · CANSU DİREKTÖR 2 manager_summary DM cevapsız · GM ESKALASYON ÖNERİLİR ama Görkem self-aware · orchestrator çıktısı görüyor · son thread aktivite 09:04 TR otomatik uyarı 6sa 11dk önce)",
       "rev": "0",
       "gecmis": "⏳21May08:47 (Görkem GM açtı · workflow · 🔔 otomatik 🟠 [20sa 11dk≤24sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log) / 📈22May~04:46 öncelik 🟠→🔴 (auto-recalc [4sa≤8sa]) / ⏰GEÇMİŞ22May08:46 (22May08:49 sync'inde 3dk geride · v1 yok) / 💬22May08:49+09:04+09:18+11:51 4 raunt thread escalation cevapsız / ⚠️22May13:46 5sa eşiği AŞILDI / ⚠️22May14:46 6sa eşiği AŞILDI (22May15:15 sync'inde 6sa 29dk GEÇMİŞ)",
@@ -210,8 +275,13 @@
       "dept_emoji": "🤖",
       "marka": "Tour2America",
       "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
-      "atanan_ids": ["U0AP31SAA1W","U030C48PL23"],
-      "editor_ids": ["U030C48PL23"],
+      "atanan_ids": [
+        "U0AP31SAA1W",
+        "U030C48PL23"
+      ],
+      "editor_ids": [
+        "U030C48PL23"
+      ],
       "priority": "🟢",
       "priority_label": "🟢 Düşük",
       "deadline": "1 Haziran 2026",
@@ -227,12 +297,18 @@
       "dept_emoji": "🤖",
       "marka": "VDM Petdent",
       "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
-      "atanan_ids": ["U4XCE3532","U030C48PL23","U0AP31SAA1W"],
-      "editor_ids": ["U030C48PL23"],
+      "atanan_ids": [
+        "U4XCE3532",
+        "U030C48PL23",
+        "U0AP31SAA1W"
+      ],
+      "editor_ids": [
+        "U030C48PL23"
+      ],
       "priority": "🟠",
       "priority_label": "🟠 Yüksek",
       "deadline": "23 May 2026",
-      "saat": "14:42 TR (23sa 27dk kaldı · 24sa eşiği AŞILDI · 🟡→🟠 transition · workflow · marka VDM Petdent n=0 → kıyas atlandı · silent_log)",
+      "saat": "14:42 TR (22sa 57dk · Cansu+Görkem+Eren · 24sa eşiği aşıldı)",
       "durum": "⏳ Yeni açıldı (Görkem 21May14:43 TR · workflow · Paralel Cansu+Görkem+Eren · Tip Video · Ref www.benseno.com.tr · Not: bahar dönemini anlatan bir video · ⚠️ 3 yönetici/AI atanması — fiili üretim Eren'de varsayılıyor · 22May14:45 öncelik 🟡→🟠 transition)",
       "rev": "0",
       "gecmis": "⏳21May14:43 (Görkem GM açtı · workflow · 🔔 otomatik 🟡 [47sa 51dk≤72sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log · ⚠️ Eren'in 5. aktif iş'i — KAPASİTE AŞIMI başladı) / 📈22May14:45 öncelik 🟡→🟠 (auto-recalc [23sa 57dk≤24sa])",
@@ -244,8 +320,15 @@
       "dept_emoji": "✍️",
       "marka": "Splenda",
       "is": "SPLENDA UK / Summer Newsletter (E-posta · Paralel · 🐷 Eda T)",
-      "atanan_ids": ["U06J26R1XCJ","U02SZQDAFPF","U4XCE3532"],
-      "editor_ids": ["U4XCE3532","U02SZQDAFPF"],
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U02SZQDAFPF",
+        "U4XCE3532"
+      ],
+      "editor_ids": [
+        "U4XCE3532",
+        "U02SZQDAFPF"
+      ],
       "priority": "🟢",
       "priority_label": "🟢 Düşük",
       "deadline": "22 May 2026",
@@ -261,12 +344,16 @@
       "dept_emoji": "📋",
       "marka": "Bauhaus",
       "is": "Kaçırılmayacak Fırsatlar! (Sosyal Medya Post · Paralel · 'Alevleri hareketli yapalım')",
-      "atanan_ids": ["U09BFPBKQG7"],
-      "editor_ids": ["U09BZHR25NG"],
+      "atanan_ids": [
+        "U09BFPBKQG7"
+      ],
+      "editor_ids": [
+        "U09BZHR25NG"
+      ],
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (1sa 44dk kaldı · workflow · marka Bauhaus n=0 → kıyas atlandı · silent_log)",
+      "saat": "17:00 TR (1sa 14dk kaldı · workflow · marka Bauhaus n=0 → kıyas atlandı · silent_log)",
       "durum": "⏳ Yeni açıldı (Eda T 22May14:48 TR · workflow · Paralel Arda tek atanan · Tip Sosyal Medya Post · Ref Bauhaus doc · Not: 'Kapak fotoğrafında kullanmamızı istedikleri görseli ekte paylaştım. Alevleri hareketli yapalım' · Eda T 14:49 'çıkışa kadar yardımcı olabilir misinn' soft ping · Arda henüz cevap vermedi · 27dk pasif)",
       "rev": "0",
       "gecmis": "⏳22May14:48 (Eda T açtı · workflow · 🔔 otomatik 🔴 [2sa 12dk≤8sa] · 📊 marka_kiyasla: Bauhaus n=0 · skip · yetersiz_veri · silent_log) / 💬22May14:49 Eda T 'çıkışa kadar yardımcı olabilir misinn' Arda'ya soft ping",
@@ -279,7 +366,9 @@
       "marka": "Bauhaus",
       "baslik": "Bahçe Düzen / 22 Mayıs (batch 1/7)",
       "leadId": "U09BFPBKQG7",
-      "contribIds": ["U06J26R1XCJ"],
+      "contribIds": [
+        "U06J26R1XCJ"
+      ],
       "deadline": "2026-05-22T12:00:00+03:00",
       "baslangic": "2026-05-20T16:12:00+03:00",
       "bitis": "2026-05-22T14:00:00+03:00",
@@ -293,7 +382,9 @@
       "marka": "Bauhaus",
       "baslik": "Evde Ferahlık / 23 Mayıs (batch 2/7)",
       "leadId": "U09BFPBKQG7",
-      "contribIds": ["U06J26R1XCJ"],
+      "contribIds": [
+        "U06J26R1XCJ"
+      ],
       "deadline": "2026-05-22T17:00:00+03:00",
       "baslangic": "2026-05-20T16:14:00+03:00",
       "bitis": "2026-05-22T14:00:00+03:00",
@@ -307,7 +398,9 @@
       "marka": "Bauhaus",
       "baslik": "Düzenli Alanlar / 24 Mayıs (batch 3/7)",
       "leadId": "U09BFPBKQG7",
-      "contribIds": ["U06J26R1XCJ"],
+      "contribIds": [
+        "U06J26R1XCJ"
+      ],
       "deadline": "2026-05-22T17:00:00+03:00",
       "baslangic": "2026-05-20T16:15:00+03:00",
       "bitis": "2026-05-22T14:05:00+03:00",
@@ -321,7 +414,9 @@
       "marka": "Bauhaus",
       "baslik": "Güneşli Günler / 26 Mayıs (batch 4/7)",
       "leadId": "U09BFPBKQG7",
-      "contribIds": ["U06J26R1XCJ"],
+      "contribIds": [
+        "U06J26R1XCJ"
+      ],
       "deadline": "2026-05-22T17:00:00+03:00",
       "baslangic": "2026-05-20T16:16:00+03:00",
       "bitis": "2026-05-22T14:10:00+03:00",
@@ -335,7 +430,9 @@
       "marka": "Bauhaus",
       "baslik": "Evinize Düzen / 28 Mayıs (batch 5/7)",
       "leadId": "U09BFPBKQG7",
-      "contribIds": ["U06J26R1XCJ"],
+      "contribIds": [
+        "U06J26R1XCJ"
+      ],
       "deadline": "2026-05-22T14:00:00+03:00",
       "baslangic": "2026-05-20T16:20:00+03:00",
       "bitis": "2026-05-22T14:00:00+03:00",
@@ -374,65 +471,287 @@
     }
   ],
   "bns_brands": [
-    "Bauhaus","Beta","Cimporglobal","Cureffect","Egosport","Gürsoy","Hasvet","Hendex","JNJ","JNJ Acuvue ME","JNJ Vision TR","Jungleous","KMR Amos","KMR Copic","KMR Lamy","KMR Marshmallow","KMR Max","KMR Panfix","KMR Serve","Kuzeypet","KZY Bark","KZY Everclean","KZY Ferplast","KZY Flamingo","KZY Simple Solution","KZY Supreme","KZY Vet's Best","Marmara Holding","Muffik","Polisan","Splenda","Tour2America","VDM Petdent"
+    "Bauhaus",
+    "Beta",
+    "Cimporglobal",
+    "Cureffect",
+    "Egosport",
+    "Gürsoy",
+    "Hasvet",
+    "Hendex",
+    "JNJ",
+    "JNJ Acuvue ME",
+    "JNJ Vision TR",
+    "Jungleous",
+    "KMR Amos",
+    "KMR Copic",
+    "KMR Lamy",
+    "KMR Marshmallow",
+    "KMR Max",
+    "KMR Panfix",
+    "KMR Serve",
+    "Kuzeypet",
+    "KZY Bark",
+    "KZY Everclean",
+    "KZY Ferplast",
+    "KZY Flamingo",
+    "KZY Simple Solution",
+    "KZY Supreme",
+    "KZY Vet's Best",
+    "Marmara Holding",
+    "Muffik",
+    "Polisan",
+    "Splenda",
+    "Tour2America",
+    "VDM Petdent"
   ],
   "bns_users": [
-    {"id":"U0AN6DD79M0","name":"Aylin Tozkoparan","dept":"tasarim"},
-    {"id":"U06J26R1XCJ","name":"Aykut Arslan","dept":"tasarim"},
-    {"id":"U09BFPBKQG7","name":"Hasan Serdar Arda","dept":"tasarim"},
-    {"id":"U0B3K2WE7SB","name":"Pelin Özdemir ✨","dept":"tasarim"},
-    {"id":"U055EDESLSE","name":"İpek Akdeniz 🎯","dept":"tasarim"},
-    {"id":"U0AK8U7L57F","name":"İrem Özkan","dept":"tasarim"},
-    {"id":"U08HLMHTGEL","name":"Serhat","dept":"tasarim"},
-    {"id":"U4XCE3532","name":"Cansu Kazgan 👑","dept":"editor"},
-    {"id":"U02SZQDAFPF","name":"erdem akoğlu 🏅","dept":"editor"},
-    {"id":"U09BZHR25NG","name":"Eda Tireli","dept":"editor"},
-    {"id":"U07PV0RA9L2","name":"Eda Ayral","dept":"editor"},
-    {"id":"U08NQJ27G5S","name":"Melis","dept":"editor"},
-    {"id":"U05PP70GQTX","name":"Aylin Canel","dept":"editor"},
-    {"id":"U063T8M5HL4","name":"Buse Gürbüzer","dept":"editor"},
-    {"id":"U0AAC3YK20G","name":"Simge Acar","dept":"editor"},
-    {"id":"U0AP31SAA1W","name":"Eren Mahzunlar","dept":"ai"}
+    {
+      "id": "U0AN6DD79M0",
+      "name": "Aylin Tozkoparan",
+      "dept": "tasarim"
+    },
+    {
+      "id": "U06J26R1XCJ",
+      "name": "Aykut Arslan",
+      "dept": "tasarim"
+    },
+    {
+      "id": "U09BFPBKQG7",
+      "name": "Hasan Serdar Arda",
+      "dept": "tasarim"
+    },
+    {
+      "id": "U0B3K2WE7SB",
+      "name": "Pelin Özdemir ✨",
+      "dept": "tasarim"
+    },
+    {
+      "id": "U055EDESLSE",
+      "name": "İpek Akdeniz 🎯",
+      "dept": "tasarim"
+    },
+    {
+      "id": "U0AK8U7L57F",
+      "name": "İrem Özkan",
+      "dept": "tasarim"
+    },
+    {
+      "id": "U08HLMHTGEL",
+      "name": "Serhat",
+      "dept": "tasarim"
+    },
+    {
+      "id": "U4XCE3532",
+      "name": "Cansu Kazgan 👑",
+      "dept": "editor"
+    },
+    {
+      "id": "U02SZQDAFPF",
+      "name": "erdem akoğlu 🏅",
+      "dept": "editor"
+    },
+    {
+      "id": "U09BZHR25NG",
+      "name": "Eda Tireli",
+      "dept": "editor"
+    },
+    {
+      "id": "U07PV0RA9L2",
+      "name": "Eda Ayral",
+      "dept": "editor"
+    },
+    {
+      "id": "U08NQJ27G5S",
+      "name": "Melis",
+      "dept": "editor"
+    },
+    {
+      "id": "U05PP70GQTX",
+      "name": "Aylin Canel",
+      "dept": "editor"
+    },
+    {
+      "id": "U063T8M5HL4",
+      "name": "Buse Gürbüzer",
+      "dept": "editor"
+    },
+    {
+      "id": "U0AAC3YK20G",
+      "name": "Simge Acar",
+      "dept": "editor"
+    },
+    {
+      "id": "U0AP31SAA1W",
+      "name": "Eren Mahzunlar",
+      "dept": "ai"
+    }
   ],
   "bns_dept_stats": {
-    "tasarim": {"name":"Tasarım","people":7,"active":13,"overdue":8,"capacity":42,"completed30":7,"avgComplete":2.0,"revRate":0.29},
-    "editor":  {"name":"Editör","people":8,"active":1,"overdue":0,"capacity":48,"completed30":0,"avgComplete":0,"revRate":0},
-    "ai":      {"name":"AI","people":1,"active":4,"overdue":1,"capacity":4,"completed30":0,"avgComplete":0,"revRate":0}
+    "tasarim": {
+      "name": "Tasarım",
+      "people": 7,
+      "active": 13,
+      "overdue": 8,
+      "capacity": 42,
+      "completed30": 7,
+      "avgComplete": 2.0,
+      "revRate": 0.29
+    },
+    "editor": {
+      "name": "Editör",
+      "people": 8,
+      "active": 1,
+      "overdue": 0,
+      "capacity": 48,
+      "completed30": 0,
+      "avgComplete": 0,
+      "revRate": 0
+    },
+    "ai": {
+      "name": "AI",
+      "people": 1,
+      "active": 4,
+      "overdue": 1,
+      "capacity": 4,
+      "completed30": 0,
+      "avgComplete": 0,
+      "revRate": 0
+    }
   },
   "bns_brand_stats": [
-    {"name":"Bauhaus","active":7},
-    {"name":"Beta","active":0},
-    {"name":"Cimporglobal","active":0},
-    {"name":"Cureffect","active":0},
-    {"name":"Egosport","active":0},
-    {"name":"Gürsoy","active":0},
-    {"name":"Hasvet","active":1},
-    {"name":"Hendex","active":0},
-    {"name":"JNJ","active":0},
-    {"name":"JNJ Acuvue ME","active":0},
-    {"name":"JNJ Vision TR","active":1},
-    {"name":"Jungleous","active":0},
-    {"name":"KMR Amos","active":0},
-    {"name":"KMR Copic","active":0},
-    {"name":"KMR Lamy","active":0},
-    {"name":"KMR Marshmallow","active":0},
-    {"name":"KMR Max","active":0},
-    {"name":"KMR Panfix","active":0},
-    {"name":"KMR Serve","active":1},
-    {"name":"Kuzeypet","active":0},
-    {"name":"KZY Bark","active":0},
-    {"name":"KZY Everclean","active":0},
-    {"name":"KZY Ferplast","active":0},
-    {"name":"KZY Flamingo","active":0},
-    {"name":"KZY Simple Solution","active":0},
-    {"name":"KZY Supreme","active":0},
-    {"name":"KZY Vet's Best","active":0},
-    {"name":"Marmara Holding","active":0},
-    {"name":"Muffik","active":0},
-    {"name":"Polisan","active":0},
-    {"name":"Splenda","active":1},
-    {"name":"Tour2America","active":1},
-    {"name":"VDM Petdent","active":4}
+    {
+      "name": "Bauhaus",
+      "active": 7
+    },
+    {
+      "name": "Beta",
+      "active": 0
+    },
+    {
+      "name": "Cimporglobal",
+      "active": 0
+    },
+    {
+      "name": "Cureffect",
+      "active": 0
+    },
+    {
+      "name": "Egosport",
+      "active": 0
+    },
+    {
+      "name": "Gürsoy",
+      "active": 0
+    },
+    {
+      "name": "Hasvet",
+      "active": 1
+    },
+    {
+      "name": "Hendex",
+      "active": 0
+    },
+    {
+      "name": "JNJ",
+      "active": 0
+    },
+    {
+      "name": "JNJ Acuvue ME",
+      "active": 0
+    },
+    {
+      "name": "JNJ Vision TR",
+      "active": 1
+    },
+    {
+      "name": "Jungleous",
+      "active": 0
+    },
+    {
+      "name": "KMR Amos",
+      "active": 0
+    },
+    {
+      "name": "KMR Copic",
+      "active": 0
+    },
+    {
+      "name": "KMR Lamy",
+      "active": 0
+    },
+    {
+      "name": "KMR Marshmallow",
+      "active": 0
+    },
+    {
+      "name": "KMR Max",
+      "active": 0
+    },
+    {
+      "name": "KMR Panfix",
+      "active": 0
+    },
+    {
+      "name": "KMR Serve",
+      "active": 1
+    },
+    {
+      "name": "Kuzeypet",
+      "active": 0
+    },
+    {
+      "name": "KZY Bark",
+      "active": 0
+    },
+    {
+      "name": "KZY Everclean",
+      "active": 0
+    },
+    {
+      "name": "KZY Ferplast",
+      "active": 0
+    },
+    {
+      "name": "KZY Flamingo",
+      "active": 0
+    },
+    {
+      "name": "KZY Simple Solution",
+      "active": 0
+    },
+    {
+      "name": "KZY Supreme",
+      "active": 0
+    },
+    {
+      "name": "KZY Vet's Best",
+      "active": 0
+    },
+    {
+      "name": "Marmara Holding",
+      "active": 0
+    },
+    {
+      "name": "Muffik",
+      "active": 0
+    },
+    {
+      "name": "Polisan",
+      "active": 0
+    },
+    {
+      "name": "Splenda",
+      "active": 1
+    },
+    {
+      "name": "Tour2America",
+      "active": 1
+    },
+    {
+      "name": "VDM Petdent",
+      "active": 4
+    }
   ],
   "priority_summary": {
     "critical": 11,
@@ -441,10 +760,10 @@
     "low": 3
   },
   "overdue_count": 9,
-  "last_sync": "2026-05-22T15:15:48+03:00",
-  "sync_ts": 1779452148,
+  "last_sync": "2026-05-22T15:45:44+03:00",
+  "sync_ts": 1779453944,
   "now": 1779452148,
-  "source": "data-agent-run-1779452148",
+  "source": "data-agent-run-1779453944",
   "sync_iso": "2026-05-22T15:15:48+03:00",
   "run_type": "launchd_1515_ara_sync_NEW_BRIEF_23_processed"
 }

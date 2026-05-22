@@ -172,5 +172,19 @@
     "sent_at": "2026-05-22T15:15:48+03:00",
     "user_id": "skip-U030C48PL23-gorkem",
     "reason": "#17 VDM bayram postu · 6sa eşiği AŞILDI (6sa 29dk GEÇMİŞ) · Threshold transition · Görkem GM'ye uyarı DM SKIPPED — Görkem self-aware (orchestrator çıktısı + 09:04 TR thread otomatik uyarı) · Cansu Direktör 12:15+14:15 2 DM zaten gönderildi spam riski · 4 raunt thread escalation cevapsız · ek DM faydasız"
+  },
+  {
+    "brief_ts": "1779450529.976979",
+    "template": "ara_sync_1545_skip_23_arda_eda_t_thread_ping_still_active",
+    "sent_at": "2026-05-22T15:45:44+03:00",
+    "user_id": "skip-U09BFPBKQG7-arda",
+    "reason": "Arda 57dk pasif (27dk→57dk) #23 brief'te ama Eda T 14:49 'çıkışa kadar yardımcı' thread ping hâlâ aktif · bot DM spam riski · 1sa 14dk deadline'a"
+  },
+  {
+    "brief_ts": "1779342432.583659",
+    "template": "ara_sync_1545_skip_17_gorkem_self_aware_continued",
+    "sent_at": "2026-05-22T15:45:44+03:00",
+    "user_id": "skip-U030C48PL23-gorkem",
+    "reason": "#17 6sa 29dk→6sa 59dk · 7sa eşiği yaklaşıyor (1dk kaldı) · Görkem orchestrator çıktısı izliyor · Cansu 2 DM cevapsız · ek DM spam"
   }
 ]
