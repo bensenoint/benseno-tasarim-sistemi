@@ -41,8 +41,15 @@ cat \
       --minify-whitespace \
   > "$APP/bundle.js"
 
-# Root app/ ile senkronize et
+# Root app/ ile senkronize et (data.js dahil)
 rsync -a --delete "$APP/" "$PROJ/app/"
+
+# Cache-bust: bundle.js ve data.js'e timestamp ekle
+TS=$(date +%s)
+sed -i '' \
+  -e "s|app/bundle\.js?v=[0-9]*|app/bundle.js?v=${TS}|g" \
+  -e "s|app/data\.js?v=[0-9]*|app/data.js?v=${TS}|g" \
+  "$PROJ/dashboard/index.html"
 
 # Root index.html güncelle
 cp "$PROJ/dashboard/index.html" "$PROJ/index.html"
