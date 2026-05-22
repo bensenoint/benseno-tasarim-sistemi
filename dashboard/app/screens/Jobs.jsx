@@ -13,7 +13,12 @@ function JobsScreen({ data, user, viewMode, tableMode, onOpenBrief, onStatusChan
   if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
   if (search.trim()) {
     const q = search.toLowerCase().trim();
-    rows = rows.filter(b => b.baslik.toLowerCase().includes(q) || b.marka.toLowerCase().includes(q) || b.lead.name.toLowerCase().includes(q));
+    rows = rows.filter(b =>
+      (b.baslik || "").toLowerCase().includes(q) ||
+      (b.marka  || "").toLowerCase().includes(q) ||
+      (b.lead?.name || "").toLowerCase().includes(q) ||
+      (b.contributors || []).some(u => (u?.name || "").toLowerCase().includes(q))
+    );
   }
 
   return (
