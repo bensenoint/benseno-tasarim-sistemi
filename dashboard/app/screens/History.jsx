@@ -38,7 +38,8 @@ function HistoryScreen({ data }) {
   let lastDay = "";
   all.forEach(a => {
     const d = new Date(a.t);
-    const key = `${d.getDate()} ${["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][d.getMonth()]} · ${["Pazar","Pzt","Salı","Çar","Per","Cuma","Cmt"][d.getDay()]}`;
+    const holidayLabel = typeof isTRHoliday === "function" && isTRHoliday(d) ? ` 🎌 ${isTRHolidayName(d)}` : "";
+    const key = `${d.getDate()} ${["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][d.getMonth()]} · ${["Pazar","Pzt","Salı","Çar","Per","Cuma","Cmt"][d.getDay()]}${holidayLabel}`;
     if (key !== lastDay) { groups.push({ key, items: [] }); lastDay = key; }
     groups[groups.length - 1].items.push(a);
   });
