@@ -7,34 +7,86 @@ function NewBriefModal({ open, onClose, onCreate, data }) {
   const [contribIds, setContribIds] = React.useState([]);
   const [reviewerId, setReviewerId] = React.useState("");
   const [deadlineH, setDeadlineH] = React.useState(48);
+  const [clipboardDone, setClipboardDone] = React.useState(false);
   React.useEffect(() => {
     if (open) {
-      setMarka(""); setBaslik(""); setLeadId(""); setContribIds([]); setReviewerId(""); setDeadlineH(48);
+      setMarka(""); setBaslik(""); setLeadId(""); setContribIds([]); setReviewerId(""); setDeadlineH(48); setClipboardDone(false);
     }
   }, [open]);
   if (!open) return null;
 
   const valid = marka && baslik && leadId;
 
+  // Marka adı → Slack kanal adı mapping
+  const MARKA_KANAL = {
+    "Bauhaus":              "marka-bauhaus",
+    "Beta":                 "marka-beta",
+    "Cimporglobal":         "marka-cimporglobal",
+    "Cureffect":            "marka-cureffect",
+    "Egosport":             "marka-egosport",
+    "Gürsoy":               "marka-gursoy",
+    "Hasvet":               "marka-hasvet",
+    "Hendex":               "marka-hendex",
+    "JNJ":                  "marka-jnj",
+    "JNJ Acuvue ME":        "marka-jnj-acuvue-me",
+    "JNJ Vision TR":        "marka-jnj-vision-tr",
+    "Jungleous":            "marka-jungleous",
+    "KMR Amos":             "marka-kmr-amos",
+    "KMR Copic":            "marka-kmr-copic",
+    "KMR Lamy":             "marka-kmr-lamy",
+    "KMR Marshmallow":      "marka-kmr-marshmallow",
+    "KMR Max":              "marka-kmr-max",
+    "KMR Panfix":           "marka-kmr-panfix",
+    "KMR Serve":            "marka-kmr-serve",
+    "Kuzeypet":             "marka-kuzeypet",
+    "KZY Bark":             "marka-kzy-bark",
+    "KZY Everclean":        "marka-kzy-everclean",
+    "KZY Ferplast":         "marka-kzy-ferplast",
+    "KZY Flamingo":         "marka-kzy-flamingo",
+    "KZY Simple Solution":  "marka-kzy-simplesolution",
+    "KZY Supreme":          "marka-kzy-supreme",
+    "KZY Vet's Best":       "marka-kzy-vetsbest",
+    "Marmara Holding":      "marka-marmaraholding",
+    "Muffik":               "marka-muffik",
+    "Polisan":              "marka-polisan",
+    "Splenda":              "marka-splenda",
+    "Tour2America":         "marka-tour2america",
+    "VDM Petdent":          "marka-vdm-petdent",
+  };
+
+  function slackKanalUrl(markaAdi) {
+    const kanal = MARKA_KANAL[markaAdi];
+    if (!kanal) return null;
+    return `https://benseno.slack.com/app_redirect?channel=${kanal}`;
+  }
+
   function submit() {
     if (!valid) return;
-    const brand = data.BRANDS.find(b => b.name === marka);
     const lead = data.USERS.find(u => u.id === leadId);
     const contributors = contribIds.map(id => data.USERS.find(u => u.id === id)).filter(Boolean);
-    const reviewer = reviewerId ? data.USERS.find(u => u.id === reviewerId) : null;
     const dh = Number(deadlineH);
-    onCreate({
-      id: "br_n" + Date.now(),
-      no: 200 + Math.floor(Math.random() * 9000),
-      marka, brand, baslik, lead, contributors, reviewer,
-      acilma: data.NOW,
-      deadline: data.NOW + dh * 3600 * 1000,
-      deltaH: dh,
-      durum: "yeni",
-      priority: priorityFromDh(dh),
-      revision: 0, stale: false, slack_url: "#"
-    });
-    onClose();
+    const deadlineDate = new Date(Date.now() + dh * 3600 * 1000);
+    const deadlineStr = deadlineDate.toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric", timeZone:"Europe/Istanbul" });
+
+    // Slack kanalına yönlendir
+    const kanalUrl = slackKanalUrl(marka);
+    if (kanalUrl) {
+      window.open(kanalUrl, "_blank");
+    }
+
+    // Kopyalanabilir brief metni oluştur
+    const leadName = lead ? lead.name : "—";
+    const contribNames = contributors.map(u => u.name).join(", ");
+    const briefText = [
+      `📋 ${baslik}`,
+      `🎀 İş: ${baslik}`,
+      `⏰ Süre: ${deadlineStr}`,
+      `👷 Kim: ${leadName}${contribNames ? " + " + contribNames : ""}`,
+    ].join("\n");
+
+    navigator.clipboard?.writeText(briefText).catch(() => {});
+    setClipboardDone(true);
+    setTimeout(() => { setClipboardDone(false); onClose(); }, 2800);
   }
 
   return (
@@ -54,7 +106,7 @@ function NewBriefModal({ open, onClose, onCreate, data }) {
           <div>
             <div style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.08em", textTransform:"uppercase", color:"var(--ink-3)"}}>Yeni brief</div>
             <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:18, color:"var(--ink-2)", marginTop:4}}>
-              Slack yerine hızlıca buradan.
+              Formu doldur → Slack kanalı açılır, brief metni kopyalanır.
             </div>
           </div>
           <button onClick={onClose} style={{
@@ -105,10 +157,22 @@ function NewBriefModal({ open, onClose, onCreate, data }) {
             </div>
           </Field>
         </div>
-        <div style={{padding:"12px 18px", borderTop:"1px solid var(--line)", display:"flex", justifyContent:"flex-end", gap: 8}}>
-          <Button kind="secondary" onClick={onClose}>İptal</Button>
-          <Button kind="primary" icon={<I.Send size={13}/>} onClick={submit}
-            style={!valid ? { opacity: 0.5, pointerEvents:"none" } : {}}>Brief'i oluştur</Button>
+        {clipboardDone && (
+          <div style={{padding:"10px 18px", background:"var(--ink)", color:"#fff", font:"500 12px/1.4 var(--font-sans)", display:"flex", alignItems:"center", gap:8}}>
+            ✓ Slack kanalı açıldı · Brief metni panoya kopyalandı — kanalda yapıştır ve gönder
+          </div>
+        )}
+        <div style={{padding:"12px 18px", borderTop:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center", gap: 8}}>
+          <span style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>
+            {marka ? `#${(MARKA_KANAL[marka] || "?")}` : "Marka seçince kanal görünür"}
+          </span>
+          <div style={{display:"flex", gap:8}}>
+            <Button kind="secondary" onClick={onClose}>İptal</Button>
+            <Button kind="primary" icon={<I.Slack size={13}/>} onClick={submit}
+              style={!valid ? { opacity: 0.5, pointerEvents:"none" } : {}}>
+              Slack'te Aç
+            </Button>
+          </div>
         </div>
       </div>
     </>

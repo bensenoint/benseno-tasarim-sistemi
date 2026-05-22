@@ -1,14 +1,18 @@
 {
-  "last_run": "2026-05-22T08:49:24+03:00",
-  "last_run_ts": 1779428964,
+  "last_run": "2026-05-22T09:18:03+03:00",
+  "last_run_ts": 1779430683,
+  "last_run_completed_at": "2026-05-22T09:37:30+03:00",
+  "run_type": "ara_sync_manuel",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
   "active_briefs": 21,
-  "priority_distribution": {"red": 11, "orange": 7, "yellow": 1, "green": 2},
+  "priority_distribution": {"red": 17, "orange": 1, "yellow": 1, "green": 2},
   "overdue_count": 8,
+  "priority_upgrades_this_run": 6,
+  "github_pushed_sha": "7258795",
   "errors": [],
   "pat_age_days": 4,
   "pat_expires_in_days": 86,
-  "notes": "Day 5 sabah 2/2 orchestrator sync (08:49). Key event: #17 VDM Petdent bayram postu transitioned to 🔴 GEÇMİŞ (deadline 08:46 → 3dk geride). 8th overdue brief. Eren Sıralı 1️⃣ blocking, v1 not delivered. Görkem GM 2️⃣ waiting. Sent: 1 thread reply (#17 brief warning), 1 DM (Eren about overdue + cap 4 aşımı + broşür also still GEÇMİŞ). No new briefs since last sync (08:21). Canvas full replace pushed. GitHub push commit 4c0b870. Eren capacity 5/4 cap continues (broşür 19sa+ GEÇMİŞ + Whatsapp + bayram GEÇMİŞ + Tour2America + bahar video). Arda 9, Aykut 8 (cap 6) — unchanged. #10 Bauhaus Bahçe Düzen thread aktif — Arda çalışıyor (08:30+), Eda T coord, v1 yaklaşıyor."
+  "notes": "Day 5 09:18 ara sync (manuel orchestrator run). Key event: 6 brief 🟠→🔴 auto-upgrade (17:00 deadline'a 7sa 42dk kaldı). Upgrades: #11/12/13/16 (Bauhaus weekly batch 2/7, 3/7, 4/7, 7/7) + #18/19 (Kuzeypet Org Şeması x2). New distribution: 17🔴 + 1🟠 + 1🟡 + 2🟢. GEÇMİŞ count sabit 8 (yeni eklenen yok; #17 VDM bayram 08:49 sync'inde GEÇMİŞ olmuştu, şimdi 32dk geride). #10 Bauhaus Bahçe Düzen thread aktif — Arda parantezleri kaldırdı + dolap kapakları üzerinde + Eda T 'bugün yayna alacağım' + 'Okitto'; v1 yaklaşıyor ama henüz teslim yok (2sa 42dk deadline). Bauhaus bahar (#3) hâlâ 2g 8sa pasif. Kapasite: Arda 9, Aykut 8 (cap 6) + Eren 5 (cap 4) — değişmedi ama 🔴 sayısı arttı. Sent: 1 özet DM Cansu Direktör'e (priority_upgrade_summary_to_director · 12 bireysel DM yerine tek özet · kapasite imkânsızlığı + erteleme/ek tasarımcı önerisi). Canvas full replace pushed. live-data.json sync'inde Hasvet divergence düzeltildi (live-data 'v1 TESLİM' diyordu, canvas 'v1 yok' — canvas haklı). 7 commit push edildi (1 orchestrator + 6 Görkem UI fixleri parallel work). PAT 4 gün önce oluşturuldu, 86 gün kaldı."
 }
