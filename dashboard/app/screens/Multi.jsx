@@ -47,9 +47,9 @@ function MultiScreen({ data, onOpenBrief }) {
     (b.contributors && b.contributors.length > 0) || b.reviewer
   );
 
-  const paralel = allMulti.filter(b => getAssignType(b.durum) === "paralel");
-  const sirali  = allMulti.filter(b => getAssignType(b.durum) === "sirali");
-  const diger   = allMulti.filter(b => !["paralel","sirali"].includes(getAssignType(b.durum)));
+  const paralel = allMulti.filter(b => getAssignType(b.durum_raw || b.durum) === "paralel");
+  const sirali  = allMulti.filter(b => getAssignType(b.durum_raw || b.durum) === "sirali");
+  const diger   = allMulti.filter(b => !["paralel","sirali"].includes(getAssignType(b.durum_raw || b.durum)));
 
   const shown = tab === "paralel" ? paralel : tab === "sirali" ? sirali : allMulti;
 
@@ -97,10 +97,10 @@ function MultiScreen({ data, onOpenBrief }) {
 }
 
 function MultiCard({ brief: b, users, onClick }) {
-  const type = getAssignType(b.durum);
+  const type = getAssignType(b.durum_raw || b.durum);
   const completedIds = getCompletedIds(b.gecmis || "", users);
   const allMembers = [b.lead, ...(b.contributors || [])].filter(Boolean);
-  const orderNum = type === "sirali" ? getOrderNum(b.durum) : null;
+  const orderNum = type === "sirali" ? getOrderNum(b.durum_raw || b.durum) : null;
 
   const typeLabel = type === "paralel" ? "Paralel" : type === "sirali" ? "Sıralı" : "Multi";
   const typeColor = type === "paralel" ? "var(--info)" : type === "sirali" ? "var(--warning)" : "var(--ink-3)";

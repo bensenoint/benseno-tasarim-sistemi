@@ -399,6 +399,7 @@ function bnsHydrateBrief(raw, idx) {
     deadline,
     dept:         raw.dept || "",
     durum:        bnsNormalizeDurum(raw.durum, raw.status),
+    durum_raw:    raw.durum || raw.status || "",  // Paralel/Sıralı/🎨 bilgisi için ham durum
     prio:         prio(deltaH),   // prio objesi: {code, label, color}
     priority:     prio(deltaH),   // backwards compat
     deltaH,
