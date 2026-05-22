@@ -3,9 +3,38 @@
 function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange }) {
   // Yönetici komuta merkezi tüm sistemi izler — viewMode (mine/dept/all) etkilemez.
   const briefs = data._allBriefs || data.briefs;
-  const overdue = briefs.filter(b => b.deltaH <= 0);
+  const overdue = briefs.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
   const review  = briefs.filter(b => b.durum === "incelemede");
   const blocked = briefs.filter(b => b.durum === "blokeli");
+
+  // Senkron zamanı
+  const nowTs = data.NOW || Date.now();
+  const syncAgo = Math.round((Date.now() - nowTs) / 1000);
+  const syncLabel = syncAgo < 60 ? `${syncAgo} sn önce` : syncAgo < 3600 ? `${Math.round(syncAgo/60)} dk önce` : `${Math.round(syncAgo/3600)} sa önce`;
+
+  // Bu hafta özet — allCompleted'dan hesapla
+  const allCompleted = data._allCompleted || data.completed || [];
+  const weekCutoff = nowTs - 7 * 24 * 3600 * 1000;
+  const prevWeekCutoff = nowTs - 14 * 24 * 3600 * 1000;
+  const thisWeek = allCompleted.filter(c => (c.bitis||0) >= weekCutoff);
+  const prevWeek = allCompleted.filter(c => (c.bitis||0) >= prevWeekCutoff && (c.bitis||0) < weekCutoff);
+  const weekCount = thisWeek.length;
+  const weekCountDelta = weekCount - prevWeek.length;
+  const sureArr  = thisWeek.filter(c => c.sureH > 0).map(c => c.sureH);
+  const avgSure  = sureArr.length ? sureArr.reduce((s,v)=>s+v,0)/sureArr.length : 0;
+  const prevSureArr = prevWeek.filter(c => c.sureH > 0).map(c => c.sureH);
+  const prevAvgSure = prevSureArr.length ? prevSureArr.reduce((s,v)=>s+v,0)/prevSureArr.length : 0;
+  const sureDelta = avgSure - prevAvgSure;
+  const revArr   = thisWeek.map(c => c.revision || 0);
+  const avgRevPct = revArr.length ? Math.round(revArr.reduce((s,v)=>s+v,0)/revArr.length * 10) : 0;
+  const staleCount = briefs.filter(b => b.stale).length;
+
+  // Eşik kuralları — live hesapla
+  const H = 3600 * 1000;
+  const capHits   = (tasarimCap != null && tasarimCap > 85) ? 1 : 0; // Kapasite > %85
+  const overdueHits = overdue.length > 5 ? 1 : 0;                    // Geciken > 5
+  const staleHits   = briefs.filter(b => b.stale || ((nowTs - (b.acilma||0)) > 3 * 24 * H && b.durum === "yeni")).length;
+  const revHits     = avgRevPct > 30 ? 1 : 0;
 
   // Kapasite: live dept stats'tan tasarım departmanı (en kritik)
   const ds = data.deptStats || {};
@@ -22,7 +51,7 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
         subtitle="bugün dikkat etmen gereken şeyler."
         actions={
           <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>
-            Senkron · 22 sn önce
+            Senkron · {syncLabel}
           </span>
         }
       />
@@ -51,7 +80,7 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
             <div>
               <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
-              <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline 14:30 öncesine düştü · acil müdahale</div>
+              <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline {(() => { const d = new Date(nowTs); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); })()} öncesine düştü · acil müdahale</div>
             </div>
             <Button kind="ghost" size="sm" icon={<I.Move size={13}/>}>Yeniden ata</Button>
           </div>
@@ -74,18 +103,26 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
 
           <Card>
             <CardHead title="Bu hafta · özet"/>
-            <WeekStat label="Tamamlanan" value="42" trend={{dir:"up", value:"+8"}}/>
-            <WeekStat label="Ortalama tamamlama" value="28,4 sa" trend={{dir:"down", value:"-1,9 sa"}} good/>
-            <WeekStat label="Revize oranı" value="%19" trend={{dir:"flat", value:"="}}/>
-            <WeekStat label="Hareketsiz brief" value="4" trend={{dir:"up", value:"+2"}} bad last/>
+            <WeekStat label="Tamamlanan" value={String(weekCount)}
+              trend={{dir: weekCountDelta > 0 ? "up" : weekCountDelta < 0 ? "down" : "flat",
+                      value: (weekCountDelta > 0 ? "+" : "") + weekCountDelta}}/>
+            <WeekStat label="Ortalama tamamlama"
+              value={avgSure > 0 ? avgSure.toFixed(1).replace(".",",") + " sa" : "—"}
+              trend={{dir: sureDelta < 0 ? "down" : sureDelta > 0 ? "up" : "flat",
+                      value: (sureDelta > 0 ? "+" : "") + sureDelta.toFixed(1).replace(".",",") + " sa"}} good/>
+            <WeekStat label="Revize oranı"
+              value={avgRevPct > 0 ? "%" + avgRevPct : "—"}
+              trend={{dir:"flat", value:"="}}/>
+            <WeekStat label="Hareketsiz brief" value={String(staleCount)}
+              trend={{dir: staleCount > 0 ? "up" : "flat", value: staleCount > 0 ? "+"+staleCount : "="}} bad last/>
           </Card>
 
           <Card>
             <CardHead title="Eşik kuralları" sub="otomatik tetiklenen uyarılar"/>
-            <Rule name="Kapasite > %85" status="ON" hits={2}/>
-            <Rule name="Geciken > 5"     status="ON" hits={1}/>
-            <Rule name="Hareketsiz > 3 gün"   status="ON" hits={4}/>
-            <Rule name="Revize > %30"    status="OFF" hits={0} last/>
+            <Rule name="Kapasite > %85"     status="ON"  hits={capHits}/>
+            <Rule name="Geciken > 5"        status="ON"  hits={overdueHits}/>
+            <Rule name="Hareketsiz > 3 gün" status="ON"  hits={staleHits}/>
+            <Rule name="Revize > %30"       status={avgRevPct > 30 ? "ON" : "OFF"} hits={revHits} last/>
           </Card>
         </div>
       </div>
