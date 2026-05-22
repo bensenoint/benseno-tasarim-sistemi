@@ -486,7 +486,7 @@ function buildActivity(b) {
   }
 
   // ─── Acil uyarılar ───
-  if (b.stale) items.push({ when: "", who: "", verb: "🚨 STALE", tail: "uzun süre pasif" });
+  if (b.stale) items.push({ when: "", who: "", verb: "🚨 Hareketsiz", tail: "3+ gün güncelleme yok" });
   if (b.deltaH !== undefined && b.deltaH <= 0) {
     items.push({ when: "", who: "", verb: "⏰ Deadline geçti", tail: "" });
   }

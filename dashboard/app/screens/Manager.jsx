@@ -70,14 +70,14 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
             <WeekStat label="Tamamlanan" value="42" trend={{dir:"up", value:"+8"}}/>
             <WeekStat label="Ortalama tamamlama" value="28,4 sa" trend={{dir:"down", value:"-1,9 sa"}} good/>
             <WeekStat label="Revize oranı" value="%19" trend={{dir:"flat", value:"="}}/>
-            <WeekStat label="Stale brief" value="4" trend={{dir:"up", value:"+2"}} bad last/>
+            <WeekStat label="Hareketsiz brief" value="4" trend={{dir:"up", value:"+2"}} bad last/>
           </Card>
 
           <Card>
             <CardHead title="Eşik kuralları" sub="otomatik tetiklenen uyarılar"/>
             <Rule name="Kapasite > %85" status="ON" hits={2}/>
             <Rule name="Geciken > 5"     status="ON" hits={1}/>
-            <Rule name="Stale > 3 gün"   status="ON" hits={4}/>
+            <Rule name="Hareketsiz > 3 gün"   status="ON" hits={4}/>
             <Rule name="Revize > %30"    status="OFF" hits={0} last/>
           </Card>
         </div>

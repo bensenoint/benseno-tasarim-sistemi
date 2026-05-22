@@ -99,7 +99,7 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
         <Kpi label="Geciken"      value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={[3,4,5,4,6,7,overdue.length]} trend={{dir:"up", value:"+2", bad:true}} sub="dün gece"/>
         <Kpi label="Bugün teslim" value={today.length} variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil"/>
         <Kpi label="Onay bekleyen" value={review.length} color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri"/>
-        <Kpi label="Stale" value={stale.length} variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün hareketsiz"/>
+        <Kpi label="Hareketsiz" value={stale.length} variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok"/>
         <Kpi label="Kapasite" value="%87" variant={kpiVariant} spark={[72,75,78,80,82,85,87]} trend={{dir:"up", value:"+%5", bad:true}} sub="ekip ortalaması"/>
       </KpiGrid>
 
@@ -161,7 +161,7 @@ function DenseLayout({ data, active, overdue, today, week, stale, review, blocke
         <Kpi label="Bu hafta"     value={week.length}  variant={kpiVariant} spark={[18,20,22,24,26,28,week.length]}/>
         <Kpi label="İncelemede"   value={review.length} color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]}/>
         <Kpi label="Blokeli"      value={blocked.length} color="var(--danger)" variant={kpiVariant}/>
-        <Kpi label="Stale"        value={stale.length} variant={kpiVariant}/>
+        <Kpi label="Hareketsiz"        value={stale.length} variant={kpiVariant}/>
         <Kpi label="Kapasite"     value="%87" variant={kpiVariant} spark={[72,75,78,80,82,85,87]}/>
       </div>
 
@@ -190,7 +190,7 @@ function DenseLayout({ data, active, overdue, today, week, stale, review, blocke
             <WeekStat label="Tamamlanan" value="42" trend={{dir:"up", value:"+8"}}/>
             <WeekStat label="Ort. tamamlama" value="28,4 sa" trend={{dir:"down", value:"-1,9 sa"}} good/>
             <WeekStat label="Revize oranı" value="%19" trend={{dir:"flat", value:"="}}/>
-            <WeekStat label="Stale" value={stale.length} trend={{dir:"up", value:"+2"}} bad last/>
+            <WeekStat label="Hareketsiz" value={stale.length} trend={{dir:"up", value:"+2"}} bad last/>
           </Card>
         </div>
       </div>
