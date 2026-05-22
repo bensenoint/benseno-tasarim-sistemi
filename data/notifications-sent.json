@@ -106,5 +106,37 @@
     "sent_at": "2026-05-22T09:18:00+03:00",
     "user_id": "skip-aggregated-to-director-summary",
     "reason": "#19 Kuzeypet Org (Reyhan GMY ⚠️ duplicate) 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+  },
+  {
+    "brief_ts": "1779439428.236359",
+    "template": "1_new_brief_dm_aykut_assignee",
+    "sent_at": "2026-05-22T11:51:28+03:00",
+    "user_id": "U06J26R1XCJ",
+    "message_ts": "1779440288.506899",
+    "reason": "#22 SPLENDA UK / Summer Newsletter — Aykut (paralel atanan, tasarımcı). Capacity warning eklendi (9 aktif iş + Bauhaus batch çakışması)."
+  },
+  {
+    "brief_ts": "1779439428.236359",
+    "template": "1_new_brief_dm_erdem_assignee",
+    "sent_at": "2026-05-22T11:51:32+03:00",
+    "user_id": "U02SZQDAFPF",
+    "message_ts": "1779440292.076429",
+    "reason": "#22 SPLENDA UK / Summer Newsletter — erdem (paralel atanan, editör, ilk aktif iş bu sezon)."
+  },
+  {
+    "brief_ts": "1779439428.236359",
+    "template": "1+18_new_brief_dm_cansu_assignee_plus_manager_summary_17_3h_threshold",
+    "sent_at": "2026-05-22T11:51:41+03:00",
+    "user_id": "U4XCE3532",
+    "message_ts": "1779440301.091209",
+    "reason": "#22 SPLENDA UK paralel atanan DM + #17 VDM bayram 3sa eşik AŞILDI manager_summary tek DM içinde. Cansu Direktör'e müdahale opsiyonları sunuldu (Eren devre dışı / Görkem 2️⃣'ye devret / iptal)."
+  },
+  {
+    "brief_ts": "1779439428.236359",
+    "template": "confirm_dm_submitter_eda_t",
+    "sent_at": "2026-05-22T11:51:46+03:00",
+    "user_id": "U09BZHR25NG",
+    "message_ts": "1779440306.101299",
+    "reason": "#22 SPLENDA UK — submitter Eda T'ye sistem kayıt teyidi. 3 atananın DM aldığını bildirdi + dept ✍️ Editör seçimini açıkladı."
   }
 ]
