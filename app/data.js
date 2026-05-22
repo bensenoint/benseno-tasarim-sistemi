@@ -487,9 +487,9 @@ window.bnsHydrateCompleted = bnsHydrateCompleted;
 try {
   const ed = window.EMBEDDED_DATA;
   if (ed && typeof ed === "object") {
-    if (typeof ed.now === "string") {
-      window.BNS_DATA.NOW = Date.parse(ed.now);
-    }
+    if (typeof ed.now === "string")       window.BNS_DATA.NOW = Date.parse(ed.now);
+    else if (typeof ed.now === "number")  window.BNS_DATA.NOW = ed.now < 1e12 ? ed.now * 1000 : ed.now;
+    if (typeof ed.sync_ts === "number")   window.BNS_DATA.NOW = ed.sync_ts < 1e12 ? ed.sync_ts * 1000 : ed.sync_ts;
     // Önce brand list'i override et (briefs hidrasyonu lookup yapacak)
     if (Array.isArray(ed.bns_brands) && ed.bns_brands.length > 0) {
       // Normalize: string[] veya {name,...}[] her ikisini de destekle

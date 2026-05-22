@@ -2,27 +2,29 @@
 
 function HistoryScreen({ data }) {
   const [filter, setFilter] = React.useState("all");
-  // Expand: combine activity + synthesize more from briefs/completed
+  // viewMode'dan bağımsız: her zaman TÜM brief ve tamamlananları kullan
+  const allBriefs    = data._allBriefs    || data.briefs    || [];
+  const allCompleted = data._allCompleted || data.completed || [];
+
   const extras = [];
-  // YENİ SEMANTİK:
-  //   "açıldı" eylemini brief'i AÇAN kişiye (b.lead → eski Cowork lead = açan) atfet.
-  //   "tamamlandı" eylemini gerçek tamamlayana (ilk atanan, varsa) atfet.
-  data.briefs.slice(0, 20).forEach((b) => {
-    const acan = b.lead || (b.leadId ? { id: b.leadId } : null);
+  allBriefs.slice(0, 30).forEach((b) => {
+    if (!b.acilma) return;
+    const acan = b.lead;
     if (!acan) return;
     extras.push({
-      t: typeof b.acilma === 'string' ? Date.parse(b.acilma) : b.acilma,
+      t: b.acilma,
       who: acan.id, verb: "açtı", target: b.baslik,
       brand: b.brand, _type: "open"
     });
   });
-  data.completed.slice(0, 12).forEach((c) => {
+  allCompleted.slice(0, 20).forEach((c) => {
+    if (!c.bitis) return;
     const tamamlayan = (c.contributors && c.contributors[0]) || c.lead;
     if (!tamamlayan) return;
     extras.push({
-      t: typeof c.bitis === 'string' ? Date.parse(c.bitis) : c.bitis,
+      t: c.bitis,
       who: tamamlayan.id, verb: "tamamladı", target: c.baslik,
-      brand: c.brand, meta: c.sureH ? c.sureH.toFixed(1) + " sa" : "",
+      brand: c.brand, meta: c.sureH != null && c.sureH > 0 ? c.sureH.toFixed(1) + " sa" : "",
       _type: "done"
     });
   });
@@ -80,7 +82,7 @@ function HistoryScreen({ data }) {
               position: "sticky", top: 0, zIndex: 4
             }}>{g.key}</div>
             {g.items.map((a, i) => {
-              const u = data.USERS.find(x => x.id === a.who) || data.USERS[0];
+              const u = data.USERS.find(x => x.id === a.who) || { id: a.who, name: "Bilinmiyor", initials: "?", color: "#999" };
               const d = new Date(a.t);
               const time = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
               return (
