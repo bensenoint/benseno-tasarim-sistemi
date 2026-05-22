@@ -1,78 +1,120 @@
 {
-  "sync_ts": 1779457571,
-  "sync_iso": "2026-05-22T16:45:00+03:00",
-  "run_type": "launchd_1645_ara_sync_8sa_esigi_asildi_17_imminent_window_16_23",
+  "sync_ts": 1779459350,
+  "sync_iso": "2026-05-22T17:15:00+03:00",
+  "run_type": "launchd_1715_ara_sync_23_v1v2_yari_onay_24_aykut_hazir_2_hasvet_v1_16_23_deadline_transition",
   "new_briefs": [],
   "past_deadline": [
-    {"no": "1", "marka": "JNJ Vision TR", "delta_h": -96.77, "confirmed": true, "note": "4g 46dk · teyitli (bakanlık)"},
-    {"no": "2", "marka": "Hasvet", "delta_h": -24.77, "note": "1g 46dk · v1 yok · İrem JnJ bitince"},
-    {"no": "3", "marka": "Bauhaus", "delta_h": -54.77, "note": "2g 6sa 46dk · Aykut+Eda T · v1 yok"},
-    {"no": "4", "marka": "Bauhaus", "delta_h": -27.77, "note": "1g 3sa 46dk · İpek dispatch+Görkem"},
-    {"no": "5", "marka": "Bauhaus", "delta_h": -27.07, "note": "1g 3sa 4dk · Eren · v1 yok · 24sa eşiği aşıldı"},
-    {"no": "6", "marka": "Bauhaus", "delta_h": -46.77, "note": "1g 22sa 46dk · Arda · v1 yok"},
-    {"no": "8", "marka": "VDM Petdent", "delta_h": -27.37, "note": "1g 3sa 22dk · Arda · cross-dept"},
-    {"no": "15", "marka": "Bauhaus", "delta_h": -2.77, "note": "2sa 46dk · v1 verildi 13:28 + Eda T 'ellerine sağlık' 14:04 · resmi onay bekleniyor 2sa 42dk"},
-    {"no": "17", "marka": "VDM Petdent", "delta_h": -8.0, "note": "8sa 0dk · 8sa eşiği AŞILDI · v1 yok"}
-  ],
-  "past_confirmed": [
-    {"no": "1", "marka": "JNJ Vision TR", "note": "bakanlık dönüşü bekleniyor"}
-  ],
-  "saat_eksik": [],
-  "dept_belirsiz": [
-    {"no": "8", "marka": "VDM Petdent", "note": "Tip 'Veri analizi' ambiguous · heuristic 📋"}
-  ],
-  "marka_yetersiz_sure": [],
-  "marka_anormal_uzun": [],
-  "priority_transitions": [
-    {"no": "9", "marka": "VDM Petdent", "from": "🟠", "to": "🔴", "reason": "8sa eşiği aşıldı (7sa 13dk kaldı)"}
-  ],
-  "threshold_transitions": [
-    {"no": "17", "marka": "VDM Petdent", "from": "6sa GEÇMİŞ", "to": "8sa GEÇMİŞ", "reason": "8sa eşiği AŞILDI (7sa 40dk → 8sa 0dk) · predicted 16:45 trigger"}
-  ],
-  "imminent_deadlines": [
-    {"no": "16", "marka": "Bauhaus", "delta_h": 0.23, "note": "14dk kaldı · v1 verildi 14:40 🌸 · Eda T 14:50 'ellerine sağlıkk' kabul · resmi onay bekleniyor 1sa 56dk pasif · KRİTİK pencere"},
-    {"no": "23", "marka": "Bauhaus", "delta_h": 0.23, "note": "14dk kaldı · Arda 1sa 58dk pasif · Eda T 14:49 ping cevapsız · v1 yok · KRİTİK"},
-    {"no": "24", "marka": "Bauhaus", "delta_h": 1.23, "note": "1sa 14dk kaldı · Aykut+Arda · Arda 6/6 cap aşıldı · #23 ile paralel"},
-    {"no": "9", "marka": "VDM Petdent", "delta_h": 7.22, "note": "7sa 13dk · Eren · 8sa eşiği aşıldı"},
-    {"no": "21", "marka": "VDM Petdent", "delta_h": 21.93, "note": "21sa 56dk · 24sa eşiği AŞILDI"}
-  ],
-  "threshold_warnings": [
-    {"no": "17", "marka": "VDM Petdent", "threshold": "8sa GEÇMİŞ", "note": "8sa 0dk GEÇMİŞ · 8sa eşiği AŞILDI · Görkem DM tetiklenir bu sync'te"},
-    {"no": "16", "marka": "Bauhaus", "threshold": "14dk deadline · v1 verildi onay yok", "note": "Eda T 14:50 + 1sa 56dk pasif · KRİTİK pencere"},
-    {"no": "23", "marka": "Bauhaus", "threshold": "14dk deadline · Arda v1 vermedi", "note": "Arda 1sa 58dk pasif · 14dk içinde teslim imkansız · v1 yok"}
-  ],
-  "v1_status_updates": [
-    {"no": "15", "marka": "Bauhaus", "note": "Eda T 'ellerine sağlık canoo' 14:04 · 'onaylandı' denmedi · 2sa 42dk pasif"},
-    {"no": "16", "marka": "Bauhaus", "note": "Eda T 'ellerine sağlıkk' 14:50 · 'onaylandı' denmedi · 1sa 56dk pasif · 14dk kala deadline"}
-  ],
-  "completed_this_run": [],
-  "cancelled_this_run": [],
-  "postponed_this_run": [],
-  "calendar_events": [],
-  "notification_dm_recommendations": [
     {
-      "no": "17",
-      "template": "4_threshold_8h_escalation",
-      "targets": ["U030C48PL23"],
-      "reason": "#17 VDM bayram postu 8sa eşiği AŞILDI · v1 yok · 4 raunt thread cevapsız · Cansu Direktör 2 DM cevapsız · 16:45 predicted threshold trigger · Görkem GM olarak self-aware ama 8sa eşik DM kuralı zorunlu"
+      "no": "16",
+      "marka": "Bauhaus",
+      "is": "Banyo Şık (batch 7/7)",
+      "deadline_iso": "2026-05-22T17:00:00+03:00",
+      "delta_min": -15,
+      "v1_verildi": true,
+      "note": "v1 verildi 14:40 Arda · Eda T 14:50 'ellerine sağlıkk' onay yok 2sa 25dk pasif",
+      "dm_action": "skip",
+      "dm_skip_reason": "v1 verildi + onay flow pasif · uyarı zaten 16:45 sync'te yöneticilere iletildi · spam riski"
+    },
+    {
+      "no": "23",
+      "marka": "Bauhaus",
+      "is": "Kaçırılmayacak Fırsatlar!",
+      "deadline_iso": "2026-05-22T17:00:00+03:00",
+      "delta_min": -15,
+      "v1_verildi": true,
+      "v2_verildi": true,
+      "note": "v1+v2 verildi · Eda T 16:51 'burası haricinde okidir ellerine sağlıkk' yarı onay · onay komutu bekleniyor",
+      "dm_action": "skip",
+      "dm_skip_reason": "POZİTİF status improvement · v2 verildi yarı onay · DM spam riski · 17dk içinde v1+revize+v2 hızlı döngü"
     }
   ],
-  "skip_dm_reasons": {
-    "23_eda_thread_active": "Eda T 14:49 thread ping zaten aktif · Arda 1sa 58dk pasif · ek DM spam riski · sync :15 (17:15) sonrası deadline geçince eskalasyon",
-    "16_v1_verildi_durum_info": "v1 verildi ve Eda T 'ellerine sağlıkk' kabul · onay sadece zaman bekleniyor · DM gerekmez",
-    "24_recent_dm_20min_ago": "16:25 sync'inde Şablon 1 DM Aykut+Arda gönderildi (20dk önce) · tekrar gönderme spam"
-  },
-  "capacity_state": {
-    "arda_active": 6,
-    "arda_cap": 6,
-    "arda_pct": 100,
-    "aykut_active": 5,
-    "aykut_cap": 6,
-    "aykut_pct": 83,
-    "eren_active": 5,
-    "eren_cap": 4,
-    "eren_pct": 125,
-    "note": "🚨 Arda 6/6 sabit (100% cap aşıldı) · #6+#8+#15+#16+#23+#24 · 14dk içinde #16+#23 deadline · 1sa 14dk içinde #24 deadline · Aykut 5/6 (83%) · Eren 5/4 (+25%)"
-  },
-  "notes": "16:45 launchd ara sync. 8sa eşiği AŞILDI #17 (7sa 40dk → 8sa 0dk · predicted 16:45 trigger) — Şablon 4 DM Görkem'e zorunlu. #9 priority transition 🟠→🔴 (7sa 13dk · 8sa eşiği aşıldı). #16+#23 14dk kala 17:00 deadline KRİTİK pencere — #16 v1 verildi onay yok 1sa 56dk pasif · #23 v1 YOK Arda 1sa 58dk pasif. #24 1sa 14dk · DM 16:25'te gönderildi 20dk önce. Canvas SLACK update YAPILDI. Notification Agent: Şablon 4 DM Görkem #17."
+  "past_confirmed": [],
+  "saat_eksik": [],
+  "dept_belirsiz": [],
+  "marka_yetersiz_sure": [],
+  "marka_anormal_uzun": [],
+  "marka_kiyasla_skip": "marka_stats mode=silent_log_only · DM gönderme · sadece log",
+  "status_improvements": [
+    {
+      "no": "23",
+      "marka": "Bauhaus",
+      "is": "Kaçırılmayacak Fırsatlar!",
+      "old_status": "v1 yok 14dk KRİTİK",
+      "new_status": "v1+v2 verildi Eda T yarı onay 'okidir ellerine sağlıkk' · onay bekleniyor",
+      "events": [
+        "16:25 Arda v1 🌸 (canvas 16:45 sync'te missed)",
+        "16:49 Eda T 'Salıncak alınmasın' minor revize",
+        "16:51 Eda T 'burası haricinde okidir ellerine sağlıkk' yarı onay",
+        "16:58 Arda v2 verdi"
+      ],
+      "dm_action": "skip",
+      "dm_skip_reason": "pozitif status · ekstra DM gereksiz"
+    },
+    {
+      "no": "24",
+      "marka": "Bauhaus",
+      "is": "Bayrama Özel Dev Kampanya",
+      "old_status": "yeni açıldı 1sa 14dk to 18:00",
+      "new_status": "Aykut 17:02 'burası hazırrr' · Aykut kısmı tamam · Arda meşgul #23'te · 45dk to 18:00",
+      "events": [
+        "16:33 ekip sarı şerit detayını netleştirdi · Eda T 'Video yapalım' kararı",
+        "17:02 Aykut tamamladı 'burası hazırrr'"
+      ],
+      "dm_action": "skip",
+      "dm_skip_reason": "16:25 Şablon 1 DM gönderildi 50dk önce · pozitif progress · ekstra DM gereksiz"
+    },
+    {
+      "no": "2",
+      "marka": "Hasvet",
+      "is": "Menteşe Cam Giydirme",
+      "old_status": "v1 yok · İrem JNJ bitince başlayacak · STALE 🔴 23sa+",
+      "new_status": "v1 verildi · İrem teslim · Buse 17:00 'Eline sağlık, mockup iste' onay flow başladı",
+      "events": [
+        "17:00 İrem v1 verdi (thread/channel ekli)",
+        "17:00 Buse 'Eline sağlık, mockup olarakta iletebilir misin?' onay+mockup talep"
+      ],
+      "dm_action": "skip",
+      "dm_skip_reason": "pozitif sürpriz · İrem JNJ bitmeden başlamış · onay flow başladı · ekstra DM gereksiz"
+    }
+  ],
+  "imminent_deadlines": [
+    {
+      "no": "24",
+      "marka": "Bauhaus",
+      "delta_min": 45,
+      "esik": "1sa eşiği · Aykut tamam Arda pending · workflow Paralel",
+      "dm_action": "skip",
+      "dm_skip_reason": "Aykut tamam · Arda meşgul ama pozitif progress · 16:25 DM 50dk önce gönderildi"
+    },
+    {
+      "no": "9",
+      "marka": "VDM Petdent",
+      "delta_min": 404,
+      "esik": "8sa eşiği aşıldı · 22May16:45 sync'inde 🟠→🔴 transition",
+      "dm_action": "skip",
+      "dm_skip_reason": "Eren'in birden fazla iş'i devam · #17 ile paralel · spam riski · sabah raporunda izlenecek"
+    },
+    {
+      "no": "21",
+      "marka": "VDM Petdent",
+      "delta_min": 1287,
+      "esik": "24sa eşiği aşıldı · 22May14:45 sync'inde 🟡→🟠 transition",
+      "dm_action": "skip",
+      "dm_skip_reason": "24sa+ kalmış · acil değil · sabah raporunda izlenecek"
+    }
+  ],
+  "continuing_critical": [
+    {
+      "no": "17",
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu",
+      "deadline_iso": "2026-05-22T08:46:00+03:00",
+      "delta_min": -509,
+      "note": "8sa 29dk GEÇMİŞ · v1 yok · Eren+Görkem · 4 raunt thread escalation + Cansu 2 DM cevapsız · Görkem DM 16:45 tetiklendi (Şablon 4 8sa eşiği predicted threshold)",
+      "dm_action": "skip",
+      "dm_skip_reason": "Görkem DM 16:45 sync'te zaten gönderildi · ek DM gereksiz · 12sa eşiğine kadar bekle (20:46 TR)"
+    }
+  ],
+  "calendar_events": [],
+  "summary": "Ara sync 17:15 · 0 yeni brief · 3 status improvement (POZİTİF) · 2 deadline transition (#16, #23) · 0 DM gönderildi · #17 8sa 29dk GEÇMİŞ devam (16:45 DM stabilized)"
 }
