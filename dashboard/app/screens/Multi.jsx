@@ -2,12 +2,11 @@
 
 // durum string'inden atama tipini çıkar
 function getAssignType(durum) {
-  if (!durum) return "unknown";
+  if (!durum) return "sirali";
   const d = durum.toLowerCase();
-  if (/sıralı|sirali|sequential/i.test(d)) return "sirali";
   if (/paralel|parallel/i.test(d)) return "paralel";
-  if (/self.assign/i.test(d)) return "self";
-  return "unknown";
+  if (/sıralı|sirali|sequential/i.test(d)) return "sirali";
+  return "sirali"; // tip belirtilmemişse sıralı varsayılan
 }
 
 // gecmis string'inden kim 🎨 verdi (işi teslim etti) çıkar
@@ -49,7 +48,6 @@ function MultiScreen({ data, onOpenBrief }) {
 
   const paralel = allMulti.filter(b => getAssignType(b.durum_raw || b.durum) === "paralel");
   const sirali  = allMulti.filter(b => getAssignType(b.durum_raw || b.durum) === "sirali");
-  const diger   = allMulti.filter(b => !["paralel","sirali"].includes(getAssignType(b.durum_raw || b.durum)));
 
   const shown = tab === "paralel" ? paralel : tab === "sirali" ? sirali : allMulti;
 
@@ -61,11 +59,10 @@ function MultiScreen({ data, onOpenBrief }) {
       />
 
       {/* KPI */}
-      <div style={{display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
+      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Toplam multi" value={allMulti.length} sub={`${data.briefs.length} aktif brief`}/>
         <Kpi label="Paralel" value={paralel.length} sub="aynı anda birden fazla kişi"/>
         <Kpi label="Sıralı" value={sirali.length} sub="biri bitince diğeri başlar"/>
-        <Kpi label="Diğer" value={diger.length} sub="tip belirtilmemiş"/>
       </div>
 
       {/* Tab */}
