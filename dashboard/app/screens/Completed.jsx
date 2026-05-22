@@ -2,7 +2,23 @@
 
 function CompletedScreen({ data }) {
   const [range, setRange] = React.useState("30");
-  const rows = data.completed;
+  const now = data.NOW || Date.now();
+
+  // Range filtresi
+  const cutoff = now - parseInt(range) * 24 * 3600 * 1000;
+  const rows = data.completed.filter(c => {
+    const ts = c.bitis || c.deadline || 0;
+    return ts >= cutoff;
+  });
+
+  // KPI hesaplamaları gerçek veriden
+  const avgSure   = rows.length ? (rows.reduce((s,c) => s + (c.sure || 0), 0) / rows.length) : 0;
+  const avgGecikme = rows.length ? (rows.filter(c => c.gecikme > 0).reduce((s,c) => s + c.gecikme, 0) / Math.max(1, rows.filter(c => c.gecikme > 0).length)) : 0;
+  const avgRev    = rows.length ? (rows.reduce((s,c) => s + (c.revision || 0), 0) / rows.length) : 0;
+  const avgRating = rows.length ? (rows.filter(c => c.rating > 0).reduce((s,c) => s + c.rating, 0) / Math.max(1, rows.filter(c => c.rating > 0).length)) : 0;
+
+  const fmtNum = (n) => n.toFixed(1).replace(".", ",");
+
   const cols = ["#","Marka","İş","Atanan","Deadline","Başla","Bitiş","Süre","Rev","Gecikme","⭐","🔗"];
 
   return (
@@ -25,11 +41,11 @@ function CompletedScreen({ data }) {
         }/>
 
       <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 12, marginBottom: 16}}>
-        <Kpi label="Tamamlanan" value={rows.length} sub="son 30 gün"/>
-        <Kpi label="Ort. süre" value="22,4 sa" trend={{dir:"down", value:"-3,1", good:true}}/>
-        <Kpi label="Ort. gecikme" value="1,8 sa"/>
-        <Kpi label="Ort. revize" value="1,4"/>
-        <Kpi label="Ort. puan" value="4,2 / 5"/>
+        <Kpi label="Tamamlanan" value={rows.length} sub={`son ${range} gün`}/>
+        <Kpi label="Ort. süre"    value={rows.length ? fmtNum(avgSure) + " sa"  : "—"}/>
+        <Kpi label="Ort. gecikme" value={rows.length ? fmtNum(avgGecikme) + " sa" : "—"}/>
+        <Kpi label="Ort. revize"  value={rows.length ? fmtNum(avgRev)    : "—"}/>
+        <Kpi label="Ort. puan"    value={rows.length && avgRating > 0 ? fmtNum(avgRating) + " / 5" : "—"}/>
       </div>
 
       <div style={{
@@ -49,6 +65,11 @@ function CompletedScreen({ data }) {
             </tr>
           </thead>
           <tbody>
+            {rows.length === 0 && (
+              <tr><td colSpan={12} style={{padding:"32px 16px", textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>
+                Son {range} günde tamamlanan brief bulunamadı.
+              </td></tr>
+            )}
             {rows.map((c, idx) => (
               <tr key={c.id} style={{background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)"}}>
                 <td style={cs(true, "right")}>{c.no}</td>

@@ -10,6 +10,7 @@
   "priority_distribution": {"red": 18, "orange": 1, "yellow": 1, "green": 2},
   "overdue_count": 9,
   "priority_upgrades_this_run": 0,
+  "github_pushed_sha": "ccef440",
   "errors": [],
   "pat_age_days": 4,
   "pat_expires_in_days": 86,
