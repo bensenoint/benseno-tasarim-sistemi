@@ -76,7 +76,8 @@ function PlanScreen({ data, onOpenBrief }) {
   const span = endMs - startMs;
 
   // Sort by start time
-  const visible = data.briefs
+  const allBriefs = data._allBriefs || data.briefs || [];
+  const visible = allBriefs
     .filter(b => b.deadline >= startMs && b.acilma <= endMs)
     .sort((a, b) => a.deadline - b.deadline)
     .slice(0, 60);
@@ -114,7 +115,7 @@ function PlanScreen({ data, onOpenBrief }) {
                   background: isToday ? "var(--ember-tint)" : isOff ? "var(--paper-2)" : "transparent"
                 }}>
                   <span style={{font:"500 10px/1 var(--font-mono)", color: isHoliday ? "var(--prio-orange)" : "var(--ink-4)"}}>
-                    {isHoliday ? "🎌" : ["Pzr","Pzt","Sal","Çar","Per","Cum","Cmt"][d.getDay()]}
+                    {isHoliday ? "[T]" : ["Pzr","Pzt","Sal","Çar","Per","Cum","Cmt"][d.getDay()]}
                   </span>
                   <span style={{font:"600 13px/1 var(--font-sans)", color: isToday ? "var(--ember)" : isHoliday ? "var(--prio-orange)" : "var(--ink)", marginTop: 3}}>{d.getDate()}</span>
                 </div>
@@ -197,7 +198,8 @@ function DeadlinesScreen({ data, onOpenBrief }) {
   const startMs = todayStart.getTime();
   const endMs = startMs + days * dayMs;
 
-  const visible = data.briefs.filter(b => b.deltaH > -24 && b.deadline < endMs)
+  const allBriefs2 = data._allBriefs || data.briefs || [];
+  const visible = allBriefs2.filter(b => b.deltaH > -24 && b.deadline < endMs)
     .sort((a, b) => a.deadline - b.deadline);
 
   // Bucket by day
@@ -250,7 +252,7 @@ function DeadlinesScreen({ data, onOpenBrief }) {
               background: i === 0 ? "rgba(194,74,44,0.04)" : isOff ? "var(--paper-2)" : "var(--surface)"
             }}>
               <div style={{font:"600 12px/1 var(--font-sans)", color: i === 0 ? "var(--ember)" : isHoliday ? "var(--prio-orange)" : "var(--ink-2)", marginBottom: 8}}>
-                {i === 0 ? "Bugün" : i === 1 ? "Yarın" : isHoliday ? `🎌 ${holidayName}` : ["Pzr","Pzt","Sal","Çar","Per","Cum","Cmt"][bk.day.getDay()]}
+                {i === 0 ? "Bugün" : i === 1 ? "Yarın" : isHoliday ? `★ ${holidayName}` : ["Pzr","Pzt","Sal","Çar","Per","Cum","Cmt"][bk.day.getDay()]}
               </div>
               <div style={{display:"flex", flexDirection:"column", gap: 6}}>
                 {bk.items.slice(0, 5).map(b => (
