@@ -89,13 +89,12 @@ WORKFLOW_BOT_NAME = "Yeni Brief Aç"
 MARKA_STATS_FILE = ~/benseno-tasarim-sistemi/data/marka_stats.json
 ```
 
-## CHANNEL → MARKA MAPPING (35 marka)
+## CHANNEL → MARKA MAPPING (33 marka)
 ```
 marka-bauhaus → Bauhaus
 marka-beta → Beta
 marka-cimporglobal → Cimporglobal
 marka-cureffect → Cureffect
-marka-efor-ofçay → Efor (Ofçay)
 marka-egosport → Egosport
 marka-gursoy → Gürsoy
 marka-hasvet → Hasvet
@@ -122,7 +121,6 @@ marka-kzy-vetsbest → KZY Vet's Best
 marka-marmaraholding → Marmara Holding
 marka-muffik → Muffik
 marka-polisan → Polisan
-marka-preby → Preby
 marka-splenda → Splenda
 marka-tour2america → Tour2America
 marka-vdm-petdent → VDM Petdent

@@ -473,7 +473,6 @@
     "Beta",
     "Cimporglobal",
     "Cureffect",
-    "Efor (Ofçay)",
     "Egosport",
     "Gürsoy",
     "Hasvet",
@@ -500,7 +499,6 @@
     "Marmara Holding",
     "Muffik",
     "Polisan",
-    "Preby",
     "Splenda",
     "Tour2America",
     "VDM Petdent"
@@ -637,10 +635,6 @@
       "active": 0
     },
     {
-      "name": "Efor (Ofçay)",
-      "active": 0
-    },
-    {
       "name": "Egosport",
       "active": 0
     },
@@ -742,10 +736,6 @@
     },
     {
       "name": "Polisan",
-      "active": 0
-    },
-    {
-      "name": "Preby",
       "active": 0
     },
     {

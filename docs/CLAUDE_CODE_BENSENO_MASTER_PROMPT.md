@@ -367,7 +367,6 @@ Brief Sync'in kanal adından markayı türetmesi için kritik. Bir brief hangi m
 marka-beta: Beta
 marka-cimporglobal: Cimporglobal
 marka-cureffect: Cureffect
-marka-efor-ofçay: Efor (Ofçay)
 marka-egosport: Egosport
 marka-gursoy: Gürsoy
 marka-hasvet: Hasvet
@@ -394,7 +393,6 @@ marka-kzy-vetsbest: KZY Vet's Best
 marka-marmaraholding: Marmara Holding
 marka-muffik: Muffik
 marka-polisan: Polisan
-marka-preby: Preby
 marka-splenda: Splenda
 marka-tour2america: Tour2America
 marka-vdm-petdent: VDM Petdent
