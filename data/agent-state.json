@@ -1,1 +1,10 @@
-{"last_run":"","data_agent":"","dashboard_agent":"","notification_agent":"","active_briefs":0,"errors":[]}
+{
+  "last_run": "2026-05-21T17:36:25+03:00",
+  "last_run_ts": 1779374185,
+  "data_agent": "ok",
+  "notification_agent": "ok",
+  "dashboard_agent": "ok",
+  "active_briefs": 21,
+  "errors": [],
+  "notes": "Hasvet GEÇMİŞ detected but v1 delivered by İrem 14:30 TR — past_deadline notif skipped. 7 brief auto-recalc 🟡→🟠. Canvas full replace + GitHub push 88dc6d7."
+}
