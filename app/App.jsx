@@ -29,6 +29,7 @@ function App() {
   React.useEffect(() => { window.openNewBriefModal = () => setNewBrief(true); }, []);
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
+  const [brandStats, setBrandStats] = React.useState(data.brandStats);
 
   // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
   // Bana / Departman / Tümü filtresi briefs ve completed'a uygulanır.
@@ -82,7 +83,7 @@ function App() {
   const filteredCompleted = React.useMemo(() => filterByViewMode(data.completed), [filterByViewMode, data.completed, briefs]);
 
   // Live data shape — briefs ve completed artık filtered (viewMode'a göre)
-  const liveData = { ...data, briefs: filteredBriefs, completed: filteredCompleted, _allBriefs: briefs, _allCompleted: data.completed };
+  const liveData = { ...data, briefs: filteredBriefs, completed: filteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
   React.useEffect(() => { document.documentElement.setAttribute("data-theme", t.theme); }, [t.theme]);
@@ -188,34 +189,39 @@ function App() {
           window.BNS_DATA.matrix = mx;
         }
         if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
-          window.BNS_DATA.brandStats = ed.bns_brand_stats;
+          window.BNS_DATA.brandStats = ed.bns_brand_stats; setBrandStats(ed.bns_brand_stats);
         } else if (window.BNS_DATA.BRANDS && window.BNS_DATA.briefs) {
           // bns_brand_stats henüz doldurulmamışsa live brief'lerden hesapla
           const allB = window.BNS_DATA.briefs;
           const allC = window.BNS_DATA.completed || [];
           const now  = Date.now();
           const cutoff30 = now - 30 * 24 * 3600 * 1000;
-          window.BNS_DATA.brandStats = window.BNS_DATA.BRANDS.map(b => {
+          const freshBS = window.BNS_DATA.BRANDS.map(b => {
             const active = allB.filter(x => x.marka === b.name).length;
-            const done30 = allC.filter(x => x.marka === b.name && (x.bitis||0)*1000 >= cutoff30).length;
-            // deadline istatistikleri — brief'lerin deltaH'larından medyan
-            const deltas = allB.filter(x => x.marka === b.name && x.deltaH != null).map(x => x.deltaH);
-            deltas.sort((a,b2) => a - b2);
-            const medH = deltas.length ? deltas[Math.floor(deltas.length/2)] : null;
-            const madH = deltas.length ? Math.round(deltas.reduce((s,v) => s + Math.abs(v - (medH||0)), 0) / deltas.length) : null;
+            // done30: bitis zaten ms cinsinden — doğrudan karşılaştır
+            const done30 = allC.filter(x => x.marka === b.name && (x.bitis || 0) >= cutoff30).length;
+            // medyan süre: tamamlanan işlerin sureH değerlerinden
+            const sures = allC.filter(x => x.marka === b.name && x.sureH > 0).map(x => x.sureH).sort((a,z)=>a-z);
+            const medH = sures.length ? sures[Math.floor(sures.length/2)] : null;
+            const madH = sures.length ? Math.round(sures.reduce((s,v)=>s+Math.abs(v-(medH||0)),0)/sures.length) : null;
+            // ort. revize: tamamlananlardan
+            const revs = allC.filter(x => x.marka === b.name).map(x => x.revision || 0);
+            const avgRev = revs.length ? (revs.reduce((a,v)=>a+v,0)/revs.length).toFixed(1) : null;
             const hasStale = allB.some(x => x.marka === b.name && x.stale);
             const hasOverdue = allB.some(x => x.marka === b.name && x.deltaH <= 0);
             return {
               ...b,
               active,
               done30,
-              medianH: medH != null ? Math.round(Math.abs(medH)) : null,
-              madH:    madH,
-              avgRev:  null,
+              medianH: medH != null ? Math.round(medH) : null,
+              madH,
+              avgRev,
               rating:  null,
               stale:   hasStale || hasOverdue
             };
           });
+          window.BNS_DATA.brandStats = freshBS;
+          setBrandStats(freshBS);
         }
         window.BNS_DATA.__lastPoll = Date.now();
         console.info("[BNS] poll OK · source=" + ed.source + " · reason=" + ed.reason +
