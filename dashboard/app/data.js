@@ -234,19 +234,18 @@ const activity = [
 // capacity burada yüzde (%) olarak tutulur.
 // live-data'dan gelen capacity = slot sayısı (people × limit), bnsCapPct() ile yüzdeye çevrilir.
 const deptStats = {
-  tasarim: { name: "Tasarım", people: 6,  active: 28, overdue: 4, capacity: 92, completed30: 84, avgComplete: 26.4, revRate: 18 },
-  editor:  { name: "Editör",  people: 6,  active: 22, overdue: 2, capacity: 78, completed30: 71, avgComplete: 34.1, revRate: 22 },
-  ai:      { name: "AI",      people: 1,  active: 10, overdue: 2, capacity: 96, completed30: 38, avgComplete: 18.7, revRate: 11 }
+  // capacity = people × 6 (kişi başı limit) → yüzde: active/capacity*100
+  tasarim: { name: "Tasarım", people: 6,  active: 28, overdue: 4, capacity: 36, completed30: 84, avgComplete: 26.4, revRate: 18 },
+  editor:  { name: "Editör",  people: 6,  active: 22, overdue: 2, capacity: 36, completed30: 71, avgComplete: 34.1, revRate: 22 },
+  ai:      { name: "AI",      people: 1,  active: 10, overdue: 2, capacity:  6, completed30: 38, avgComplete: 18.7, revRate: 11 }
 };
 
-// live-data dept stats içindeki capacity = slots (people×limit).
-// Bu fonksiyon her zaman 0-100 yüzde döner — tüm ekranlar bunu kullanır.
+// capacity = toplam slot sayısı (people × kişi_başı_limit).
+// Her zaman 0-100 yüzde döner: active / capacity * 100
 function bnsCapPct(s) {
-  if (!s) return 0;
-  // Slot sayısı büyükse (>100) ham slot → yüzde hesapla
-  if (s.capacity > 100) return Math.round((s.active / s.capacity) * 100);
-  // Zaten yüzde (mock veya eski format)
-  return s.capacity || 0;
+  if (!s || !s.capacity) return 0;
+  if (s.capacity_pct != null) return s.capacity_pct; // zaten hesaplıysa kullan
+  return Math.min(100, Math.round((s.active / s.capacity) * 100));
 }
 
 // Tüm dept stats'ı capacity_pct alanı ile normalize et

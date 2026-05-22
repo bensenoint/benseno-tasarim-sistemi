@@ -25,6 +25,8 @@ function App() {
   const [briefs, setBriefs] = React.useState(data.briefs); // mutable for live edits
   const [palette, setPalette] = React.useState(false);
   const [newBrief, setNewBrief] = React.useState(false);
+  // Global erişim: Department/diğer ekranlar buradan modal açabilir
+  React.useEffect(() => { window.openNewBriefModal = () => setNewBrief(true); }, []);
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
 
