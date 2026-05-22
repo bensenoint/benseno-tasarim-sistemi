@@ -375,7 +375,7 @@ function bnsHydrateBrief(raw, idx) {
     const m = raw.gecmis.match(/(\d{1,2})([A-Za-z]{3})(\d{1,2}:\d{2})/);
     if (m) {
       const TR_MON = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,
-                      Oca:0,Sub:1,Mar:2,Nis:3,Haz:5,Tem:6,Agu:7,Eyl:8,Eki:9,Kas:10,Ara:11};
+                      Oca:0,Sub:1,Şub:1,Nis:3,May:4,Haz:5,Tem:6,Agu:7,Eyl:8,Eki:9,Kas:10,Ara:11};
       const mon = TR_MON[m[2]];
       if (mon != null) {
         const [hh,mm] = m[3].split(":").map(Number);
@@ -383,9 +383,24 @@ function bnsHydrateBrief(raw, idx) {
       }
     }
   }
-  // deadline: "18 May 2026" formatı veya ISO string'i veya ms — hepsini destekle
+  // deadline: "18 May 2026", "1 Haziran 2026", ISO veya ms — hepsini destekle
   let deadlineRaw = raw.deadline || raw.deadlineISO;
-  const deadline = typeof deadlineRaw === "string" ? Date.parse(deadlineRaw) : (deadlineRaw || 0);
+  let deadline = 0;
+  if (typeof deadlineRaw === "string") {
+    // Türkçe tam ay adları ve kısaltmaları → sayıya çevir
+    const TR_DL = {Ocak:0,Oca:0,Şubat:1,Şub:1,Mart:2,Mar:2,Nisan:3,Nis:3,Mayıs:4,May:4,
+                   Haziran:5,Haz:5,Temmuz:6,Tem:6,Ağustos:7,Agustos:7,Agu:7,
+                   Eylül:8,Eyl:8,Ekim:9,Eki:9,Kasım:10,Kasim:10,Kas:10,Aralık:11,Aralik:11,Ara:11};
+    const trMatch = deadlineRaw.match(/^(\d{1,2})\s+([A-Za-zÇĞİÖŞÜçğışöü]+)\s+(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+    if (trMatch && TR_DL[trMatch[2]] != null) {
+      const [, day, , year, hh, mm] = trMatch;
+      deadline = new Date(parseInt(year), TR_DL[trMatch[2]], parseInt(day), parseInt(hh||23), parseInt(mm||59), 0).getTime();
+    } else {
+      deadline = Date.parse(deadlineRaw) || 0;
+    }
+  } else {
+    deadline = deadlineRaw || 0;
+  }
   const liveNow = window.BNS_DATA.NOW || NOW;
   const deltaH  = deadline > 0 ? (deadline - liveNow) / H : 999;
   // Önce live BR (Slack'ten gelen), yoksa mock BR, yoksa fallback
