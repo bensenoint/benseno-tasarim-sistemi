@@ -4,13 +4,12 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
   const [b, setB] = React.useState(brief);
   const [saved, setSaved] = React.useState(false);
   const [assignedMe, setAssignedMe] = React.useState(false);
-  React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); }, [brief]);
+  const [inlineToast, setInlineToast] = React.useState(null); // ← hook'lar erken return'dan önce
+  React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); setInlineToast(null); }, [brief]);
   if (!b) return null;
 
   function set(patch) { const next = { ...b, ...patch }; setB(next); setSaved(false); }
   function changeStatus(s) { set({ durum: s }); }
-
-  const [inlineToast, setInlineToast] = React.useState(null);
 
   function showToast(msg, duration) {
     setInlineToast(msg);
