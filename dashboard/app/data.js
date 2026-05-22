@@ -312,6 +312,24 @@ window.BNS_DATA = {
 // Bridge bunu USERS/BR/prio ile zenginleştirir → tam Brief object.
 //
 // EMBEDDED_DATA yoksa yukarıdaki mock veri kalır.
+// Uzun durum açıklamalarını ("⏳ Yeni açıldı (Eda T...") kısa koda normalize eder
+function bnsNormalizeDurum(durum, status) {
+  // Zaten kısa kod mu?
+  const SHORT = ["yeni","calisiliyor","incelemede","blokeli","tamamlandi","tamamlandı"];
+  const d = (durum || status || "").toLowerCase().trim();
+  if (SHORT.includes(d)) return d === "tamamlandı" ? "tamamlandi" : d;
+
+  // Uzun string içindeki anahtar kelimelere bak
+  if (/tamamland[ıi]/i.test(d))                          return "tamamlandi";
+  if (/blokel[ıi]|blokland[ıi]|bekleniyor/i.test(d))    return "blokeli";
+  if (/incelem|review|revize bekl/i.test(d))             return "incelemede";
+  if (/çalışıl|calisil|devam|sürd|started/i.test(d))    return "calisiliyor";
+  // ⏳ işareti + "Sırada" veya "Kritik" gibi → henüz atanmış ama başlanmamış = yeni
+  if (/⏳|yeni|sırada|açıldı|acildi|dispatch/i.test(d)) return "yeni";
+  // Fallback
+  return "yeni";
+}
+
 function bnsHydrateBrief(raw, idx) {
   // acilma: önce raw.acilma, yoksa gecmis'ten ilk ⏳ zaman damgasını çıkar
   let acilma = typeof raw.acilma === "string" ? Date.parse(raw.acilma) : (raw.acilma || null);
@@ -357,7 +375,7 @@ function bnsHydrateBrief(raw, idx) {
     acilma,
     deadline,
     dept:         raw.dept || "",
-    durum:        raw.durum || "",
+    durum:        bnsNormalizeDurum(raw.durum, raw.status),
     prio:         prio(deltaH),   // prio objesi: {code, label, color}
     priority:     prio(deltaH),   // backwards compat
     deltaH,

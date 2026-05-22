@@ -1,6 +1,9 @@
 // app/screens/Kanban.jsx — full kanban with 5 columns (including tamamlandı).
 
 function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
+  const [prioFilter, setPrioFilter] = React.useState("all");
+  const [search, setSearch]         = React.useState("");
+
   const cols = [
     { id: "yeni",        label: "Yeni",        Ic: I.Inbox,  accent: "var(--ink-3)" },
     { id: "calisiliyor", label: "Çalışılıyor", Ic: I.Pencil, accent: "var(--info)" },
@@ -18,22 +21,44 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     deltaH: 0, priority: { code:"grn", label:"DÜŞÜK", color:"var(--prio-green)" }, revision: c.revision
   }));
 
+  // Filtrele
+  let allBriefs = data.briefs;
+  if (prioFilter !== "all") allBriefs = allBriefs.filter(b => b.priority.code === prioFilter);
+  if (search.trim()) {
+    const q = search.toLowerCase().trim();
+    allBriefs = allBriefs.filter(b =>
+      (b.baslik||"").toLowerCase().includes(q) ||
+      (b.marka||"").toLowerCase().includes(q) ||
+      (b.lead?.name||"").toLowerCase().includes(q)
+    );
+  }
+
   return (
     <div className="bn-tab-in">
       <PageHead
         title="Kanban"
         subtitle="durum bazlı kolonlar · drag yerine status menüsü"
         actions={<>
-          <Button kind="ghost" size="sm" icon={<I.Filter size={13}/>}>Filtrele</Button>
+          <PrioFilter value={prioFilter} onChange={setPrioFilter}/>
         </>}
       />
+
+      {/* Arama */}
+      <div style={{marginBottom:12}}>
+        <div style={{display:"inline-flex", alignItems:"center", gap:6, background:"var(--surface-sub)", border:"1px solid var(--line)", borderRadius:8, padding:"6px 10px", width:240}}>
+          <I.Search size={13} style={{color:"var(--ink-4)", flexShrink:0}}/>
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Brief, marka, kişi…"
+            style={{border:0, background:"transparent", font:"500 13px/1 var(--font-sans)", color:"var(--ink)", outline:"none", width:"100%"}}/>
+        </div>
+      </div>
 
       <div style={{
         display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 12,
         minHeight: 540, overflowX:"auto"
       }}>
         {cols.map(col => {
-          const items = col.id === "tamamlandi" ? completedAsBriefs : data.briefs.filter(b => b.durum === col.id);
+          const items = col.id === "tamamlandi" ? completedAsBriefs : allBriefs.filter(b => b.durum === col.id);
           return (
             <div key={col.id} style={{
               background:"var(--surface-sub)", border:"1px solid var(--line)",
