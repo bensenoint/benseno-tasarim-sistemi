@@ -24,6 +24,7 @@ function PlanScreen({ data, onOpenBrief }) {
         title={`Plan · ${days} günlük gantt`}
         subtitle="brief'lerin başlangıçtan deadline'a süresi · öncelik renkleriyle"
         actions={<>
+          <Button kind={horizon===7 ?"secondary":"ghost"} size="sm" onClick={() => setHorizon(7)}>7 gün</Button>
           <Button kind={horizon===14?"secondary":"ghost"} size="sm" onClick={() => setHorizon(14)}>14 gün</Button>
           <Button kind={horizon===30?"secondary":"ghost"} size="sm" onClick={() => setHorizon(30)}>30 gün</Button>
         </>}
