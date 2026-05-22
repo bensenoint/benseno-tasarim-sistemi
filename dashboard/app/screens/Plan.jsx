@@ -2,7 +2,8 @@
 
 // ─── PLAN (gantt) ───────────────────────────────────────────────────────────
 function PlanScreen({ data, onOpenBrief }) {
-  const days = 14;
+  const [horizon, setHorizon] = React.useState(14);
+  const days = horizon;
   const dayMs = 24 * 3600 * 1000;
   const todayStart = new Date(data.NOW); todayStart.setHours(0,0,0,0);
   const startMs = todayStart.getTime() - 2 * dayMs;
@@ -13,18 +14,18 @@ function PlanScreen({ data, onOpenBrief }) {
   const visible = data.briefs
     .filter(b => b.deadline >= startMs && b.acilma <= endMs)
     .sort((a, b) => a.deadline - b.deadline)
-    .slice(0, 40);
+    .slice(0, 60);
 
   const colW = 100 / days;
 
   return (
     <div className="bn-tab-in">
       <PageHead
-        title="Plan · 14 günlük gantt"
+        title={`Plan · ${days} günlük gantt`}
         subtitle="brief'lerin başlangıçtan deadline'a süresi · öncelik renkleriyle"
         actions={<>
-          <Button kind="secondary" size="sm">14 gün</Button>
-          <Button kind="ghost" size="sm">30 gün</Button>
+          <Button kind={horizon===14?"secondary":"ghost"} size="sm" onClick={() => setHorizon(14)}>14 gün</Button>
+          <Button kind={horizon===30?"secondary":"ghost"} size="sm" onClick={() => setHorizon(30)}>30 gün</Button>
         </>}
       />
 
