@@ -170,16 +170,21 @@ function App() {
             mx[u.id] = {};
             brands.forEach(b => { mx[u.id][b.name] = 0; });
           });
-          // tamamlananlardan say
-          allC.forEach(c => {
-            const uid = c.lead?.id;
-            const mn  = c.marka || c.brand?.name;
+          function addToMatrix(mx, uid, mn) {
             if (uid && mn && mx[uid] && mx[uid][mn] !== undefined) mx[uid][mn]++;
-            (c.contributors || []).forEach(cu => {
-              if (cu?.id && mn && mx[cu.id] && mx[cu.id][mn] !== undefined) mx[cu.id][mn]++;
-            });
+          }
+          // tamamlananlar
+          allC.forEach(c => {
+            const mn = c.marka || c.brand?.name;
+            addToMatrix(mx, c.lead?.id, mn);
+            (c.contributors || []).forEach(cu => addToMatrix(mx, cu?.id, mn));
           });
-          // aktif brief'leri de göster (daha az ağırlık — 0.5 gibi değil, sadece tamamlanmış say)
+          // aktif briefler
+          allB.forEach(b => {
+            const mn = b.marka || b.brand?.name;
+            addToMatrix(mx, b.lead?.id, mn);
+            (b.contributors || []).forEach(cu => addToMatrix(mx, cu?.id, mn));
+          });
           window.BNS_DATA.matrix = mx;
         }
         if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {

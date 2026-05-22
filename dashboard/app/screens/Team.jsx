@@ -22,7 +22,7 @@ function TeamScreen({ data }) {
     <div className="bn-tab-in">
       <PageHead
         title="Ekip matrisi"
-        subtitle={`${users.length} kişi × ${brands.length} marka · hücrede tamamlanan iş sayısı · yoğunluk haritası`}/>
+        subtitle={`${users.length} kişi × ${brands.length} marka · hücrede toplam iş sayısı (aktif + tamamlanan) · yoğunluk haritası`}/>
 
       <div style={{display:"flex", alignItems:"center", gap: 16, marginBottom: 14, font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
         <span>Renk skalası:</span>
