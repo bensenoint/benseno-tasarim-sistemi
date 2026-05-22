@@ -113,7 +113,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
-      "saat": "13:42 TR ⚠️ **GEÇMİŞ (1g 1sa 33dk geride · 24sa eşiği AŞILDI · STALE 🔴 sürüyor 🚨)**",
+      "saat": "13:42 TR ⚠️ **GEÇMİŞ (1g 2sa 33dk geride · 24sa eşiği AŞILDI · STALE 🔴 sürüyor 🚨)**",
       "durum": "⏳ Kritik (Eren self-assign · 🔴 Acil seviyesinde · v1 hâlâ yok · Eren 5 aktif iş · cap 4 aşıldı · VDM bayram da 🔴 GEÇMİŞ paralel)",
       "rev": "0",
       "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 / 📈21May~04:42 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:42 (22May15:15 sync'inde 1g 1sa 33dk geride · 24sa eşiği AŞILDI)",
@@ -197,7 +197,7 @@
       "priority": "🟠",
       "priority_label": "🟠 Yüksek",
       "deadline": "22 May 2026",
-      "saat": "23:59 TR (8sa 13dk · Eren · sorunsuz)",
+      "saat": "23:59 TR (7sa 43dk · Eren · sorunsuz)",
       "durum": "⏳ Yeni açıldı (Eren 20May14:05 TR · workflow · self-assign · 2g önce)",
       "rev": "0",
       "gecmis": "⏳20May14:05 (Eren AI açtı · workflow · self-assign · 🔔 otomatik 🟡 [~58sa≤72sa])",
@@ -219,7 +219,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "14:00 TR ⚠️ **GEÇMİŞ (1sa 45dk geride · v1 verildi 13:28 Arda 🌸 · Eda T 14:04 'ellerine sağlık canoo' kabul · resmi onay/yayın komutu bekleniyor)**",
+      "saat": "14:00 TR ⚠️ **GEÇMİŞ (2sa 15dk geride · v1 verildi 13:28 Arda 🌸 · Eda T 14:04 'ellerine sağlık canoo' kabul · resmi onay/yayın komutu bekleniyor)**",
       "durum": "🎨 v1 verildi (Arda 13:28 cherry_blossom · Eda T 14:04 'ellerine sağlık canoo' + cherry_blossom reaction · 'onaylandı' denmedi · 1sa 11dk pasif onay bekleniyor)",
       "rev": "0",
       "gecmis": "⏳20May16:21 (Eda T açtı · workflow · 🔔 otomatik 🟡 [45sa≤72sa]) / 📈21May14:51 öncelik 🟡→🟠 (auto-recalc [23sa 9dk≤24sa]) / 📈22May~06:00 öncelik 🟠→🔴 (auto-recalc [8sa≤8sa]) / 🎨22May13:28 Arda v1 verdi 🌸 / 💬22May14:04 Eda T 'ellerine sağlık canoo' + 🌸 reaction / ⏰GEÇMİŞ22May14:00 (22May15:15 sync'inde 1sa 15dk geride · v1 sonrası teknik)",
@@ -241,7 +241,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (1sa 14dk kaldı · v1 verildi Arda 14:40 'sonuncuya geldik sanırım, burdayım' 🌸 · Eda T 14:50 'ellerine sağlıkk' kabul · resmi onay bekleniyor)",
+      "saat": "17:00 TR (45dk kaldı · v1 verildi Arda 14:40 'sonuncuya geldik sanırım, burdayım' 🌸 · Eda T 14:50 'ellerine sağlıkk' kabul · resmi onay bekleniyor)",
       "durum": "🎨 v1 verildi (Arda 14:40 'sonuncuya geldik sanırım, burdayım' + cherry_blossom · son brief batch 7/7 · Eda T 14:50 'ellerine sağlıkk' + 25dk pasif · 'onaylandı' denmedi · resmi onay bekleniyor)",
       "rev": "0",
       "gecmis": "⏳20May16:22 (Eda T açtı · workflow · 🔔 otomatik 🟡 [48sa≤72sa]) / 📈21May17:25 öncelik 🟡→🟠 (auto-recalc [23sa 40dk≤24sa]) / 📈22May09:18 öncelik 🟠→🔴 (auto-recalc [7sa 42dk≤8sa]) / 🎨22May14:40 Arda v1 verdi 🌸 / 💬22May14:50 Eda T 'ellerine sağlıkk'",
@@ -263,7 +263,7 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "08:46 TR ⚠️ **GEÇMİŞ (6sa 59dk geride · 6sa eşiği aşıldı · v1 yok · 🤖 reaction yok · Eren 5 aktif iş · Sıralı 1️⃣ Eren bloke ediyor · 9 GEÇMİŞ brief)**",
+      "saat": "08:46 TR ⚠️ **GEÇMİŞ (7sa 30dk geride · 6sa eşiği aşıldı · 8sa eşiğine 30dk · v1 yok · 🤖 reaction yok · Eren 5 aktif iş · Sıralı 1️⃣ Eren bloke ediyor · 9 GEÇMİŞ brief)**",
       "durum": "⏳ KRİTİK GEÇMİŞ (Görkem 21May08:47 TR · workflow · Sıralı 1️⃣ Eren · v1 hâlâ yok · 6sa eşiği AŞILDI · 3 raunt escalation cevapsız · CANSU DİREKTÖR 2 manager_summary DM cevapsız · GM ESKALASYON ÖNERİLİR ama Görkem self-aware · orchestrator çıktısı görüyor · son thread aktivite 09:04 TR otomatik uyarı 6sa 11dk önce)",
       "rev": "0",
       "gecmis": "⏳21May08:47 (Görkem GM açtı · workflow · 🔔 otomatik 🟠 [20sa 11dk≤24sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log) / 📈22May~04:46 öncelik 🟠→🔴 (auto-recalc [4sa≤8sa]) / ⏰GEÇMİŞ22May08:46 (22May08:49 sync'inde 3dk geride · v1 yok) / 💬22May08:49+09:04+09:18+11:51 4 raunt thread escalation cevapsız / ⚠️22May13:46 5sa eşiği AŞILDI / ⚠️22May14:46 6sa eşiği AŞILDI (22May15:15 sync'inde 6sa 29dk GEÇMİŞ)",
@@ -308,7 +308,7 @@
       "priority": "🟠",
       "priority_label": "🟠 Yüksek",
       "deadline": "23 May 2026",
-      "saat": "14:42 TR (22sa 57dk · Cansu+Görkem+Eren · 24sa eşiği aşıldı)",
+      "saat": "14:42 TR (22sa 27dk · Cansu+Görkem+Eren · 24sa eşiği aşıldı)",
       "durum": "⏳ Yeni açıldı (Görkem 21May14:43 TR · workflow · Paralel Cansu+Görkem+Eren · Tip Video · Ref www.benseno.com.tr · Not: bahar dönemini anlatan bir video · ⚠️ 3 yönetici/AI atanması — fiili üretim Eren'de varsayılıyor · 22May14:45 öncelik 🟡→🟠 transition)",
       "rev": "0",
       "gecmis": "⏳21May14:43 (Görkem GM açtı · workflow · 🔔 otomatik 🟡 [47sa 51dk≤72sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log · ⚠️ Eren'in 5. aktif iş'i — KAPASİTE AŞIMI başladı) / 📈22May14:45 öncelik 🟡→🟠 (auto-recalc [23sa 57dk≤24sa])",
@@ -353,11 +353,33 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "17:00 TR (1sa 14dk kaldı · workflow · marka Bauhaus n=0 → kıyas atlandı · silent_log)",
+      "saat": "17:00 TR (45dk kaldı · Arda hâlâ başlamadı · 1sa 27dk pasif sonrası Eda T 14:49 ping · workflow · marka Bauhaus n=0 → kıyas atlandı · silent_log)",
       "durum": "⏳ Yeni açıldı (Eda T 22May14:48 TR · workflow · Paralel Arda tek atanan · Tip Sosyal Medya Post · Ref Bauhaus doc · Not: 'Kapak fotoğrafında kullanmamızı istedikleri görseli ekte paylaştım. Alevleri hareketli yapalım' · Eda T 14:49 'çıkışa kadar yardımcı olabilir misinn' soft ping · Arda henüz cevap vermedi · 27dk pasif)",
       "rev": "0",
       "gecmis": "⏳22May14:48 (Eda T açtı · workflow · 🔔 otomatik 🔴 [2sa 12dk≤8sa] · 📊 marka_kiyasla: Bauhaus n=0 · skip · yetersiz_veri · silent_log) / 💬22May14:49 Eda T 'çıkışa kadar yardımcı olabilir misinn' Arda'ya soft ping",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779450529976979)"
+    },
+    {
+      "no": "24",
+      "dept": "tasarim",
+      "dept_emoji": "📋",
+      "marka": "Bauhaus",
+      "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "editor_ids": [
+        "U09BZHR25NG"
+      ],
+      "priority": "🔴",
+      "priority_label": "🔴 Acil",
+      "deadline": "22 May 2026",
+      "saat": "18:00 TR (1sa 35dk kaldı · workflow · Aykut+Arda Paralel · 2 ekli görsel · marka Bauhaus n=0 → kıyas atlandı · silent_log)",
+      "durum": "⏳ Yeni açıldı (Eda T 22May16:22 TR · workflow · Paralel Aykut+Arda · Tip Sosyal Medya Post · Ref Bauhaus doc · 2 ekli görsel · Not: 'Ürünlerin etrafını sari şeritle çizerek gösterebilir misiniz?' · Arda 6/6 cap aşıldı · #23 ile paralel kritik)",
+      "rev": "0",
+      "gecmis": "⏳22May16:22 (Eda T açtı · workflow · 🔔 otomatik 🔴 [1sa 38dk≤8sa] · 📊 marka_kiyasla: Bauhaus n=0 · skip · yetersiz_veri · silent_log)",
+      "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919)"
     }
   ],
   "bns_completed": [
@@ -591,7 +613,7 @@
     "tasarim": {
       "name": "Tasarım",
       "people": 7,
-      "active": 13,
+      "active": 14,
       "overdue": 8,
       "capacity": 42,
       "completed30": 7,
@@ -622,7 +644,7 @@
   "bns_brand_stats": [
     {
       "name": "Bauhaus",
-      "active": 7
+      "active": 8
     },
     {
       "name": "Beta",
@@ -754,16 +776,16 @@
     }
   ],
   "priority_summary": {
-    "critical": 11,
+    "critical": 12,
     "high": 2,
     "normal": 0,
     "low": 3
   },
   "overdue_count": 9,
-  "last_sync": "2026-05-22T15:45:44+03:00",
-  "sync_ts": 1779453944,
-  "now": 1779452148,
-  "source": "data-agent-run-1779453944",
-  "sync_iso": "2026-05-22T15:15:48+03:00",
-  "run_type": "launchd_1515_ara_sync_NEW_BRIEF_23_processed"
+  "last_sync": "2026-05-22T16:25:00+03:00",
+  "sync_ts": 1779456300,
+  "now": 1779456300,
+  "source": "data-agent-run-1779456300",
+  "sync_iso": "2026-05-22T16:25:00+03:00",
+  "run_type": "launchd_1615_ara_sync_NEW_BRIEF_24_processed"
 }

@@ -412,6 +412,7 @@ function bnsHydrateBrief(raw, idx) {
   };
 }
 function bnsHydrateCompleted(raw, idx) {
+  const liveUsers = (window.BNS_DATA && window.BNS_DATA.USERS && window.BNS_DATA.USERS.length > 0) ? window.BNS_DATA.USERS : USERS;
   const liveNow = window.BNS_DATA.NOW || NOW;
   const deadline = typeof raw.deadline === "string" ? Date.parse(raw.deadline) : raw.deadline;
   const baslangic = typeof raw.baslangic === "string" ? Date.parse(raw.baslangic) : raw.baslangic;
@@ -427,13 +428,13 @@ function bnsHydrateCompleted(raw, idx) {
     marka: raw.marka,
     brand,
     baslik: raw.baslik,
-    lead: USERS.find(u => u.id === raw.leadId) || null,
-    contributors: (raw.contribIds || []).map(id => USERS.find(u => u.id === id)).filter(Boolean),
+    lead: liveUsers.find(u => u.id === raw.leadId) || null,
+    contributors: (raw.contribIds || []).map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
     deadline,
     baslangic,
     bitis,
     sureH,
-    revision: raw.revision != null ? raw.revision : 0,
+    revision: raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
     gecikme,
     rating: raw.rating != null ? raw.rating : null,
     slack_url:  raw.slack_url || "#",

@@ -1,79 +1,84 @@
 {
-  "sync_ts": 1779453944,
-  "sync_iso": "2026-05-22T15:45:44+03:00",
-  "run_type": "launchd_1545_ara_sync_idempotent_no_state_change",
+  "sync_ts": 1779456300,
+  "sync_iso": "2026-05-22T16:25:00+03:00",
+  "run_type": "launchd_1615_ara_sync_NEW_BRIEF_24_processed",
   "new_briefs": [
     {
-      "no": "23",
+      "no": "24",
       "marka": "Bauhaus",
-      "is": "Kaçırılmayacak Fırsatlar! (Sosyal Medya Post · Paralel)",
+      "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel)",
       "atanan_ids": [
+        "U06J26R1XCJ",
         "U09BFPBKQG7"
       ],
       "submitter": "U09BZHR25NG",
       "channel_id": "C4Y43AW2E",
-      "ts": "1779450529.976979",
-      "deadline": "2026-05-22T17:00:00+03:00",
-      "delta_h": 1.24,
+      "ts": "1779456154.216919",
+      "deadline": "2026-05-22T18:00:00+03:00",
+      "delta_h": 1.58,
       "priority": "🔴",
-      "note": "Eda T 14:48 açtı · Arda atanan · Eda T 14:49 'çıkışa kadar yardımcı olabilir misinn' soft ping · Arda 27dk pasif"
+      "tip": "Sosyal Medya Post",
+      "akis": "Paralel",
+      "ref": "https://docs.google.com/document/d/1CfPgcW76DYt0_1ilASZZiczdR2fVc4HJpE9nwRRHbMw/edit?usp=sharing",
+      "note": "Ürünlerin etrafını sari şeritle çizerek gösterebilir misiniz? · 2 ekli görsel · Eda T submitter",
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919"
     }
   ],
   "past_deadline": [
     {
       "no": "1",
       "marka": "JNJ Vision TR",
-      "delta_h": -95.75,
+      "delta_h": -96.42,
       "confirmed": true,
-      "note": "3g 23sa 15dk · teyitli (bakanlık)"
+      "note": "4g 25dk · teyitli (bakanlık)"
     },
     {
       "no": "2",
       "marka": "Hasvet",
-      "delta_h": -23.75,
-      "note": "23sa 15dk · v1 yok · İrem JnJ bitince"
+      "delta_h": -24.42,
+      "note": "1g 25dk · v1 yok · İrem JnJ bitince"
     },
     {
       "no": "3",
       "marka": "Bauhaus",
-      "delta_h": -53.75,
-      "note": "2g 5sa 15dk · Aykut+Eda T · v1 yok"
+      "delta_h": -54.42,
+      "note": "2g 6sa 25dk · Aykut+Eda T · v1 yok"
     },
     {
       "no": "4",
       "marka": "Bauhaus",
-      "delta_h": -26.75,
-      "note": "1g 2sa 15dk · İpek dispatch+Görkem"
+      "delta_h": -27.42,
+      "note": "1g 3sa 25dk · İpek dispatch+Görkem"
     },
     {
       "no": "5",
       "marka": "Bauhaus",
-      "delta_h": -26.05,
-      "note": "1g 1sa 33dk · Eren · v1 yok"
+      "delta_h": -26.72,
+      "note": "1g 2sa 43dk · Eren · v1 yok"
     },
     {
       "no": "6",
       "marka": "Bauhaus",
-      "delta_h": -45.75,
-      "note": "1g 21sa 15dk · Arda · v1 yok · batch tamamlandı + #23 yeni paralel"
+      "delta_h": -46.42,
+      "note": "1g 22sa 25dk · Arda · v1 yok"
     },
     {
       "no": "8",
       "marka": "VDM Petdent",
-      "delta_h": -26.35,
-      "note": "1g 1sa 51dk · Arda · cross-dept"
+      "delta_h": -27.02,
+      "note": "1g 3sa 1dk · Arda · cross-dept"
     },
     {
       "no": "15",
       "marka": "Bauhaus",
-      "delta_h": -1.75,
-      "note": "1sa 15dk · v1 verildi 13:28 + Eda T 'ellerine sağlık' 14:04 · resmi onay bekleniyor 1sa 11dk"
+      "delta_h": -2.42,
+      "note": "2sa 25dk · v1 verildi 13:28 + Eda T 'ellerine sağlık' 14:04 · resmi onay bekleniyor 2sa 21dk"
     },
     {
       "no": "17",
       "marka": "VDM Petdent",
-      "delta_h": -6.98,
-      "note": "6sa 29dk · 6sa eşiği AŞILDI · v1 yok"
+      "delta_h": -7.67,
+      "note": "7sa 40dk · 6sa eşiği AŞILDI · 8sa eşiğine 20dk · v1 yok"
     }
   ],
   "past_confirmed": [
@@ -98,73 +103,94 @@
     {
       "no": "16",
       "marka": "Bauhaus",
-      "delta_h": 1.23,
-      "note": "1sa 44dk · v1 verildi 14:40 🌸 · Eda T 14:50 'ellerine sağlıkk' kabul · resmi onay bekleniyor"
+      "delta_h": 0.58,
+      "note": "35dk kaldı · v1 verildi 14:40 🌸 · Eda T 14:50 'ellerine sağlıkk' kabul · resmi onay bekleniyor (1sa 35dk pasif)"
     },
     {
       "no": "23",
       "marka": "Bauhaus",
-      "delta_h": 1.24,
-      "note": "1sa 44dk · YENİ brief · Arda · Eda T çıkışa kadar yardımcı soft ping · 27dk pasif"
+      "delta_h": 0.58,
+      "note": "35dk kaldı · Arda 1sa 37dk pasif · Eda T 14:49 ping · v1 yok · KRİTİK"
+    },
+    {
+      "no": "24",
+      "marka": "Bauhaus",
+      "delta_h": 1.58,
+      "note": "1sa 35dk kaldı · YENİ brief Aykut+Arda · 2 görsel · sarı şerit isteği"
     },
     {
       "no": "9",
       "marka": "VDM Petdent",
-      "delta_h": 8.22,
-      "note": "8sa 43dk · Eren · sorunsuz"
+      "delta_h": 7.55,
+      "note": "7sa 33dk · Eren · sorunsuz"
     },
     {
       "no": "21",
       "marka": "VDM Petdent",
-      "delta_h": 22.95,
-      "note": "23sa 27dk · 24sa eşiği AŞILDI"
+      "delta_h": 22.28,
+      "note": "22sa 17dk · 24sa eşiği AŞILDI"
     }
   ],
   "threshold_warnings": [
     {
       "no": "17",
       "marka": "VDM Petdent",
-      "threshold": "6sa GEÇMİŞ",
-      "at": "2026-05-22T14:46:00+03:00",
-      "crossed_at_sync": "2026-05-22T15:15:48+03:00",
-      "note": "6sa 29dk GEÇMİŞ · 6sa eşiği aşıldı · Görkem self-aware · ek DM önerilmez · 4 raunt thread escalation cevapsız · Cansu Direktör 2 DM cevapsız"
+      "threshold": "6sa GEÇMİŞ · 8sa eşiğine 20dk",
+      "note": "7sa 40dk GEÇMİŞ · 8sa eşiği 16:46 TR'de aşılacak (16:45 sync'inde tetiklenir)"
+    },
+    {
+      "no": "23",
+      "marka": "Bauhaus",
+      "threshold": "35dk deadline · Arda hâlâ başlamamış",
+      "note": "Arda 1sa 37dk pasif · Eda T thread ping aktif · #24 yeni brief ile çakışıyor"
+    },
+    {
+      "no": "24",
+      "marka": "Bauhaus",
+      "threshold": "1sa 35dk deadline · Arda+Aykut paralel atama",
+      "note": "Arda capacity 6/6 (100% cap aşıldı) · #23 ile aynı saat penceresi · Aykut 5/6 (83%) · Şablon 1 DM her ikisine"
     }
   ],
   "v1_status_updates": [
     {
       "no": "15",
       "marka": "Bauhaus",
-      "note": "Eda T 'ellerine sağlık canoo' 14:04 · cherry_blossom reaction · 'onaylandı' denmedi · 1sa 11dk pasif"
+      "note": "Eda T 'ellerine sağlık canoo' 14:04 · 'onaylandı' denmedi · 2sa 21dk pasif"
     },
     {
       "no": "16",
       "marka": "Bauhaus",
-      "note": "Eda T 'ellerine sağlıkk' 14:50 · 'onaylandı' denmedi · 25dk pasif · YENİ INFO bu sync'te"
+      "note": "Eda T 'ellerine sağlıkk' 14:50 · 'onaylandı' denmedi · 1sa 35dk pasif"
     }
   ],
   "completed_this_run": [],
   "cancelled_this_run": [],
   "postponed_this_run": [],
   "calendar_events": [],
-  "notification_dm_recommendations": [],
+  "notification_dm_recommendations": [
+    {
+      "no": "24",
+      "template": "1_new_brief_dm",
+      "targets": ["U06J26R1XCJ", "U09BFPBKQG7"],
+      "reason": "Yeni #24 brief · Aykut+Arda Paralel atama · 18:00 TR (1sa 35dk) · Şablon 1 DM her ikisine zorunlu"
+    }
+  ],
   "skip_dm_reasons": {
-    "gorkem_self_aware": "orchestrator çıktısı zaten izleniyor · #17 6sa eşiği için ek GM DM önerilmez (sabah 09:04 zaten otomatik uyarı verdi)",
-    "cansu_director_recent": "12:15 + 14:15 zaten 2 manager_summary DM · spam riski · sessizlik gerekli",
-    "reyhan_gmy": "#19 tamamlandı · eskalasyon gerekmez",
-    "bauhaus_channel": "zaten yoğun · #15/#16 v1 verildi · #23 yeni brief Eda T zaten Arda'yı thread'de pinglemiş 'çıkışa kadar yardımcı' — sistem ek DM göndermesin",
-    "arda_busy": "Arda 5 aktif (#6, #8, #15, #16, #23) · son 1.5sa'da 5 brief teslim etti · Eda T zaten thread'den ping atmış · bot DM spam riski"
+    "gorkem_self_aware": "#17 7sa 40dk · 8sa eşiğine 20dk · 16:45 sync'inde tetiklenir",
+    "cansu_director_recent": "12:15 + 14:15 zaten 2 DM · spam riski",
+    "bauhaus_channel_23": "Eda T thread ping aktif · 16:45 sync'inde 15dk kala karar verilir"
   },
   "capacity_state": {
-    "arda_active": 5,
+    "arda_active": 6,
     "arda_cap": 6,
-    "arda_pct": 83,
-    "aykut_active": 4,
+    "arda_pct": 100,
+    "aykut_active": 5,
     "aykut_cap": 6,
-    "aykut_pct": 67,
+    "aykut_pct": 83,
     "eren_active": 5,
     "eren_cap": 4,
     "eren_pct": 125,
-    "note": "Arda 4→5 (yeni #23 brief · 83% · cap'e yaklaşıyor) · Aykut 4 sabit (67%) · Eren 5 sabit (+25% aşım sürüyor)"
+    "note": "🚨 Arda 5→6 (yeni #24 brief) · 100% cap (5/6→6/6) · #23 + #24 paralel kritik · Aykut 4→5 (83%) · Eren 5/4 sabit (+25%)"
   },
-  "notes": "15:45 ara sync (orchestrator launchd) · NO STATE CHANGE — 30dk geçti, yeni brief yok, kritik thread'lerde hareket yok. Threshold transitions: #17 6sa 29dk→6sa 59dk (7sa eşiğine 1dk kaldı), #15 1sa 15dk→1sa 45dk, #16/#23 deadline 1sa 44dk→1sa 14dk yaklaştı. Canvas SLACK update SKIP (idempotent · sadece zaman geçti). live-data.json sync_ts + 6 kritik brief saat field refresh. notification-flags refresh. Önceki skip reason'lar geçerli (Görkem self-aware · Cansu spam · Bauhaus yoğun · Arda Eda T thread ping aldı). #23 Arda 57dk pasif (önceden 27dk) ama Eda T thread ping zaten aktif — bot DM spam riski sürüyor."
+  "notes": "16:25 NEW BRIEF #24 processed (race condition: 16:15 sync sırasında 16:22:35 TR'de Slack Bot brief-queue'ya yazdı). #24 Bauhaus Bayrama Özel Dev Kampanya · Aykut+Arda Paralel · 18:00 TR · 1sa 35dk · 🔴 · 2 görsel ekli · sarı şerit isteği. brief-queue → boşaltıldı. Canvas SLACK update YAPILACAK (major event new brief). Şablon 1 DM Aykut+Arda gönderilecek. Arda capacity 100% (cap aşımı) → kapasite uyarısı flag'i."
 }

@@ -186,5 +186,35 @@
     "sent_at": "2026-05-22T15:45:44+03:00",
     "user_id": "skip-U030C48PL23-gorkem",
     "reason": "#17 6sa 29dk→6sa 59dk · 7sa eşiği yaklaşıyor (1dk kaldı) · Görkem orchestrator çıktısı izliyor · Cansu 2 DM cevapsız · ek DM spam"
+  },
+  {
+    "brief_ts": "1779450529.976979",
+    "template": "ara_sync_1615_skip_23_arda_critical_45min_remaining",
+    "sent_at": "2026-05-22T16:15:48+03:00",
+    "user_id": "skip-U09BFPBKQG7-arda",
+    "reason": "#23 Arda 1sa 27dk pasif (57dk→1sa 27dk) · deadline 45dk · Eda T 14:49 thread ping hâlâ aktif · bot DM hâlâ spam riski ancak KRİTİK seviyeye yaklaşıyor · 16:45 sync next decision point (15dk kala otomatik tetiklenecek)"
+  },
+  {
+    "brief_ts": "1779342432.583659",
+    "template": "ara_sync_1615_skip_17_8sa_eşiği_30dk",
+    "sent_at": "2026-05-22T16:15:48+03:00",
+    "user_id": "skip-U030C48PL23-gorkem",
+    "reason": "#17 7sa 30dk GEÇMİŞ · 8sa eşiğine 30dk kaldı · 16:45 sync'inde 8sa eşiği aşılırsa otomatik Görkem DM tetiklenir · şu an DM yok (Görkem self-aware + Cansu 2 DM spam)"
+  },
+  {
+    "brief_ts": "1779456154.216919",
+    "template": "1_new_brief_dm",
+    "sent_at": "2026-05-22T16:28:30+03:00",
+    "user_id": "U06J26R1XCJ",
+    "message_ts": "1779456509.865839",
+    "reason": "#24 Bauhaus Bayrama Özel Dev Kampanya · YENİ brief Şablon 1 DM Aykut'a gönderildi · 18:00 TR deadline · Paralel atama Aykut+Arda · 2 görsel ekli"
+  },
+  {
+    "brief_ts": "1779456154.216919",
+    "template": "1_new_brief_dm",
+    "sent_at": "2026-05-22T16:28:34+03:00",
+    "user_id": "U09BFPBKQG7",
+    "message_ts": "1779456514.320639",
+    "reason": "#24 Bauhaus Bayrama Özel Dev Kampanya · YENİ brief Şablon 1 DM Arda'ya gönderildi + KAPASİTE UYARISI eklendi (6/6 · 100% · 3 brief 30dk-1sa35dk pencerede)"
   }
 ]
