@@ -3,15 +3,57 @@
 function DeptCompareScreen({ data }) {
   const raw = data.deptStats || {};
   const DEPT_DEF = {
-    tasarim: { name: "Tasarım", people: 7, active: 0, overdue: 0, capacity: 0, completed30: 0, avgComplete: 0, revRate: 0 },
-    editor:  { name: "Editör",  people: 8, active: 0, overdue: 0, capacity: 0, completed30: 0, avgComplete: 0, revRate: 0 },
-    ai:      { name: "AI",      people: 1, active: 0, overdue: 0, capacity: 0, completed30: 0, avgComplete: 0, revRate: 0 },
+    tasarim: { name: "Tasarım", people: 7, active: 0, overdue: 0, capacity: 42, completed30: 0, avgComplete: 0, revRate: 0 },
+    editor:  { name: "Editör",  people: 8, active: 0, overdue: 0, capacity: 48, completed30: 0, avgComplete: 0, revRate: 0 },
+    ai:      { name: "AI",      people: 1, active: 0, overdue: 0, capacity:  6, completed30: 0, avgComplete: 0, revRate: 0 },
   };
+
+  // active ve overdue'yu Department screen ile aynı mantıkla live hesapla
+  const allBriefs    = data._allBriefs    || data.briefs    || [];
+  const allCompleted = data._allCompleted || data.completed || [];
+  const cutoff30 = Date.now() - 30 * 24 * 3600000;
+
+  function deptRows(role) {
+    return allBriefs.filter(b =>
+      (b.lead && (b.lead.rol || b.lead.dept) === role) ||
+      b.dept === role ||
+      (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.rol || c.dept) === role))
+    );
+  }
+  function deptCompleted(role) {
+    return allCompleted.filter(c =>
+      (c.lead && (c.lead.rol || c.lead.dept) === role) ||
+      (Array.isArray(c.contributors) && c.contributors.some(cc => cc && (cc.rol || cc.dept) === role))
+    );
+  }
+
+  const computed = {};
+  for (const role of ["tasarim","editor","ai"]) {
+    const rows   = deptRows(role);
+    const doneAll = deptCompleted(role);
+    const done30  = doneAll.filter(c => (c.bitis || 0) >= cutoff30);
+    const sures   = doneAll.filter(c => c.sureH > 0).map(c => c.sureH);
+    const avgH    = sures.length ? Math.round(sures.reduce((a,v)=>a+v,0)/sures.length) : 0;
+    const revs    = doneAll.map(c => c.revision || 0);
+    const avgRev  = revs.length ? parseFloat((revs.reduce((a,v)=>a+v,0)/revs.length).toFixed(2)) : 0;
+    computed[role] = {
+      active:      rows.length,
+      overdue:     rows.filter(b => b.deltaH <= 0).length,
+      completed30: done30.length,
+      avgComplete: avgH,
+      revRate:     avgRev,
+    };
+  }
+
   const d = {
-    tasarim: { ...DEPT_DEF.tasarim, ...(raw.tasarim || {}) },
-    editor:  { ...DEPT_DEF.editor,  ...(raw.editor  || {}) },
-    ai:      { ...DEPT_DEF.ai,      ...(raw.ai      || {}) },
+    tasarim: { ...DEPT_DEF.tasarim, ...(raw.tasarim || {}), ...computed.tasarim },
+    editor:  { ...DEPT_DEF.editor,  ...(raw.editor  || {}), ...computed.editor  },
+    ai:      { ...DEPT_DEF.ai,      ...(raw.ai      || {}), ...computed.ai      },
   };
+  // capacity_pct'yi live active ile yeniden hesapla
+  for (const role of ["tasarim","editor","ai"]) {
+    d[role].capacity_pct = d[role].capacity > 0 ? Math.min(100, Math.round((d[role].active / d[role].capacity) * 100)) : 0;
+  }
   const metrics = [
     { key: "completed30", label: "Tamamlanan iş (30 gün)", unit: "" },
     { key: "avgComplete", label: "Ort. tamamlama süresi",   unit: "sa" },
@@ -92,8 +134,9 @@ function DeptCompareScreen({ data }) {
 }
 
 function fmtN(v, unit) {
-  if (unit === "%") return "%" + v;
-  if (unit === "sa") return v.toString().replace(".", ",") + " sa";
+  if (v == null || isNaN(v)) return "—";
+  if (unit === "%") return "%" + (Number.isInteger(v) ? v : v.toFixed(2));
+  if (unit === "sa") return (Number.isInteger(v) ? v : v.toFixed(1)).toString().replace(".", ",") + " sa";
   return String(v);
 }
 
