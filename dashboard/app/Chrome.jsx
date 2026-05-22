@@ -17,7 +17,6 @@ const NAV_SECTIONS = [
     items: [
       { id: "gantt",   label: "Plan / Gantt",  icon: "Calendar" },
       { id: "kanban",  label: "Kanban",         icon: "Columns" },
-      { id: "timeline",label: "Deadlines",      icon: "Clock" },
     ]
   },
   {

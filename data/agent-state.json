@@ -1,46 +1,54 @@
 {
-  "last_run": "2026-05-22T12:15:57+03:00",
-  "last_run_ts": 1779441357,
-  "last_run_completed_at": "2026-05-22T12:17:30+03:00",
-  "run_type": "ara_sync_launchd_1215_brief_10_becomes_9th_overdue",
+  "last_run": "2026-05-22T12:45:59+03:00",
+  "last_run_ts": 1779443159,
+  "last_run_completed_at": "2026-05-22T13:00:00+03:00",
+  "run_type": "ara_sync_launchd_1245_canvas_full_replace_mandatory_third_sync",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
   "active_briefs": 22,
   "priority_distribution": {"red": 18, "orange": 1, "yellow": 1, "green": 2},
   "overdue_count": 9,
-  "priority_upgrades_this_run": 1,
-  "priority_upgrade_detail": "#10 Bauhaus Bahçe Düzen 🔴(9dk kaldı) → 🔴+GEÇMİŞ(16dk geride) — 9. GEÇMİŞ brief",
-  "github_pushed_sha": "1712254",
+  "priority_upgrades_this_run": 0,
+  "github_pushed_sha": "43663c7",
   "errors": [],
   "pat_age_days": 4,
   "pat_expires_in_days": 86,
-  "notes": "Day 5 12:15 ara sync (launchd window · user-triggered /run). Cache hit (canvas_cache.md 19dk · <30dk TTL → slack_read_canvas SKIPPED). Brief queue: [] (boş). 0 yeni brief. 1 priority transition: #10 Bauhaus Bahçe Düzen 12:00 deadline 16dk önce geçti → 🔴+GEÇMİŞ — 9. GEÇMİŞ brief. Thread check: Arda 'Okitto' 09:24 sonrası 2sa 51dk sessiz, v1 yok, Eda T dolap kapakları istedi ack'lı ama üretim yok. live-data.json REWRITTEN (22 brief · tüm deltalar 25dk delta ile refresh · #10 saat/durum/gecmis GEÇMİŞ olarak güncel · overdue_count 8→9 · tasarim.overdue 7→8). canvas_cache.md REWRITTEN (özet tablosu #10 GEÇMİŞ + 9 GEÇMİŞ vurgulu · header güncel). Canvas SLACK update SKIPPED İKİNCİ KEZ (94K full replace · 2 sync üst üste ertelendi · sonraki 12:45 sync'inde zorunlu replace) — 12:45 sync için yüksek öncelik flag. 1 DM gönderildi: Cansu Direktör U4XCE3532 manager_summary (1779441734.278459) — #10 9. GEÇMİŞ + #17 hâlâ 3sa 30dk açık + müdahale opsiyonları (a/Eren devre dışı b/iptal c/thread ping). Bot DM thread ping #10 atlandı (Arda+Eda zaten koord ediyor · doğal akış izleniyor). notifications-sent.json'a 1 entry eklendi (toplam 20). dashboard/index.html EMBEDDED_DATA inject (27925→27241 chars · canvas_md backtick escape). rsync dashboard/app/ → app/ + cp index.html. Sıradaki scheduled sync: 12:45 launchd window — KRİTİK: Cansu Direktör cevabı bekleniyor · #14/15 14:00 deadline 1sa 14dk kalacak · Canvas full replace zorunlu (3. ertelemeye gitmemeli).",
-  "deferred_canvas_update": {
-    "status": "skipped_2_consecutive_syncs",
+  "notes": "Day 5 12:45 ara sync (MANUEL TETİK · /run). Cache hit (canvas_cache.md 26dk · <30dk TTL → slack_read_canvas skipped on data layer · ama Canvas FULL REPLACE için tek seferlik 94K read yapıldı). Brief queue: [] (boş). 0 yeni brief. 0 priority transition (delta'lar refresh edildi · #10 GEÇMİŞ sürüyor 16dk→45dk · #17 GEÇMİŞ sürüyor 3sa 30dk→3sa 59dk · 4sa eşiği AŞILDI). Thread check: #10 Arda 'Okitto' 09:24 sonrası 3sa 21dk sessiz (mesaj yok · v1 yok). #17 thread sessizliği sürüyor (3 raunt escalation cevapsız). live-data.json REWRITTEN (22 brief · tüm deltalar 12:45 baseline refresh). canvas_cache.md REWRITTEN. **Canvas SLACK update FULL REPLACE YAPILDI ✅** (3. sync zorunlu update — 11:51 + 12:15 ertelemeleri kapandı · 31K markdown · 22 brief tablosu yeniden inşa). Notification Agent: 0 DM (Cansu Direktör 2x DM cevapsız → spam riskine karşı atlandı · #10/#17 thread soft ping atlandı · 13:15 sync'te yeniden değerlendirilecek). Dashboard Agent: EMBEDDED_DATA inject (canvas_md backtick escape · 22 brief) + rsync + GitHub push (sha 43663c7). Sıradaki scheduled sync: 13:15 launchd window — KRİTİK: #14/15 14:00 deadline 14dk sonra (Aykut+Arda hareket yok); Cansu Direktör cevabı bekleniyor (2 DM cevapsız 49dk+).",
+  "canvas_update": {
+    "status": "full_replace_completed",
     "first_skip": "2026-05-22T11:51:08+03:00",
     "second_skip": "2026-05-22T12:15:57+03:00",
-    "next_required": "2026-05-22T12:45:00+03:00",
-    "reason": "94K canvas full replace pahalı · partial yok kuralı",
-    "impact": "Slack canvas hâlâ 11:18 state'inde (#22 ve #10 GEÇMİŞ Slack canvas'ta görünmüyor · dashboard güncel)"
+    "completed_at": "2026-05-22T12:50:00+03:00",
+    "skip_count_resolved": 2,
+    "canvas_md_chars": 32547,
+    "sections_rebuilt": ["header", "workload_tasarim", "workload_editor", "workload_ai", "aktif_isler (22 row)", "thread_ozetleri", "yonetici_dikkat", "production_launch", "footer"]
   },
   "thread_10_status_at_run_end": {
     "no": "10",
     "marka": "Bauhaus",
-    "status": "9.GEÇMİŞ",
-    "delta_min": -16,
+    "status": "9.GEÇMİŞ_sürüyor",
+    "delta_min": -46,
     "v1_status": "yok",
-    "last_thread_activity_min_ago": 171,
-    "manager_dm_ts": "1779441734.278459",
-    "next_check": "12:45 sync"
+    "last_thread_activity_min_ago": 201,
+    "manager_dm_count": 2,
+    "manager_dm_last": "1779441734.278459 (12:15)",
+    "next_check": "13:15 sync"
   },
   "thread_17_status_at_run_end": {
     "no": "17",
     "marka": "VDM Petdent",
-    "delta_h": -3.5,
+    "delta_h": -4.0,
     "escalation_rounds": 3,
     "still_no_response": true,
     "manager_summary_count_today": 2,
-    "next_check": "12:45 sync (Cansu cevabı bekleniyor)"
+    "4sa_eşik_aşıldı": true,
+    "next_check": "13:15 sync"
+  },
+  "next_critical_milestones": {
+    "14:00_deadline_briefs": ["#14 Bauhaus Evinize Düzen", "#15 Bauhaus Bahçeniz İçin Her Şey"],
+    "14:00_time_remaining_at_1245": "1sa 14dk",
+    "17:00_deadline_briefs": ["#11", "#12", "#13", "#16", "#18", "#19", "#22"],
+    "17:00_time_remaining_at_1245": "4sa 14dk"
   }
 }
