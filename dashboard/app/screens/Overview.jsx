@@ -319,16 +319,33 @@ function DeptRow({ s, color, last, compact }) {
   );
 }
 
-// ─── ProblemBrands — canlı brand_stats'tan ilk 3 sorunlu marka ─────────────
+// ─── ProblemBrands — live brief'lerden hesaplanan sorun skoru ────────────────
 function ProblemBrands({ data }) {
-  const list = (data.brandStats || [])
-    .filter(b => b.problem_label || b.overdue > 0 || b.stale || (b.active || 0) >= 3)
-    .sort((a, b) =>
-      ((b.overdue || 0) - (a.overdue || 0)) ||
-      ((b.stale ? 1 : 0) - (a.stale ? 1 : 0)) ||
-      ((b.active || 0) - (a.active || 0))
-    )
-    .slice(0, 3);
+  // Her marka için live brief'lerden istatistik hesapla
+  const byBrand = {};
+  (data._allBriefs || data.briefs || []).forEach(b => {
+    const m = b.marka;
+    if (!m) return;
+    if (!byBrand[m]) byBrand[m] = { name: m, brand: b.brand, active: 0, overdue: 0, stale: 0, blokeli: 0, highRev: 0, score: 0 };
+    const s = byBrand[m];
+    s.active++;
+    if (b.deltaH <= 0)          s.overdue++;
+    if (b.stale)                s.stale++;
+    if (b.durum === "blokeli")  s.blokeli++;
+    if ((b.revision || 0) >= 3) s.highRev++;
+  });
+
+  // Sorun skoru: ağırlıklı
+  // geciken ×4 + stale ×2 + blokeli ×3 + revize≥3 ×1 + aktif yük (5'ten fazra her iş için ×1)
+  Object.values(byBrand).forEach(s => {
+    s.score = s.overdue * 4 + s.blokeli * 3 + s.stale * 2 + s.highRev * 1 + Math.max(0, s.active - 4);
+  });
+
+  const list = Object.values(byBrand)
+    .filter(s => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+
   if (list.length === 0) {
     return (
       <div style={{padding:"12px 4px", font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>
@@ -336,18 +353,28 @@ function ProblemBrands({ data }) {
       </div>
     );
   }
+
   return (
     <>
-      {list.map((b, i) => (
-        <BrandRow
-          key={b.name}
-          name={b.name}
-          note={b.problem_label || (b.active + ' aktif')}
-          color={b.color}
-          v={b.active || 0}
-          last={i === list.length - 1}
-        />
-      ))}
+      {list.map((s, i) => {
+        // En baskın sorunu etiketle
+        const tags = [];
+        if (s.overdue)  tags.push(`${s.overdue} geciken`);
+        if (s.blokeli)  tags.push(`${s.blokeli} blokeli`);
+        if (s.stale)    tags.push(`${s.stale} stale`);
+        if (s.highRev)  tags.push(`${s.highRev} yüksek rev`);
+        if (!tags.length) tags.push(`${s.active} aktif`);
+        return (
+          <BrandRow
+            key={s.name}
+            name={s.name}
+            note={tags.join(" · ")}
+            color={s.brand?.color}
+            v={s.active}
+            last={i === list.length - 1}
+          />
+        );
+      })}
     </>
   );
 }
