@@ -1,86 +1,49 @@
 {
-  "sync_ts": 1779448526,
-  "sync_iso": "2026-05-22T14:15:26+03:00",
-  "run_type": "launchd_1415_mandatory_canvas_full_replace_cycle3_with_6_completions",
+  "sync_ts": 1779450338,
+  "sync_iso": "2026-05-22T14:45:38+03:00",
+  "run_type": "launchd_1445_ara_sync_delta_refresh",
   "new_briefs": [],
-  "priority_upgrades": [],
-  "completed_briefs": [
-    {"no":"10","marka":"Bauhaus","baslik":"Bahçe Düzen / 22 Mayıs","lead":"U09BFPBKQG7","note":"Eda T 'burayı da yayına aldım onaylandı' · 9. GEÇMİŞ derinleştikten sonra Arda'dan v1 geldi · 2sa GEÇMİŞ sonrası onaylandı"},
-    {"no":"11","marka":"Bauhaus","baslik":"Evde Ferahlık / 23 Mayıs","lead":"U09BFPBKQG7","note":"3sa erken teslim · Eda T 'burası onaylandı ellerine sağlıkk'"},
-    {"no":"12","marka":"Bauhaus","baslik":"Düzenli Alanlar / 24 Mayıs","lead":"U09BFPBKQG7","note":"3sa erken teslim · 'onaylandı yayını planladım'"},
-    {"no":"13","marka":"Bauhaus","baslik":"Güneşli Günler / 26 Mayıs","lead":"U09BFPBKQG7","note":"2 revize ile tamamlandı · slogan + fiyat değişikliği · 3sa erken"},
-    {"no":"14","marka":"Bauhaus","baslik":"Evinize Düzen / 28 Mayıs","lead":"U09BFPBKQG7","note":"KRİTİK pencerede deadline'a tam yetişti (14:00→14:00)"},
-    {"no":"19","marka":"Kuzeypet","baslik":"TR Organizasyon Şeması","lead":"UD96GH76E","note":"Reyhan GMY kendisi yaptı · Montserrat font · 2sa 50dk erken teslim"}
+  "past_deadline": [
+    {"no":"1","marka":"JNJ Vision TR","delta_h":-94.75,"confirmed":true,"note":"3g 22sa 45dk · teyitli (bakanlık)"},
+    {"no":"2","marka":"Hasvet","delta_h":-22.75,"note":"22sa 45dk · v1 yok · İrem JnJ bitince"},
+    {"no":"3","marka":"Bauhaus","delta_h":-52.75,"note":"2g 4sa 45dk · Aykut+Eda T · v1 yok"},
+    {"no":"4","marka":"Bauhaus","delta_h":-25.75,"note":"1g 1sa 45dk · İpek dispatch+Görkem"},
+    {"no":"5","marka":"Bauhaus","delta_h":-25.05,"note":"1g 1sa 3dk · Eren · v1 yok"},
+    {"no":"6","marka":"Bauhaus","delta_h":-44.75,"note":"1g 20sa 45dk · Arda · v1 yok · batch sonrası müsait"},
+    {"no":"8","marka":"VDM Petdent","delta_h":-25.35,"note":"1g 1sa 21dk · Arda · cross-dept"},
+    {"no":"15","marka":"Bauhaus","delta_h":-0.75,"note":"45dk · v1 verildi · onay bekleniyor"},
+    {"no":"17","marka":"VDM Petdent","delta_h":-5.98,"note":"5sa 59dk · 6sa eşiği <1dk · v1 yok"}
   ],
-  "cancelled_briefs": [
-    {"no":"18","marka":"Kuzeypet","baslik":"Org Şeması Serhat (duplicate)","note":"Aylin Canel sildi · Eren delete permission ekledi · #19 (Reyhan) gerçek brief"}
+  "past_confirmed": [
+    {"no":"1","marka":"JNJ Vision TR","note":"bakanlık dönüşü bekleniyor"}
   ],
-  "postponed_briefs": [
-    {"no":"22","marka":"Splenda","baslik":"UK Summer Newsletter","note":"Aykut 'bayram sonrasına bırakabiliyoruz değil mi' · Cansu Direktör 'bayram sonrası kalabilir sıkıntı değil' · 🔴→🟢 priority demoted · yeni deadline atanmadı"}
-  ],
-  "past_deadline": [],
-  "past_confirmed": [],
   "saat_eksik": [],
-  "dept_belirsiz": [],
+  "dept_belirsiz": [
+    {"no":"8","marka":"VDM Petdent","note":"Tip 'Veri analizi' ambiguous · heuristic 📋"}
+  ],
   "marka_yetersiz_sure": [],
   "marka_anormal_uzun": [],
-  "gecmis_growing": [
-    {"no": "1", "marka": "JNJ Vision TR", "is": "24 Haziran Kontakt Lens Davetiyesi", "delta_h": -94.25, "note": "teyit edilmiş — bakanlık süreci · DM gerekmiyor"},
-    {"no": "2", "marka": "Hasvet", "is": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME", "delta_h": -22.25, "note": "İrem JnJ bitince başlayacak, v1 yok"},
-    {"no": "3", "marka": "Bauhaus", "is": "bahar kampanyası", "delta_h": -52.25, "note": "2g 10sa+ pasif · Bauhaus batch tamamlandı, Aykut müsait olmalı"},
-    {"no": "4", "marka": "Bauhaus", "is": "mayıs kampanyası", "delta_h": -25.25, "note": "tasarımcı yok, 1g eşiği aşıldı"},
-    {"no": "5", "marka": "Bauhaus", "is": "Broşür (AI)", "delta_h": -24.55, "note": "Eren self-assign, v1 yok · 24sa eşiği AŞILDI"},
-    {"no": "6", "marka": "Bauhaus", "is": "20 Mayıs İçerik", "delta_h": -44.25, "note": "Arda 🎨 yok · batch tamamlandığından Arda müsait olabilir"},
-    {"no": "8", "marka": "VDM Petdent", "is": "GA4 Analiz", "delta_h": -24.85, "note": "Eren açtı Arda atadı · Arda batch sonrası müsait"},
-    {"no": "15", "marka": "Bauhaus", "is": "Bahçeniz / 30 Mayıs", "delta_h": -0.25, "note": "v1 verildi 14:00+ · Eda T 'ellerine sağlık' kabul · resmi onay bekleniyor"},
-    {"no": "17", "marka": "VDM Petdent", "is": "Yeni bayram postu", "delta_h": -5.49, "note": "5sa eşiği AŞILDI (5sa 29dk GEÇMİŞ) · 3 raunt escalation cevapsız · Cansu Direktör 2 DM cevapsız · GM Görkem self-aware"}
+  "priority_transitions": [
+    {"no":"21","from":"🟡","to":"🟠","reason":"24sa eşiği aşıldı (23sa 57dk)","at":"2026-05-22T14:45:38+03:00"}
   ],
-  "thread_activity": [
-    {"no": "10", "marka": "Bauhaus", "channel_id": "C4Y43AW2E", "activity": "TAMAMLANDI 14:00+ · Arda v1 verdi · Eda T 'burayı da yayına aldım onaylandı'", "action": "bns_completed'a taşındı · pozitif update Cansu Direktör için"},
-    {"no": "11-14", "marka": "Bauhaus", "channel_id": "C4Y43AW2E", "activity": "TAMAMLANDI tümü 14:00+ · Arda batch 2/7-5/7 v1 verdi · Eda T onayladı (#13'te 2 revize)", "action": "bns_completed'a taşındı"},
-    {"no": "15", "marka": "Bauhaus", "channel_id": "C4Y43AW2E", "activity": "v1 verildi 14:00+ · Arda 'burdayım' · Eda T 'ellerine sağlık canoo' · onaylanma henüz net değil", "action": "Aktif kal · durum güncellendi · GEÇMİŞ 15dk minor"},
-    {"no": "16", "marka": "Bauhaus", "channel_id": "C4Y43AW2E", "activity": "v1 verildi 14:00+ · Arda 'sonuncuya geldik sanırım, burdayım' · Eda T henüz cevap vermedi", "action": "Aktif kal · durum güncellendi · 2sa 44dk içinde teslim umulur"},
-    {"no": "17", "marka": "VDM Petdent", "channel_id": "C0AQLPY4TUM", "activity": "Hareket yok · 5sa 29dk GEÇMİŞ derinleşiyor", "action": "Tüm escalation kanalları tıkalı · spam riski yüksek · skip new DM · Görkem GM self-aware"},
-    {"no": "18", "marka": "Kuzeypet", "channel_id": "C03MCS7R0KB", "activity": "İPTAL · Aylin C 'iptal' · Eren delete permission ekledi · brief silindi", "action": "bns_completed'a [İPTAL] olarak taşındı"},
-    {"no": "19", "marka": "Kuzeypet", "channel_id": "C03MCS7R0KB", "activity": "TAMAMLANDI ~14:10 · Reyhan GMY 'TR organizasyon şeması hazır...'", "action": "bns_completed'a taşındı · 2sa 50dk erken teslim"},
-    {"no": "22", "marka": "Splenda", "channel_id": "C02SZRFPARK", "activity": "ERTELENDİ · Aykut 'bayram sonrası' soru · Cansu Direktör onayladı · yeni deadline TBD", "action": "Aktif kal · 🔴→🟢 priority demoted · postponed status"}
-  ],
-  "calendar_events": [],
   "imminent_deadlines": [
-    {"no": "16", "marka": "Bauhaus", "is": "Banyo Şık (batch 7/7)", "delta_h": 2.73, "atanan_ids": ["U06J26R1XCJ","U09BFPBKQG7"], "thread_activity": "v1 verildi 14:00+ · Eda T onayı bekleniyor (2sa 44dk içinde)"}
+    {"no":"16","marka":"Bauhaus","delta_h":2.23,"note":"2sa 14dk · v1 verildi 14:40 🌸 · Eda T onayı bekleniyor"},
+    {"no":"9","marka":"VDM Petdent","delta_h":9.22,"note":"9sa 13dk · Eren · sorunsuz"},
+    {"no":"21","marka":"VDM Petdent","delta_h":23.95,"note":"23sa 57dk · 24sa eşiği aşıldı"}
   ],
-  "positive_updates": [
-    {
-      "type": "bauhaus_batch_resolution",
-      "summary": "🎉 Bauhaus batch (5 brief) ve #10 (9. GEÇMİŞ Bahçe Düzen) tamamlandı 14:00+ · Arda büyük üretim · Eda T onayladı tümü · Sadece batch 7/7 (#16) ve #15 (onay) açık kaldı",
-      "manager_dm_candidates": ["U4XCE3532"],
-      "manager_dm_skip_reason": "Cansu Direktör 2 DM (11:51+12:15) cevapsız — pozitif update DM göndermek mantıklı (stres rahatlatır) AMA 3. DM riski yüksek. Görkem GM zaten orchestrator çıktısı görüyor. İdeal: Cansu Direktör'e tek pozitif özet DM."
-    },
-    {
-      "type": "kuzeypet_resolution",
-      "summary": "Reyhan GMY #19 TR Organizasyon Şeması'nı kendisi yaptı (Montserrat font · 2sa 50dk erken) · #18 duplicate silindi (Aylin C iptal · Eren teknik destek)",
-      "manager_dm_candidates": [],
-      "manager_dm_skip_reason": "Reyhan kendisi yaptı, biliyor · Aylin C cevap bekliyor zaten · ekstra DM gereksiz"
-    },
-    {
-      "type": "splenda_postponed",
-      "summary": "#22 Splenda Newsletter bayram sonrasına ertelendi (Cansu Direktör onayı) · 🔴→🟢 priority demoted",
-      "manager_dm_candidates": [],
-      "manager_dm_skip_reason": "Cansu kendisi onayladı, biliyor"
-    }
+  "threshold_warnings": [
+    {"no":"17","marka":"VDM Petdent","threshold":"6sa GEÇMİŞ","at":"2026-05-22T14:46:00+03:00","note":"5sa 59dk · 1dk sonra 6sa eşiği aşılacak · Görkem self-aware · ek DM önerilmez"}
   ],
-  "manager_summary_recommended": {
-    "to": "U4XCE3532",
-    "type": "POZİTİF_UPDATE",
-    "priority": "OPTIONAL",
-    "reason": "Cansu Direktör 11:51 + 12:15 #10/#17 stres DM'lerine cevap vermedi. ŞİMDİ #10 ve diğer 4 Bauhaus brief tamamlandı + #19 Reyhan TR şeması bitirdi. POZİTİF özet DM rahatlatıcı olabilir ama 3. DM spam riski. Notification Agent karar versin (skip önerisi: önceki 2 DM zaten her şeyi söyledi, sistem zaten her yerde görünüyor).",
-    "draft_message": "💚 14:15 sync update · İYİ HABER\n\nBauhaus batch'ten 5/7 + 9. GEÇMİŞ #10 (Bahçe Düzen) tamamlandı:\n• #10 Bahçe Düzen 22May → ✅ Yayına alındı (Arda v1 + Eda T onay)\n• #11 Evde Ferahlık → ✅ 3sa erken\n• #12 Düzenli Alanlar → ✅ 3sa erken\n• #13 Güneşli Günler → ✅ 2 revize ile (slogan + fiyat)\n• #14 Evinize Düzen → ✅ KRİTİK pencerede tam zamanında (14:00→14:00)\n• #15 Bahçeniz → 🎨 v1 verildi, onay bekleniyor\n• #16 Banyo Şık → 🎨 v1 verildi, onay bekleniyor\n\nKuzeypet:\n• #19 TR Org Şeması → ✅ Reyhan GMY 2sa 50dk erken\n• #18 (duplicate) → İPTAL (Aylin C sildi)\n\nSplenda:\n• #22 Newsletter → ⏸ Bayram sonrasına ertelendi (senin onayınla)\n\n⚠️ Sadece açık kalan stres noktası: #17 VDM bayram postu (5sa 29dk GEÇMİŞ · v1 yok · Eren+Görkem). Görkem GM bilinçli — orchestrator çıktısı görüyor."
+  "completed_this_run": [],
+  "cancelled_this_run": [],
+  "postponed_this_run": [],
+  "calendar_events": [],
+  "notification_dm_recommendations": [],
+  "skip_dm_reasons": {
+    "gorkem_self_aware": "orchestrator çıktısı zaten izleniyor · #17 için ek GM DM önerilmez",
+    "cansu_director_recent": "12:15 ve 14:15 zaten 2 manager_summary DM · spam riski · sessizlik gerekli",
+    "reyhan_gmy": "#19 tamamlandı · eskalasyon gerekmez",
+    "bauhaus_channel": "zaten yoğun · #15/#16 v1 verildi · soft ping spam"
   },
-  "manager_summary_decision_note": "POZİTİF içerikli olduğu için spam riski daha düşük. Notification Agent göndersin (önerilen).",
-  "next_critical_milestone": {
-    "time_tr": "17:00",
-    "event": "#16 Bauhaus Banyo Şık ve #9 VDM Whatsapp deadline · #16 v1 verildi onay bekleniyor",
-    "action_if_no_response": "14:45-15:15 sync'lerinde #16 onay durumu izlenir"
-  },
-  "test_queue_drained": []
+  "notes": "14:45 ara sync delta refresh · canvas SLACK update DEFERRED (idempotent · 14:15 mandatory cycle3 30dk önce · 15:45 cycle3 backstop bekleniyor) · #21 🟡→🟠 transition gerçekleşti (yeni 🟠 brief) · #17 6sa eşiği yaklaşıyor ama ek DM önerilmez · #16 Arda 14:40 cherry_blossom v1 son brief · #15 onay bekleniyor"
 }

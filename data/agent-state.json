@@ -1,48 +1,44 @@
 {
-  "last_run": "2026-05-22T14:15:26+03:00",
-  "last_run_ts": 1779448526,
-  "last_run_completed_at": "2026-05-22T14:18:00+03:00",
-  "run_type": "ara_sync_launchd_1415_MANDATORY_canvas_full_replace_cycle3_with_6_completions",
+  "last_run": "2026-05-22T14:45:38+03:00",
+  "last_run_ts": 1779450338,
+  "last_run_completed_at": "2026-05-22T14:48:00+03:00",
+  "run_type": "ara_sync_launchd_1445_delta_refresh_canvas_DEFERRED_idempotent",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
   "active_briefs": 15,
-  "completed_this_run": 6,
-  "cancelled_this_run": 1,
-  "postponed_this_run": 1,
-  "priority_distribution": {"red": 10, "orange": 1, "yellow": 1, "green": 3},
+  "completed_this_run": 0,
+  "cancelled_this_run": 0,
+  "postponed_this_run": 0,
+  "priority_distribution": {"red": 10, "orange": 2, "yellow": 0, "green": 3},
   "overdue_count": 9,
-  "priority_upgrades_this_run": 0,
-  "priority_demotes_this_run": 1,
-  "github_pushed_sha": "pending",
+  "priority_upgrades_this_run": 1,
+  "priority_demotes_this_run": 0,
+  "github_pushed_sha": null,
   "errors": [],
   "pat_age_days": 4,
   "pat_expires_in_days": 86,
-  "notes": "Day 5 14:15 MANDATORY canvas full replace (cycle 3). 6 BRIEF TAMAMLANDI (#10/#11/#12/#13/#14 Bauhaus weekly batch 1-5/7 + #19 Reyhan TR org). 1 İPTAL (#18 Aylin C duplicate sildi). 1 ERTELEME (#22 Splenda bayram sonrası · Cansu Direktör onayı · 🔴→🟢 demote). Arda mega üretim 14:00 civarı (5 brief deadline'a yetişti/erken). Eda T tümünü onayladı (sadece #13'te 2 minor revize · slogan+fiyat). #15+#16 v1 verildi · resmi onay bekleniyor. Cache miss (canvas_cache.md 30dk eşik · refresh edildi). Slack thread reads: 9 thread kontrol edildi (yeni hareket bulundu 8'inde). live-data.json REWRITTEN (15 aktif + 7 completed[6+1 iptal]). canvas_cache.md REFRESHED. Canvas SLACK update MANDATORY YAPILDI ✅ (full replace · cycle 3 backstop + 6 tamamlanan major event). Notification Agent: 1 POZİTİF closure DM Cansu Direktör (12:15 manager_summary'nin doğal cevabı · #10 'yayına aldım onaylandı' + diğer 5 tamamlanan + #22 postponed). Skip: Görkem GM self-aware · Reyhan GMY ESKALASYON tetiklenmedi (#14/15 v1 verildi). Dashboard Agent: EMBEDDED_DATA inject (canvas_md backtick escape · 15 brief + 7 completed) + rsync + GitHub push. Açık tek stres: #17 VDM bayram 5sa 29dk GEÇMİŞ (v1 yok · Eren+Görkem · 3 raunt cevapsız). Sıradaki scheduled sync: 14:45 launchd.",
+  "notes": "Day 5 14:45 ara sync (launchd · /run · 14:15 mandatory cycle3 30dk sonra). Canvas SLACK update DEFERRED (idempotent · 6 tamamlanan brief 14:15'te major event sonrası dingin · 15:45 sonraki mandatory backstop). #21 VDM bayram video 🟡→🟠 priority transition gerçekleşti (24sa eşiği aşıldı · 23sa 57dk kaldı). 15 aktif brief: 10🔴+2🟠+0🟡+3🟢 (#9 zaten 🟠 sürüyor + #21 yeni 🟠). 9 GEÇMİŞ sabit (#1 teyitli + #2/3/4/5/6/8/15/17 sorunlu · #15 v1 verildi onay bekleniyor). #17 VDM bayram 5sa 59dk GEÇMİŞ (6sa eşiği <1dk · Görkem GM self-aware · ek DM önerilmez). #16 Bauhaus Banyo Şık batch 7/7 — Arda 14:40 'sonuncuya geldik sanırım, burdayım' + 🌸 v1 verildi (Eda T onayı bekleniyor · 2sa 14dk deadline). #15 v1 onaylanmadı (Eda T 'ellerine sağlık' kabul ama resmi onay yok). live-data.json refreshed (15 brief + 7 completed · 14:45 baseline). Cache hit (canvas_cache.md 18dk önce 14:27 refresh). 0 DM gönderildi (idempotent · 4 skip reason justified · Görkem self-aware · Cansu Direktör 12:15+14:15 2 DM spam riski · Reyhan #19 tamamlandı · Bauhaus channel yoğun). Sonraki scheduled sync: 15:15 launchd ara.",
   "canvas_update": {
-    "status": "MANDATORY_full_replace_DONE",
-    "reason": "Cycle 3 backstop + 6 tamamlanan major event + 1 iptal + 1 erteleme + 9 brief status değişikliği. Idempotent eşiği çok aştı."
+    "status": "DEFERRED_idempotent",
+    "reason": "14:15 mandatory cycle3 sonrası 30dk · sadece delta drift + #21 minor priority transition + #16 v1 status notu · major event yok · 15:45 cycle3 mandatory backstop bekleniyor."
   },
-  "completions": [
-    {"no":"10","marka":"Bauhaus","baslik":"Bahçe Düzen 22May (batch 1/7)","note":"9. GEÇMİŞ derinleşmesi sonrası v1 + Eda T 'yayına aldım onaylandı'","gecikme_h":2},
-    {"no":"11","marka":"Bauhaus","baslik":"Evde Ferahlık 23May (batch 2/7)","note":"3sa erken teslim","gecikme_h":0},
-    {"no":"12","marka":"Bauhaus","baslik":"Düzenli Alanlar 24May (batch 3/7)","note":"'onaylandı yayını planladım' · 3sa erken","gecikme_h":0},
-    {"no":"13","marka":"Bauhaus","baslik":"Güneşli Günler 26May (batch 4/7)","note":"slogan+fiyat 2 revize · 'onaylandı' · 3sa erken","gecikme_h":0,"revisions":2},
-    {"no":"14","marka":"Bauhaus","baslik":"Evinize Düzen 28May (batch 5/7)","note":"KRİTİK pencerede tam zamanında (14:00→14:00)","gecikme_h":0},
-    {"no":"19","marka":"Kuzeypet","baslik":"TR Org Şeması (Reyhan GMY)","note":"Reyhan kendisi · Montserrat · 2sa 50dk erken","gecikme_h":0}
+  "priority_transitions": [
+    {"no":"21","from":"🟡","to":"🟠","reason":"24sa eşiği aşıldı (23sa 57dk kaldı)"}
   ],
-  "cancellations": [
-    {"no":"18","marka":"Kuzeypet","baslik":"Org Şeması Serhat","note":"DUPLICATE · Aylin C sildi · Eren delete permission ekledi · #19 gerçek brief"}
+  "threshold_warnings": [
+    {"no":"17","threshold":"6sa GEÇMİŞ","ETA":"<1dk","note":"Görkem self-aware · ek DM önerilmez"}
   ],
-  "postponements": [
-    {"no":"22","marka":"Splenda","baslik":"UK Summer Newsletter","priority_before":"🔴","priority_after":"🟢","note":"Aykut soru + Cansu Direktör onayı · bayram sonrası · yeni deadline TBD"}
+  "v1_status_updates": [
+    {"no":"15","note":"Eda T 'ellerine sağlık' kabul ama resmi onay yok · 45dk GEÇMİŞ"},
+    {"no":"16","note":"Arda 14:40 cherry_blossom 🌸 v1 verildi · Eda T onayı bekleniyor · 2sa 14dk deadline"}
   ],
   "still_open_critical": [
-    {"no":"17","marka":"VDM Petdent","baslik":"Yeni bayram postu","delta_h":-5.49,"note":"5sa 29dk GEÇMİŞ · v1 yok · Eren+Görkem · 3 raunt cevapsız · Cansu Direktör 2 DM cevapsız · Görkem GM self-aware · ESKALASYON tetiklenmedi (Bauhaus batch çözüldü)"}
+    {"no":"17","marka":"VDM Petdent","delta_h":-5.98,"note":"5sa 59dk GEÇMİŞ · v1 yok · 3 raunt + Cansu 2 DM cevapsız · Görkem self-aware"},
+    {"no":"15","marka":"Bauhaus","delta_h":-0.75,"note":"v1 verildi · resmi onay/yayın komutu bekleniyor"},
+    {"no":"16","marka":"Bauhaus","delta_h":2.23,"note":"v1 verildi 14:40 · Eda T onayı bekleniyor"}
   ],
-  "notification_dms_sent": [
-    {"to":"U4XCE3532","template":"positive_closure_after_bauhaus_batch_and_kuzeypet_resolution","ts":"1779449377.477259","at":"2026-05-22T14:16:17+03:00"}
-  ],
+  "notification_dms_sent": [],
   "capacity_state": {
     "arda_active": 4,
     "arda_cap": 6,
@@ -50,6 +46,6 @@
     "aykut_cap": 6,
     "eren_active": 5,
     "eren_cap": 4,
-    "note": "Bauhaus batch tamamlandığı için Arda ve Aykut normalleşti (67% kapasite). Eren hâlâ +25% (5 aktif · #17 + #5 + #9 + #20 + #21)."
+    "note": "Bauhaus batch tamamlandığı için Arda ve Aykut normalleşti (67% kapasite · 14:40 #16 v1 verildi). Eren hâlâ +25% (5 aktif · #17 + #5 + #9 + #20 + #21)."
   }
 }

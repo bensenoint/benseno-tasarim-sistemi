@@ -231,11 +231,35 @@ const activity = [
 ];
 
 // ─── DEPT STATS ────────────────────────────────────────────────────────────
+// capacity burada yüzde (%) olarak tutulur.
+// live-data'dan gelen capacity = slot sayısı (people × limit), bnsCapPct() ile yüzdeye çevrilir.
 const deptStats = {
   tasarim: { name: "Tasarım", people: 6,  active: 28, overdue: 4, capacity: 92, completed30: 84, avgComplete: 26.4, revRate: 18 },
   editor:  { name: "Editör",  people: 6,  active: 22, overdue: 2, capacity: 78, completed30: 71, avgComplete: 34.1, revRate: 22 },
   ai:      { name: "AI",      people: 1,  active: 10, overdue: 2, capacity: 96, completed30: 38, avgComplete: 18.7, revRate: 11 }
 };
+
+// live-data dept stats içindeki capacity = slots (people×limit).
+// Bu fonksiyon her zaman 0-100 yüzde döner — tüm ekranlar bunu kullanır.
+function bnsCapPct(s) {
+  if (!s) return 0;
+  // Slot sayısı büyükse (>100) ham slot → yüzde hesapla
+  if (s.capacity > 100) return Math.round((s.active / s.capacity) * 100);
+  // Zaten yüzde (mock veya eski format)
+  return s.capacity || 0;
+}
+
+// Tüm dept stats'ı capacity_pct alanı ile normalize et
+function bnsNormDeptStats(raw) {
+  const out = {};
+  for (const [k, s] of Object.entries(raw || {})) {
+    out[k] = { ...s, capacity_pct: bnsCapPct(s) };
+  }
+  return out;
+}
+
+window.bnsCapPct     = bnsCapPct;
+window.bnsNormDeptStats = bnsNormDeptStats;
 
 // ─── BRAND STATS (for marka tab) ───────────────────────────────────────────
 const brandStats = BRANDS.map(b => {
