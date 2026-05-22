@@ -5,5 +5,40 @@
     "sent_at": "2026-05-21T17:32:42+03:00",
     "user_id": "skip-Hasvet-v1-delivered",
     "reason": "İrem delivered v1 at 14:30 TR (Mockup_01+02). Cansu+Buse forwarding to client. Not a real SLA breach."
+  },
+  {
+    "brief_ts": "1779275121.721279",
+    "template": "priority_upgrade_🟡_to_🟠_noted",
+    "sent_at": "2026-05-22T08:28:34+03:00",
+    "user_id": "skip-no-template-defined",
+    "reason": "#9 VDM Petdent Whatsapp Business Kurulumu (Otomasyon ·  🟡->🟠 (delta_h=15.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+  },
+  {
+    "brief_ts": "1779282760.860839",
+    "template": "priority_upgrade_🟠_to_🔴_noted",
+    "sent_at": "2026-05-22T08:28:34+03:00",
+    "user_id": "skip-no-template-defined",
+    "reason": "#10 Bauhaus Bahçe Düzen / 22 Mayıs (Sosyal Medya Pos 🟠->🔴 (delta_h=3.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+  },
+  {
+    "brief_ts": "1779283214.343159",
+    "template": "priority_upgrade_🟠_to_🔴_noted",
+    "sent_at": "2026-05-22T08:28:34+03:00",
+    "user_id": "skip-no-template-defined",
+    "reason": "#14 Bauhaus Evinize Düzen / 28 Mayıs (Sosyal Medya P 🟠->🔴 (delta_h=5.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+  },
+  {
+    "brief_ts": "1779283282.205179",
+    "template": "priority_upgrade_🟠_to_🔴_noted",
+    "sent_at": "2026-05-22T08:28:34+03:00",
+    "user_id": "skip-no-template-defined",
+    "reason": "#15 Bauhaus Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal 🟠->🔴 (delta_h=5.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+  },
+  {
+    "brief_ts": "1779342432.583659",
+    "template": "priority_upgrade_🟠_to_🔴_noted",
+    "sent_at": "2026-05-22T08:28:34+03:00",
+    "user_id": "skip-no-template-defined",
+    "reason": "#17 VDM Petdent Yeni bayram postu (Sosyal Medya Post · 🐷 🟠->🔴 (delta_h=0.4). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
   }
 ]

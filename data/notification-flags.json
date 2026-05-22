@@ -1,62 +1,159 @@
 {
   "new_briefs": [],
+  "priority_upgrades": [
+    {
+      "no": "9",
+      "marka": "VDM Petdent",
+      "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
+      "dept": "ai",
+      "atanan_ids": [
+        "U0AP31SAA1W"
+      ],
+      "editor_ids": [
+        "U0AP31SAA1W"
+      ],
+      "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279)",
+      "old": "🟡",
+      "new": "🟠",
+      "delta_h": 15.7
+    },
+    {
+      "no": "10",
+      "marka": "Bauhaus",
+      "is": "Bahçe Düzen / 22 Mayıs (Sosyal Medya Post · weekly content batch 1/7)",
+      "dept": "tasarim",
+      "atanan_ids": [
+        "U09BFPBKQG7",
+        "U06J26R1XCJ"
+      ],
+      "editor_ids": [
+        "U09BZHR25NG"
+      ],
+      "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779282760860839)",
+      "old": "🟠",
+      "new": "🔴",
+      "delta_h": 3.7
+    },
+    {
+      "no": "14",
+      "marka": "Bauhaus",
+      "is": "Evinize Düzen / 28 Mayıs (Sosyal Medya Post · weekly content batch 5/7)",
+      "dept": "tasarim",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "editor_ids": [
+        "U09BZHR25NG"
+      ],
+      "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779283214343159)",
+      "old": "🟠",
+      "new": "🔴",
+      "delta_h": 5.7
+    },
+    {
+      "no": "15",
+      "marka": "Bauhaus",
+      "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
+      "dept": "tasarim",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "editor_ids": [
+        "U09BZHR25NG"
+      ],
+      "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179)",
+      "old": "🟠",
+      "new": "🔴",
+      "delta_h": 5.7
+    },
+    {
+      "no": "17",
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
+      "dept": "tasarim",
+      "atanan_ids": [
+        "U0AP31SAA1W",
+        "U030C48PL23"
+      ],
+      "editor_ids": [
+        "U030C48PL23"
+      ],
+      "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659)",
+      "old": "🟠",
+      "new": "🔴",
+      "delta_h": 0.4
+    }
+  ],
   "past_deadline": [],
   "past_confirmed": [],
   "saat_eksik": [],
   "dept_belirsiz": [],
   "marka_yetersiz_sure": [],
   "marka_anormal_uzun": [],
-  "calendar_events": [],
-  "auto_recalc": [
+  "gecmis_growing": [
     {
-      "no": "10",
+      "no": "1",
+      "marka": "JNJ Vision TR",
+      "is": "24 Haziran Kontakt Lens Davetiyesi",
+      "delta_h": -88.3
+    },
+    {
+      "no": "2",
+      "marka": "Hasvet",
+      "is": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
+      "delta_h": -16.3
+    },
+    {
+      "no": "3",
       "marka": "Bauhaus",
-      "from": "🟡",
-      "to": "🟠",
-      "saat_kaldi": "18sa 40dk"
+      "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "delta_h": -46.3
     },
     {
-      "no": "11",
+      "no": "4",
       "marka": "Bauhaus",
-      "from": "🟡",
-      "to": "🟠",
-      "saat_kaldi": "23sa 40dk"
+      "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "delta_h": -19.3
     },
     {
-      "no": "12",
+      "no": "5",
       "marka": "Bauhaus",
-      "from": "🟡",
-      "to": "🟠",
-      "saat_kaldi": "23sa 40dk"
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "delta_h": -18.6
     },
     {
-      "no": "13",
+      "no": "6",
       "marka": "Bauhaus",
-      "from": "🟡",
-      "to": "🟠",
-      "saat_kaldi": "23sa 40dk"
+      "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "delta_h": -38.3
     },
     {
-      "no": "16",
-      "marka": "Bauhaus",
-      "from": "🟡",
-      "to": "🟠",
-      "saat_kaldi": "23sa 40dk"
-    },
-    {
-      "no": "18",
-      "marka": "Kuzeypet",
-      "from": "🟡",
-      "to": "🟠",
-      "saat_kaldi": "23sa 40dk"
-    },
-    {
-      "no": "19",
-      "marka": "Kuzeypet",
-      "from": "🟡",
-      "to": "🟠",
-      "saat_kaldi": "23sa 40dk"
+      "no": "8",
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "delta_h": -18.9
     }
   ],
-  "_note": "Hasvet past_deadline cleared: v1 teslim 14:30 TR + müşteriye iletiliyor 14:58 (Cansu+Buse koordinasyonu)"
+  "calendar_events": [],
+  "imminent_deadlines": [
+    {
+      "no": "17",
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
+      "dept": "tasarim",
+      "atanan_ids": [
+        "U0AP31SAA1W",
+        "U030C48PL23"
+      ],
+      "editor_ids": [
+        "U030C48PL23"
+      ],
+      "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659)",
+      "old": "🟠",
+      "new": "🔴",
+      "delta_h": 0.4
+    }
+  ]
 }
