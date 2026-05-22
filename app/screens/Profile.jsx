@@ -1,11 +1,39 @@
 // app/screens/Profile.jsx — Kişisel performans dashboardı v2
 // Aktif işler · tamamlanan · revize · saat · marka · iş tipi · verilen/alınan görevler
 
+const TIME_RANGES = [
+  { key: "7",   label: "7 gün",  days: 7   },
+  { key: "30",  label: "30 gün", days: 30  },
+  { key: "90",  label: "90 gün", days: 90  },
+  { key: "all", label: "Tümü",   days: null },
+];
+
+function TimeRangeToggle({ value, onChange }) {
+  return (
+    <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8, gap:1}}>
+      {TIME_RANGES.map(r => (
+        <button key={r.key} onClick={() => onChange(r.key)} style={{
+          font:"500 11px/1 var(--font-sans)", padding:"5px 10px", border:0,
+          background: value === r.key ? "var(--surface)" : "transparent",
+          color: value === r.key ? "var(--ink)" : "var(--ink-3)",
+          borderRadius:5, cursor:"pointer",
+          boxShadow: value === r.key ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
+        }}>{r.label}</button>
+      ))}
+    </div>
+  );
+}
+
 function ProfileScreen({ data, user, onOpenBrief }) {
   const [selectedUser, setSelectedUser] = React.useState(user);
+  const [timeRange, setTimeRange] = React.useState("30");
   const allBriefs    = data._allBriefs    || data.briefs    || [];
   const allCompleted = data._allCompleted || data.completed || [];
   const allUsers     = data.USERS || [];
+
+  // Zaman filtresi — sadece tamamlananlara uygulanır, aktifler hep gösterilir
+  const rangeDays = TIME_RANGES.find(r => r.key === timeRange)?.days;
+  const cutoff = rangeDays ? (Date.now() - rangeDays * 86400000) : 0;
 
   const u = selectedUser;
 
@@ -22,11 +50,14 @@ function ProfileScreen({ data, user, onOpenBrief }) {
   const overdue      = myActive.filter(b => b.deltaH <= 0);
   const urgent       = myActive.filter(b => b.deltaH > 0 && b.deltaH <= 24);
 
-  // ─── Tamamlanan
-  const myCompleted  = allCompleted.filter(b =>
-    (b.lead && b.lead.id === u.id) ||
-    (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
-  );
+  // ─── Tamamlanan (zaman filtresiyle)
+  const myCompleted  = allCompleted.filter(b => {
+    const inRange = !cutoff || ((b.bitis || b.deadline || 0) * (b.bitis < 1e10 ? 1000 : 1)) >= cutoff;
+    return inRange && (
+      (b.lead && b.lead.id === u.id) ||
+      (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
+    );
+  });
   const completedAsLead   = myCompleted.filter(b => b.lead && b.lead.id === u.id);
   const completedAsContrib= myCompleted.filter(b => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id));
 
@@ -123,6 +154,14 @@ function ProfileScreen({ data, user, onOpenBrief }) {
           <h1 style={{font:"600 26px/1.1 var(--font-sans)", color:"var(--ink)", margin:"5px 0 0", letterSpacing:"-0.01em"}}>{u.name}</h1>
           <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:17, color:"var(--ink-3)", marginTop:6}}>
             {myActive.length} aktif · {myCompleted.length} tamamlandı · {totalRev} toplam revize
+          </div>
+        </div>
+
+        {/* Zaman filtresi */}
+        <div style={{display:"flex", flexDirection:"column", alignItems:"flex-end", gap:8}}>
+          <TimeRangeToggle value={timeRange} onChange={setTimeRange}/>
+          <div style={{font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
+            tamamlanan · {rangeDays ? `son ${rangeDays} gün` : "tüm zamanlar"}
           </div>
         </div>
 

@@ -1,9 +1,44 @@
 // app/screens/Team.jsx — 17 kişi × 39 marka heatmap matrix.
 
 function TeamScreen({ data }) {
-  const m = data.matrix;
-  const users = data.USERS;
-  const brands = data.BRANDS;
+  const [timeRange, setTimeRange] = React.useState("all");
+  const allUsers  = data.USERS  || [];
+  const allBrands = data.BRANDS || [];
+  const allBriefs    = data._allBriefs    || data.briefs    || [];
+  const allCompleted = data._allCompleted || data.completed || [];
+
+  // Zaman filtresiyle matrix hesapla
+  const rangeDays = TIME_RANGES.find(r => r.key === timeRange)?.days;
+  const cutoff = rangeDays ? Date.now() - rangeDays * 86400000 : 0;
+
+  const mx = {};
+  allUsers.forEach(u => {
+    mx[u.id] = {};
+    allBrands.forEach(b => { mx[u.id][b.name] = 0; });
+  });
+  function addMx(uid, mn) {
+    if (uid && mn && mx[uid] && mx[uid][mn] !== undefined) mx[uid][mn]++;
+  }
+  // Tamamlananlar (filtreli)
+  allCompleted.forEach(c => {
+    const ts = (c.bitis || c.deadline || 0) * (c.bitis < 1e10 ? 1000 : 1);
+    if (cutoff && ts < cutoff) return;
+    const mn = c.marka || c.brand?.name;
+    addMx(c.lead?.id, mn);
+    (c.contributors || []).forEach(cu => addMx(cu?.id, mn));
+  });
+  // Aktif briefler (filtre yok — aktifler her zaman dahil)
+  if (!cutoff) {
+    allBriefs.forEach(b => {
+      const mn = b.marka || b.brand?.name;
+      addMx(b.lead?.id, mn);
+      (b.contributors || []).forEach(cu => addMx(cu?.id, mn));
+    });
+  }
+
+  const m = mx;
+  const users = allUsers;
+  const brands = allBrands;
 
   // Find max value for color scale
   let max = 1;
@@ -22,7 +57,9 @@ function TeamScreen({ data }) {
     <div className="bn-tab-in">
       <PageHead
         title="Ekip matrisi"
-        subtitle={`${users.length} kişi × ${brands.length} marka · hücrede toplam iş sayısı (aktif + tamamlanan) · yoğunluk haritası`}/>
+        subtitle={`${users.length} kişi × ${brands.length} marka · yoğunluk haritası`}
+        actions={<TimeRangeToggle value={timeRange} onChange={setTimeRange}/>}
+      />
 
       <div style={{display:"flex", alignItems:"center", gap: 16, marginBottom: 14, font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
         <span>Renk skalası:</span>
