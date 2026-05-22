@@ -432,7 +432,7 @@ function bnsHydrateCompleted(raw, idx) {
   const deadline = typeof raw.deadline === "string" ? Date.parse(raw.deadline) : raw.deadline;
   const baslangic = typeof raw.baslangic === "string" ? Date.parse(raw.baslangic) : raw.baslangic;
   const bitis = typeof raw.bitis === "string" ? Date.parse(raw.bitis) : raw.bitis;
-  const sureH = raw.sureH != null ? raw.sureH : ((bitis - baslangic) / H);
+  const sureH = raw.sureH != null ? raw.sureH : (bitis && baslangic && !isNaN(bitis) && !isNaN(baslangic) ? (bitis - baslangic) / H : null);
   const gecikme = bitis > deadline ? ((bitis - deadline) / H).toFixed(1) + "h" : "—";
   const brand = BR[raw.marka] || {
     name: raw.marka, color: WHEEL[brandHash(raw.marka)], wheelIdx: brandHash(raw.marka)

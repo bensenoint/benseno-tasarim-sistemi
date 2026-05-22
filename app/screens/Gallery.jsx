@@ -103,7 +103,7 @@ function GalleryTile({ c, idx }) {
           {c.baslik}
         </div>
         <div style={{font:"400 11px/1.2 var(--font-sans)", color:"var(--ink-4)", marginTop: 4}}>
-          tamamlandı · {c.sure} sa
+          tamamlandı · {c.sureH != null && c.sureH > 0 ? c.sureH.toFixed(1) + " sa" : "—"}
         </div>
       </div>
     </div>
