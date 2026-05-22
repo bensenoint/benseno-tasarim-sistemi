@@ -435,7 +435,8 @@ function bnsHydrateCompleted(raw, idx) {
     revision: raw.revision != null ? raw.revision : 0,
     gecikme,
     rating: raw.rating != null ? raw.rating : null,
-    slack_url: raw.slack_url || "#",
+    slack_url:  raw.slack_url || "#",
+    image_url:  raw.image_url || null,  // Slack thread'indeki ilk görsel (Brief Sync tarafından doldurulur)
     notes: raw.notes || ""
   };
 }

@@ -364,7 +364,13 @@ Her brief için (queue veya search fark etmez):
 2. `window.EMBEDDED_DATA = {…}` bloğunu regex replace et:
    - `canvas_markdown`: bu run'daki yeni Canvas markdown (backtick + `${}` escape)
    - `bns_briefs`: aktif brief'ler (JSON array)
-   - `bns_completed`: son 90 günde tamamlananlar (JSON array)
+   - `bns_completed`: son 90 günde tamamlananlar (JSON array) — her obje şu alanları içermeli:
+     `no, marka, baslik, leadId, contribIds[], deadline, baslangic, bitis, revision, rating, slack_url, notes`
+     **YENİ:** `image_url` — brief thread'indeki ilk Slack dosya eki URL'si (varsa). Şu adımlarla çıkar:
+     1. `slack_read_thread` ile brief thread'ini oku
+     2. Thread mesajlarındaki `files[]` dizisini tara — ilk `image/*` mime type'lı dosyanın `thumb_720` veya `url_private_download` değerini al
+     3. Bulamazsan `image_url: null` gönder (dashboard SVG pattern gösterir)
+     Not: `url_private` Slack auth gerektirdiğinden dashboard'da görüntülenemez — `thumb_720` tercih edilir (public CDN URL olabilir)
    - `bns_brands`: 39 marka listesi (JSON array)
    - `bns_users`: 16+ kullanıcı listesi (JSON array)
    - `bns_dept_stats`: departman istatistikleri (JSON object — tasarim/editor/ai key'leri zorunlu, her biri: name/people/active/overdue/capacity/completed30/avgComplete/revRate)

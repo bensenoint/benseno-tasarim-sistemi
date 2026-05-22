@@ -1,51 +1,73 @@
 {
-  "last_run": "2026-05-22T14:45:38+03:00",
-  "last_run_ts": 1779450338,
-  "last_run_completed_at": "2026-05-22T14:48:00+03:00",
-  "run_type": "ara_sync_launchd_1445_delta_refresh_canvas_DEFERRED_idempotent",
+  "last_run": "2026-05-22T15:15:48+03:00",
+  "last_run_ts": 1779452148,
+  "last_run_completed_at": "2026-05-22T15:17:00+03:00",
+  "run_type": "ara_sync_launchd_1515_NEW_BRIEF_23_processed_canvas_FULL_REPLACE",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
-  "active_briefs": 15,
+  "active_briefs": 16,
   "completed_this_run": 0,
   "cancelled_this_run": 0,
   "postponed_this_run": 0,
-  "priority_distribution": {"red": 10, "orange": 2, "yellow": 0, "green": 3},
+  "new_briefs_this_run": 1,
+  "priority_distribution": {"red": 11, "orange": 2, "yellow": 0, "green": 3},
   "overdue_count": 9,
-  "priority_upgrades_this_run": 1,
+  "priority_upgrades_this_run": 0,
   "priority_demotes_this_run": 0,
-  "github_pushed_sha": "64fd5fa",
+  "github_pushed_sha": null,
   "errors": [],
   "pat_age_days": 4,
   "pat_expires_in_days": 86,
-  "notes": "Day 5 14:45 ara sync (launchd · /run · 14:15 mandatory cycle3 30dk sonra). Canvas SLACK update DEFERRED (idempotent · 6 tamamlanan brief 14:15'te major event sonrası dingin · 15:45 sonraki mandatory backstop). #21 VDM bayram video 🟡→🟠 priority transition gerçekleşti (24sa eşiği aşıldı · 23sa 57dk kaldı). 15 aktif brief: 10🔴+2🟠+0🟡+3🟢 (#9 zaten 🟠 sürüyor + #21 yeni 🟠). 9 GEÇMİŞ sabit (#1 teyitli + #2/3/4/5/6/8/15/17 sorunlu · #15 v1 verildi onay bekleniyor). #17 VDM bayram 5sa 59dk GEÇMİŞ (6sa eşiği <1dk · Görkem GM self-aware · ek DM önerilmez). #16 Bauhaus Banyo Şık batch 7/7 — Arda 14:40 'sonuncuya geldik sanırım, burdayım' + 🌸 v1 verildi (Eda T onayı bekleniyor · 2sa 14dk deadline). #15 v1 onaylanmadı (Eda T 'ellerine sağlık' kabul ama resmi onay yok). live-data.json refreshed (15 brief + 7 completed · 14:45 baseline). Cache hit (canvas_cache.md 18dk önce 14:27 refresh). 0 DM gönderildi (idempotent · 4 skip reason justified · Görkem self-aware · Cansu Direktör 12:15+14:15 2 DM spam riski · Reyhan #19 tamamlandı · Bauhaus channel yoğun). Sonraki scheduled sync: 15:15 launchd ara.",
+  "notes": "Day 5 15:15 ara sync · launchd /run · cache miss (canvas_cache.md 48dk eski · fresh slack_read_canvas yapıldı). 1 YENİ BRIEF işlendi (#23 Bauhaus Kaçırılmayacak Fırsatlar! · Eda T 14:48 açtı · Arda atanan · 17:00 TR deadline · 1sa 44dk · 🔴 [2sa 12dk≤8sa] · Eda T 14:49 'çıkışa kadar yardımcı' thread soft ping · Arda 27dk pasif). brief-queue.json 1→0 işlendi. #17 6sa eşiği AŞILDI (6sa 29dk GEÇMİŞ · v1 yok · Görkem self-aware · ek DM önerilmez · 4 raunt thread + Cansu 2 DM cevapsız). #16 v1 YENİ ack: Eda T 14:50 'ellerine sağlıkk' (25dk pasif · 'onaylandı' yok). #15 Eda T 14:04 'ellerine sağlık canoo' kabul (1sa 11dk pasif · 'onaylandı' yok). Canvas SLACK update YAPILDI ✅ (new brief major event · 6sa threshold transition · #16 Eda T ack delta). live-data.json REWRITTEN (16 aktif + 7 completed · sync_ts 1779452148). canvas_cache.md REFRESHED. 0 DM gönderildi (2 skip log eklendi: #23 Arda Eda T thread ping aldı + #17 Görkem self-aware/Cansu spam). Capacity: Arda 4→5 (83% · cap yaklaşıyor) · Aykut 4 sabit (67%) · Eren 5 sabit (+25% aşım sürüyor). Sonraki scheduled: 15:45 launchd (mandatory cycle 3 backstop).",
   "canvas_update": {
-    "status": "DEFERRED_idempotent",
-    "reason": "14:15 mandatory cycle3 sonrası 30dk · sadece delta drift + #21 minor priority transition + #16 v1 status notu · major event yok · 15:45 cycle3 mandatory backstop bekleniyor."
+    "status": "DONE_full_replace",
+    "reason": "NEW BRIEF #23 major event · #17 6sa eşiği AŞILDI threshold transition · #16 Eda T 14:50 'ellerine sağlıkk' YENİ ack info · idempotent değil"
   },
-  "priority_transitions": [
-    {"no":"21","from":"🟡","to":"🟠","reason":"24sa eşiği aşıldı (23sa 57dk kaldı)"}
-  ],
+  "priority_transitions": [],
   "threshold_warnings": [
-    {"no":"17","threshold":"6sa GEÇMİŞ","ETA":"<1dk","note":"Görkem self-aware · ek DM önerilmez"}
+    {"no":"17","threshold":"6sa GEÇMİŞ AŞILDI","ETA":"6sa 29dk geride","note":"Görkem self-aware · ek DM önerilmez · 4 raunt + Cansu 2 DM cevapsız"}
   ],
   "v1_status_updates": [
-    {"no":"15","note":"Eda T 'ellerine sağlık' kabul ama resmi onay yok · 45dk GEÇMİŞ"},
-    {"no":"16","note":"Arda 14:40 cherry_blossom 🌸 v1 verildi · Eda T onayı bekleniyor · 2sa 14dk deadline"}
+    {"no":"15","note":"Eda T 14:04 'ellerine sağlık canoo' + 🌸 reaction · 1sa 11dk pasif onay yok"},
+    {"no":"16","note":"Eda T 14:50 'ellerine sağlıkk' · 25dk pasif onay yok · YENİ INFO bu sync'te"}
+  ],
+  "new_briefs_processed": [
+    {
+      "no": "23",
+      "marka": "Bauhaus",
+      "is": "Kaçırılmayacak Fırsatlar!",
+      "atanan_ids": ["U09BFPBKQG7"],
+      "submitter": "U09BZHR25NG",
+      "channel_id": "C4Y43AW2E",
+      "ts": "1779450529.976979",
+      "deadline_tr": "22May17:00",
+      "delta_h": 1.74,
+      "priority": "🔴",
+      "note": "Workflow brief · Sosyal Medya Post · Paralel · 'Alevleri hareketli yapalım' · Eda T thread'de Arda'ya 'çıkışa kadar yardımcı' soft ping yaptı"
+    }
   ],
   "still_open_critical": [
-    {"no":"17","marka":"VDM Petdent","delta_h":-5.98,"note":"5sa 59dk GEÇMİŞ · v1 yok · 3 raunt + Cansu 2 DM cevapsız · Görkem self-aware"},
-    {"no":"15","marka":"Bauhaus","delta_h":-0.75,"note":"v1 verildi · resmi onay/yayın komutu bekleniyor"},
-    {"no":"16","marka":"Bauhaus","delta_h":2.23,"note":"v1 verildi 14:40 · Eda T onayı bekleniyor"}
+    {"no":"17","marka":"VDM Petdent","delta_h":-6.48,"note":"6sa 29dk GEÇMİŞ · 6sa eşiği AŞILDI · v1 yok · Görkem self-aware · son thread aktivite 09:04 TR"},
+    {"no":"15","marka":"Bauhaus","delta_h":-1.25,"note":"v1 verildi 13:28 · Eda T 'ellerine sağlık' kabul 14:04 · resmi onay bekleniyor 1sa 11dk"},
+    {"no":"16","marka":"Bauhaus","delta_h":1.73,"note":"v1 verildi 14:40 🌸 · Eda T 14:50 'ellerine sağlıkk' kabul · resmi onay bekleniyor 25dk · deadline 1sa 44dk"},
+    {"no":"23","marka":"Bauhaus","delta_h":1.74,"note":"YENİ brief 14:48 · Arda atanan · Eda T 14:49 'çıkışa kadar yardımcı' soft ping · Arda 27dk pasif · deadline 1sa 44dk"}
   ],
   "notification_dms_sent": [],
+  "notification_skips_logged": [
+    {"brief":"23","reason":"Eda T zaten 14:49 Arda'ya thread soft ping yaptı · bot DM spam riski"},
+    {"brief":"17","reason":"Görkem self-aware + Cansu 12:15+14:15 2 DM zaten gönderildi spam riski"}
+  ],
   "capacity_state": {
-    "arda_active": 4,
+    "arda_active": 5,
     "arda_cap": 6,
+    "arda_pct": 83,
     "aykut_active": 4,
     "aykut_cap": 6,
+    "aykut_pct": 67,
     "eren_active": 5,
     "eren_cap": 4,
-    "note": "Bauhaus batch tamamlandığı için Arda ve Aykut normalleşti (67% kapasite · 14:40 #16 v1 verildi). Eren hâlâ +25% (5 aktif · #17 + #5 + #9 + #20 + #21)."
+    "eren_pct": 125,
+    "note": "Arda 4→5 (#23 yeni · cap'e yaklaşıyor 83%) · Aykut 4 sabit (67%) · Eren 5 sabit (+25% aşım sürüyor)"
   }
 }

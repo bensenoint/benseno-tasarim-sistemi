@@ -36,35 +36,42 @@ function GalleryTile({ c, idx }) {
         aspectRatio:"4/3", background: `linear-gradient(135deg, ${c.brand.color} 0%, ${shade(c.brand.color, -0.25)} 100%)`,
         position:"relative", overflow:"hidden"
       }}>
-        <svg viewBox="0 0 200 150" style={{width:"100%", height:"100%", position:"absolute"}}>
-          {pattern === 0 && Array.from({length: 8}).map((_, i) => (
-            <circle key={i} cx={20 + (i % 4) * 50} cy={30 + Math.floor(i / 4) * 60}
-              r={10 + (seed + i) % 8} fill="rgba(255,255,255,0.25)"/>
-          ))}
-          {pattern === 1 && Array.from({length: 6}).map((_, i) => (
-            <rect key={i} x={5 + i * 30} y={30 + ((seed + i) % 6) * 10} width={20} height={80}
-              fill="rgba(255,255,255,0.2)"/>
-          ))}
-          {pattern === 2 && (
-            <g fill="rgba(255,255,255,0.22)">
-              <path d="M0 90 Q 50 60 100 90 T 200 90 V 150 H 0 Z"/>
-              <path d="M0 110 Q 60 90 120 110 T 200 110 V 150 H 0 Z" opacity="0.5"/>
-            </g>
-          )}
-          {pattern === 3 && (
-            <g stroke="rgba(255,255,255,0.3)" strokeWidth="1" fill="none">
-              {Array.from({length: 7}).map((_, i) => (
-                <line key={i} x1="0" y1={i * 22} x2="200" y2={i * 22 - 30}/>
-              ))}
-            </g>
-          )}
-          {pattern === 4 && (
-            <text x="100" y="90" fill="rgba(255,255,255,0.3)" textAnchor="middle"
-              fontSize="64" fontFamily="serif" fontStyle="italic">
-              {c.brand.name.charAt(0)}
-            </text>
-          )}
-        </svg>
+        {c.image_url ? (
+          <img src={c.image_url} alt={c.baslik}
+            style={{width:"100%", height:"100%", objectFit:"cover", position:"absolute", inset:0}}
+            onError={e => { e.target.style.display = "none"; }}
+          />
+        ) : (
+          <svg viewBox="0 0 200 150" style={{width:"100%", height:"100%", position:"absolute"}}>
+            {pattern === 0 && Array.from({length: 8}).map((_, i) => (
+              <circle key={i} cx={20 + (i % 4) * 50} cy={30 + Math.floor(i / 4) * 60}
+                r={10 + (seed + i) % 8} fill="rgba(255,255,255,0.25)"/>
+            ))}
+            {pattern === 1 && Array.from({length: 6}).map((_, i) => (
+              <rect key={i} x={5 + i * 30} y={30 + ((seed + i) % 6) * 10} width={20} height={80}
+                fill="rgba(255,255,255,0.2)"/>
+            ))}
+            {pattern === 2 && (
+              <g fill="rgba(255,255,255,0.22)">
+                <path d="M0 90 Q 50 60 100 90 T 200 90 V 150 H 0 Z"/>
+                <path d="M0 110 Q 60 90 120 110 T 200 110 V 150 H 0 Z" opacity="0.5"/>
+              </g>
+            )}
+            {pattern === 3 && (
+              <g stroke="rgba(255,255,255,0.3)" strokeWidth="1" fill="none">
+                {Array.from({length: 7}).map((_, i) => (
+                  <line key={i} x1="0" y1={i * 22} x2="200" y2={i * 22 - 30}/>
+                ))}
+              </g>
+            )}
+            {pattern === 4 && (
+              <text x="100" y="90" fill="rgba(255,255,255,0.3)" textAnchor="middle"
+                fontSize="64" fontFamily="serif" fontStyle="italic">
+                {c.brand.name.charAt(0)}
+              </text>
+            )}
+          </svg>
+        )}
         <div style={{
           position:"absolute", left: 10, bottom: 10,
           background:"rgba(0,0,0,0.6)", color:"#fff",
