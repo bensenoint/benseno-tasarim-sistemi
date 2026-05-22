@@ -373,10 +373,10 @@
       "priority": "🔴",
       "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
-      "saat": "08:46 TR (0sa 26dk kaldı · workflow · marka VDM Petdent n=0 → kıyas atlandı · silent_log)",
-      "durum": "⏳ Yeni açıldı (Görkem 21May08:47 TR · workflow · Sıralı 1️⃣ Eren · Tip Sosyal Medya Post · Ref www.benseno.com.tr · Not: bayramın ne kadar güzel bir şey olduğunu anlatan bir post)",
+      "saat": "08:46 TR ⚠️ **GEÇMİŞ (3dk geride · v1 yok · 🤖 reaction yok · Eren 5 aktif iş · Sıralı 1️⃣ Eren bloke ediyor · 8. GEÇMİŞ brief)**",
+      "durum": "⏳ KRİTİK GEÇMİŞ (Görkem 21May08:47 TR · workflow · Sıralı 1️⃣ Eren · v1 hâlâ yok · thread'de hareket yok · deadline aşıldı 3dk önce · KAPASİTE: Eren 5 aktif)",
       "rev": "0",
-      "gecmis": "⏳21May08:47 (Görkem GM açtı · workflow · 🔔 otomatik 🟠 [20sa 11dk≤24sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log)",
+      "gecmis": "⏳21May08:47 (Görkem GM açtı · workflow · 🔔 otomatik 🟠 [20sa 11dk≤24sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log) / 📈22May~04:46 öncelik 🟠→🔴 (auto-recalc [4sa≤8sa]) / ⏰GEÇMİŞ22May08:46 (22May08:49 sync'inde 3dk geride · v1 yok · 8. GEÇMİŞ brief 🚨)",
       "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659)"
     },
     {
@@ -590,7 +590,7 @@
       "name": "Tasarım",
       "people": 7,
       "active": 17,
-      "overdue": 6,
+      "overdue": 7,
       "capacity": 42,
       "completed30": 1,
       "avgComplete": 2.7,
@@ -757,9 +757,9 @@
     "normal": 1,
     "low": 2
   },
-  "overdue_count": 7,
-  "last_sync": "2026-05-22T11:19:37+03:00",
-  "sync_ts": 1779427177,
-  "now": 1779427177,
-  "source": "data-agent-run-1779427177"
+  "overdue_count": 8,
+  "last_sync": "2026-05-22T08:49:24+03:00",
+  "sync_ts": 1779428964,
+  "now": 1779428964,
+  "source": "data-agent-run-1779428964"
 }

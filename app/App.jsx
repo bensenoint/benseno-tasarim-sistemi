@@ -124,8 +124,10 @@ function App() {
         if (cancelled) return;
         // EMBEDDED_DATA güncelle (next time data.js bridge yeniden çalışsa diye)
         window.EMBEDDED_DATA = ed;
-        // NOW + lastSync güncelle
+        // NOW + lastSync güncelle (now: ISO string veya unix timestamp her ikisi)
         if (typeof ed.now === "string")        window.BNS_DATA.NOW = Date.parse(ed.now);
+        else if (typeof ed.now === "number")   window.BNS_DATA.NOW = ed.now * (ed.now < 1e12 ? 1000 : 1); // saniye→ms
+        if (typeof ed.sync_ts === "number")    window.BNS_DATA.NOW = ed.sync_ts * (ed.sync_ts < 1e12 ? 1000 : 1);
         if (typeof ed.last_sync === "string")  window.BNS_DATA.lastSync = ed.last_sync;
         // Brand list (Slack channels) — briefs hidrasyonundan ÖNCE override et
         if (Array.isArray(ed.bns_brands) && ed.bns_brands.length > 0) {

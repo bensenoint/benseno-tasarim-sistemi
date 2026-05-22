@@ -81,7 +81,7 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
   return (
     <div className="bn-tab-in">
       <PageHead
-        eyebrow={data.fmtTr ? data.fmtTr(data.NOW) : `18 Mayıs · Cuma · 14:30 ${greetingTimezone()}`}
+        eyebrow={data.fmtTr ? data.fmtTr(Date.now()) : `${greetingTimezone()}`}
         title={`${greeting}, ${firstName}.`}
         subtitle={`bugün ${overdue.length} geciken, ${today.length} bugün teslim. önce bunlar.`}
         actions={<div style={{position:"relative",display:"flex",gap:6}}>
@@ -108,7 +108,11 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
             <div>
               <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Bugün ve yarın</h2>
-              <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{today.length} brief · öncelik sırasına göre</div>
+              <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>
+                {today.length + overdue.length} brief
+                {overdue.length > 0 && <span style={{color:"var(--prio-red)", fontWeight:600, marginLeft:6}}>· {overdue.length} gecikmiş</span>}
+                {" · öncelik sırasına göre"}
+              </div>
             </div>
             <button onClick={() => onSwitchTab("jobs")} style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)", background:"transparent", border:0, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:4}}>
               Tümünü gör <I.ChevronRight size={12}/>
