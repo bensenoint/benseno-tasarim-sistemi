@@ -193,7 +193,9 @@ function cellStyle(mono, align) {
 }
 
 function formatDate(ts) {
+  if (!ts || isNaN(ts)) return "—";
   const d = new Date(ts);
+  if (isNaN(d.getTime())) return "—";
   const months = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
   return `${d.getDate()} ${months[d.getMonth()]} · ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }

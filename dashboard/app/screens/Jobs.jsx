@@ -7,7 +7,7 @@ function JobsScreen({ data, user, viewMode, tableMode, onOpenBrief, onStatusChan
 
   // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
   let rows = data.briefs;
-  if (scope === "overdue") rows = rows.filter(b => b.deltaH <= 0);
+  if (scope === "overdue") rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
   if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor");
   if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");
   if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
@@ -43,7 +43,7 @@ function JobsScreen({ data, user, viewMode, tableMode, onOpenBrief, onStatusChan
             ["all",     `Tümü · ${data.briefs.length}`],
             ["open",    `Açık · ${data.briefs.filter(b => b.durum==="yeni"||b.durum==="calisiliyor").length}`],
             ["review",  `İncelemede · ${data.briefs.filter(b => b.durum==="incelemede").length}`],
-            ["overdue", `Geciken · ${data.briefs.filter(b => b.deltaH<=0).length}`]
+            ["overdue", `Geciken · ${data.briefs.filter(b => b.deltaH<=0 && b.durum!=="tamamlandi").length}`]
           ]}/>
 
         <div style={{display:"inline-flex", gap: 6, alignItems:"center"}}>
@@ -65,7 +65,7 @@ function JobsScreen({ data, user, viewMode, tableMode, onOpenBrief, onStatusChan
        <BriefTable rows={rows} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>}
 
       <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop: 14, font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", flexWrap:"wrap", gap:8}}>
-        <span>{rows.length} satır · son senkron 14:30</span>
+        <span>{rows.length} satır · son senkron {(() => { const d = new Date(data.NOW); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); })()}</span>
         <span>Slack Canvas <span style={{fontFamily:"var(--font-mono)", color:"var(--ink-4)"}}>F0B1B6XUD44</span></span>
       </div>
     </div>
