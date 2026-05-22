@@ -1,8 +1,8 @@
 {
-  "last_run": "2026-05-22T13:15:25+03:00",
-  "last_run_ts": 1779444925,
-  "last_run_completed_at": "2026-05-22T13:20:00+03:00",
-  "run_type": "ara_sync_launchd_1315_delta_refresh_cycle1_after_mandatory",
+  "last_run": "2026-05-22T13:45:46+03:00",
+  "last_run_ts": 1779446746,
+  "last_run_completed_at": "2026-05-22T13:52:00+03:00",
+  "run_type": "ara_sync_launchd_1345_delta_refresh_cycle2_after_mandatory",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
@@ -10,51 +10,41 @@
   "priority_distribution": {"red": 18, "orange": 1, "yellow": 1, "green": 2},
   "overdue_count": 9,
   "priority_upgrades_this_run": 0,
-  "github_pushed_sha": "pending",
   "errors": [],
   "pat_age_days": 4,
   "pat_expires_in_days": 86,
-  "notes": "Day 5 13:15 ara sync (MANUEL TETİK · /run). Cache hit (canvas_cache.md 15dk · <30dk TTL → slack_read_canvas skipped). Brief queue: [] (boş). 0 yeni brief. 0 priority transition (deltalar 30dk düştü · #4 24sa eşiğini aştı). #10 GEÇMİŞ sürüyor 45dk→1sa 15dk (Arda Okitto sonrası 3sa 51dk sessiz · v1 yok · Cansu Direktör 2 manager_summary DM cevapsız). #17 GEÇMİŞ sürüyor 3sa 59dk→4sa 29dk (5sa eşiğine 31dk · 13:46'da Görkem GM eskalasyon DM önerilir). #14/#15 1sa 14dk→44dk kaldı (KRİTİK · Aykut+Arda hareket yok). live-data.json REWRITTEN (22 brief · tüm deltalar 13:15 baseline). canvas_cache.md REWRITTEN. **Canvas SLACK update DEFERRED** (idempotent · 12:45 mandatory'den sonra ilk cycle · 13:45+14:15 cycle'larda yeniden değerlendirilecek). Notification Agent: 0 DM (#10 thread soft ping atlandı · #17 5sa eşiği henüz aşılmadı · Cansu Direktör 3. DM atlanır spam riski). Dashboard Agent: EMBEDDED_DATA inject (canvas_md backtick escape · 22 brief · sync_ts=1779444925) + rsync + GitHub push QUEUED. Paralel Claude session 13:20'de 9fdf099 commit attı (Deadlines sekmesi UI kaldırıldı + live-data.json 60 satır update — aynı 13:15 delta refresh idempotent olarak iki kez yapıldı). Sıradaki scheduled sync: 13:45 launchd window. KRİTİK: #14/15 14:00 deadline 44dk · #17 5sa eşiği 13:46 · Cansu Direktör cevabı bekleniyor.",
+  "notes": "Day 5 13:45 ara sync (MANUEL TETİK · /run · 9fdf099 + paralel session sonrası). Cache hit (canvas_cache.md 24dk · <30dk TTL → slack_read_canvas skipped). Brief queue: [] (boş). 0 yeni brief. 0 priority transition. Threshold transitions: #5 24sa eşiği AŞILDI (23sa 33dk→1g 3dk), #17 5sa eşiği AŞILDI (4sa 29dk→4sa 59dk · 13:46 boundary'sini geçti). #14/#15 KRİTİK pencere (44dk→14dk · Aykut+Arda hareket yok). #10 GEÇMİŞ derinleşti (1sa 15dk→1sa 45dk · Arda Okitto 4sa 21dk sessiz · v1 yok). live-data.json REWRITTEN (22 brief · tüm deltalar 13:45 baseline · top-level sync_ts=1779446746). canvas_cache.md REFRESHED. notification-flags.json REWRITTEN. **Canvas SLACK update DEFERRED yine** (idempotent · cycle 2 after 12:45 mandatory · 14:15 cycle MANDATORY backstop). Notification Agent: 0 DM (#10 thread soft ping atlandı · #17 Cansu 3. DM spam riski · Görkem GM self-aware orchestrator çıktısı görüyor · #14/15 Bauhaus channel 7 paralel brief sessizlik bilinçli karar). Dashboard Agent: EMBEDDED_DATA inject (canvas_md backtick escape · 22 brief · sync_ts=1779446746) + rsync + GitHub push pending. Sıradaki scheduled sync: 14:15 launchd window (14:15 = cycle 3 = MANDATORY canvas full replace backstop · 14:00 deadline geçtiğinde #14/15 GEÇMİŞ olacak → 11 GEÇMİŞ brief).",
   "canvas_update": {
-    "status": "deferred_idempotent",
-    "reason": "12:45 mandatory full replace cycle'ından 30dk sonra ilk delta refresh — sadece deltalar değişti, priority/queue/marka transition yok. Idempotent kurala göre Canvas update atlandı. 13:45 ve 14:15'te yeniden değerlendirilecek (3. cycle mandatory)."
+    "status": "deferred_idempotent_cycle2",
+    "reason": "12:45 mandatory full replace + 13:15 cycle1 deferred + 13:45 cycle2 deferred. State değişiklikleri threshold-deepening (24sa, 5sa eşikleri aşıldı) ama priority/queue transition yok. Idempotent kurala göre yine atlandı. 14:15 cycle3 MANDATORY backstop — özellikle 14:00 deadline geçtikten sonra #14/15 GEÇMİŞ flag eklenecek."
   },
   "thread_10_status_at_run_end": {
     "no": "10",
     "marka": "Bauhaus",
     "status": "9.GEÇMİŞ_sürüyor_derinleşti",
-    "delta_min": -75,
+    "delta_min": -105,
     "v1_status": "yok",
-    "last_thread_activity_min_ago": 231,
+    "last_thread_activity_min_ago": 261,
     "manager_dm_count": 2,
     "manager_dm_last": "1779441734.278459 (12:15)",
-    "next_check": "13:45 sync"
+    "next_check": "14:15 sync"
   },
   "thread_17_status_at_run_end": {
     "no": "17",
     "marka": "VDM Petdent",
-    "delta_h": -4.49,
+    "delta_h": -4.99,
     "escalation_rounds": 3,
     "still_no_response": true,
     "manager_summary_count_today": 2,
-    "4sa_eşik_aşıldı": true,
-    "5sa_eşiğine_dk_kaldı": 31,
-    "5sa_eşiği_zamanı": "2026-05-22T13:46:00+03:00",
-    "next_check": "13:45 sync (eğer hâlâ cevap yoksa Görkem GM ESCALATION_SUMMARY DM önerilir)"
+    "5sa_eşik_aşıldı": true,
+    "next_check": "14:15 sync (eğer hâlâ cevap yoksa Reyhan GMY ESCALATION_SUMMARY DM önerilir — Görkem self-aware ama Reyhan yedek hat)"
   },
   "next_critical_milestones": {
-    "13:46_5sa_eşiği": "#17 VDM bayram",
     "14:00_deadline_briefs": ["#14 Bauhaus Evinize Düzen", "#15 Bauhaus Bahçeniz İçin Her Şey"],
-    "14:00_time_remaining_at_1315": "44dk",
+    "14:00_time_remaining_at_1345": "14dk",
+    "14:15_mandatory_canvas_cycle": "cycle3 backstop · 14:00 deadline geçer · #14/15 GEÇMİŞ olur · 11 GEÇMİŞ brief",
     "17:00_deadline_briefs": ["#11", "#12", "#13", "#16", "#18", "#19", "#22"],
-    "17:00_time_remaining_at_1315": "3sa 44dk"
+    "17:00_time_remaining_at_1345": "3sa 14dk"
   },
-  "parallel_session_note": {
-    "detected": true,
-    "commit_sha": "9fdf099",
-    "commit_time": "2026-05-22T13:20:24+03:00",
-    "ui_changes": ["Deadlines sekmesi kaldırıldı (Gantt+Kanban yeterli)", "Chrome.jsx + App.jsx + bundle.js"],
-    "data_changes": ["live-data.json 13:15 delta refresh (60 satır)"],
-    "note": "Paralel session aynı 13:15 sync delta refresh'i bağımsız yaptı + UI temizliği ekledi. Bu run idempotent — sonuç aynı."
-  }
+  "delta_only_refresh_note": "Cycle 2 after mandatory — local files (live-data.json, canvas_cache.md, notification-flags.json) refresh + GitHub push (dashboard live). Slack canvas SLACK update SKIPPED."
 }
