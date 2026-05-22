@@ -25,6 +25,9 @@ function formatDelta(h) {
 }
 
 function PriorityBadge({ p, deltaH, compact }) {
+  const label = deltaH === null
+    ? (compact ? "zamanında" : `${p.label}`)
+    : (compact ? formatDelta(deltaH) : `${p.label} · ${formatDelta(deltaH)}`);
   return (
     <span className="bn-prio" style={{
       display: "inline-flex", alignItems: "center", gap: 5,
@@ -36,7 +39,7 @@ function PriorityBadge({ p, deltaH, compact }) {
       <span style={{display:"inline-flex", alignItems:"center", color: PRIO_FG[p.code]}}>
         {PRIO_GLYPH[p.code]}
       </span>
-      {compact ? formatDelta(deltaH) : `${p.label} · ${formatDelta(deltaH)}`}
+      {label}
     </span>
   );
 }

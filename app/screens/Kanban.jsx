@@ -13,16 +13,25 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   ];
 
   // for the Tamamlandı column we use completed[]; map to active brief shape (lightly)
-  const completedAsBriefs = data.completed.slice(0, 8).map(c => ({
-    id: c.id, no: c.no, marka: c.marka, brand: c.brand, baslik: c.baslik,
-    lead: c.lead, contributors: [], reviewer: null,
-    durum: "tamamlandi",
-    deadline: c.bitis, acilma: c.basla,
-    deltaH: 0, priority: { code:"grn", label:"DÜŞÜK", color:"var(--prio-green)" }, revision: c.revision
-  }));
+  const allCompleted = data._allCompleted || data.completed || [];
+  const completedAsBriefs = allCompleted.slice(0, 12).map(c => {
+    // Gerçek gecikmeyi veya "zamanında" badge'ini göster
+    const gh = c.gecikmeH || 0;
+    return {
+      id: c.id, no: c.no, marka: c.marka, brand: c.brand, baslik: c.baslik,
+      lead: c.lead, contributors: c.contributors || [], reviewer: null,
+      durum: "tamamlandi",
+      deadline: c.bitis, acilma: c.baslangic,
+      deltaH: gh > 0 ? -gh : null,   // null → "zamanında" badge
+      priority: gh > 0
+        ? { code:"red", label:"GEÇ", color:"var(--prio-red)" }
+        : { code:"grn", label:"ZAMANINDA", color:"var(--prio-green)" },
+      revision: c.revision
+    };
+  });
 
-  // Filtrele
-  let allBriefs = data.briefs;
+  // Filtrele — viewMode'dan bağımsız tüm brief'ler
+  let allBriefs = data._allBriefs || data.briefs;
   if (prioFilter !== "all") allBriefs = allBriefs.filter(b => b.priority.code === prioFilter);
   if (search.trim()) {
     const q = search.toLowerCase().trim();
