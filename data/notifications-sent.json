@@ -216,5 +216,13 @@
     "user_id": "U09BFPBKQG7",
     "message_ts": "1779456514.320639",
     "reason": "#24 Bauhaus Bayrama Özel Dev Kampanya · YENİ brief Şablon 1 DM Arda'ya gönderildi + KAPASİTE UYARISI eklendi (6/6 · 100% · 3 brief 30dk-1sa35dk pencerede)"
+  },
+  {
+    "brief_ts": "1779342432.583659",
+    "template": "4_threshold_8h_escalation",
+    "sent_at": "2026-05-22T16:47:00+03:00",
+    "user_id": "U030C48PL23",
+    "message_ts": "1779458052.803289",
+    "reason": "#17 VDM bayram postu · 8sa eşiği AŞILDI (8sa 0dk GEÇMİŞ at 16:46 sync) · predicted 16:45 trigger · Şablon 4 DM Görkem'e gönderildi · karar gerekli (Eren hızlı v1 / Görkem devral / ertele-iptal)"
   }
 ]

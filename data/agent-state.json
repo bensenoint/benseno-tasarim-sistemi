@@ -1,59 +1,67 @@
 {
-  "last_run": "2026-05-22T15:45:44+03:00",
-  "last_run_ts": 1779453944,
-  "last_run_completed_at": "2026-05-22T15:46:00+03:00",
-  "run_type": "ara_sync_launchd_1545_idempotent_no_state_change",
+  "last_run": "2026-05-22T16:45:00+03:00",
+  "last_run_ts": 1779457571,
+  "last_run_completed_at": "2026-05-22T16:50:00+03:00",
+  "run_type": "launchd_1645_ara_sync_8sa_esigi_asildi_17_imminent_window_16_23",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
-  "active_briefs": 16,
+  "active_briefs": 17,
   "completed_this_run": 0,
   "cancelled_this_run": 0,
   "postponed_this_run": 0,
   "new_briefs_this_run": 0,
-  "priority_distribution": {"red": 11, "orange": 2, "yellow": 0, "green": 3},
+  "priority_distribution": {"red": 13, "orange": 1, "yellow": 0, "green": 3},
   "overdue_count": 9,
-  "priority_upgrades_this_run": 0,
+  "priority_upgrades_this_run": 1,
   "priority_demotes_this_run": 0,
-  "github_pushed_sha": "80d388c",
+  "threshold_transitions_this_run": 1,
+  "github_pushed_sha": null,
   "errors": [],
   "pat_age_days": 4,
   "pat_expires_in_days": 86,
-  "notes": "Day 5 15:45 ara sync · launchd /run · cache HIT (canvas_cache.md 18dk yaşında · TTL içinde · slack_read_canvas skip). 0 YENİ BRIEF (Workflow bot tetiklenmemiş 15:15'ten beri). brief-queue.json boş. Canvas SLACK update SKIP (idempotent · sadece zaman geçti · durum/öncelik/yeni brief yok). live-data.json sync_ts refresh + 6 kritik brief saat field güncelleme (#15 1sa45dk · #16 1sa14dk · #17 6sa59dk · #23 1sa14dk · #9 8sa13dk · #21 22sa57dk). notification-flags.json delta refresh. 0 DM önerildi (+2 skip log: #23 Arda 57dk pasif ama Eda T thread ping aktif · #17 Görkem self-aware). Dashboard GitHub push: 80d388c. Threshold transitions: #17 6sa→7sa eşiğine 1dk · #15+#16+#23 deadline yaklaşıyor (1sa14dk-1sa45dk window). Sonraki sync: hafta sonu launchd OFF · Pazartesi 25May 08:15 ilk sync (07:50 sabah raporu önce).",
+  "notes": "16:45 launchd ara sync. **PREDICTED 8sa eşiği AŞILDI #17** (16:25 sync'inde 8sa eşiğine 20dk vardı; 16:46'da tam 8sa 0dk GEÇMİŞ). Şablon 4 DM Görkem'e gönderildi (msg_ts 1779458052.803289). #9 priority transition 🟠→🔴 (8sa eşiği aşıldı 7sa 13dk). #16+#23 14dk kala 17:00 deadline KRİTİK pencere — #16 v1 verildi 1sa 56dk onay pasif · #23 v1 YOK Arda 1sa 58dk pasif. #24 1sa 14dk · Arda 6/6 cap 100% sürüyor. Canvas SLACK update YAPILDI. canvas_cache.md REFRESHED. live-data.json REWRITTEN. EMBEDDED_DATA inject + GitHub push pending. Sonraki sync 17:15 launchd — bu pencerede #16/#23 deadline geçer · #16 onay gelir mi · #23 v1 var mı kritik karar noktası.",
   "canvas_update": {
-    "status": "SKIPPED_idempotent",
-    "reason": "No state change · only delta refresh · last canvas update was 15:15 (NEW BRIEF #23) · 30dk geçti sadece"
+    "status": "DONE_8sa_esigi_asildi_17_imminent_window_16_23",
+    "reason": "Major: #17 8sa eşiği AŞILDI threshold transition + #16/#23 14dk kala 17:00 deadline imminent + time deltas refresh"
   },
-  "priority_transitions": [],
-  "threshold_warnings": [
-    {"no":"17","threshold":"6sa GEÇMİŞ aşılı kaldı","ETA":"6sa 59dk geride","note":"7sa eşiğine 1dk kaldı · DM skip Görkem self-aware sürüyor"}
-  ],
-  "v1_status_updates": [
-    {"no":"15","note":"v1 verildi 13:28 · Eda T 'ellerine sağlık canoo' 14:04 · resmi onay bekleniyor 1sa 41dk pasif"},
-    {"no":"16","note":"v1 verildi 14:40 🌸 · Eda T 'ellerine sağlıkk' 14:50 · resmi onay bekleniyor 55dk pasif"}
-  ],
   "new_briefs_processed": [],
   "still_open_critical": [
-    {"no":"17","marka":"VDM Petdent","delta_h":-6.98,"note":"6sa 59dk GEÇMİŞ · v1 yok · Görkem self-aware · son thread aktivite 09:04 TR"},
-    {"no":"15","marka":"Bauhaus","delta_h":-1.75,"note":"v1 13:28 · Eda T 14:04 ack · resmi onay 1sa 41dk pasif"},
-    {"no":"16","marka":"Bauhaus","delta_h":1.23,"note":"v1 14:40 · Eda T 14:50 ack · resmi onay 55dk pasif · deadline 1sa 14dk"},
-    {"no":"23","marka":"Bauhaus","delta_h":1.24,"note":"Arda 57dk pasif (önceden 27dk) · Eda T thread ping aktif · deadline 1sa 14dk"}
+    {"no":"17","marka":"VDM Petdent","delta_h":-8.0,"note":"8sa 0dk GEÇMİŞ · 8sa eşiği AŞILDI · Görkem DM tetiklendi"},
+    {"no":"16","marka":"Bauhaus","delta_h":0.23,"note":"14dk kaldı · v1 verildi · 1sa 56dk pasif onay · KRİTİK pencere"},
+    {"no":"23","marka":"Bauhaus","delta_h":0.23,"note":"14dk kaldı · Arda 1sa 58dk pasif · v1 YOK · KRİTİK"},
+    {"no":"24","marka":"Bauhaus","delta_h":1.23,"note":"1sa 14dk · Aykut+Arda · Arda 6/6 cap"},
+    {"no":"9","marka":"VDM Petdent","delta_h":7.22,"note":"🟠→🔴 transition · 8sa eşiği aşıldı"}
   ],
-  "notification_dms_sent": [],
+  "notification_dms_sent": [
+    {"brief":"17","template":"4_threshold_8h_escalation","target":"U030C48PL23","msg_ts":"1779458052.803289","reason":"predicted 16:45 8sa eşiği trigger fired"}
+  ],
   "notification_skips_logged": [
-    {"brief":"23","reason":"Arda 57dk pasif ama Eda T 14:49 thread ping hâlâ etkin · bot DM spam riski sürüyor"},
-    {"brief":"17","reason":"Görkem self-aware + Cansu 12:15+14:15 2 DM cevapsız · 7sa eşiğine 1dk kala bile spam sınırı"}
+    {"brief":"23","reason":"Eda T 14:49 thread ping aktif · Arda 1sa 58dk pasif · ek DM spam riski · 17:15 sync sonrası eskalasyon kararı"},
+    {"brief":"16","reason":"v1 verildi · Eda T 'ellerine sağlıkk' kabul · onay sadece zaman · DM gerekmez"},
+    {"brief":"24","reason":"16:25 sync'inde Şablon 1 DM Aykut+Arda gönderildi 20dk önce · tekrar spam"}
+  ],
+  "priority_transitions_this_run": [
+    {"no":"9","from":"🟠","to":"🔴","reason":"8sa eşiği aşıldı (7sa 13dk)"}
+  ],
+  "threshold_transitions_log": [
+    {"no":"17","from":"6sa GEÇMİŞ","to":"8sa GEÇMİŞ","at":"16:46 TR","triggered":"Şablon 4 DM Görkem"}
   ],
   "capacity_state": {
-    "arda_active": 5,
+    "arda_active": 6,
     "arda_cap": 6,
-    "arda_pct": 83,
-    "aykut_active": 4,
+    "arda_pct": 100,
+    "aykut_active": 5,
     "aykut_cap": 6,
-    "aykut_pct": 67,
+    "aykut_pct": 83,
     "eren_active": 5,
     "eren_cap": 4,
     "eren_pct": 125,
-    "note": "Değişmedi · Arda 5/6 (83%) · Aykut 4/6 (67%) · Eren 5/4 (+25% aşım)"
-  }
+    "note": "🚨 Arda 6/6 sabit (100% cap aşıldı) · #6+#8+#15+#16+#23+#24 · 14dk içinde #16+#23 deadline (17:00) · 1sa 14dk içinde #24 deadline (18:00) · Aykut 5/6 (83%) · Eren 5/4 (+25%)"
+  },
+  "next_sync_decision_points": [
+    "17:15: #16/#23 deadline 17:00 geçti — completed mi yoksa yeni GEÇMİŞ mi?",
+    "17:15: #24 son 45dk pencere · v1 var mı?",
+    "17:15: #17 9sa eşiği aşılır — bayram öncesi son sync için ertele/iptal kararı"
+  ]
 }
