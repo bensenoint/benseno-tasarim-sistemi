@@ -7,19 +7,6 @@ function GalleryScreen({ data }) {
       <PageHead
         title="Galeri"
         subtitle="tamamlanmış brief'lerin görsel çıktıları · Slack thread'lerinden"
-        actions={
-          <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8}}>
-            {["Tümü","Tasarım","Editör","Bu ay"].map((v, i) => (
-              <button key={v} style={{
-                font:"500 12px/1 var(--font-sans)", padding:"6px 10px",
-                border:0, background: i === 0 ? "var(--surface)" : "transparent",
-                color: i === 0 ? "var(--ink)" : "var(--ink-3)",
-                borderRadius:6, cursor:"pointer",
-                boxShadow: i === 0 ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
-              }}>{v}</button>
-            ))}
-          </div>
-        }
       />
       <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(220px, 1fr))", gap: 12}}>
         {items.map((c, i) => <GalleryTile key={c.id} c={c} idx={i}/>)}
