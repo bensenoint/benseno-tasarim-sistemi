@@ -8,7 +8,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "kpiVariant": "trendchart",
   "tabStyle": "underline",
   "ember": "#C24A2C",
-  "noise": false,
+  "noise": true,
   "overviewLayout": "editorial"
 }/*EDITMODE-END*/;
 
@@ -286,7 +286,7 @@ function App() {
   else Screen = <div>Not found</div>;
 
   return (
-    <div data-screen-label={tab} style={{display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden"}}>
+    <div data-screen-label={tab} style={{display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden", position:"relative"}}>
       <Header
         user={user}
         viewMode={viewMode} setViewMode={setViewMode}
@@ -306,7 +306,7 @@ function App() {
           flex: 1, overflowY: "auto", overflowX: "hidden",
           background: "var(--paper)",
         }}>
-          <div style={{maxWidth: 1400, margin: "0 auto", padding: "16px 28px 72px"}}>
+          <div style={{maxWidth: 1400, margin: "0 auto", padding: "8px 32px 72px"}}>
             {Screen}
           </div>
           <footer style={{

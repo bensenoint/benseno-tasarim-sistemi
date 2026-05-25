@@ -5,8 +5,10 @@ function Card({ children, style, padding, accent }) {
     <section style={{
       background: "var(--surface)",
       border: "1px solid var(--line)",
-      borderRadius: 10,
+      borderRadius: 12,
       padding: padding === 0 ? 0 : (padding || "var(--card-pad)"),
+      boxShadow: "var(--shadow-card)",
+      transition: "box-shadow 200ms",
       ...(accent ? { borderTop: `2px solid ${accent}` } : {}),
       ...style
     }}>
@@ -39,13 +41,18 @@ function Kpi({ label, value, color, trend, sub, variant = "plain", spark, accent
     <div style={{
       background: "var(--surface)",
       border: "1px solid var(--line)",
-      borderRadius: 10,
+      borderRadius: 12,
       padding: "14px 16px",
       display: "flex", flexDirection: "column", gap: 8, minWidth: 0,
       position: "relative", overflow: "hidden",
+      boxShadow: "var(--shadow-card)",
       ...(accent ? { borderTop: `2px solid ${accent}` } : {})
     }}>
-      <Eyebrow style={{color: "var(--ink-3)"}}>{label}</Eyebrow>
+      <div style={{
+        font: "600 10px/1 var(--font-sans)", color: "var(--ink-3)",
+        letterSpacing: "0.07em", textTransform: "uppercase",
+        whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
+      }}>{label}</div>
       <div style={{
         font: `600 ${variant === "hero" ? 56 : "var(--kpi-fs)"} /1 var(--font-sans)`,
         color: color || "var(--ink)",
@@ -109,13 +116,15 @@ function PageHead({ title, subtitle, actions, eyebrow }) {
           letterSpacing:"0.08em", textTransform:"uppercase", marginBottom: 6
         }}>{eyebrow}</div>}
         <h1 style={{
-          font: "600 22px/1.15 var(--font-sans)", color: "var(--ink)",
+          fontFamily: "var(--font-display)", fontStyle: "italic",
+          fontWeight: 400, fontSize: 28, lineHeight: 1.15, color: "var(--ink)",
           margin: 0, letterSpacing: "-0.01em"
         }}>{title}</h1>
         {subtitle && (
           <div style={{
-            fontFamily: "var(--font-display)", fontStyle: "italic",
-            fontSize: 18, lineHeight: 1.3, color: "var(--ink-2)", marginTop: 4
+            fontFamily: "var(--font-sans)",
+            fontSize: 13, lineHeight: 1.45, color: "var(--ink-3)", marginTop: 5,
+            fontStyle: "normal", fontWeight: 400,
           }}>{subtitle}</div>
         )}
       </div>

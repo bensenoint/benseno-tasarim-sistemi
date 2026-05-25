@@ -20,6 +20,9 @@
   --paper-2:      #F4F2EC;   /* secondary surface (toolbar fills) */
   --surface:      #FFFFFF;   /* card / panel */
   --surface-sub:  #FAF9F6;   /* inset / table-stripe */
+  --surface-raised: #FFFFFF; /* elevated card (hover state) */
+  --sidebar-bg:   #F7F5F0;   /* sidebar — slightly warmer than paper */
+  --header-blur:  rgba(251, 250, 247, 0.88); /* header backdrop */
   --overlay:      rgba(22, 22, 26, 0.40); /* modal backdrop */
 
   /* ---- Ink (text) ------------------------------------------ */
@@ -124,11 +127,14 @@
   /* ---- Shadows --------------------------------------------- */
   --shadow-0: none;
   --shadow-1:
-    0 1px 2px rgba(22, 22, 26, 0.04),
-    0 4px 12px rgba(22, 22, 26, 0.04);
+    0 1px 2px rgba(22, 22, 26, 0.05),
+    0 4px 16px rgba(22, 22, 26, 0.06);
   --shadow-2:
-    0 2px 6px rgba(22, 22, 26, 0.04),
-    0 12px 32px rgba(22, 22, 26, 0.08);
+    0 2px 8px rgba(22, 22, 26, 0.06),
+    0 16px 40px rgba(22, 22, 26, 0.10);
+  --shadow-card:
+    0 1px 3px rgba(22, 22, 26, 0.04),
+    0 6px 20px rgba(22, 22, 26, 0.06);
   --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
 
   /* ---- Motion ---------------------------------------------- */
@@ -153,6 +159,9 @@
   --paper-2:      #15151A;
   --surface:      #18181D;
   --surface-sub:  #1C1C22;
+  --surface-raised: #1E1E24;
+  --sidebar-bg:   #111116;
+  --header-blur:  rgba(15, 15, 18, 0.90);
   --overlay:      rgba(0, 0, 0, 0.55);
 
   --ink:          #F1EFE9;
@@ -177,6 +186,9 @@
   --shadow-2:
     0 2px 6px rgba(0, 0, 0, 0.40),
     0 16px 40px rgba(0, 0, 0, 0.48);
+  --shadow-card:
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    0 6px 20px rgba(0, 0, 0, 0.36);
   --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
 }
 

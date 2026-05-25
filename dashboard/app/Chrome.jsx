@@ -85,9 +85,12 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       height: 52,
       display: "flex", alignItems: "center", gap: 12,
       padding: "0 20px 0 16px",
-      background: "var(--surface)",
+      background: "var(--header-blur)",
+      backdropFilter: "blur(14px) saturate(160%)",
+      WebkitBackdropFilter: "blur(14px) saturate(160%)",
       borderBottom: "1px solid var(--line)",
       flexShrink: 0,
+      position: "sticky", top: 0, zIndex: 30,
     }}>
       {/* Search */}
       <button onClick={onOpenPalette} style={{
@@ -156,7 +159,8 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
         </button>
 
         {/* New brief */}
-        <Button kind="primary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}>Yeni brief</Button>
+        <Button kind="secondary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}
+          style={{borderColor:"var(--ember)", color:"var(--ember)", fontWeight:600}}>Yeni brief</Button>
 
         {/* User avatar + menu */}
         <div style={{position: "relative"}}>
@@ -240,10 +244,10 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
 
   return (
     <aside style={{
-      width: collapsed ? 52 : 200,
+      width: collapsed ? 52 : 212,
       flexShrink: 0,
       display: "flex", flexDirection: "column",
-      background: "var(--surface)",
+      background: "var(--sidebar-bg)",
       borderRight: "1px solid var(--line)",
       transition: "width 200ms var(--ease-out-quart)",
       overflow: "hidden",
@@ -253,33 +257,35 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
       <div style={{
         height: 52, flexShrink: 0,
         display: "flex", alignItems: "center",
-        padding: collapsed ? "0 14px" : "0 16px",
+        padding: collapsed ? "0 14px" : "0 14px",
         borderBottom: "1px solid var(--line)",
-        gap: 10,
+        gap: 8,
         overflow: "hidden",
       }}>
         <img src="app/logo.png" alt="Benseno" style={{
-          height: 30, width: "auto", objectFit: "contain",
+          height: 28, width: "auto", objectFit: "contain",
           flexShrink: 0, mixBlendMode: "multiply",
         }}/>
         {!collapsed && (
           <span style={{
-            font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)",
-            padding: "2px 5px", borderRadius: 3, background: "var(--paper-2)",
+            font: "500 9px/1 var(--font-mono)", color: "var(--ink-5)",
+            padding: "2px 4px", borderRadius: 3,
+            background: "var(--line)",
+            letterSpacing: "0.04em",
             flexShrink: 0,
           }}>v7.13</span>
         )}
       </div>
 
       {/* Nav sections */}
-      <nav style={{flex: 1, overflowY: "auto", overflowX: "hidden", padding: "8px 0"}}>
+      <nav style={{flex: 1, overflowY: "auto", overflowX: "hidden", padding: "6px 0 8px"}}>
         {NAV_SECTIONS.map((section, si) => (
-          <div key={section.id} style={{marginBottom: si < NAV_SECTIONS.length - 1 ? 4 : 0}}>
+          <div key={section.id} style={{marginBottom: si < NAV_SECTIONS.length - 1 ? 2 : 0}}>
             {!collapsed && (
               <div style={{
-                padding: "8px 14px 3px",
-                font: "600 10px/1 var(--font-sans)",
-                letterSpacing: "0.07em", textTransform: "uppercase",
+                padding: si === 0 ? "6px 16px 2px" : "10px 16px 2px",
+                font: "600 9.5px/1 var(--font-sans)",
+                letterSpacing: "0.08em", textTransform: "uppercase",
                 color: "var(--ink-5)",
               }}>{section.label}</div>
             )}
@@ -294,18 +300,18 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
                   title={collapsed ? item.label : undefined}
                   style={{
                     display: "flex", alignItems: "center",
-                    gap: collapsed ? 0 : 9,
+                    gap: collapsed ? 0 : 8,
                     border: 0, cursor: "pointer",
-                    padding: collapsed ? "8px 0" : "7px 12px",
+                    padding: collapsed ? "8px 0" : "6px 10px",
                     justifyContent: collapsed ? "center" : "flex-start",
-                    borderRadius: 7,
-                    margin: "0 6px", width: "calc(100% - 12px)",
+                    borderRadius: 8,
+                    margin: "1px 8px", width: "calc(100% - 16px)",
                     background: isActive ? "var(--ember-tint)" : "transparent",
                     color: isActive ? "var(--ember)" : "var(--ink-3)",
-                    transition: "background 120ms, color 120ms",
+                    transition: "background 150ms, color 150ms",
                     position: "relative",
                   }}
-                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink-2)"; }}}
+                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink)"; }}}
                   onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ink-3)"; }}}
                 >
                   {/* Active indicator */}
