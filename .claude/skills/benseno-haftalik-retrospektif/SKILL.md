@@ -42,6 +42,38 @@ Mesaj footer'a ekle:
 📊 Detaylı analiz: https://bensenoint.github.io/dashboard/ (Raporlama sekmesi)
 ```
 
+### 2b. Haftanın Yıldızları mesajı — #benseno-grafik (YENİ v7.14)
+
+Canvas'taki tamamlanan brief'leri analiz ederek bu haftanın öne çıkan kişilerini belirle ve **ayrı bir Slack mesajı** olarak #benseno-grafik'e gönder.
+
+**Hesaplamalar:**
+- **En çok tamamlayan:** Lead olarak en fazla brief bitiren kişi (bu hafta)
+- **En hızlı teslim:** Ortalama sureH en düşük olan kişi (en az 2 brief tamamlamış olmalı)
+- **0 gecikme:** Bu hafta tamamladığı tüm brief'lerde gecikme olmayan kişi(ler)
+- **Streak:** Geçen haftaya göre tamamlama sayısını artıran kişi
+
+**Eşitlik durumu:** Aynı brief sayısında en hızlı ortalama kazanır.
+
+**Slack mesaj formatı:**
+```
+🌟 *Haftanın Yıldızları — {tarih aralığı}*
+
+🏆 *En çok tamamlayan:* {isim} · {N} brief
+⚡ *En hızlı teslim:* {isim} · {ort_sure} sa ortalama
+✅ *0 gecikme:* {isim(ler)} · hepsi zamanında teslim
+
+{Eğer streak varsa:}
+📈 *Hız kazandı:* {isim} (geçen hafta {N-1} → bu hafta {N} brief)
+
+_{toplam_kişi} kişi bu hafta {toplam_brief} brief tamamladı. Harika iş! 🎉_
+```
+
+**Koşullar:**
+- Bu hafta hiç tamamlanan brief yoksa mesaj gönderme
+- Tüm kategorilerde aynı kişi varsa tek satırda listele (tekrar etme)
+- Kişi adı Slack User ID'den çözümle (`slack_read_user_profile`)
+- Mesaj ayrı bir `slack_send_message` çağrısı — retro mesajından sonra gönder
+
 ### 3. marka_stats.json refresh (v7.6 — E3)
 
 **Amaç:** Brief Sync v7.13 E3 sisteminin her hafta güncel istatistiklerle çalışması.

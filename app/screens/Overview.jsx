@@ -139,6 +139,10 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
             <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
             <ProblemBrands data={data}/>
           </Card>
+          <Card>
+            <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
+            <StarOfTheWeek data={data}/>
+          </Card>
         </div>
       </div>
     </div>
@@ -422,6 +426,88 @@ function BrandRow({ name, note, color, v, last }) {
   );
 }
 
+// ─── StarOfTheWeek — son 7 günde en çok iş tamamlayan ───────────────────────
+function StarOfTheWeek({ data }) {
+  const nowTs = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
+  const cutoff = nowTs - 7 * 24 * 3600 * 1000;
+  const allCompleted = data._allCompleted || data.completed || [];
+  const thisWeek = allCompleted.filter(c => (c.bitis || 0) >= cutoff);
+
+  if (thisWeek.length === 0) {
+    return <div style={{padding:"12px 4px", font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>Bu hafta henüz tamamlanan brief yok.</div>;
+  }
+
+  // Kişi başına istatistik hesapla
+  const byUser = {};
+  thisWeek.forEach(c => {
+    const u = c.lead;
+    if (!u || !u.id) return;
+    if (!byUser[u.id]) byUser[u.id] = { user: u, count: 0, totalSure: 0, sureCount: 0, minSure: Infinity };
+    const s = byUser[u.id];
+    s.count++;
+    if (c.sureH > 0) { s.totalSure += c.sureH; s.sureCount++; s.minSure = Math.min(s.minSure, c.sureH); }
+  });
+
+  // En çok iş tamamlayan — eşit puanda en hızlı ortalama kazanır
+  const ranked = Object.values(byUser).sort((a, b) =>
+    b.count !== a.count ? b.count - a.count :
+    (a.totalSure / (a.sureCount || 1)) - (b.totalSure / (b.sureCount || 1))
+  );
+
+  // 0 gecikme olan kişi
+  const zeroLate = Object.values(byUser).filter(s => {
+    return thisWeek.filter(c => c.lead?.id === s.user.id && (c.gecikmeH || 0) > 0).length === 0;
+  }).map(s => s.user);
+
+  // En hızlı teslim
+  const fastest = Object.values(byUser).filter(s => s.sureCount > 0)
+    .sort((a, b) => (a.totalSure / a.sureCount) - (b.totalSure / b.sureCount))[0];
+
+  const stars = [
+    ranked[0] && {
+      emoji: "🏆",
+      label: "En çok tamamlayan",
+      user: ranked[0].user,
+      detail: `${ranked[0].count} brief`
+    },
+    fastest && ranked[0]?.user.id !== fastest.user.id && {
+      emoji: "⚡",
+      label: "En hızlı teslim",
+      user: fastest.user,
+      detail: (fastest.totalSure / fastest.sureCount).toFixed(1).replace(".", ",") + " sa ort."
+    },
+    zeroLate.length > 0 && zeroLate[0].id !== ranked[0]?.user.id && {
+      emoji: "✅",
+      label: "0 gecikme",
+      user: zeroLate[0],
+      detail: "hepsi zamanında"
+    }
+  ].filter(Boolean).slice(0, 3);
+
+  if (stars.length === 0) return (
+    <div style={{padding:"12px 4px", font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>Yeterli veri yok.</div>
+  );
+
+  return (
+    <>
+      {stars.map((s, i) => (
+        <div key={i} style={{
+          display:"flex", alignItems:"center", gap: 10,
+          padding:"10px 0", borderBottom: i < stars.length - 1 ? "1px solid var(--line)" : 0
+        }}>
+          <span style={{fontSize: 16, flexShrink: 0}}>{s.emoji}</span>
+          <Avatar user={s.user} size={26}/>
+          <div style={{flex: 1, minWidth: 0}}>
+            <div style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{s.user.name}</div>
+            <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop: 3}}>{s.label}</div>
+          </div>
+          <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--success)", whiteSpace:"nowrap"}}>{s.detail}</span>
+        </div>
+      ))}
+    </>
+  );
+}
+
 function ApprovalRow({ brief, onClick, last }) {
   return (
     <button onClick={onClick} style={{
@@ -473,3 +559,4 @@ window.OverviewScreen = OverviewScreen;
 window.DeptRow_OV = DeptRow;
 window.ApprovalRow = ApprovalRow;
 window.WeekStat = WeekStat;
+window.StarOfTheWeek = StarOfTheWeek;
