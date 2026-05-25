@@ -38,7 +38,7 @@ function DeptCompareScreen({ data }) {
     const avgRev  = revs.length ? parseFloat((revs.reduce((a,v)=>a+v,0)/revs.length).toFixed(2)) : 0;
     computed[role] = {
       active:      rows.length,
-      overdue:     rows.filter(b => b.deltaH <= 0).length,
+      overdue:     rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length,
       completed30: done30.length,
       avgComplete: avgH,
       revRate:     avgRev,

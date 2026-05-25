@@ -17,7 +17,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
     (b.dept === role) ||
     (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.rol || c.dept) === role))
   );
-  const overdueCount = rows.filter(b => b.deltaH <= 0).length;
+  const overdueCount = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length;
   // Kapasite: rows.length / (people × 6 slot) — deptStats.active yerine gerçek satır sayısı
   const capPct = r.stats && r.stats.capacity ? Math.min(100, Math.round((rows.length / r.stats.capacity) * 100)) : _capPctFromStats;
   const reviewCount = rows.filter(b => b.durum === "incelemede").length;
@@ -26,7 +26,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
   // Load per person
   const loadByPerson = people.map(p => {
     const my = allBriefs.filter(b => (b.lead && b.lead.id === p.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id)));
-    const myOverdue = my.filter(b => b.deltaH <= 0).length;
+    const myOverdue = my.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length;
     return {
       user: p,
       active: my.length,

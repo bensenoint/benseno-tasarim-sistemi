@@ -29,16 +29,16 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
   const avgRevPct = revArr.length ? Math.round(revArr.reduce((s,v)=>s+v,0)/revArr.length * 10) : 0;
   const staleCount = briefs.filter(b => b.stale).length;
 
-  // Eşik kuralları — live hesapla
+  // Kapasite: live dept stats'tan tasarım departmanı (en kritik)
+  const ds = data.deptStats || {};
+  const tasarimCap = ds.tasarim ? (ds.tasarim.capacity_pct != null ? ds.tasarim.capacity_pct : bnsCapPct(ds.tasarim)) : null;
+
+  // Eşik kuralları — live hesapla (tasarimCap'tan sonra)
   const H = 3600 * 1000;
   const capHits   = (tasarimCap != null && tasarimCap > 85) ? 1 : 0; // Kapasite > %85
   const overdueHits = overdue.length > 5 ? 1 : 0;                    // Geciken > 5
   const staleHits   = briefs.filter(b => b.stale || ((nowTs - (b.acilma||0)) > 3 * 24 * H && b.durum === "yeni")).length;
   const revHits     = avgRevPct > 30 ? 1 : 0;
-
-  // Kapasite: live dept stats'tan tasarım departmanı (en kritik)
-  const ds = data.deptStats || {};
-  const tasarimCap = ds.tasarim ? (ds.tasarim.capacity_pct != null ? ds.tasarim.capacity_pct : bnsCapPct(ds.tasarim)) : null;
   const capLabel = tasarimCap != null ? `Tasarım kapasitesi %${tasarimCap}` : "Tasarım kapasitesi";
   const capMetric = tasarimCap != null ? `%${tasarimCap}` : "—";
   const capTone = tasarimCap != null && tasarimCap > 85 ? "warn" : "info";

@@ -42,7 +42,7 @@ function MultiScreen({ data, onOpenBrief }) {
   const users = data.USERS || [];
 
   // Multi-atanmış: 2+ atanan VEYA reviewer olan briefler
-  const allMulti = data.briefs.filter(b =>
+  const allMulti = ( data._allBriefs || data.briefs ).filter(b =>
     (b.contributors && b.contributors.length > 0) || b.reviewer
   );
 
@@ -60,7 +60,7 @@ function MultiScreen({ data, onOpenBrief }) {
 
       {/* KPI */}
       <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
-        <Kpi label="Toplam multi" value={allMulti.length} sub={`${data.briefs.length} aktif brief`}/>
+        <Kpi label="Toplam multi" value={allMulti.length} sub={`${( data._allBriefs || data.briefs ).length} aktif brief`}/>
         <Kpi label="Paralel" value={paralel.length} sub="aynı anda birden fazla kişi"/>
         <Kpi label="Sıralı" value={sirali.length} sub="biri bitince diğeri başlar"/>
       </div>

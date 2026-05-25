@@ -15,7 +15,7 @@ function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwit
     return true;
   });
 
-  const overdue = filtered.filter(b => b.deltaH <= 0);
+  const overdue = filtered.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
   const today = filtered.filter(b => b.deltaH > 0 && b.deltaH <= 24);
   const week = filtered.filter(b => b.deltaH > 0 && b.deltaH <= 168);
   const stale = filtered.filter(b => b.stale);
@@ -148,6 +148,19 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
 // ─── DENSE ──────────────────────────────────────────────────────────────────
 function DenseLayout({ data, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const avgCapPct = calcAvgCapPct(data);
+  // Bu hafta özet — canlı veriden
+  const nowTs2 = data.NOW || Date.now();
+  const allComp2 = data._allCompleted || data.completed || [];
+  const wk2 = allComp2.filter(c => (c.bitis||0) >= nowTs2 - 7*24*3600*1000);
+  const wkCount2 = wk2.length;
+  const prevWk2 = allComp2.filter(c => { const t=c.bitis||0; return t>=nowTs2-14*24*3600*1000 && t<nowTs2-7*24*3600*1000; });
+  const wkDelta2 = wkCount2 - prevWk2.length;
+  const sArr2 = wk2.filter(c=>c.sureH>0).map(c=>c.sureH);
+  const avgS2 = sArr2.length ? sArr2.reduce((a,v)=>a+v,0)/sArr2.length : 0;
+  const prevSArr2 = prevWk2.filter(c=>c.sureH>0).map(c=>c.sureH);
+  const prevS2 = prevSArr2.length ? prevSArr2.reduce((a,v)=>a+v,0)/prevSArr2.length : 0;
+  const sDelta2 = avgS2 - prevS2;
+  const revPct2 = wk2.length ? Math.round(wk2.reduce((a,c)=>a+(c.revision||0),0)/wk2.length*10) : 0;
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -195,10 +208,12 @@ function DenseLayout({ data, active, overdue, today, week, stale, review, blocke
           </Card>
           <Card>
             <CardHead title="Bu hafta · özet"/>
-            <WeekStat label="Tamamlanan" value="42" trend={{dir:"up", value:"+8"}}/>
-            <WeekStat label="Ort. tamamlama" value="28,4 sa" trend={{dir:"down", value:"-1,9 sa"}} good/>
-            <WeekStat label="Revize oranı" value="%19" trend={{dir:"flat", value:"="}}/>
-            <WeekStat label="Hareketsiz" value={stale.length} trend={{dir:"up", value:"+2"}} bad last/>
+            <WeekStat label="Tamamlanan" value={String(wkCount2)}
+              trend={{dir:wkDelta2>0?"up":wkDelta2<0?"down":"flat", value:(wkDelta2>0?"+":"")+wkDelta2}}/>
+            <WeekStat label="Ort. tamamlama" value={avgS2>0?avgS2.toFixed(1).replace(".",",")+' sa':"—"}
+              trend={{dir:sDelta2<0?"down":sDelta2>0?"up":"flat", value:(sDelta2>0?"+":"")+sDelta2.toFixed(1).replace(".",",")+' sa'}} good/>
+            <WeekStat label="Revize oranı" value={revPct2>0?"%"+revPct2:"—"} trend={{dir:"flat", value:"="}}/>
+            <WeekStat label="Hareketsiz" value={stale.length} trend={{dir:stale.length>0?"up":"flat", value:stale.length>0?"+"+stale.length:"="}} bad last/>
           </Card>
         </div>
       </div>
@@ -208,6 +223,7 @@ function DenseLayout({ data, active, overdue, today, week, stale, review, blocke
 
 // ─── STORY (vertical narrative) ─────────────────────────────────────────────
 function StoryLayout({ data, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, kpiVariant }) {
+  const avgCapPct = calcAvgCapPct(data);
   return (
     <div className="bn-tab-in">
       <PageHead

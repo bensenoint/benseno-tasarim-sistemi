@@ -1,7 +1,7 @@
 // app/screens/Gallery.jsx — image grid of completed outputs.
 
 function GalleryScreen({ data }) {
-  const items = data.completed.slice(0, 18);
+  const items = ( data._allCompleted || data.completed || [] ).slice(0, 18);
   return (
     <div className="bn-tab-in">
       <PageHead

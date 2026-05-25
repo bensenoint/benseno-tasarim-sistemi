@@ -10,7 +10,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
     copy.sort((a, b) => {
       let av = a[col], bv = b[col];
       if (col === "marka")  av = a.marka, bv = b.marka;
-      if (col === "atanan") av = a.lead.name, bv = b.lead.name;
+      if (col === "atanan") av = a.lead?.name ?? "", bv = b.lead?.name ?? "";
       if (col === "no")     av = a.no, bv = b.no;
       if (col === "durum")  av = a.durum, bv = b.durum;
       if (typeof av === "string") av = av.toLowerCase();
@@ -200,8 +200,10 @@ function formatDate(ts) {
   return `${d.getDate()} ${months[d.getMonth()]} · ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }
 function relTime(ts) {
-  const now = window.BNS_DATA.NOW;
+  if (!ts || isNaN(ts)) return "—";
+  const now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
   const dh = (now - ts) / (3600 * 1000);
+  if (dh < 0) return "az önce";
   if (dh < 1) return Math.round(dh*60) + " dk önce";
   if (dh < 24) return Math.round(dh) + " sa önce";
   return Math.round(dh/24) + " gün önce";

@@ -452,9 +452,10 @@ function bnsHydrateCompleted(raw, idx) {
   const liveUsers = (window.BNS_DATA && window.BNS_DATA.USERS && window.BNS_DATA.USERS.length > 0) ? window.BNS_DATA.USERS : USERS;
   const liveNow = window.BNS_DATA.NOW || NOW;
   const deadline = typeof raw.deadline === "string" ? Date.parse(raw.deadline) : raw.deadline;
-  const baslangic = typeof raw.baslangic === "string" ? Date.parse(raw.baslangic) : raw.baslangic;
+  const _baslangicRaw = raw.baslangic ?? raw.basla;
+  const baslangic = typeof _baslangicRaw === "string" ? Date.parse(_baslangicRaw) : _baslangicRaw;
   const bitis = typeof raw.bitis === "string" ? Date.parse(raw.bitis) : raw.bitis;
-  const sureH = raw.sureH != null ? raw.sureH : (bitis && baslangic && !isNaN(bitis) && !isNaN(baslangic) ? (bitis - baslangic) / H : null);
+  const sureH = raw.sureH != null ? raw.sureH : raw.sure != null ? raw.sure : (bitis && baslangic && !isNaN(bitis) && !isNaN(baslangic) ? (bitis - baslangic) / H : null);
   const gecikmeH = (bitis && deadline && bitis > deadline) ? Math.round((bitis - deadline) / H * 10) / 10 : 0;
   const gecikme  = gecikmeH > 0 ? gecikmeH.toFixed(1) + "h" : "—";
   const brand = BR[raw.marka] || {
