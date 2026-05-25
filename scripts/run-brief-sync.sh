@@ -26,6 +26,9 @@ echo "[$TIMESTAMP] Brief Sync başlatıldı..." >> logs/brief-sync.log
 
 echo "[$TIMESTAMP] Brief Sync tamamlandı." >> logs/brief-sync.log
 
+# Watchdog heartbeat — son başarılı çalışma zamanını kaydet
+date +%s > logs/brief-sync-last.ts
+
 # Root index.html'yi dashboard/index.html ile senkronize et (GitHub Pages için)
 cp ~/benseno-tasarim-sistemi/dashboard/index.html ~/benseno-tasarim-sistemi/index.html 2>/dev/null
 

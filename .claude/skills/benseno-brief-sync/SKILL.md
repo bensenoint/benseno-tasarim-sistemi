@@ -504,6 +504,56 @@ Büyük bir iş (dergi kapağı, kampanya seti vb) ise normal. İş tipini ve ka
 
 ## P1.x / P2 entegrasyonlar — değişmedi.
 
+---
+
+### 9c. Blokeli Brief DM — v7.14 (YENİ)
+
+**Amaç:** Bir brief'in durumu "blokeli" olarak tespit edildiğinde lead'e otomatik Slack DM gönder.
+
+**Tetikleyici:** Canvas'taki brief satırında durum = "🔴 Blokeli" veya "blokeli" ise VE:
+- `~/benseno-tasarim-sistemi/data/blokeli-notified.json` dosyasında bu brief'in `ts` değeri YOK ise (idempotent)
+
+**Akış:**
+1. Canvas'taki brief listesini parse et
+2. `durum == "blokeli"` olan brief'leri filtrele
+3. Her biri için `blokeli-notified.json`'a bak — daha önce DM gönderildiyse atla
+4. DM gönderilmemişse → brief'in `lead` kullanıcısına Şablon 29 DM at
+5. `blokeli-notified.json`'a `{ts, marka, baslik, notified_at}` kaydet
+
+**Dosya formatı (`data/blokeli-notified.json`):**
+```json
+[
+  {"ts": "1234567890.123456", "marka": "Bauhaus", "baslik": "Sosyal medya paketi", "notified_at": "2026-05-25T08:15:00"}
+]
+```
+
+**İdempotent:** Aynı brief için bir kez DM gönderilir. Durum "blokeli" → başka bir şeye geçince bir sonraki blokeli dönemde tekrar DM gönderilir (ts bazlı değil, ts+durum_degisim_tarihi bazlı tutmak mümkün ama basit versiyon: 24 saat sonra tekrar blokeli olursa yeni DM).
+
+**Basit versiyon:** Notified listesini `notified_at`'e göre 24 saat sonra otomatik temizle — böylece uzun süre blokeli kalan brief'ler her gün 1 kez DM atar.
+
+**Mod kontrolü:** `current_mode == "silent_log_only"` ise DM atma, sadece log'a yaz.
+
+---
+
+### Şablon 29 — Blokeli Brief DM (v7.14)
+
+**Alıcı:** Brief'in lead kullanıcısı  
+**Koşul:** Brief durumu "blokeli" olarak tespit edildi, daha önce DM gönderilmedi
+
+```
+🔴 *{{Marka}} · {{İş başlığı}}* blokeli olarak işaretlendi.
+
+*Ne engel var?*
+Bu brief'i ilerletmek için kime ihtiyacın var veya ne eksik?
+
+Eğer çözüldüyse → brief'e ✅ reaksiyonu koy veya durumu güncelle.
+Eğer devam ediyorsa → #benseno-grafik kanalında "@yönetici" ile müdahale iste.
+
+[Brief'e git]({{permalink}})
+```
+
+---
+
 ## ÇIKTI
 ```
 Brief Sync v7.13 OK · :15/:45
@@ -517,6 +567,7 @@ v7.12 Yön. override: 🔴={A} 🟠={B} 🟡={C} 🟢={D}
 v7.12 Geçmiş tarih: yeni={N} teyitli={C} bekleyen={B}
 v7.12 Saat eksik (aynı gün): {N} · Mesai dışı: {N}
 v7.13 Marka kıyas: mode={silent_log_only|active} yetersiz_süre={A} anormal_uzun={B} yeterli_veri_yok={C} high_conf={H} medium_conf={M}
+v7.14 Blokeli DM: gönderilen={N} atlanan={S} (daha önce notified)
 SLA: 4h={N} 8h={N} 24h={N} · GitHub: pushed {sha[:7]}
 PAT: {days}/90
 🔗 Ref:{N} · 📎 Dosya:{N} · 💬 Not:{N}
