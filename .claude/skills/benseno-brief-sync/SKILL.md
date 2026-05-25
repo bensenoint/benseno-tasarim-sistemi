@@ -506,7 +506,115 @@ Büyük bir iş (dergi kapağı, kampanya seti vb) ise normal. İş tipini ve ka
 
 ---
 
-### 9c. Blokeli Brief DM — v7.14 (YENİ)
+### 9c. Gecikme Escalation — v7.14 (YENİ)
+
+**Amaç:** Geciken brief'ler için otomatik tırmanma zinciri. Brief ne kadar uzun süre gecikirse o kadar üst kademelere ulaşır.
+
+**Escalation kural zinciri (gecikme süresine göre):**
+
+| Gecikme | Kime | Mesaj |
+|---|---|---|
+| ≥ 1 saat | Lead'e DM | Hatırlatma — müdahale fırsatı |
+| ≥ 24 saat | Sorumlu yöneticiye DM | "Müdahale gerekiyor" uyarısı |
+| ≥ 48 saat | Tüm yöneticiler + #benseno-grafik | Kritik duyuru |
+| ≥ 72 saat | Brief otomatik "blokeli" → Şablon 29 tetiklenir | Sistem müdahalesi |
+
+**Tracking dosyası:** `~/benseno-tasarim-sistemi/data/escalation-log.json`
+
+Formatı:
+```json
+[
+  {
+    "ts": "1234567890.123456",
+    "marka": "Bauhaus",
+    "baslik": "Sosyal medya paketi",
+    "lead_id": "U0AN6DD79M0",
+    "escalation_1h_at": "2026-05-25T09:15:00",
+    "escalation_24h_at": null,
+    "escalation_48h_at": null,
+    "escalation_72h_at": null
+  }
+]
+```
+
+**Akış (her Brief Sync çalışmasında):**
+1. Canvas'taki tüm brief'leri oku
+2. `deltaH <= 0` olan brief'leri bul (gecikmiş) — `durum !== "tamamlandi"` olanlar
+3. Her gecikmiş brief için `escalation-log.json`'a bak:
+   - Gecikme ≥ 1 saat VE `escalation_1h_at` null → Lead'e Şablon 30 DM at, tarihi kaydet
+   - Gecikme ≥ 24 saat VE `escalation_24h_at` null → Sorumlu yöneticiye Şablon 31 DM at, tarihi kaydet
+   - Gecikme ≥ 48 saat VE `escalation_48h_at` null → Tüm yöneticilere DM + #benseno-grafik'e Şablon 32 mesajı at, tarihi kaydet
+   - Gecikme ≥ 72 saat VE `escalation_72h_at` null → Brief'in durumunu otomatik "blokeli" olarak işaretle (Canvas güncelle), Şablon 29 tetikle, tarihi kaydet
+4. Tamamlanan brief'leri log'dan temizle (bitis tarihi olan brief'ler)
+
+**Sorumlu yönetici tespiti:**
+- Lead `rol == "tasarim"` → İpek (U055EDESLSE)
+- Lead `rol == "editor"` → erdem (U02SZQDAFPF)
+- Lead `rol == "ai"` → Görkem (U030C48PL23)
+- Belirsiz → Reyhan (UD96GH76E)
+
+**İdempotent:** Her escalation seviyesi yalnızca 1 kez tetiklenir. Brief tekrar gecikirse (yeniden açılırsa) log'daki kaydı sil, yeni döngü başlar.
+
+**Mod kontrolü:** `current_mode == "silent_log_only"` ise tüm DM/mesajlar atlanır, sadece log'a yazılır.
+
+---
+
+### Şablon 30 — Gecikme Hatırlatma (lead'e, ≥1 saat)
+
+```
+⏰ *{{Marka}} · {{İş başlığı}}* gecikiyor.
+
+Deadline: *{{deadline_str}}* geçti ({{gecikme_h}} saat önce).
+
+Bugün bitirebilir misin? Zorlanıyorsan yöneticine haber ver.
+
+[Brief'e git]({{permalink}})
+```
+
+---
+
+### Şablon 31 — Yönetici Uyarısı (24 saat gecikme)
+
+```
+⚠️ *Müdahale Gerekiyor — {{Marka}}*
+
+*{{İş başlığı}}* *{{gecikme_h}} saattir* gecikiyor.
+
+👤 Atanan: {{lead_name}}
+📅 Deadline: {{deadline_str}}
+
+Öneri: {{lead_name}} ile iletişime geç veya brief'i yeniden ata.
+
+[Brief'e git]({{permalink}})
+```
+
+---
+
+### Şablon 32 — Kritik Duyuru (48 saat — tüm yöneticiler + kanal)
+
+**DM (tüm 5 yöneticiye ayrı ayrı):**
+```
+🚨 *Kritik Gecikme — {{Marka}}*
+
+*{{İş başlığı}}* *{{gecikme_h}} saattir* teslim edilmedi.
+
+👤 Atanan: {{lead_name}}
+📅 Deadline: {{deadline_str}}
+
+Bu brief bugün çözülmezse sistem otomatik olarak "blokeli" işaretleyecek (72 saat dolduğunda).
+```
+
+**Kanal mesajı (#benseno-grafik):**
+```
+🚨 *{{Marka}} · {{İş başlığı}}* — *{{gecikme_h}} saat gecikme*
+
+Atanan: {{lead_name}} · Deadline: {{deadline_str}}
+Durum: Acil müdahale bekleniyor.
+```
+
+---
+
+### 9d. Blokeli Brief DM — v7.14 (YENİ)
 
 **Amaç:** Bir brief'in durumu "blokeli" olarak tespit edildiğinde lead'e otomatik Slack DM gönder.
 
@@ -567,6 +675,7 @@ v7.12 Yön. override: 🔴={A} 🟠={B} 🟡={C} 🟢={D}
 v7.12 Geçmiş tarih: yeni={N} teyitli={C} bekleyen={B}
 v7.12 Saat eksik (aynı gün): {N} · Mesai dışı: {N}
 v7.13 Marka kıyas: mode={silent_log_only|active} yetersiz_süre={A} anormal_uzun={B} yeterli_veri_yok={C} high_conf={H} medium_conf={M}
+v7.14 Escalation: 1h={A} 24h={B} 48h={C} 72h_blokeli={D} silent={S}
 v7.14 Blokeli DM: gönderilen={N} atlanan={S} (daha önce notified)
 SLA: 4h={N} 8h={N} 24h={N} · GitHub: pushed {sha[:7]}
 PAT: {days}/90

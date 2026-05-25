@@ -99,7 +99,9 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
       <td style={cellStyle(true, "right")}>{brief.no}</td>
       <td style={cellStyle()}>
         {brief.stale && <span title="3+ gün hareketsiz" style={{color:"var(--warning)"}}>●</span>}
-        {!brief.stale && brief.deltaH <= 0 && <span title="Geçmiş" style={{color:"var(--prio-red)"}}>!</span>}
+        {!brief.stale && brief.deltaH !== null && brief.deltaH <= -72 && <span title="72+ saat gecikme — sistem müdahalesi" style={{color:"var(--prio-red)", fontWeight:700, fontSize:13}}>!!!</span>}
+        {!brief.stale && brief.deltaH !== null && brief.deltaH <= -48 && brief.deltaH > -72 && <span title="48+ saat gecikme — kritik" style={{color:"var(--prio-red)", fontWeight:600}}>!!</span>}
+        {!brief.stale && brief.deltaH !== null && brief.deltaH <= 0 && brief.deltaH > -48 && <span title="Gecikmiş" style={{color:"var(--prio-red)"}}>!</span>}
       </td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
