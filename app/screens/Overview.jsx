@@ -491,7 +491,7 @@ function StarOfTheWeek({ data }) {
   return (
     <>
       {stars.map((s, i) => (
-        <div key={i} style={{
+        <div key={s.emoji} style={{
           display:"flex", alignItems:"center", gap: 10,
           padding:"10px 0", borderBottom: i < stars.length - 1 ? "1px solid var(--line)" : 0
         }}>
@@ -548,7 +548,7 @@ function WeekStat({ label, value, trend, good, bad, last }) {
 }
 
 function greetingFor() {
-  const h = new Date(window.BNS_DATA.NOW).getHours();
+  const h = new Date((window.BNS_DATA && window.BNS_DATA.NOW) || Date.now()).getHours();
   if (h < 12) return "Günaydın";
   if (h < 18) return "İyi günler";
   return "İyi akşamlar";

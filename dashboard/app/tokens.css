@@ -39,6 +39,7 @@
   --ember-hover:  #A93D22;
   --ember-press:  #8E3119;
   --ember-tint:   rgba(194, 74, 44, 0.10);
+  --ember-muted:  rgba(194, 74, 44, 0.25);
 
   /* ---- Semantic — priority (color-blind paired with glyph) -- */
   --prio-red:     #D7263D;   /* 🔴 Acil   — triangle glyph */
@@ -168,6 +169,7 @@
   --ember-hover:  #ED7A5B;
   --ember-press:  #C24A2C;
   --ember-tint:   rgba(228, 98, 63, 0.14);
+  --ember-muted:  rgba(228, 98, 63, 0.30);
 
   --shadow-1:
     0 1px 2px rgba(0, 0, 0, 0.40),
