@@ -30,3 +30,8 @@ claude-design-package 2/
 .mcp.json
 data/blokeli-notified.json
 data/escalation-log.json
+
+# Supabase secrets
+data/.supabase-service-key
+data/.supabase-anon-key
+data/.supabase-url
