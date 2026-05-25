@@ -2,11 +2,15 @@
 // Searches briefs by title/brand/lead, and shows quick actions.
 
 function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNewBrief, data, currentTheme }) {
+  // All hooks must come before any early return (Rules of Hooks)
   const [q, setQ] = React.useState("");
-  React.useEffect(() => { if (open) setQ(""); }, [open]);
-  if (!open) return null;
-
+  const [sel, setSel] = React.useState(0);
   const ql = q.toLowerCase().trim();
+
+  React.useEffect(() => { if (open) setQ(""); }, [open]);
+  React.useEffect(() => { setSel(0); }, [ql]);
+
+  if (!open) return null;
 
   // Quick actions
   const actions = [
@@ -22,7 +26,7 @@ function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNew
   const briefs = ql ? data.briefs.filter(b =>
     b.baslik.toLowerCase().includes(ql) ||
     b.marka.toLowerCase().includes(ql) ||
-    b.lead.name.toLowerCase().includes(ql) ||
+    b.lead?.name?.toLowerCase()?.includes(ql) ||
     String(b.no).includes(ql)
   ).slice(0, 6) : [];
 
@@ -38,8 +42,6 @@ function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNew
   ];
 
   const flat = sections.flatMap(s => s.items);
-  const [sel, setSel] = React.useState(0);
-  React.useEffect(() => { setSel(0); }, [ql]);
 
   function onKey(e) {
     if (e.key === "ArrowDown") { e.preventDefault(); setSel(s => Math.min(flat.length - 1, s + 1)); }
