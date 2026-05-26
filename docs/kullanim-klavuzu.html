@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benseno Tasarım Sistemi — Kullanım Kılavuzu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:        #FBFAF7;
+    --paper-2:      #F4F2EC;
+    --surface:      #FFFFFF;
+    --sidebar-bg:   #F7F5F0;
+    --ink:          #16161A;
+    --ink-2:        #2E2E36;
+    --ink-3:        #5B5B66;
+    --ink-4:        #8A8A94;
+    --ink-5:        #B6B6BE;
+    --line:         #ECEAE3;
+    --line-strong:  #DFDCD3;
+    --line-soft:    #F2F0EA;
+    --ember:        #C24A2C;
+    --ember-hover:  #A93D22;
+    --ember-tint:   rgba(194,74,44,0.10);
+    --ember-muted:  rgba(194,74,44,0.25);
+    --prio-red:     #D7263D;
+    --prio-orange:  #E07A1F;
+    --prio-yellow:  #C99A1E;
+    --prio-green:   #2E8F66;
+    --prio-red-bg:    rgba(215,38,61,0.10);
+    --prio-orange-bg: rgba(224,122,31,0.12);
+    --prio-yellow-bg: rgba(201,154,30,0.14);
+    --prio-green-bg:  rgba(46,143,102,0.12);
+    --success:      #2E8F66;
+    --warning:      #E07A1F;
+    --danger:       #D7263D;
+    --info:         #3A82C4;
+    --shadow-sm: 0 1px 2px rgba(22,22,26,0.04), 0 3px 8px rgba(22,22,26,0.06);
+    --shadow-md: 0 2px 8px rgba(22,22,26,0.07), 0 12px 32px rgba(22,22,26,0.10);
+    --radius: 10px;
+    --font-sans: 'Geist', -apple-system, sans-serif;
+    --font-display: 'Instrument Serif', Georgia, serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { font-size: 16px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Layout ─────────────────────────────────── */
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ─── Sidebar ────────────────────────────────── */
+  .sidebar {
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 0 48px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  .sidebar-brand {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 16px;
+  }
+
+  .sidebar-wordmark {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .sidebar-badge {
+    display: inline-block;
+    margin-top: 6px;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .sidebar-nav { padding: 0 12px; }
+
+  .nav-section {
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-3);
+    text-decoration: none;
+    transition: background 150ms, color 150ms;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-item:hover {
+    background: var(--paper-2);
+    color: var(--ink);
+  }
+
+  .nav-item.active {
+    background: var(--ember-tint);
+    color: var(--ember);
+    font-weight: 600;
+  }
+
+  .nav-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ink-5);
+    width: 16px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .nav-divider {
+    height: 1px;
+    background: var(--line-soft);
+    margin: 8px 12px;
+  }
+
+  /* ─── Main ───────────────────────────────────── */
+  .main {
+    max-width: 860px;
+    padding: 56px 64px 120px;
+  }
+
+  /* ─── Cover ──────────────────────────────────── */
+  .cover {
+    margin-bottom: 64px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cover-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--ember);
+    background: var(--ember-tint);
+    border: 1px solid var(--ember-muted);
+    padding: 4px 10px;
+    border-radius: 5px;
+    margin-bottom: 16px;
+  }
+
+  .cover-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 52px;
+    font-weight: 400;
+    line-height: 1.08;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .cover-sub {
+    font-size: 16px;
+    color: var(--ink-3);
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 540px;
+    margin-bottom: 24px;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .cover-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--ink-3);
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    padding: 4px 10px;
+    border-radius: 5px;
+  }
+
+  /* ─── Sections ───────────────────────────────── */
+  .section {
+    margin-bottom: 64px;
+    scroll-margin-top: 32px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .section-num {
+    width: 32px;
+    height: 32px;
+    background: var(--ember);
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .section-title-wrap {}
+
+  .section-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  .section-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-top: 4px;
+  }
+
+  /* ─── Sub sections ───────────────────────────── */
+  h3 {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.003em;
+    margin: 32px 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 24px 0 10px;
+  }
+
+  p {
+    font-size: 14.5px;
+    color: var(--ink-2);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  /* ─── Tables ─────────────────────────────────── */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 16px 0 24px;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: var(--surface);
+  }
+
+  thead tr {
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--ink-2);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface-sub, #FAF9F6); }
+
+  code {
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 12px;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--ember);
+  }
+
+  /* ─── Code blocks ────────────────────────────── */
+  .code-block {
+    background: #16161A;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin: 16px 0 20px;
+    overflow-x: auto;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: #E0DDD5;
+    box-shadow: var(--shadow-md);
+  }
+
+  .code-block .cm { color: #6A7A8A; }
+  .code-block .kw { color: #C9A85C; }
+  .code-block .str { color: #88C5A2; }
+  .code-block .sym { color: #9BB4D4; }
+
+  /* ─── Callout boxes ──────────────────────────── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin: 16px 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .callout.warn {
+    background: var(--prio-orange-bg);
+    border: 1px solid rgba(224,122,31,0.25);
+    color: var(--ink-2);
+  }
+
+  .callout.info {
+    background: rgba(58,130,196,0.08);
+    border: 1px solid rgba(58,130,196,0.20);
+    color: var(--ink-2);
+  }
+
+  .callout.tip {
+    background: var(--prio-green-bg);
+    border: 1px solid rgba(46,143,102,0.20);
+    color: var(--ink-2);
+  }
+
+  .callout.danger {
+    background: var(--prio-red-bg);
+    border: 1px solid rgba(215,38,61,0.20);
+    color: var(--ink-2);
+  }
+
+  /* ─── Flow diagram ───────────────────────────── */
+  .flow {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin: 16px 0 24px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 0;
+    position: relative;
+  }
+
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 36px;
+    bottom: -10px;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .flow-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ember);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .flow-dot.alt { background: var(--paper-2); color: var(--ink-3); border: 1px solid var(--line); }
+
+  .flow-content { padding-top: 4px; }
+  .flow-label { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .flow-sub { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+
+  /* ─── Reaction pills ─────────────────────────── */
+  .reaction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin: 16px 0 20px;
+  }
+
+  .reaction-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 150ms, transform 150ms;
+  }
+  .reaction-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+  .reaction-emoji { font-size: 24px; margin-bottom: 6px; }
+  .reaction-name { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .reaction-desc { font-size: 11.5px; color: var(--ink-3); }
+
+  /* ─── Priority badges ────────────────────────── */
+  .prio {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .prio-red    { background: var(--prio-red-bg);    color: var(--prio-red);    }
+  .prio-orange { background: var(--prio-orange-bg); color: var(--prio-orange); }
+  .prio-yellow { background: var(--prio-yellow-bg); color: var(--prio-yellow); }
+  .prio-green  { background: var(--prio-green-bg);  color: var(--prio-green);  }
+
+  /* ─── KPI cards ──────────────────────────────── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 16px 0 24px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ember);
+    border-radius: var(--radius);
+    padding: 14px 16px 12px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .kpi-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+
+  .kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--ink-4);
+    margin-top: 6px;
+  }
+
+  /* ─── Template blocks ────────────────────────── */
+  .tmpl {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ember);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin: 12px 0 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ink-2);
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .tmpl-header {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  /* ─── File tree ──────────────────────────────── */
+  .tree {
+    background: #16161A;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin: 16px 0 24px;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #C0BDB5;
+    box-shadow: var(--shadow-md);
+    overflow-x: auto;
+  }
+
+  .tree .dir { color: #9BB4D4; }
+  .tree .comment { color: #4E5E6E; }
+
+  /* ─── Separator ──────────────────────────────── */
+  hr {
+    border: none;
+    height: 1px;
+    background: var(--line-soft);
+    margin: 40px 0;
+  }
+
+  /* ─── Lists ──────────────────────────────────── */
+  ul, ol {
+    padding-left: 20px;
+    margin: 10px 0 16px;
+  }
+
+  li {
+    font-size: 14px;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+    line-height: 1.65;
+  }
+
+  /* ─── Strong ─────────────────────────────────── */
+  strong { font-weight: 600; color: var(--ink); }
+
+  /* ─── Timeline ───────────────────────────────── */
+  .timeline {
+    margin: 16px 0 24px;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 20px;
+    position: relative;
+  }
+
+  .timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 0;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .timeline-day {
+    width: 38px;
+    height: 38px;
+    background: var(--ember);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .timeline-content { padding-top: 8px; }
+  .timeline-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+  .timeline-desc { font-size: 13px; color: var(--ink-3); margin-top: 3px; }
+
+  /* ─── Screen chips ───────────────────────────── */
+  .screen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin: 16px 0 24px;
+  }
+
+  .screen-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 150ms, transform 150ms;
+    cursor: default;
+  }
+  .screen-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+  .screen-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ember);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .screen-name { font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .screen-desc { font-size: 11.5px; color: var(--ink-3); line-height: 1.45; }
+
+  /* ─── Schedule timeline ──────────────────────── */
+  .schedule-grid {
+    display: grid;
+    gap: 1px;
+    background: var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 16px 0 24px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    background: var(--surface);
+    font-size: 13px;
+  }
+
+  .schedule-time {
+    padding: 12px 16px;
+    background: var(--paper-2);
+    font-weight: 600;
+    color: var(--ink-3);
+    font-size: 12px;
+    border-right: 1px solid var(--line);
+  }
+
+  .schedule-task { padding: 12px 16px; color: var(--ink-2); }
+
+  /* ─── Print ──────────────────────────────────── */
+  @media print {
+    .sidebar { display: none; }
+    .layout { display: block; }
+    .main { max-width: 100%; padding: 20px 30px; }
+    .cover-title { font-size: 36px; }
+    .code-block, .tree { background: #f5f5f5; color: #333; box-shadow: none; }
+    .section { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 32px 24px 80px; }
+    .cover-title { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-wordmark">Benseno</div>
+      <div class="sidebar-badge">Kullanım Kılavuzu v7.13</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <a class="nav-item" href="#s1"><span class="nav-num">1</span>Sisteme Genel Bakış</a>
+        <a class="nav-item" href="#s2"><span class="nav-num">2</span>Brief Açma</a>
+        <a class="nav-item" href="#s3"><span class="nav-num">3</span>Brief Takibi</a>
+        <a class="nav-item" href="#s4"><span class="nav-num">4</span>Bildirimler & DM'ler</a>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-section">
+        <a class="nav-item" href="#s5"><span class="nav-num">5</span>Dashboard Kullanımı</a>
+        <a class="nav-item" href="#s6"><span class="nav-num">6</span>Ekranlar Rehberi</a>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-section">
+        <a class="nav-item" href="#s7"><span class="nav-num">7</span>Yönetici İşlemleri</a>
+        <a class="nav-item" href="#s8"><span class="nav-num">8</span>Otomatik Raporlar</a>
+        <a class="nav-item" href="#s9"><span class="nav-num">9</span>Onboarding</a>
+        <a class="nav-item" href="#s10"><span class="nav-num">10</span>Çalışma Takvimi</a>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-section">
+        <a class="nav-item" href="#s11"><span class="nav-num">11</span>SSS & Sorun Giderme</a>
+        <a class="nav-item" href="#s12"><span class="nav-num">12</span>Teknik Referans</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Cover -->
+    <div class="cover">
+      <div class="cover-eyebrow">Benseno Tasarım Sistemi · v7.13</div>
+      <h1 class="cover-title">Kullanım<br>Kılavuzu</h1>
+      <p class="cover-sub">Tasarımcılar, editörler, AI ve yöneticiler için eksiksiz sistem rehberi. Brief açmaktan dashboard'u okumaya, reaction'lardan otomatik raporlara kadar her adım.</p>
+      <div class="cover-meta">
+        <span class="cover-chip">📅 Mayıs 2026</span>
+        <span class="cover-chip">👥 16 kişi · 39 marka</span>
+        <span class="cover-chip">🏢 3 departman</span>
+        <span class="cover-chip">🤖 4 agent katmanı</span>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 1: Genel Bakış -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s1">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Sisteme Genel Bakış</h2>
+          <div class="section-tag">Mimari · Roller · Departmanlar</div>
+        </div>
+      </div>
+
+      <p>Benseno Tasarım Sistemi; 16 kişilik dijital ajans ekibinin 39 marka için ürettiği tasarım ve içerik işlerini Slack üzerinden takip eden, otomatik önceliklendiren, raporlayan ve dashboard'da görselleştiren bir iş akışı platformudur.</p>
+
+      <h3>Sistem Ne Yapar?</h3>
+      <ul>
+        <li>Her <strong>30 dakikada bir</strong> Slack'teki tüm marka kanallarını tarar, yeni brief'leri tespit eder</li>
+        <li>Brief'leri parse ederek öncelik sıralar (<span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> <span class="prio prio-yellow">🟡 Normal</span> <span class="prio prio-green">🟢 Düşük</span>)</li>
+        <li>Atanan ekip üyelerine Slack DM ile bildirim gönderir</li>
+        <li>Geciken, bekleyen, sorunlu brief'leri tespit eder ve uyarı verir</li>
+        <li>Tüm veriyi canlı Dashboard'a yansıtır</li>
+        <li>Her sabah 07:50'de yöneticilere ve tüm ekibe özet rapor gönderir</li>
+      </ul>
+
+      <h3>Kimler Ne Yapar?</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rol</th><th>Görev</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Editörler</strong></td><td>Marka kanallarında brief açar, tasarımcı atar, teslimi onaylar</td></tr>
+            <tr><td><strong>Tasarımcılar</strong></td><td>Atanan brief'te reaction atar (başla/sun/bitir), iş teslim eder</td></tr>
+            <tr><td><strong>AI (Eren)</strong></td><td>AI brief'lerini alır, tasarımcılarla cross-dept iş yapar</td></tr>
+            <tr><td><strong>Yöneticiler</strong></td><td>Öncelik override atar, sorunları takip eder, rapor okur</td></tr>
+            <tr><td><strong>Sistem (otomatik)</strong></td><td>Brief'leri parse eder, bildirim gönderir, dashboard'ı günceller</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Departmanlar & Ekip</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Departman</th><th>Kişiler</th></tr></thead>
+          <tbody>
+            <tr><td>🎨 Tasarım (7 kişi)</td><td>Aylin T, Aykut, Hasan Serdar, Pelin, İpek (Yön.), İrem, Serhat</td></tr>
+            <tr><td>✍️ Editör (8 kişi)</td><td>Cansu (Direktör), erdem (Yön.), Eda T, Eda A, Melis, Aylin C, Buse, Simge</td></tr>
+            <tr><td>🤖 AI (1 kişi)</td><td>Eren</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5 Yönetici</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>İsim</th><th>Unvan</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Görkem</strong></td><td>Genel Müdür</td></tr>
+            <tr><td><strong>Reyhan</strong></td><td>Genel Müdür Yardımcısı</td></tr>
+            <tr><td><strong>Cansu</strong></td><td>Direktör (3 departman)</td></tr>
+            <tr><td><strong>İpek</strong></td><td>Tasarım Ekibi Yöneticisi</td></tr>
+            <tr><td><strong>erdem</strong></td><td>Editör Ekibi Yöneticisi</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>4-Katman Agent Mimarisi</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-dot">1</div>
+          <div class="flow-content">
+            <div class="flow-label">Orchestrator</div>
+            <div class="flow-sub">Her :15/:45 — tüm akışı koordine eder</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">2</div>
+          <div class="flow-content">
+            <div class="flow-label">Data Agent</div>
+            <div class="flow-sub">Canvas okuma, brief parsing, öncelik hesaplama, E3 kıyaslama</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">3</div>
+          <div class="flow-content">
+            <div class="flow-label">Notification Agent</div>
+            <div class="flow-sub">Slack DM, Google Calendar event, idempotent kontrol</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot" style="background:var(--prio-green)">4</div>
+          <div class="flow-content">
+            <div class="flow-label">Dashboard Agent</div>
+            <div class="flow-sub">live-data.json → GitHub Pages push</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 2: Brief Açma -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s2">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Slack — Brief Açma</h2>
+          <div class="section-tag">Kanallar · Workflow · Manuel · Deadline kuralları</div>
+        </div>
+      </div>
+
+      <h3>2.1 Brief Hangi Kanalda Açılır?</h3>
+      <p>Her markanın kendine ait Slack kanalı vardır. Brief, o markanın kanalında açılır.</p>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span><code>*-editors</code> veya <code>*-faq</code> suffix'li kanallar taranmaz. Brief bu kanallara <strong>açılmamalıdır</strong>.</span>
+      </div>
+
+      <h4>Kanal → Marka Eşleşmesi (33 marka)</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kanal</th><th>Marka</th><th>Kanal</th><th>Marka</th></tr></thead>
+          <tbody>
+            <tr><td>#marka-bauhaus</td><td>Bauhaus</td><td>#marka-kmr-amos</td><td>KMR Amos</td></tr>
+            <tr><td>#marka-beta</td><td>Beta</td><td>#marka-kmr-copic</td><td>KMR Copic</td></tr>
+            <tr><td>#marka-cimporglobal</td><td>Cimporglobal</td><td>#marka-kmr-lamy</td><td>KMR Lamy</td></tr>
+            <tr><td>#marka-cureffect</td><td>Cureffect</td><td>#marka-kmr-marshmallow</td><td>KMR Marshmallow</td></tr>
+            <tr><td>#marka-egosport</td><td>Egosport</td><td>#marka-kmr-max</td><td>KMR Max</td></tr>
+            <tr><td>#marka-gursoy</td><td>Gürsoy</td><td>#marka-kmr-panfix</td><td>KMR Panfix</td></tr>
+            <tr><td>#marka-hasvet</td><td>Hasvet</td><td>#marka-kmr-serve</td><td>KMR Serve</td></tr>
+            <tr><td>#marka-hendex</td><td>Hendex</td><td>#marka-kuzeypet</td><td>Kuzeypet</td></tr>
+            <tr><td>#marka-jnj</td><td>JNJ</td><td>#marka-kzy-bark</td><td>KZY Bark</td></tr>
+            <tr><td>#marka-jnj-acuvue-me</td><td>JNJ Acuvue ME</td><td>#marka-kzy-everclean</td><td>KZY Everclean</td></tr>
+            <tr><td>#marka-jnj-vision-tr</td><td>JNJ Vision TR</td><td>#marka-kzy-ferplast</td><td>KZY Ferplast</td></tr>
+            <tr><td>#marka-jungleous</td><td>Jungleous</td><td>#marka-kzy-flamingo</td><td>KZY Flamingo</td></tr>
+            <tr><td>#marka-marmaraholding</td><td>Marmara Holding</td><td>#marka-kzy-simplesolution</td><td>KZY Simple Solution</td></tr>
+            <tr><td>#marka-muffik</td><td>Muffik</td><td>#marka-kzy-supreme</td><td>KZY Supreme</td></tr>
+            <tr><td>#marka-polisan</td><td>Polisan</td><td>#marka-kzy-vetsbest</td><td>KZY Vet's Best</td></tr>
+            <tr><td>#marka-splenda</td><td>Splenda</td><td>#marka-tour2america</td><td>Tour2America</td></tr>
+            <tr><td>#marka-vdm-petdent</td><td>VDM Petdent</td><td></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2.2 Workflow Yöntemi (Önerilen)</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-dot">1</div>
+          <div class="flow-content"><div class="flow-label">İlgili marka kanalını aç</div><div class="flow-sub">Örn. #marka-bauhaus</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">2</div>
+          <div class="flow-content"><div class="flow-label">"Yeni Brief Aç" iş akışı butonuna tıkla</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">3</div>
+          <div class="flow-content"><div class="flow-label">Formu doldur ve gönder</div><div class="flow-sub">Aşağıdaki tablodaki tüm zorunlu alanlar</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot" style="background:var(--prio-green)">✓</div>
+          <div class="flow-content"><div class="flow-label">Sistem otomatik işler</div><div class="flow-sub">Parse → öncelik → Canvas → DM → Dashboard</div></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Alan</th><th>Açıklama</th><th>Zorunlu?</th></tr></thead>
+          <tbody>
+            <tr><td>🎀 İş Özeti</td><td>Yapılacak işin kısa açıklaması</td><td>✅ Evet</td></tr>
+            <tr><td>⏰ Deadline</td><td>Teslim tarihi ve saati</td><td>✅ Evet</td></tr>
+            <tr><td>👷 Kim</td><td>Atanan kişi(ler) — Slack @mention ile</td><td>✅ Evet</td></tr>
+            <tr><td>🏷️ Tip</td><td>İş tipi (sosyal medya, banner, video, vb.)</td><td>✅ Evet</td></tr>
+            <tr><td>🔄 Akış</td><td>Paralel / Sıralı</td><td>✅ Evet</td></tr>
+            <tr><td>🔗 Ref</td><td>Referans link (varsa)</td><td>Hayır</td></tr>
+            <tr><td>💬 Not</td><td>Ek açıklama</td><td>Hayır</td></tr>
+            <tr><td>🐷 Kimden</td><td>Formu açan kişi</td><td>Otomatik</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2.3 Manuel Yöntem (Fallback)</h3>
+      <p>Workflow butonu yoksa ya da çalışmıyorsa kanalda doğrudan mesaj formatı kullanılır:</p>
+
+      <div class="tmpl">
+        <div class="tmpl-header">🎨 Tasarım Brief'i</div>
+📋 [İş özeti]
+Atanan: @isim
+Deadline: GG Ay YYYY SS:DD
+Tip: [iş tipi]
+Akış: Paralel
+Not: [varsa not]
+      </div>
+
+      <div class="tmpl">
+        <div class="tmpl-header">✍️ Editör Brief'i</div>
+✍️ [İş özeti]
+Atanan: @isim
+Deadline: GG Ay YYYY SS:DD
+...
+      </div>
+
+      <div class="tmpl">
+        <div class="tmpl-header">🤖 AI Brief'i</div>
+🤖 [İş özeti]
+Atanan: @eren
+Deadline: GG Ay YYYY SS:DD
+...
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">💡</span>
+        <span>İlk satırdaki emoji (<strong>📋 / ✍️ / 🤖</strong>) departmanı belirler. Bu emoji yoksa sistem atanan kişilerden departmanı tahmin eder.</span>
+      </div>
+
+      <h3>2.4 Deadline Kuralları</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Durum</th><th>Kural</th></tr></thead>
+          <tbody>
+            <tr><td>Aynı gün deadline</td><td><strong>Saat zorunludur.</strong> Girilmezse sistem DM ile uyarır</td></tr>
+            <tr><td>Geçmiş tarih</td><td>Thread'e <code>✅ ok</code> veya brief'e ✅ reaction ekle; uyarı kalkar</td></tr>
+            <tr><td>Mesai dışı saat</td><td>Bilgilendirici <code>🌙 Mesai dışı</code> etiketi — blokaj değildir</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2.5 Kime Atama Yapılır?</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Atama</th><th>Ne Yapar</th><th>Ne Zaman</th></tr></thead>
+          <tbody>
+            <tr><td><code>@isim</code></td><td>Belirli kişiye atama</td><td>Her zaman geçerli</td></tr>
+            <tr><td><code>@auto</code></td><td>Smart Assign 2.0 — marka uzmanlığı + iş yükü + streak skoru</td><td>Acil brief'lerde kullanma!</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout danger">
+        <span class="callout-icon">🚨</span>
+        <span><strong>🔴 Acil brief'lerde <code>@auto</code> kullanılmamalıdır.</strong> Sistem otomatik atamayı sonraki sync'te işler — 8 saatin altında deadline'larda bu gecikme kabul edilemez. Acil durumlarda atananı manuel belirtin.</span>
+      </div>
+
+      <h3>2.6 Paralel vs. Sıralı Akış</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Akış</th><th>Ne Demek</th><th>Ne Zaman</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Paralel</strong></td><td>Tüm atananlar aynı anda çalışabilir</td><td>Bağımsız işler</td></tr>
+            <tr><td><strong>Sıralı</strong></td><td>Birinci bitirmeden ikincisi başlamaz</td><td>Tasarım → Editör gibi ardışık süreçler</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Sıralı akışta: birinci kişi işi bitirince sistem otomatik olarak sıradaki kişiye "sıran geldi" DM'i gönderir.</p>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 3: Brief Takibi -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s3">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Slack — Brief Takibi</h2>
+          <div class="section-tag">Reaction sistemi · Durum akışı · Force-close</div>
+        </div>
+      </div>
+
+      <p>Sistem tüm brief durumunu Slack <strong>reaction'ları</strong> üzerinden takip eder. Reaction'lar <strong>her zaman brief'in PARENT mesajına</strong> (ana mesaja) eklenmelidir — thread içine eklenenler işlenmez.</p>
+
+      <h3>3.1 Reaction'lar</h3>
+      <div class="reaction-grid">
+        <div class="reaction-card">
+          <div class="reaction-emoji">🎨</div>
+          <div class="reaction-name">İşe Başladım</div>
+          <div class="reaction-desc">Durum: Çalışılıyor. Revizyon başlarken tekrar kullanılır.</div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-emoji">👀</div>
+          <div class="reaction-name">Sunum</div>
+          <div class="reaction-desc">Durum: İncelemede. Revize için sunuyorum.</div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-emoji">✅</div>
+          <div class="reaction-name">Tamamlandı</div>
+          <div class="reaction-desc">İş bitti, teslim edildi.</div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-emoji">♻️</div>
+          <div class="reaction-name">Yeniden Aç</div>
+          <div class="reaction-desc">Tamamlanan brief reopen edilir.</div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-emoji">🔒</div>
+          <div class="reaction-name">Force-Close</div>
+          <div class="reaction-desc">Yönetici/lead eksik ✅'leri zorla kapatır.</div>
+        </div>
+      </div>
+
+      <h3>3.2 Tasarımcı Reaction Akışı</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-dot alt">→</div>
+          <div class="flow-content"><div class="flow-label">Brief mesajı geldi</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">🎨</div>
+          <div class="flow-content"><div class="flow-label">İşe başlıyorum</div><div class="flow-sub">Durum: Çalışılıyor</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">👀</div>
+          <div class="flow-content"><div class="flow-label">Revize için sunuyorum</div><div class="flow-sub">Durum: İncelemede</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot alt">↩</div>
+          <div class="flow-content"><div class="flow-label">Revizyon varsa: 🎨 tekrar ekle</div><div class="flow-sub">Revizyon sayacı +1, tekrar Çalışılıyor</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot" style="background:var(--prio-green)">✅</div>
+          <div class="flow-content"><div class="flow-label">Tamamlandı</div><div class="flow-sub">Onay gelince ✅ ekle — iş kapanır</div></div>
+        </div>
+      </div>
+
+      <h3>3.3 Brief Tamamlama — Buton Yöntemi</h3>
+      <p>Slack Bot'un gönderdiği mesajlardaki <strong>"Tamamlandı"</strong> butonuna tıklayarak da iş kapatılabilir. Sistem Canvas'taki satırı Tamamlananlar'a taşır, tasarımcıya DM gönderir.</p>
+
+      <h3>3.4 Hayalet İş Uyarısı</h3>
+      <p>30 dakikalık sessizlik + onay keyword'ü tespit edilirse sistem DM ile sorar:</p>
+      <div class="tmpl" style="font-family: var(--font-sans); font-size: 13.5px;">
+        "Bu iş bitmiş olabilir mi? Tamamlandıysa ✅ ekle, devam ediyorsa 🎨 ekle."
+      </div>
+
+      <h3>3.5 Force-Close (🔒)</h3>
+      <div class="callout info">
+        <span class="callout-icon">🔒</span>
+        <span>Yetkili kişiler (lead, editör yöneticisi, yöneticiler) eksik ✅'leri zorla kapatabilir. Tasarımcılar da <strong>kendi atandıkları işte</strong> 🔒 kullanabilir (sözlü onay durumunda).</span>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 4: Bildirimler -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s4">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Slack — Bildirimler & DM'ler</h2>
+          <div class="section-tag">11 DM şablonu · Tüm uyarılar</div>
+        </div>
+      </div>
+
+      <h3>Şablon 1 — Atama Bildirimi</h3>
+      <div class="tmpl">
+        <div class="tmpl-header">Atanan kişiye DM</div>
+📋 *[İş özeti]* — [Marka]
+⏰ Deadline: [tarih TR]
+🏷️ Tip: [iş tipi]
+🔄 Akış: [Paralel/Sıralı]
+💬 Not: [not]
+[Mesaja git](link)
+      </div>
+
+      <h3>Şablon 2 — Sıralı Akış Bildirimi</h3>
+      <div class="tmpl">
+        <div class="tmpl-header">Sıradaki kişiye DM</div>
+📋 *[İş özeti]* — [Marka]
+Sıran yaklaşıyor — [önceki kişi] bitirince başlayabilirsin.
+Deadline: [tarih]
+[Mesaja git](link)
+      </div>
+
+      <h3>Şablon 24 — Geçmiş Deadline (Thread'e)</h3>
+      <div class="tmpl">
+        <div class="tmpl-header">Brief thread'ine gönderilir</div>
+⚠️ Deadline geçmiş bir tarih: [tarih] ([N] gün geride)
+
+Yanlışlık ise:
+• Yeni brief aç (doğru tarihle), bu brief'i sahibin force-close etsin (🔒)
+
+Bilerek geç tarihli kayıt ise:
+• Bu thread'e ✅ ok veya teyit yaz → uyarı kalkar
+• Veya brief'e ✅ reaction ekle
+      </div>
+
+      <h3>Şablon 25 — Geçmiş Deadline (Brief Açana DM)</h3>
+      <div class="tmpl">
+        <div class="tmpl-header">Brief açan kişiye DM</div>
+⚠️ Az önce açtığın brief'te deadline geçmiş bir tarih var.
+[İş özeti] — [Marka]
+Deadline: [tarih] ([N] gün geride)
+Thread'inde teyit isteniyor.
+      </div>
+
+      <h3>Şablon 26 — Saat Eksik Uyarısı</h3>
+      <div class="tmpl">
+        <div class="tmpl-header">Brief açan kişiye DM</div>
+⏰ Az önce açtığın brief aynı gün teslim ama saat girilmemiş.
+[İş özeti] — [Marka]
+Deadline: [bugün — saat yok]
+Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
+      </div>
+
+      <h3>Şablon 18 — Acil Brief'te @auto Uyarısı</h3>
+      <div class="tmpl">
+        <div class="tmpl-header">Brief açan kişiye DM</div>
+⚠️ 🔴 Acil brief'te @auto kullanma. Atananları manuel belirt.
+      </div>
+
+      <h3>Şablon 23 — Departman Belirsiz Uyarısı</h3>
+      <div class="tmpl">
+        <div class="tmpl-header">erdem'e (Editör Yöneticisi) DM</div>
+📋 Departman tespit edilemedi — kontrol et:
+[İş özeti] — [Marka]
+[Mesaja git](link)
+      </div>
+
+      <h3>Şablonlar 27 & 28 — E3 Marka Davranış Sapması</h3>
+      <div class="callout info">
+        <span class="callout-icon">📊</span>
+        <span>Yalnızca E3 sistemi <code>active</code> modda iken çalışır — 1 Haziran 2026 ve sonrası.</span>
+      </div>
+      <div class="tmpl">
+        <div class="tmpl-header">Şablon 27 — Yetersiz Süre</div>
+📈 [Marka] için bu deadline alışılmadık agresif
+[İş özeti] — [Marka]
+Senin deadline'ın: [N] gün
+[Marka] medyan (son 90 gün): [M] gün
+Bilgilendirme amaçlı — blokaj değil.
+      </div>
+      <div class="tmpl">
+        <div class="tmpl-header">Şablon 28 — Anormal Uzun Süre</div>
+📊 [Marka] için bu deadline alışılmadık geniş
+[İş özeti] — [Marka]
+Senin deadline'ın: [N] gün
+[Marka] medyan: [M] gün
+Büyük iş ise normal — iş tipini kontrol et.
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 5: Dashboard -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s5">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Dashboard — Genel Kullanım</h2>
+          <div class="section-tag">Erişim · Görünüm · Arama · Güncelleme</div>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-left-color: var(--ember)">
+          <div class="kpi-label">Dashboard URL</div>
+          <div class="kpi-value" style="font-size: 13px; letter-spacing: 0; line-height: 1.4; margin-top: 4px;">bensenoint.github.io/</div>
+          <div class="kpi-sub">GitHub Pages · canlı</div>
+        </div>
+        <div class="kpi-card" style="border-left-color: var(--prio-green)">
+          <div class="kpi-label">Auto-Refresh</div>
+          <div class="kpi-value">30<span style="font-size: 14px; font-weight: 400;">sn</span></div>
+          <div class="kpi-sub">Sağ üst: "Canlı · Xsn"</div>
+        </div>
+        <div class="kpi-card" style="border-left-color: var(--info)">
+          <div class="kpi-label">Şifre</div>
+          <div class="kpi-value" style="font-size: 14px; letter-spacing: 0; line-height: 1.4; margin-top: 4px;">İpek'ten alın</div>
+          <div class="kpi-sub">Tasarım Yöneticisi</div>
+        </div>
+        <div class="kpi-card" style="border-left-color: var(--prio-orange)">
+          <div class="kpi-label">Arama</div>
+          <div class="kpi-value" style="font-size: 14px; letter-spacing: 0; line-height: 1.4; margin-top: 4px;">⌘K / Ctrl+K</div>
+          <div class="kpi-sub">Command Palette</div>
+        </div>
+      </div>
+
+      <h3>Görünüm Seçimi</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Görünüm</th><th>Ne Gösterir</th><th>Kim Kullanır</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Ben</strong></td><td>Sadece size atanmış brief'ler</td><td>Tasarımcılar, editörler</td></tr>
+            <tr><td><strong>Dept</strong></td><td>Departmanınızdaki tüm brief'ler</td><td>Departman liderleri</td></tr>
+            <tr><td><strong>Tümü</strong></td><td>Tüm aktif brief'ler</td><td>Yöneticiler</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 6: Ekranlar -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s6">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Dashboard — Ekranlar Rehberi</h2>
+          <div class="section-tag">14 ekran · Sütun açıklamaları · KPI rehberi</div>
+        </div>
+      </div>
+
+      <div class="screen-grid">
+        <div class="screen-card"><div class="screen-num">6.1</div><div class="screen-name">Genel Bakış</div><div class="screen-desc">6 KPI kartı, bugün & yarın tablosu, departman özeti, sorunlu markalar</div></div>
+        <div class="screen-card"><div class="screen-num">6.2</div><div class="screen-name">Yönetici</div><div class="screen-desc">Kritik liste — geçmiş tarih, blokeli, stale, marka yoğunluğu</div></div>
+        <div class="screen-card"><div class="screen-num">6.3</div><div class="screen-name">Aktif İşler</div><div class="screen-desc">Tüm brief'ler tablo formatında, detay çekmecesi</div></div>
+        <div class="screen-card"><div class="screen-num">6.4</div><div class="screen-name">Plan / Gantt</div><div class="screen-desc">Brief'lerin zaman ekseninde görünümü</div></div>
+        <div class="screen-card"><div class="screen-num">6.5</div><div class="screen-name">Kanban</div><div class="screen-desc">Durum sütunlarına göre gruplandırılmış</div></div>
+        <div class="screen-card"><div class="screen-num">6.6</div><div class="screen-name">Tamamlananlar</div><div class="screen-desc">Geçmiş tüm işler, tarih/marka/kişi filtresi</div></div>
+        <div class="screen-card"><div class="screen-num">6.7</div><div class="screen-name">Karşılaştırma</div><div class="screen-desc">Departmanlar arası performans analizi</div></div>
+        <div class="screen-card"><div class="screen-num">6.8</div><div class="screen-name">Geçmiş</div><div class="screen-desc">Son 14 günlük trend grafikleri</div></div>
+        <div class="screen-card"><div class="screen-num">6.9</div><div class="screen-name">Galeri</div><div class="screen-desc">Tamamlanan işlerin marka bazlı galerisi</div></div>
+        <div class="screen-card"><div class="screen-num">6.10</div><div class="screen-name">Multi-Atama</div><div class="screen-desc">Paralel/sıralı akış yönetim görünümü</div></div>
+        <div class="screen-card"><div class="screen-num">6.11</div><div class="screen-name">Marka</div><div class="screen-desc">39 markanın istatistik ve sorun skoru</div></div>
+        <div class="screen-card"><div class="screen-num">6.12</div><div class="screen-name">Ekip Matrisi</div><div class="screen-desc">Kişi × marka uzmanlık haritası</div></div>
+        <div class="screen-card"><div class="screen-num">6.13</div><div class="screen-name">Tasarım/Editör/AI</div><div class="screen-desc">Departman detay ekranı — kişi bazlı istatistikler</div></div>
+        <div class="screen-card"><div class="screen-num">6.14</div><div class="screen-name">Profil</div><div class="screen-desc">Kişisel istatistikler, tamamlanan işler, puan geçmişi</div></div>
+      </div>
+
+      <h3>6.1 Genel Bakış — KPI Kartları</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>KPI</th><th>Açıklaması</th><th>Trend Rengi</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Aktif Brief</strong></td><td>Şu an işlemde olan toplam brief sayısı</td><td>↑ Kırmızı (artış kötü)</td></tr>
+            <tr><td><strong>Geciken</strong></td><td>Deadline'ı geçmiş brief'ler</td><td>↑ Kırmızı, ↓ Yeşil</td></tr>
+            <tr><td><strong>Bugün Teslim</strong></td><td>Bugün teslim edilmesi gereken brief'ler</td><td>Bilgilendirici</td></tr>
+            <tr><td><strong>Onay Bekleyen</strong></td><td>İncelemede (👀) durumundaki brief'ler</td><td>Bilgilendirici</td></tr>
+            <tr><td><strong>Hareketsiz</strong></td><td>3+ gün güncelleme olmayan brief'ler</td><td>↑ Kırmızı</td></tr>
+            <tr><td><strong>Kapasite</strong></td><td>Ekip ortalama kapasite doluluk oranı</td><td>↑ Yeşil (artış iyi)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6.3 Aktif İşler — Sütunlar</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Sütun</th><th>İçerik</th></tr></thead>
+          <tbody>
+            <tr><td>No</td><td>Brief numarası</td></tr>
+            <tr><td>Dept</td><td>Departman (🎨 ✍️ 🤖)</td></tr>
+            <tr><td>Marka</td><td>Marka adı</td></tr>
+            <tr><td>İş</td><td>Brief başlığı (tıklanınca detay çekmecesi açılır)</td></tr>
+            <tr><td>Atanan</td><td>Tasarımcı</td></tr>
+            <tr><td>Editör</td><td>Sorumlu editör</td></tr>
+            <tr><td>Öncelik</td><td><span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> + kalan süre</td></tr>
+            <tr><td>Deadline</td><td>Teslim tarihi/saati</td></tr>
+            <tr><td>Durum</td><td>Yeni / Çalışılıyor / İncelemede / Blokeli</td></tr>
+            <tr><td>Rev</td><td>Revizyon sayısı</td></tr>
+            <tr><td>Geçmiş</td><td>Yönetici override geçmişi (<code>🔴Yön14:23</code>)</td></tr>
+            <tr><td>Link</td><td>Slack mesajına git</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 7: Yönetici İşlemleri -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s7">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Yönetici İşlemleri</h2>
+          <div class="section-tag">Override · Teyit · Force-close · E3 · Sabah raporu</div>
+        </div>
+      </div>
+
+      <h3>7.1 Öncelik Override — Reaction ile</h3>
+      <p><strong>Yetkili kişiler:</strong> Görkem, Reyhan, Cansu, İpek, erdem</p>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-dot">1</div>
+          <div class="flow-content"><div class="flow-label">İlgili brief mesajını bul</div><div class="flow-sub">Marka kanalında, PARENT mesajı</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">2</div>
+          <div class="flow-content">
+            <div class="flow-label">Öncelik reaction'ını ekle</div>
+            <div class="flow-sub">🔴 Acil · 🟠 Yüksek · 🟡 Normal · 🟢 Düşük</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot" style="background:var(--prio-green)">✓</div>
+          <div class="flow-content">
+            <div class="flow-label">Anlık işlenir (Socket Mode)</div>
+            <div class="flow-sub">Canvas güncellenir, Geçmiş sütununa <code>🔴Yön14:23</code> notu düşer</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>7.2 Geçmiş Deadline Teyidi</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Yöntem</th><th>Nasıl</th></tr></thead>
+          <tbody>
+            <tr><td>Thread yazı</td><td>Brief thread'ine <code>✅ ok</code> veya <code>teyit</code> yaz</td></tr>
+            <tr><td>Reaction</td><td>Brief mesajına ✅ reaction ekle</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>7.3 Force-Close (🔒)</h3>
+      <p>Brief tamamlanmış ama ✅ atılmamışsa, brief mesajının parent'ına 🔒 reaction ekle. Sistem eksik adımları otomatik tamamlar.</p>
+
+      <h3>7.4 Sabah Raporunu Yorumlama</h3>
+      <p>Her hafta içi sabah <strong>07:50'de</strong> 3 çıktı üretilir:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Çıktı</th><th>Hedef</th><th>İçerik</th></tr></thead>
+          <tbody>
+            <tr><td>Çıktı 1</td><td>#benseno-grafik (tüm ekip)</td><td>Aktif brief, dün tamamlananlar, OOO listesi</td></tr>
+            <tr><td>Çıktı 2</td><td>5 yöneticiye özelleştirilmiş DM</td><td>Role göre farklılaşan özet + "Bugün 3 aksiyon"</td></tr>
+            <tr><td>Çıktı 3</td><td>16 kişiye günaydın DM</td><td>Departmana göre kişiselleştirilmiş bugünkü iş listesi</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Yönetici</th><th>Özel Bölüm</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Görkem</strong> (GM)</td><td>Tam stratejik özet, tüm departmanlar</td></tr>
+            <tr><td><strong>Reyhan</strong> (GMY)</td><td>Operasyonel öncelikler, SLA durumu</td></tr>
+            <tr><td><strong>Cansu</strong> (Direktör)</td><td>3 departman, marka hız trendi (E3), kalite skoru</td></tr>
+            <tr><td><strong>İpek</strong> (Tasarım Yön.)</td><td>Tasarım ekibi detayı, kapasite, mentörlük notları</td></tr>
+            <tr><td><strong>erdem</strong> (Editör Yön.)</td><td>Editör ekibi detayı, açılan/bekleyen brief'ler</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>7.5 E3 — Marka Davranış Kıyaslaması</h3>
+      <p>E3, 39 marka için geçmiş veriden öğrenilen "bu marka için normal deadline ne kadar?" sorusunu yanıtlayan istatistik sistemidir.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Mod</th><th>Açıklama</th><th>Aktiflik</th></tr></thead>
+          <tbody>
+            <tr><td><code>silent_log_only</code></td><td>Veriler toplanır ama DM/uyarı gönderilmez</td><td>1 Haziran 2026 öncesi</td></tr>
+            <tr><td><code>active</code></td><td>Tam aktivasyon — DM + dashboard etiketi</td><td>1 Haziran 2026 ve sonrası</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">📊</span>
+        <span>Haftalık güncelleme: Her Cuma 17:00'de tamamlanan brief'lerden marka istatistikleri yeniden hesaplanır. Medyan ± 1×MAD dışındaki deadline'lar flag'lenir. Veri az ise (3'ten az brief) kıyas yapılmaz.</span>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 8: Otomatik Raporlar -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s8">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Otomatik Raporlar</h2>
+          <div class="section-tag">4 rapor · Zamanlama · İçerik</div>
+        </div>
+      </div>
+
+      <div class="schedule-grid">
+        <div class="schedule-row">
+          <div class="schedule-time">☀️ Her gün 07:50</div>
+          <div class="schedule-task"><strong>Sabah Raporu</strong> — #benseno-grafik + 5 yönetici DM + 16 kişi günaydın DM</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">📊 Cuma 17:00</div>
+          <div class="schedule-task"><strong>Haftalık Retrospektif</strong> — Haftanın özeti, yıldızlar, E3 istatistik güncellemesi, Google Drive PDF</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">📋 Ay sonu 17:00</div>
+          <div class="schedule-task"><strong>Aylık Stratejik Özet</strong> — Aylık tamamlanan, top 3 marka/tasarımcı/editör, strateji önerileri, Google Drive PDF</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">🔍 Her gün 17:00</div>
+          <div class="schedule-task"><strong>Günlük Sistem Özeti</strong> — Kaç run yapıldı, timeout/hata, Slack Bot durumu</div>
+        </div>
+      </div>
+
+      <h3>Haftalık Retrospektif — Haftanın Yıldızları</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ödül</th><th>Ölçüt</th></tr></thead>
+          <tbody>
+            <tr><td>🏆 En çok tamamlayan</td><td>Haftaki toplam tamamlanan iş</td></tr>
+            <tr><td>⚡ En hızlı teslim</td><td>Ortalama teslim süresi</td></tr>
+            <tr><td>✅ 0 gecikme oranı</td><td>Hiç gecikmeden teslim</td></tr>
+            <tr><td>📈 En çok gelişen</td><td>Geçen haftaya göre iyileşme</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 9: Onboarding -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s9">
+      <div class="section-header">
+        <div class="section-num">9</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Onboarding — Yeni Ekip Üyesi</h2>
+          <div class="section-tag">5 günlük program · Kaynaklar · Başlatma</div>
+        </div>
+      </div>
+
+      <h3>Onboarding Nasıl Başlatılır?</h3>
+      <div class="tmpl">
+        <div class="tmpl-header">Yönetici (İpek, Cansu, Görkem veya Reyhan) sisteme gönderir</div>
+Onboarding başlat: [USER_ID] [İsim] [başlangıç_tarihi]
+
+Örnek: Onboarding başlat: U0B3K2WE7SB Pelin Özdemir 2026-05-15
+      </div>
+
+      <h3>5 Günlük Program</h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-day">1</div>
+          <div class="timeline-content">
+            <div class="timeline-title">Hoşgeldin & Sistem Turu</div>
+            <div class="timeline-desc">Canvas, Dashboard, Marka Kitabı, Lessons Learned kanalı tanıtımı</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-day">2</div>
+          <div class="timeline-content">
+            <div class="timeline-title">Marka Kitabı Turu</div>
+            <div class="timeline-desc">39 markanın logo/font/renk/ton özelliklerini öğren</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-day">3</div>
+          <div class="timeline-content">
+            <div class="timeline-title">İlk Egzersiz Brief</div>
+            <div class="timeline-desc">İpek atar — düşük baskılı pratik iş</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-day">4</div>
+          <div class="timeline-content">
+            <div class="timeline-title">İlk Gerçek Brief + Phase 7 Özellikleri</div>
+            <div class="timeline-desc">Smart Assign, Thread Özet, Revizyon Tahmini tanıtımı</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-day" style="background:var(--prio-green)">5</div>
+          <div class="timeline-content">
+            <div class="timeline-title">Geri Bildirim Toplantısı & Tam Üyelik</div>
+            <div class="timeline-desc">14:00, Cansu + İpek ile toplantı — tam üyelik aktif</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Önemli Kaynaklar</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kaynak</th><th>Ne İçin</th></tr></thead>
+          <tbody>
+            <tr><td>Ana Canvas (F0B1B6XUD44)</td><td>Tüm aktif brief'ler</td></tr>
+            <tr><td>Marka Kitabı Canvas</td><td>39 markanın logo/font/renk/ton bilgileri</td></tr>
+            <tr><td>Lessons Learned Canvas</td><td>Önceki tasarımcıların çıkardığı dersler</td></tr>
+            <tr><td>Templates Canvas</td><td>Hazır şablonlar (Instagram, banner, vb.)</td></tr>
+            <tr><td>Dashboard</td><td>Canlı iş takip panosu</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 10: Çalışma Takvimi -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s10">
+      <div class="section-header">
+        <div class="section-num">10</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Sistem Çalışma Takvimi</h2>
+          <div class="section-tag">Saatler · Orchestrator adımları · Lockfile</div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">🕐</span>
+        <span>Sistem yalnızca <strong>hafta içi (Pazartesi–Cuma) 08:00–18:00</strong> saatleri arasında aktiftir. Hafta sonu brief açılabilir ama sistem ancak Pazartesi sabahı işler.</span>
+      </div>
+
+      <h3>Orchestrator Çalışma Zamanları</h3>
+      <div class="schedule-grid">
+        <div class="schedule-row">
+          <div class="schedule-time">Her :15 ve :45</div>
+          <div class="schedule-task"><strong>Orchestrator tam döngü</strong> — brief tarama, canvas güncelleme, bildirim, dashboard push</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Her dakika</div>
+          <div class="schedule-task">launchd kontrol: mesai saati mi? Evet ise :15/:45 çalıştır</div>
+        </div>
+      </div>
+
+      <h3>Orchestrator Adımları (Her :15/:45)</h3>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-dot">1</div>
+          <div class="flow-content">
+            <div class="flow-label">Data Agent</div>
+            <div class="flow-sub">Canvas okuma (30dk cache), brief-queue.json, parse, E3, canvas güncelleme, live-data.json üret</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">2</div>
+          <div class="flow-content">
+            <div class="flow-label">Notification Agent</div>
+            <div class="flow-sub">DM'ler, thread uyarıları, Google Calendar, idempotent kontrol</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot">3</div>
+          <div class="flow-content">
+            <div class="flow-label">Dashboard Agent</div>
+            <div class="flow-sub">live-data.json → EMBEDDED_DATA → GitHub push</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot" style="background:var(--prio-green)">4</div>
+          <div class="flow-content">
+            <div class="flow-label">State güncelle</div>
+            <div class="flow-sub">agent-state.json · GitHub PAT süresi kontrol (80+ gün → DM uyarı)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">🔒</span>
+        <span><strong>Lockfile sistemi:</strong> Bir orchestrator çalışması devam ederken yenisi başlamaz (<code>/tmp/benseno-orchestrator.lock</code>). Takılı run varsa lock dosyası silinerek yenisi başlatılır.</span>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 11: SSS -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s11">
+      <div class="section-header">
+        <div class="section-num">11</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Sık Sorulan Sorular</h2>
+          <div class="section-tag">8 soru · Sorun giderme</div>
+        </div>
+      </div>
+
+      <h4>Brief'i açtım ama Canvas'ta görünmüyor. Ne yapmalıyım?</h4>
+      <p>Brief sync her 30 dakikada bir çalışır — açtığınız saatten sonra gelen ilk :15 veya :45'te işlenecektir. 45 dakika geçtiyse: (1) doğru format kullanıldığını kontrol edin, (2) doğru kanalda açıldığından emin olun (editor/faq kanalları taranmaz), (3) erdem veya Görkem'e haber verin.</p>
+
+      <hr>
+
+      <h4>Yanlış kişiye atandım. Ne yapabilirim?</h4>
+      <p>Brief thread'ine yeni atama bilgisiyle cevap yazın (editör yapabilir). Editör veya yönetici brief'i force-close (🔒) edip yenisini açabilir. Doğrudan İpek veya erdem'e DM atın.</p>
+
+      <hr>
+
+      <h4>Deadline'ı geçmiş bir brief açtım ama bilerek. Uyarıyı nasıl kapatırım?</h4>
+      <p>Brief thread'ine <code>✅ ok</code> veya <code>teyit</code> yazın. Ya da brief mesajına ✅ reaction ekleyin. Sistem "teyit edilmiş geç brief" olarak işaretler ve sabah raporundan çıkarır.</p>
+
+      <hr>
+
+      <h4>Brief'in önceliği yanlış hesaplanmış. Nasıl düzeltirim?</h4>
+      <p>Yöneticiler (Görkem, Reyhan, Cansu, İpek, erdem) brief mesajının parent'ına doğrudan <span class="prio prio-red">🔴</span> <span class="prio prio-orange">🟠</span> <span class="prio prio-yellow">🟡</span> <span class="prio prio-green">🟢</span> reaction ekleyerek önceliği anlık değiştirebilir.</p>
+
+      <hr>
+
+      <h4>Dashboard güncellenmedi, eski veri gösteriyor.</h4>
+      <p>Sayfayı yenileyin (F5). Sağ üstteki "Canlı · Xsn" göstergesine bakın. 30 dakikadan uzun süredir güncellenmemişse Görkem'e haber verin.</p>
+
+      <hr>
+
+      <h4>Reaction'ı yanlış mesaja ekledim (thread'e). Ne olur?</h4>
+      <p>Sistem 30 dakika içinde size DM ile bildirim gönderir. Reaction'ı silerek doğru (parent) mesaja eklemeniz yeterlidir.</p>
+
+      <hr>
+
+      <h4><code>@auto</code> ile atama yaptım ama kimse belirlenmedi.</h4>
+      <p><code>@auto</code> Smart Assign 2.0 ile sonraki sync'te işlenir. Şu an müsait tasarımcı yoksa ya da brief 🔴 Acil ise sistem sizi uyaracaktır (Şablon 18). <strong>Acil brief'lerde daima manuel atama yapın.</strong></p>
+
+      <hr>
+
+      <h4>OOO (izin) durumum sisteme nasıl yansır?</h4>
+      <p>Google Calendar'a izin/tatil/raporlu/OOO etkinliği ekleyin. Sabah raporu bu etkinlikleri okuyarak OOO listesi oluşturur. WFH (evden çalışma) OOO sayılmaz.</p>
+    </section>
+
+    <!-- ─────────────────────────────────────────── -->
+    <!-- Section 12: Teknik Referans -->
+    <!-- ─────────────────────────────────────────── -->
+    <section class="section" id="s12">
+      <div class="section-header">
+        <div class="section-num">12</div>
+        <div class="section-title-wrap">
+          <h2 class="section-title">Teknik Referans</h2>
+          <div class="section-tag">Yönetici/Teknik · Dosya yapısı · Komutlar · Formüller</div>
+        </div>
+      </div>
+
+      <h3>12.1 Dosya Yapısı</h3>
+      <div class="tree">
+<span class="dir">~/benseno-tasarim-sistemi/</span>
+├── .claude/skills/
+│   ├── <span class="dir">benseno-orchestrator/</span>      <span class="comment"># Ana orkestratör</span>
+│   ├── <span class="dir">benseno-data-agent/</span>        <span class="comment"># Canvas okuma / parsing</span>
+│   ├── <span class="dir">benseno-notification-agent/</span> <span class="comment"># DM / calendar</span>
+│   ├── <span class="dir">benseno-dashboard-agent/</span>    <span class="comment"># GitHub push</span>
+│   ├── <span class="dir">benseno-gunluk-performans/</span>  <span class="comment"># Sabah raporu</span>
+│   ├── <span class="dir">benseno-haftalik-retrospektif/</span>
+│   ├── <span class="dir">benseno-aylik-strateji/</span>
+│   ├── <span class="dir">benseno-onboarding/</span>
+│   ├── <span class="dir">benseno-brief-tamamla/</span>
+│   └── <span class="dir">benseno-reaction-override/</span>
+├── dashboard/
+│   ├── index.html                  <span class="comment"># Ana HTML (EMBEDDED_DATA burada)</span>
+│   └── app/
+│       ├── bundle.js               <span class="comment"># Derlenmiş React uygulaması</span>
+│       ├── live-data.json          <span class="comment"># Canlı veri (30sn polling)</span>
+│       ├── tokens.css              <span class="comment"># Tasarım token'ları</span>
+│       └── screens/                <span class="comment"># 14 ekran JSX dosyası</span>
+├── data/
+│   ├── canvas_cache.md             <span class="comment"># Canvas cache (30dk TTL)</span>
+│   ├── live-data.json              <span class="comment"># Canlı veri kaynağı</span>
+│   ├── notification-flags.json     <span class="comment"># Data→Notification haberleşmesi</span>
+│   ├── brief-queue.json            <span class="comment"># Slack Bot→Data Agent kuyruğu</span>
+│   ├── agent-state.json            <span class="comment"># Son run + 14 günlük geçmiş</span>
+│   ├── marka_stats.json            <span class="comment"># E3 marka istatistikleri</span>
+│   └── notifications-sent.json     <span class="comment"># İdempotent DM log</span>
+├── scripts/
+│   ├── build-dashboard.sh          <span class="comment"># Bundle yeniden derle</span>
+│   ├── run-orchestrator.sh         <span class="comment"># launchd wrapper</span>
+│   ├── run-sabah-raporu.sh
+│   ├── run-haftalik.sh
+│   ├── run-aylik.sh
+│   ├── run-gunluk-ozet.sh
+│   ├── run-slack-bot.sh
+│   └── slack-bot.js                <span class="comment"># Socket Mode bot</span>
+└── logs/
+    ├── orchestrator.log
+    ├── slack-bot.log
+    └── sabah-raporu.log
+      </div>
+
+      <h3>12.2 Manuel Komutlar</h3>
+      <div class="code-block">
+<span class="cm"># Dashboard bundle yeniden derle (JSX değişikliği sonrası)</span>
+bash scripts/build-dashboard.sh
+
+<span class="cm"># Manuel orchestrator çalıştır (test için)</span>
+claude -p <span class="str">"Skill: benseno-orchestrator — run"</span> --dangerously-skip-permissions
+
+<span class="cm"># Sadece data agent'ı çalıştır</span>
+claude -p <span class="str">"Skill: benseno-data-agent — run"</span> --dangerously-skip-permissions
+
+<span class="cm"># Sabah raporunu manuel tetikle</span>
+claude -p <span class="str">"Skill: benseno-gunluk-performans — run now"</span> --dangerously-skip-permissions
+
+<span class="cm"># Slack Bot'u yeniden başlat</span>
+pkill -f <span class="str">"slack-bot.js"</span>; bash scripts/run-slack-bot.sh &
+
+<span class="cm"># Aktif launchd job'ları listele</span>
+launchctl list | grep benseno
+
+<span class="cm"># Canlı log izle</span>
+tail -f logs/orchestrator.log
+tail -f logs/slack-bot.log
+      </div>
+
+      <h3>12.3 launchd Job'ları</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Job</th><th>Tetiklenme</th><th>Komut</th></tr></thead>
+          <tbody>
+            <tr><td><code>com.benseno.orchestrator</code></td><td>Her dakika, :15/:45 check</td><td>run-orchestrator.sh</td></tr>
+            <tr><td><code>com.benseno.sabah-raporu</code></td><td>Hft içi 07:50</td><td>run-sabah-raporu.sh</td></tr>
+            <tr><td><code>com.benseno.haftalik</code></td><td>Cuma 17:00</td><td>run-haftalik.sh</td></tr>
+            <tr><td><code>com.benseno.aylik</code></td><td>Her gün 17:05 (script tarih kontrol)</td><td>run-aylik.sh</td></tr>
+            <tr><td><code>com.benseno.gunluk-ozet</code></td><td>Hft içi 17:00</td><td>run-gunluk-ozet.sh</td></tr>
+            <tr><td><code>com.benseno.slack-bot</code></td><td>Boot'ta başlar, crash'te yeniden</td><td>run-slack-bot.sh</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>12.4 Öncelik Hesaplama</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Kalan Süre (delta_hours)</th><th>Öncelik</th></tr></thead>
+          <tbody>
+            <tr><td>≤ 0</td><td><span class="prio prio-red">🔴 GEÇMİŞ</span></td></tr>
+            <tr><td>0 &lt; Δ ≤ 8</td><td><span class="prio prio-red">🔴 Acil</span></td></tr>
+            <tr><td>8 &lt; Δ ≤ 24</td><td><span class="prio prio-orange">🟠 Yüksek</span></td></tr>
+            <tr><td>24 &lt; Δ ≤ 72</td><td><span class="prio prio-yellow">🟡 Normal</span></td></tr>
+            <tr><td>&gt; 72</td><td><span class="prio prio-green">🟢 Düşük</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size: 13px; color: var(--ink-3);">Saatsiz brief'lerde deadline = o günün 23:59'u olarak hesaplanır.</p>
+
+      <h3>12.5 Sorunlu Marka Skor Formülü</h3>
+      <div class="code-block">
+Skor = (geciken × 4) + (blokeli × 3) + (stale × 2)
+     + (yüksek_revizyon × 1) + max(0, aktif - 4)
+
+<span class="cm"># En yüksek 4 marka Dashboard → Sorunlu Markalar widget'ında listelenir</span>
+      </div>
+
+      <h3>12.6 GitHub PAT Yönetimi</h3>
+      <p>Token (<code>data/.github-pat-sistem</code>) 90 gün geçerlidir.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Gün</th><th>Sistem Aksiyonu</th></tr></thead>
+          <tbody>
+            <tr><td>80+ gün</td><td>Görkem'e DM uyarısı</td></tr>
+            <tr><td>90+ gün</td><td>DM + sabah raporuna ek not. Dashboard push kesilir!</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Yenileme: GitHub Settings → Tokens → yeni PAT → <code>data/.github-pat-sistem</code> dosyasına yaz → <code>data/.github-pat-created</code> güncelle.</p>
+
+      <h3>12.7 Canvas Güncelleme Kuralları (Kritik)</h3>
+      <div class="callout danger">
+        <span class="callout-icon">🚨</span>
+        <div>
+          <strong>Canvas güncellemeleri yanlış yapılırsa veri bozulur!</strong>
+          <ol style="margin-top: 8px; padding-left: 16px;">
+            <li><code>slack_update_canvas</code>'ta <strong>section_id parametresi KULLANMA</strong> — API bug'ı, blockquote/footer çoğalır</li>
+            <li>Canvas'a <strong>H1 başlık YAZMA</strong> — title ayrıca set edilir</li>
+            <li>Canvas güncelleme her zaman <strong>full replace</strong> — kısmi güncelleme yoktur</li>
+            <li><strong>Değişiklik yoksa canvas güncelleme ÇAĞIRMA</strong> (idempotent kontrol)</li>
+            <li>Aktif İşler <strong>13 sütun</strong>, Tamamlananlar <strong>14 sütun</strong> — karıştırma</li>
+          </ol>
+        </div>
+      </div>
+
+      <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); text-align: center;">
+        <div style="font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--ink-3); margin-bottom: 4px;">Benseno Tasarım Sistemi</div>
+        <div style="font-size: 11px; color: var(--ink-5); letter-spacing: 0.06em; text-transform: uppercase;">v7.13 · Mayıs 2026 · Kılavuz sonu</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Active nav on scroll
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-10% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
