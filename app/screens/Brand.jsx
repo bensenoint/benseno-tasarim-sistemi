@@ -39,7 +39,7 @@ function BrandScreen({ data, onOpenBrief }) {
         </>}
       />
 
-      <div style={{display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
+      <div className="bns-kpi-4" style={{display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Toplam marka" value={data.brandStats.length}/>
         <Kpi label="En yoğun" value={busiest.active} sub={busiest.name} color={busiest.color}/>
         <Kpi label="Ort. brief/marka" value={avg}/>

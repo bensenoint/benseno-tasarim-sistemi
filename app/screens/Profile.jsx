@@ -189,7 +189,7 @@ function ProfileScreen({ data, user, onOpenBrief }) {
       <div style={{height:16}}/>
 
       {/* ─── KPI şeridi ──────────────────────────────────────── */}
-      <div style={{display:"grid", gridTemplateColumns:"repeat(8,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}} className="bn-kpi-grid">
+      <div className="bns-kpi-8" style={{display:"grid", gridTemplateColumns:"repeat(8,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Aktif iş"      value={myActive.length} color={myActive.length > CAP_LIMIT ? "var(--prio-red)" : undefined}/>
         <Kpi label="Tamamlanan"    value={myCompleted.length} sub="kayıtlı"/>
         <Kpi label="Toplam revize" value={totalRev} sub={`ort. ${avgRev}/iş`}/>
@@ -370,8 +370,8 @@ function ProfileScreen({ data, user, onOpenBrief }) {
             </div>
           </div>
           {myCompleted.length > 0 ? (
-            <div style={{overflowX:"auto"}}>
-              <table style={{width:"100%", borderCollapse:"collapse", font:"400 12px/1.3 var(--font-sans)"}}>
+            <div style={{overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
+              <table style={{width:"100%", minWidth:480, borderCollapse:"collapse", font:"400 12px/1.3 var(--font-sans)"}}>
                 <thead>
                   <tr style={{background:"var(--paper-2)"}}>
                     {["Marka","İş","Rol","Revize","Süre","Gecikme"].map(h => (

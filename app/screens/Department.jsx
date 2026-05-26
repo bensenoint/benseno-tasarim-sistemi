@@ -44,7 +44,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
         actions={null}
       />
 
-      <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
+      <div className="bns-kpi-5" style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Aktif iş"     value={rows.length} accent={r.accent}/>
         <Kpi label="Bu hafta"     value={thisWeek}/>
         <Kpi label="Kapasite"     value={`%${capPct}`} color={capPct > 85 ? "var(--warning)" : "var(--ink)"}/>

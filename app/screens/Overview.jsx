@@ -179,7 +179,7 @@ function DenseLayout({ data, active, overdue, today, week, stale, review, blocke
         </div>}
       />
 
-      <div style={{display:"grid", gridTemplateColumns:"repeat(8, 1fr)", gap: 10, marginBottom: 16}}>
+      <div className="bns-kpi-8" style={{display:"grid", gridTemplateColumns:"repeat(8, 1fr)", gap: 10, marginBottom: 16}}>
         <Kpi label="Aktif"        value={active.length} variant={kpiVariant} spark={[42,45,49,52,55,58,active.length]}/>
         <Kpi label="Geciken"      value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={[3,4,5,4,6,7,overdue.length]}/>
         <Kpi label="Bugün"        value={today.length} variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]}/>
@@ -310,7 +310,7 @@ function StoryLayout({ data, active, overdue, today, week, stale, review, blocke
 // ─── shared ─────────────────────────────────────────────────────────────────
 function KpiGrid({ children, cols = 6 }) {
   return (
-    <div className="bn-kpi-grid" style={{
+    <div className={`bn-kpi-grid bns-kpi-${cols}`} style={{
       display:"grid",
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
       gap: "var(--grid-gap)",

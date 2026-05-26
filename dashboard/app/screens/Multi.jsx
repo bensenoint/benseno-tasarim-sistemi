@@ -59,7 +59,7 @@ function MultiScreen({ data, onOpenBrief }) {
       />
 
       {/* KPI */}
-      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
+      <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Toplam multi" value={allMulti.length} sub={`${( data._allBriefs || data.briefs ).length} aktif brief`}/>
         <Kpi label="Paralel" value={paralel.length} sub="aynı anda birden fazla kişi"/>
         <Kpi label="Sıralı" value={sirali.length} sub="biri bitince diğeri başlar"/>

@@ -62,9 +62,9 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
         </div>
       </div>
 
-      <div style={{
+      <div className="bns-kanban-grid" style={{
         display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 12,
-        minHeight: 540, overflowX:"auto"
+        minHeight: 540, overflowX:"auto", WebkitOverflowScrolling:"touch"
       }}>
         {cols.map(col => {
           const items = col.id === "tamamlandi" ? completedAsBriefs : allBriefs.filter(b => b.durum === col.id);

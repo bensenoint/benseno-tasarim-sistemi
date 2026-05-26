@@ -239,7 +239,7 @@ function DeadlinesScreen({ data, onOpenBrief }) {
         </div>
 
         {/* Day cards */}
-        <div style={{display:"grid", gridTemplateColumns:"repeat(7, 1fr)", gap: 8}}>
+        <div className="bns-deadlines-grid" style={{display:"grid", gridTemplateColumns:"repeat(7, 1fr)", gap: 8}}>
           {buckets.slice(0, 7).map((bk, i) => {
             const isHoliday = isTRHoliday(bk.day);
             const isWeekend = bk.day.getDay() === 0 || bk.day.getDay() === 6;

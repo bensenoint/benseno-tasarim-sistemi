@@ -69,7 +69,7 @@ function DeptCompareScreen({ data }) {
         title="Departmanlar · karşılaştırma"
         subtitle="tasarım · editör · AI · son 30 gün performansı"/>
 
-      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap: 12, marginBottom: "var(--section-gap)"}}>
+      <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap: 12, marginBottom: "var(--section-gap)"}}>
         {["tasarim", "editor", "ai"].map(k => {
           const s = d[k];
           return (

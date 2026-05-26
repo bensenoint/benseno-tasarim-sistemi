@@ -137,7 +137,7 @@ function KanbanView({ rows, onOpenBrief }) {
     { id: "blokeli",     label: "Blokeli",     Ic: I.Warn }
   ];
   return (
-    <div style={{display:"grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, minHeight: 480}}>
+    <div className="bns-kanban-grid" style={{display:"grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, minHeight: 480, overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
       {cols.map(col => {
         const items = rows.filter(b => b.durum === col.id);
         return (

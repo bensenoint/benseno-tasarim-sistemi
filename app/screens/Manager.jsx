@@ -57,7 +57,7 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
       />
 
       {/* Alert grid */}
-      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}} className="bn-grid-3">
+      <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Alert tone="danger" Icon={I.Warn}
           title={`${overdue.length} iş gecikti`}
           body="Şu an deadline'ı geçmiş aktif brief'ler. İlk eylem: yeniden ata veya Slack thread'ini aç."
