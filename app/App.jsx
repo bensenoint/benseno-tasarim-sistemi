@@ -304,7 +304,7 @@ function App() {
           data={liveData}
         />
         <main key={tab + t.overviewLayout} style={{
-          flex: 1, overflowY: "auto", overflowX: "hidden",
+          flex: 1, overflowY: "auto", overflowX: "clip",
           background: "var(--paper)",
         }}>
           <div className="bns-main-content" style={{maxWidth: 1400, margin: "0 auto", padding: "8px 32px 72px"}}>
