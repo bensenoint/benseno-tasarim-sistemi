@@ -431,6 +431,12 @@ html[data-theme="dark"][data-noise="on"] body::before {
   /* Main content: extra bottom padding for bottom nav */
   .bns-main-content { padding: 8px 14px 80px !important; }
 
+  /* Table: hide non-essential columns on mobile */
+  .bns-col-mobile-hide { display: none !important; }
+
+  /* Overview 2-col grid → single col on mobile */
+  .bn-grid-2 { grid-template-columns: 1fr !important; }
+
   /* KPI grid — 2 columns on mobile */
   .bns-kpi-grid {
     grid-template-columns: repeat(2, 1fr) !important;

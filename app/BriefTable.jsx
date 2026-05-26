@@ -27,16 +27,16 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
 
   const cols = [
     { id: "no",     label: "#",      sort: true,  align: "right" },
-    { id: "stale",  label: "🔔",     sort: false },
+    { id: "stale",  label: "🔔",     sort: false, mobileHide: true },
     { id: "deltaH", label: "Öncelik",sort: true },
     { id: "marka",  label: "Marka",  sort: true },
     { id: "baslik", label: "İş",     sort: true },
-    { id: "atanan", label: "Atanan", sort: false },
+    { id: "atanan", label: "Atanan", sort: false, mobileHide: true },
     { id: "deadline",label:"Teslim", sort: true,  align: "right" },
-    { id: "durum",  label: "Durum",  sort: true },
-    { id: "rev",    label: "Rev",    sort: false, align: "right" },
-    { id: "acilma", label: "Güncel", sort: true,  align: "right" },
-    { id: "link",   label: "🔗",     sort: false }
+    { id: "durum",  label: "Durum",  sort: true,  mobileHide: true },
+    { id: "rev",    label: "Rev",    sort: false, align: "right", mobileHide: true },
+    { id: "acilma", label: "Güncel", sort: true,  align: "right", mobileHide: true },
+    { id: "link",   label: "🔗",     sort: false, mobileHide: true }
   ];
 
   return (
@@ -48,16 +48,18 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
         <thead>
           <tr style={{background:"var(--surface-sub)"}}>
             {cols.map(c => (
-              <th key={c.id} onClick={() => c.sort && sortable && toggle(c.id)} style={{
-                font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
-                letterSpacing:"0.04em", textTransform:"uppercase",
-                textAlign: c.align === "right" ? "right" : "left",
-                padding:"10px 10px",
-                borderBottom:"1px solid var(--line-strong)",
-                whiteSpace:"nowrap", cursor: c.sort && sortable ? "pointer" : "default",
-                userSelect:"none", position:"sticky", top: 0, zIndex: 5,
-                background:"var(--surface-sub)"
-              }}>
+              <th key={c.id} onClick={() => c.sort && sortable && toggle(c.id)}
+                className={c.mobileHide ? "bns-col-mobile-hide" : ""}
+                style={{
+                  font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
+                  letterSpacing:"0.04em", textTransform:"uppercase",
+                  textAlign: c.align === "right" ? "right" : "left",
+                  padding:"10px 10px",
+                  borderBottom:"1px solid var(--line-strong)",
+                  whiteSpace:"nowrap", cursor: c.sort && sortable ? "pointer" : "default",
+                  userSelect:"none", position:"sticky", top: 0, zIndex: 5,
+                  background:"var(--surface-sub)"
+                }}>
                 <span style={{display:"inline-flex", alignItems:"center", gap:4}}>
                   {c.label}
                   {sortable && c.sort && sort.col === c.id && (
@@ -97,7 +99,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
-      <td style={cellStyle()}>
+      <td className="bns-col-mobile-hide" style={cellStyle()}>
         {brief.stale && <span title="3+ gün hareketsiz" style={{color:"var(--warning)"}}>●</span>}
         {!brief.stale && brief.deltaH !== null && brief.deltaH <= -72 && <span title="72+ saat gecikme — sistem müdahalesi" style={{color:"var(--prio-red)", fontWeight:700, fontSize:13}}>!!!</span>}
         {!brief.stale && brief.deltaH !== null && brief.deltaH <= -48 && brief.deltaH > -72 && <span title="48+ saat gecikme — kritik" style={{color:"var(--prio-red)", fontWeight:600}}>!!</span>}
@@ -108,14 +110,14 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
       <td style={{...cellStyle(), maxWidth: 320, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
         {brief.baslik}
       </td>
-      <td style={cellStyle()}>
+      <td className="bns-col-mobile-hide" style={cellStyle()}>
         <span style={{display:"inline-flex", alignItems:"center", gap:6}}>
           <Avatar user={brief.lead} size={20}/>
           {brief.contributors.length > 0 && <AvatarStack users={brief.contributors} max={2} size={18}/>}
         </span>
       </td>
       <td style={cellStyle(true, "right")}>{formatDate(brief.deadline)}</td>
-      <td style={{...cellStyle(), position:"relative"}}>
+      <td className="bns-col-mobile-hide" style={{...cellStyle(), position:"relative"}}>
         <span onClick={(e) => { e.stopPropagation(); if (onStatusChange) setMenu(v => !v); }}
           style={{display:"inline-flex", padding:"4px 6px", borderRadius: 6,
             background: menu ? "var(--paper-2)" : "transparent"}}>
@@ -126,9 +128,9 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
             onClose={() => setMenu(false)}/>
         )}
       </td>
-      <td style={cellStyle(true, "right")}>{String(brief.revision).padStart(2, "0")}</td>
-      <td style={cellStyle(true, "right")}>{relTime(brief.acilma)}</td>
-      <td style={cellStyle()}>
+      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{String(brief.revision).padStart(2, "0")}</td>
+      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{relTime(brief.acilma)}</td>
+      <td className="bns-col-mobile-hide" style={cellStyle()}>
         <a href={brief.slack_url} onClick={e => e.stopPropagation()} style={{color:"var(--ink-4)", display:"inline-flex"}}>
           <I.Link size={14}/>
         </a>
