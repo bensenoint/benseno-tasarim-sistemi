@@ -312,7 +312,9 @@
       "durum": "⚠️ GEÇMİŞ · Şablon 24+25 gönderildi · 72sa blokeli eşiği ~14:45 sync Şablon 29 → Eren",
       "rev": "0",
       "gecmis": "⏳21May14:43 (Görkem GM açtı · workflow · 🔔 otomatik 🟡 [47sa 51dk≤72sa] · 📊 marka_kiyasla: VDM Petdent n=0 · skip · yetersiz_veri · silent_log · ⚠️ Eren'in 5. aktif iş'i — KAPASİTE AŞIMI başladı) / 📈22May14:45 öncelik 🟡→🟠 (auto-recalc [23sa 57dk≤24sa])",
-      "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629)"
+      "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629)",
+      "status": "⚠️ GEÇMİŞ · Şablon 24+25 gönderildi · 72sa blokeli eşiği ~14:42 · ~1sa 21dk · ~14:45 sync Şablon 29 → Eren",
+      "deadline_tr": "23May14:42 GEÇMİŞ 2g 22sa 21dk ⏳ 72sa ~26May14:42 (~1sa 21dk)"
     },
     {
       "no": "22",
@@ -793,10 +795,10 @@
     "green": 3
   },
   "overdue_count": 13,
-  "last_sync": "2026-05-26T12:45:52+03:00",
-  "sync_ts": 1779788752,
+  "last_sync": "2026-05-26T13:20:08+03:00",
+  "sync_ts": 1779790808,
   "now": "2026-05-26T12:45:52+03:00",
-  "source": "data-agent-run-1779788752",
+  "source": "data-agent-run-1779790808",
   "sync_iso": "2026-05-26T12:45:52+03:00",
   "run_type": "orchestrator_1245_delta_refresh"
 }
