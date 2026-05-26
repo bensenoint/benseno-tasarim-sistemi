@@ -35,3 +35,10 @@ data/escalation-log.json
 data/.supabase-service-key
 data/.supabase-anon-key
 data/.supabase-url
+
+# launchd stdout/stderr dosyaları
+logs/*.out
+logs/*.err
+
+# Graphify çıktıları
+graphify-out/
