@@ -27,7 +27,15 @@ $CLAUDE -p "Skill: benseno-orchestrator — run" \
   --print \
   >> "$LOG" 2>&1
 
-# Heartbeat güncelle — Watchdog bu dosyaya bakarak "sistem çalışıyor" doğrular
+CLAUDE_EXIT=$?
+
+# Heartbeat: her durumda güncelle (başarılı da olsa başarısız da olsa)
 date +%s > "$PROJ/logs/brief-sync-last.ts"
 
-echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator tamamlandı." >> "$LOG"
+if [ $CLAUDE_EXIT -ne 0 ]; then
+  echo "[$(date '+%d.%m.%Y %H:%M')] HATA: Claude çıkış kodu $CLAUDE_EXIT — orchestrator başarısız olmuş olabilir." >> "$LOG"
+  # Watchdog'a sinyal: başarısız çalışma not et
+  echo "claude_exit=$CLAUDE_EXIT ts=$(date +%s)" >> "$PROJ/logs/orchestrator-errors.log"
+fi
+
+echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator tamamlandı. (exit: $CLAUDE_EXIT)" >> "$LOG"
