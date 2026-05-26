@@ -1,0 +1,398 @@
+/* ============================================================
+   Benseno Tasarım Sistemi — colors_and_type.css
+   Foundation tokens. Used by every preview card and UI kit.
+   ============================================================ */
+
+/* ----- Fonts (Google Fonts CDN) ------------------------------ */
+/* If offline, drop WOFF2s in fonts/ and uncomment the @font-face
+   block at the bottom of this file. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap");
+
+/* ------------------------------------------------------------ */
+/*  CORE TOKENS                                                 */
+/* ------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- Surfaces (warm-paper canvas) -------------------------- */
+  --paper:        #FBFAF7;   /* page canvas */
+  --paper-2:      #F4F2EC;   /* secondary surface (toolbar fills) */
+  --surface:      #FFFFFF;   /* card / panel */
+  --surface-sub:  #FAF9F6;   /* inset / table-stripe */
+  --overlay:      rgba(22, 22, 26, 0.40); /* modal backdrop */
+
+  /* ---- Ink (text) ------------------------------------------ */
+  --ink:          #16161A;   /* primary text */
+  --ink-2:        #2E2E36;   /* secondary text */
+  --ink-3:        #5B5B66;   /* tertiary / labels */
+  --ink-4:        #8A8A94;   /* placeholder / disabled text */
+  --ink-5:        #B6B6BE;   /* hint / icon idle */
+
+  /* ---- Lines ----------------------------------------------- */
+  --line:         #ECEAE3;   /* hairline border */
+  --line-strong:  #DFDCD3;   /* divider / table grid */
+  --line-soft:    #F2F0EA;   /* very faint separator */
+
+  /* ---- Brand accent (single warm) -------------------------- */
+  --ember:        #C24A2C;   /* primary action, focus ring, wordmark */
+  --ember-hover:  #A93D22;
+  --ember-press:  #8E3119;
+  --ember-tint:   rgba(194, 74, 44, 0.10);
+  --ember-muted:  rgba(194, 74, 44, 0.25);
+
+  /* ---- Semantic — priority (color-blind paired with glyph) -- */
+  --prio-red:     #D7263D;   /* 🔴 Acil   — triangle glyph */
+  --prio-orange:  #E07A1F;   /* 🟠 Yüksek — square glyph */
+  --prio-yellow:  #C99A1E;   /* 🟡 Normal — circle glyph */
+  --prio-green:   #2E8F66;   /* 🟢 Düşük  — check glyph */
+
+  --prio-red-bg:    rgba(215, 38, 61, 0.10);
+  --prio-orange-bg: rgba(224, 122, 31, 0.12);
+  --prio-yellow-bg: rgba(201, 154, 30, 0.14);
+  --prio-green-bg:  rgba(46, 143, 102, 0.12);
+
+  /* ---- Semantic — system feedback -------------------------- */
+  --success:      #2E8F66;
+  --warning:      #E07A1F;
+  --danger:       #D7263D;
+  --info:         #3360A4;
+
+  /* ---- 16-hue brand wheel (color-blind safe, Wong-derived) -- */
+  --bw-1:  #4E79A7;  --bw-2:  #F28E2B;  --bw-3:  #59A14F;  --bw-4:  #B07AA1;
+  --bw-5:  #76B7B2;  --bw-6:  #E15759;  --bw-7:  #EDC948;  --bw-8:  #9C755F;
+  --bw-9:  #BAB0AC;  --bw-10: #2C7FB8;  --bw-11: #D9881F;  --bw-12: #6A8E3D;
+  --bw-13: #8E5BA1;  --bw-14: #00786F;  --bw-15: #C44545;  --bw-16: #B79100;
+
+  /* ---- Type families --------------------------------------- */
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* ---- Type scale (px) ------------------------------------- */
+  --fs-11: 11px;   /* caption / mono labels */
+  --fs-12: 12px;   /* tabular minor */
+  --fs-13: 13px;   /* secondary UI */
+  --fs-14: 14px;   /* body */
+  --fs-15: 15px;   /* large body */
+  --fs-16: 16px;   /* paragraph */
+  --fs-18: 18px;   /* section title */
+  --fs-20: 20px;   /* card heading */
+  --fs-22: 22px;   /* page heading */
+  --fs-28: 28px;   /* KPI value small */
+  --fs-36: 36px;   /* KPI value large */
+  --fs-44: 44px;   /* display number */
+  --fs-56: 56px;   /* hero number */
+
+  /* ---- Line heights ---------------------------------------- */
+  --lh-tight:   1.15;
+  --lh-snug:    1.30;
+  --lh-normal:  1.45;
+  --lh-prose:   1.60;
+
+  /* ---- Letter spacing -------------------------------------- */
+  --ls-tight:   -0.01em;
+  --ls-normal:   0;
+  --ls-wide:     0.04em;
+  --ls-eyebrow:  0.10em;   /* for ALLCAPS labels */
+
+  /* ---- Weights --------------------------------------------- */
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* ---- Spacing (4px base) ---------------------------------- */
+  --sp-0:   0;
+  --sp-1:   4px;
+  --sp-2:   8px;
+  --sp-3:   12px;
+  --sp-4:   16px;
+  --sp-6:   24px;
+  --sp-8:   32px;
+  --sp-12:  48px;
+  --sp-16:  64px;
+  --sp-24:  96px;
+
+  /* ---- Radii ----------------------------------------------- */
+  --r-1:   4px;    /* tag, dot */
+  --r-2:   6px;    /* button, input */
+  --r-3:   10px;   /* card */
+  --r-4:   14px;   /* modal, drawer */
+  --r-pill: 999px; /* chip, focus ring */
+
+  /* ---- Shadows --------------------------------------------- */
+  --shadow-0: none;
+  --shadow-1:
+    0 1px 2px rgba(22, 22, 26, 0.04),
+    0 4px 12px rgba(22, 22, 26, 0.04);
+  --shadow-2:
+    0 2px 6px rgba(22, 22, 26, 0.04),
+    0 12px 32px rgba(22, 22, 26, 0.08);
+  --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
+
+  /* ---- Motion ---------------------------------------------- */
+  --ease-out-quart: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-slow:    320ms;
+
+  /* ---- Layout ---------------------------------------------- */
+  --max-content: 1440px;
+  --header-h:    56px;
+  --tabbar-h:    44px;
+}
+
+/* ------------------------------------------------------------ */
+/*  DARK MODE (optional)                                        */
+/* ------------------------------------------------------------ */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --paper:        #0F0F12;
+  --paper-2:      #15151A;
+  --surface:      #18181D;
+  --surface-sub:  #1C1C22;
+  --overlay:      rgba(0, 0, 0, 0.55);
+
+  --ink:          #F1EFE9;
+  --ink-2:        #C9C7C1;
+  --ink-3:        #8F8E8A;
+  --ink-4:        #6B6A67;
+  --ink-5:        #4B4A48;
+
+  --line:         #2A2A30;
+  --line-strong:  #36363E;
+  --line-soft:    #22222A;
+
+  --ember:        #E4623F;
+  --ember-hover:  #ED7A5B;
+  --ember-press:  #C24A2C;
+  --ember-tint:   rgba(228, 98, 63, 0.14);
+  --ember-muted:  rgba(228, 98, 63, 0.30);
+
+  --shadow-1:
+    0 1px 2px rgba(0, 0, 0, 0.40),
+    0 4px 12px rgba(0, 0, 0, 0.32);
+  --shadow-2:
+    0 2px 6px rgba(0, 0, 0, 0.40),
+    0 16px 40px rgba(0, 0, 0, 0.48);
+  --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
+}
+
+/* ------------------------------------------------------------ */
+/*  SEMANTIC ROLES                                              */
+/* ------------------------------------------------------------ */
+
+/* Use these classes (or the matching vars) wherever you'd otherwise
+   write h1/h2/etc. They tie to the scale above and add the right
+   font-family + weight + line-height + tracking. */
+
+.bn-display {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-56);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+}
+.bn-h1 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-22);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+}
+.bn-h2 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-18);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+.bn-h3 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-15);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+.bn-subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-20);
+  line-height: var(--lh-snug);
+  color: var(--ink-2);
+}
+.bn-body {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-14);
+  line-height: var(--lh-normal);
+  color: var(--ink);
+}
+.bn-body-sm {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-13);
+  line-height: var(--lh-normal);
+  color: var(--ink-2);
+}
+.bn-label {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+.bn-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-11);
+  line-height: 1;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.bn-caption {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+.bn-mono {
+  font-family: var(--font-mono);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  letter-spacing: 0;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.bn-kpi-value {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-36);
+  line-height: 1;
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.bn-kpi-value-lg {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-44);
+  line-height: 1;
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* No-wrap helpers — most chrome labels should never wrap */
+button, .bn-eyebrow, .bn-label, .bn-mono { white-space: nowrap; }
+
+/* Tabular numerics everywhere inside tables and KPI cells */
+table, .bn-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------ */
+/*  BASE PAGE                                                   */
+/* ------------------------------------------------------------ */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-14);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+  border-radius: var(--r-2);
+}
+
+/* ------------------------------------------------------------ */
+/*  DENSITY MODES                                               */
+/*  Set on <html data-density="…"> via Tweaks.                  */
+/* ------------------------------------------------------------ */
+:root {
+  --row-h: 38px;         /* table row default */
+  --row-pad: 10px;
+  --card-pad: 16px;
+  --section-gap: 24px;
+  --grid-gap: 16px;
+  --kpi-fs: 36px;
+}
+html[data-density="compact"] {
+  --row-h: 32px;
+  --row-pad: 7px;
+  --card-pad: 12px;
+  --section-gap: 18px;
+  --grid-gap: 12px;
+  --kpi-fs: 28px;
+}
+html[data-density="spacious"] {
+  --row-h: 48px;
+  --row-pad: 14px;
+  --card-pad: 22px;
+  --section-gap: 32px;
+  --grid-gap: 20px;
+  --kpi-fs: 44px;
+}
+
+/* ------------------------------------------------------------ */
+/*  PAPER NOISE OVERLAY                                         */
+/*  Set on <html data-noise="on"> — faint 2% paper texture.     */
+/* ------------------------------------------------------------ */
+html[data-noise="on"] body::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+html[data-theme="dark"][data-noise="on"] body::before {
+  opacity: 0.06;
+  mix-blend-mode: screen;
+}
+
+/* ------------------------------------------------------------ */
+/*  SCROLLBAR (subtle)                                          */
+/* ------------------------------------------------------------ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  border: 2px solid var(--paper);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--ink-5); }
+
+/* ------------------------------------------------------------ */
+/*  SCREEN ANIMATION                                            */
+/* ------------------------------------------------------------ */
+@keyframes bn-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes bn-slide-r { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes bn-slide-up { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+.bn-tab-in { animation: bn-fade 200ms var(--ease-out-quart); }
+
+/* Tabular numerics for KPIs */
+.bn-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
