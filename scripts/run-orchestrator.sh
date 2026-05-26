@@ -27,4 +27,7 @@ $CLAUDE -p "Skill: benseno-orchestrator — run" \
   --print \
   >> "$LOG" 2>&1
 
+# Heartbeat güncelle — Watchdog bu dosyaya bakarak "sistem çalışıyor" doğrular
+date +%s > "$PROJ/logs/brief-sync-last.ts"
+
 echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator tamamlandı." >> "$LOG"

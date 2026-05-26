@@ -18,11 +18,24 @@ CREATED=$(cat "$CREATED_FILE" | tr -d '[:space:]')
 PAT=$(cat "$PAT_FILE" | tr -d '[:space:]')
 
 # GitHub API üzerinden PAT'in gerçekte geçerli olup olmadığını kontrol et
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-  -H "Authorization: token $PAT" \
-  https://api.github.com/user)
+# HTTP 000 = ağ bağlantı hatası → 3 kez retry yap, ardından ağ hatası olarak işaretle
+MAX_RETRY=3
+HTTP_STATUS="000"
+for i in 1 2 3; do
+  HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+    -H "Authorization: token $PAT" \
+    https://api.github.com/user)
+  [[ "$HTTP_STATUS" == "200" || "$HTTP_STATUS" == "401" || "$HTTP_STATUS" == "403" ]] && break
+  # 000 veya 5xx = geçici hata, bekleyip tekrar dene
+  echo "[$TIMESTAMP] Deneme $i/3: HTTP $HTTP_STATUS — 5 saniye bekleniyor..." >> "$LOG"
+  sleep 5
+done
 
-if [[ "$HTTP_STATUS" != "200" ]]; then
+if [[ "$HTTP_STATUS" == "000" ]]; then
+  # Ağ ulaşılamadı — PAT geçersizliğinden farklı, alarm gönderme
+  echo "[$TIMESTAMP] UYARI: GitHub API'ye ulaşılamadı (HTTP 000 — ağ hatası). PAT durumu bilinmiyor, DM gönderilmedi." >> "$LOG"
+  exit 0
+elif [[ "$HTTP_STATUS" != "200" ]]; then
   MSG="🚨 *GitHub PAT GEÇERSİZ!* (HTTP $HTTP_STATUS)\nBrief Sync ve GitHub push çalışmıyor. PAT'i hemen yenile: https://github.com/settings/tokens"
   echo "[$TIMESTAMP] KRITIK: PAT geçersiz (HTTP $HTTP_STATUS)" >> "$LOG"
   /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --print --dangerously-skip-permissions >> "$LOG" 2>&1

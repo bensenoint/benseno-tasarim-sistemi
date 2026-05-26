@@ -20,14 +20,36 @@ DOW=$(date +%u)
 
 NOW_EPOCH=$(date +%s)
 
-# Heartbeat dosyası yoksa → hiç çalışmamış
-if [[ ! -f "$HEARTBEAT" ]]; then
-  echo "[$TIMESTAMP] UYARI: Heartbeat dosyası yok — Brief Sync hiç çalışmamış olabilir." >> "$LOG"
-  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: ⚠️ *Brief Sync Watchdog:* Heartbeat dosyası bulunamadı. Brief Sync hiç çalışmamış veya log silinmiş olabilir. Kontrol et: launchctl list | grep benseno" --print --dangerously-skip-permissions >> "$LOG" 2>&1
+# Heartbeat kaynakları:
+# 1. agent-state.json last_run_ts (Orchestrator çalıştıysa güncellenir)
+# 2. logs/brief-sync-last.ts (doğrudan Brief Sync launchd job'u)
+# İkisinden hangisi daha yeniyse onu kullan — Orchestrator Brief Sync'i üstlenmiş olabilir.
+
+LAST_SYNC=""
+
+AGENT_STATE="data/agent-state.json"
+if [[ -f "$AGENT_STATE" ]]; then
+  AGENT_TS=$(python3 -c "import json,sys; d=json.load(open('$AGENT_STATE')); print(d.get('last_run_ts',''))" 2>/dev/null)
+  if [[ -n "$AGENT_TS" && "$AGENT_TS" =~ ^[0-9]+$ ]]; then
+    LAST_SYNC="$AGENT_TS"
+  fi
+fi
+
+if [[ -f "$HEARTBEAT" ]]; then
+  HEARTBEAT_TS=$(cat "$HEARTBEAT" | tr -d '[:space:]')
+  # Daha yeniyse heartbeat'i kullan
+  if [[ -z "$LAST_SYNC" || "$HEARTBEAT_TS" -gt "$LAST_SYNC" ]]; then
+    LAST_SYNC="$HEARTBEAT_TS"
+  fi
+fi
+
+# Hiçbir kaynak yoksa → uyar
+if [[ -z "$LAST_SYNC" ]]; then
+  echo "[$TIMESTAMP] UYARI: Heartbeat ve agent-state bulunamadı — sistem hiç çalışmamış olabilir." >> "$LOG"
+  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: ⚠️ *Brief Sync Watchdog:* Heartbeat ve agent-state bulunamadı. Brief Sync hiç çalışmamış veya log silinmiş olabilir. Kontrol et: launchctl list | grep benseno" --print --dangerously-skip-permissions >> "$LOG" 2>&1
   exit 1
 fi
 
-LAST_SYNC=$(cat "$HEARTBEAT" | tr -d '[:space:]')
 DIFF=$(( NOW_EPOCH - LAST_SYNC ))
 DIFF_MIN=$(( DIFF / 60 ))
 LAST_HUMAN=$(date -j -f "%s" "$LAST_SYNC" "+%H:%M" 2>/dev/null)

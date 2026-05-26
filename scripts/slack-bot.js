@@ -108,6 +108,11 @@ const app = new App({
   appToken:   process.env.SLACK_APP_TOKEN,
   socketMode: true,
   logLevel:   'warn',
+  // Mac uyku/uyanma döngüsünde WebSocket kopuyor — ping timeout'ı artırarak
+  // gereksiz yeniden bağlanma ve "pong not received" uyarılarını azalt
+  clientOptions: {
+    retryConfig: { retries: 5, minTimeout: 2000, maxTimeout: 30000, randomize: true }
+  }
 });
 
 // ─── Canvas Parse Yardımcıları ────────────────────────────────────────────────

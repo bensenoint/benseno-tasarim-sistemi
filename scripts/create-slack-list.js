@@ -125,7 +125,15 @@ async function clearList(listId) {
   console.log('🗑  Mevcut kayıtlar siliniyor...');
   // lists.records.list
   const res = await slackApi('lists.records.list', { list_id: listId, limit: 200 });
-  if (!res.ok) { console.log('  records.list →', res.error); return; }
+  if (!res.ok) {
+    if (res.error === 'not_allowed_token_type') {
+      console.log('  ⚠️  records.list: not_allowed_token_type — Slack Lists Records API bu token tipini desteklemiyor.');
+      console.log('  Çözüm: Slack app ayarlarında Lists Records API için enterprise/cookie token gerekiyor.');
+    } else {
+      console.log('  records.list →', res.error);
+    }
+    return;
+  }
   const records = res.records || [];
   console.log(`  ${records.length} kayıt bulundu`);
   for (const rec of records) {
@@ -187,7 +195,14 @@ async function main() {
       values: { name: { value: name } }
     }, true);
     if (res.ok) { added++; process.stdout.write('✓'); }
-    else         { failed++; process.stdout.write('✗'); console.error(` [${brief.marka}] ${res.error}`); }
+    else if (res.error === 'not_allowed_token_type') {
+      // Token tipi hatası — tek seferlik açıkla, döngüyü kır
+      failed += sorted.length - added;
+      console.error(`\n  ⚠️  lists.records.create: not_allowed_token_type`);
+      console.error(`  Slack Lists Records API bu workspace'te bu token tipiyle çalışmıyor.`);
+      console.error(`  Bu özellik şu an devre dışı — Canvas/Dashboard senkronizasyonu devam ediyor.`);
+      break;
+    } else { failed++; process.stdout.write('✗'); console.error(` [${brief.marka}] ${res.error}`); }
     // Rate limit: 10 req/sn
     await new Promise(r => setTimeout(r, 110));
   }
