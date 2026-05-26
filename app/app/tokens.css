@@ -437,20 +437,20 @@ html[data-theme="dark"][data-noise="on"] body::before {
   /* Overview 2-col grid → single col on mobile */
   .bn-grid-2 { grid-template-columns: 1fr !important; }
 
-  /* KPI grid — 2 columns on mobile */
-  .bns-kpi-grid {
+  /* KPI grid — 2 columns on mobile (bn-kpi-grid and bns-kpi-grid) */
+  .bns-kpi-grid, .bn-kpi-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
   }
 
-  /* Brief table — horizontal scroll */
+  /* Brief table — fit to screen on mobile (columns already reduced) */
   .bns-table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  .bns-table-wrap table,
-  .bns-table-wrap [role="table"] {
-    min-width: 640px;
+  .bns-table-wrap table {
+    min-width: 0 !important;
+    width: 100% !important;
   }
 
   /* Card padding reduced */

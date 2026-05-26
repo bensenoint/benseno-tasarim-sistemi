@@ -40,11 +40,11 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
   ];
 
   return (
-    <div style={{
+    <div className="bns-table-wrap" style={{
       background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10,
-      overflow: "auto"
+      overflowX: "auto", WebkitOverflowScrolling: "touch"
     }}>
-      <table style={{width:"100%", borderCollapse: "collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
+      <table style={{width:"100%", minWidth: 0, borderCollapse: "collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
         <thead>
           <tr style={{background:"var(--surface-sub)"}}>
             {cols.map(c => (
@@ -107,7 +107,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
       </td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
-      <td style={{...cellStyle(), maxWidth: 320, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
+      <td style={{...cellStyle(), maxWidth: 160, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
         {brief.baslik}
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle()}>
