@@ -20,4 +20,16 @@ fi
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "[$TIMESTAMP] Slack Bot başlatılıyor..." >> logs/slack-bot.log
 
-/opt/homebrew/bin/node scripts/slack-bot.js < /dev/null >> logs/slack-bot.log 2>&1
+# Node başlatılmadan önce PID'i bilemeyiz — background başlat, PID yaz, bekle
+/opt/homebrew/bin/node scripts/slack-bot.js < /dev/null >> logs/slack-bot.log 2>&1 &
+NODE_PID=$!
+echo "$NODE_PID" > logs/slack-bot.pid
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+echo "[$TIMESTAMP] Slack Bot PID=$NODE_PID" >> logs/slack-bot.log
+
+# Node bitene kadar bekle (launchd'nin süreç takibini koru)
+wait $NODE_PID
+EXIT_CODE=$?
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+echo "[$TIMESTAMP] Slack Bot durdu (exit $EXIT_CODE)" >> logs/slack-bot.log
+rm -f logs/slack-bot.pid
