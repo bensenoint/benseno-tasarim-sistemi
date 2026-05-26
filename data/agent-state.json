@@ -1,76 +1,37 @@
 {
-  "last_run": "2026-05-22T17:45:00+03:00",
-  "last_run_ts": 1779461100,
-  "last_run_completed_at": "2026-05-22T17:58:00+03:00",
-  "run_type": "launchd_1745_ara_sync_23_TAMAMLANDI_24_aykut_yari_onay_17_9sa_esigi",
+  "last_run": "2026-05-26T12:45:52+03:00",
+  "last_run_ts": 1779788752,
+  "run_type": "orchestrator_1245_delta_refresh",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
   "active_briefs": 16,
-  "completed_this_run": 1,
-  "cancelled_this_run": 0,
-  "postponed_this_run": 0,
+  "completed_briefs": 8,
+  "priority_summary": {"red": 13, "orange": 0, "yellow": 0, "green": 3},
+  "overdue_count": 13,
+  "blokeli_count": 12,
   "new_briefs_this_run": 0,
-  "priority_distribution": {"red": 12, "orange": 1, "yellow": 0, "green": 3},
-  "overdue_count": 10,
-  "priority_upgrades_this_run": 0,
-  "priority_demotes_this_run": 0,
-  "threshold_transitions_this_run": 1,
-  "deadline_transitions_this_run": 0,
-  "status_improvements_this_run": 1,
-  "github_pushed_sha": "252d6f2",
+  "completed_this_run": 0,
+  "dm_sent": 0,
+  "dm_skipped_idempotent": 5,
+  "canvas_updated": true,
+  "github_commit": "pending",
+  "github_push": "pending",
+  "imminent_deadline": {
+    "no": "21",
+    "marka": "VDM Petdent",
+    "blokeli_esik_iso": "2026-05-26T14:42:00+03:00",
+    "kalan_dk_to_blokeli": 117,
+    "trigger_sync": "14:45 (Şablon 29 → Eren)"
+  },
+  "pat_status": {
+    "created": "2026-05-18",
+    "days_since_creation": 8,
+    "days_to_expiry": 82,
+    "warning": false
+  },
+  "marka_stats_mode": "silent_log_only",
+  "marka_stats_active_from": "2026-06-01T00:00:00+03:00",
   "errors": [],
-  "pat_age_days": 4,
-  "pat_expires_in_days": 86,
-  "notes": "17:45 launchd ara sync. MAJOR: #23 Bauhaus Kaçırılmayacak Fırsatlar TAMAMLANDI Eda T 17:46 'onaylandı' (46dk GEÇMİŞ teslim · 1 revize Salıncak alınmasın minor · v1 16:25 → v2 16:58 → onay 17:46). #24 Bauhaus Bayrama Özel: Aykut yarı onay 17:35 (Eda T 'ellerine sağlıkk' Aykut video v1 kabul · Arda kısmı pending · 15dk to 18:00 deadline · Arda #23 sonrası serbest). #17 VDM bayram postu: 9sa eşiği AŞILDI 17:46 · v1 yok devam · Görkem DM 16:45 stabilized 1sa önce · 12sa eşiği 20:46 sonraki kontrol. Time delta refresh tüm aktif brief'lere. Notification Agent: 0 DM (tüm flags POZİTİF status improvement veya idempotent prior DM · spam riski). Canvas SLACK update YAPILDI · canvas_cache.md REFRESHED · live-data.json REWRITTEN (16 aktif + 8 tamamlanan + 33 marka) · EMBEDDED_DATA inject + cache-bust DONE · GitHub push 252d6f2. Parallel commit 619101a (17:57:52) tarafından live-data.json + notification-flags.json zaten committed edildi. Sonraki sync 18:15 — kritik karar noktaları: #24 18:00 deadline (Arda kısmı geldi mi · GEÇMİŞ olur mu) · #16 + #15 onay komutu Eda T'den (Eda T müsait şimdi) · #2 Hasvet mockup talep Buse'ye dönüş.",
-  "canvas_update": {
-    "status": "DONE_completion_status_improvements_threshold",
-    "reason": "Major: #23 TAMAMLANDI (Eda T onaylandı) + #24 Aykut yarı onay + #17 9sa eşik + time delta refresh"
-  },
-  "new_briefs_processed": [],
-  "completed_briefs_processed": [
-    {"no":"23","marka":"Bauhaus","is":"Kaçırılmayacak Fırsatlar!","bitis":"2026-05-22T17:46:36+03:00","gecikme_dk":46,"revision":1,"note":"Eda T 'onaylandı' tam onay · v1+v2 + Salıncak minor revize"}
-  ],
-  "still_open_critical": [
-    {"no":"24","marka":"Bauhaus","delta_h":0.25,"note":"15dk to 18:00 · Aykut yarı onay · Arda kısmı pending · Arda #23 sonrası serbest"},
-    {"no":"17","marka":"VDM Petdent","delta_h":-8.98,"note":"9sa eşiği AŞILDI 17:46 · Görkem DM 16:45 stabilized · 12sa eşiği 20:46"},
-    {"no":"16","marka":"Bauhaus","delta_h":-0.75,"note":"45dk GEÇMİŞ · v1 verildi · onay 2sa 55dk pasif · Eda T #23 sonrası müsait"},
-    {"no":"15","marka":"Bauhaus","delta_h":-3.75,"note":"3sa 45dk GEÇMİŞ · v1 verildi · onay 3sa 41dk pasif · paralel #16 ile aynı durum"},
-    {"no":"9","marka":"VDM Petdent","delta_h":6.23,"note":"6sa 14dk to 23:59 · Eren · 8sa eşiği önceki sync'lerde işlendi"}
-  ],
-  "notification_dms_sent": [],
-  "notification_skips_logged": [
-    {"brief":"23","reason":"TAMAMLANDI POZİTİF · DM gereksiz"},
-    {"brief":"24","reason":"Aykut yarı onay POZİTİF · Arda doğal akış (#23 onaylandı) · 16:25 + 17:15 sync DM'leri zaten gönderildi"},
-    {"brief":"17","reason":"Görkem DM 16:45 stabilized · 12sa eşiği 20:46 bekle · 9sa eşik DM tetiklenmedi (sabah raporu kapsamında)"},
-    {"brief":"16","reason":"v1 verildi onay pasif uyarı 16:45 sync'te verildi"},
-    {"brief":"15","reason":"onay pasif paralel #16 ile aynı durum"},
-    {"brief":"2","reason":"İrem v1 verildi POZİTİF · mockup talep pending doğal akış"}
-  ],
-  "status_improvements_log": [
-    {"no":"24","old":"Aykut hazır 17:02 · Eda T tepkisi yok","new":"Aykut yarı onay (Eda T 17:35 'ellerine sağlıkk')","events":["17:02 Aykut 'burası hazırrr' video v1","17:35 Eda T 'ellerine sağlıkk' Aykut kısmı yarı kabul"]}
-  ],
-  "threshold_transitions_log": [
-    {"no":"17","eski":"8sa GEÇMİŞ","yeni":"9sa GEÇMİŞ","at":"2026-05-22T17:46:00+03:00","action":"skip_dm","reason":"Görkem DM 16:45 stabilized · 12sa eşiği bekle"}
-  ],
-  "deadline_transitions_log": [],
-  "capacity_state": {
-    "arda_active": 5,
-    "arda_cap": 6,
-    "arda_pct": 83,
-    "aykut_active": 5,
-    "aykut_cap": 6,
-    "aykut_pct": 83,
-    "eren_active": 5,
-    "eren_cap": 4,
-    "eren_pct": 125,
-    "note": "Arda 6/6 → 5/6 (#23 tamamlandı) · #6+#8+#15+#16+#24 · #24 kritik 15dk Arda pending · #6 47sa+ pasif YÖNETİCİ MÜDAHALESİ · Aykut 5/6 (83%) · Eren 5/4 (125%) — kapasite aşımı sürüyor"
-  },
-  "next_sync_decision_points": [
-    "18:15: #24 18:00 deadline AŞILDI mı? · Arda kısmı geldi mi?",
-    "18:15: #16 + #15 Eda T'den onay komutu (Eda T #23 sonrası müsait — aktivasyon kontrol)",
-    "18:15: #2 Hasvet mockup talep Buse'ye İrem'den dönüş geldi mi?",
-    "18:15: #17 10sa eşiği AŞILDI (18:46) — bayram öncesi son izleme",
-    "18:15: #9 VDM Whatsapp 5sa 44dk · son gün takip"
-  ]
+  "notes": "12:45 delta refresh · 0 yeni brief · 0 tamamlanan · brief queue boş · Slack'te 12:15 sonrası aktivite yok · #21 kritik takip (1sa 56dk to eşik · 14:45 sync Şablon 29 tetiklenecek)"
 }

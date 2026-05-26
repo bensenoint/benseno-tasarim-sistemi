@@ -1,7 +1,7 @@
 {
-  "sync_ts": 1779786936,
-  "sync_iso": "2026-05-26T12:15:36+03:00",
-  "run_type": "orchestrator_1215_delta_refresh",
+  "sync_ts": 1779788752,
+  "sync_iso": "2026-05-26T12:45:52+03:00",
+  "run_type": "orchestrator_1245_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
   "past_deadline": [],
@@ -18,11 +18,11 @@
       "is": "bahar video",
       "deadline_iso": "2026-05-23T14:42:00+03:00",
       "blokeli_esik_iso": "2026-05-26T14:42:00+03:00",
-      "kalan_dk_to_blokeli": 147,
+      "kalan_dk_to_blokeli": 117,
       "atanan_ids": ["U4XCE3532", "U030C48PL23", "U0AP31SAA1W"],
-      "status": "72sa blokeli eşiği ~14:42 · ~2sa 27dk · Şablon 24+25 zaten gönderildi · ~14:45 sync'te Şablon 29 → Eren",
+      "status": "72sa blokeli eşiği ~14:42 · ~1sa 56dk · Şablon 24+25 zaten gönderildi · 14:45 sync'te Şablon 29 → Eren",
       "dm_required": false,
-      "skip_reason": "72sa eşiği henüz aşılmadı · ~14:45 sync (2 sonra) Şablon 29 tetikleyecek"
+      "skip_reason": "72sa eşiği henüz aşılmadı · sonraki sync (13:15) hala aşılmamış · 14:45 sync (2 sonra) Şablon 29 tetikleyecek"
     }
   ],
   "status_improvements": [],
@@ -30,11 +30,11 @@
   "calendar_events": [],
   "dm_log": [],
   "dm_skips": [
-    {"brief": "21", "reason": "72sa eşiği 2sa 27dk sonrasında · sonraki sync (12:45) hala aşılmamış · 14:45 sync'inde Şablon 29 tetiklenecek"},
+    {"brief": "21", "reason": "72sa eşiği 1sa 56dk sonrasında · 13:15 sync hala aşılmamış · 14:45 sync'inde Şablon 29 tetiklenecek"},
     {"brief": "9", "reason": "72sa A̧SILDI 25May23:59 · Şablon 29 zaten gönderildi 26May09:33 · idempotent"},
     {"brief": "17", "reason": "72sa+ A̧SILDI · Görkem DM Cuma 16:45 stabilized · bayram sonrası müdahale"},
     {"brief": "4", "reason": "tasarımcı yok · İpek dispatch > Görkem · DM Cuma gönderildi · idempotent"},
     {"brief": "3", "reason": "6g eşiği A̧SILDI · tüm escalation tamamlandı · log güncellendi"}
   ],
-  "notes": "12:15 delta refresh · 0 yeni brief · 0 tamamlanan · brief queue boş · Slack'te 11:45 sonrası aktivite yok · #21 kritik takip (~14:45 sync · Şablon 29 ETA 2sa 30dk)"
+  "notes": "12:45 delta refresh · 0 yeni brief · 0 tamamlanan · brief queue boş · Slack'te 12:15 sonrası aktivite yok · #21 kritik takip (~14:45 sync · Şablon 29 ETA 2sa 0dk)"
 }
