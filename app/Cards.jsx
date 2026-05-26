@@ -1,17 +1,22 @@
 // app/Cards.jsx — Card / Kpi / PageHead (density-aware via CSS vars).
 
-function Card({ children, style, padding, accent }) {
+function Card({ children, style, padding, accent, hover }) {
+  const [hovered, setHovered] = React.useState(false);
   return (
-    <section style={{
-      background: "var(--surface)",
-      border: "1px solid var(--line)",
-      borderRadius: 12,
-      padding: padding === 0 ? 0 : (padding || "var(--card-pad)"),
-      boxShadow: "var(--shadow-card)",
-      transition: "box-shadow 200ms",
-      ...(accent ? { borderTop: `2px solid ${accent}` } : {}),
-      ...style
-    }}>
+    <section
+      onMouseEnter={() => hover && setHovered(true)}
+      onMouseLeave={() => hover && setHovered(false)}
+      style={{
+        background: "var(--surface)",
+        border: "1px solid var(--line)",
+        borderRadius: 12,
+        padding: padding === 0 ? 0 : (padding || "var(--card-pad)"),
+        boxShadow: hovered ? "var(--shadow-2)" : "var(--shadow-card)",
+        transform: hovered ? "translateY(-1px)" : "none",
+        transition: "box-shadow 200ms var(--ease-out-quart), transform 200ms var(--ease-out-quart)",
+        ...(accent ? { borderTop: `2px solid ${accent}` } : {}),
+        ...style
+      }}>
       {children}
     </section>
   );
@@ -36,70 +41,112 @@ function CardHead({ title, sub, action, style }) {
 }
 
 // Kpi has three variants: "plain" | "trendchart" | "hero"
-function Kpi({ label, value, color, trend, sub, variant = "plain", spark, accent }) {
+function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, accent }) {
+  const [hov, setHov] = React.useState(false);
+  // Determine left-border accent color from color prop or trend
+  const borderAccent = accent || color || null;
   return (
-    <div style={{
-      background: "var(--surface)",
-      border: "1px solid var(--line)",
-      borderRadius: 12,
-      padding: "14px 16px",
-      display: "flex", flexDirection: "column", gap: 8, minWidth: 0,
-      position: "relative", overflow: "hidden",
-      boxShadow: "var(--shadow-card)",
-      ...(accent ? { borderTop: `2px solid ${accent}` } : {})
-    }}>
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: "var(--surface)",
+        border: "1px solid var(--line)",
+        borderLeft: borderAccent ? `3px solid ${borderAccent}` : "1px solid var(--line)",
+        borderRadius: 12,
+        padding: "14px 16px 12px",
+        display: "flex", flexDirection: "column", gap: 6, minWidth: 0,
+        position: "relative", overflow: "hidden",
+        boxShadow: hov ? "var(--shadow-2)" : "var(--shadow-card)",
+        transform: hov ? "translateY(-1px)" : "none",
+        transition: "box-shadow 180ms var(--ease-out-quart), transform 180ms var(--ease-out-quart)",
+      }}>
+      {/* subtle tint overlay matching border accent */}
+      {borderAccent && (
+        <div style={{
+          position:"absolute", inset:0, pointerEvents:"none",
+          background: `linear-gradient(135deg, ${borderAccent}08 0%, transparent 50%)`,
+          borderRadius: 12,
+        }}/>
+      )}
       <div style={{
         font: "600 10px/1 var(--font-sans)", color: "var(--ink-3)",
-        letterSpacing: "0.07em", textTransform: "uppercase",
-        whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
+        letterSpacing: "0.08em", textTransform: "uppercase",
+        whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+        position: "relative",
       }}>{label}</div>
       <div style={{
-        font: `600 ${variant === "hero" ? 56 : "var(--kpi-fs)"} /1 var(--font-sans)`,
+        font: `600 ${variant === "hero" ? 56 : "var(--kpi-fs)"}/1 var(--font-sans)`,
         color: color || "var(--ink)",
-        letterSpacing: "-0.01em", fontVariantNumeric: "tabular-nums"
+        letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums",
+        position: "relative",
       }}>{value}</div>
 
       {variant === "trendchart" && spark && (
-        <Sparkline points={spark} color={color || "var(--ink-2)"}/>
+        <Sparkline points={spark} color={color || "var(--ember)"}/>
       )}
 
       {(trend || sub) && (
         <div style={{
-          display:"flex", alignItems:"center", gap:6,
-          font:"500 12px/1.2 var(--font-sans)", whiteSpace:"nowrap",
-          overflow:"hidden", textOverflow:"ellipsis"
+          display:"flex", alignItems:"center", gap:5,
+          font:"500 11px/1.2 var(--font-sans)", whiteSpace:"nowrap",
+          overflow:"hidden", textOverflow:"ellipsis",
+          position:"relative", marginTop: 2,
         }}>
           {trend && (
             <span style={{
+              display:"inline-flex", alignItems:"center", gap:3,
+              padding:"2px 6px", borderRadius:4,
+              background: trend.dir === "up" ? (trend.bad ? "var(--prio-red-bg)" : "var(--prio-green-bg)")
+                        : trend.dir === "down" ? (trend.good ? "var(--prio-green-bg)" : "var(--prio-red-bg)")
+                        : "var(--paper-2)",
               color: trend.dir === "up" ? (trend.bad ? "var(--danger)" : "var(--success)")
                    : trend.dir === "down" ? (trend.good ? "var(--success)" : "var(--danger)")
-                   : "var(--ink-3)",
-              flexShrink: 0
+                   : "var(--ink-4)",
+              fontWeight: 600, fontSize: 10,
+              flexShrink: 0,
             }}>
-              {trend.dir === "up" ? "▲" : trend.dir === "down" ? "▼" : "▬"} {trend.value}
+              {trend.dir === "up" ? "↑" : trend.dir === "down" ? "↓" : "→"} {trend.value}
             </span>
           )}
-          {sub && <span style={{color:"var(--ink-4)", overflow:"hidden", textOverflow:"ellipsis"}}>{sub}</span>}
+          {sub && <span style={{color:"var(--ink-4)", overflow:"hidden", textOverflow:"ellipsis", fontSize:11}}>{sub}</span>}
         </div>
       )}
     </div>
   );
 }
 
-function Sparkline({ points, color = "var(--ink-2)", w = 100, h = 28 }) {
-  if (!points || points.length === 0) return null;
+function Sparkline({ points, color = "var(--ember)", w = 100, h = 32 }) {
+  if (!points || points.length < 2) return null;
   const min = Math.min(...points), max = Math.max(...points);
   const span = max - min || 1;
-  const dx = w / (points.length - 1 || 1);
-  const path = points.map((p, i) => {
-    const x = i * dx, y = h - ((p - min) / span) * h;
-    return (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
-  }).join(" ");
-  const area = path + ` L${w},${h} L0,${h} Z`;
+  const pad = 2;
+  const dx = (w - pad * 2) / (points.length - 1 || 1);
+  // Smooth bezier curve
+  const coords = points.map((p, i) => ({
+    x: pad + i * dx,
+    y: pad + (h - pad * 2) - ((p - min) / span) * (h - pad * 2)
+  }));
+  let path = `M${coords[0].x.toFixed(1)},${coords[0].y.toFixed(1)}`;
+  for (let i = 1; i < coords.length; i++) {
+    const cx = (coords[i-1].x + coords[i].x) / 2;
+    path += ` C${cx.toFixed(1)},${coords[i-1].y.toFixed(1)} ${cx.toFixed(1)},${coords[i].y.toFixed(1)} ${coords[i].x.toFixed(1)},${coords[i].y.toFixed(1)}`;
+  }
+  const last = coords[coords.length - 1];
+  const area = path + ` L${last.x.toFixed(1)},${(h).toFixed(1)} L${pad},${(h).toFixed(1)} Z`;
+  const gradId = `sg-${Math.round(Math.random()*99999)}`;
   return (
-    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{display:"block"}}>
-      <path d={area} fill={color} opacity="0.10"/>
-      <path d={path} stroke={color} strokeWidth="1.4" fill="none" strokeLinejoin="round"/>
+    <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{display:"block", marginTop:2}}>
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.18"/>
+          <stop offset="100%" stopColor={color} stopOpacity="0.02"/>
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#${gradId})`}/>
+      <path d={path} stroke={color} strokeWidth="1.5" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
+      {/* Last point dot */}
+      <circle cx={last.x.toFixed(1)} cy={last.y.toFixed(1)} r="2.5" fill={color} opacity="0.9"/>
     </svg>
   );
 }
@@ -108,22 +155,26 @@ function PageHead({ title, subtitle, actions, eyebrow }) {
   return (
     <header style={{
       display: "flex", alignItems: "flex-end", justifyContent: "space-between",
-      gap: 16, padding: "20px 0 14px", flexWrap: "wrap"
+      gap: 16, padding: "22px 0 16px", flexWrap: "wrap",
+      borderBottom: "1px solid var(--line-soft)", marginBottom: 4,
     }}>
       <div style={{minWidth: 0, flex: "0 1 auto"}}>
         {eyebrow && <div style={{
-          font: "600 11px/1 var(--font-sans)", color:"var(--ink-3)",
-          letterSpacing:"0.08em", textTransform:"uppercase", marginBottom: 6
+          display:"inline-flex", alignItems:"center", gap:6,
+          font: "600 10px/1 var(--font-sans)", color:"var(--ink-4)",
+          letterSpacing:"0.10em", textTransform:"uppercase", marginBottom: 8,
+          padding:"3px 8px", borderRadius:4,
+          background:"var(--paper-2)", border:"1px solid var(--line)",
         }}>{eyebrow}</div>}
         <h1 style={{
           fontFamily: "var(--font-display)", fontStyle: "italic",
-          fontWeight: 400, fontSize: 28, lineHeight: 1.15, color: "var(--ink)",
+          fontWeight: 400, fontSize: 30, lineHeight: 1.12, color: "var(--ink)",
           margin: 0, letterSpacing: "-0.01em"
         }}>{title}</h1>
         {subtitle && (
           <div style={{
             fontFamily: "var(--font-sans)",
-            fontSize: 13, lineHeight: 1.45, color: "var(--ink-3)", marginTop: 5,
+            fontSize: 13, lineHeight: 1.5, color: "var(--ink-3)", marginTop: 6,
             fontStyle: "normal", fontWeight: 400,
           }}>{subtitle}</div>
         )}

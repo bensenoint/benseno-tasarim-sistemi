@@ -31,6 +31,8 @@ function App() {
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
   const [brandStats, setBrandStats] = React.useState(data.brandStats);
+  const [history, setHistory] = React.useState(data.history || []); // 7 günlük geçmiş
+  const [lastPollTime, setLastPollTime] = React.useState(null); // son başarılı poll zamanı
 
   // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
   // Bana / Departman / Tümü filtresi briefs ve completed'a uygulanır.
@@ -84,7 +86,7 @@ function App() {
   const filteredCompleted = React.useMemo(() => filterByViewMode(data.completed), [filterByViewMode, data.completed, briefs]);
 
   // Live data shape — briefs ve completed artık filtered (viewMode'a göre)
-  const liveData = { ...data, briefs: filteredBriefs, completed: filteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats };
+  const liveData = { ...data, briefs: filteredBriefs, completed: filteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats, history };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
   React.useEffect(() => { document.documentElement.setAttribute("data-theme", t.theme); }, [t.theme]);
@@ -224,7 +226,12 @@ function App() {
           window.BNS_DATA.brandStats = freshBS;
           setBrandStats(freshBS);
         }
+        if (Array.isArray(ed.bns_history) && ed.bns_history.length > 0) {
+          window.BNS_DATA.history = ed.bns_history;
+          setHistory(ed.bns_history);
+        }
         window.BNS_DATA.__lastPoll = Date.now();
+        setLastPollTime(Date.now()); // footer'daki "son güncelleme" için re-render tetikle
         console.info("[BNS] poll OK · source=" + ed.source + " · reason=" + ed.reason +
                      " · briefs=" + (ed.bns_briefs?.length||0) +
                      " · completed=" + (ed.bns_completed?.length||0));
@@ -316,7 +323,15 @@ function App() {
               display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8,
               font: "400 11px/1 var(--font-sans)", color: "var(--ink-5)"
             }}>
-              <span>{data.fmtTr ? data.fmtTr(data.lastSync ? Date.parse(data.lastSync) : data.NOW, {style:"footer"}) : "Son senkron · 21 May 2026 · 14:45 (Europe/Istanbul)"}</span>
+              <span>
+                {data.fmtTr ? data.fmtTr(data.lastSync ? Date.parse(data.lastSync) : data.NOW, {style:"footer"}) : "Son senkron · 21 May 2026 · 14:45 (Europe/Istanbul)"}
+                {lastPollTime && (
+                  <span style={{marginLeft:8, color:"var(--ink-4)"}}>
+                    · <span style={{color:"var(--prio-green)", fontWeight:500}}>●</span> canlı
+                    {" · güncellendi " + Math.round((Date.now() - lastPollTime) / 1000) + "sn önce"}
+                  </span>
+                )}
+              </span>
               <span style={{fontFamily:"var(--font-mono)"}}>Benseno v7.13 · GitHub Pages</span>
             </footer>
           )}

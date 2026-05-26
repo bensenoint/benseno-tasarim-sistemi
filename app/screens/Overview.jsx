@@ -81,10 +81,37 @@ function calcAvgCapPct(data) {
   return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : null;
 }
 
+// history dizisinden spark array üretir: son 6 kayıt + bugünkü değer = 7 nokta
+function histSpark(history, field, currentVal) {
+  if (!Array.isArray(history) || history.length === 0) return null;
+  const pts = history.slice(-6).map(h => h[field] ?? 0);
+  while (pts.length < 6) pts.unshift(0);
+  pts.push(currentVal);
+  return pts;
+}
+// Geçen haftaya göre trend hesaplar
+function histTrend(history, field, currentVal) {
+  if (!Array.isArray(history) || history.length < 2) return null;
+  const prev = history[history.length - 1]?.[field] ?? currentVal;
+  const diff = currentVal - prev;
+  if (diff === 0) return { dir: "flat", value: "=" };
+  return { dir: diff > 0 ? "up" : "down", value: (diff > 0 ? "+" : "") + diff };
+}
+
 function EditorialLayout({ data, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   const avgCapPct = calcAvgCapPct(data);
+  const hist = data.history || [];
+
+  // Gerçek history'den spark dizileri
+  const sparkActive  = histSpark(hist, "active",  active.length)  || [42,45,49,52,55,58,active.length];
+  const sparkOverdue = histSpark(hist, "overdue", overdue.length) || [3,4,5,4,6,7,overdue.length];
+
+  // Trend: son kayıtla karşılaştır
+  const trendActive  = histTrend(hist, "active",  active.length)  || { dir:"up",   value:"+8",  bad:true };
+  const trendOverdue = histTrend(hist, "overdue", overdue.length) || { dir:"up",   value:"+2",  bad:true };
+
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -102,19 +129,19 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
 
       {/* KPI grid */}
       <KpiGrid>
-        <Kpi label="Aktif brief"  value={active.length} variant={kpiVariant} spark={[42,45,49,52,55,58,active.length]} trend={{dir:"up", value:"+8", bad:true}} sub="geçen haftaya göre"/>
-        <Kpi label="Geciken"      value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={[3,4,5,4,6,7,overdue.length]} trend={{dir:"up", value:"+2", bad:true}} sub="dün gece"/>
-        <Kpi label="Bugün teslim" value={today.length} variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil"/>
-        <Kpi label="Onay bekleyen" value={review.length} color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri"/>
-        <Kpi label="Hareketsiz" value={stale.length} variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok"/>
-        <Kpi label="Kapasite" value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması"/>
+        <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"}/>
+        <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"}/>
+        <Kpi label="Bugün teslim"  value={today.length}   variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil"/>
+        <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri"/>
+        <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok"/>
+        <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması"/>
       </KpiGrid>
 
       <div style={{display:"grid", gridTemplateColumns:"1.7fr 1fr", gap:"var(--grid-gap)", marginTop: "var(--section-gap)"}} className="bn-grid-2">
         <Card padding={0}>
-          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
+          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line-soft)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
             <div>
-              <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Bugün ve yarın</h2>
+              <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.01em"}}>Bugün ve yarın</h2>
               <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>
                 {today.length + overdue.length} brief
                 {overdue.length > 0 && <span style={{color:"var(--prio-red)", fontWeight:600, marginLeft:6}}>· {overdue.length} gecikmiş</span>}
@@ -323,25 +350,35 @@ function KpiGrid({ children, cols = 6 }) {
 
 function DeptRow({ s, color, last, compact }) {
   if (!s) return null;
+  const capPct = s.capacity_pct ?? bnsCapPct(s) ?? 0;
+  const capColor = capPct > 85 ? "var(--warning)" : capPct > 60 ? color || "var(--info)" : "var(--success)";
   return (
     <div style={{
-      display: "flex", alignItems: "center", gap: 8,
-      padding: compact ? "8px 0" : "11px 0",
-      borderBottom: last ? "0" : "1px solid var(--line)"
+      padding: compact ? "10px 0" : "13px 0",
+      borderBottom: last ? "0" : "1px solid var(--line-soft)",
     }}>
-      <div style={{display:"flex", alignItems:"center", gap: 8, minWidth: 96}}>
-        <span style={{width:8, height:8, background:color, borderRadius:2}}/>
-        <span style={{font:"600 13px/1 var(--font-sans)"}}>{s.name}</span>
-      </div>
-      <div style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>
-        <span style={{color:"var(--ink)", fontWeight:600, fontVariantNumeric:"tabular-nums"}}>{s.active}</span> aktif ·{" "}
-        <span style={{color:"var(--prio-red)", fontWeight:600}}>{s.overdue}</span> geciken
-      </div>
-      <div style={{display:"flex", alignItems:"center", gap: 8, flex: 1, marginLeft:"auto"}}>
-        <div style={{flex:1, height: 6, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
-          <div style={{width: s.capacity_pct+"%", height:"100%", background: s.capacity_pct > 85 ? "var(--warning)" : "var(--ink-2)", borderRadius:999}}/>
+      <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:7}}>
+        <span style={{width:10, height:10, background:color, borderRadius:3, flexShrink:0}}/>
+        <span style={{font:"600 13px/1 var(--font-sans)", flex:1}}>{s.name}</span>
+        <div style={{display:"flex", alignItems:"center", gap:6}}>
+          <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{s.active}</span>
+          <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>aktif</span>
+          {s.overdue > 0 && <>
+            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--line-strong)"}}>·</span>
+            <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--prio-red)"}}>{s.overdue}</span>
+            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>geciken</span>
+          </>}
         </div>
-        <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-2)", minWidth: 32, textAlign:"right"}}>%{s.capacity_pct}</span>
+      </div>
+      <div style={{display:"flex", alignItems:"center", gap:8}}>
+        <div style={{flex:1, height:5, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
+          <div style={{
+            width: Math.min(capPct, 100)+"%", height:"100%",
+            background: capColor, borderRadius:999,
+            transition: "width 600ms var(--ease-out-quart)",
+          }}/>
+        </div>
+        <span style={{font:"500 11px/1 var(--font-mono)", color: capColor, minWidth:28, textAlign:"right"}}>%{capPct}</span>
       </div>
     </div>
   );
@@ -530,18 +567,24 @@ function ApprovalRow({ brief, onClick, last }) {
 }
 
 function WeekStat({ label, value, trend, good, bad, last }) {
-  const color = trend.dir === "flat" ? "var(--ink-3)" :
+  const trendColor = trend.dir === "flat" ? "var(--ink-4)" :
                 (good ? "var(--success)" : bad ? "var(--danger)" :
                   (trend.dir === "up" ? "var(--success)" : "var(--danger)"));
+  const trendBg = trend.dir === "flat" ? "var(--paper-2)" :
+                (good ? "var(--prio-green-bg)" : bad ? "var(--prio-red-bg)" :
+                  (trend.dir === "up" ? "var(--prio-green-bg)" : "var(--prio-red-bg)"));
   return (
     <div style={{
-      display:"flex", justifyContent:"space-between", alignItems:"center", padding:"11px 0",
-      borderBottom: last ? "0" : "1px solid var(--line)", gap: 12
+      display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0",
+      borderBottom: last ? "0" : "1px solid var(--line-soft)", gap: 12
     }}>
       <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"nowrap"}}>{label}</span>
-      <span style={{display:"flex", alignItems:"baseline", gap:8, whiteSpace:"nowrap"}}>
+      <span style={{display:"flex", alignItems:"center", gap:7, whiteSpace:"nowrap"}}>
         <span style={{font:"600 15px/1 var(--font-sans)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{value}</span>
-        <span style={{font:"500 12px/1 var(--font-sans)", color}}>{trend.dir==="up"?"▲":trend.dir==="down"?"▼":"▬"} {trend.value}</span>
+        <span style={{
+          font:"600 10px/1 var(--font-sans)", color:trendColor,
+          padding:"2px 6px", borderRadius:4, background:trendBg,
+        }}>{trend.dir==="up"?"↑":trend.dir==="down"?"↓":"→"} {trend.value}</span>
       </span>
     </div>
   );

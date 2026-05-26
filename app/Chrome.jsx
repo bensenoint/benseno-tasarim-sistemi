@@ -99,11 +99,12 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       display: "flex", alignItems: "center", gap: isMobile ? 8 : 12,
       padding: isMobile ? "0 12px" : "0 20px 0 16px",
       background: "var(--header-blur)",
-      backdropFilter: "blur(14px) saturate(160%)",
-      WebkitBackdropFilter: "blur(14px) saturate(160%)",
+      backdropFilter: "blur(20px) saturate(180%)",
+      WebkitBackdropFilter: "blur(20px) saturate(180%)",
       borderBottom: "1px solid var(--line)",
       flexShrink: 0,
       position: "sticky", top: 0, zIndex: 30,
+      boxShadow: "0 1px 0 var(--line-soft)",
     }}>
       {/* Logo on mobile */}
       {isMobile && (
@@ -465,14 +466,17 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
       </div>
 
       {/* Nav sections */}
-      <nav style={{flex: 1, overflowY: "auto", overflowX: "hidden", padding: "6px 0 8px"}}>
+      <nav style={{flex: 1, overflowY: "auto", overflowX: "hidden", padding: "8px 0 8px"}}>
         {NAV_SECTIONS.map((section, si) => (
-          <div key={section.id} style={{marginBottom: si < NAV_SECTIONS.length - 1 ? 2 : 0}}>
+          <div key={section.id} style={{marginBottom: si < NAV_SECTIONS.length - 1 ? 4 : 0}}>
+            {!collapsed && si > 0 && (
+              <div style={{height:1, background:"var(--line-soft)", margin:"4px 14px 6px"}}/>
+            )}
             {!collapsed && (
               <div style={{
-                padding: si === 0 ? "6px 16px 2px" : "10px 16px 2px",
-                font: "600 9.5px/1 var(--font-sans)",
-                letterSpacing: "0.08em", textTransform: "uppercase",
+                padding: si === 0 ? "4px 16px 4px" : "2px 16px 4px",
+                font: "600 9px/1 var(--font-sans)",
+                letterSpacing: "0.10em", textTransform: "uppercase",
                 color: "var(--ink-5)",
               }}>{section.label}</div>
             )}
@@ -495,24 +499,27 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
                     margin: "1px 8px", width: "calc(100% - 16px)",
                     background: isActive ? "var(--ember-tint)" : "transparent",
                     color: isActive ? "var(--ember)" : "var(--ink-3)",
-                    transition: "background 150ms, color 150ms",
+                    transition: "background 140ms, color 140ms",
                     position: "relative",
+                    boxShadow: isActive && !collapsed ? "inset 0 0 0 1px var(--ember-muted)" : "none",
                   }}
-                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink)"; }}}
+                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink-2)"; }}}
                   onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ink-3)"; }}}
                 >
                   {/* Active indicator */}
                   {isActive && (
                     <span style={{
-                      position: "absolute", left: -6, top: "50%", transform: "translateY(-50%)",
-                      width: 3, height: 18, borderRadius: 999,
+                      position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)",
+                      width: 3, height: 20, borderRadius: 999,
                       background: "var(--ember)",
+                      boxShadow: "0 0 6px var(--ember-muted)",
                     }}/>
                   )}
                   <span style={{
                     display: "inline-flex", alignItems: "center", justifyContent: "center",
                     flexShrink: 0,
                     color: isActive ? "var(--ember)" : "inherit",
+                    opacity: isActive ? 1 : 0.75,
                   }}>
                     <Icon/>
                   </span>
@@ -520,19 +527,21 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
                     <span style={{
                       font: `${isActive ? 600 : 500} 13px/1 var(--font-sans)`,
                       flex: 1, textAlign: "left", whiteSpace: "nowrap",
+                      letterSpacing: isActive ? "-0.005em" : 0,
                     }}>{item.label}</span>
                   )}
                   {badge && !collapsed && (
                     <span style={{
                       font: "600 10px/1 var(--font-mono)",
-                      padding: "2px 5px", borderRadius: 4,
+                      padding: "2px 6px", borderRadius: 999,
                       color: "var(--prio-red)", background: "var(--prio-red-bg)",
+                      border: "1px solid rgba(215,38,61,0.15)",
                       flexShrink: 0,
                     }}>{badge}</span>
                   )}
                   {badge && collapsed && (
                     <span style={{
-                      position: "absolute", top: 4, right: 4,
+                      position: "absolute", top: 4, right: 6,
                       width: 7, height: 7, borderRadius: 999,
                       background: "var(--prio-red)", border: "2px solid var(--surface)",
                     }}/>

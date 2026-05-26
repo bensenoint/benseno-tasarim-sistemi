@@ -23,7 +23,20 @@ function CompletedScreen({ data }) {
 
   const fmtNum = (n) => n.toFixed(1).replace(".", ",");
 
-  const cols = ["#","Marka","İş","Atanan","Deadline","Başla","Bitiş","Süre","Rev","Gecikme","⭐","🔗"];
+  const cols = [
+    { h: "#",        mobile: true  },
+    { h: "Marka",    mobile: true  },
+    { h: "İş",       mobile: true  },
+    { h: "Atanan",   mobile: false },
+    { h: "Deadline", mobile: true  },
+    { h: "Başla",    mobile: false },
+    { h: "Bitiş",    mobile: false },
+    { h: "Süre",     mobile: true  },
+    { h: "Rev",      mobile: false },
+    { h: "Gecikme",  mobile: true  },
+    { h: "⭐",       mobile: true  },
+    { h: "🔗",       mobile: false },
+  ];
 
   return (
     <div className="bn-tab-in">
@@ -52,20 +65,20 @@ function CompletedScreen({ data }) {
         <Kpi label="Ort. puan"    value={rows.length && avgRating > 0 ? fmtNum(avgRating) + " / 5" : "—"}/>
       </div>
 
-      <div style={{
+      <div className="bns-table-wrap" style={{
         background:"var(--surface)", border:"1px solid var(--line)", borderRadius:10,
-        overflowX:"auto", WebkitOverflowScrolling:"touch"
+        overflowX:"auto", WebkitOverflowScrolling:"touch", minWidth:0
       }}>
-        <table style={{width:"100%", minWidth:640, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
+        <table style={{width:"100%", minWidth:440, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
           <thead>
             <tr style={{background:"var(--surface-sub)"}}>
-              {cols.map((h, i) => (
-                <th key={i} style={{
+              {cols.map((c, i) => (
+                <th key={i} className={c.mobile ? "" : "bns-col-mobile-hide"} style={{
                   font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
                   letterSpacing:"0.04em", textTransform:"uppercase",
-                  textAlign: ["Süre","Gecikme","#","Rev"].includes(h) ? "right" : "left",
+                  textAlign: ["Süre","Gecikme","#","Rev"].includes(c.h) ? "right" : "left",
                   padding:"10px 10px", borderBottom:"1px solid var(--line-strong)", whiteSpace:"nowrap"
-                }}>{h}</th>
+                }}>{c.h}</th>
               ))}
             </tr>
           </thead>
@@ -80,17 +93,24 @@ function CompletedScreen({ data }) {
                 <td style={cs(true, "right")}>{c.no}</td>
                 <td style={cs()}><BrandChip brand={c.brand} size="sm"/></td>
                 <td style={{...cs(), maxWidth: 240, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{c.baslik}</td>
-                <td style={cs()}><Avatar user={c.lead} size={20}/></td>
+                <td className="bns-col-mobile-hide" style={cs()}><Avatar user={c.lead} size={20}/></td>
                 <td style={cs(true)}>{fmt(c.deadline)}</td>
-                <td style={cs(true)}>{c.baslangic ? fmt(c.baslangic) : "—"}</td>
-                <td style={cs(true)}>{c.bitis ? fmt(c.bitis) : "—"}</td>
+                <td className="bns-col-mobile-hide" style={cs(true)}>{c.baslangic ? fmt(c.baslangic) : "—"}</td>
+                <td className="bns-col-mobile-hide" style={cs(true)}>{c.bitis ? fmt(c.bitis) : "—"}</td>
                 <td style={cs(true, "right")}>{c.sureH != null && c.sureH > 0 ? c.sureH.toFixed(1) + " sa" : "—"}</td>
-                <td style={cs(true, "right")}>{String(c.revision || 0).padStart(2,"0")}</td>
+                <td className="bns-col-mobile-hide" style={cs(true, "right")}>{String(c.revision || 0).padStart(2,"0")}</td>
                 <td style={{...cs(true, "right"), color: c.gecikmeH > 0 ? "var(--prio-red)" : "var(--ink-4)"}}>
                   {c.gecikmeH > 0 ? c.gecikmeH.toFixed(1) + " sa" : "—"}
                 </td>
                 <td style={cs()}><Stars n={c.rating}/></td>
-                <td style={cs()}><a href="#" style={{color:"var(--ink-4)", display:"inline-flex"}}><I.Link size={14}/></a></td>
+                <td className="bns-col-mobile-hide" style={cs()}>
+                  <a href={c.slack_url && c.slack_url !== "#" ? c.slack_url : undefined}
+                     target="_blank" rel="noopener noreferrer"
+                     title={c.slack_url && c.slack_url !== "#" ? "Slack'te aç" : "Link yok"}
+                     style={{color: c.slack_url && c.slack_url !== "#" ? "var(--ink-3)" : "var(--ink-5)", display:"inline-flex"}}>
+                    <I.Link size={14}/>
+                  </a>
+                </td>
               </tr>
             ))}
           </tbody>

@@ -103,7 +103,14 @@ function CompletedScreen({ data }) {
                   {c.gecikmeH > 0 ? c.gecikmeH.toFixed(1) + " sa" : "—"}
                 </td>
                 <td style={cs()}><Stars n={c.rating}/></td>
-                <td className="bns-col-mobile-hide" style={cs()}><a href="#" style={{color:"var(--ink-4)", display:"inline-flex"}}><I.Link size={14}/></a></td>
+                <td className="bns-col-mobile-hide" style={cs()}>
+                  <a href={c.slack_url && c.slack_url !== "#" ? c.slack_url : undefined}
+                     target="_blank" rel="noopener noreferrer"
+                     title={c.slack_url && c.slack_url !== "#" ? "Slack'te aç" : "Link yok"}
+                     style={{color: c.slack_url && c.slack_url !== "#" ? "var(--ink-3)" : "var(--ink-5)", display:"inline-flex"}}>
+                    <I.Link size={14}/>
+                  </a>
+                </td>
               </tr>
             ))}
           </tbody>

@@ -139,9 +139,9 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
 
       <div style={{display:"grid", gridTemplateColumns:"1.7fr 1fr", gap:"var(--grid-gap)", marginTop: "var(--section-gap)"}} className="bn-grid-2">
         <Card padding={0}>
-          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
+          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line-soft)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
             <div>
-              <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Bugün ve yarın</h2>
+              <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.01em"}}>Bugün ve yarın</h2>
               <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>
                 {today.length + overdue.length} brief
                 {overdue.length > 0 && <span style={{color:"var(--prio-red)", fontWeight:600, marginLeft:6}}>· {overdue.length} gecikmiş</span>}
@@ -350,25 +350,35 @@ function KpiGrid({ children, cols = 6 }) {
 
 function DeptRow({ s, color, last, compact }) {
   if (!s) return null;
+  const capPct = s.capacity_pct ?? bnsCapPct(s) ?? 0;
+  const capColor = capPct > 85 ? "var(--warning)" : capPct > 60 ? color || "var(--info)" : "var(--success)";
   return (
     <div style={{
-      display: "flex", alignItems: "center", gap: 8,
-      padding: compact ? "8px 0" : "11px 0",
-      borderBottom: last ? "0" : "1px solid var(--line)"
+      padding: compact ? "10px 0" : "13px 0",
+      borderBottom: last ? "0" : "1px solid var(--line-soft)",
     }}>
-      <div style={{display:"flex", alignItems:"center", gap: 8, minWidth: 96}}>
-        <span style={{width:8, height:8, background:color, borderRadius:2}}/>
-        <span style={{font:"600 13px/1 var(--font-sans)"}}>{s.name}</span>
-      </div>
-      <div style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>
-        <span style={{color:"var(--ink)", fontWeight:600, fontVariantNumeric:"tabular-nums"}}>{s.active}</span> aktif ·{" "}
-        <span style={{color:"var(--prio-red)", fontWeight:600}}>{s.overdue}</span> geciken
-      </div>
-      <div style={{display:"flex", alignItems:"center", gap: 8, flex: 1, marginLeft:"auto"}}>
-        <div style={{flex:1, height: 6, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
-          <div style={{width: s.capacity_pct+"%", height:"100%", background: s.capacity_pct > 85 ? "var(--warning)" : "var(--ink-2)", borderRadius:999}}/>
+      <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:7}}>
+        <span style={{width:10, height:10, background:color, borderRadius:3, flexShrink:0}}/>
+        <span style={{font:"600 13px/1 var(--font-sans)", flex:1}}>{s.name}</span>
+        <div style={{display:"flex", alignItems:"center", gap:6}}>
+          <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{s.active}</span>
+          <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>aktif</span>
+          {s.overdue > 0 && <>
+            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--line-strong)"}}>·</span>
+            <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--prio-red)"}}>{s.overdue}</span>
+            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>geciken</span>
+          </>}
         </div>
-        <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-2)", minWidth: 32, textAlign:"right"}}>%{s.capacity_pct}</span>
+      </div>
+      <div style={{display:"flex", alignItems:"center", gap:8}}>
+        <div style={{flex:1, height:5, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
+          <div style={{
+            width: Math.min(capPct, 100)+"%", height:"100%",
+            background: capColor, borderRadius:999,
+            transition: "width 600ms var(--ease-out-quart)",
+          }}/>
+        </div>
+        <span style={{font:"500 11px/1 var(--font-mono)", color: capColor, minWidth:28, textAlign:"right"}}>%{capPct}</span>
       </div>
     </div>
   );
@@ -557,18 +567,24 @@ function ApprovalRow({ brief, onClick, last }) {
 }
 
 function WeekStat({ label, value, trend, good, bad, last }) {
-  const color = trend.dir === "flat" ? "var(--ink-3)" :
+  const trendColor = trend.dir === "flat" ? "var(--ink-4)" :
                 (good ? "var(--success)" : bad ? "var(--danger)" :
                   (trend.dir === "up" ? "var(--success)" : "var(--danger)"));
+  const trendBg = trend.dir === "flat" ? "var(--paper-2)" :
+                (good ? "var(--prio-green-bg)" : bad ? "var(--prio-red-bg)" :
+                  (trend.dir === "up" ? "var(--prio-green-bg)" : "var(--prio-red-bg)"));
   return (
     <div style={{
-      display:"flex", justifyContent:"space-between", alignItems:"center", padding:"11px 0",
-      borderBottom: last ? "0" : "1px solid var(--line)", gap: 12
+      display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0",
+      borderBottom: last ? "0" : "1px solid var(--line-soft)", gap: 12
     }}>
       <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"nowrap"}}>{label}</span>
-      <span style={{display:"flex", alignItems:"baseline", gap:8, whiteSpace:"nowrap"}}>
+      <span style={{display:"flex", alignItems:"center", gap:7, whiteSpace:"nowrap"}}>
         <span style={{font:"600 15px/1 var(--font-sans)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{value}</span>
-        <span style={{font:"500 12px/1 var(--font-sans)", color}}>{trend.dir==="up"?"▲":trend.dir==="down"?"▼":"▬"} {trend.value}</span>
+        <span style={{
+          font:"600 10px/1 var(--font-sans)", color:trendColor,
+          padding:"2px 6px", borderRadius:4, background:trendBg,
+        }}>{trend.dir==="up"?"↑":trend.dir==="down"?"↓":"→"} {trend.value}</span>
       </span>
     </div>
   );

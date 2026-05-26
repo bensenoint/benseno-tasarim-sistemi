@@ -131,7 +131,11 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{String(brief.revision).padStart(2, "0")}</td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{relTime(brief.acilma)}</td>
       <td className="bns-col-mobile-hide" style={cellStyle()}>
-        <a href={brief.slack_url} onClick={e => e.stopPropagation()} style={{color:"var(--ink-4)", display:"inline-flex"}}>
+        <a href={brief.slack_url && brief.slack_url !== "#" ? brief.slack_url : undefined}
+           target="_blank" rel="noopener noreferrer"
+           onClick={e => e.stopPropagation()}
+           title={brief.slack_url && brief.slack_url !== "#" ? "Slack'te aç" : "Link yok"}
+           style={{color: brief.slack_url && brief.slack_url !== "#" ? "var(--ink-3)" : "var(--ink-5)", display:"inline-flex"}}>
           <I.Link size={14}/>
         </a>
       </td>
