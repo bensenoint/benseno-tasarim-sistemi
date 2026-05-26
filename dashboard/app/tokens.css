@@ -436,9 +436,11 @@ html[data-theme="dark"][data-noise="on"] body::before {
 
   /* Overview 2-col grid → single col on mobile */
   .bn-grid-2 { grid-template-columns: 1fr !important; }
+  .bn-grid-2 > * { min-width: 0; }
 
   /* 3-col grids → single col on mobile */
   .bn-grid-3 { grid-template-columns: 1fr !important; }
+  .bn-grid-3 > * { min-width: 0; }
 
   /* KPI grid — 2 columns on mobile (bn-kpi-grid and bns-kpi-grid) */
   .bns-kpi-grid, .bn-kpi-grid {
