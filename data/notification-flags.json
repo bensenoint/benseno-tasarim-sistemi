@@ -1,96 +1,40 @@
 {
-  "sync_ts": 1779461100,
-  "sync_iso": "2026-05-22T17:45:00+03:00",
-  "run_type": "launchd_1745_ara_sync",
+  "sync_ts": 1779786936,
+  "sync_iso": "2026-05-26T12:15:36+03:00",
+  "run_type": "orchestrator_1215_delta_refresh",
   "new_briefs": [],
-  "completed_this_run": [
-    {
-      "no": "23",
-      "marka": "Bauhaus",
-      "is": "Kaçırılmayacak Fırsatlar!",
-      "leadId": "U09BFPBKQG7",
-      "editor_id": "U09BZHR25NG",
-      "deadline_iso": "2026-05-22T17:00:00+03:00",
-      "bitis_iso": "2026-05-22T17:46:36+03:00",
-      "gecikme_dk": 46,
-      "revision": 1,
-      "note": "Eda T 'onaylandı' tam onay · v1 16:25 → minor revize (Salıncak alınmasın) → v2 16:58 → onaylandı 17:46"
-    }
-  ],
+  "completed_this_run": [],
   "past_deadline": [],
   "past_confirmed": [],
   "saat_eksik": [],
   "dept_belirsiz": [],
   "marka_yetersiz_sure": [],
   "marka_anormal_uzun": [],
-  "threshold_transitions": [
-    {
-      "no": "17",
-      "marka": "VDM Petdent",
-      "is": "Yeni bayram postu",
-      "eski_esik": "8sa GEÇMİŞ",
-      "yeni_esik": "9sa GEÇMİŞ",
-      "transition_at": "2026-05-22T17:46:00+03:00",
-      "atanan_ids": ["U0AP31SAA1W", "U030C48PL23"],
-      "note": "9sa eşiği AŞILDI · Görkem DM 16:45 stabilized 1sa önce · 12sa eşiği 20:46 sonraki kontrol",
-      "dm_required": false,
-      "skip_reason": "Görkem DM 16:45'te zaten gönderildi · stabilized · 12sa eşiğine kadar bekle (20:46) · spam riski"
-    }
-  ],
+  "threshold_transitions": [],
   "imminent_deadlines": [
-    {
-      "no": "24",
-      "marka": "Bauhaus",
-      "is": "Bayrama Özel Dev Kampanya",
-      "deadline_iso": "2026-05-22T18:00:00+03:00",
-      "kalan_dk": 15,
-      "atanan_ids": ["U06J26R1XCJ", "U09BFPBKQG7"],
-      "status": "Aykut yarı onay 17:35 · Arda kısmı pending · Arda serbest #23 sonrası",
-      "dm_required": false,
-      "skip_reason": "Aykut kısmı tamam · Arda doğal akışla geçecek (#23 onaylandı şimdi) · 16:25 + 17:15 sync DM'leri zaten gönderildi"
-    },
-    {
-      "no": "9",
-      "marka": "VDM Petdent",
-      "is": "Whatsapp Business Kurulumu",
-      "deadline_iso": "2026-05-22T23:59:00+03:00",
-      "kalan_dk": 374,
-      "atanan_ids": ["U0AP31SAA1W"],
-      "status": "8sa eşiği aşıldı (önceki sync'te) · v1 yok",
-      "dm_required": false,
-      "skip_reason": "8sa eşiği önceki sync'lerde işlendi · Eren kapasite aşımı bilinen durum"
-    },
     {
       "no": "21",
       "marka": "VDM Petdent",
       "is": "bahar video",
       "deadline_iso": "2026-05-23T14:42:00+03:00",
-      "kalan_dk": 1257,
+      "blokeli_esik_iso": "2026-05-26T14:42:00+03:00",
+      "kalan_dk_to_blokeli": 147,
       "atanan_ids": ["U4XCE3532", "U030C48PL23", "U0AP31SAA1W"],
-      "status": "24sa eşiği aşıldı · 22May14:45 sync'te 🟡→🟠 transition",
+      "status": "72sa blokeli eşiği ~14:42 · ~2sa 27dk · Şablon 24+25 zaten gönderildi · ~14:45 sync'te Şablon 29 → Eren",
       "dm_required": false,
-      "skip_reason": "24sa eşiği önceki sync'te işlendi · 21 saat to deadline"
+      "skip_reason": "72sa eşiği henüz aşılmadı · ~14:45 sync (2 sonra) Şablon 29 tetikleyecek"
     }
   ],
-  "status_improvements": [
-    {
-      "no": "24",
-      "marka": "Bauhaus",
-      "old": "Aykut hazır 17:02 · Eda T tepkisi yok",
-      "new": "Aykut yarı onay (Eda T 17:35 'ellerine sağlıkk')",
-      "dm_required": false,
-      "skip_reason": "POZİTİF progress · DM spam riski"
-    }
-  ],
+  "status_improvements": [],
   "deadline_transitions": [],
   "calendar_events": [],
   "dm_log": [],
   "dm_skips": [
-    {"brief": "23", "reason": "TAMAMLANDI POZİTİF · DM gereksiz"},
-    {"brief": "24", "reason": "Aykut yarı onay POZİTİF · Arda doğal akış · spam riski"},
-    {"brief": "17", "reason": "Görkem DM 16:45 stabilized · 12sa eşiği 20:46 bekle"},
-    {"brief": "16", "reason": "v1 verildi onay pasif uyarı 16:45 sync'te verildi"},
-    {"brief": "15", "reason": "onay pasif paralel #16 ile aynı durum"},
-    {"brief": "2", "reason": "İrem v1 verildi POZİTİF · mockup talep pending doğal akış"}
-  ]
+    {"brief": "21", "reason": "72sa eşiği 2sa 27dk sonrasında · sonraki sync (12:45) hala aşılmamış · 14:45 sync'inde Şablon 29 tetiklenecek"},
+    {"brief": "9", "reason": "72sa A̧SILDI 25May23:59 · Şablon 29 zaten gönderildi 26May09:33 · idempotent"},
+    {"brief": "17", "reason": "72sa+ A̧SILDI · Görkem DM Cuma 16:45 stabilized · bayram sonrası müdahale"},
+    {"brief": "4", "reason": "tasarımcı yok · İpek dispatch > Görkem · DM Cuma gönderildi · idempotent"},
+    {"brief": "3", "reason": "6g eşiği A̧SILDI · tüm escalation tamamlandı · log güncellendi"}
+  ],
+  "notes": "12:15 delta refresh · 0 yeni brief · 0 tamamlanan · brief queue boş · Slack'te 11:45 sonrası aktivite yok · #21 kritik takip (~14:45 sync · Şablon 29 ETA 2sa 30dk)"
 }
