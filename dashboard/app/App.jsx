@@ -307,11 +307,11 @@ function App() {
           flex: 1, overflowY: "auto", overflowX: "hidden",
           background: "var(--paper)",
         }}>
-          <div style={{maxWidth: 1400, margin: "0 auto", padding: isMobile ? "8px 14px 80px" : "8px 32px 72px"}}>
+          <div className="bns-main-content" style={{maxWidth: 1400, margin: "0 auto", padding: "8px 32px 72px"}}>
             {Screen}
           </div>
-          {!isMobile && (
-            <footer style={{
+          {(
+            <footer className="bns-desktop-footer" style={{
               padding: "14px 28px 28px", maxWidth: 1400, margin: "0 auto",
               display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8,
               font: "400 11px/1 var(--font-sans)", color: "var(--ink-5)"
@@ -323,9 +323,10 @@ function App() {
         </main>
       </div>
 
-      {isMobile && (
+      {/* MobileNav — always rendered, CSS controls visibility (display:none on desktop) */}
+      <div className="bns-mobile-nav-wrap">
         <MobileNav active={tab} onChange={setTab} data={liveData}/>
-      )}
+      </div>
 
       {openBrief && (
         <BriefDrawer brief={openBrief} onClose={onCloseBrief}

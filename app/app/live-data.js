@@ -1,0 +1,1213 @@
+window.EMBEDDED_DATA = {
+  "now": "2026-05-20T13:52:17.571092+00:00",
+  "last_sync": "2026-05-20T13:36:00.708Z",
+  "source": "manual-full-rebuild",
+  "bns_briefs": [
+    {
+      "id": "br_live_1779099416366989",
+      "no": 1,
+      "marka": "JNJ Vision TR",
+      "brand": {
+        "name": "JNJ Vision TR",
+        "color": "#76B7B2",
+        "wheelIdx": 4,
+        "channel_id": "C4Y58FEUU",
+        "channel_name": "marka-jnj-vision-tr"
+      },
+      "baslik": "24 Haziran Kontakt Lens Davetiyesi",
+      "leadId": "U08NQJ27G5S",
+      "contribIds": [
+        "U4XCE3532",
+        "U02SZQDAFPF",
+        "U055EDESLSE",
+        "U030C48PL23",
+        "U0AAC3YK20G",
+        "U09BZHR25NG",
+        "U0AN6DD79M0"
+      ],
+      "reviewerId": "U08NQJ27G5S",
+      "acilma": "2026-05-18T10:16:56.366989+00:00",
+      "deadline": "2026-05-18T16:00:00+03:00",
+      "durum": "yeni",
+      "priority": "🔴",
+      "revision": 1,
+      "stale": true,
+      "slack_url": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
+      "notes": "18 May 2026 16:00 TR ⚠️ GEÇMİŞ (1g 22sa 15dk geride · ✓ teyit edilmiş — bakanlık süreci)",
+      "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22"
+    },
+    {
+      "id": "br_live_1779104369515529",
+      "no": 2,
+      "marka": "Hasvet",
+      "brand": {
+        "name": "Hasvet",
+        "color": "#E15759",
+        "wheelIdx": 5,
+        "channel_id": "C081GAK936J",
+        "channel_name": "marka-hasvet"
+      },
+      "baslik": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
+      "leadId": "U08NQJ27G5S",
+      "contribIds": [
+        "U4XCE3532",
+        "U055EDESLSE",
+        "U02SZQDAFPF",
+        "U030C48PL23",
+        "U063T8M5HL4",
+        "U0AAC3YK20G",
+        "U0AK8U7L57F"
+      ],
+      "reviewerId": "U08NQJ27G5S",
+      "acilma": "2026-05-18T11:39:29.515529+00:00",
+      "deadline": "2026-05-21T16:00:00+03:00",
+      "durum": "yeni",
+      "priority": "🟡",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C081GAK936J/p1779104369515529",
+      "notes": "21 May 2026 16:00 TR (1g 1sa 45dk kaldı · son hareket 3sa 40dk önce · pasif değil)",
+      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡→↪️20May10:22 İpek dispatch İrem→✅20May10:35 İrem kabul"
+    },
+    {
+      "id": "br_live_1779167651759819",
+      "no": 3,
+      "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
+      "baslik": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "leadId": "U030C48PL23",
+      "contribIds": [
+        "U06J26R1XCJ",
+        "U09BZHR25NG"
+      ],
+      "reviewerId": "U030C48PL23",
+      "acilma": "2026-05-19T05:14:11.759819+00:00",
+      "deadline": "2026-05-20T10:00:00+03:00",
+      "durum": "yeni",
+      "priority": "🔴",
+      "revision": 0,
+      "stale": true,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
+      "notes": "20 May 2026 10:00 TR ⚠️ GEÇMİŞ (4sa 15dk geride 🚨🚨🚨) · STALE 🔴 sürüyor",
+      "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (4sa 15dk geride)"
+    },
+    {
+      "id": "br_live_1779167921567269",
+      "no": 4,
+      "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
+      "baslik": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "leadId": "U030C48PL23",
+      "contribIds": [
+        "U055EDESLSE",
+        "U030C48PL23"
+      ],
+      "reviewerId": "U030C48PL23",
+      "acilma": "2026-05-19T05:18:41.567269+00:00",
+      "deadline": "2026-05-21T13:00:00+03:00",
+      "durum": "yeni",
+      "priority": "🟠",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
+      "notes": "21 May 2026 13:00 TR (22sa 45dk kaldı · 🟠 Yüksek — transition 13:17)",
+      "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini) / 📈20May13:17 öncelik 🟡→🟠 (auto-recalc · 23sa 43dk ≤24sa)"
+    },
+    {
+      "id": "br_live_1779187350819039",
+      "no": 5,
+      "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
+      "baslik": "Broşür (Print · AI · Eren self-assign)",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [
+        "U0AP31SAA1W"
+      ],
+      "reviewerId": "U0AP31SAA1W",
+      "acilma": "2026-05-19T10:42:30.819039+00:00",
+      "deadline": "2026-05-21T13:42:00+03:00",
+      "durum": "yeni",
+      "priority": "🟠",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
+      "notes": "21 May 2026 13:42 TR (23sa 27dk kaldı · 🟠 Yüksek — 13:46 transition · 24sa 33dk önce açıldı, henüz 🤖 reaction yok)",
+      "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 (auto-recalc · 23sa 56dk ≤24sa)"
+    },
+    {
+      "id": "br_live_1779266016085909",
+      "no": 6,
+      "marka": "Bauhaus",
+      "brand": {
+        "name": "Bauhaus",
+        "color": "#00786F",
+        "wheelIdx": 13,
+        "channel_id": "C4Y43AW2E",
+        "channel_name": "marka-bauhaus"
+      },
+      "baslik": "20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "leadId": "U09BZHR25NG",
+      "contribIds": [
+        "U09BFPBKQG7"
+      ],
+      "reviewerId": "U09BZHR25NG",
+      "acilma": "2026-05-20T08:33:36.085909+00:00",
+      "deadline": "2026-05-20T18:00:00+03:00",
+      "durum": "yeni",
+      "priority": "🔴",
+      "revision": 0,
+      "stale": true,
+      "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
+      "notes": "20 May 2026 18:00 TR 🌙 Mesai dışı (17:30 sonrası · yumuşak uyarı) · 3sa 45dk kaldı",
+      "gecmis": "⏳20May11:33 (Eda T açtı · workflow · 🔔 otomatik 🔴 [3sa 45dk≤8sa])"
+    },
+    {
+      "id": "br_live_1779271830010029",
+      "no": 7,
+      "marka": "KMR Serve",
+      "brand": {
+        "name": "KMR Serve",
+        "color": "#F28E2B",
+        "wheelIdx": 1,
+        "channel_id": "C03M070G8HY",
+        "channel_name": "marka-kmr-serve"
+      },
+      "baslik": "Haziran SM Planı 26' (Sosyal Medya Post · aylık plan)",
+      "leadId": "U063T8M5HL4",
+      "contribIds": [
+        "U055EDESLSE"
+      ],
+      "reviewerId": "U063T8M5HL4",
+      "acilma": "2026-05-20T10:10:30.010029+00:00",
+      "deadline": "2026-06-21T17:00:00+03:00",
+      "durum": "yeni",
+      "priority": "🟢",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C03M070G8HY/p1779271830010029",
+      "notes": "21 Haziran 2026 17:00 TR (32g 2sa 45dk kaldı · workflow · marka n=0 → kıyas atlandı)",
+      "gecmis": "⏳20May13:10 (Buse açtı · workflow · 🔔 otomatik 🟢 [>72sa])"
+    },
+    {
+      "id": "br_live_1779272694698569",
+      "no": 8,
+      "marka": "Vdm Petdent",
+      "brand": {
+        "name": "Vdm Petdent",
+        "color": "#6A8E3D",
+        "wheelIdx": 11,
+        "channel_id": "C0AQLPY4TUM",
+        "channel_name": "marka-vdm-petdent"
+      },
+      "baslik": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [
+        "U09BFPBKQG7"
+      ],
+      "reviewerId": "U0AP31SAA1W",
+      "acilma": "2026-05-20T10:24:54.698569+00:00",
+      "deadline": "2026-05-21T13:24:00+03:00",
+      "durum": "yeni",
+      "priority": "🟠",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569",
+      "notes": "21 May 2026 13:24 TR (23sa 9dk kaldı · workflow · marka n=0 → kıyas atlandı · departman heuristic 📋 · Tip \"Veri analizi\" ambiguous)",
+      "gecmis": "⏳20May13:24 (Eren AI açtı · workflow · 🔔 otomatik 🟠 [23sa 38dk≤24sa])"
+    },
+    {
+      "id": "br_live_1779275121721279",
+      "no": 9,
+      "marka": "Vdm Petdent",
+      "brand": {
+        "name": "Vdm Petdent",
+        "color": "#6A8E3D",
+        "wheelIdx": 11,
+        "channel_id": "C0AQLPY4TUM",
+        "channel_name": "marka-vdm-petdent"
+      },
+      "baslik": "🆕 Whatsapp Business Kurulumu (Otomasyon · Eren self-assign · bugünün 2. VDM brief'i)",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [
+        "U0AP31SAA1W"
+      ],
+      "reviewerId": "U0AP31SAA1W",
+      "acilma": "2026-05-20T11:05:21.721279+00:00",
+      "deadline": "2026-05-22T23:59:00+03:00",
+      "durum": "yeni",
+      "priority": "🟡",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
+      "notes": "22 May 2026 (tüm gün · saat seçilmemiş → 23:59 TR varsayıldı · 2g 9sa 44dk kaldı · workflow · marka n=0 → kıyas atlandı · Otomasyon kapsamı net · self-assign — tipik AI iş)",
+      "gecmis": "⏳20May14:05 (Eren AI açtı · workflow · self-assign · 🔔 otomatik 🟡 [~58sa≤72sa])"
+    },
+    {
+      "id": "br_queue_1779266803180509",
+      "no": 10,
+      "marka": "Kmr Serve",
+      "brand": {
+        "name": "KMR Serve",
+        "color": "#F28E2B",
+        "wheelIdx": 1,
+        "channel_id": "C03M070G8HY",
+        "channel_name": "marka-kmr-serve"
+      },
+      "baslik": "Serve | Mayıs SM Planı 26'",
+      "leadId": "U063T8M5HL4",
+      "contribIds": [],
+      "reviewerId": null,
+      "acilma": "2026-05-20T08:46:43.180509+00:00",
+      "deadline": "2026-05-31T17:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C03M070G8HY/p1779266803180509",
+      "notes": "Sosyal Medya Post",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U063T8M5HL4"
+    },
+    {
+      "id": "br_queue_1779271340778199",
+      "no": 11,
+      "marka": "Kzy Everclean",
+      "brand": {
+        "name": "KZY Everclean",
+        "color": "#E15759",
+        "wheelIdx": 5,
+        "channel_id": "C01EJSS20K0",
+        "channel_name": "marka-kzy-everclean"
+      },
+      "baslik": "Ever Clean - Ekranda Yayınlanacak Video",
+      "leadId": "U05PP70GQTX",
+      "contribIds": [],
+      "reviewerId": null,
+      "acilma": "2026-05-20T10:02:20.778199+00:00",
+      "deadline": "2026-05-21T17:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C01EJSS20K0/p1779271340778199",
+      "notes": "Video",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U05PP70GQTX"
+    },
+    {
+      "id": "br_queue_1779275673657199",
+      "no": 12,
+      "marka": "Cureffect",
+      "brand": {
+        "name": "Cureffect",
+        "color": "#B79100",
+        "wheelIdx": 15,
+        "channel_id": "C05DF8RFQ77",
+        "channel_name": "marka-cureffect"
+      },
+      "baslik": "CurEffect SM Haziran Ayı İçerikleri",
+      "leadId": "U0AAC3YK20G",
+      "contribIds": [
+        "U08HLMHTGEL",
+        "U055EDESLSE"
+      ],
+      "reviewerId": null,
+      "acilma": "2026-05-20T11:14:33.657199+00:00",
+      "deadline": "2026-05-21T12:00:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C05DF8RFQ77/p1779275673657199",
+      "notes": "Sosyal Medya Post",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U0AAC3YK20G"
+    },
+    {
+      "id": "br_queue_1779277830269149",
+      "no": 13,
+      "marka": "Vdm Petdent",
+      "brand": {
+        "name": "Vdm Petdent",
+        "color": "#6A8E3D",
+        "wheelIdx": 11,
+        "channel_id": "C0AQLPY4TUM",
+        "channel_name": "marka-vdm-petdent"
+      },
+      "baslik": "Whatsapp Business Kurulumu",
+      "leadId": "U0AP31SAA1W",
+      "contribIds": [
+        "U0AP31SAA1W"
+      ],
+      "reviewerId": null,
+      "acilma": "2026-05-20T11:50:30.269149+00:00",
+      "deadline": "2026-05-22T14:50:00+03:00",
+      "durum": "yeni",
+      "revision": 0,
+      "stale": false,
+      "slack_url": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779277830269149",
+      "notes": "Otomasyon",
+      "gecmis": "",
+      "_from_queue": true,
+      "_kimden_id": "U0AP31SAA1W"
+    }
+  ],
+  "bns_completed": [],
+  "bns_brands": [
+    {
+      "name": "Bauhaus",
+      "color": "#00786F",
+      "wheelIdx": 13,
+      "channel_id": "C4Y43AW2E",
+      "channel_name": "marka-bauhaus"
+    },
+    {
+      "name": "Beta",
+      "color": "#4E79A7",
+      "wheelIdx": 0,
+      "channel_id": "C03QUBW5659",
+      "channel_name": "marka-beta"
+    },
+    {
+      "name": "Cimporglobal",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "C08N311GBHP",
+      "channel_name": "marka-cimporglobal"
+    },
+    {
+      "name": "Cureffect",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "C05DF8RFQ77",
+      "channel_name": "marka-cureffect"
+    },
+    {
+      "name": "Dermaqual",
+      "color": "#8E5BA1",
+      "wheelIdx": 12,
+      "channel_id": "C08QEE4GPFW",
+      "channel_name": "marka-dermaqual"
+    },
+    {
+      "name": "Efor Eforçay",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "C07MY8EFG0Z",
+      "channel_name": "marka-efor-eforçay"
+    },
+    {
+      "name": "Egosport",
+      "color": "#9C755F",
+      "wheelIdx": 7,
+      "channel_id": "C0ANY1ZMH2A",
+      "channel_name": "marka-egosport"
+    },
+    {
+      "name": "Gursoy",
+      "color": "#2C7FB8",
+      "wheelIdx": 9,
+      "channel_id": "CCVCC4KQU",
+      "channel_name": "marka-gursoy"
+    },
+    {
+      "name": "Hasvet",
+      "color": "#E15759",
+      "wheelIdx": 5,
+      "channel_id": "C081GAK936J",
+      "channel_name": "marka-hasvet"
+    },
+    {
+      "name": "JNJ",
+      "color": "#EDC948",
+      "wheelIdx": 6,
+      "channel_id": "C01ERQV89R9",
+      "channel_name": "marka-jnj"
+    },
+    {
+      "name": "JNJ Acuvue Me",
+      "color": "#E15759",
+      "wheelIdx": 5,
+      "channel_id": "CCUS6KJG0",
+      "channel_name": "marka-jnj-acuvue-me"
+    },
+    {
+      "name": "JNJ Vision TR",
+      "color": "#76B7B2",
+      "wheelIdx": 4,
+      "channel_id": "C4Y58FEUU",
+      "channel_name": "marka-jnj-vision-tr"
+    },
+    {
+      "name": "Jungleous",
+      "color": "#4E79A7",
+      "wheelIdx": 0,
+      "channel_id": "C0ANHBGKJQJ",
+      "channel_name": "marka-jungleous"
+    },
+    {
+      "name": "KMR Amos",
+      "color": "#4E79A7",
+      "wheelIdx": 0,
+      "channel_id": "C01ERJUEECA",
+      "channel_name": "marka-kmr-amos"
+    },
+    {
+      "name": "KMR Copic",
+      "color": "#59A14F",
+      "wheelIdx": 2,
+      "channel_id": "C0AJW8X06KB",
+      "channel_name": "marka-kmr-copic"
+    },
+    {
+      "name": "KMR Lamy",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "CCVJ74S1G",
+      "channel_name": "marka-kmr-lamy"
+    },
+    {
+      "name": "KMR Lamy Faq",
+      "color": "#9C755F",
+      "wheelIdx": 7,
+      "channel_id": "C083EB519E2",
+      "channel_name": "marka-kmr-lamy-faq"
+    },
+    {
+      "name": "KMR Marshmallow",
+      "color": "#F28E2B",
+      "wheelIdx": 1,
+      "channel_id": "C099PUJB4QZ",
+      "channel_name": "marka-kmr-marshmallow"
+    },
+    {
+      "name": "KMR Max",
+      "color": "#76B7B2",
+      "wheelIdx": 4,
+      "channel_id": "C088BEZEH8F",
+      "channel_name": "marka-kmr-max"
+    },
+    {
+      "name": "KMR Panfix",
+      "color": "#BAB0AC",
+      "wheelIdx": 8,
+      "channel_id": "C0A5CQ7RSJJ",
+      "channel_name": "marka-kmr-panfix"
+    },
+    {
+      "name": "KMR Scase",
+      "color": "#00786F",
+      "wheelIdx": 13,
+      "channel_id": "C05MC1ECLKB",
+      "channel_name": "marka-kmr-scase"
+    },
+    {
+      "name": "KMR Serve",
+      "color": "#F28E2B",
+      "wheelIdx": 1,
+      "channel_id": "C03M070G8HY",
+      "channel_name": "marka-kmr-serve"
+    },
+    {
+      "name": "Krups",
+      "color": "#F28E2B",
+      "wheelIdx": 1,
+      "channel_id": "C04RSD57ZMK",
+      "channel_name": "marka-krups"
+    },
+    {
+      "name": "Kuzeypet",
+      "color": "#6A8E3D",
+      "wheelIdx": 11,
+      "channel_id": "C03MCS7R0KB",
+      "channel_name": "marka-kuzeypet"
+    },
+    {
+      "name": "KZY Bark",
+      "color": "#59A14F",
+      "wheelIdx": 2,
+      "channel_id": "C0A5TTK1W64",
+      "channel_name": "marka-kzy-bark"
+    },
+    {
+      "name": "KZY Everclean",
+      "color": "#E15759",
+      "wheelIdx": 5,
+      "channel_id": "C01EJSS20K0",
+      "channel_name": "marka-kzy-everclean"
+    },
+    {
+      "name": "KZY Ferplast",
+      "color": "#2C7FB8",
+      "wheelIdx": 9,
+      "channel_id": "C01FFE7DYL8",
+      "channel_name": "marka-kzy-ferplast"
+    },
+    {
+      "name": "KZY Flamingo",
+      "color": "#E15759",
+      "wheelIdx": 5,
+      "channel_id": "C0A5CEXDGC9",
+      "channel_name": "marka-kzy-flamingo"
+    },
+    {
+      "name": "KZY Simplesolution",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "C01F47Z7LSD",
+      "channel_name": "marka-kzy-simplesolution"
+    },
+    {
+      "name": "KZY Supreme",
+      "color": "#00786F",
+      "wheelIdx": 13,
+      "channel_id": "C05KKSV6EF7",
+      "channel_name": "marka-kzy-supreme"
+    },
+    {
+      "name": "KZY Vetsbest",
+      "color": "#BAB0AC",
+      "wheelIdx": 8,
+      "channel_id": "C042SGZ4N3W",
+      "channel_name": "marka-kzy-vetsbest"
+    },
+    {
+      "name": "Marmaraholding",
+      "color": "#59A14F",
+      "wheelIdx": 2,
+      "channel_id": "C09EWGL9249",
+      "channel_name": "marka-marmaraholding"
+    },
+    {
+      "name": "Muffik",
+      "color": "#EDC948",
+      "wheelIdx": 6,
+      "channel_id": "C092B2GCDAT",
+      "channel_name": "marka-muffik"
+    },
+    {
+      "name": "Polisan",
+      "color": "#76B7B2",
+      "wheelIdx": 4,
+      "channel_id": "C047C3MCW9G",
+      "channel_name": "marka-polisan"
+    },
+    {
+      "name": "Splenda",
+      "color": "#6A8E3D",
+      "wheelIdx": 11,
+      "channel_id": "C02SZRFPARK",
+      "channel_name": "marka-splenda"
+    },
+    {
+      "name": "Tour2america",
+      "color": "#8E5BA1",
+      "wheelIdx": 12,
+      "channel_id": "C05J5PXBPGS",
+      "channel_name": "marka-tour2america"
+    },
+    {
+      "name": "Vdm Petdent",
+      "color": "#6A8E3D",
+      "wheelIdx": 11,
+      "channel_id": "C0AQLPY4TUM",
+      "channel_name": "marka-vdm-petdent"
+    }
+  ],
+  "bns_users": [
+    {
+      "id": "U4XCE3532",
+      "name": "Cansu Kazgan",
+      "mono": "CK",
+      "rol": "yonetici",
+      "title": "Direktör",
+      "email": "cansu@benseno.com.tr"
+    },
+    {
+      "id": "U02SZQDAFPF",
+      "name": "Erdem Akoğlu",
+      "mono": "EA",
+      "rol": "yonetici",
+      "title": "Editör Yöneticisi",
+      "email": "erdem@benseno.com.tr"
+    },
+    {
+      "id": "U030C48PL23",
+      "name": "Görkem Kaya",
+      "mono": "GK",
+      "rol": "yonetici",
+      "title": "Genel Müdür",
+      "email": "gorkem@benseno.com.tr"
+    },
+    {
+      "id": "U055EDESLSE",
+      "name": "İpek Akdeniz",
+      "mono": "İA",
+      "rol": "yonetici",
+      "title": "Tasarım Yöneticisi",
+      "email": "ipek@benseno.com.tr"
+    },
+    {
+      "id": "UD96GH76E",
+      "name": "Reyhan Nur Pınar",
+      "mono": "RP",
+      "rol": "yonetici",
+      "title": "GMY",
+      "email": "reyhan@benseno.com.tr"
+    },
+    {
+      "id": "U06J26R1XCJ",
+      "name": "Aykut Arslan",
+      "mono": "AA",
+      "rol": "tasarim",
+      "title": "",
+      "email": "aykut@benseno.com.tr"
+    },
+    {
+      "id": "U0AN6DD79M0",
+      "name": "Aylin Tozkoparan",
+      "mono": "AT",
+      "rol": "tasarim",
+      "title": "",
+      "email": "aylin.tozkoparan@benseno.com.tr"
+    },
+    {
+      "id": "U09BFPBKQG7",
+      "name": "Hasan Serdar Arda",
+      "mono": "HA",
+      "rol": "tasarim",
+      "title": "",
+      "email": "hasan@benseno.com.tr"
+    },
+    {
+      "id": "U0AK8U7L57F",
+      "name": "İrem Özkan",
+      "mono": "İÖ",
+      "rol": "tasarim",
+      "title": "",
+      "email": "irem.ozkan@benseno.com.tr"
+    },
+    {
+      "id": "U0B3K2WE7SB",
+      "name": "Pelin Özdemir",
+      "mono": "PÖ",
+      "rol": "tasarim",
+      "title": "",
+      "email": "pelin@benseno.com.tr"
+    },
+    {
+      "id": "U08HLMHTGEL",
+      "name": "Serhat",
+      "mono": "SE",
+      "rol": "tasarim",
+      "title": "",
+      "email": "serhat@benseno.com.tr"
+    },
+    {
+      "id": "U05PP70GQTX",
+      "name": "Aylin Canel",
+      "mono": "AC",
+      "rol": "editor",
+      "title": "",
+      "email": "aylin@benseno.com.tr"
+    },
+    {
+      "id": "U063T8M5HL4",
+      "name": "Buse Gürbüzer",
+      "mono": "BG",
+      "rol": "editor",
+      "title": "",
+      "email": "buse@benseno.com.tr"
+    },
+    {
+      "id": "U07PV0RA9L2",
+      "name": "Eda Ayral",
+      "mono": "EA",
+      "rol": "editor",
+      "title": "",
+      "email": "eda@benseno.com.tr"
+    },
+    {
+      "id": "U09BZHR25NG",
+      "name": "Eda Tireli",
+      "mono": "ET",
+      "rol": "editor",
+      "title": "",
+      "email": "eda.tireli@benseno.com.tr"
+    },
+    {
+      "id": "U08NQJ27G5S",
+      "name": "Melis",
+      "mono": "ME",
+      "rol": "editor",
+      "title": "",
+      "email": "melis@benseno.com.tr"
+    },
+    {
+      "id": "U0AAC3YK20G",
+      "name": "Simge Acar",
+      "mono": "SA",
+      "rol": "editor",
+      "title": "",
+      "email": "simge@benseno.com.tr"
+    },
+    {
+      "id": "U0AP31SAA1W",
+      "name": "Eren Mahzunlar",
+      "mono": "EM",
+      "rol": "ai",
+      "title": "AI Operatör",
+      "email": "eren@benseno.com.tr"
+    }
+  ],
+  "bns_dept_stats": {
+    "tasarim": {
+      "name": "Tasarım",
+      "people": 7,
+      "active": 0,
+      "overdue": 0,
+      "capacity": 0
+    },
+    "editor": {
+      "name": "Editör",
+      "people": 8,
+      "active": 0,
+      "overdue": 0,
+      "capacity": 0
+    },
+    "ai": {
+      "name": "AI",
+      "people": 1,
+      "active": 0,
+      "overdue": 0,
+      "capacity": 0
+    }
+  },
+  "bns_brand_stats": [
+    {
+      "name": "Bauhaus",
+      "color": "#00786F",
+      "wheelIdx": 13,
+      "channel_id": "C4Y43AW2E",
+      "channel_name": "marka-bauhaus",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Beta",
+      "color": "#4E79A7",
+      "wheelIdx": 0,
+      "channel_id": "C03QUBW5659",
+      "channel_name": "marka-beta",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Cimporglobal",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "C08N311GBHP",
+      "channel_name": "marka-cimporglobal",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Cureffect",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "C05DF8RFQ77",
+      "channel_name": "marka-cureffect",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Dermaqual",
+      "color": "#8E5BA1",
+      "wheelIdx": 12,
+      "channel_id": "C08QEE4GPFW",
+      "channel_name": "marka-dermaqual",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Efor Eforçay",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "C07MY8EFG0Z",
+      "channel_name": "marka-efor-eforçay",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Egosport",
+      "color": "#9C755F",
+      "wheelIdx": 7,
+      "channel_id": "C0ANY1ZMH2A",
+      "channel_name": "marka-egosport",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Gursoy",
+      "color": "#2C7FB8",
+      "wheelIdx": 9,
+      "channel_id": "CCVCC4KQU",
+      "channel_name": "marka-gursoy",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Hasvet",
+      "color": "#E15759",
+      "wheelIdx": 5,
+      "channel_id": "C081GAK936J",
+      "channel_name": "marka-hasvet",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "JNJ",
+      "color": "#EDC948",
+      "wheelIdx": 6,
+      "channel_id": "C01ERQV89R9",
+      "channel_name": "marka-jnj",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "JNJ Acuvue Me",
+      "color": "#E15759",
+      "wheelIdx": 5,
+      "channel_id": "CCUS6KJG0",
+      "channel_name": "marka-jnj-acuvue-me",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "JNJ Vision TR",
+      "color": "#76B7B2",
+      "wheelIdx": 4,
+      "channel_id": "C4Y58FEUU",
+      "channel_name": "marka-jnj-vision-tr",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Jungleous",
+      "color": "#4E79A7",
+      "wheelIdx": 0,
+      "channel_id": "C0ANHBGKJQJ",
+      "channel_name": "marka-jungleous",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Amos",
+      "color": "#4E79A7",
+      "wheelIdx": 0,
+      "channel_id": "C01ERJUEECA",
+      "channel_name": "marka-kmr-amos",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Copic",
+      "color": "#59A14F",
+      "wheelIdx": 2,
+      "channel_id": "C0AJW8X06KB",
+      "channel_name": "marka-kmr-copic",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Lamy",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "CCVJ74S1G",
+      "channel_name": "marka-kmr-lamy",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Lamy Faq",
+      "color": "#9C755F",
+      "wheelIdx": 7,
+      "channel_id": "C083EB519E2",
+      "channel_name": "marka-kmr-lamy-faq",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Marshmallow",
+      "color": "#F28E2B",
+      "wheelIdx": 1,
+      "channel_id": "C099PUJB4QZ",
+      "channel_name": "marka-kmr-marshmallow",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Max",
+      "color": "#76B7B2",
+      "wheelIdx": 4,
+      "channel_id": "C088BEZEH8F",
+      "channel_name": "marka-kmr-max",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Panfix",
+      "color": "#BAB0AC",
+      "wheelIdx": 8,
+      "channel_id": "C0A5CQ7RSJJ",
+      "channel_name": "marka-kmr-panfix",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Scase",
+      "color": "#00786F",
+      "wheelIdx": 13,
+      "channel_id": "C05MC1ECLKB",
+      "channel_name": "marka-kmr-scase",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KMR Serve",
+      "color": "#F28E2B",
+      "wheelIdx": 1,
+      "channel_id": "C03M070G8HY",
+      "channel_name": "marka-kmr-serve",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Krups",
+      "color": "#F28E2B",
+      "wheelIdx": 1,
+      "channel_id": "C04RSD57ZMK",
+      "channel_name": "marka-krups",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Kuzeypet",
+      "color": "#6A8E3D",
+      "wheelIdx": 11,
+      "channel_id": "C03MCS7R0KB",
+      "channel_name": "marka-kuzeypet",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KZY Bark",
+      "color": "#59A14F",
+      "wheelIdx": 2,
+      "channel_id": "C0A5TTK1W64",
+      "channel_name": "marka-kzy-bark",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KZY Everclean",
+      "color": "#E15759",
+      "wheelIdx": 5,
+      "channel_id": "C01EJSS20K0",
+      "channel_name": "marka-kzy-everclean",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KZY Ferplast",
+      "color": "#2C7FB8",
+      "wheelIdx": 9,
+      "channel_id": "C01FFE7DYL8",
+      "channel_name": "marka-kzy-ferplast",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KZY Flamingo",
+      "color": "#E15759",
+      "wheelIdx": 5,
+      "channel_id": "C0A5CEXDGC9",
+      "channel_name": "marka-kzy-flamingo",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KZY Simplesolution",
+      "color": "#B79100",
+      "wheelIdx": 15,
+      "channel_id": "C01F47Z7LSD",
+      "channel_name": "marka-kzy-simplesolution",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KZY Supreme",
+      "color": "#00786F",
+      "wheelIdx": 13,
+      "channel_id": "C05KKSV6EF7",
+      "channel_name": "marka-kzy-supreme",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "KZY Vetsbest",
+      "color": "#BAB0AC",
+      "wheelIdx": 8,
+      "channel_id": "C042SGZ4N3W",
+      "channel_name": "marka-kzy-vetsbest",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Marmaraholding",
+      "color": "#59A14F",
+      "wheelIdx": 2,
+      "channel_id": "C09EWGL9249",
+      "channel_name": "marka-marmaraholding",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Muffik",
+      "color": "#EDC948",
+      "wheelIdx": 6,
+      "channel_id": "C092B2GCDAT",
+      "channel_name": "marka-muffik",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Polisan",
+      "color": "#76B7B2",
+      "wheelIdx": 4,
+      "channel_id": "C047C3MCW9G",
+      "channel_name": "marka-polisan",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Splenda",
+      "color": "#6A8E3D",
+      "wheelIdx": 11,
+      "channel_id": "C02SZRFPARK",
+      "channel_name": "marka-splenda",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Tour2america",
+      "color": "#8E5BA1",
+      "wheelIdx": 12,
+      "channel_id": "C05J5PXBPGS",
+      "channel_name": "marka-tour2america",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    },
+    {
+      "name": "Vdm Petdent",
+      "color": "#6A8E3D",
+      "wheelIdx": 11,
+      "channel_id": "C0AQLPY4TUM",
+      "channel_name": "marka-vdm-petdent",
+      "active": 0,
+      "overdue": 0,
+      "stale": false,
+      "problem_label": null
+    }
+  ]
+};

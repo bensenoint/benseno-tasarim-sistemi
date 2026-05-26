@@ -412,7 +412,25 @@ html[data-theme="dark"][data-noise="on"] body::before {
 /* ------------------------------------------------------------ */
 /*  MOBILE RESPONSIVE                                           */
 /* ------------------------------------------------------------ */
+/* MobileNav: hidden on desktop, shown on mobile via CSS */
+.bns-mobile-nav-wrap { display: none; }
+
+/* Desktop footer shown by default */
+.bns-desktop-footer { display: flex; }
+
 @media (max-width: 767px) {
+  /* Sidebar: always hidden on mobile — CSS guarantees this even if JS isMobile fails */
+  aside { display: none !important; }
+
+  /* MobileNav: always shown on mobile */
+  .bns-mobile-nav-wrap { display: block; }
+
+  /* Footer: hidden on mobile */
+  .bns-desktop-footer { display: none !important; }
+
+  /* Main content: extra bottom padding for bottom nav */
+  .bns-main-content { padding: 8px 14px 80px !important; }
+
   /* KPI grid — 2 columns on mobile */
   .bns-kpi-grid {
     grid-template-columns: repeat(2, 1fr) !important;
