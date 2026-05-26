@@ -472,7 +472,7 @@ html[data-theme="dark"][data-noise="on"] body::before {
     -webkit-overflow-scrolling: touch;
   }
   .bns-table-wrap table {
-    min-width: 0 !important;
+    min-width: 380px !important;
     width: 100% !important;
   }
 
