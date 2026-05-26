@@ -408,3 +408,54 @@ html[data-theme="dark"][data-noise="on"] body::before {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
 }
+
+/* ------------------------------------------------------------ */
+/*  MOBILE RESPONSIVE                                           */
+/* ------------------------------------------------------------ */
+@media (max-width: 767px) {
+  /* KPI grid — 2 columns on mobile */
+  .bns-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Brief table — horizontal scroll */
+  .bns-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bns-table-wrap table,
+  .bns-table-wrap [role="table"] {
+    min-width: 640px;
+  }
+
+  /* Card padding reduced */
+  .bns-card-mobile {
+    padding: 12px !important;
+  }
+
+  /* PageHead title smaller */
+  .bns-page-title {
+    font-size: 22px !important;
+  }
+
+  /* BriefDrawer — full screen on mobile */
+  .bns-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    top: auto !important;
+    bottom: 0 !important;
+    height: 92vh !important;
+  }
+
+  /* Hide desktop-only shortcuts hint */
+  .bns-shortcuts-hint {
+    display: none !important;
+  }
+
+  /* Tweak panel hidden on mobile */
+  .bns-tweaks {
+    display: none !important;
+  }
+}

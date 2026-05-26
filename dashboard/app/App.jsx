@@ -19,6 +19,7 @@ function App() {
   // App state
   const [user, setUser] = React.useState(data.ME);
   const [tab, setTab] = React.useState("overview");
+  const isMobile = window.useIsMobile ? window.useIsMobile() : false;
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [viewMode, setViewMode] = React.useState(t.defaultView);
   const [openBrief, setOpenBrief] = React.useState(null);
@@ -306,19 +307,25 @@ function App() {
           flex: 1, overflowY: "auto", overflowX: "hidden",
           background: "var(--paper)",
         }}>
-          <div style={{maxWidth: 1400, margin: "0 auto", padding: "8px 32px 72px"}}>
+          <div style={{maxWidth: 1400, margin: "0 auto", padding: isMobile ? "8px 14px 80px" : "8px 32px 72px"}}>
             {Screen}
           </div>
-          <footer style={{
-            padding: "14px 28px 28px", maxWidth: 1400, margin: "0 auto",
-            display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8,
-            font: "400 11px/1 var(--font-sans)", color: "var(--ink-5)"
-          }}>
-            <span>{data.fmtTr ? data.fmtTr(data.lastSync ? Date.parse(data.lastSync) : data.NOW, {style:"footer"}) : "Son senkron · 21 May 2026 · 14:45 (Europe/Istanbul)"}</span>
-            <span style={{fontFamily:"var(--font-mono)"}}>Benseno v7.13 · GitHub Pages</span>
-          </footer>
+          {!isMobile && (
+            <footer style={{
+              padding: "14px 28px 28px", maxWidth: 1400, margin: "0 auto",
+              display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8,
+              font: "400 11px/1 var(--font-sans)", color: "var(--ink-5)"
+            }}>
+              <span>{data.fmtTr ? data.fmtTr(data.lastSync ? Date.parse(data.lastSync) : data.NOW, {style:"footer"}) : "Son senkron · 21 May 2026 · 14:45 (Europe/Istanbul)"}</span>
+              <span style={{fontFamily:"var(--font-mono)"}}>Benseno v7.13 · GitHub Pages</span>
+            </footer>
+          )}
         </main>
       </div>
+
+      {isMobile && (
+        <MobileNav active={tab} onChange={setTab} data={liveData}/>
+      )}
 
       {openBrief && (
         <BriefDrawer brief={openBrief} onClose={onCloseBrief}

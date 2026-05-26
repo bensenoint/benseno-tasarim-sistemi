@@ -1,6 +1,18 @@
 // app/Chrome.jsx — Sidebar navigation + slim header (v2).
 // Replaces horizontal tab bar with a left sidebar for better scalability.
 
+// ─── Mobile detection hook ────────────────────────────────────────────────
+function useIsMobile() {
+  const [mobile, setMobile] = React.useState(() => window.innerWidth < 768);
+  React.useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const handler = (e) => setMobile(e.matches);
+    mq.addEventListener ? mq.addEventListener("change", handler) : mq.addListener(handler);
+    return () => mq.removeEventListener ? mq.removeEventListener("change", handler) : mq.removeListener(handler);
+  }, []);
+  return mobile;
+}
+
 const NAV_SECTIONS = [
   {
     id: "main",
@@ -72,6 +84,7 @@ const NAV_ICONS = {
 };
 
 function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers }) {
+  const isMobile = useIsMobile();
   const [tick, setTick] = React.useState(0);
   React.useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 1000);
@@ -83,8 +96,8 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
   return (
     <header style={{
       height: 52,
-      display: "flex", alignItems: "center", gap: 12,
-      padding: "0 20px 0 16px",
+      display: "flex", alignItems: "center", gap: isMobile ? 8 : 12,
+      padding: isMobile ? "0 12px" : "0 20px 0 16px",
       background: "var(--header-blur)",
       backdropFilter: "blur(14px) saturate(160%)",
       WebkitBackdropFilter: "blur(14px) saturate(160%)",
@@ -92,56 +105,77 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       flexShrink: 0,
       position: "sticky", top: 0, zIndex: 30,
     }}>
-      {/* Search */}
-      <button onClick={onOpenPalette} style={{
-        flex: 1, maxWidth: 360,
-        display: "flex", alignItems: "center", gap: 8,
-        padding: "7px 10px", border: "1px solid var(--line)",
-        borderRadius: 8, background: "var(--paper-2)",
-        color: "var(--ink-4)",
-        cursor: "pointer", font: "400 13px/1 var(--font-sans)",
-        textAlign: "left", transition: "border-color 150ms, background 150ms",
-      }}
-        onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--ink-4)"; e.currentTarget.style.background = "var(--paper)"; }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.background = "var(--paper-2)"; }}
-      >
-        <I.Search size={13} style={{flexShrink:0}}/>
-        <span style={{flex:1}}>Brief, marka, kişi ara…</span>
-        <span style={{
-          font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)",
-          padding: "3px 6px", border: "1px solid var(--line)",
-          borderRadius: 4, background: "var(--surface)"
-        }}>⌘K</span>
-      </button>
+      {/* Logo on mobile */}
+      {isMobile && (
+        <img src="app/logo.png" alt="Benseno" style={{
+          height: 24, width: "auto", objectFit: "contain",
+          mixBlendMode: "multiply", flexShrink: 0,
+        }}/>
+      )}
 
-      <div style={{marginLeft: "auto", display: "flex", alignItems: "center", gap: 8}}>
+      {/* Search — full bar on desktop, icon-only on mobile */}
+      {isMobile ? (
+        <button onClick={onOpenPalette} style={{
+          width: 36, height: 36, flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          border: "1px solid var(--line)", borderRadius: 8,
+          background: "var(--paper-2)", color: "var(--ink-4)", cursor: "pointer",
+        }}>
+          <I.Search size={15}/>
+        </button>
+      ) : (
+        <button onClick={onOpenPalette} style={{
+          flex: 1, maxWidth: 360,
+          display: "flex", alignItems: "center", gap: 8,
+          padding: "7px 10px", border: "1px solid var(--line)",
+          borderRadius: 8, background: "var(--paper-2)",
+          color: "var(--ink-4)",
+          cursor: "pointer", font: "400 13px/1 var(--font-sans)",
+          textAlign: "left", transition: "border-color 150ms, background 150ms",
+        }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--ink-4)"; e.currentTarget.style.background = "var(--paper)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.background = "var(--paper-2)"; }}
+        >
+          <I.Search size={13} style={{flexShrink:0}}/>
+          <span style={{flex:1}}>Brief, marka, kişi ara…</span>
+          <span style={{
+            font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)",
+            padding: "3px 6px", border: "1px solid var(--line)",
+            borderRadius: 4, background: "var(--surface)"
+          }}>⌘K</span>
+        </button>
+      )}
+
+      <div style={{marginLeft: "auto", display: "flex", alignItems: "center", gap: isMobile ? 6 : 8}}>
         {/* Sync pill */}
         <span title="Slack Canvas senkron" style={{
           display: "inline-flex", alignItems: "center", gap: 5,
-          padding: "4px 9px 4px 7px", borderRadius: 999,
+          padding: isMobile ? "4px 7px 4px 6px" : "4px 9px 4px 7px", borderRadius: 999,
           background: "var(--ember-tint)", color: "var(--ember)",
-          font: "500 11px/1 var(--font-sans)", flexShrink: 0,
+          font: `500 ${isMobile ? 10 : 11}px/1 var(--font-sans)`, flexShrink: 0,
         }}>
           <span style={{
             width: 5, height: 5, borderRadius: 999, background: "var(--ember)",
             animation: "bn-pulse 2.4s ease-in-out infinite", flexShrink: 0,
           }}/>
-          Canlı · {syncSecs}sn
+          {isMobile ? "Canlı" : `Canlı · ${syncSecs}sn`}
         </span>
 
-        {/* View mode */}
-        <div style={{display: "inline-flex", padding: 2, background: "var(--paper-2)", borderRadius: 7, gap: 1}}>
-          {[["mine", "Ben"], ["dept", "Dept"], ["all", "Tümü"]].map(([k, v]) => (
-            <button key={k} onClick={() => setViewMode(k)} style={{
-              font: "500 11px/1 var(--font-sans)", padding: "5px 9px",
-              border: 0, background: viewMode === k ? "var(--surface)" : "transparent",
-              color: viewMode === k ? "var(--ink)" : "var(--ink-3)",
-              borderRadius: 5, cursor: "pointer",
-              boxShadow: viewMode === k ? "0 1px 2px rgba(22,22,26,0.06)" : "none",
-              transition: "all 120ms",
-            }}>{v}</button>
-          ))}
-        </div>
+        {/* View mode — hidden on mobile (bottom nav handles navigation) */}
+        {!isMobile && (
+          <div style={{display: "inline-flex", padding: 2, background: "var(--paper-2)", borderRadius: 7, gap: 1}}>
+            {[["mine", "Ben"], ["dept", "Dept"], ["all", "Tümü"]].map(([k, v]) => (
+              <button key={k} onClick={() => setViewMode(k)} style={{
+                font: "500 11px/1 var(--font-sans)", padding: "5px 9px",
+                border: 0, background: viewMode === k ? "var(--surface)" : "transparent",
+                color: viewMode === k ? "var(--ink)" : "var(--ink-3)",
+                borderRadius: 5, cursor: "pointer",
+                boxShadow: viewMode === k ? "0 1px 2px rgba(22,22,26,0.06)" : "none",
+                transition: "all 120ms",
+              }}>{v}</button>
+            ))}
+          </div>
+        )}
 
         {/* Theme toggle */}
         <button title={theme === "dark" ? "Aydınlık mod" : "Karanlık mod"}
@@ -158,9 +192,20 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
           {theme === "dark" ? <I.Sun size={14}/> : <I.Moon size={14}/>}
         </button>
 
-        {/* New brief */}
-        <Button kind="secondary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}
-          style={{borderColor:"var(--ember)", color:"var(--ember)", fontWeight:600}}>Yeni brief</Button>
+        {/* New brief — icon+text on desktop, icon-only on mobile */}
+        {isMobile ? (
+          <button onClick={onNewBrief} style={{
+            width: 36, height: 36, flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: "1.5px solid var(--ember)", borderRadius: 8,
+            background: "transparent", color: "var(--ember)", cursor: "pointer",
+          }}>
+            <I.Plus size={16}/>
+          </button>
+        ) : (
+          <Button kind="secondary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}
+            style={{borderColor:"var(--ember)", color:"var(--ember)", fontWeight:600}}>Yeni brief</Button>
+        )}
 
         {/* User avatar + menu */}
         <div style={{position: "relative"}}>
@@ -239,8 +284,150 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
   );
 }
 
-function Sidebar({ active, onChange, collapsed, onToggle, data }) {
+// ─── Mobile bottom navigation bar ────────────────────────────────────────
+function MobileNav({ active, onChange, data }) {
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const alertCount = (data && data.briefs) ? data.briefs.filter(b => b.prio && (b.prio.code === "red" || b.prio.code === "over")).length : 0;
+
+  const PRIMARY = [
+    { id: "overview",  label: "Özet",    icon: "Home" },
+    { id: "jobs",      label: "İşler",   icon: "Briefcase" },
+    { id: "manager",   label: "Yönetici", icon: "Target", alert: true },
+    { id: "kanban",    label: "Kanban",  icon: "Columns" },
+  ];
+
+  // All nav items for drawer
+  const ALL_ITEMS = NAV_SECTIONS.flatMap(s => s.items);
+
+  return (
+    <>
+      {/* Drawer backdrop */}
+      {menuOpen && (
+        <div onClick={() => setMenuOpen(false)} style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)",
+          zIndex: 80, backdropFilter: "blur(2px)",
+        }}/>
+      )}
+
+      {/* Slide-up drawer */}
+      <div style={{
+        position: "fixed", left: 0, right: 0, bottom: menuOpen ? 60 : "-100%",
+        zIndex: 81, background: "var(--surface)",
+        borderRadius: "16px 16px 0 0",
+        border: "1px solid var(--line)", borderBottom: "none",
+        padding: "12px 0 8px",
+        transition: "bottom 250ms cubic-bezier(0.4,0,0.2,1)",
+        maxHeight: "70vh", overflowY: "auto",
+      }}>
+        <div style={{
+          width: 36, height: 4, borderRadius: 2, background: "var(--line)",
+          margin: "0 auto 12px",
+        }}/>
+        {NAV_SECTIONS.map((section, si) => (
+          <div key={section.id}>
+            <div style={{
+              padding: "8px 20px 4px",
+              font: "600 10px/1 var(--font-sans)", letterSpacing: "0.08em",
+              textTransform: "uppercase", color: "var(--ink-5)",
+            }}>{section.label}</div>
+            {section.items.map(item => {
+              const Icon = NAV_ICONS[item.icon] || (() => null);
+              const isActive = active === item.id;
+              const badge = item.alert && alertCount > 0 ? alertCount : null;
+              return (
+                <button key={item.id} onClick={() => { onChange(item.id); setMenuOpen(false); }}
+                  style={{
+                    display: "flex", width: "100%", alignItems: "center", gap: 12,
+                    padding: "10px 20px", border: 0, cursor: "pointer",
+                    background: isActive ? "var(--ember-tint)" : "transparent",
+                    color: isActive ? "var(--ember)" : "var(--ink-2)",
+                    font: `${isActive ? 600 : 500} 14px/1 var(--font-sans)`,
+                    textAlign: "left",
+                  }}
+                >
+                  <Icon/>
+                  <span style={{flex:1}}>{item.label}</span>
+                  {badge && <span style={{font:"600 10px/1 var(--font-mono)", padding:"2px 6px", borderRadius:4, color:"var(--prio-red)", background:"var(--prio-red-bg)"}}>{badge}</span>}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom tab bar */}
+      <nav style={{
+        position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 82,
+        height: 60,
+        display: "flex", alignItems: "stretch",
+        background: "var(--header-blur)",
+        backdropFilter: "blur(14px) saturate(160%)",
+        WebkitBackdropFilter: "blur(14px) saturate(160%)",
+        borderTop: "1px solid var(--line)",
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+      }}>
+        {PRIMARY.map(item => {
+          const Icon = NAV_ICONS[item.icon] || (() => null);
+          const isActive = active === item.id;
+          const badge = item.alert && alertCount > 0 ? alertCount : null;
+          return (
+            <button key={item.id} onClick={() => onChange(item.id)} style={{
+              flex: 1, display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center", gap: 3,
+              border: 0, background: "transparent", cursor: "pointer",
+              color: isActive ? "var(--ember)" : "var(--ink-4)",
+              position: "relative", minWidth: 0,
+              transition: "color 150ms",
+            }}>
+              {isActive && <span style={{
+                position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+                width: 24, height: 2, borderRadius: 2, background: "var(--ember)",
+              }}/>}
+              <span style={{position:"relative"}}>
+                <Icon/>
+                {badge && <span style={{
+                  position:"absolute", top:-4, right:-6,
+                  width:14, height:14, borderRadius:999,
+                  background:"var(--prio-red)", border:"2px solid var(--surface)",
+                  font:"600 8px/14px var(--font-mono)", color:"#fff",
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  fontSize:8,
+                }}>{badge > 9 ? "9+" : badge}</span>}
+              </span>
+              <span style={{
+                font: `${isActive ? 600 : 400} 9.5px/1 var(--font-sans)`,
+                letterSpacing: "0.01em", whiteSpace: "nowrap",
+              }}>{item.label}</span>
+            </button>
+          );
+        })}
+        {/* Menü butonu */}
+        <button onClick={() => setMenuOpen(v => !v)} style={{
+          flex: 1, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: 3,
+          border: 0, background: "transparent", cursor: "pointer",
+          color: menuOpen ? "var(--ember)" : "var(--ink-4)",
+          transition: "color 150ms",
+        }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+            {menuOpen
+              ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
+              : <><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>
+            }
+          </svg>
+          <span style={{font:"400 9.5px/1 var(--font-sans)"}}>Menü</span>
+        </button>
+      </nav>
+    </>
+  );
+}
+
+function Sidebar({ active, onChange, collapsed, onToggle, data }) {
+  const isMobile = useIsMobile();
+  const alertCount = (data && data.briefs) ? data.briefs.filter(b => b.prio && (b.prio.code === "red" || b.prio.code === "over")).length : 0;
+
+  // On mobile, sidebar is hidden (MobileNav handles navigation)
+  if (isMobile) return null;
 
   return (
     <aside style={{
@@ -387,5 +574,7 @@ function TabBar() { return null; }
 
 window.Header = Header;
 window.Sidebar = Sidebar;
+window.MobileNav = MobileNav;
 window.TabBar = TabBar;
 window.NAV_SECTIONS = NAV_SECTIONS;
+window.useIsMobile = useIsMobile;
