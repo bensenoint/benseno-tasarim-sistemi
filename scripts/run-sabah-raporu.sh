@@ -11,6 +11,13 @@ TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "[$TIMESTAMP] Sabah Raporu başlatıldı..." >> logs/sabah-raporu.log
 
 /opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — sabah-raporu" --print --dangerously-skip-permissions >> logs/sabah-raporu.log 2>&1
+EXIT_CODE=$?
+
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+if [[ $EXIT_CODE -ne 0 ]]; then
+  echo "[$TIMESTAMP] HATA: Sabah Raporu başarısız (exit $EXIT_CODE) — tamamlandı sayılmadı." >> logs/sabah-raporu.log
+  exit $EXIT_CODE
+fi
 
 echo "[$TIMESTAMP] Sabah Raporu tamamlandı." >> logs/sabah-raporu.log
 
