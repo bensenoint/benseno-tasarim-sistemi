@@ -76,8 +76,8 @@ function TeamScreen({ data }) {
         </div>
       </div>
 
-      <Card padding={0} style={{overflow:"auto", maxHeight:"72vh"}}>
-        <table style={{borderCollapse:"collapse", font:"400 11px/1 var(--font-mono)", color:"var(--ink-2)"}}>
+      <Card padding={0} style={{overflowX:"auto", WebkitOverflowScrolling:"touch", maxHeight:"72vh"}}>
+        <table style={{borderCollapse:"collapse", minWidth:480, font:"400 11px/1 var(--font-mono)", color:"var(--ink-2)"}}>
           <thead>
             <tr>
               <th style={{

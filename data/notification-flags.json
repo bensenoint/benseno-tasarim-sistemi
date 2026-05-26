@@ -1,7 +1,7 @@
 {
-  "sync_ts": 1779790808,
-  "sync_iso": "2026-05-26T13:20:08+03:00",
-  "run_type": "orchestrator_1315_delta_refresh",
+  "sync_ts": 1779813807,
+  "sync_iso": "2026-05-26T19:43:27+03:00",
+  "run_type": "orchestrator_1940_after_hours_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
   "past_deadline": [],
@@ -13,20 +13,17 @@
   "threshold_transitions": [],
   "imminent_deadlines": [
     {
-      "no": "21",
-      "marka": "VDM Petdent",
-      "is": "bahar video",
-      "deadline_iso": "2026-05-23T14:42:00+03:00",
-      "blokeli_esik_iso": "2026-05-26T14:42:00+03:00",
-      "kalan_dk_to_blokeli": 81,
-      "atanan_ids": [
-        "U4XCE3532",
-        "U030C48PL23",
-        "U0AP31SAA1W"
-      ],
-      "status": "72sa blokeli eşiği ~14:42 · ~1sa 21dk · Şablon 24+25 zaten gönderildi · 14:45 sync'te Şablon 29 → Eren",
-      "dm_required": false,
-      "skip_reason": "72sa eşiği henüz aşılmadı · sonraki sync (13:45) hala aşılmamış · 14:45 sync (~1.5sa sonra) Şablon 29 tetikleyecek"
+      "no": "20",
+      "marka": "Tour2America",
+      "is": "bayram icerigi",
+      "deadline_iso": "2026-06-01T12:31:00+03:00",
+      "kalan_dk": 8208,
+      "atanan_ids": ["U0AP31SAA1W", "U030C48PL23"],
+      "status": "5g 16sa 49dk kaldı · 🟢 Düşük öncelik · yeni",
+      "dm_required": false
     }
-  ]
+  ],
+  "after_hours": true,
+  "after_hours_note": "19:43 TR · Mesai dışı (08-17 dışı) · Manuel orchestrator run · Notification DM atılmaz · Sadece dashboard refresh",
+  "dm_skip_reason": "Mesai dışı (saat 17:30 sonrası) · Tüm threshold geçişleri zaten önceki sync'lerde işlendi (#1 8g 16:00, #21 72sa 14:42, #9 72sa 09:33) · Yeni transition yok"
 }

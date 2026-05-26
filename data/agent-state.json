@@ -21,8 +21,8 @@
   "dm_skipped_idempotent": 5,
   "canvas_updated": false,
   "canvas_skip_reason": "structural değişiklik yok · sadece countdown delta · 13:45 sync'te yenilenecek",
-  "github_commit": "pending",
-  "github_push": "pending",
+  "github_commit": "5c30441",
+  "github_push": "ok",
   "imminent_deadline": {
     "no": "21",
     "marka": "VDM Petdent",

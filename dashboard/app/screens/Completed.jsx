@@ -53,9 +53,10 @@ function CompletedScreen({ data }) {
       </div>
 
       <div style={{
-        background:"var(--surface)", border:"1px solid var(--line)", borderRadius:10, overflow:"auto"
+        background:"var(--surface)", border:"1px solid var(--line)", borderRadius:10,
+        overflowX:"auto", WebkitOverflowScrolling:"touch"
       }}>
-        <table style={{width:"100%", borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
+        <table style={{width:"100%", minWidth:640, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
           <thead>
             <tr style={{background:"var(--surface-sub)"}}>
               {cols.map((h, i) => (

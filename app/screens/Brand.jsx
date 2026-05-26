@@ -47,8 +47,8 @@ function BrandScreen({ data, onOpenBrief }) {
       </div>
 
       <Card padding={0}>
-        <div style={{overflow:"auto"}}>
-          <table style={{width:"100%", borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)"}}>
+        <div style={{overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
+          <table style={{width:"100%", minWidth:540, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)"}}>
             <thead>
               <tr style={{background:"var(--surface-sub)"}}>
                 {[
