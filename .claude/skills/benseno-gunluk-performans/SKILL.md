@@ -41,7 +41,7 @@ CANVAS_ID = F0B1B6XUD44
 GRAFIK_CHANNEL_ID = C02SZRJGY0M
 TZ = Europe/Istanbul (UTC+3)
 PRIMARY_CALENDAR = gorkem@benseno.com.tr
-DASHBOARD_URL = https://bensenoint.github.io/dashboard/
+DASHBOARD_URL = https://bensenoint.github.io/benseno-tasarim-sistemi/
 ```
 
 ## 3 DEPARTMAN — 16 kişi
@@ -84,7 +84,7 @@ TR: "5 Mayıs 2026 Çarşamba". `T_now`, `T_today_start`, `T_yesterday_start`.
 PRIMARY_CALENDAR'da `list_events`. Yukarıdaki keyword listesinden eşleşme + 16 kişi isim. **WFH OOO sayılmaz.**
 
 ### 4. Dashboard URL'si
-Sabit: `https://bensenoint.github.io/dashboard/` (şifre korumalı).
+Sabit: `https://bensenoint.github.io/benseno-tasarim-sistemi/` (şifre korumalı).
 
 ### 5. Veri analizi (son 7 gün) — TEK SEFERDE
 
@@ -245,7 +245,7 @@ Stale brief'ler: 🔴={N1} 🟠={N2} 🟡={N3} 🟢={N4}
 Tarihi Şüpheli: geçmiş={A} saat_eksik={B} mesai_dışı={C}
 🆕 Marka hız trendi: mode={silent_log_only|active} izlenen={N} hızlanan={H} yavaşlayan={Y}
 🆕 Pelin Day: {N/5 veya tamamlandı}
-Dashboard: https://bensenoint.github.io/dashboard/
+Dashboard: https://bensenoint.github.io/benseno-tasarim-sistemi/
 ```
 
 ## HATA KURTARMA

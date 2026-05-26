@@ -39,6 +39,9 @@ Canvas'ta eşleşen brief bulunamazsa:
 ## Araçlar
 
 ```
-mcp__claude_ai_Slack__slack_read_canvas   (canvas_id: F0B1B6XUD44)
-mcp__claude_ai_Slack__slack_update_canvas (canvas_id: F0B1B6XUD44, content: <FULL MARKDOWN>)
+slack_read_canvas   (canvas_id: F0B1B6XUD44)
+slack_update_canvas (canvas_id: F0B1B6XUD44, content: <FULL MARKDOWN>)
 ```
+
+> **Not:** Eski Cowork formatındaki `mcp__claude_ai_Slack__` prefix kullanılmaz.
+> Claude Code'da MCP tool'ları prefix olmadan çağrılır.

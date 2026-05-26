@@ -18,7 +18,7 @@ description: v7.6 · Phase 7 — Haftalık Retrospektif (Cuma 17:00). v7.13 ile 
 ```
 CANVAS_ID = F0B1B6XUD44
 GRAFIK_CHANNEL_ID = C02SZRJGY0M
-DASHBOARD_URL = https://bensenoint.github.io/dashboard/
+DASHBOARD_URL = https://bensenoint.github.io/benseno-tasarim-sistemi/
 TZ = Europe/Istanbul
 ```
 
@@ -39,7 +39,7 @@ TZ = Europe/Istanbul
 
 Mesaj footer'a ekle:
 ```
-📊 Detaylı analiz: https://bensenoint.github.io/dashboard/ (Raporlama sekmesi)
+📊 Detaylı analiz: https://bensenoint.github.io/benseno-tasarim-sistemi/ (Raporlama sekmesi)
 ```
 
 ### 2b. Haftanın Yıldızları mesajı — #benseno-grafik (YENİ v7.14)
@@ -140,7 +140,7 @@ Sapan markalar (son hafta):
 📈 Hızlanan: {hızlanan_listesi}
 🐌 Yavaşlayan: {yavaşlayan_listesi}
 
-Dashboard'da detay: https://bensenoint.github.io/dashboard/ (Marka Raporu sekmesi)
+Dashboard'da detay: https://bensenoint.github.io/benseno-tasarim-sistemi/ (Marka Raporu sekmesi)
 ```
 
 7. **Çıktı log'una ekle:**
@@ -161,7 +161,7 @@ GitHub Pages geçişi öncesi {N} eski snapshot Drive'da kalmış olabilir.
 Disk yeri için temizleyebilirsin:
 👉 https://drive.google.com/drive/folders/14gzFxG5gnigWLPh3Qc1pNTNS14u3BMMK
 
-Live dashboard artık GitHub Pages'te: https://bensenoint.github.io/dashboard/
+Live dashboard artık GitHub Pages'te: https://bensenoint.github.io/benseno-tasarim-sistemi/
 ```
 
 Eski dosya yoksa veya az ise sessiz kal.
