@@ -176,10 +176,9 @@ Footer: `> 🔄 Son sync: {şimdi TR} · LAST_SYNC_TS={unix}`
   },
   "bns_brand_stats": [...],
   "bns_history": [
-    // agent-state.json'daki history dizisinden al (son 7 kayıt, kronolojik sıra — eski→yeni)
-    // Her eleman: { "ts": <unix>, "active": N, "overdue": N, "dm_sent": N, "errors": N, "ok": true|false }
-    // data/agent-state.json dosyasını oku → history[] → slice(-7).reverse() → buraya yaz
-    // Yoksa ya da boşsa [] gönder
+    // data/agent-state.json dosyasını oku → history[] (1 kayıt/gün, eski→yeni)
+    // Son 14 kaydı al (zaten günlük, ~3 hafta), yoksa [] gönder
+    // Her eleman: { "ts": <unix>, "date": "YYYY-MM-DD", "active": N, "overdue": N, "dm_sent": N, "errors": N, "ok": true|false }
   ],
   "last_sync": "<ISO timestamp>",
   "sync_ts": <unix>,

@@ -49,7 +49,10 @@ AGENT_STATE  = ~/benseno-tasarim-sistemi/data/agent-state.json
 
 ### Adım 4 — State Güncelle
 
-`data/agent-state.json` dosyasına yaz:
+`data/agent-state.json` dosyasına yaz.
+
+**ÖNEMLİ:** Mevcut dosyayı oku → tüm alanları koru → sadece güncellenen alanları üzerine yaz → history'ye yeni satır ekle. Dosyadaki `dm_sent`, `overdue_count`, `run_type`, `priority_summary` gibi alanları silme.
+
 ```json
 {
   "last_run": "<ISO timestamp>",
@@ -58,9 +61,31 @@ AGENT_STATE  = ~/benseno-tasarim-sistemi/data/agent-state.json
   "notification_agent": "ok|error",
   "dashboard_agent": "ok|error",
   "active_briefs": <N>,
-  "errors": []
+  "errors": [],
+  "history": [
+    {
+      "ts": <unix>,
+      "date": "<YYYY-MM-DD>",
+      "active": <N>,
+      "overdue": <N>,
+      "dm_sent": <N>,
+      "errors": <N>,
+      "ok": true|false
+    }
+    // ... önceki kayıtlar (her gün için 1 kayıt, max 14 günlük)
+  ]
 }
 ```
+
+`history` güncellemesi — **GÜNLÜK özet** (per-run değil):
+1. Mevcut `agent-state.json`'u oku → `history` dizisini al (yoksa `[]`)
+2. Bugünün tarihi (`YYYY-MM-DD`) history'de var mı?
+   - **Varsa:** Bugünkü satırı bu run'ın verileriyle GÜNCELLE (replace)
+   - **Yoksa:** Bu run'ın özetini dizinin SONUNA ekle (push)
+3. 14'ten fazla kayıt varsa en eski kaydı sil
+4. Güncellenmiş `agent-state.json`'u yaz
+
+> Amaç: 1 kayıt/gün → 14 kayıt = 14 iş günü = ~3 haftalık trend verisi
 
 ### Adım 5 — PAT Süresi Kontrolü
 
