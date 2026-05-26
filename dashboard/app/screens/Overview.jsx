@@ -81,10 +81,37 @@ function calcAvgCapPct(data) {
   return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : null;
 }
 
+// history dizisinden spark array üretir: son 6 kayıt + bugünkü değer = 7 nokta
+function histSpark(history, field, currentVal) {
+  if (!Array.isArray(history) || history.length === 0) return null;
+  const pts = history.slice(-6).map(h => h[field] ?? 0);
+  while (pts.length < 6) pts.unshift(0);
+  pts.push(currentVal);
+  return pts;
+}
+// Geçen haftaya göre trend hesaplar
+function histTrend(history, field, currentVal) {
+  if (!Array.isArray(history) || history.length < 2) return null;
+  const prev = history[history.length - 1]?.[field] ?? currentVal;
+  const diff = currentVal - prev;
+  if (diff === 0) return { dir: "flat", value: "=" };
+  return { dir: diff > 0 ? "up" : "down", value: (diff > 0 ? "+" : "") + diff };
+}
+
 function EditorialLayout({ data, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   const avgCapPct = calcAvgCapPct(data);
+  const hist = data.history || [];
+
+  // Gerçek history'den spark dizileri
+  const sparkActive  = histSpark(hist, "active",  active.length)  || [42,45,49,52,55,58,active.length];
+  const sparkOverdue = histSpark(hist, "overdue", overdue.length) || [3,4,5,4,6,7,overdue.length];
+
+  // Trend: son kayıtla karşılaştır
+  const trendActive  = histTrend(hist, "active",  active.length)  || { dir:"up",   value:"+8",  bad:true };
+  const trendOverdue = histTrend(hist, "overdue", overdue.length) || { dir:"up",   value:"+2",  bad:true };
+
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -102,12 +129,12 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
 
       {/* KPI grid */}
       <KpiGrid>
-        <Kpi label="Aktif brief"  value={active.length} variant={kpiVariant} spark={[42,45,49,52,55,58,active.length]} trend={{dir:"up", value:"+8", bad:true}} sub="geçen haftaya göre"/>
-        <Kpi label="Geciken"      value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={[3,4,5,4,6,7,overdue.length]} trend={{dir:"up", value:"+2", bad:true}} sub="dün gece"/>
-        <Kpi label="Bugün teslim" value={today.length} variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil"/>
-        <Kpi label="Onay bekleyen" value={review.length} color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri"/>
-        <Kpi label="Hareketsiz" value={stale.length} variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok"/>
-        <Kpi label="Kapasite" value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması"/>
+        <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"}/>
+        <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"}/>
+        <Kpi label="Bugün teslim"  value={today.length}   variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil"/>
+        <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri"/>
+        <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok"/>
+        <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması"/>
       </KpiGrid>
 
       <div style={{display:"grid", gridTemplateColumns:"1.7fr 1fr", gap:"var(--grid-gap)", marginTop: "var(--section-gap)"}} className="bn-grid-2">

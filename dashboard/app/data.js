@@ -531,6 +531,10 @@ try {
     if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
       window.BNS_DATA.brandStats = ed.bns_brand_stats;
     }
+    // 7 günlük geçmiş (agent-state.json history → live-data.json → spark chart)
+    if (Array.isArray(ed.bns_history) && ed.bns_history.length > 0) {
+      window.BNS_DATA.history = ed.bns_history; // [{ts,active,overdue,dm_sent,errors,ok}, ...]
+    }
     if (typeof ed.last_sync === "string") {
       window.BNS_DATA.lastSync = ed.last_sync;
     }
