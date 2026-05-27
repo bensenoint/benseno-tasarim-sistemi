@@ -81,6 +81,18 @@
     margin-bottom: 16px;
   }
 
+  .sidebar-brand a {
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  .sidebar-logo {
+    height: 36px;
+    width: auto;
+    display: block;
+    mix-blend-mode: multiply;
+  }
+
   .sidebar-wordmark {
     font-family: var(--font-display);
     font-style: italic;
@@ -732,8 +744,10 @@
   <!-- ── Sidebar ── -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <div class="sidebar-wordmark">Benseno</div>
-      <div class="sidebar-badge">Kullanım Kılavuzu v7.13</div>
+      <a href="../" title="Dashboard'a dön">
+        <img src="../app/logo.png" alt="Benseno" class="sidebar-logo">
+      </a>
+      <div class="sidebar-badge" style="margin-top:8px;">Kullanım Kılavuzu v7.13</div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
