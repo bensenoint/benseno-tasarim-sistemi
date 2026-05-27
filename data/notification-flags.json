@@ -1,6 +1,6 @@
 {
-  "sync_ts": 1779859123,
-  "sync_iso": "2026-05-27T08:18:00+03:00",
+  "sync_ts": 1779860954,
+  "sync_iso": "2026-05-27T08:49:00+03:00",
   "run_type": "orchestrator_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
@@ -17,14 +17,17 @@
       "marka": "Tour2America",
       "is": "bayram icerigi",
       "deadline_iso": "2026-06-01T12:31:00+03:00",
-      "kalan_dk": 7452,
-      "atanan_ids": ["U0AP31SAA1W", "U030C48PL23"],
-      "status": "5g 4sa 12dk kaldı · 🟢 Düşük öncelik · yeni",
+      "kalan_dk": 7421,
+      "atanan_ids": [
+        "U0AP31SAA1W",
+        "U030C48PL23"
+      ],
+      "status": "5g 3sa 41dk kaldı · 🟢 Düşük öncelik · yeni",
       "dm_required": false
     }
   ],
   "after_hours": false,
   "startup_recovery": false,
-  "downtime_note": "06:54 startup recovery sonrası ilk mesai-içi run. 06:54→08:18 arası Slack'te yeni brief / tamamlanma / eşik geçişi YOK.",
-  "dm_skip_reason": "Delta refresh · 0 yeni transition · Tüm escalation'lar önceki sync'lerde işlendi (#1 8g, #9 72sa, #21 72sa) · Günlük özet zaten 07:50 Sabah Raporu'na devredildi"
+  "downtime_note": "08:18→08:49 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma / 0 eşik geçişi).",
+  "dm_skip_reason": "Delta refresh (:49) · 0 yeni transition · Tüm escalation'lar önceki sync'lerde işlendi (#1 8g, #9 72sa, #17 72sa, #21 72sa) · #17 5g derinlik işareti geçti (yeni eşik değil) · Günlük özet 07:50 Sabah Raporu'na devredildi"
 }
