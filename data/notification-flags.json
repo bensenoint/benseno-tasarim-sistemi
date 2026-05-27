@@ -1,7 +1,7 @@
 {
-  "sync_ts": 1779854003,
-  "sync_iso": "2026-05-27T06:54:00+03:00",
-  "run_type": "orchestrator_startup_recovery_force_rebuild",
+  "sync_ts": 1779859123,
+  "sync_iso": "2026-05-27T08:18:00+03:00",
+  "run_type": "orchestrator_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
   "past_deadline": [],
@@ -17,14 +17,14 @@
       "marka": "Tour2America",
       "is": "bayram icerigi",
       "deadline_iso": "2026-06-01T12:31:00+03:00",
-      "kalan_dk": 7537,
+      "kalan_dk": 7452,
       "atanan_ids": ["U0AP31SAA1W", "U030C48PL23"],
-      "status": "5g 5sa 37dk kaldı · 🟢 Düşük öncelik · yeni",
+      "status": "5g 4sa 12dk kaldı · 🟢 Düşük öncelik · yeni",
       "dm_required": false
     }
   ],
-  "after_hours": true,
-  "startup_recovery": true,
-  "downtime_note": "Sistem ~14sa kapalıydı (26May16:45 → 27May06:54). Gece boşluğunda Slack'te yeni brief / tamamlanma / eşik geçişi YOK.",
-  "dm_skip_reason": "Erken saat (06:54 · mesai öncesi) + startup recovery · Tüm threshold geçişleri zaten downtime öncesi sync'lerde işlendi (#1 8g 16:00, #21 72sa 14:42, #9 72sa 09:33) · Yeni transition yok · Günlük özet 07:50 Sabah Raporu'na devredildi"
+  "after_hours": false,
+  "startup_recovery": false,
+  "downtime_note": "06:54 startup recovery sonrası ilk mesai-içi run. 06:54→08:18 arası Slack'te yeni brief / tamamlanma / eşik geçişi YOK.",
+  "dm_skip_reason": "Delta refresh · 0 yeni transition · Tüm escalation'lar önceki sync'lerde işlendi (#1 8g, #9 72sa, #21 72sa) · Günlük özet zaten 07:50 Sabah Raporu'na devredildi"
 }
