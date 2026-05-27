@@ -110,7 +110,7 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       {isMobile && (
         <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
           <img src="app/logo.png" alt="Benseno" style={{
-            height: 42, width: "auto", objectFit: "contain",
+            height: 84, width: "auto", objectFit: "contain",
             mixBlendMode: "multiply", flexShrink: 0,
           }}/>
         </a>
@@ -445,16 +445,16 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
     }}>
       {/* Logo area */}
       <div style={{
-        height: 52, flexShrink: 0,
+        height: 100, flexShrink: 0,
         display: "flex", alignItems: "center",
-        padding: collapsed ? "0 14px" : "0 14px",
+        padding: collapsed ? "0 14px" : "0 16px",
         borderBottom: "1px solid var(--line)",
         gap: 8,
         overflow: "hidden",
       }}>
         <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
           <img src="app/logo.png" alt="Benseno" style={{
-            height: 46, width: "auto", objectFit: "contain",
+            height: 92, width: "auto", objectFit: "contain",
             flexShrink: 0, mixBlendMode: "multiply",
           }}/>
         </a>
