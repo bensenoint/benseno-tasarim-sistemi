@@ -1,6 +1,6 @@
 {
-  "sync_ts": 1779864420,
-  "sync_iso": "2026-05-27T09:47:00+03:00",
+  "sync_ts": 1779893859,
+  "sync_iso": "2026-05-27T17:58:00+03:00",
   "run_type": "orchestrator_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
@@ -10,24 +10,36 @@
   "dept_belirsiz": [],
   "marka_yetersiz_sure": [],
   "marka_anormal_uzun": [],
-  "threshold_transitions": [],
+  "threshold_transitions": [
+    {
+      "no": "16",
+      "marka": "Bauhaus",
+      "is": "Banyo Şık ve Pratik (batch 7/7)",
+      "threshold": "5g",
+      "crossed_at": "2026-05-27T17:58:00+03:00",
+      "delta": "5g 0sa 58dk geride",
+      "already_blocked": true,
+      "dm_required": false,
+      "note": "Zaten 🔴 Blokeli · 5g GEÇMİŞ derinlik eşiği · sessiz (escalation önceki sync'lerde işlendi)"
+    }
+  ],
   "imminent_deadlines": [
     {
       "no": "20",
       "marka": "Tour2America",
-      "is": "bayram icerigi",
+      "is": "bayram içeriği",
       "deadline_iso": "2026-06-01T12:31:00+03:00",
-      "kalan_dk": 7364,
+      "kalan_dk": 6632,
       "atanan_ids": [
         "U0AP31SAA1W",
         "U030C48PL23"
       ],
-      "status": "5g 2sa 43dk kaldı · 🟢 Düşük öncelik · yeni",
+      "status": "4g 18sa 32dk kaldı · 🟢 Düşük öncelik · yeni",
       "dm_required": false
     }
   ],
-  "after_hours": false,
+  "after_hours": true,
   "startup_recovery": false,
-  "downtime_note": "09:16→09:47 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma / 0 eşik geçişi).",
-  "dm_skip_reason": "Delta refresh (:45) · 0 yeni transition · Tüm escalation'lar önceki sync'lerde işlendi (#1 8g, #9 72sa, #17 72sa, #21 72sa) · Günlük özet 07:50 Sabah Raporu'na devredildi"
+  "downtime_note": "16:45→17:58 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma / 1 GEÇMİŞ-derinlik eşik geçişi: #16 5g).",
+  "dm_skip_reason": "Delta refresh (:58 · mesai sonu) · 0 yeni brief/transition gerektiren · #16 5g eşiği zaten-blokeli sessiz · Tüm escalation'lar önceki sync'lerde işlendi (#1 9g, #9 72sa, #17 72sa, #21 72sa) · Günlük özet 07:50 Sabah Raporu'na devredildi"
 }
