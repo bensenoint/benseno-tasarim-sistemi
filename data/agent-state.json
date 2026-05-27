@@ -1,7 +1,7 @@
 {
-  "last_run": "2026-05-26T13:23:45+03:00",
-  "last_run_ts": 1779791025,
-  "run_type": "orchestrator_1315_delta_refresh",
+  "last_run": "2026-05-27T06:58:00+03:00",
+  "last_run_ts": 1779854003,
+  "run_type": "orchestrator_startup_recovery_force_rebuild",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
@@ -14,30 +14,42 @@
     "green": 3
   },
   "overdue_count": 13,
-  "blokeli_count": 12,
+  "blokeli_count": 13,
   "new_briefs_this_run": 0,
   "completed_this_run": 0,
   "dm_sent": 0,
-  "dm_skipped_idempotent": 5,
-  "canvas_updated": false,
-  "canvas_skip_reason": "structural değişiklik yok · sadece countdown delta · 13:45 sync'te yenilenecek",
-  "github_commit": "5c30441",
+  "dm_skipped_idempotent": 0,
+  "canvas_updated": true,
+  "canvas_skip_reason": null,
+  "github_commit": "1258efe",
   "github_push": "ok",
   "imminent_deadline": {
-    "no": "21",
-    "marka": "VDM Petdent",
-    "blokeli_esik_iso": "2026-05-26T14:42:00+03:00",
-    "kalan_dk_to_blokeli": 81,
-    "trigger_sync": "14:45 (Şablon 29 → Eren)"
+    "no": "20",
+    "marka": "Tour2America",
+    "deadline_iso": "2026-06-01T12:31:00+03:00",
+    "kalan_dk": 7537,
+    "priority": "🟢",
+    "note": "5g 5sa 37dk · düşük öncelik"
   },
   "pat_status": {
     "created": "2026-05-18",
-    "days_since_creation": 8,
-    "days_to_expiry": 82,
+    "days_since_creation": 9,
+    "days_to_expiry": 81,
     "warning": false
   },
   "marka_stats_mode": "silent_log_only",
   "marka_stats_active_from": "2026-06-01T00:00:00+03:00",
   "errors": [],
-  "notes": "13:15 delta refresh · 0 yeni brief · 0 tamamlanan · brief queue boş · Slack'te 12:45 sonrası aktivite yok · #21 kritik takip (1sa 21dk to eşik · 14:45 sync Şablon 29 tetiklenecek) · Canvas update skip (sadece countdown delta)"
+  "notes": "Startup recovery FORCE_REBUILD · sistem ~14sa kapalıydı (26May16:45→27May06:54) · gece boşluğunda Slack'te 0 yeni aktivite · tüm deltalar yeniden hesaplandı (+14sa) · #21 öncelik 🟠→🔴 düzeltildi (blokeli tutarlılık) · Canvas full-replace YAPILDI · live-data.json + EMBEDDED_DATA güncellendi · GitHub push 1258efe · Notification: 0 DM (yeni transition yok) · günlük özet 07:50 Sabah Raporu'na devredildi",
+  "history": [
+    {
+      "ts": 1779854003,
+      "date": "2026-05-27",
+      "active": 16,
+      "overdue": 13,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    }
+  ]
 }

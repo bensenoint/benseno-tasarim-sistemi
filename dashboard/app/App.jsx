@@ -273,10 +273,10 @@ function App() {
 
   // ─── Pick screen ──────────────────────────────────────────────────────
   let Screen;
-  if (tab === "overview")   Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode}
+  if (tab === "overview" || tab === "manager")
+                            Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode}
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
-                                       onOpenBrief={onOpenBrief} onSwitchTab={setTab} onRefresh={onRefresh}/>;
-  else if (tab === "manager")  Screen = <ManagerScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} onSwitchTab={setTab} onStatusChange={onStatusChange}/>;
+                                       onOpenBrief={onOpenBrief} onSwitchTab={setTab} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
   else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} tableMode={t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;

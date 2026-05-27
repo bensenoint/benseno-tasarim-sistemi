@@ -19,7 +19,6 @@ const NAV_SECTIONS = [
     label: "Ana",
     items: [
       { id: "overview",  label: "Genel bakış",   icon: "Home" },
-      { id: "manager",   label: "Yönetici",       icon: "Target",  alert: true },
       { id: "jobs",      label: "Aktif işler",    icon: "Briefcase" },
     ]
   },
@@ -295,8 +294,8 @@ function MobileNav({ active, onChange, data }) {
   const PRIMARY = [
     { id: "overview",  label: "Özet",    icon: "Home" },
     { id: "jobs",      label: "İşler",   icon: "Briefcase" },
-    { id: "manager",   label: "Yönetici", icon: "Target", alert: true },
     { id: "kanban",    label: "Kanban",  icon: "Columns" },
+    { id: "profile",   label: "Profil",  icon: "User" },
   ];
 
   // All nav items for drawer

@@ -19,7 +19,6 @@ const NAV_SECTIONS = [
     label: "Ana",
     items: [
       { id: "overview",  label: "Genel bakış",   icon: "Home" },
-      { id: "manager",   label: "Yönetici",       icon: "Target",  alert: true },
       { id: "jobs",      label: "Aktif işler",    icon: "Briefcase" },
     ]
   },
@@ -108,10 +107,12 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
     }}>
       {/* Logo on mobile */}
       {isMobile && (
-        <img src="app/logo.png" alt="Benseno" style={{
-          height: 24, width: "auto", objectFit: "contain",
-          mixBlendMode: "multiply", flexShrink: 0,
-        }}/>
+        <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
+          <img src="app/logo.png" alt="Benseno" style={{
+            height: 34, width: "auto", objectFit: "contain",
+            mixBlendMode: "multiply", flexShrink: 0,
+          }}/>
+        </a>
       )}
 
       {/* Search — full bar on desktop, icon-only on mobile */}
@@ -293,8 +294,8 @@ function MobileNav({ active, onChange, data }) {
   const PRIMARY = [
     { id: "overview",  label: "Özet",    icon: "Home" },
     { id: "jobs",      label: "İşler",   icon: "Briefcase" },
-    { id: "manager",   label: "Yönetici", icon: "Target", alert: true },
     { id: "kanban",    label: "Kanban",  icon: "Columns" },
+    { id: "profile",   label: "Profil",  icon: "User" },
   ];
 
   // All nav items for drawer
@@ -445,23 +446,39 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
       <div style={{
         height: 52, flexShrink: 0,
         display: "flex", alignItems: "center",
-        padding: collapsed ? "0 14px" : "0 14px",
+        padding: collapsed ? "0 14px" : "0 16px",
         borderBottom: "1px solid var(--line)",
         gap: 8,
         overflow: "hidden",
       }}>
-        <img src="app/logo.png" alt="Benseno" style={{
-          height: 28, width: "auto", objectFit: "contain",
-          flexShrink: 0, mixBlendMode: "multiply",
-        }}/>
+        <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
+          <img src="app/logo.png" alt="Benseno" style={{
+            height: 36, width: "auto", objectFit: "contain",
+            flexShrink: 0, mixBlendMode: "multiply",
+          }}/>
+        </a>
         {!collapsed && (
-          <span style={{
-            font: "500 9px/1 var(--font-mono)", color: "var(--ink-5)",
-            padding: "2px 4px", borderRadius: 3,
-            background: "var(--line)",
-            letterSpacing: "0.04em",
-            flexShrink: 0,
-          }}>v7.13</span>
+          <a
+            href="docs/kullanim-klavuzu.html"
+            title="Kullanım Kılavuzu"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              marginLeft: "auto",
+              display: "inline-flex", alignItems: "center", gap: 4,
+              font: "500 10px/1 var(--font-sans)", color: "var(--ink-3)",
+              padding: "4px 7px", borderRadius: 5,
+              border: "1px solid var(--line)",
+              background: "transparent",
+              textDecoration: "none", flexShrink: 0,
+              transition: "color 150ms, border-color 150ms, background 150ms",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color = "var(--ember)"; e.currentTarget.style.borderColor = "var(--ember)"; e.currentTarget.style.background = "var(--ember-tint)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "var(--ink-3)"; e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.background = "transparent"; }}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Kılavuz
+          </a>
         )}
       </div>
 
