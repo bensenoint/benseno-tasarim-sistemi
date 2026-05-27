@@ -82,6 +82,11 @@ function PlanScreen({ data, onOpenBrief }) {
     .sort((a, b) => a.deadline - b.deadline)
     .slice(0, 60);
 
+  // Geçmiş deadline'lı ama hâlâ aktif brief'ler (tamamlanmamış)
+  const overdueList = allBriefs
+    .filter(b => b.deadline > 0 && b.deadline < startMs && b.durum !== "tamamlandi")
+    .sort((a, b) => a.deadline - b.deadline);
+
   const colW = 100 / days;
 
   return (
@@ -177,6 +182,92 @@ function PlanScreen({ data, onOpenBrief }) {
           <span style={{width:1, height:12, background:"var(--ember)"}}/> bugün
         </span>
       </div>
+
+      {/* Geçmiş deadline — ayrı tablo */}
+      {overdueList.length > 0 && (
+        <div style={{marginTop:"var(--section-gap)"}}>
+          <div style={{
+            display:"flex", alignItems:"center", gap:10,
+            marginBottom:"var(--grid-gap)", paddingBottom:10,
+            borderBottom:"1px solid var(--line)"
+          }}>
+            <span style={{
+              font:"600 13px/1 var(--font-sans)", color:"var(--prio-red)",
+              display:"inline-flex", alignItems:"center", gap:6
+            }}>
+              <I.Warn size={14}/> Geçmiş deadline · planlanamayan işler
+            </span>
+            <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-4)"}}>
+              deadline'ı geçti ama henüz tamamlanmadı · {overdueList.length} brief
+            </span>
+          </div>
+          <Card padding={0}>
+            {/* Tablo başlığı */}
+            <div style={{
+              display:"grid",
+              gridTemplateColumns:"240px 1fr 140px 100px 100px",
+              padding:"9px 14px",
+              borderBottom:"1px solid var(--line)",
+              background:"var(--surface-sub)",
+              font:"600 11px/1 var(--font-sans)",
+              color:"var(--ink-3)",
+              letterSpacing:"0.04em",
+              textTransform:"uppercase",
+              gap:8
+            }}>
+              <span>Brief</span>
+              <span>Başlık</span>
+              <span>Deadline</span>
+              <span>Gecikme</span>
+              <span>Durum</span>
+            </div>
+            {overdueList.map((b, i) => {
+              const gecikmeH = b.deltaH < 0 ? Math.abs(Math.round(b.deltaH)) : 0;
+              const gecikmeLabel = gecikmeH >= 48
+                ? `${Math.round(gecikmeH/24)} gün`
+                : `${gecikmeH} sa`;
+              const dl = new Date(b.deadline);
+              const dlLabel = dl.getDate() + " " +
+                ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][dl.getMonth()] +
+                " " + String(dl.getHours()).padStart(2,"0") + ":" + String(dl.getMinutes()).padStart(2,"0");
+              const durumLabel =
+                b.durum === "incelemede" ? "İncelemede" :
+                b.durum === "blokeli"    ? "Blokeli" :
+                b.durum === "beklemede" ? "Beklemede" : "Devam ediyor";
+              const durumColor =
+                b.durum === "blokeli"    ? "var(--danger)" :
+                b.durum === "incelemede" ? "var(--warning)" : "var(--ink-3)";
+
+              return (
+                <div key={b.id} onClick={() => onOpenBrief(b)} style={{
+                  display:"grid",
+                  gridTemplateColumns:"240px 1fr 140px 100px 100px",
+                  padding:"10px 14px",
+                  borderBottom: i < overdueList.length - 1 ? "1px solid var(--line-soft)" : 0,
+                  cursor:"pointer", alignItems:"center", gap:8,
+                  background:"transparent",
+                  transition:"background 120ms"
+                }}
+                  onMouseEnter={e => e.currentTarget.style.background = "var(--paper-2)"}
+                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                >
+                  <BrandChip brand={b.brand} size="sm"/>
+                  <span style={{font:"500 12px/1.3 var(--font-sans)", color:"var(--ink-2)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{b.baslik}</span>
+                  <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--prio-red)", whiteSpace:"nowrap"}}>{dlLabel}</span>
+                  <span style={{
+                    font:"600 12px/1 var(--font-sans)",
+                    color:"var(--prio-red)",
+                    padding:"3px 8px", borderRadius:5,
+                    background:"var(--prio-red-bg)",
+                    whiteSpace:"nowrap", display:"inline-block"
+                  }}>+{gecikmeLabel}</span>
+                  <span style={{font:"500 12px/1 var(--font-sans)", color:durumColor}}>{durumLabel}</span>
+                </div>
+              );
+            })}
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
