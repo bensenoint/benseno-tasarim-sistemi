@@ -110,7 +110,7 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       {isMobile && (
         <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
           <img src="app/logo.png" alt="Benseno" style={{
-            height: 30, width: "auto", objectFit: "contain",
+            height: 42, width: "auto", objectFit: "contain",
             mixBlendMode: "multiply", flexShrink: 0,
           }}/>
         </a>
@@ -454,13 +454,13 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
       }}>
         <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
           <img src="app/logo.png" alt="Benseno" style={{
-            height: 34, width: "auto", objectFit: "contain",
+            height: 46, width: "auto", objectFit: "contain",
             flexShrink: 0, mixBlendMode: "multiply",
           }}/>
         </a>
         {!collapsed && (
           <a
-            href="../docs/kullanim-klavuzu.html"
+            href="docs/kullanim-klavuzu.html"
             title="Kullanım Kılavuzu"
             target="_blank"
             rel="noopener noreferrer"
