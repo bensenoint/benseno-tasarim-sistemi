@@ -1,6 +1,6 @@
 {
-  "sync_ts": 1779967020,
-  "sync_iso": "2026-05-28T14:17:00+03:00",
+  "sync_ts": 1779970836,
+  "sync_iso": "2026-05-28T15:20:36+03:00",
   "run_type": "orchestrator_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
@@ -12,19 +12,19 @@
   "marka_anormal_uzun": [],
   "threshold_transitions": [
     {
-      "no": "15",
-      "marka": "Bauhaus",
-      "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
-      "deadline_iso": "2026-05-22T14:00:00+03:00",
-      "prev_g": 5,
-      "new_g": 6,
-      "transition_ts": 1779966000,
-      "transition_iso": "2026-05-28T14:00:00+03:00",
-      "atanan_ids": ["U06J26R1XCJ", "U09BFPBKQG7"],
+      "no": "21",
+      "marka": "VDM Petdent",
+      "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
+      "deadline_iso": "2026-05-23T14:42:00+03:00",
+      "prev_g": 4,
+      "new_g": 5,
+      "transition_ts": 1779968520,
+      "transition_iso": "2026-05-28T14:42:00+03:00",
+      "atanan_ids": ["U4XCE3532", "U030C48PL23", "U0AP31SAA1W"],
       "priority": "🔴",
-      "status": "🔴 Blokeli >72sa · Arda+Aykut assigned · v1 verildi · 6g+ GEÇMİŞ",
+      "status": "🔴 Blokeli >72sa · Şablon 29 → Eren 26May14:46 · 72sa AŞILDI 26May14:42 · Görkem GM dahil",
       "dm_required": false,
-      "dm_skip_reason": "Brief zaten 🔴 Blokeli + Arda+Aykut assigned + v1 verildi · ek DM gereksiz · log only"
+      "dm_skip_reason": "Brief zaten 🔴 Blokeli + Şablon 29 → Eren 26May14:46 + Görkem GM zaten atanmış · ek DM gereksiz · log only"
     }
   ],
   "imminent_deadlines": [
@@ -33,20 +33,20 @@
       "marka": "Tour2America",
       "is": "bayram içeriği",
       "deadline_iso": "2026-06-01T12:31:00+03:00",
-      "kalan_dk": 5654,
+      "kalan_dk": 5591,
       "atanan_ids": ["U0AP31SAA1W", "U030C48PL23"],
-      "status": "3g 22sa 14dk kaldı · 🟢 Düşük öncelik",
+      "status": "3g 21sa 16dk kaldı · 🟢 Düşük öncelik",
       "dm_required": false
     }
   ],
   "next_thresholds_anticipated": [
-    { "no": "21", "marka": "VDM Petdent", "g_threshold": 5, "transition_iso": "2026-05-28T14:42:00+03:00", "minutes_away": 25 },
-    { "no": "16", "marka": "Bauhaus",     "g_threshold": 6, "transition_iso": "2026-05-28T17:00:00+03:00", "minutes_away": 163 },
-    { "no": "24", "marka": "Bauhaus",     "g_threshold": 6, "transition_iso": "2026-05-28T18:00:00+03:00", "minutes_away": 223 },
-    { "no": "17", "marka": "VDM Petdent", "g_threshold": 7, "transition_iso": "2026-05-29T08:46:00+03:00", "minutes_away": 1109 }
+    { "no": "16", "marka": "Bauhaus",     "g_threshold": 6, "transition_iso": "2026-05-28T17:00:00+03:00", "minutes_away": 100 },
+    { "no": "24", "marka": "Bauhaus",     "g_threshold": 6, "transition_iso": "2026-05-28T18:00:00+03:00", "minutes_away": 160 },
+    { "no": "17", "marka": "VDM Petdent", "g_threshold": 7, "transition_iso": "2026-05-29T08:46:00+03:00", "minutes_away": 1046 },
+    { "no": "5",  "marka": "Bauhaus",     "g_threshold": 8, "transition_iso": "2026-05-29T13:42:00+03:00", "minutes_away": 1342 }
   ],
   "after_hours": false,
   "startup_recovery": false,
-  "downtime_note": "13:46→14:17 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma). #15 Bauhaus Bahçeniz 6g eşiği 14:00'da aşıldı — log-only (zaten 🔴 Blokeli + Arda+Aykut assigned + v1 verildi).",
-  "dm_skip_reason": "Delta refresh (:15 · mesai içi) · 0 yeni brief · 1 threshold transition (#15 5g→6g) ancak brief zaten 🔴 Blokeli + atanmış + v1 verildi · ek DM gereksiz · #21 VDM bahar video 5g eşiği 14:42'de aşılacak (25dk sonra · sonraki :45 sync'inde) · #20 Tour2America deadline 3g 22sa uzakta · marka_stats silent_log_only mode"
+  "downtime_note": "14:17→15:20 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma). #21 VDM Petdent bahar video 5g eşiği 14:42'de aşıldı — anticipated last run (25dk).",
+  "dm_skip_reason": "Delta refresh (:15 · mesai içi) · 0 yeni brief · 1 threshold transition (#21 4g→5g) ancak brief zaten 🔴 Blokeli + Şablon 29 → Eren 26May14:46 + Görkem GM zaten atanmış · ek DM gereksiz · #16 6g eşiği 17:00 (100dk · sonraki :45 sync'inde), #24 6g 18:00 (160dk) · #20 Tour2America deadline 3g 21sa uzakta · marka_stats silent_log_only mode"
 }
