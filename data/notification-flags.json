@@ -1,6 +1,6 @@
 {
-  "sync_ts": 1779893859,
-  "sync_iso": "2026-05-27T17:58:00+03:00",
+  "sync_ts": 1779961572,
+  "sync_iso": "2026-05-28T12:46:12+03:00",
   "run_type": "orchestrator_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
@@ -10,36 +10,24 @@
   "dept_belirsiz": [],
   "marka_yetersiz_sure": [],
   "marka_anormal_uzun": [],
-  "threshold_transitions": [
-    {
-      "no": "16",
-      "marka": "Bauhaus",
-      "is": "Banyo Şık ve Pratik (batch 7/7)",
-      "threshold": "5g",
-      "crossed_at": "2026-05-27T17:58:00+03:00",
-      "delta": "5g 0sa 58dk geride",
-      "already_blocked": true,
-      "dm_required": false,
-      "note": "Zaten 🔴 Blokeli · 5g GEÇMİŞ derinlik eşiği · sessiz (escalation önceki sync'lerde işlendi)"
-    }
-  ],
+  "threshold_transitions": [],
   "imminent_deadlines": [
     {
       "no": "20",
       "marka": "Tour2America",
       "is": "bayram içeriği",
       "deadline_iso": "2026-06-01T12:31:00+03:00",
-      "kalan_dk": 6632,
+      "kalan_dk": 5745,
       "atanan_ids": [
         "U0AP31SAA1W",
         "U030C48PL23"
       ],
-      "status": "4g 18sa 32dk kaldı · 🟢 Düşük öncelik · yeni",
+      "status": "3g 23sa 44dk kaldı · 🟢 Düşük öncelik · yeni",
       "dm_required": false
     }
   ],
-  "after_hours": true,
+  "after_hours": false,
   "startup_recovery": false,
-  "downtime_note": "16:45→17:58 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma / 1 GEÇMİŞ-derinlik eşik geçişi: #16 5g).",
-  "dm_skip_reason": "Delta refresh (:58 · mesai sonu) · 0 yeni brief/transition gerektiren · #16 5g eşiği zaten-blokeli sessiz · Tüm escalation'lar önceki sync'lerde işlendi (#1 9g, #9 72sa, #17 72sa, #21 72sa) · Günlük özet 07:50 Sabah Raporu'na devredildi"
+  "downtime_note": "12:17→12:46 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma / 0 yeni eşik geçişi).",
+  "dm_skip_reason": "Delta refresh (:45 · mesai içi) · 0 yeni brief/transition gerektiren · #15 Bauhaus Bahçeniz 6g eşiği 14:00'da aşılacak (sonraki :15 sync'inde) · #21 VDM bahar video 5g eşiği 14:42'de aşılacak · #20 Tour2America deadline 3g 23sa uzakta (DM gerek yok) · marka_stats silent_log_only mode"
 }

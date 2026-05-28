@@ -224,5 +224,13 @@
     "user_id": "U030C48PL23",
     "message_ts": "1779458052.803289",
     "reason": "#17 VDM bayram postu · 8sa eşiği AŞILDI (8sa 0dk GEÇMİŞ at 16:46 sync) · predicted 16:45 trigger · Şablon 4 DM Görkem'e gönderildi · karar gerekli (Eren hızlı v1 / Görkem devral / ertele-iptal)"
+  },
+  {
+    "brief_ts": "system_alert_brief_sync_down",
+    "template": "ad_hoc_system_alert",
+    "sent_at": "2026-05-28T08:53:47+03:00",
+    "user_id": "U030C48PL23",
+    "message_ts": "1779947612.341419",
+    "reason": "Sistem uyarısı · Brief Sync 835 dakikadır çalışmadı (son çalışma 18:33) · Görkem'e DM gönderildi (launchd kontrol + manuel başlatma komutu)"
   }
 ]
