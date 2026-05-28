@@ -1,6 +1,6 @@
 {
-  "sync_ts": 1779963480,
-  "sync_iso": "2026-05-28T13:18:00+03:00",
+  "sync_ts": 1779965160,
+  "sync_iso": "2026-05-28T13:46:00+03:00",
   "run_type": "orchestrator_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
@@ -12,19 +12,34 @@
   "marka_anormal_uzun": [],
   "threshold_transitions": [
     {
-      "no": "4",
-      "marka": "Bauhaus",
-      "is": "mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
-      "deadline_iso": "2026-05-21T13:00:00+03:00",
+      "no": "8",
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "deadline_iso": "2026-05-21T13:24:00+03:00",
       "prev_g": 6,
       "new_g": 7,
-      "transition_ts": 1779962400,
-      "transition_iso": "2026-05-28T13:00:00+03:00",
-      "atanan_ids": ["U055EDESLSE", "U030C48PL23"],
+      "transition_ts": 1779964440,
+      "transition_iso": "2026-05-28T13:24:00+03:00",
+      "atanan_ids": ["U09BFPBKQG7"],
       "priority": "🔴",
-      "status": "🔴 Blokeli >72sa · tasarımcı yok · İpek dispatch > Görkem · 7g+ GEÇMİŞ",
+      "status": "🔴 Blokeli >72sa · Arda assigned · dept ambiguity · 7g+ GEÇMİŞ",
       "dm_required": false,
-      "dm_skip_reason": "Brief zaten 🔴 Blokeli durumda · tasarımcı atanmamış · GM (Görkem) zaten atanmış · ek DM gereksiz · log only"
+      "dm_skip_reason": "Brief zaten 🔴 Blokeli + Arda assigned · ek DM gereksiz · log only"
+    },
+    {
+      "no": "5",
+      "marka": "Bauhaus",
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "deadline_iso": "2026-05-21T13:42:00+03:00",
+      "prev_g": 6,
+      "new_g": 7,
+      "transition_ts": 1779965520,
+      "transition_iso": "2026-05-28T13:42:00+03:00",
+      "atanan_ids": ["U0AP31SAA1W"],
+      "priority": "🔴",
+      "status": "🔴 Blokeli >72sa · Eren self-assigned · v1 yok · 7g+ GEÇMİŞ",
+      "dm_required": false,
+      "dm_skip_reason": "Brief zaten 🔴 Blokeli + Eren self-assigned · ek DM gereksiz · log only"
     }
   ],
   "imminent_deadlines": [
@@ -33,14 +48,14 @@
       "marka": "Tour2America",
       "is": "bayram içeriği",
       "deadline_iso": "2026-06-01T12:31:00+03:00",
-      "kalan_dk": 5713,
+      "kalan_dk": 5684,
       "atanan_ids": ["U0AP31SAA1W", "U030C48PL23"],
-      "status": "3g 23sa 13dk kaldı · 🟢 Düşük öncelik · yeni",
+      "status": "3g 22sa 44dk kaldı · 🟢 Düşük öncelik",
       "dm_required": false
     }
   ],
   "after_hours": false,
   "startup_recovery": false,
-  "downtime_note": "12:46→13:18 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma). #4 Bauhaus mayıs kampanyası 28May13:00'da 7g eşiğini aştı (sessiz transition · log only).",
-  "dm_skip_reason": "Delta refresh (:15 · mesai içi) · 0 yeni brief · 1 threshold transition (#4 6g→7g) ancak brief zaten 🔴 Blokeli + GM atanmış · ek DM gereksiz · #8 VDM GA4 7g eşiği 13:24'de aşılacak (6dk sonra · :45 sync'inde) · #5 Bauhaus Broşür 7g eşiği 13:42'de aşılacak (24dk sonra) · #15 Bauhaus Bahçeniz 6g eşiği 14:00'da aşılacak (42dk sonra) · #21 VDM bahar video 5g eşiği 14:42'de aşılacak (84dk sonra) · #20 Tour2America deadline 3g 23sa uzakta · marka_stats silent_log_only mode"
+  "downtime_note": "13:18→13:46 arası Slack'te 0 yeni aktivite (0 brief / 0 tamamlanma). #8 VDM GA4 7g eşiği 13:24'te aşıldı, #5 Bauhaus Broşür 7g eşiği 13:42'de aşıldı — her ikisi de log-only.",
+  "dm_skip_reason": "Delta refresh (:45 · mesai içi) · 0 yeni brief · 2 threshold transition (#8 6g→7g + #5 6g→7g) ancak briefler zaten 🔴 Blokeli + atanmış · ek DM gereksiz · #15 Bauhaus Bahçeniz 6g eşiği 14:00'da aşılacak (14dk sonra · sonraki :15 sync'inde) · #21 VDM bahar video 5g eşiği 14:42'de aşılacak (56dk sonra) · #20 Tour2America deadline 3g 22sa uzakta · marka_stats silent_log_only mode"
 }
