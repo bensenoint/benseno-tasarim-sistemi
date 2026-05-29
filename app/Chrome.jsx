@@ -113,8 +113,8 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
         }}/>
       </a>
 
-      {/* Search — full bar on desktop, icon-only on mobile */}
-      {isMobile ? (
+      {/* Mobile: search icon (desktop'ta sidebar'da) */}
+      {isMobile && (
         <button onClick={onOpenPalette} style={{
           width: 36, height: 36, flexShrink: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -122,27 +122,6 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
           background: "var(--paper-2)", color: "var(--ink-4)", cursor: "pointer",
         }}>
           <I.Search size={15}/>
-        </button>
-      ) : (
-        <button onClick={onOpenPalette} style={{
-          flex: 1, maxWidth: 360,
-          display: "flex", alignItems: "center", gap: 8,
-          padding: "7px 10px", border: "1px solid var(--line)",
-          borderRadius: 8, background: "var(--paper-2)",
-          color: "var(--ink-4)",
-          cursor: "pointer", font: "400 13px/1 var(--font-sans)",
-          textAlign: "left", transition: "border-color 150ms, background 150ms",
-        }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--ink-4)"; e.currentTarget.style.background = "var(--paper)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.background = "var(--paper-2)"; }}
-        >
-          <I.Search size={13} style={{flexShrink:0}}/>
-          <span style={{flex:1}}>Brief, marka, kişi ara…</span>
-          <span style={{
-            font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)",
-            padding: "3px 6px", border: "1px solid var(--line)",
-            borderRadius: 4, background: "var(--surface)"
-          }}>⌘K</span>
         </button>
       )}
 
