@@ -17,14 +17,14 @@
   display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px;
   background: var(--paper); color: var(--ink-3);
   font-family: var(--font-sans); font-size: 14px;
-  z-index: 9999; transition: opacity 0.3s;
+  z-index: 9999; transition: opacity 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 #bns-loading.hidden { opacity: 0; pointer-events: none; }
 #bns-loading .spinner {
   width: 36px; height: 36px; border-radius: 50%;
   border: 2px solid var(--line-strong);
   border-top-color: var(--ember);
-  animation: spin 0.7s linear infinite;
+  animation: spin 0.55s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 #root { min-height: 100vh; }
@@ -106,10 +106,10 @@ window.EMBEDDED_DATA = {
 </script>
 
 <!-- data.js: EMBEDDED_DATA → window.BNS_DATA bridge (plain script, no Babel) -->
-<script src="app/data.js?v=1780050980"></script>
+<script src="app/data.js?v=1780051137"></script>
 
 <!-- Pre-built bundle (esbuild — no Babel runtime) -->
-<script src="app/bundle.js?v=1780050980"></script>
+<script src="app/bundle.js?v=1780051137"></script>
 
 <!-- Bootstrap: mount React app -->
 <script>
