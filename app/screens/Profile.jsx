@@ -243,9 +243,10 @@ function ProfileScreen({ data, user, onOpenBrief }) {
               </div>
               <div style={{height:8, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
                 <div style={{
-                  width: Math.min(capPct,100)+"%", height:"100%", borderRadius:999,
+                  width:"100%", height:"100%", borderRadius:999,
                   background: capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":"var(--prio-green)",
-                  transition:"width 400ms var(--ease-out-quart)"
+                  transform:`scaleX(${Math.min(capPct,100)/100})`, transformOrigin:"left",
+                  transition:"transform 400ms cubic-bezier(0.2,0,0,1)"
                 }}/>
               </div>
             </div>
@@ -328,9 +329,11 @@ function ProfileScreen({ data, user, onOpenBrief }) {
                     </div>
                     <div style={{height:5, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
                       <div style={{
-                        width: Math.round((t.v/maxV)*100)+"%", height:"100%",
+                        width:"100%", height:"100%",
                         background: "var(--ember)", opacity: 0.65 + (i===0?0.35:0),
-                        borderRadius:999, transition:"width 400ms var(--ease-out-quart)"
+                        borderRadius:999,
+                        transform:`scaleX(${Math.round((t.v/maxV)*100)/100})`, transformOrigin:"left",
+                        transition:"transform 400ms cubic-bezier(0.2,0,0,1)"
                       }}/>
                     </div>
                   </div>

@@ -556,9 +556,10 @@ function DeptRow({ s, color, last, compact }) {
       <div style={{display:"flex", alignItems:"center", gap:8}}>
         <div style={{flex:1, height:5, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
           <div style={{
-            width: Math.min(capPct, 100)+"%", height:"100%",
+            width:"100%", height:"100%",
             background: capColor, borderRadius:999,
-            transition: "width 600ms var(--ease-out-quart)",
+            transform:`scaleX(${Math.min(capPct,100)/100})`, transformOrigin:"left",
+            transition:"transform 600ms cubic-bezier(0.2,0,0,1)",
           }}/>
         </div>
         <span style={{font:"500 11px/1 var(--font-mono)", color: capColor, minWidth:28, textAlign:"right"}}>%{capPct}</span>

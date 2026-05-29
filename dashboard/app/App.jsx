@@ -303,7 +303,7 @@ function App() {
         onNewBrief={() => setNewBrief(true)}
         defaultUsers={Object.assign([...data.USERS], { onPick: (u) => setUser(u) })}
       />
-      <div style={{display:"flex", flex:1, overflow:"hidden"}}>
+      <div style={{display:"grid", gridTemplateColumns:`${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
         <Sidebar
           active={tab} onChange={setTab}
           collapsed={sidebarCollapsed}

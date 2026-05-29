@@ -433,12 +433,11 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
 
   return (
     <aside style={{
-      width: collapsed ? 52 : 212,
+      width: "100%",
       flexShrink: 0,
       display: "flex", flexDirection: "column",
       background: "var(--sidebar-bg)",
       borderRight: "1px solid var(--line)",
-      transition: "width 200ms var(--ease-out-quart)",
       overflow: "hidden",
       position: "relative",
     }}>
