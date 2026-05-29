@@ -63,7 +63,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
       </div>
 
       <div className="bns-kanban-grid" style={{
-        display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 12,
+        display:"grid", gridTemplateColumns:"repeat(5, minmax(200px, 1fr))", gap: 12,
         minHeight: 540, overflowX:"auto", WebkitOverflowScrolling:"touch"
       }}>
         {cols.map(col => {
@@ -73,7 +73,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
               background:"var(--surface-sub)", border:"1px solid var(--line)",
               borderRadius: 10, padding: 10,
               display:"flex", flexDirection:"column", gap: 8,
-              minWidth: 230
+              minWidth: 0, overflow:"hidden"
             }}>
               <div style={{
                 display:"flex", alignItems:"center", justifyContent:"space-between",
