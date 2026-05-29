@@ -108,7 +108,7 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       {/* Logo — mobil VE desktop header'da */}
       <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
         <img src="app/logo.png" alt="Benseno" style={{
-          height: isMobile ? 32 : 40, width: "auto", objectFit: "contain",
+          height: isMobile ? 34 : 48, width: "auto", objectFit: "contain",
           mixBlendMode: "multiply", flexShrink: 0,
         }}/>
       </a>
