@@ -173,7 +173,9 @@ Her completed brief için (max son 12 brief):
     channel_id = URL'deki /archives/{channel_id}/ kısmı
     slack_read_thread(channel_id, ts) çağır
     Thread mesajlarında dosya eki ara:
-      message.files[] içinde mimetype "image/*" olan ilk dosyayı bul
+      Tüm mesajlardaki files[] listesini topla
+      mimetype "image/*" olanları filtrele
+      → En SON yüklenen görseli al (son mesajdaki son dosya)
       → image_url = file.url_private veya file.permalink
     Bulunmazsa → image_url = null
 ```
