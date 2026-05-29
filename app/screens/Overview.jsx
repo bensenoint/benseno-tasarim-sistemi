@@ -336,18 +336,18 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
           <BriefTable rows={today.concat(overdue).slice(0, 9)} onRowClick={onOpenBrief}/>
         </Card>
 
-        <div style={{display:"flex", flexDirection:"column", gap: "var(--grid-gap)"}}>
-          <Card>
+        <div style={{display:"flex", flexDirection:"column", gap: "var(--grid-gap)", minWidth:0, overflow:"hidden"}}>
+          <Card style={{overflow:"hidden"}}>
             <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
             <DeptRow s={data.deptStats.tasarim} color="var(--bw-1)"/>
             <DeptRow s={data.deptStats.editor}  color="var(--bw-4)"/>
             <DeptRow s={data.deptStats.ai}      color="var(--bw-14)" last/>
           </Card>
-          <Card>
+          <Card style={{overflow:"hidden"}}>
             <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
             <ProblemBrands data={data}/>
           </Card>
-          <Card>
+          <Card style={{overflow:"hidden"}}>
             <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
             <StarOfTheWeek data={data}/>
           </Card>
