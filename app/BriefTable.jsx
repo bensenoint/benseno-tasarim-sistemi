@@ -26,17 +26,16 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
   }
 
   const cols = [
-    { id: "no",     label: "#",      sort: true,  align: "right" },
-    { id: "stale",  label: "🔔",     sort: false, mobileHide: true },
-    { id: "deltaH", label: "Öncelik",sort: true },
-    { id: "marka",  label: "Marka",  sort: true },
-    { id: "baslik", label: "İş",     sort: true },
-    { id: "atanan", label: "Atanan", sort: false, mobileHide: true },
-    { id: "deadline",label:"Teslim", sort: true,  align: "right" },
-    { id: "durum",  label: "Durum",  sort: true,  mobileHide: true },
-    { id: "rev",    label: "Rev#",   sort: false, align: "right", mobileHide: true },
-    { id: "acilma", label: "Yaş",    sort: true,  align: "right", mobileHide: true },
-    { id: "link",   label: "🔗",     sort: false, mobileHide: true }
+    { id: "no",      label: "#",        sort: true,  align: "right" },
+    { id: "deltaH",  label: "Öncelik",  sort: true },
+    { id: "marka",   label: "Marka",    sort: true },
+    { id: "baslik",  label: "İş",       sort: true },
+    { id: "atanan",  label: "Atanan",   sort: false, mobileHide: true },
+    { id: "deadline",label: "Teslim",   sort: true,  align: "right" },
+    { id: "durum",   label: "Durum",    sort: true,  mobileHide: true },
+    { id: "rev",     label: "Rev#",     sort: false, align: "right", mobileHide: true },
+    { id: "acilma",  label: "Gecikme",  sort: true,  align: "right", mobileHide: true },
+    { id: "link",    label: "🔗",       sort: false }
   ];
 
   return (
@@ -99,12 +98,6 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
-      <td className="bns-col-mobile-hide" style={cellStyle()}>
-        {brief.stale && <span title="3+ gün hareketsiz" style={{color:"var(--warning)"}}>●</span>}
-        {!brief.stale && brief.deltaH !== null && brief.deltaH <= -72 && <span title="72+ saat gecikme — sistem müdahalesi" style={{color:"var(--prio-red)", fontWeight:700, fontSize:13}}>!!!</span>}
-        {!brief.stale && brief.deltaH !== null && brief.deltaH <= -48 && brief.deltaH > -72 && <span title="48+ saat gecikme — kritik" style={{color:"var(--prio-red)", fontWeight:600}}>!!</span>}
-        {!brief.stale && brief.deltaH !== null && brief.deltaH <= 0 && brief.deltaH > -48 && <span title="Gecikmiş" style={{color:"var(--prio-red)"}}>!</span>}
-      </td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
       <td style={{...cellStyle(), maxWidth: 160, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
@@ -130,7 +123,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{brief.revision > 0 ? brief.revision : <span style={{color:"var(--ink-5)"}}>—</span>}</td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title={brief.acilma ? new Date(brief.acilma).toLocaleDateString("tr-TR") + " açıldı" : ""}>{relTime(brief.acilma)}</td>
-      <td className="bns-col-mobile-hide" style={cellStyle()}>
+      <td style={cellStyle()}>
         <a href={brief.slack_url && brief.slack_url !== "#" ? brief.slack_url : undefined}
            target="_blank" rel="noopener noreferrer"
            onClick={e => e.stopPropagation()}
