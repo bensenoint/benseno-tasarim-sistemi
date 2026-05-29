@@ -336,18 +336,18 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
           <BriefTable rows={today.concat(overdue).slice(0, 9)} onRowClick={onOpenBrief}/>
         </Card>
 
-        <div style={{display:"flex", flexDirection:"column", gap: "var(--grid-gap)", minWidth:0, overflow:"hidden"}}>
-          <Card style={{overflow:"hidden"}}>
+        <div style={{display:"flex", flexDirection:"column", gap: "var(--grid-gap)", minWidth:0}}>
+          <Card>
             <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
             <DeptRow s={data.deptStats.tasarim} color="var(--bw-1)"/>
             <DeptRow s={data.deptStats.editor}  color="var(--bw-4)"/>
             <DeptRow s={data.deptStats.ai}      color="var(--bw-14)" last/>
           </Card>
-          <Card style={{overflow:"hidden"}}>
+          <Card>
             <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
             <ProblemBrands data={data}/>
           </Card>
-          <Card style={{overflow:"hidden"}}>
+          <Card>
             <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
             <StarOfTheWeek data={data}/>
           </Card>
@@ -536,26 +536,20 @@ function DeptRow({ s, color, last, compact }) {
   const capPct = s.capacity_pct ?? bnsCapPct(s) ?? 0;
   const capColor = capPct > 85 ? "var(--warning)" : capPct > 60 ? color || "var(--info)" : "var(--success)";
   return (
-    <div style={{
-      padding: compact ? "10px 0" : "13px 0",
-      borderBottom: last ? "0" : "1px solid var(--line-soft)",
-    }}>
-      <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:7, minWidth:0}}>
-        <span style={{width:8, height:8, background:color, borderRadius:3, flexShrink:0}}/>
-        <span style={{font:"600 13px/1 var(--font-sans)", flex:1, minWidth:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{s.name}</span>
-        <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)", flexShrink:0}}>{s.active}</span>
-        {s.overdue > 0 && <span style={{font:"600 11px/1 var(--font-mono)", color:"var(--prio-red)", flexShrink:0}}>· {s.overdue}g</span>}
+    <div style={{padding: compact ? "8px 0" : "11px 0", borderBottom: last ? "0" : "1px solid var(--line-soft)"}}>
+      {/* İsim + sayılar */}
+      <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:6}}>
+        <span style={{width:8, height:8, borderRadius:2, background:color, flexShrink:0}}/>
+        <span style={{font:"600 12px/1 var(--font-sans)", color:"var(--ink)", flex:1}}>{s.name}</span>
+        <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--ink)"}}>{s.active}</span>
+        {s.overdue > 0 && <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--prio-red)"}}>· {s.overdue}g</span>}
       </div>
-      <div style={{display:"flex", alignItems:"center", gap:8}}>
-        <div style={{flex:1, height:5, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
-          <div style={{
-            width:"100%", height:"100%",
-            background: capColor, borderRadius:999,
-            transform:`scaleX(${Math.min(capPct,100)/100})`, transformOrigin:"left",
-            transition:"transform 600ms cubic-bezier(0.2,0,0,1)",
-          }}/>
+      {/* Progress bar + % */}
+      <div style={{display:"flex", alignItems:"center", gap:6}}>
+        <div style={{flex:1, height:4, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
+          <div style={{height:"100%", background:capColor, borderRadius:999, width:`${Math.min(capPct,100)}%`, transition:"width 600ms ease"}}/>
         </div>
-        <span style={{font:"500 11px/1 var(--font-mono)", color: capColor, minWidth:28, textAlign:"right"}}>%{capPct}</span>
+        <span style={{font:"500 11px/1 var(--font-mono)", color:capColor, flexShrink:0}}>%{capPct}</span>
       </div>
     </div>
   );
@@ -623,20 +617,15 @@ function ProblemBrands({ data }) {
 
 function BrandRow({ name, note, color, v, last }) {
   return (
-    <div style={{
-      display:"flex", alignItems:"center", justifyContent:"space-between",
-      padding: "11px 0", gap: 8,
-      borderBottom: last ? "0" : "1px solid var(--line)",
-      overflow:"hidden"
-    }}>
-      <div style={{display:"flex", alignItems:"center", gap: 8, minWidth: 0, flex:1, overflow:"hidden"}}>
-        <span style={{width:8, height:8, borderRadius:999, background:color, flexShrink:0}}/>
-        <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{name}</span>
+    <div style={{padding:"9px 0", borderBottom: last ? "0" : "1px solid var(--line-soft)"}}>
+      {/* İsim satırı */}
+      <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:2}}>
+        <span style={{width:7, height:7, borderRadius:999, background:color||"var(--ink-4)", flexShrink:0}}/>
+        <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", flex:1}}>{name}</span>
+        <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0}}>{v}</span>
       </div>
-      <div style={{display:"flex", alignItems:"center", gap: 6, flexShrink:0}}>
-        <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-3)", whiteSpace:"nowrap", maxWidth:120, overflow:"hidden", textOverflow:"ellipsis"}}>{note}</span>
-        <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-4)"}}>{v}</span>
-      </div>
+      {/* Not satırı */}
+      {note && <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-3)", paddingLeft:13}}>{note}</div>}
     </div>
   );
 }
