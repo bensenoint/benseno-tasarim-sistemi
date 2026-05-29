@@ -107,22 +107,20 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
 function KanbanCard({ brief, onClick }) {
   return (
     <button onClick={onClick} style={{
-      display:"flex", flexDirection:"column", gap: 8, padding: 10,
+      display:"block", padding: 10,
       background:"var(--surface)", border:"1px solid var(--line)", borderRadius: 8,
       cursor:"pointer", textAlign:"left", color:"var(--ink)",
-      width:"100%", minWidth:0, overflow:"hidden", boxSizing:"border-box"
+      width:"100%", boxSizing:"border-box", overflow:"hidden"
     }}>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, minWidth:0}}>
-        <div style={{minWidth:0, overflow:"hidden"}}><BrandChip brand={brief.brand} size="sm"/></div>
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginBottom: 8}}>
+        <BrandChip brand={brief.brand} size="sm"/>
         <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0}}>#{brief.no}</span>
       </div>
       <div style={{
         font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
-        overflow:"hidden", maxHeight:"2.7em",
-        wordBreak:"break-word", overflowWrap:"anywhere",
-        whiteSpace:"normal", width:"100%"
+        marginBottom: 8, wordBreak:"break-word", overflowWrap:"anywhere"
       }}>{brief.baslik}</div>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginTop: 2}}>
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6}}>
         {brief.priority && <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>}
         <span style={{display:"inline-flex"}}>
           <Avatar user={brief.lead} size={20}/>
