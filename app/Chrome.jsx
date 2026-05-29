@@ -105,46 +105,23 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       position: "sticky", top: 0, zIndex: 30,
       boxShadow: "0 1px 0 var(--line-soft)",
     }}>
-      {/* Logo on mobile */}
-      {isMobile && (
-        <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
-          <img src="app/logo.png" alt="Benseno" style={{
-            height: 34, width: "auto", objectFit: "contain",
-            mixBlendMode: "multiply", flexShrink: 0,
-          }}/>
-        </a>
-      )}
+      {/* Logo — hem mobil hem desktop header'da */}
+      <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
+        <img src="app/logo.png" alt="Benseno" style={{
+          height: isMobile ? 32 : 40, width: "auto", objectFit: "contain",
+          mixBlendMode: "multiply", flexShrink: 0,
+        }}/>
+      </a>
 
-      {/* Search — full bar on desktop, icon-only on mobile */}
-      {isMobile ? (
+      {/* Mobile: search icon */}
+      {isMobile && (
         <button onClick={onOpenPalette} style={{
-          width: 36, height: 36, flexShrink: 0,
+          width: 36, height: 36, flexShrink: 0, marginLeft: 4,
           display: "flex", alignItems: "center", justifyContent: "center",
           border: "1px solid var(--line)", borderRadius: 8,
           background: "var(--paper-2)", color: "var(--ink-4)", cursor: "pointer",
         }}>
           <I.Search size={15}/>
-        </button>
-      ) : (
-        <button onClick={onOpenPalette} style={{
-          flex: 1, maxWidth: 360,
-          display: "flex", alignItems: "center", gap: 8,
-          padding: "7px 10px", border: "1px solid var(--line)",
-          borderRadius: 8, background: "var(--paper-2)",
-          color: "var(--ink-4)",
-          cursor: "pointer", font: "400 13px/1 var(--font-sans)",
-          textAlign: "left", transition: "border-color 150ms, background 150ms",
-        }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--ink-4)"; e.currentTarget.style.background = "var(--paper)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.background = "var(--paper-2)"; }}
-        >
-          <I.Search size={13} style={{flexShrink:0}}/>
-          <span style={{flex:1}}>Brief, marka, kişi ara…</span>
-          <span style={{
-            font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)",
-            padding: "3px 6px", border: "1px solid var(--line)",
-            borderRadius: 4, background: "var(--surface)"
-          }}>⌘K</span>
         </button>
       )}
 
@@ -441,21 +418,40 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
       overflow: "hidden",
       position: "relative",
     }}>
-      {/* Logo area */}
+      {/* Search area — sidebar üstünde */}
       <div style={{
         height: 52, flexShrink: 0,
         display: "flex", alignItems: "center",
-        padding: collapsed ? "0 14px" : "0 16px",
+        padding: collapsed ? "0 10px" : "0 12px",
         borderBottom: "1px solid var(--line)",
         gap: 8,
         overflow: "hidden",
       }}>
-        <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
-          <img src="app/logo.png" alt="Benseno" style={{
-            height: 36, width: "auto", objectFit: "contain",
-            flexShrink: 0, mixBlendMode: "multiply",
-          }}/>
-        </a>
+        {collapsed ? (
+          <button onClick={onOpenPalette} style={{
+            width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center",
+            border: "1px solid var(--line)", borderRadius: 7,
+            background: "var(--paper-2)", color: "var(--ink-4)", cursor: "pointer", flexShrink: 0,
+          }}>
+            <I.Search size={13}/>
+          </button>
+        ) : (
+          <button onClick={onOpenPalette} style={{
+            flex: 1, display: "flex", alignItems: "center", gap: 7,
+            padding: "6px 9px", border: "1px solid var(--line)",
+            borderRadius: 7, background: "var(--paper-2)",
+            color: "var(--ink-4)", cursor: "pointer",
+            font: "400 12px/1 var(--font-sans)", textAlign: "left",
+            transition: "border-color 150ms, background 150ms", minWidth: 0,
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--ink-4)"; e.currentTarget.style.background = "var(--paper)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.background = "var(--paper-2)"; }}
+          >
+            <I.Search size={12} style={{flexShrink:0}}/>
+            <span style={{flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>Ara…</span>
+            <span style={{font:"500 9px/1 var(--font-mono)", color:"var(--ink-5)", padding:"2px 5px", border:"1px solid var(--line)", borderRadius:3, background:"var(--surface)", flexShrink:0}}>⌘K</span>
+          </button>
+        )}
         {!collapsed && (
           <a
             href="docs/kullanim-klavuzu.html"
@@ -463,8 +459,7 @@ function Sidebar({ active, onChange, collapsed, onToggle, data }) {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              marginLeft: "auto",
-              display: "inline-flex", alignItems: "center", gap: 4,
+              display: "inline-flex", alignItems: "center", gap: 3,
               font: "500 10px/1 var(--font-sans)", color: "var(--ink-3)",
               padding: "4px 7px", borderRadius: 5,
               border: "1px solid var(--line)",
