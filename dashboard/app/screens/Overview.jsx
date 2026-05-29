@@ -540,18 +540,11 @@ function DeptRow({ s, color, last, compact }) {
       padding: compact ? "10px 0" : "13px 0",
       borderBottom: last ? "0" : "1px solid var(--line-soft)",
     }}>
-      <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:7}}>
-        <span style={{width:10, height:10, background:color, borderRadius:3, flexShrink:0}}/>
-        <span style={{font:"600 13px/1 var(--font-sans)", flex:1}}>{s.name}</span>
-        <div style={{display:"flex", alignItems:"center", gap:6, flexShrink:0}}>
-          <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{s.active}</span>
-          <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>aktif</span>
-          {s.overdue > 0 && <>
-            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--line-strong)"}}>·</span>
-            <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--prio-red)"}}>{s.overdue}</span>
-            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>geciken</span>
-          </>}
-        </div>
+      <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:7, minWidth:0}}>
+        <span style={{width:8, height:8, background:color, borderRadius:3, flexShrink:0}}/>
+        <span style={{font:"600 13px/1 var(--font-sans)", flex:1, minWidth:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{s.name}</span>
+        <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)", flexShrink:0}}>{s.active}</span>
+        {s.overdue > 0 && <span style={{font:"600 11px/1 var(--font-mono)", color:"var(--prio-red)", flexShrink:0}}>· {s.overdue}g</span>}
       </div>
       <div style={{display:"flex", alignItems:"center", gap:8}}>
         <div style={{flex:1, height:5, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
