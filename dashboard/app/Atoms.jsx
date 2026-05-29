@@ -105,15 +105,15 @@ function AvatarStack({ users, max = 3, size = 22 }) {
 
 function StatusPill({ status }) {
   const map = {
-    yeni:        { color: "var(--ink-4)",    label: "Yeni" },
-    calisiliyor: { color: "var(--info)",     label: "Çalışılıyor" },
-    incelemede:  { color: "var(--warning)",  label: "İncelemede" },
-    blokeli:     { color: "var(--danger)",   label: "Blokeli" },
-    tamamlandi:  { color: "var(--success)",  label: "Tamamlandı" }
+    yeni:        { color: "var(--ink-4)",    label: "Yeni",     full: "Yeni" },
+    calisiliyor: { color: "var(--info)",     label: "Çalışıyor", full: "Çalışılıyor" },
+    incelemede:  { color: "var(--warning)",  label: "İnceleme",  full: "İncelemede" },
+    blokeli:     { color: "var(--danger)",   label: "Blokeli",   full: "Blokeli" },
+    tamamlandi:  { color: "var(--success)",  label: "Tamam",     full: "Tamamlandı" }
   };
   const s = map[status] || map.yeni;
   return (
-    <span style={{display:"inline-flex", alignItems:"center", gap:6}}>
+    <span title={s.full} style={{display:"inline-flex", alignItems:"center", gap:5}}>
       <I.Dot size={7} color={s.color}/>
       <span style={{font:"500 12px/1 var(--font-sans)", color: "var(--ink-2)"}}>{s.label}</span>
     </span>

@@ -34,8 +34,8 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
     { id: "atanan", label: "Atanan", sort: false, mobileHide: true },
     { id: "deadline",label:"Teslim", sort: true,  align: "right" },
     { id: "durum",  label: "Durum",  sort: true,  mobileHide: true },
-    { id: "rev",    label: "Rev",    sort: false, align: "right", mobileHide: true },
-    { id: "acilma", label: "Güncel", sort: true,  align: "right", mobileHide: true },
+    { id: "rev",    label: "Rev#",   sort: false, align: "right", mobileHide: true },
+    { id: "acilma", label: "Yaş",    sort: true,  align: "right", mobileHide: true },
     { id: "link",   label: "🔗",     sort: false, mobileHide: true }
   ];
 
@@ -128,8 +128,8 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
             onClose={() => setMenu(false)}/>
         )}
       </td>
-      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{String(brief.revision).padStart(2, "0")}</td>
-      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{relTime(brief.acilma)}</td>
+      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{brief.revision > 0 ? brief.revision : <span style={{color:"var(--ink-5)"}}>—</span>}</td>
+      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title={brief.acilma ? new Date(brief.acilma).toLocaleDateString("tr-TR") + " açıldı" : ""}>{relTime(brief.acilma)}</td>
       <td className="bns-col-mobile-hide" style={cellStyle()}>
         <a href={brief.slack_url && brief.slack_url !== "#" ? brief.slack_url : undefined}
            target="_blank" rel="noopener noreferrer"
@@ -212,9 +212,9 @@ function relTime(ts) {
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
   const dh = (now - ts) / (3600 * 1000);
   if (dh < 0) return "az önce";
-  if (dh < 1) return Math.round(dh*60) + " dk önce";
-  if (dh < 24) return Math.round(dh) + " sa önce";
-  return Math.round(dh/24) + " gün önce";
+  if (dh < 1) return Math.round(dh*60) + "dk";
+  if (dh < 24) return Math.round(dh) + "sa";
+  return Math.round(dh/24) + "g";
 }
 
 window.BriefTable = BriefTable;
