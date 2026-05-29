@@ -119,11 +119,11 @@ function KanbanCard({ brief, onClick }) {
         </div>
         <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0}}>#{brief.no}</span>
       </div>
-      <div style={{
+      <p style={{
         font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
-        wordBreak:"break-word", overflowWrap:"anywhere", whiteSpace:"normal",
-        width:"100%"
-      }}>{brief.baslik || brief.marka || "—"}</div>
+        wordBreak:"break-word", overflowWrap:"anywhere",
+        margin:0, padding:0
+      }}>{String(brief.baslik || brief.marka || brief.no || "?")}</p>
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, width:"100%"}}>
         {brief.priority && <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>}
         <span style={{display:"inline-flex", marginLeft:"auto"}}>
