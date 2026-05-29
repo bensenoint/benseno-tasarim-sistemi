@@ -107,25 +107,26 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
 function KanbanCard({ brief, onClick }) {
   return (
     <button onClick={onClick} style={{
-      display:"block", padding: 10,
+      display:"flex", flexDirection:"column", gap: 8, padding: 10,
       background:"var(--surface)", border:"1px solid var(--line)", borderRadius: 8,
       cursor:"pointer", textAlign:"left", color:"var(--ink)",
-      width:"100%", boxSizing:"border-box", overflow:"hidden"
+      width:"100%", maxWidth:"100%", minWidth:0,
+      boxSizing:"border-box", alignSelf:"stretch"
     }}>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginBottom: 8, overflow:"hidden"}}>
-        <span style={{overflow:"hidden", minWidth:0, flexShrink:1}}>
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, width:"100%", overflow:"hidden"}}>
+        <div style={{flex:1, minWidth:0, overflow:"hidden"}}>
           <BrandChip brand={brief.brand} size="sm"/>
-        </span>
+        </div>
         <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0}}>#{brief.no}</span>
       </div>
       <div style={{
         font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
-        marginBottom: 8, wordBreak:"break-word", overflowWrap:"anywhere",
-        whiteSpace:"normal"
-      }}>{brief.baslik || brief.is || `[${brief.marka}]`}</div>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6}}>
+        wordBreak:"break-word", overflowWrap:"anywhere", whiteSpace:"normal",
+        width:"100%"
+      }}>{brief.baslik || brief.marka || "—"}</div>
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, width:"100%"}}>
         {brief.priority && <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>}
-        <span style={{display:"inline-flex"}}>
+        <span style={{display:"inline-flex", marginLeft:"auto"}}>
           <Avatar user={brief.lead} size={20}/>
           {brief.contributors && brief.contributors.length > 0 && (
             <span style={{marginLeft: -6}}><AvatarStack users={brief.contributors} max={2} size={18}/></span>
