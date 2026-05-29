@@ -309,6 +309,7 @@ function App() {
           collapsed={sidebarCollapsed}
           onToggle={() => setSidebarCollapsed(v => !v)}
           data={liveData}
+          onOpenPalette={onOpenPalette}
         />
         <main key={tab + t.overviewLayout} style={{
           flex: 1, overflowY: "auto", overflowX: "hidden", minWidth: 0,
