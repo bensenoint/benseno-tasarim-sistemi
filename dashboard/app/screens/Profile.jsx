@@ -273,7 +273,7 @@ function ProfileScreen({ data, user, onOpenBrief }) {
       </div>
 
       {/* ─── Verdiğim / Aldığım işler ────────────────────────── */}
-      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--grid-gap)", marginBottom:"var(--grid-gap)"}} className="bn-grid-2">
+      <div style={{display:"flex", flexDirection:"column", gap:"var(--grid-gap)", marginBottom:"var(--grid-gap)"}}>
         <Card padding={0}>
           <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)"}}>
             <h2 style={{font:"600 14px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Verdiğim işler</h2>
@@ -442,7 +442,7 @@ function DelegateRow({ brief: b, mode, uid, onOpen, last }) {
       onMouseLeave={e=>e.currentTarget.style.background=""}>
       <PriorityBadge p={b.prio||b.priority||{code:"grn",label:"—"}} deltaH={b.deltaH||999} compact/>
       <div style={{flex:1, minWidth:0}}>
-        <div style={{font:"500 12px/1.2 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>
+        <div style={{font:"500 12px/1.35 var(--font-sans)", color:"var(--ink)", overflow:"hidden", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical"}}>
           {b.marka} · {b.baslik || b.is || "—"}
         </div>
         <div style={{font:"400 11px/1.2 var(--font-sans)", color:"var(--ink-4)", marginTop:2}}>
