@@ -167,7 +167,7 @@ function ProfileScreen({ data, user, onOpenBrief }) {
 
         {/* Kullanıcı değiştir */}
         <div style={{display:"flex", flexWrap:"wrap", gap:6, maxWidth:520}}>
-          {allUsers.map(usr => (
+          {[...allUsers].sort((a, b) => a.name.localeCompare(b.name, 'tr')).map(usr => (
             <button key={usr.id} onClick={() => setSelectedUser(usr)}
               title={usr.name}
               style={{
