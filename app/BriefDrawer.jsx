@@ -57,7 +57,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         boxShadow: "var(--shadow-2)",
         zIndex: 81,
         display:"flex", flexDirection:"column",
-        animation: "bn-slide-r 240ms var(--ease-out-quart)"
+        animation: "bn-slide-r 220ms var(--ease-out-quart)"
       }}>
         <div style={{padding:"14px 20px", borderBottom:"1px solid var(--line)", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
           <div style={{display:"flex", alignItems:"center", gap:10}}>
@@ -66,8 +66,13 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           </div>
           <button onClick={onClose} style={{
             border:0, background:"transparent", cursor:"pointer", color:"var(--ink-3)",
-            padding:4, display:"inline-flex"
-          }}><I.X size={16}/></button>
+            padding:4, display:"inline-flex", borderRadius:6,
+            transition:"background 120ms cubic-bezier(0.2,0,0,1), transform 120ms cubic-bezier(0.2,0,0,1)",
+          }}
+          onMouseDown={e => e.currentTarget.style.transform="scale(0.9)"}
+          onMouseUp={e => e.currentTarget.style.transform=""}
+          onMouseLeave={e => e.currentTarget.style.transform=""}
+          ><I.X size={16}/></button>
         </div>
 
         <div style={{padding:"18px 20px", overflowY:"auto", flex: 1}}>

@@ -400,8 +400,91 @@ html[data-theme="dark"][data-noise="on"] body::before {
 /* ------------------------------------------------------------ */
 @keyframes bn-fade { from { opacity: 0 } to { opacity: 1 } }
 @keyframes bn-slide-r { from { transform: translateX(100%); } to { transform: translateX(0); } }
-@keyframes bn-slide-up { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-.bn-tab-in { animation: bn-fade 200ms var(--ease-out-quart); }
+/* Emil: 8px → 5px; opacity always paired with translate */
+@keyframes bn-slide-up {
+  from { transform: translateY(5px); opacity: 0 }
+  to   { transform: translateY(0);   opacity: 1 }
+}
+/* Emil: tab enter = opacity + subtle Y, not just fade */
+@keyframes bn-tab-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.bn-tab-in { animation: bn-tab-enter 180ms var(--ease-out-quart); }
+
+/* ------------------------------------------------------------ */
+/*  PRESS FEEDBACK (Emil: every pressable must feel responsive) */
+/* ------------------------------------------------------------ */
+button,
+[role="button"],
+.bns-tab,
+.bns-nav-item,
+.bns-row-clickable,
+.bns-cmd-item,
+.bns-kpi-card[onclick],
+.bns-brief-row {
+  transition: transform 120ms var(--ease-out-quart),
+              background 120ms var(--ease-out-quart),
+              color 120ms var(--ease-out-quart);
+}
+button:active,
+[role="button"]:active,
+.bns-tab:active,
+.bns-nav-item:active,
+.bns-row-clickable:active,
+.bns-cmd-item:active,
+.bns-brief-row:active {
+  transform: scale(0.97);
+}
+
+/* ------------------------------------------------------------ */
+/*  FOCUS RING — animated transition                            */
+/* ------------------------------------------------------------ */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+  border-radius: var(--r-2);
+  transition: box-shadow 120ms var(--ease-out-quart);
+}
+
+/* ------------------------------------------------------------ */
+/*  POPOVER / TOOLTIP origin-aware scale                        */
+/* ------------------------------------------------------------ */
+.bns-popover,
+.bns-tooltip,
+.bns-dropdown {
+  transform-origin: var(--radix-popover-content-transform-origin, top center);
+}
+
+/* ------------------------------------------------------------ */
+/*  PREFERS-REDUCED-MOTION                                      */
+/* ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  /* Keep opacity transitions for comprehension */
+  .bn-tab-in,
+  #bns-loading {
+    transition-duration: 150ms !important;
+    animation-duration: 150ms !important;
+  }
+}
+
+/* ------------------------------------------------------------ */
+/*  HOVER — only on devices that support it (not touch)         */
+/* ------------------------------------------------------------ */
+@media (hover: hover) and (pointer: fine) {
+  .bns-row-clickable:hover,
+  .bns-brief-row:hover {
+    background: var(--surface-sub);
+  }
+  .bns-nav-item:hover {
+    background: var(--paper-2);
+  }
+}
 
 /* Tabular numerics for KPIs */
 .bn-num {

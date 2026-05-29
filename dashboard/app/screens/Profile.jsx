@@ -175,7 +175,7 @@ function ProfileScreen({ data, user, onOpenBrief }) {
                 padding:"4px 10px 4px 4px",
                 border: usr.id === u.id ? "1.5px solid var(--ember)" : "1px solid var(--line)",
                 borderRadius:999, background: usr.id === u.id ? "var(--ember-tint)" : "var(--surface)",
-                cursor:"pointer", transition:"all 120ms",
+                cursor:"pointer", transition:"background 120ms cubic-bezier(0.2,0,0,1), border-color 120ms cubic-bezier(0.2,0,0,1), transform 120ms cubic-bezier(0.2,0,0,1)",
               }}>
               <Avatar user={usr} size={18}/>
               <span style={{font:`${usr.id===u.id?600:400} 11px/1 var(--font-sans)`, color: usr.id===u.id ? "var(--ember)" : "var(--ink-3)", whiteSpace:"nowrap"}}>

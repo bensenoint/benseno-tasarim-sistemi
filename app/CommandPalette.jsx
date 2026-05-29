@@ -63,7 +63,7 @@ function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNew
         width: "min(640px, 92vw)", zIndex: 91,
         background:"var(--surface)", border:"1px solid var(--line)",
         borderRadius: 14, boxShadow:"var(--shadow-2)",
-        animation: "bn-slide-up 220ms var(--ease-out-quart)",
+        animation: "bn-slide-up 180ms var(--ease-out-quart)",
         overflow: "hidden"
       }}>
         <div style={{padding: "10px 14px", borderBottom:"1px solid var(--line)", display:"flex", alignItems:"center", gap: 10}}>
@@ -94,11 +94,15 @@ function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNew
                 i++; const isSel = i === sel; const idx = i;
                 return (
                   <button key={it.id} onMouseEnter={() => setSel(idx)} onClick={() => { it.run(); onClose(); }}
+                    onMouseDown={e => e.currentTarget.style.transform="scale(0.98)"}
+                    onMouseUp={e => e.currentTarget.style.transform=""}
+                    onMouseLeave={e => e.currentTarget.style.transform=""}
                     style={{
                       display:"flex", alignItems:"center", gap: 10, width:"100%", textAlign:"left",
                       padding:"9px 10px", border:0, borderRadius: 8,
                       background: isSel ? "var(--paper-2)" : "transparent",
-                      cursor:"pointer", color:"var(--ink)"
+                      cursor:"pointer", color:"var(--ink)",
+                      transition:"background 100ms cubic-bezier(0.2,0,0,1), transform 100ms cubic-bezier(0.2,0,0,1)"
                     }}>
                     {it.kind === "action" && <span style={{color:"var(--ink-3)"}}>{it.icon}</span>}
                     {it.kind === "brief" && <BrandChip brand={it.brand} size="sm"/>}

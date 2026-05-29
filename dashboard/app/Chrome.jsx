@@ -173,7 +173,7 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
                 color: viewMode === k ? "var(--ink)" : "var(--ink-3)",
                 borderRadius: 5, cursor: "pointer",
                 boxShadow: viewMode === k ? "0 1px 2px rgba(22,22,26,0.06)" : "none",
-                transition: "all 120ms",
+                transition: "background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1), box-shadow 120ms cubic-bezier(0.2,0,0,1), transform 120ms cubic-bezier(0.2,0,0,1)",
               }}>{v}</button>
             ))}
           </div>
