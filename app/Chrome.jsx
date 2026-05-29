@@ -105,15 +105,13 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       position: "sticky", top: 0, zIndex: 30,
       boxShadow: "0 1px 0 var(--line-soft)",
     }}>
-      {/* Logo on mobile */}
-      {isMobile && (
-        <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
-          <img src="app/logo.png" alt="Benseno" style={{
-            height: 34, width: "auto", objectFit: "contain",
-            mixBlendMode: "multiply", flexShrink: 0,
-          }}/>
-        </a>
-      )}
+      {/* Logo — mobil VE desktop header'da */}
+      <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
+        <img src="app/logo.png" alt="Benseno" style={{
+          height: isMobile ? 32 : 40, width: "auto", objectFit: "contain",
+          mixBlendMode: "multiply", flexShrink: 0,
+        }}/>
+      </a>
 
       {/* Search — full bar on desktop, icon-only on mobile */}
       {isMobile ? (
