@@ -122,7 +122,7 @@ function KanbanCard({ brief, onClick }) {
         font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
         marginBottom: 8, wordBreak:"break-word", overflowWrap:"anywhere",
         whiteSpace:"normal"
-      }}>{brief.baslik}</div>
+      }}>{brief.baslik || brief.is || `[${brief.marka}]`}</div>
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6}}>
         {brief.priority && <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>}
         <span style={{display:"inline-flex"}}>
