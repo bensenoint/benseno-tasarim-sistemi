@@ -63,7 +63,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
       </div>
 
       <div className="bns-kanban-grid" style={{
-        display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 12,
+        display:"grid", gridTemplateColumns:"repeat(5, 220px)", gap: 12,
         minHeight: 540, overflowX:"auto", WebkitOverflowScrolling:"touch"
       }}>
         {cols.map(col => {
@@ -73,7 +73,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
               background:"var(--surface-sub)", border:"1px solid var(--line)",
               borderRadius: 10, padding: 10,
               display:"flex", flexDirection:"column", gap: 8,
-              minWidth: 230
+              minWidth: 0, overflow:"hidden"
             }}>
               <div style={{
                 display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -88,7 +88,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
                   padding:"3px 6px", background:"var(--surface)", borderRadius: 4, border:"1px solid var(--line)"
                 }}>{items.length}</span>
               </div>
-              <div style={{display:"flex", flexDirection:"column", gap: 8, flex:1, overflowY:"auto", maxHeight: "60vh"}}>
+              <div style={{display:"flex", flexDirection:"column", gap: 8, flex:1, overflowY:"auto", overflowX:"hidden", maxHeight: "60vh", minWidth:0}}>
                 {items.map(b => <KanbanCard key={b.id} brief={b} onClick={() => onOpenBrief(b)}/>)}
                 {items.length === 0 && (
                   <div style={{padding: 20, textAlign:"center", color:"var(--ink-4)", font:"400 12px/1.4 var(--font-sans)"}}>
@@ -107,16 +107,23 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
 function KanbanCard({ brief, onClick }) {
   return (
     <button onClick={onClick} style={{
-      display:"flex", flexDirection:"column", gap: 8, padding: 10,
+      display:"block", padding: 10,
       background:"var(--surface)", border:"1px solid var(--line)", borderRadius: 8,
-      cursor:"pointer", textAlign:"left", color:"var(--ink)"
+      cursor:"pointer", textAlign:"left", color:"var(--ink)",
+      width:"100%", boxSizing:"border-box", overflow:"hidden"
     }}>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6}}>
-        <BrandChip brand={brief.brand} size="sm"/>
-        <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{brief.no}</span>
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginBottom: 8, overflow:"hidden"}}>
+        <span style={{overflow:"hidden", minWidth:0, flexShrink:1}}>
+          <BrandChip brand={brief.brand} size="sm"/>
+        </span>
+        <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0}}>#{brief.no}</span>
       </div>
-      <div style={{font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)"}}>{brief.baslik}</div>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginTop: 2}}>
+      <div style={{
+        font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
+        marginBottom: 8, wordBreak:"break-word", overflowWrap:"anywhere",
+        whiteSpace:"normal"
+      }}>{brief.baslik}</div>
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6}}>
         {brief.priority && <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>}
         <span style={{display:"inline-flex"}}>
           <Avatar user={brief.lead} size={20}/>

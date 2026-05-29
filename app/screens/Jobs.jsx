@@ -137,14 +137,14 @@ function KanbanView({ rows, onOpenBrief }) {
     { id: "blokeli",     label: "Blokeli",     Ic: I.Warn }
   ];
   return (
-    <div className="bns-kanban-grid" style={{display:"grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, minHeight: 480, overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
+    <div className="bns-kanban-grid" style={{display:"grid", gridTemplateColumns: "repeat(4, 220px)", gap: 12, minHeight: 480, overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
       {cols.map(col => {
         const items = rows.filter(b => b.durum === col.id);
         return (
           <div key={col.id} style={{
             background:"var(--surface-sub)", border:"1px solid var(--line)",
             borderRadius: 10, padding: 10, display:"flex", flexDirection:"column", gap: 8,
-            minWidth: 0
+            minWidth: 0, overflow:"hidden"
           }}>
             <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", padding:"4px 6px 8px"}}>
               <span style={{display:"inline-flex", alignItems:"center", gap:8, font:"600 13px/1 var(--font-sans)", color:"var(--ink-2)"}}>
@@ -154,15 +154,19 @@ function KanbanView({ rows, onOpenBrief }) {
             </div>
             {items.map(b => (
               <button key={b.id} onClick={() => onOpenBrief(b)} style={{
-                display:"flex", flexDirection:"column", gap: 8, padding: 10,
+                display:"block", padding: 10,
                 background:"var(--surface)", border:"1px solid var(--line)", borderRadius: 8,
-                cursor:"pointer", textAlign:"left", color:"var(--ink)"
+                cursor:"pointer", textAlign:"left", color:"var(--ink)",
+                width:"100%", boxSizing:"border-box", overflow:"hidden"
               }}>
-                <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6}}>
+                <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginBottom: 8}}>
                   <BrandChip brand={b.brand} size="sm"/>
-                  <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{b.no}</span>
+                  <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0}}>#{b.no}</span>
                 </div>
-                <div style={{font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)"}}>{b.baslik}</div>
+                <div style={{
+                  font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
+                  marginBottom: 8, wordBreak:"break-word", overflowWrap:"anywhere", whiteSpace:"normal"
+                }}>{b.baslik}</div>
                 <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginTop: 2}}>
                   <PriorityBadge p={b.priority} deltaH={b.deltaH} compact/>
                   <Avatar user={b.lead} size={20}/>

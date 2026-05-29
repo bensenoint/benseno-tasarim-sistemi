@@ -543,7 +543,7 @@ function DeptRow({ s, color, last, compact }) {
       <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:7}}>
         <span style={{width:10, height:10, background:color, borderRadius:3, flexShrink:0}}/>
         <span style={{font:"600 13px/1 var(--font-sans)", flex:1}}>{s.name}</span>
-        <div style={{display:"flex", alignItems:"center", gap:6}}>
+        <div style={{display:"flex", alignItems:"center", gap:6, flexShrink:0}}>
           <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{s.active}</span>
           <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>aktif</span>
           {s.overdue > 0 && <>
