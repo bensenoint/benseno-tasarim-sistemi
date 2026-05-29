@@ -632,15 +632,16 @@ function BrandRow({ name, note, color, v, last }) {
   return (
     <div style={{
       display:"flex", alignItems:"center", justifyContent:"space-between",
-      padding: "11px 0",
-      borderBottom: last ? "0" : "1px solid var(--line)"
+      padding: "11px 0", gap: 8,
+      borderBottom: last ? "0" : "1px solid var(--line)",
+      overflow:"hidden"
     }}>
-      <div style={{display:"flex", alignItems:"center", gap: 8, minWidth: 0}}>
+      <div style={{display:"flex", alignItems:"center", gap: 8, minWidth: 0, flex:1, overflow:"hidden"}}>
         <span style={{width:8, height:8, borderRadius:999, background:color, flexShrink:0}}/>
-        <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", whiteSpace:"nowrap"}}>{name}</span>
+        <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{name}</span>
       </div>
-      <div style={{display:"flex", alignItems:"center", gap: 10}}>
-        <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>{note}</span>
+      <div style={{display:"flex", alignItems:"center", gap: 6, flexShrink:0}}>
+        <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-3)", whiteSpace:"nowrap", maxWidth:120, overflow:"hidden", textOverflow:"ellipsis"}}>{note}</span>
         <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-4)"}}>{v}</span>
       </div>
     </div>
