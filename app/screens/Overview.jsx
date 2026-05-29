@@ -175,12 +175,9 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
 
       {/* Geciken işler — tam genişlik */}
       <Card padding={0}>
-        <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
-          <div>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
-            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline geçmiş · acil müdahale</div>
-          </div>
-          <Button kind="ghost" size="sm" icon={<I.Move size={13}/>}>Yeniden ata</Button>
+        <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
+          <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
+          <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline geçmiş · acil müdahale</div>
         </div>
         <BriefTable rows={allOverdue} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>
       </Card>
