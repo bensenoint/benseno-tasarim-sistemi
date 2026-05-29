@@ -209,6 +209,10 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
               const rol = u.rol || "diger";
               (grouped[rol] = grouped[rol] || []).push(u);
             }
+            // Her grubu alfabetik sırala
+            Object.keys(grouped).forEach(k => {
+              grouped[k].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+            });
             const onPick = defaultUsers && defaultUsers.onPick;
             return (
               <div onMouseLeave={() => setUserMenu(false)} style={{
