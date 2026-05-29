@@ -107,30 +107,33 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
 function KanbanCard({ brief, onClick }) {
   return (
     <button onClick={onClick} style={{
-      display:"flex", flexDirection:"column", gap: 8, padding: 10,
+      display:"flex", flexDirection:"column", gap: 6, padding: "10px 10px 8px",
       background:"var(--surface)", border:"1px solid var(--line)", borderRadius: 8,
       cursor:"pointer", textAlign:"left", color:"var(--ink)",
-      width:"100%", maxWidth:"100%", minWidth:0,
-      boxSizing:"border-box", alignSelf:"stretch"
+      width:"100%", minWidth:0, boxSizing:"border-box"
     }}>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, width:"100%", overflow:"hidden"}}>
-        <div style={{flex:1, minWidth:0, overflow:"hidden"}}>
+      {/* Üst satır: marka chip + numara */}
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:4, minWidth:0}}>
+        <div style={{minWidth:0, overflow:"hidden", flex:1}}>
           <BrandChip brand={brief.brand} size="sm"/>
         </div>
         <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0}}>#{brief.no}</span>
       </div>
-      <p style={{
-        font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
-        wordBreak:"break-word", overflowWrap:"anywhere",
-        margin:0, padding:0
-      }}>{String(brief.baslik || brief.marka || brief.no || "?")}</p>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, width:"100%"}}>
-        {brief.priority && <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>}
-        <span style={{display:"inline-flex", marginLeft:"auto"}}>
-          <Avatar user={brief.lead} size={20}/>
-          {brief.contributors && brief.contributors.length > 0 && (
-            <span style={{marginLeft: -6}}><AvatarStack users={brief.contributors} max={2} size={18}/></span>
-          )}
+      {/* İş adı — 2 satıra kadar */}
+      <div style={{
+        font:"500 13px/1.4 var(--font-sans)", color:"var(--ink)",
+        display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical",
+        overflow:"hidden", wordBreak:"break-word"
+      }}>{brief.baslik || "—"}</div>
+      {/* Alt satır: öncelik + avatarlar */}
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:4, marginTop:2}}>
+        {brief.priority
+          ? <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>
+          : <span/>}
+        <span style={{display:"inline-flex", flexShrink:0}}>
+          <Avatar user={brief.lead} size={18}/>
+          {brief.contributors && brief.contributors.length > 0 &&
+            <span style={{marginLeft:-5}}><AvatarStack users={brief.contributors} max={2} size={16}/></span>}
         </span>
       </div>
     </button>
