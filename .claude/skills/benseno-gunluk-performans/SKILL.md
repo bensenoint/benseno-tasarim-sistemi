@@ -256,3 +256,47 @@ Dashboard: https://bensenoint.github.io/benseno-tasarim-sistemi/
 - Tek bir DM fail → log, devam
 - Kanal mesajı fail → log, DM'lere devam
 - Beyza eski ID atanmış aktif iş tespiti → Cansu+İpek'e DM "Beyza ayrıldı, yeniden ata"
+---
+
+## GITHUB ACTIONS ORTAMI — Slack API Fallback
+
+Bu skill GitHub Actions üzerinde çalışıyorsa (ortam değişkeni `GITHUB_ACTIONS=true`):
+
+**MCP tool'ları yoktur.** Bunun yerine doğrudan Slack Web API kullan:
+
+### Canvas okuma (mcp__slack__slack_read_canvas yerine):
+```bash
+curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  "https://slack.com/api/canvas.sections.lookup?canvas_id=F0B1B6XUD44&criteria={\"section_types\":[\"any\"]}" \
+  | python3 -c "import json,sys; d=json.load(sys.stdin); [print(s.get('document_content','')) for s in d.get('sections',[])]"
+```
+
+### Mesaj gönderme (mcp__slack__slack_send_message yerine):
+```bash
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"channel\":\"CHANNEL_ID\",\"text\":\"MESAJ\"}"
+```
+
+### DM gönderme:
+```bash
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"channel\":\"USER_ID\",\"text\":\"MESAJ\"}"
+```
+
+### Kanal ID'leri:
+- `#benseno-grafik` → `C04V4L7LJGZ`
+- Görkem DM → `U030C48PL23`
+
+### Saat kontrolü:
+GitHub Actions'ta `TZ=Europe/Istanbul date +%H:%M` ile Türkiye saatini al.
+Sabah raporu sadece 07:45-08:15 arasında DM gönderir.
+**Eğer test modundaysa (workflow_dispatch ile tetiklendiyse) saat kontrolünü atla, içeriği üret ve gönder.**
+
+### Workflow dispatch tespiti:
+```bash
+echo $GITHUB_EVENT_NAME  # "workflow_dispatch" ise manuel tetiklenmiş
+```
