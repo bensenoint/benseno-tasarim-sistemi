@@ -173,56 +173,56 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
           metric={allReview.length}/>
       </div>
 
-      <div style={{display:"grid", gridTemplateColumns:"1.6fr 1fr", gap:"var(--grid-gap)"}} className="bn-grid-2">
-        <Card padding={0}>
-          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
-            <div>
-              <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
-              <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline geçmiş · acil müdahale</div>
-            </div>
-            <Button kind="ghost" size="sm" icon={<I.Move size={13}/>}>Yeniden ata</Button>
+      {/* Geciken işler — tam genişlik */}
+      <Card padding={0}>
+        <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
+          <div>
+            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
+            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline geçmiş · acil müdahale</div>
           </div>
-          <BriefTable rows={allOverdue} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>
+          <Button kind="ghost" size="sm" icon={<I.Move size={13}/>}>Yeniden ata</Button>
+        </div>
+        <BriefTable rows={allOverdue} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>
+      </Card>
+
+      {/* Stat kartları — 3 kolon */}
+      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
+        <Card>
+          <CardHead title="Onay bekleyenler" sub={`${allReview.length} brief · rev tamamlandı`}/>
+          {allReview.slice(0, 5).map((b, i) => (
+            <ApprovalRow key={b.id} brief={b} onClick={() => onOpenBrief(b)} last={i === Math.min(4, allReview.length - 1)}/>
+          ))}
+          {allReview.length > 5 && (
+            <button onClick={() => onSwitchTab("jobs")} style={{
+              marginTop: 8, font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)",
+              background:"transparent", border:0, cursor:"pointer", padding: 4
+            }}>+{allReview.length - 5} daha →</button>
+          )}
         </Card>
 
-        <div style={{display:"flex", flexDirection:"column", gap:"var(--grid-gap)"}}>
-          <Card>
-            <CardHead title="Onay bekleyenler" sub={`${allReview.length} brief · rev tamamlandı`}/>
-            {allReview.slice(0, 5).map((b, i) => (
-              <ApprovalRow key={b.id} brief={b} onClick={() => onOpenBrief(b)} last={i === Math.min(4, allReview.length - 1)}/>
-            ))}
-            {allReview.length > 5 && (
-              <button onClick={() => onSwitchTab("jobs")} style={{
-                marginTop: 8, font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)",
-                background:"transparent", border:0, cursor:"pointer", padding: 4
-              }}>+{allReview.length - 5} daha →</button>
-            )}
-          </Card>
+        <Card>
+          <CardHead title="Bu hafta · özet"/>
+          <WeekStat label="Tamamlanan" value={String(weekCount)}
+            trend={{dir: weekCountDelta > 0 ? "up" : weekCountDelta < 0 ? "down" : "flat",
+                    value: (weekCountDelta > 0 ? "+" : "") + weekCountDelta}}/>
+          <WeekStat label="Ort. tamamlama"
+            value={avgSure > 0 ? avgSure.toFixed(1).replace(".",",") + " sa" : "—"}
+            trend={{dir: sureDelta < 0 ? "down" : sureDelta > 0 ? "up" : "flat",
+                    value: (sureDelta > 0 ? "+" : "") + sureDelta.toFixed(1).replace(".",",") + " sa"}} good/>
+          <WeekStat label="Revize oranı"
+            value={avgRevPct > 0 ? "%" + avgRevPct : "—"}
+            trend={{dir:"flat", value:"="}}/>
+          <WeekStat label="Hareketsiz" value={String(staleCount)}
+            trend={{dir: staleCount > 0 ? "up" : "flat", value: staleCount > 0 ? "+"+staleCount : "="}} bad last/>
+        </Card>
 
-          <Card>
-            <CardHead title="Bu hafta · özet"/>
-            <WeekStat label="Tamamlanan" value={String(weekCount)}
-              trend={{dir: weekCountDelta > 0 ? "up" : weekCountDelta < 0 ? "down" : "flat",
-                      value: (weekCountDelta > 0 ? "+" : "") + weekCountDelta}}/>
-            <WeekStat label="Ort. tamamlama"
-              value={avgSure > 0 ? avgSure.toFixed(1).replace(".",",") + " sa" : "—"}
-              trend={{dir: sureDelta < 0 ? "down" : sureDelta > 0 ? "up" : "flat",
-                      value: (sureDelta > 0 ? "+" : "") + sureDelta.toFixed(1).replace(".",",") + " sa"}} good/>
-            <WeekStat label="Revize oranı"
-              value={avgRevPct > 0 ? "%" + avgRevPct : "—"}
-              trend={{dir:"flat", value:"="}}/>
-            <WeekStat label="Hareketsiz" value={String(staleCount)}
-              trend={{dir: staleCount > 0 ? "up" : "flat", value: staleCount > 0 ? "+"+staleCount : "="}} bad last/>
-          </Card>
-
-          <Card>
-            <CardHead title="Eşik kuralları" sub="otomatik tetiklenen uyarılar"/>
-            <Rule name="Kapasite > %85"     status="ON"  hits={capHits}/>
-            <Rule name="Geciken > 5"        status="ON"  hits={overdueHits}/>
-            <Rule name="Hareketsiz > 3 gün" status="ON"  hits={staleHits}/>
-            <Rule name="Revize > %30"       status={avgRevPct > 30 ? "ON" : "OFF"} hits={revHits} last/>
-          </Card>
-        </div>
+        <Card>
+          <CardHead title="Eşik kuralları" sub="otomatik tetiklenen uyarılar"/>
+          <Rule name="Kapasite > %85"     status="ON"  hits={capHits}/>
+          <Rule name="Geciken > 5"        status="ON"  hits={overdueHits}/>
+          <Rule name="Hareketsiz > 3 gün" status="ON"  hits={staleHits}/>
+          <Rule name="Revize > %30"       status={avgRevPct > 30 ? "ON" : "OFF"} hits={revHits} last/>
+        </Card>
       </div>
     </div>
   );
