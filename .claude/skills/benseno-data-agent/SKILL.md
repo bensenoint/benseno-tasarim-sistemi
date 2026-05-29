@@ -153,6 +153,52 @@ Canvas yapısı (14 sütun): No | Dept | Marka | İş | Atanan | Editör | Önce
 
 Footer: `> 🔄 Son sync: {şimdi TR} · LAST_SYNC_TS={unix}`
 
+### 4b. Tamamlananlar — Galeri Görselleri
+
+Canvas'ın **"Tamamlananlar"** tablosunu parse et (aktif brief tablosunun altında ayrı tablo):
+
+**Adımlar:**
+1. Canvas cache'den "Tamamlananlar" bölümünü bul
+2. Her satırdan şunları çıkar:
+   - No, Marka, İş adı, Atanan, Deadline, Tamamlanma tarihi, Rev sayısı
+   - **Link sütunu** → `slack_url` (Slack thread URL, `[link](https://...)` formatı)
+3. `bns_completed` array'ini oluştur — max 20 kayıt, en yeni önce
+
+**Slack thread'den görsel çekme (kritik):**
+```
+Her completed brief için (max son 12 brief):
+  slack_url boşsa → image_url = null, atla
+  slack_url doluysa:
+    ts = URL'den çıkar (son /p{ts} kısmı → ts formatına çevir: "1234567890.123456")
+    channel_id = URL'deki /archives/{channel_id}/ kısmı
+    slack_read_thread(channel_id, ts) çağır
+    Thread mesajlarında dosya eki ara:
+      message.files[] içinde mimetype "image/*" olan ilk dosyayı bul
+      → image_url = file.url_private veya file.permalink
+    Bulunmazsa → image_url = null
+```
+
+**Hız notu:** Thread çağrıları sıralı yapılır (rate limit). 12'den fazla tamamlanan varsa sadece en yeni 12'si için görsel çek, geri kalanlar image_url=null.
+
+**bns_completed kayıt formatı:**
+```json
+{
+  "no": 10,
+  "marka": "Bauhaus",
+  "baslik": "Bahçe Düzen / 22 Mayıs",
+  "leadId": "U0AN6DD79M0",
+  "contribIds": [],
+  "deadline": 1747872000000,
+  "baslangic": 1747785600000,
+  "bitis": 1747958400000,
+  "revision": 0,
+  "rating": null,
+  "slack_url": "https://benseno.slack.com/archives/C.../p...",
+  "image_url": "https://files.slack.com/files-pri/...",
+  "notes": ""
+}
+```
+
 ### 5. live-data.json Üret
 
 `~/benseno-tasarim-sistemi/dashboard/app/live-data.json` dosyasına yaz:
