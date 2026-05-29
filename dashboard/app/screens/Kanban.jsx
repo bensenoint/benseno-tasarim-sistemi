@@ -118,8 +118,9 @@ function KanbanCard({ brief, onClick }) {
       </div>
       <div style={{
         font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
-        display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical",
-        overflow:"hidden", wordBreak:"break-word"
+        overflow:"hidden", maxHeight:"2.7em",
+        wordBreak:"break-word", overflowWrap:"anywhere",
+        whiteSpace:"normal", width:"100%"
       }}>{brief.baslik}</div>
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginTop: 2}}>
         {brief.priority && <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>}
