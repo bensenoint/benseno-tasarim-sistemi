@@ -190,6 +190,23 @@
     0 1px 3px rgba(0, 0, 0, 0.30),
     0 6px 20px rgba(0, 0, 0, 0.36);
   --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
+
+  /* ---- Semantic — priority (dark mode: lighter for contrast) -- */
+  --prio-red:     #F06B78;
+  --prio-orange:  #F5A05A;
+  --prio-yellow:  #E8C050;
+  --prio-green:   #52C49A;
+
+  --prio-red-bg:    rgba(240, 107, 120, 0.14);
+  --prio-orange-bg: rgba(245, 160, 90,  0.14);
+  --prio-yellow-bg: rgba(232, 192, 80,  0.16);
+  --prio-green-bg:  rgba(82,  196, 154, 0.14);
+
+  /* ---- Semantic — system feedback (dark) ------------------- */
+  --success: #52C49A;
+  --warning: #F5A05A;
+  --danger:  #F06B78;
+  --info:    #6B9FD4;
 }
 
 /* ------------------------------------------------------------ */
@@ -289,7 +306,7 @@
   font-family: var(--font-sans);
   font-weight: var(--fw-semibold);
   font-size: var(--fs-36);
-  line-height: 1;
+  line-height: var(--lh-tight);   /* 1.15 — prevents Türkçe descender clip */
   letter-spacing: var(--ls-tight);
   color: var(--ink);
   font-variant-numeric: tabular-nums;
@@ -298,7 +315,7 @@
   font-family: var(--font-sans);
   font-weight: var(--fw-semibold);
   font-size: var(--fs-44);
-  line-height: 1;
+  line-height: var(--lh-tight);   /* 1.15 — prevents Türkçe descender clip */
   letter-spacing: var(--ls-tight);
   color: var(--ink);
   font-variant-numeric: tabular-nums;

@@ -76,7 +76,7 @@ function DeptCompareScreen({ data }) {
             <Card key={k} accent={palette[k]}>
               <Eyebrow>{s.name} · {s.people} kişi</Eyebrow>
               <div style={{display:"flex", alignItems:"baseline", gap: 10, marginTop: 8}}>
-                <span style={{font:"600 36px/1 var(--font-sans)", color:"var(--ink)", letterSpacing:"-0.01em", fontVariantNumeric:"tabular-nums"}}>{s.active}</span>
+                <span style={{font:"600 36px/1.15 var(--font-sans)", color:"var(--ink)", letterSpacing:"-0.01em", fontVariantNumeric:"tabular-nums"}}>{s.active}</span>
                 <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink-3)"}}>aktif iş</span>
               </div>
               <div style={{font:"500 12px/1.4 var(--font-sans)", color:"var(--ink-3)", marginTop: 6}}>

@@ -248,7 +248,7 @@ function Alert({ tone, Icon, title, body, action, metric }) {
           <span style={{font:"600 13px/1 var(--font-sans)"}}>{title}</span>
         </div>
         {metric !== undefined && (
-          <span style={{font:"600 28px/1 var(--font-sans)", color: c.fg, letterSpacing:"-0.01em", fontVariantNumeric:"tabular-nums"}}>{metric}</span>
+          <span style={{font:"600 28px/1.15 var(--font-sans)", color: c.fg, letterSpacing:"-0.01em", fontVariantNumeric:"tabular-nums"}}>{metric}</span>
         )}
       </div>
       <div style={{font:"400 13px/1.45 var(--font-sans)", color:"var(--ink-2)"}}>{body}</div>
@@ -454,7 +454,7 @@ function StoryLayout({ data, active, overdue, today, week, stale, review, blocke
         <div style={{display:"flex", alignItems:"flex-start", gap: 24}}>
           <div style={{minWidth: 220}}>
             <Eyebrow style={{color:"var(--prio-red)"}}>Şimdi · acil</Eyebrow>
-            <div style={{font:"600 56px/1 var(--font-sans)", color:"var(--prio-red)", letterSpacing:"-0.02em", margin:"8px 0 6px", fontVariantNumeric:"tabular-nums"}}>
+            <div style={{font:"600 56px/1.1 var(--font-sans)", color:"var(--prio-red)", letterSpacing:"-0.02em", margin:"8px 0 6px", fontVariantNumeric:"tabular-nums"}}>
               {overdue.length}
             </div>
             <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:18, color:"var(--ink-2)"}}>

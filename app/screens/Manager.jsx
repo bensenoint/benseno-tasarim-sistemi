@@ -150,7 +150,7 @@ function Alert({ tone, Icon, title, body, action, metric }) {
           <span style={{font:"600 13px/1 var(--font-sans)"}}>{title}</span>
         </div>
         {metric !== undefined && (
-          <span style={{font:"600 28px/1 var(--font-sans)", color: c.fg, letterSpacing:"-0.01em", fontVariantNumeric:"tabular-nums"}}>{metric}</span>
+          <span style={{font:"600 28px/1.15 var(--font-sans)", color: c.fg, letterSpacing:"-0.01em", fontVariantNumeric:"tabular-nums"}}>{metric}</span>
         )}
       </div>
       <div style={{font:"400 13px/1.45 var(--font-sans)", color:"var(--ink-2)"}}>{body}</div>

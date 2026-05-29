@@ -234,7 +234,7 @@ function ProfileScreen({ data, user, onOpenBrief }) {
             <CardHead title="Kapasite" sub={`${myActive.length} / ${CAP_LIMIT} iş limiti`}/>
             <div style={{margin:"8px 0 4px"}}>
               <div style={{display:"flex", justifyContent:"space-between", marginBottom:6}}>
-                <span style={{font:"600 28px/1 var(--font-sans)", color: capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":"var(--ink)", letterSpacing:"-0.02em"}}>
+                <span style={{font:"600 28px/1.15 var(--font-sans)", color: capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":"var(--ink)", letterSpacing:"-0.02em"}}>
                   %{capPct}
                 </span>
                 <span style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", textAlign:"right"}}>
@@ -474,7 +474,7 @@ function BrandBar({ name, v, color, last }) {
 function StatBox({ label, value }) {
   return (
     <div style={{padding:"8px 10px", background:"var(--paper-2)", borderRadius:7, textAlign:"center"}}>
-      <div style={{font:"600 18px/1 var(--font-sans)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{value}</div>
+      <div style={{font:"600 18px/1.15 var(--font-sans)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{value}</div>
       <div style={{font:"400 10px/1.3 var(--font-sans)", color:"var(--ink-4)", marginTop:4}}>{label}</div>
     </div>
   );
