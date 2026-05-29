@@ -457,29 +457,6 @@ function Sidebar({ active, onChange, collapsed, onToggle, data, onOpenPalette })
         overflow: "hidden",
       }}>
         <SidebarSearch onOpenPalette={onOpenPalette} collapsed={collapsed}/>
-        {!collapsed && (
-          <a
-            href="docs/kullanim-klavuzu.html"
-            title="Kullanım Kılavuzu"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              marginLeft: "auto",
-              display: "inline-flex", alignItems: "center", gap: 4,
-              font: "500 10px/1 var(--font-sans)", color: "var(--ink-3)",
-              padding: "4px 7px", borderRadius: 5,
-              border: "1px solid var(--line)",
-              background: "transparent",
-              textDecoration: "none", flexShrink: 0,
-              transition: "color 150ms, border-color 150ms, background 150ms",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = "var(--ember)"; e.currentTarget.style.borderColor = "var(--ember)"; e.currentTarget.style.background = "var(--ember-tint)"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "var(--ink-3)"; e.currentTarget.style.borderColor = "var(--line)"; e.currentTarget.style.background = "transparent"; }}
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            Kılavuz
-          </a>
-        )}
       </div>
 
       {/* Nav sections */}
@@ -569,6 +546,24 @@ function Sidebar({ active, onChange, collapsed, onToggle, data, onOpenPalette })
           </div>
         ))}
       </nav>
+
+      {/* Kılavuz linki */}
+      {!collapsed && (
+        <a href="docs/kullanim-klavuzu.html" target="_blank" rel="noopener noreferrer"
+          style={{
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "10px 16px", borderTop: "1px solid var(--line-soft)",
+            font: "500 12px/1 var(--font-sans)", color: "var(--ink-4)",
+            textDecoration: "none", flexShrink: 0,
+            transition: "color 150ms, background 150ms",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = "var(--ember)"; e.currentTarget.style.background = "var(--ember-tint)"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = "var(--ink-4)"; e.currentTarget.style.background = "transparent"; }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Kullanım Kılavuzu
+        </a>
+      )}
 
       {/* Collapse toggle */}
       <button
