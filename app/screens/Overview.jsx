@@ -318,40 +318,40 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
         <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması"/>
       </KpiGrid>
 
-      <div style={{display:"grid", gridTemplateColumns:"1.7fr 1fr", gap:"var(--grid-gap)", marginTop: "var(--section-gap)"}} className="bn-grid-2">
-        <Card padding={0}>
-          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line-soft)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-            <div>
-              <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.01em"}}>Bugün ve yarın</h2>
-              <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>
-                {today.length + overdue.length} brief
-                {overdue.length > 0 && <span style={{color:"var(--prio-red)", fontWeight:600, marginLeft:6}}>· {overdue.length} gecikmiş</span>}
-                {" · öncelik sırasına göre"}
-              </div>
+      {/* Tablo — tam genişlik */}
+      <Card padding={0} style={{marginTop:"var(--section-gap)"}}>
+        <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line-soft)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <div>
+            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.01em"}}>Bugün ve yarın</h2>
+            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>
+              {today.length + overdue.length} brief
+              {overdue.length > 0 && <span style={{color:"var(--prio-red)", fontWeight:600, marginLeft:6}}>· {overdue.length} gecikmiş</span>}
+              {" · öncelik sırasına göre"}
             </div>
-            <button onClick={() => onSwitchTab("jobs")} style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)", background:"transparent", border:0, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:4}}>
-              Tümünü gör <I.ChevronRight size={12}/>
-            </button>
           </div>
-          <BriefTable rows={today.concat(overdue).slice(0, 9)} onRowClick={onOpenBrief}/>
-        </Card>
-
-        <div style={{display:"flex", flexDirection:"column", gap: "var(--grid-gap)", minWidth:0}}>
-          <Card>
-            <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
-            <DeptRow s={data.deptStats.tasarim} color="var(--bw-1)"/>
-            <DeptRow s={data.deptStats.editor}  color="var(--bw-4)"/>
-            <DeptRow s={data.deptStats.ai}      color="var(--bw-14)" last/>
-          </Card>
-          <Card>
-            <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
-            <ProblemBrands data={data}/>
-          </Card>
-          <Card>
-            <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
-            <StarOfTheWeek data={data}/>
-          </Card>
+          <button onClick={() => onSwitchTab("jobs")} style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)", background:"transparent", border:0, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:4}}>
+            Tümünü gör <I.ChevronRight size={12}/>
+          </button>
         </div>
+        <BriefTable rows={today.concat(overdue).slice(0, 9)} onRowClick={onOpenBrief}/>
+      </Card>
+
+      {/* Stat kartları — tablonun altında 3 kolon */}
+      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
+        <Card>
+          <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
+          <DeptRow s={data.deptStats.tasarim} color="var(--bw-1)"/>
+          <DeptRow s={data.deptStats.editor}  color="var(--bw-4)"/>
+          <DeptRow s={data.deptStats.ai}      color="var(--bw-14)" last/>
+        </Card>
+        <Card>
+          <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
+          <ProblemBrands data={data}/>
+        </Card>
+        <Card>
+          <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
+          <StarOfTheWeek data={data}/>
+        </Card>
       </div>
 
       <ManagerSection data={data} user={user} overdue={overdue} review={review} onOpenBrief={onOpenBrief} onSwitchTab={onSwitchTab} onStatusChange={onStatusChange}/>
