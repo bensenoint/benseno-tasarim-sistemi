@@ -23,4 +23,5 @@ jobs:
           SLACK_USER_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
           SLACK_TEAM_ID: ${{ secrets.SLACK_TEAM_ID }}
           GITHUB_TOKEN: ${{ secrets.BENSENO_GITHUB_PAT }}
-        run: claude -p "Skill: benseno-gunluk-performans — run now" --dangerously-skip-permissions --print
+        run: |
+          claude -p "Skill: benseno-gunluk-performans — run now" --dangerously-skip-permissions --print
