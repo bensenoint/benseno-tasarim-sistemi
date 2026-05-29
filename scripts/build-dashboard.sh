@@ -42,7 +42,8 @@ cat \
   > "$APP/bundle.js"
 
 # Root app/ ile senkronize et (data.js dahil)
-rsync -a --delete "$APP/" "$PROJ/app/"
+rsync -a --delete --exclude='.gitkeep' "$APP/" "$PROJ/app/"
+# Not: gallery/*.jpg dosyaları rsync ile app/gallery/'ye kopyalanır (--delete hariç tutulmadı)
 
 # Cache-bust: bundle.js ve data.js'e timestamp ekle
 TS=$(date +%s)
