@@ -376,7 +376,8 @@
       "revision": 0,
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779282760860839",
-      "notes": "Eda T 'burayı da yayına aldım onaylandı' · 2sa 0dk GEÇMİŞ sonra onaylandı"
+      "notes": "Eda T 'burayı da yayına aldım onaylandı' · 2sa 0dk GEÇMİŞ sonra onaylandı",
+      "image_url": "app/gallery/10.jpg"
     },
     {
       "no": "11",
@@ -392,7 +393,8 @@
       "revision": 0,
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779282859178849",
-      "notes": "3sa erken teslim"
+      "notes": "3sa erken teslim",
+      "image_url": "app/gallery/11.jpg"
     },
     {
       "no": "12",
@@ -408,7 +410,8 @@
       "revision": 0,
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779282928074819",
-      "notes": "3sa erken teslim"
+      "notes": "3sa erken teslim",
+      "image_url": "app/gallery/12.jpg"
     },
     {
       "no": "13",
@@ -424,7 +427,8 @@
       "revision": 2,
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283006745819",
-      "notes": "slogan + fiyat revize ile tamamlandı · 3sa erken"
+      "notes": "slogan + fiyat revize ile tamamlandı · 3sa erken",
+      "image_url": "app/gallery/13.jpg"
     },
     {
       "no": "14",
@@ -440,7 +444,8 @@
       "revision": 0,
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283214343159",
-      "notes": "KRİTİK pencerede tam zamanında"
+      "notes": "KRİTİK pencerede tam zamanında",
+      "image_url": "app/gallery/14.jpg"
     },
     {
       "no": "18",
@@ -454,7 +459,8 @@
       "revision": 0,
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C03MCS7R0KB/p1779352449496569",
-      "notes": "İPTAL · DUPLICATE temizlendi"
+      "notes": "İPTAL · DUPLICATE temizlendi",
+      "image_url": "app/gallery/18.jpg"
     },
     {
       "no": "19",
@@ -468,7 +474,8 @@
       "revision": 0,
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C03MCS7R0KB/p1779352849311019",
-      "notes": "2sa 50dk erken teslim · Montserrat font"
+      "notes": "2sa 50dk erken teslim · Montserrat font",
+      "image_url": "app/gallery/19.jpg"
     },
     {
       "no": "23",
@@ -482,7 +489,8 @@
       "revision": 1,
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779450529976979",
-      "notes": "46dk GEÇMİŞ teslim · 1 revize"
+      "notes": "46dk GEÇMİŞ teslim · 1 revize",
+      "image_url": "app/gallery/23.jpg"
     }
   ],
   "bns_brands": [
@@ -701,39 +709,138 @@
     }
   },
   "bns_brand_stats": [
-    {"name": "Bauhaus", "active": 7},
-    {"name": "Beta", "active": 0},
-    {"name": "Cimporglobal", "active": 0},
-    {"name": "Cureffect", "active": 0},
-    {"name": "Egosport", "active": 0},
-    {"name": "Gürsoy", "active": 0},
-    {"name": "Hasvet", "active": 1},
-    {"name": "Hendex", "active": 0},
-    {"name": "JNJ", "active": 0},
-    {"name": "JNJ Acuvue ME", "active": 0},
-    {"name": "JNJ Vision TR", "active": 1},
-    {"name": "Jungleous", "active": 0},
-    {"name": "KMR Amos", "active": 0},
-    {"name": "KMR Copic", "active": 0},
-    {"name": "KMR Lamy", "active": 0},
-    {"name": "KMR Marshmallow", "active": 0},
-    {"name": "KMR Max", "active": 0},
-    {"name": "KMR Panfix", "active": 0},
-    {"name": "KMR Serve", "active": 1},
-    {"name": "Kuzeypet", "active": 0},
-    {"name": "KZY Bark", "active": 0},
-    {"name": "KZY Everclean", "active": 0},
-    {"name": "KZY Ferplast", "active": 0},
-    {"name": "KZY Flamingo", "active": 0},
-    {"name": "KZY Simple Solution", "active": 0},
-    {"name": "KZY Supreme", "active": 0},
-    {"name": "KZY Vet's Best", "active": 0},
-    {"name": "Marmara Holding", "active": 0},
-    {"name": "Muffik", "active": 0},
-    {"name": "Polisan", "active": 0},
-    {"name": "Splenda", "active": 1},
-    {"name": "Tour2America", "active": 1},
-    {"name": "VDM Petdent", "active": 4}
+    {
+      "name": "Bauhaus",
+      "active": 7
+    },
+    {
+      "name": "Beta",
+      "active": 0
+    },
+    {
+      "name": "Cimporglobal",
+      "active": 0
+    },
+    {
+      "name": "Cureffect",
+      "active": 0
+    },
+    {
+      "name": "Egosport",
+      "active": 0
+    },
+    {
+      "name": "Gürsoy",
+      "active": 0
+    },
+    {
+      "name": "Hasvet",
+      "active": 1
+    },
+    {
+      "name": "Hendex",
+      "active": 0
+    },
+    {
+      "name": "JNJ",
+      "active": 0
+    },
+    {
+      "name": "JNJ Acuvue ME",
+      "active": 0
+    },
+    {
+      "name": "JNJ Vision TR",
+      "active": 1
+    },
+    {
+      "name": "Jungleous",
+      "active": 0
+    },
+    {
+      "name": "KMR Amos",
+      "active": 0
+    },
+    {
+      "name": "KMR Copic",
+      "active": 0
+    },
+    {
+      "name": "KMR Lamy",
+      "active": 0
+    },
+    {
+      "name": "KMR Marshmallow",
+      "active": 0
+    },
+    {
+      "name": "KMR Max",
+      "active": 0
+    },
+    {
+      "name": "KMR Panfix",
+      "active": 0
+    },
+    {
+      "name": "KMR Serve",
+      "active": 1
+    },
+    {
+      "name": "Kuzeypet",
+      "active": 0
+    },
+    {
+      "name": "KZY Bark",
+      "active": 0
+    },
+    {
+      "name": "KZY Everclean",
+      "active": 0
+    },
+    {
+      "name": "KZY Ferplast",
+      "active": 0
+    },
+    {
+      "name": "KZY Flamingo",
+      "active": 0
+    },
+    {
+      "name": "KZY Simple Solution",
+      "active": 0
+    },
+    {
+      "name": "KZY Supreme",
+      "active": 0
+    },
+    {
+      "name": "KZY Vet's Best",
+      "active": 0
+    },
+    {
+      "name": "Marmara Holding",
+      "active": 0
+    },
+    {
+      "name": "Muffik",
+      "active": 0
+    },
+    {
+      "name": "Polisan",
+      "active": 0
+    },
+    {
+      "name": "Splenda",
+      "active": 1
+    },
+    {
+      "name": "Tour2America",
+      "active": 1
+    },
+    {
+      "name": "VDM Petdent",
+      "active": 4
+    }
   ],
   "priority_summary": {
     "red": 13,
