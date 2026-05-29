@@ -174,9 +174,18 @@ Her completed brief için (max son 12 brief):
     slack_read_thread(channel_id, ts) çağır
     Thread mesajlarında dosya eki ara:
       Tüm mesajlardaki files[] listesini topla
-      mimetype "image/*" olanları filtrele
-      → En SON yüklenen görseli al (son mesajdaki son dosya)
-      → image_url = file.url_private veya file.permalink
+      mimetype "image/*" (png, jpg, gif, webp) olanları filtrele — video atla
+      → En SON yüklenen görseli al (kronolojik sıraya göre)
+      
+      Görsel public URL üretimi:
+      1. Slack API'den file metadata'sını al (file.url_private_download)
+      2. curl veya wget ile görseli indir:
+         curl -H "Authorization: Bearer $SLACK_BOT_TOKEN" "{url_private_download}" -o \
+           ~/benseno-tasarim-sistemi/dashboard/app/gallery/{no}.jpg
+      3. ~/benseno-tasarim-sistemi/app/gallery/{no}.jpg konumuna da kopyala (rsync zaten yapar değil)
+      4. image_url = "app/gallery/{no}.jpg" (GitHub Pages'te public)
+
+  Görsel yoksa (sadece video veya dosya yok) → image_url = null
     Bulunmazsa → image_url = null
 ```
 
