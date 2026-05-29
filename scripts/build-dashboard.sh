@@ -56,3 +56,6 @@ cp "$PROJ/dashboard/index.html" "$PROJ/index.html"
 
 SIZE=$(du -sh "$APP/bundle.js" | cut -f1)
 echo "✅ bundle.js hazır ($SIZE) — dashboard/app/ ve app/ senkronize edildi"
+
+# Root index.html'i otomatik stage et (her build'de versiyon değişiyor)
+cd "$PROJ" && git add index.html 2>/dev/null || true
