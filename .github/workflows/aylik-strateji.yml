@@ -1,0 +1,26 @@
+name: Benseno Aylik Strateji
+
+on:
+  schedule:
+    - cron: '0 14 28 * *'
+  workflow_dispatch:
+
+jobs:
+  aylik-strateji:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install -g @anthropic-ai/claude-code
+      - name: Aylik Strateji calistir
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_APP_TOKEN: ${{ secrets.SLACK_APP_TOKEN }}
+          SLACK_USER_TOKEN: ${{ secrets.SLACK_USER_TOKEN }}
+          SLACK_TEAM_ID: ${{ secrets.SLACK_TEAM_ID }}
+          GITHUB_TOKEN: ${{ secrets.BENSENO_GITHUB_PAT }}
+        run: claude -p "Skill: benseno-aylik-strateji — run now" --dangerously-skip-permissions --print
