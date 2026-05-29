@@ -115,7 +115,11 @@ function KanbanCard({ brief, onClick }) {
         <BrandChip brand={brief.brand} size="sm"/>
         <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{brief.no}</span>
       </div>
-      <div style={{font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)"}}>{brief.baslik}</div>
+      <div style={{
+        font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)",
+        display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical",
+        overflow:"hidden", wordBreak:"break-word"
+      }}>{brief.baslik}</div>
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginTop: 2}}>
         {brief.priority && <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>}
         <span style={{display:"inline-flex"}}>
