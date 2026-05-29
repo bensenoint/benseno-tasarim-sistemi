@@ -94,9 +94,9 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
 
   return (
     <header style={{
-      height: 52,
+      height: isMobile ? 52 : 64,
       display: "flex", alignItems: "center", gap: isMobile ? 8 : 12,
-      padding: isMobile ? "0 12px" : "0 20px 0 16px",
+      padding: isMobile ? "0 12px" : "0 20px 0 20px",
       background: "var(--header-blur)",
       backdropFilter: "blur(20px) saturate(180%)",
       WebkitBackdropFilter: "blur(20px) saturate(180%)",
@@ -108,7 +108,7 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
       {/* Logo — mobil VE desktop header'da */}
       <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
         <img src="app/logo.png" alt="Benseno" style={{
-          height: isMobile ? 34 : 48, width: "auto", objectFit: "contain",
+          height: isMobile ? 36 : 58, width: "auto", objectFit: "contain",
           mixBlendMode: "multiply", flexShrink: 0,
         }}/>
       </a>
@@ -449,7 +449,7 @@ function Sidebar({ active, onChange, collapsed, onToggle, data, onOpenPalette })
     }}>
       {/* Logo area */}
       <div style={{
-        height: 52, flexShrink: 0,
+        height: 64, flexShrink: 0,
         display: "flex", alignItems: "center",
         padding: collapsed ? "0 14px" : "0 16px",
         borderBottom: "1px solid var(--line)",
