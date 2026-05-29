@@ -28,8 +28,6 @@ function JobsScreen({ data, user, viewMode, tableMode, onOpenBrief, onStatusChan
         subtitle="11 sütun · sırala · filtrele · drawer'da düzenle"
         actions={<>
           <Button kind="ghost" size="sm" icon={<I.Refresh size={13}/>}>Yenile</Button>
-          <Button kind="secondary" size="sm" icon={<I.Filter size={13}/>}>Filtreler</Button>
-          <Button kind="secondary" size="sm" icon={<I.Grid size={13}/>}>Sütunlar</Button>
         </>}
       />
 
