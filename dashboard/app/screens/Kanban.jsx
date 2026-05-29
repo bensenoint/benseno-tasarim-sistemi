@@ -88,7 +88,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
                   padding:"3px 6px", background:"var(--surface)", borderRadius: 4, border:"1px solid var(--line)"
                 }}>{items.length}</span>
               </div>
-              <div style={{display:"flex", flexDirection:"column", gap: 8, flex:1, overflowY:"auto", maxHeight: "60vh"}}>
+              <div style={{display:"flex", flexDirection:"column", gap: 8, flex:1, overflowY:"auto", overflowX:"hidden", maxHeight: "60vh", minWidth:0}}>
                 {items.map(b => <KanbanCard key={b.id} brief={b} onClick={() => onOpenBrief(b)}/>)}
                 {items.length === 0 && (
                   <div style={{padding: 20, textAlign:"center", color:"var(--ink-4)", font:"400 12px/1.4 var(--font-sans)"}}>
