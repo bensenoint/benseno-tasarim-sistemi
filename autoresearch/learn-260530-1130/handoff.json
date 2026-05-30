@@ -1,0 +1,11 @@
+{
+  "version": "2.1.0",
+  "source": "learn",
+  "timestamp": "2026-05-30T11:30:00+03:00",
+  "status": "COMPLETE",
+  "results_tsv": "autoresearch/learn-260530-1130/learn-results.tsv",
+  "findings": [],
+  "config": {"mode": "init", "scope": "tüm sistem", "depth": "comprehensive"},
+  "outputs": ["docs/MIMARI-VE-OPERASYON.md"],
+  "validation": "9/9 pass"
+}
