@@ -9,8 +9,15 @@ jobs:
   haftalik-retro:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+      - name: Git push yapilandirmasi
+        run: |
+          git config user.name "Benseno Bot"
+          git config user.email "bot@benseno.com.tr"
+          git remote set-url origin https://x-access-token:${{ secrets.BENSENO_GITHUB_PAT }}@github.com/bensenoint/benseno-tasarim-sistemi.git
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
