@@ -1,6 +1,6 @@
 {
-  "sync_ts": 1780051500,
-  "sync_iso": "2026-05-29T13:45:00+03:00",
+  "sync_ts": 1780055280,
+  "sync_iso": "2026-05-29T14:48:00+03:00",
   "run_type": "orchestrator_delta_refresh",
   "new_briefs": [],
   "completed_this_run": [],
@@ -13,50 +13,36 @@
   "calendar_events": [],
   "threshold_transitions": [
     {
-      "no": "8",
+      "no": "21",
       "marka": "VDM Petdent",
-      "is": "GA4 Analiz (Veri analizi · cross-dept)",
-      "deadline_iso": "2026-05-21T13:24:00+03:00",
-      "prev_g": 7,
-      "new_g": 8,
-      "transition_ts": 1780050240,
-      "transition_iso": "2026-05-29T13:24:00+03:00",
-      "minutes_ago": 21,
-      "atanan_ids": ["U09BFPBKQG7"],
-      "editor_ids": ["U0AP31SAA1W"],
+      "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
+      "deadline_iso": "2026-05-23T14:42:00+03:00",
+      "prev_g": 5,
+      "new_g": 6,
+      "transition_ts": 1780054920,
+      "transition_iso": "2026-05-29T14:42:00+03:00",
+      "minutes_ago": 6,
+      "atanan_ids": ["U4XCE3532", "U030C48PL23", "U0AP31SAA1W"],
+      "editor_ids": ["U030C48PL23"],
       "priority": "🔴",
-      "status": "🔴 Blokeli >72sa · 8g eşiği geçildi 21dk önce · dept ambiguity sürüyor · Arda dispatch sırada · Eren'den cross-dept",
+      "status": "🔴 Blokeli >72sa · 6g eşiği geçildi 6dk önce · 72sa AŞILDI 26May14:42 · Şablon 24+25+29 sent (29→Eren 26May14:46) · v1 yok",
       "dm_required": false,
-      "dm_skip_reason": "Brief zaten 🔴 Blokeli · dept ambiguity (Arda dispatch sürüyor · Eren'den geldi) · 4dk önce #5 de aynı 8g eşiğini aştı (batched alert pattern) · sabah raporunda kapsanmış · log only"
-    },
-    {
-      "no": "5",
-      "marka": "Bauhaus",
-      "is": "Broşür (Print · AI · Eren self-assign)",
-      "deadline_iso": "2026-05-21T13:42:00+03:00",
-      "prev_g": 7,
-      "new_g": 8,
-      "transition_ts": 1780051320,
-      "transition_iso": "2026-05-29T13:42:00+03:00",
-      "minutes_ago": 3,
-      "atanan_ids": ["U0AP31SAA1W"],
-      "editor_ids": ["U0AP31SAA1W"],
-      "priority": "🔴",
-      "status": "🔴 Blokeli >72sa · 8g eşiği geçildi 3dk önce · v1 yok · Eren self-assign · AI dept",
-      "dm_required": false,
-      "dm_skip_reason": "Brief zaten 🔴 Blokeli · Eren AI %125 kapasite (4 active brief) · 21dk önce #8 de 8g eşiği aştı · 3 imminent threshold gelecek 4sa içinde (#15, #21, #2/#1) · batched alert pattern → 14:00 sonrası tek özet daha yararlı · sabah raporunda kapsanmış · log only"
+      "dm_skip_reason": "Brief zaten 🔴 Blokeli (kategori en üstte) · 72sa AŞILDI 3 gün önce · Şablon 29 zaten Eren'e gönderilmiş 26May14:46 · sabah raporunda kapsanmış (28May ve 29May) · Eren+Cansu+Görkem zaten atanmış · log only · 14:15 sync'inde imminent olarak izlenen #21 transition'ı şimdi aşıldı · batched alert pattern devam"
     }
   ],
   "imminent_thresholds": [
-    {"no": "15", "marka": "Bauhaus", "is": "Bahçeniz / 30May (batch 6/7)", "g_threshold": 7, "transition_iso": "2026-05-29T14:00:00+03:00", "minutes_away": 15},
-    {"no": "21", "marka": "VDM Petdent", "is": "bahar video", "g_threshold": 6, "transition_iso": "2026-05-29T14:42:00+03:00", "minutes_away": 57},
-    {"no": "2", "marka": "Hasvet", "is": "Menteşe Cam Giydirme", "g_threshold": 8, "transition_iso": "2026-05-29T16:00:00+03:00", "minutes_away": 135},
-    {"no": "1", "marka": "JNJ Vision TR", "is": "24 Haziran Kontakt Lens Davetiyesi", "g_threshold": 11, "transition_iso": "2026-05-29T16:00:00+03:00", "minutes_away": 135},
-    {"no": "16", "marka": "Bauhaus", "is": "Banyo Şık (batch 7/7)", "g_threshold": 7, "transition_iso": "2026-05-29T17:00:00+03:00", "minutes_away": 195},
-    {"no": "6", "marka": "Bauhaus", "is": "20 Mayıs İçerik", "g_threshold": 9, "transition_iso": "2026-05-29T18:00:00+03:00", "minutes_away": 255},
-    {"no": "24", "marka": "Bauhaus", "is": "Bayrama Özel Dev Kampanya", "g_threshold": 7, "transition_iso": "2026-05-29T18:00:00+03:00", "minutes_away": 255},
-    {"no": "9", "marka": "VDM Petdent", "is": "Whatsapp (AI)", "g_threshold": 7, "transition_iso": "2026-05-29T23:59:00+03:00", "minutes_away": 614},
-    {"no": "4", "marka": "Bauhaus", "is": "mayıs kampanyası", "g_threshold": 9, "transition_iso": "2026-05-30T13:00:00+03:00", "minutes_away": 1395}
+    {"no": "2", "marka": "Hasvet", "is": "Menteşe Cam Giydirme", "g_threshold": 8, "transition_iso": "2026-05-29T16:00:00+03:00", "minutes_away": 72},
+    {"no": "1", "marka": "JNJ Vision TR", "is": "24 Haziran Kontakt Lens Davetiyesi", "g_threshold": 11, "transition_iso": "2026-05-29T16:00:00+03:00", "minutes_away": 72},
+    {"no": "16", "marka": "Bauhaus", "is": "Banyo Şık (batch 7/7)", "g_threshold": 7, "transition_iso": "2026-05-29T17:00:00+03:00", "minutes_away": 132},
+    {"no": "6", "marka": "Bauhaus", "is": "20 Mayıs İçerik", "g_threshold": 9, "transition_iso": "2026-05-29T18:00:00+03:00", "minutes_away": 192},
+    {"no": "24", "marka": "Bauhaus", "is": "Bayrama Özel Dev Kampanya", "g_threshold": 7, "transition_iso": "2026-05-29T18:00:00+03:00", "minutes_away": 192},
+    {"no": "9", "marka": "VDM Petdent", "is": "Whatsapp (AI)", "g_threshold": 7, "transition_iso": "2026-05-29T23:59:00+03:00", "minutes_away": 551},
+    {"no": "17", "marka": "VDM Petdent", "is": "Yeni bayram postu", "g_threshold": 8, "transition_iso": "2026-05-30T08:46:00+03:00", "minutes_away": 1078},
+    {"no": "4", "marka": "Bauhaus", "is": "mayıs kampanyası", "g_threshold": 9, "transition_iso": "2026-05-30T13:00:00+03:00", "minutes_away": 1332},
+    {"no": "8", "marka": "VDM Petdent", "is": "GA4 Analiz", "g_threshold": 9, "transition_iso": "2026-05-30T13:24:00+03:00", "minutes_away": 1356},
+    {"no": "5", "marka": "Bauhaus", "is": "Broşür (AI)", "g_threshold": 9, "transition_iso": "2026-05-30T13:42:00+03:00", "minutes_away": 1374},
+    {"no": "15", "marka": "Bauhaus", "is": "Bahçeniz / 30May", "g_threshold": 8, "transition_iso": "2026-05-30T14:00:00+03:00", "minutes_away": 1392},
+    {"no": "21", "marka": "VDM Petdent", "is": "bahar video", "g_threshold": 7, "transition_iso": "2026-05-30T14:42:00+03:00", "minutes_away": 1434}
   ],
   "imminent_deadlines": [
     {
@@ -64,13 +50,13 @@
       "marka": "Tour2America",
       "is": "bayram içeriği",
       "deadline_iso": "2026-06-01T12:31:00+03:00",
-      "kalan_dk": 4126,
+      "kalan_dk": 4063,
       "priority": "🟡",
-      "note": "2g 22sa 46dk · 🟡 Normal (72sa eşiği 1sa 14dk önce AŞILDI · 24sa eşiği 31May12:31 ~1g 22sa 46dk uzakta)"
+      "note": "2g 21sa 43dk · 🟡 Normal (72sa eşiği 2sa 17dk önce AŞILDI · 24sa eşiği 31May12:31 ~1g 21sa 43dk uzakta)"
     }
   ],
   "after_hours": false,
   "startup_recovery": false,
-  "downtime_note": "30dk önceki :15 sync'ten sonra :45 mesai içi delta refresh · 0 yeni brief / 0 tamamlanma · 2 yeni threshold AŞILMASI (#8 VDM Petdent GA4 8g 13:24 TR 21dk önce, #5 Bauhaus Broşür AI 8g 13:42 TR 3dk önce) · 2 yakın threshold gelecek 1sa içinde (#15 7g@14:00 15dk, #21 6g@14:42 57dk)",
-  "dm_skip_reason": "Delta refresh (:45 · mesai içi · Cuma) · 0 yeni brief · 2 threshold transition (#8 ve #5 7g→8g) ikisi de log-only (zaten 🔴 Blokeli · dept ambiguity ve Eren AI kapasite kritik · batched alert pattern · sabah raporunda kapsanmış) · 2 imminent threshold 1sa içinde (#15, #21) → 14:15 sync'inde değerlendirilecek · marka_stats silent_log_only mode (active_from 2026-06-01)"
+  "downtime_note": "33dk önceki :15 sync'ten sonra :45-ish (14:48 TR) mesai içi delta refresh · 0 yeni brief / 0 tamamlanma · 1 yeni threshold AŞILMASI (#21 VDM Petdent bahar video 6g 14:42 TR 6dk önce) · 2 yakın threshold gelecek 1sa 12dk içinde (#2 Hasvet 8g + #1 JNJ Vision 11g @16:00)",
+  "dm_skip_reason": "Delta refresh (:48 · mesai içi · Cuma 14:48) · 0 yeni brief · 1 threshold transition (#21 5g→6g) log-only (zaten 🔴 Blokeli · 72sa AŞILDI 3 gün önce · Şablon 29 zaten gönderilmiş 26May14:46 · sabah raporunda kapsanmış · Eren+Cansu+Görkem atanmış) · 2 imminent threshold gelecek 1sa 12dk içinde (#2 8g + #1 11g @16:00) → 15:15 / 15:45 sync'lerinde izlenecek · marka_stats silent_log_only mode (active_from 2026-06-01 · ~2g 9sa 12dk kaldı)"
 }

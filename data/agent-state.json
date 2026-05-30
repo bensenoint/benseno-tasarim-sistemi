@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-05-29T13:15:00+03:00",
-  "last_run_ts": 1780049700,
+  "last_run": "2026-05-29T13:45:00+03:00",
+  "last_run_ts": 1780051500,
   "run_type": "orchestrator_delta_refresh",
   "data_agent": "ok",
   "notification_agent": "ok",
@@ -18,68 +18,79 @@
   "new_briefs_this_run": 0,
   "completed_this_run": 0,
   "dm_sent": 0,
-  "dm_skipped_idempotent": 1,
+  "dm_skipped_idempotent": 2,
   "canvas_updated": true,
-  "canvas_update_reason": "30dk önceki :45 sync sonrası :15 mesai içi delta refresh · +30dk recalc + #4 Bauhaus 7g→8g 13:00 TR threshold AŞILDI (15dk önce)",
-  "threshold_transitions_this_run": 1,
+  "canvas_update_reason": "30dk önceki :15 sync sonrası :45 mesai içi delta refresh · +30dk recalc + 2 yeni threshold AŞILDI (#8 VDM Petdent GA4 7g→8g 13:24 TR 21dk önce + #5 Bauhaus Broşür AI 7g→8g 13:42 TR 3dk önce)",
+  "threshold_transitions_this_run": 2,
   "threshold_transitions_detail": [
     {
-      "no": "4",
-      "marka": "Bauhaus",
-      "is": "mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "no": "8",
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (cross-dept)",
       "prev_g": 7,
       "new_g": 8,
-      "transition_iso": "2026-05-29T13:00:00+03:00",
-      "minutes_ago": 15,
+      "transition_iso": "2026-05-29T13:24:00+03:00",
+      "minutes_ago": 21,
       "dm_sent": false,
-      "reason": "8g eşiği 15dk önce geçildi · 🔴 Blokeli zaten · tasarımcı atanmamış (İpek dispatch > Görkem sorumluluğunda) · sabah raporunda kapsanmış · 4 imminent threshold 1.5sa içinde · batched alert :45 sync'inde"
+      "reason": "8g eşiği 21dk önce geçildi · 🔴 Blokeli zaten · dept ambiguity (Arda dispatch sürüyor · Eren'den cross-dept) · sabah raporunda kapsanmış · batched alert pattern (#5 ile birlikte) · log only"
+    },
+    {
+      "no": "5",
+      "marka": "Bauhaus",
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "prev_g": 7,
+      "new_g": 8,
+      "transition_iso": "2026-05-29T13:42:00+03:00",
+      "minutes_ago": 3,
+      "dm_sent": false,
+      "reason": "8g eşiği 3dk önce geçildi · 🔴 Blokeli zaten · Eren AI %125 kapasite · 3 imminent threshold gelecek 4sa içinde · batched alert pattern · sabah raporunda kapsanmış · log only"
     }
   ],
-  "github_commit": "beccbb0",
+  "github_commit": "3eafa80",
   "github_push": "ok",
   "imminent_deadline": {
     "no": "20",
     "marka": "Tour2America",
     "deadline_iso": "2026-06-01T12:31:00+03:00",
-    "kalan_dk": 4276,
+    "kalan_dk": 4126,
     "priority": "🟡",
-    "note": "2g 23sa 16dk · 🟡 Normal (72sa eşiği AŞILDI · 44dk önce · 24sa eşiği 31May12:31)"
+    "note": "2g 22sa 46dk · 🟡 Normal (72sa eşiği AŞILDI · 1sa 14dk önce · 24sa eşiği 31May12:31)"
   },
   "next_thresholds_anticipated": [
-    {
-      "no": "8",
-      "marka": "VDM Petdent",
-      "g_threshold": 8,
-      "transition_iso": "2026-05-29T13:24:00+03:00",
-      "minutes_away": 9
-    },
-    {
-      "no": "5",
-      "marka": "Bauhaus",
-      "g_threshold": 8,
-      "transition_iso": "2026-05-29T13:42:00+03:00",
-      "minutes_away": 27
-    },
     {
       "no": "15",
       "marka": "Bauhaus",
       "g_threshold": 7,
       "transition_iso": "2026-05-29T14:00:00+03:00",
-      "minutes_away": 45
+      "minutes_away": 15
     },
     {
       "no": "21",
       "marka": "VDM Petdent",
       "g_threshold": 6,
       "transition_iso": "2026-05-29T14:42:00+03:00",
-      "minutes_away": 87
+      "minutes_away": 57
     },
     {
       "no": "2",
       "marka": "Hasvet",
       "g_threshold": 8,
       "transition_iso": "2026-05-29T16:00:00+03:00",
-      "minutes_away": 165
+      "minutes_away": 135
+    },
+    {
+      "no": "1",
+      "marka": "JNJ Vision TR",
+      "g_threshold": 11,
+      "transition_iso": "2026-05-29T16:00:00+03:00",
+      "minutes_away": 135
+    },
+    {
+      "no": "16",
+      "marka": "Bauhaus",
+      "g_threshold": 7,
+      "transition_iso": "2026-05-29T17:00:00+03:00",
+      "minutes_away": 195
     }
   ],
   "pat_status": {
@@ -91,10 +102,10 @@
   "marka_stats_mode": "silent_log_only",
   "marka_stats_active_from": "2026-06-01T00:00:00+03:00",
   "errors": [],
-  "notes": "Cuma öğle :15 delta refresh (13:15 TR) · 30dk önceki :45 sync sonrası mesai içi cycle · 0 yeni brief / 0 tamamlanma · **1 threshold transition log-only**: (1) #4 Bauhaus 7g→8g 13:00 TR (15dk önce · tasarımcı atanmamış · İpek/Görkem sorumluluğunda · zaten 🔴 Blokeli · sabah raporunda kapsanmış) · 5 imminent threshold gelecek 1.5sa içinde: #8 8g@13:24 (9dk), #5 8g@13:42 (27dk), #15 7g@14:00 (45dk), #21 6g@14:42 (87dk), #2 8g@16:00 (165dk) · 13 GEÇMİŞ değişmedi · GitHub push OK beccbb0 · Sonraki sync :45 (13:45 TR · 30dk)",
+  "notes": "Cuma öğle :45 delta refresh (13:45 TR) · 30dk önceki :15 sync sonrası mesai içi cycle · 0 yeni brief / 0 tamamlanma · **2 threshold transition log-only**: (1) #8 VDM Petdent GA4 7g→8g 13:24 TR (21dk önce · dept ambiguity · Arda dispatch · Eren'den cross-dept · zaten 🔴 Blokeli), (2) #5 Bauhaus Broşür AI 7g→8g 13:42 TR (3dk önce · Eren self-assign · v1 yok · zaten 🔴 Blokeli) · 5 imminent threshold gelecek 3sa 15dk içinde: #15 7g@14:00 (15dk), #21 6g@14:42 (57dk), #2 8g + #1 11g@16:00 (135dk), #16 7g@17:00 (195dk) · 13 GEÇMİŞ değişmedi · GitHub push OK 3eafa80 · Sonraki sync :15 (14:15 TR · 30dk)",
   "history": [
     {
-      "ts": 1779893859,
+      "ts": 1779864420,
       "date": "2026-05-27",
       "active": 16,
       "overdue": 13,
@@ -112,7 +123,7 @@
       "ok": true
     },
     {
-      "ts": 1780049700,
+      "ts": 1780051500,
       "date": "2026-05-29",
       "active": 16,
       "overdue": 13,
