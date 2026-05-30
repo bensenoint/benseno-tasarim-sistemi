@@ -168,3 +168,42 @@ Tüm gönderimler tamamlandıktan sonra dosyayı kaydet.
 ```
 Notification Agent OK · DM:{N} · Thread:{N} · Calendar:{N} · Atlandı(idempotent):{N}
 ```
+
+---
+
+## GITHUB ACTIONS ORTAMI — Slack curl fallback (v1.1)
+
+**Tetikleyici:** `$GITHUB_ACTIONS` == `"true"`. Slack MCP YOK — `mcp__slack__*` çağırma, curl kullan. Token: `$SLACK_BOT_TOKEN`. HALT ETME.
+
+### DM gönder (slack_send_message / DM yerine)
+`chat.postMessage`'da `channel` alanına doğrudan USER_ID ver — Slack otomatik IM açar:
+```bash
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"channel":"{USER_ID}","text":"{MESAJ}"}'
+```
+Yanıtta `"ok":true` → gönderildi. `"ok":false` ise `error` alanını logla.
+
+### Kanal mesajı (#benseno-grafik)
+```bash
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"channel":"C4Y43AW2E","text":"{MESAJ}"}'
+```
+(Not: `#benseno-grafik` kanal ID'sini `conversations.list` ile doğrula; gerekirse güncelle.)
+
+### Thread cevabı
+```bash
+curl -s -X POST "https://slack.com/api/chat.postMessage" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"channel":"{CHANNEL_ID}","thread_ts":"{TS}","text":"{MESAJ}"}'
+```
+
+### Calendar event (Google MCP yerine) — ATLA
+Actions'ta Google MCP yok. Calendar event oluşturmayı atla, log'a yaz: `Calendar: skipped (headless)`. (Calendar entegrasyonu Mac'te kalır.)
+
+### İdempotentlik
+`notifications-sent.json` Actions'ta repo'dan gelir (commit'liyse) — aynı DM ikinci kez gönderme kontrolü çalışır. Gönderim sonrası dosyayı güncelle + push akışına dahil et.

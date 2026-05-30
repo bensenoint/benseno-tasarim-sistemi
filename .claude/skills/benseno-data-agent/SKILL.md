@@ -267,3 +267,44 @@ Format: workflow={N} manuel={F} · Dept: ilk_satır={A} heuristic={B} belirsiz={
 UTC→TR: {N} · Öncelik: 🔴={A} 🟠={B} 🟡={C} 🟢={D} · Override: {N}
 Geçmiş: yeni={N} teyitli={C} · Saat_eksik={N} · E3: mode={X} sapma={N}
 ```
+
+---
+
+## GITHUB ACTIONS ORTAMI — Slack curl fallback (v1.1)
+
+**Tetikleyici:** `$GITHUB_ACTIONS` == `"true"` (Actions runner). Bu modda Slack MCP sunucusu YOK — `mcp__slack__*` tool'ları çağırma, aşağıdaki curl eşdeğerlerini kullan. Token: `$SLACK_BOT_TOKEN` (env). HALT ETME — curl ile devam et.
+
+### Canvas OKU (slack_read_canvas yerine)
+```bash
+URL=$(curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  "https://slack.com/api/files.info?file=F0B1B6XUD44" \
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['file']['url_private'])")
+curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" "$URL" > /tmp/canvas.html
+```
+Dönen içerik **quip HTML** (markdown değil). İçinde 2 `<table>` var:
+- 1. tablo = Aktif brief'ler, sütunlar: `Marka | İş | Öncelik | Saat (TR) | Atanan | Durum`
+- 2. tablo = Tamamlananlar
+`<tr>`/`<td>` satırlarını parse et. Footer'daki `LAST_SYNC_TS` değerini de HTML'den çıkar. (HTML entity'leri decode et: `&amp;`→`&` vb.)
+
+### Yeni brief tespiti (slack_search_public yerine)
+Önce `brief-queue.json` oku (Mac slack-bot doluysa). Queue boşsa veya Mac kapalıysa, her `#marka-*` kanalında:
+```bash
+curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  "https://slack.com/api/conversations.history?channel={CHANNEL_ID}&oldest={LAST_SYNC_TS}&limit=30"
+```
+Kanal ID → marka mapping için channel listesini al: `conversations.list?types=public_channel,private_channel&limit=200`
+
+### Thread oku (slack_read_thread yerine)
+```bash
+curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  "https://slack.com/api/conversations.replies?channel={CHANNEL_ID}&ts={TS}&limit=50"
+```
+
+### Canvas GÜNCELLE (slack_update_canvas yerine) — ATLA
+**Actions modunda Canvas'a geri-yazma YAPMA.** Format dönüşümü riski (HTML↔markdown) ve production Canvas bozma riski nedeniyle headless'ta atlanır. Bunun yerine:
+- live-data.json'u güncelle + push et (asıl dashboard kaynağı budur)
+- Log'a yaz: `Canvas write-back: skipped (headless mode)`
+- Auto-öncelik recalc + reaction override'lar live-data.json'a YANSIR (dashboard doğru), sadece Slack Canvas etiketleri güncellenmez (kozmetik, Mac açılınca senkronlanır)
+
+### Git push (Actions'ta workflow zaten PAT remote'u ayarladı)
+`git push origin main` — remote zaten BENSENO_GITHUB_PAT ile yapılandırılmış (workflow git config step). PAT dosyası (`data/.github-pat-sistem`) Actions'ta YOK, okumaya çalışma.
