@@ -310,5 +310,11 @@ curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
 - Log'a yaz: `Canvas write-back: skipped (headless mode) · last_sync_ts→{unix} (agent-state.json)`
 - Auto-öncelik recalc + reaction override'lar live-data.json'a YANSIR (dashboard doğru), sadece Slack Canvas etiketleri güncellenmez (kozmetik, Mac açılınca senkronlanır)
 
-### Git push (Actions'ta workflow zaten PAT remote'u ayarladı)
-`git push origin main` — remote zaten BENSENO_GITHUB_PAT ile yapılandırılmış (workflow git config step). PAT dosyası (`data/.github-pat-sistem`) Actions'ta YOK, okumaya çalışma.
+### Git push — orchestrator akışında PUSH ETME
+**Orchestrator tarafından çağrıldığında (normal durum) burada `git push` YAPMA.** Sonda Dashboard Agent tüm değişiklikleri (live-data.json + index.html + data/ state dosyaları) tek seferde konsolide edip rebase+retry ile push eder. Burada ayrıca push etmek tek run'da çift push = gereksiz yarış yüzeyi yaratır. Değişiklikleri working tree'de bırak, devam et.
+
+Sadece data-agent **tek başına** (orchestrator olmadan) çalıştırıldıysa push gerekir:
+```bash
+git pull --rebase origin main && git push origin main || { git pull --rebase origin main && git push origin main; }
+```
+(remote zaten BENSENO_GITHUB_PAT ile yapılandırılmış — workflow git config step. PAT dosyası `data/.github-pat-sistem` Actions'ta YOK, okumaya çalışma.)

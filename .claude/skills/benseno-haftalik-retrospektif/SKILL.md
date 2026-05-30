@@ -118,9 +118,15 @@ _{toplam_kişi} kişi bu hafta {toplam_brief} brief tamamladı. Harika iş! 🎉
    - `brands` objesi yeniden yazılır.
    - **Mode kontrolü:** Eğer `config.current_mode == "silent_log_only"` AND `now >= config.active_from (2026-06-01)` ise `current_mode = "active"` olarak güncelle.
 
-5. **GitHub'a push:**
-   - Local marka_stats.json'ı `~/benseno-tasarim-sistemi/github-prep/dashboard/marka_stats.json` dosyasına kopyala
-   - `cd github-prep/dashboard && git add marka_stats.json && git commit -m "v7.13 weekly marka_stats refresh ({tarih})" && git push origin main`
+5. **GitHub'a push (ANA REPO):**
+   - `data/marka_stats.json`'ı güncelle (yukarıdaki `brands` + mode değişikliğiyle).
+   - `github-prep/dashboard` KULLANMA — o eski/terk edilmiş `bensenoint/dashboard` reposu, bulutta yok (gitignored) + canlı sistem değil. Push ana repodan yapılır:
+   ```bash
+   cd ~/benseno-tasarim-sistemi
+   git add data/marka_stats.json
+   git commit -m "v7.13 weekly marka_stats refresh ({tarih})"
+   git pull --rebase origin main && git push origin main || { git pull --rebase origin main && git push origin main; }
+   ```
    - Hata durumunda Görkem'e DM
 
 6. **Cansu Direktör'e özet DM:**
