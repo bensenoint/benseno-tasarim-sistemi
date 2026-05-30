@@ -277,7 +277,7 @@ function App() {
                             Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode}
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
                                        onOpenBrief={onOpenBrief} onSwitchTab={setTab} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
-  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} tableMode={t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
+  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} tableMode={isMobile && t.tableMode === "table" ? "cards" : t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
