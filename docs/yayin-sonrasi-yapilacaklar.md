@@ -7,7 +7,7 @@
 
 ## ✅ DÜZELTİLDİ (2. debug — 31 May, yayın öncesi) — pazartesi doğrula
 
-### 0. Headless watermark donması + state commit eksikliği (H12 + H17)
+### 0. Headless watermark + state commit + push yarışı (H12 + H17 + H18)
 - **Bulgu H12:** `data-agent` watermark'ı (LAST_SYNC_TS) yalnızca Canvas footer'ından okuyordu. Headless modda Canvas write-back atlandığı için watermark bulutta **donuyordu** → kanal >mesaj-eşiği birikince eski brief'ler sessizce düşer.
 - **Bulgu H17 (kademeli):** Tek bulut push'u (dashboard-agent) dar `git add` kullanıyordu → `data/agent-state.json` ve `data/notifications-sent.json` **commit edilmiyordu** → hem watermark hem DM-dedup state'i her run kayboluyordu (çift DM riski).
 - **Yapılan düzeltmeler:**
@@ -15,6 +15,7 @@
   2. `conversations.history` `limit=30 → limit=100` + `next_cursor` pagination ZORUNLU.
   3. `dashboard-agent` push kapsamı genişletildi: `data/agent-state.json data/notifications-sent.json data/marka_stats.json data/brief-queue.json data/notification-flags.json` eklendi.
   4. `agent-state.json` bootstrap `last_sync_ts=1780053300` ile seed edildi.
+  5. **H18 — push yarışı:** dashboard-agent push'a `git pull --rebase origin main` + 3x retry eklendi. Rebase yoktu → run sırasında main'e düşen commit push'u reddediyordu → run kaybı + çift DM. (4 skill main'e push ediyor, çakışma kaçınılmazdı.)
 - **Pazartesi doğrulama:** İlk orchestrator run'ından sonra `agent-state.json`'daki `last_sync_ts`'in **ilerlediğini** ve commit'lendiğini kontrol et (Benseno Bot commit diff'inde `data/agent-state.json` görünmeli). 5 yöneticiye/16 kişiye **çift DM gitmediğini** doğrula.
 
 ---
