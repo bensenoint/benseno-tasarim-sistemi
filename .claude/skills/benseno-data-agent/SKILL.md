@@ -315,6 +315,9 @@ curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
 
 Sadece data-agent **tek başına** (orchestrator olmadan) çalıştırıldıysa push gerekir:
 ```bash
-git pull --rebase origin main && git push origin main || { git pull --rebase origin main && git push origin main; }
+for i in 1 2 3; do
+  if git pull --rebase -X theirs origin main && git push origin main; then break; fi
+  git rebase --abort 2>/dev/null || true; sleep 3
+done
 ```
 (remote zaten BENSENO_GITHUB_PAT ile yapılandırılmış — workflow git config step. PAT dosyası `data/.github-pat-sistem` Actions'ta YOK, okumaya çalışma.)

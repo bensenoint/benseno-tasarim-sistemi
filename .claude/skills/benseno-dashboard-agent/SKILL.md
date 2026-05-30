@@ -69,8 +69,11 @@ git commit -m "Dashboard Agent sync {timestamp}"
 # Push yarışı koruması: run sırasında main'e başka commit düşmüş olabilir.
 # Rebase + retry yoksa non-fast-forward reddedilir → tüm run kaybolur (+ çift DM).
 for i in 1 2 3; do
-  git pull --rebase origin main && git push origin main && break
-  echo "push retry $i (non-fast-forward) — rebase tekrar"
+  # -X theirs: rebase conflict'inde bizim taze ürettiğimiz dosyalar kazanır
+  # (live-data.json/index.html her run tam yeniden üretildiği için bizimki otoritedir).
+  if git pull --rebase -X theirs origin main && git push origin main; then break; fi
+  git rebase --abort 2>/dev/null || true
+  echo "push retry $i (non-fast-forward/conflict) — rebase tekrar"
   sleep 3
 done
 ```

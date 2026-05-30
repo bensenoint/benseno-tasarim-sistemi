@@ -125,7 +125,10 @@ _{toplam_kişi} kişi bu hafta {toplam_brief} brief tamamladı. Harika iş! 🎉
    cd ~/benseno-tasarim-sistemi
    git add data/marka_stats.json
    git commit -m "v7.13 weekly marka_stats refresh ({tarih})"
-   git pull --rebase origin main && git push origin main || { git pull --rebase origin main && git push origin main; }
+   for i in 1 2 3; do
+     if git pull --rebase -X theirs origin main && git push origin main; then break; fi
+     git rebase --abort 2>/dev/null || true; sleep 3
+   done
    ```
    - Hata durumunda Görkem'e DM
 
