@@ -14,3 +14,7 @@ iteration	timestamp	hypothesis	status	technique	evidence	file_line
 12	2026-05-30 10:48	Push auth fix dogrulandi (permissions+PAT remote+identity)	confirmed	hypothesis-test	Benseno Bot push basarili	.github/workflows/
 13	2026-05-30 11:00	3 mudahil job daha (startup-recovery/watchdog/gunluk-ozet) yerel state okuyup DM atiyor	confirmed	trace	run-startup-recovery.sh:65 orchestrator force + watchdog.sh:61 false-alarm DM	scripts/
 14	2026-05-30 11:00	launchctl unload reboot-safe degil, plist tasima gerekti	confirmed	pattern	LaunchAgents reboot login load eder	~/Library/LaunchAgents/benseno-disabled/
+15	2026-05-30 11:15	15 ekran tamami render OK sifir JS hatasi (canli veri+headless)	disproven	hypothesis-test	Playwright 15/15 render OK totalErrors:0	DOGRULANDI
+16	2026-05-30 11:15	Department(x3)+Profil ~1250px alti ic layout tasma (minWidth:0 eksik)	confirmed	differential	section main+268px sagtan; page+0 (sayfa kaymiyor); kullanici 1440de gorunmez	Department.jsx,Profile.jsx
+17	2026-05-30 11:15	Dark mode calisiyor kontrast iyi	disproven	hypothesis-test	bg 15,15,18 text 241,239,233 ~18:1 render OK	H-darkmode
+18	2026-05-30 11:15	History ekrani mock activity gosteriyor (gercek degil)	confirmed	trace	data.activity data.js:215 mock hep tanimli live override yok	History.jsx:32
