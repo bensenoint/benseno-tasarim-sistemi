@@ -7,7 +7,7 @@
 
 ## ✅ DÜZELTİLDİ (2. debug — 31 May, yayın öncesi) — pazartesi doğrula
 
-### 0. Headless watermark + state commit + push yarışı (H12 + H17 + H18)
+### 0. Headless watermark + state commit + push robustluğu (H12 + H17 + H18 + H23 + H24 + H25)
 - **Bulgu H12:** `data-agent` watermark'ı (LAST_SYNC_TS) yalnızca Canvas footer'ından okuyordu. Headless modda Canvas write-back atlandığı için watermark bulutta **donuyordu** → kanal >mesaj-eşiği birikince eski brief'ler sessizce düşer.
 - **Bulgu H17 (kademeli):** Tek bulut push'u (dashboard-agent) dar `git add` kullanıyordu → `data/agent-state.json` ve `data/notifications-sent.json` **commit edilmiyordu** → hem watermark hem DM-dedup state'i her run kayboluyordu (çift DM riski).
 - **Yapılan düzeltmeler:**
@@ -15,8 +15,11 @@
   2. `conversations.history` `limit=30 → limit=100` + `next_cursor` pagination ZORUNLU.
   3. `dashboard-agent` push kapsamı genişletildi: `data/agent-state.json data/notifications-sent.json data/marka_stats.json data/brief-queue.json data/notification-flags.json` eklendi.
   4. `agent-state.json` bootstrap `last_sync_ts=1780053300` ile seed edildi.
-  5. **H18 — push yarışı:** dashboard-agent push'a `git pull --rebase origin main` + 3x retry eklendi. Rebase yoktu → run sırasında main'e düşen commit push'u reddediyordu → run kaybı + çift DM. (4 skill main'e push ediyor, çakışma kaçınılmazdı.)
-- **Pazartesi doğrulama:** İlk orchestrator run'ından sonra `agent-state.json`'daki `last_sync_ts`'in **ilerlediğini** ve commit'lendiğini kontrol et (Benseno Bot commit diff'inde `data/agent-state.json` görünmeli). 5 yöneticiye/16 kişiye **çift DM gitmediğini** doğrula.
+  5. **H18 — push yarışı:** dashboard-agent push'a `git pull --rebase` + 3x retry eklendi. Rebase yoktu → run sırasında main'e düşen commit push'u reddediyordu → run kaybı + çift DM. (4 skill main'e push ediyor, çakışma kaçınılmazdı.)
+  6. **H23 — çift push:** data-agent orchestrator akışında artık push ETMEZ (dashboard-agent sonda konsolide eder); tek run'da iki push = gereksiz yarış yüzeyi kaldırıldı. data-agent standalone push'una rebase+retry eklendi.
+  7. **H24 — ölü repo push:** haftalik-retro `github-prep/dashboard` (terk edilmiş `bensenoint/dashboard` reposu, bulutta gitignored=yok) yerine ana repo `data/marka_stats.json` yolundan push ediyor. (Ek: o repoya yazma yetkili açıktaki PAT iptal + temizlendi — bkz. güvenlik.)
+  8. **H25 — rebase conflict sağlamlaştırma:** 3 push noktası da `git pull --rebase -X theirs` (generated dosyalarda bizim taze üretimimiz kazanır) + `git rebase --abort` temizliği + 3x döngü. Salt `--rebase`, `live-data.json`/`index.html` satır çakışmasında abort edip asılı kalıyordu → push hiç olmazdı.
+- **Pazartesi doğrulama:** İlk orchestrator run'ından sonra `agent-state.json`'daki `last_sync_ts`'in **ilerlediğini** ve commit'lendiğini kontrol et (Benseno Bot commit diff'inde `data/agent-state.json` görünmeli). 5 yöneticiye/16 kişiye **çift DM gitmediğini** doğrula. Push commit'inin tek seferde (data-agent ayrı push yok) geldiğini teyit et.
 
 ---
 
@@ -83,6 +86,7 @@
 
 ### 8. marka_stats E3 aktivasyonu (1 Haziran 2026)
 - `silent_log_only` → `active` otomatik geçiş. İlk gün marka davranış uyarılarının (yetersiz/anormal süre) doğru DM gönderdiğini izle.
+- **Bulut persist doğrulandı (H19):** Geçiş `data/marka_stats.json` + `agent-state.json` mode alanına yazılıyor; bu dosyalar H17 fix'iyle push kapsamına alındı → mode değişikliği bulutta **kalıcı olur** (fix öncesi her run yeniden flip eder, "active" hiç persist olmazdı). İlk aktivasyon sonrası commit'te mode değişikliğinin push edildiğini teyit et.
 
 ### 9. Pazartesi ilk gerçek scheduled run izleme
 - **07:50** sabah raporu → 5 yönetici DM geldi mi?
