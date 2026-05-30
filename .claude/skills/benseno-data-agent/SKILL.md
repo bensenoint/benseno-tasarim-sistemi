@@ -77,7 +77,9 @@ U030C48PL23 Görkem · UD96GH76E Reyhan · U4XCE3532 Cansu · U055EDESLSE İpek 
 `canvas_cache.md` dosyasını kontrol et:
 - Varsa ve <30dk ise → cache'den oku, `slack_read_canvas` ÇAĞIRMA
 - Yoksa veya >30dk ise → `slack_read_canvas(F0B1B6XUD44)` çağır, cache'i güncelle
-- `LAST_SYNC_TS`'yi canvas footer'dan oku
+- `LAST_SYNC_TS`'yi oku — **kaynak önceliği:**
+  1. **Headless (Actions) modda:** `data/agent-state.json` → `last_sync_ts` alanı varsa ONU kullan (bulutta ilerleyen tracked watermark; Canvas write-back atlandığı için Canvas footer'ı bulutta donar). Yoksa Canvas footer'a düş.
+  2. **Mac modda:** Canvas footer'dan oku (mevcut davranış).
 
 ### 2. Yeni Brief'leri Ara — Queue Öncelikli
 
@@ -290,8 +292,9 @@ Dönen içerik **quip HTML** (markdown değil). İçinde 2 `<table>` var:
 Önce `brief-queue.json` oku (Mac slack-bot doluysa). Queue boşsa veya Mac kapalıysa, her `#marka-*` kanalında:
 ```bash
 curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
-  "https://slack.com/api/conversations.history?channel={CHANNEL_ID}&oldest={LAST_SYNC_TS}&limit=30"
+  "https://slack.com/api/conversations.history?channel={CHANNEL_ID}&oldest={LAST_SYNC_TS}&limit=100"
 ```
+**Pagination ZORUNLU:** Yanıtta `response_metadata.next_cursor` doluysa, boşalana dek `&cursor={next_cursor}` ile devam çek. `limit=100` tek sayfada yetmezse (donmuş watermark + Mac uzun kapalıyken kanal birikir) brief kaybını önler.
 Kanal ID → marka mapping için channel listesini al: `conversations.list?types=public_channel,private_channel&limit=200`
 
 ### Thread oku (slack_read_thread yerine)
@@ -303,7 +306,8 @@ curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
 ### Canvas GÜNCELLE (slack_update_canvas yerine) — ATLA
 **Actions modunda Canvas'a geri-yazma YAPMA.** Format dönüşümü riski (HTML↔markdown) ve production Canvas bozma riski nedeniyle headless'ta atlanır. Bunun yerine:
 - live-data.json'u güncelle + push et (asıl dashboard kaynağı budur)
-- Log'a yaz: `Canvas write-back: skipped (headless mode)`
+- **WATERMARK PERSIST (ZORUNLU):** Canvas'a yazmadığın için, bu run'da gördüğün **en yeni brief mesajının `ts`'ini** (yoksa şu anki unix zamanı) `data/agent-state.json` → `last_sync_ts` alanına yaz + commit et. Sonraki headless run bunu okuyup ilerletir. **Bu adım atlanırsa watermark bulutta donar → kanal >100 mesaj birikince brief sessizce kaybolur.** agent-state.json'un diğer alanlarını koru (oku→merge→yaz).
+- Log'a yaz: `Canvas write-back: skipped (headless mode) · last_sync_ts→{unix} (agent-state.json)`
 - Auto-öncelik recalc + reaction override'lar live-data.json'a YANSIR (dashboard doğru), sadece Slack Canvas etiketleri güncellenmez (kozmetik, Mac açılınca senkronlanır)
 
 ### Git push (Actions'ta workflow zaten PAT remote'u ayarladı)

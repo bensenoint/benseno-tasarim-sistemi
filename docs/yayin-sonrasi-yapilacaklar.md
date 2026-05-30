@@ -5,6 +5,20 @@
 
 ---
 
+## ✅ DÜZELTİLDİ (2. debug — 31 May, yayın öncesi) — pazartesi doğrula
+
+### 0. Headless watermark donması + state commit eksikliği (H12 + H17)
+- **Bulgu H12:** `data-agent` watermark'ı (LAST_SYNC_TS) yalnızca Canvas footer'ından okuyordu. Headless modda Canvas write-back atlandığı için watermark bulutta **donuyordu** → kanal >mesaj-eşiği birikince eski brief'ler sessizce düşer.
+- **Bulgu H17 (kademeli):** Tek bulut push'u (dashboard-agent) dar `git add` kullanıyordu → `data/agent-state.json` ve `data/notifications-sent.json` **commit edilmiyordu** → hem watermark hem DM-dedup state'i her run kayboluyordu (çift DM riski).
+- **Yapılan düzeltmeler:**
+  1. `data-agent` SKILL: headless modda watermark'ı `agent-state.json → last_sync_ts`'ten oku (Canvas fallback), her run en yeni brief ts'iyle ilerlet + persist (ZORUNLU adım olarak işaretlendi).
+  2. `conversations.history` `limit=30 → limit=100` + `next_cursor` pagination ZORUNLU.
+  3. `dashboard-agent` push kapsamı genişletildi: `data/agent-state.json data/notifications-sent.json data/marka_stats.json data/brief-queue.json data/notification-flags.json` eklendi.
+  4. `agent-state.json` bootstrap `last_sync_ts=1780053300` ile seed edildi.
+- **Pazartesi doğrulama:** İlk orchestrator run'ından sonra `agent-state.json`'daki `last_sync_ts`'in **ilerlediğini** ve commit'lendiğini kontrol et (Benseno Bot commit diff'inde `data/agent-state.json` görünmeli). 5 yöneticiye/16 kişiye **çift DM gitmediğini** doğrula.
+
+---
+
 ## 🟡 Minör Düzeltmeler (yayın engellemez)
 
 ### 1. Department + Profil ekranlarında iç layout taşması
@@ -28,6 +42,13 @@
 - **Durum:** Socket Mode bot (slash command, reaction override, brief formu) Mac'te `com.benseno.slack-bot` olarak çalışıyor. Mac kapalıyken bu özellikler çalışmaz.
 - **Etki:** Mac kapalıyken: orchestrator (curl ile kanal okur) brief'leri yine yakalar, ama gerçek-zamanlı slash/reaction/form çalışmaz.
 - **Fix:** `scripts/slack-bot.js`'i Railway/Fly.io container'ına deploy et (~$5-7/ay). Token'lar host secret'larına.
+
+#### 3a. Blokeli + escalation DM'leri Mac kapalıyken gitmiyor (2. debug bulgusu H9)
+- **Bulgu:** "Blokeli" brief uyarıları ve kademeli escalation DM'leri yalnızca `benseno-brief-sync` (Mac/Socket-Mode) skill'inde tanımlı. Bulut orchestrator'ın `notification-agent`'ı `data/notification-flags.json` şemasında `blokeli` flag'i taşımıyor — dolayısıyla Mac kapalıyken bu DM'ler hiç gönderilmez.
+- **Etki:** Sınırlı — blokeli brief'ler dashboard'da **Blokeli kolonunda görünmeye devam ediyor**; sadece proaktif DM kayboluyor (yalnızca Mac kapalıyken).
+- **Dedup dosyaları:** `data/blokeli-notified.json` + `data/escalation-log.json` gitignore'da → bu zaten brief-sync'in Mac-lokal idempotency deposu, bulutta gelmiyor (bulutta brief-sync çalışmadığı için sorun değil).
+- **Fix (Railway taşımasıyla birlikte):** ya brief-sync'i de always-on host'ta çalıştır, ya da data-agent'a `blokeli` flag üretimi + notification-agent'a blokeli DM şablonu ekle (+ dedup deposunu `notifications-sent.json` gibi tracked yap).
+- **Risk:** Orta — yeni flag + agent değişikliği; izole test gerekir.
 
 ### 4. Canvas geri-yazma (headless)
 - **Durum:** Headless modda data-agent Canvas'a geri yazmıyor (güvenli karar — format dönüşümü + bozma riski). Dashboard live-data.json'dan güncel; Slack Canvas otomatik öncelik etiketlerini güncellemiyor.

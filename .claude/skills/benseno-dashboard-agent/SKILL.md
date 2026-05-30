@@ -62,7 +62,9 @@ rsync -a --delete dashboard/app/ app/
 ### 4. GitHub Push
 ```bash
 cd ~/benseno-tasarim-sistemi
-git add dashboard/index.html dashboard/app/live-data.json index.html app/
+git add dashboard/index.html dashboard/app/live-data.json index.html app/ \
+  data/agent-state.json data/notifications-sent.json data/marka_stats.json \
+  data/brief-queue.json data/notification-flags.json
 git commit -m "Dashboard Agent sync {timestamp}"
 git push origin main
 ```
