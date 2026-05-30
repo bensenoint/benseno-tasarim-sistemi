@@ -1,0 +1,15 @@
+{
+  "version": "2.1.0",
+  "source": "debug",
+  "timestamp": "2026-05-30T11:00:00+03:00",
+  "status": "COMPLETE",
+  "results_tsv": "autoresearch/debug-260530-0915/results.tsv",
+  "findings": [
+    {"id": 1, "severity": "critical", "title": "launchd duplikasyon (7 job)", "file_line": "benseno-disabled/", "status": "fixed"},
+    {"id": 2, "severity": "critical", "title": "Actions push edemiyor (auth)", "file_line": ".github/workflows/", "status": "fixed+verified"},
+    {"id": 3, "severity": "high", "title": "git commit identity yok", "file_line": ".github/workflows/", "status": "fixed"},
+    {"id": 4, "severity": "critical", "title": "headless Canvas okuma yok", "file_line": "benseno-data-agent/SKILL.md", "status": "fixed+verified"},
+    {"id": 5, "severity": "high", "title": "3 mudahil launchd job", "file_line": "scripts/", "status": "fixed"}
+  ],
+  "config": {"scope": "tüm sistem", "symptom": "Pazartesi yayın öncesi denetim", "depth": "deep", "action": "ask-each"}
+}

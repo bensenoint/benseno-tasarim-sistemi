@@ -1,0 +1,16 @@
+# metric_direction: higher_is_better
+iteration	timestamp	hypothesis	status	technique	evidence	file_line
+1	2026-05-30 09:16	Mac launchd jobs hala aktif, GitHub Actions ile cakisiyor	confirmed	differential	launchctl 10 job yuklu + Auto commit launchd kaynakli	scripts/run-sabah-raporu.sh:44
+2	2026-05-30 09:16	sabah-raporu launchd Weekday 2-6 (Sali-Cmt) yanlis, 1-5 olmali	confirmed	differential	plist Weekday 2,3,4,5,6 = Tue-Sat	com.benseno.sabah-raporu.plist
+3	2026-05-30 09:18	Actions push edemiyor: PAT dosyasi gitignore+yok, token read-only, permissions yok	confirmed	trace	CLAUDE.md:130 PAT dosyadan + repo default read + workflow permissions yok	.github/workflows/orchestrator.yml
+4	2026-05-30 09:19	Workflow git commit identity yok	confirmed	pattern	user.name/email tanimsiz	.github/workflows/orchestrator.yml
+5	2026-05-30 09:19	sabah-raporu TZ guard dogru (TZ=Europe/Istanbul)	disproven	trace	skill satir 295 TR saati kullaniyor	benseno-gunluk-performans/SKILL.md:295
+6	2026-05-30 09:19	Gizli dosya git sizintisi (guvenlik)	disproven	pattern	hicbir token commit edilmemis	H11
+7	2026-05-30 09:19	Slack bot token gecerli	disproven	trace	auth.test ok	H20
+8	2026-05-30 09:40	Orchestrator Actions Canvas okuyamiyor: data-agent MCP bagimli, curl fallback yok	confirmed	trace	orchestrator log: Slack MCP+token yok; data-agent SKILL.md curl yok	benseno-data-agent/SKILL.md
+9	2026-05-30 09:40	Headless Canvas okuma curl ile mumkun (files.info+url_private)	confirmed	hypothesis-test	url_private quip-canvas-content tam icerik dondu	H24b
+10	2026-05-30 09:40	sabah-raporu headless calisiyor (kendi curl fallbacki var)	disproven	differential	dun test run tam rapor uretti+DM gonderdi	benseno-gunluk-performans/SKILL.md:263
+11	2026-05-30 10:48	Headless orchestrator tam calisiyor: curl read + push (Benseno Bot commit)	confirmed	hypothesis-test	2 Benseno Bot commit + log: Canvas read+pushed 2dc7e13	DOGRULANDI
+12	2026-05-30 10:48	Push auth fix dogrulandi (permissions+PAT remote+identity)	confirmed	hypothesis-test	Benseno Bot push basarili	.github/workflows/
+13	2026-05-30 11:00	3 mudahil job daha (startup-recovery/watchdog/gunluk-ozet) yerel state okuyup DM atiyor	confirmed	trace	run-startup-recovery.sh:65 orchestrator force + watchdog.sh:61 false-alarm DM	scripts/
+14	2026-05-30 11:00	launchctl unload reboot-safe degil, plist tasima gerekti	confirmed	pattern	LaunchAgents reboot login load eder	~/Library/LaunchAgents/benseno-disabled/
