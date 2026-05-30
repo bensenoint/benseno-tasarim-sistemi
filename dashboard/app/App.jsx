@@ -303,19 +303,21 @@ function App() {
         onNewBrief={() => setNewBrief(true)}
         defaultUsers={Object.assign([...data.USERS], { onPick: (u) => setUser(u) })}
       />
-      <div style={{display:"grid", gridTemplateColumns:`${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
-        <Sidebar
-          active={tab} onChange={setTab}
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(v => !v)}
-          data={liveData}
-          onOpenPalette={() => setPalette(true)}
-        />
+      <div style={{display:"grid", gridTemplateColumns: isMobile ? "1fr" : `${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
+        {!isMobile && (
+          <Sidebar
+            active={tab} onChange={setTab}
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed(v => !v)}
+            data={liveData}
+            onOpenPalette={() => setPalette(true)}
+          />
+        )}
         <main key={tab + t.overviewLayout} style={{
           flex: 1, overflowY: "auto", overflowX: "hidden", minWidth: 0,
           background: "var(--paper)",
         }}>
-          <div className="bns-main-content" style={{maxWidth: 1400, margin: "0 auto", padding: "8px 32px 72px"}}>
+          <div className="bns-main-content" style={{maxWidth: 1400, margin: "0 auto", padding: isMobile ? "8px 14px 88px" : "8px 32px 72px"}}>
             {Screen}
           </div>
           {(
