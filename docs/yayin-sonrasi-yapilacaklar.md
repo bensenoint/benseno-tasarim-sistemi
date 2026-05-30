@@ -72,6 +72,12 @@
 - Workflow-scope PAT 28 Haziran 2026'da dolar. Takvime hatırlatma.
 - data PAT (`data/.github-pat-sistem`) 78 gün kaldı.
 
+### 6b. Classic PAT'lerde expiration yok (güvenlik hijyeni)
+- **Bulgu:** `benseno-workflow` (repo+workflow) ve `benseno-sistem-full` (repo) classic token'larının **ikisinde de expiration date yok** → sızarsa sonsuza dek geçerli.
+- **Etki:** `check-pat-expiry.sh` `-sistem`'i izliyor ama token süresizse o izleme anlamsız (hiç uyarı tetiklenmez).
+- **Fix:** İkisine de expiration ekle (yeni token üret + secret/`-sistem` dosyasını güncelle), veya net bir rotasyon takvimi koy. Süre eklenince `.github-pat-created` + check-pat-expiry yeniden anlamlı olur.
+- **Doğrulandı (31 May):** Her iki token aktif, Actions secret `BENSENO_GITHUB_PAT` push için çalışıyor (Benseno Bot commit'leri kanıt). Silme YOK — sadece expiration ekle.
+
 ### 7. Node.js 24 deprecation (16 Haziran 2026)
 - `actions/checkout@v4` + `setup-node@v4` Node 20 uyarısı veriyor. 16 Haziran'dan sonra otomatik Node 24. Sorun çıkarsa action versiyonlarını güncelle.
 
