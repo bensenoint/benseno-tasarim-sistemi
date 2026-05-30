@@ -66,7 +66,13 @@ git add dashboard/index.html dashboard/app/live-data.json index.html app/ \
   data/agent-state.json data/notifications-sent.json data/marka_stats.json \
   data/brief-queue.json data/notification-flags.json
 git commit -m "Dashboard Agent sync {timestamp}"
-git push origin main
+# Push yarışı koruması: run sırasında main'e başka commit düşmüş olabilir.
+# Rebase + retry yoksa non-fast-forward reddedilir → tüm run kaybolur (+ çift DM).
+for i in 1 2 3; do
+  git pull --rebase origin main && git push origin main && break
+  echo "push retry $i (non-fast-forward) — rebase tekrar"
+  sleep 3
+done
 ```
 
 PAT: `data/.github-pat-sistem` dosyasından oku.
