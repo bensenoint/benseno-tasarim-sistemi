@@ -394,7 +394,9 @@ Sistem departmanı tespit edemezse erdem'e (Editör Yöneticisi) DM gönderir:
 ### 5.1 Erişim
 
 **URL:** https://bensenoint.github.io/benseno-tasarim-sistemi/  
-**Şifre:** İpek'ten (Tasarım Yöneticisi) alınır
+**Şifre:** İlk açılışta bir **giriş ekranı** çıkar; ekip ortak şifresi İpek'ten (Tasarım Yöneticisi) alınır. Doğru şifre girince sekme açık kaldığı sürece tekrar sorulmaz (sekme kapanınca yeniden ister).
+
+> ℹ️ Bu giriş ekranı kazara erişime karşı caydırıcıdır. (Güçlü/sunucu-tarafı koruma için Cloudflare Access yayın-sonrası değerlendirilebilir.)
 
 ### 5.2 Giriş ve Görünüm Seçimi
 
@@ -415,6 +417,13 @@ Dashboard her **30 saniyede bir** otomatik güncellenir. Sağ üstteki **"Canlı
 - **⌘K** (macOS) veya **Ctrl+K** (Windows) tuşlarıyla Command Palette açılır
 - Brief adı, marka adı veya kişi adı ile arama yapılabilir
 - Genel Bakış ekranında **Filtrele** butonu ile departman ve öncelik filtresi uygulanabilir
+
+### 5.5 Mobil Kullanım
+
+Dashboard telefonda da tam çalışır:
+- Sol sidebar gizlenir; navigasyon **alttaki tab bar**'dan yapılır (Özet · İşler · Kanban · Profil · Menü)
+- **Aktif İşler** ekranı telefonda otomatik **kart görünümüne** geçer (geniş tablo yerine okunabilir kartlar)
+- KPI kartları 2 sütun olarak dizilir
 
 ---
 
@@ -438,6 +447,8 @@ Dashboard'da 14 farklı ekran bulunmaktadır. Soldaki sidebar'dan veya mobil'de 
 | Onay Bekleyen | İncelemede (👀) durumundaki brief'ler |
 | Hareketsiz | 3+ gün güncelleme olmayan brief'ler |
 | Kapasite | Ekip ortalama kapasite doluluk oranı |
+
+> 🖱️ **KPI kartları tıklanabilir.** Bir karta tıklayınca ilgili filtreli görünüme atlar: **Geciken** → Aktif İşler (geciken filtresi), **Onay Bekleyen** → Aktif İşler (inceleme), **Kapasite** → Departman Karşılaştırma, diğerleri → Aktif İşler.
 
 Her KPI kartında soldan renkli çizgi, alt trend oku ve sparkline grafiği bulunur:
 - **↑ Yeşil:** Olumlu artış
@@ -716,7 +727,9 @@ Bkz. Bölüm 7.4.
 
 ---
 
-### 8.4 Günlük Sistem Özeti — Her Hafta İçi 17:00
+### 8.4 Günlük Sistem Özeti — Her Hafta İçi 17:00 *(şu an DEVRE DIŞI)*
+
+> ⚠️ Bu rapor bulut göçünde devre dışı bırakıldı (Mac launchd kapalı, GitHub Actions karşılığı henüz yok). Yayın-sonrası eklenmesi planlanıyor. Aşağıdaki içerik hedeflenen kapsamdır.
 
 Yöneticilere (öncelikli Görkem'e) kısa sistem sağlığı DM'i:
 - Kaç orchestrator run yapıldı
@@ -764,23 +777,25 @@ Her iş günü sabah **09:30'da** yeni ekip üyesine DM gönderilir:
 
 ## 10. Sistem Çalışma Takvimi
 
-### 10.1 Günlük Çalışma Saatleri
+### 10.1 Mimari — Bulut + Mac (Hibrit)
 
-Sistem yalnızca **hafta içi (Pazartesi–Cuma) 08:00–18:00** saatleri arasında aktiftir.
+Sistem **iki katmanda** çalışır:
 
-- Hafta sonu: Sistem uyku modunda
-- Saat 08:00 öncesi / 18:00 sonrası: Brief açılabilir ama sistem bunu ancak mesai başlangıcında işler
+- **☁️ Bulut (GitHub Actions):** Zamanlanmış tüm işler (brief tarama, raporlar, dashboard güncelleme) GitHub'ın sunucularında cron ile çalışır. **Mac kapalı olsa bile çalışır.**
+- **💻 Mac (launchd):** Yalnızca **gerçek-zamanlı Slack Bot** (slash komut, reaction override, brief formu) Mac'te çalışır. Mac kapalıyken bu özellikler beklemede kalır; ama brief'ler bulut tarafından yine yakalanır (kanal taraması).
 
-### 10.2 Orchestrator Çalışma Zamanları
+> Çalışma saatleri **hafta içi (Pzt–Cuma)**. Orchestrator TR saatiyle **08:15–16:45** arası her saat :15 ve :45'te çalışır. Hafta sonu zamanlanmış iş yok.
 
-| Zaman | İşlem |
-|-------|-------|
-| Her dakika | launchd kontrol (mesai saati mi?) |
-| **Her :15 ve :45** | Orchestrator çalışır (brief tarama, canvas güncelleme, bildirim, dashboard) |
-| **07:50 hafta içi** | Sabah raporu |
-| **Cuma 17:00** | Haftalık retrospektif |
-| **Ay sonu son iş günü 17:00** | Aylık stratejik özet |
-| **17:00 hafta içi** | Günlük sistem özeti |
+### 10.2 Bulut Çalışma Zamanları (GitHub Actions)
+
+| Zaman (TR) | İşlem | Workflow |
+|------------|-------|----------|
+| **Hft içi :15 ve :45 (08:15–16:45)** | Orchestrator (brief tarama, bildirim, dashboard) | `orchestrator.yml` |
+| **07:50 hafta içi** | Sabah raporu | `sabah-raporu.yml` |
+| **Cuma 17:00** | Haftalık retrospektif | `haftalik-retro.yml` |
+| **Ay sonu 17:00** | Aylık stratejik özet | `aylik-strateji.yml` |
+
+> ℹ️ **"Günlük Sistem Özeti" (eski 17:00 DM) şu an çalışmıyor** — bulut göçünde devre dışı bırakıldı, henüz Actions karşılığı yok (yayın-sonrası ele alınacak).
 
 ### 10.3 Orchestrator Adımları (Her :15/:45)
 
@@ -815,9 +830,11 @@ Her 30 dakikada bir sistem şu adımları sırayla tamamlar:
 5. GitHub PAT süresi kontrol (80+ gün → uyarı DM)
 ```
 
-### 10.4 Lockfile Sistemi
+### 10.4 Eşzamanlılık Koruması
 
-Bir orchestrator çalışması devam ederken yenisi başlamaz (`/tmp/benseno-orchestrator.lock`). Eğer önceki run takılı kalmışsa lock dosyası temizlenerek yenisi başlatılır.
+Bir orchestrator çalışması devam ederken yenisi başlamaz — GitHub Actions `concurrency` grubu (`benseno-orchestrator`, `cancel-in-progress: false`) bunu garanti eder. (Eski Mac-yerleşik sürümde `/tmp/benseno-orchestrator.lock` kullanılıyordu; bulutta artık gerek yok.)
+
+> **Not (bulut özel davranış):** Headless bulut modunda data-agent Slack Canvas'a **geri yazmaz** (format bozma riski) — dashboard yine güncel kalır (`live-data.json` üzerinden), sadece Slack Canvas'taki öncelik etiketleri Mac açılınca senkronlanır.
 
 ---
 
@@ -977,16 +994,26 @@ tail -f logs/slack-bot.log
 
 ---
 
-### 12.3 launchd Job'ları
+### 12.3 Zamanlama — Bulut (GitHub Actions) + Mac (launchd)
 
-| Job | Tetiklenme | Komut |
-|-----|-----------|-------|
-| `com.benseno.orchestrator` | Her dakika, :15/:45 check | `run-orchestrator.sh` |
-| `com.benseno.sabah-raporu` | Hft içi 07:50 | `run-sabah-raporu.sh` |
-| `com.benseno.haftalik` | Cuma 17:00 | `run-haftalik.sh` |
-| `com.benseno.aylik` | Her gün 17:05 (script tarih kontrol eder) | `run-aylik.sh` |
-| `com.benseno.gunluk-ozet` | Hft içi 17:00 | `run-gunluk-ozet.sh` |
-| `com.benseno.slack-bot` | Boot'ta başlar, crash'te yeniden başlar | `run-slack-bot.sh` |
+**☁️ GitHub Actions workflow'ları** (`.github/workflows/`) — Mac kapalıyken de çalışır. Cron UTC'dir; TR = UTC+3.
+
+| Workflow | Cron (UTC) | TR karşılığı |
+|----------|-----------|--------------|
+| `orchestrator.yml` | `15,45 5-13 * * 1-5` | Hft içi 08:15–16:45, :15/:45 |
+| `sabah-raporu.yml` | `50 4 * * 1-5` | Hft içi 07:50 |
+| `haftalik-retro.yml` | `0 14 * * 5` | Cuma 17:00 |
+| `aylik-strateji.yml` | `0 14 28 * *` | Ayın 28'i 17:00 |
+
+**💻 Mac launchd job'ları** (yalnız aşağıdakiler aktif):
+
+| Job | Tetiklenme | Rol |
+|-----|-----------|-----|
+| `com.benseno.slack-bot` | Boot + crash-restart | Gerçek-zamanlı Slack Bot (Socket Mode) |
+| `com.benseno.pat-check` | Günlük | PAT süre kontrolü |
+| `com.benseno.log-temizle` | Haftalık | Log temizliği |
+
+> Eski zamanlama job'ları (`orchestrator`, `sabah-raporu`, `haftalik-retro`, `aylik-strateji`, `gunluk-ozet`, `startup-recovery`, `watchdog`) bulut göçünde **devre dışı** bırakıldı → `~/Library/LaunchAgents/benseno-disabled/`. Mac + bulut'un aynı anda çalışıp çift-işlem yapmaması için.
 
 ---
 
