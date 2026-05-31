@@ -6,6 +6,7 @@
 
 ## İçindekiler
 
+0. [⚡ Hızlı Başlangıç](#-hızlı-başlangıç)
 1. [Sisteme Genel Bakış](#1-sisteme-genel-bakış)
 2. [Slack — Brief Açma](#2-slack--brief-açma)
 3. [Slack — Brief Takibi (Reaction Sistemi)](#3-slack--brief-takibi-reaction-sistemi)
@@ -18,6 +19,30 @@
 10. [Sistem Çalışma Takvimi](#10-sistem-çalışma-takvimi)
 11. [Sık Sorulan Sorular ve Sorun Giderme](#11-sık-sorulan-sorular-ve-sorun-giderme)
 12. [Teknik Referans (Yönetici/Teknik)](#12-teknik-referans-yöneticitəknik)
+13. [Terim Sözlüğü](#13-terim-sözlüğü)
+
+---
+
+## ⚡ Hızlı Başlangıç
+
+Kılavuzun tamamını okumadan başlamak için rolüne göre 3 madde:
+
+**🎨 Tasarımcıysan:**
+1. Sana atanan brief'in **ana mesajına** 🎨 ekle → işe başladın. Sununca 👀, onaylanınca ✅.
+2. Reaction'ı **thread'e değil parent mesaja** ekle (yoksa işlenmez).
+3. İşlerini Dashboard → **Aktif İşler** veya **Profil** ekranından takip et.
+
+**✍️ Editörsen:**
+1. Marka kanalında **"Yeni Brief Aç"** formuyla brief aç (marka, deadline, atanan, tip zorunlu).
+2. Aynı gün teslimlerde **saat** gir; geçmiş tarih bilerekse thread'e `teyit` yaz.
+3. Teslim gelince onayla; gerekiyorsa 🔒 ile kapat.
+
+**👔 Yöneticiysen:**
+1. Her sabah **07:50 DM raporunu** oku — "Bugün senin için 3 aksiyon" bölümüne bak.
+2. Önceliği değiştirmek için brief'in parent'ına 🔴🟠🟡🟢 ekle (anlık işlenir).
+3. Dashboard → **Yönetici** ekranı + KPI kartlarına tıklayarak ilgili listelere atla.
+
+> Şifre İpek'ten. Dashboard: https://bensenoint.github.io/benseno-tasarim-sistemi/
 
 ---
 
@@ -25,7 +50,7 @@
 
 ### Benseno Tasarım Sistemi Nedir?
 
-Benseno Tasarım Sistemi; 16 kişilik dijital ajans ekibinin 39 marka için ürettiği tasarım ve içerik işlerini Slack üzerinden takip eden, otomatik önceliklendiren, raporlayan ve dashboard'da görselleştiren bir iş akışı platformudur.
+Benseno Tasarım Sistemi; 16 kişilik dijital ajans ekibinin 33 marka için ürettiği tasarım ve içerik işlerini Slack üzerinden takip eden, otomatik önceliklendiren, raporlayan ve dashboard'da görselleştiren bir iş akışı platformudur.
 
 ### Sistem Neyi Yapar?
 
@@ -213,6 +238,18 @@ Sıralı akışta: birinci kişi işi bitirince sistem otomatik olarak sıradaki
 ## 3. Slack — Brief Takibi (Reaction Sistemi)
 
 Sistem tüm brief durumunu Slack **reaction'ları** üzerinden takip eder. Reaction'lar **her zaman brief'in PARENT mesajına** (ana mesaja) eklenmelidir; thread içine eklenen reaction'lar işlenmez.
+
+### Brief Yaşam Döngüsü
+
+```mermaid
+flowchart LR
+    A[Brief açıldı<br/>Yeni] -->|🎨| B[Çalışılıyor]
+    B -->|👀| C[İncelemede]
+    C -->|revizyon: 🎨| B
+    C -->|✅| D[Tamamlandı]
+    A -.->|🔒 force-close| D
+    D -.->|♻️ reopen| A
+```
 
 ### 3.1 Tasarımcı Reaction Akışı
 
@@ -669,7 +706,7 @@ Görkem/Cansu bunları kontrol ederek ya teyit eder ya da brief'i düzeltilmesi 
 ### 7.6 E3 — Marka Davranış Kıyaslaması
 
 **E3 Nedir?**  
-Benseno'nun 39 markası için geçmiş veriden öğrenilen "bu marka için normal deadline ne kadar?" sorusunu yanıtlayan istatistik sistemidir.
+Benseno'nun 33 markası için geçmiş veriden öğrenilen "bu marka için normal deadline ne kadar?" sorusunu yanıtlayan istatistik sistemidir.
 
 **Nasıl Çalışır?**
 - Her brief açıldığında o markanın geçmiş brief'lerinden hesaplanan medyan deadline süresiyle karşılaştırılır
@@ -758,7 +795,7 @@ Her iş günü sabah **09:30'da** yeni ekip üyesine DM gönderilir:
 | Gün | Konu |
 |-----|------|
 | **Gün 1** | Hoşgeldin & Sistem Turu — Canvas, Dashboard, Marka Kitabı, Lessons Learned |
-| **Gün 2** | Marka Kitabı Turu — 39 markanın özelliklerini öğren |
+| **Gün 2** | Marka Kitabı Turu — 33 markanın özelliklerini öğren |
 | **Gün 3** | İlk Egzersiz Brief — İpek atar, düşük baskılı pratik iş |
 | **Gün 4** | İlk Gerçek Brief + Phase 7 özellikleri (Smart Assign, Thread Özet, Revizyon Tahmini) |
 | **Gün 5** | Geri bildirim toplantısı (14:00, Cansu + İpek), tam üyelik |
@@ -768,7 +805,7 @@ Her iş günü sabah **09:30'da** yeni ekip üyesine DM gönderilir:
 | Kaynak | Ne İçin |
 |--------|---------|
 | Ana Canvas (F0B1B6XUD44) | Tüm aktif brief'ler |
-| Marka Kitabı Canvas | 39 markanın logo/font/renk/ton bilgileri |
+| Marka Kitabı Canvas | 33 markanın logo/font/renk/ton bilgileri |
 | Lessons Learned Canvas | Önceki tasarımcıların çıkardığı dersler |
 | Templates Canvas | Hazır şablonlar (Instagram, banner, vb.) |
 | Dashboard | Canlı iş takip panosu |
@@ -1068,6 +1105,28 @@ Canvas güncellemeleri yanlış yapılırsa veri bozulur. Kesinlikle uyulması g
 3. Canvas güncelleme her zaman **full replace** — kısmi güncelleme yoktur
 4. **Değişiklik yoksa canvas güncelleme ÇAĞIRMA** (idempotent kontrol)
 5. Aktif İşler tablosu **13 sütun**, Tamamlananlar **14 sütun** — karıştırma
+
+---
+
+## 13. Terim Sözlüğü
+
+| Terim | Anlamı |
+|-------|--------|
+| **Brief** | Bir markaya yapılacak tasarım/içerik işinin Slack'te açılan iş emri |
+| **Parse** | Sistemin brief mesajını okuyup marka/deadline/atanan/öncelik alanlarına ayırması |
+| **Orchestrator** | Her :15/:45'te çalışan ana otomasyon; data→bildirim→dashboard adımlarını sırayla yürütür |
+| **Canvas** | Slack'teki ana iş takip tablosu (aktif + tamamlanan brief'ler) |
+| **Reaction override** | Yöneticinin brief'e 🔴🟠🟡🟢 ekleyerek önceliği anlık değiştirmesi |
+| **Force-close (🔒)** | Eksik ✅'li veya tamamlanamayan brief'i zorla kapatma |
+| **Smart Assign** | `@auto` ile en uygun tasarımcıyı öneren motor (marka uzmanlığı + iş yükü + streak + memnuniyet) |
+| **Streak** | Bir kişinin üst üste günlerde zamanında teslim zinciri |
+| **E3** | Markanın geçmiş verisinden "normal deadline ne kadar?" kıyası yapan istatistik sistemi |
+| **SLA** | Hizmet süresi taahhüdü; deadline'a uyma performansı |
+| **OOO** | "Out of Office" — izin/tatil/raporlu; SLA süresini durdurur (WFH durdurmaz) |
+| **Stale / Hareketsiz** | 3+ gündür güncellenmeyen brief |
+| **Blokeli** | İlerlemesi engellenmiş (>72sa geçmiş veya engelli) brief |
+| **Soft gate** | Dashboard giriş şifre ekranı — UI'ı gizler (sunucu-tarafı koruma değil) |
+| **Headless** | Bulutta (GitHub Actions) ekran/MCP olmadan çalışan mod; Canvas'a geri yazmaz |
 
 ---
 
