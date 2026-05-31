@@ -1,7 +1,9 @@
 // app/screens/Jobs.jsx — Aktif İşler tab. Supports table / kanban / cards view.
 
-function JobsScreen({ data, user, viewMode, tableMode, onOpenBrief, onStatusChange }) {
-  const [scope, setScope] = React.useState("all");
+function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief, onStatusChange }) {
+  const [scope, setScope] = React.useState(initialScope || "all");
+  // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle
+  React.useEffect(() => { if (initialScope) setScope(initialScope); }, [initialScope]);
   const [search, setSearch] = React.useState("");
   const [prioFilter, setPrioFilter] = React.useState("all");
 

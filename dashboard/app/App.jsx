@@ -19,6 +19,8 @@ function App() {
   // App state
   const [user, setUser] = React.useState(data.ME);
   const [tab, setTab] = React.useState("overview");
+  const [jobsScope, setJobsScope] = React.useState("all"); // Overview KPI → Jobs deep-link filtresi
+  const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
   const isMobile = window.useIsMobile ? window.useIsMobile() : false;
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [viewMode, setViewMode] = React.useState(t.defaultView);
@@ -276,8 +278,8 @@ function App() {
   if (tab === "overview" || tab === "manager")
                             Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode}
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
-                                       onOpenBrief={onOpenBrief} onSwitchTab={setTab} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
-  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} tableMode={isMobile && t.tableMode === "table" ? "cards" : t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
+                                       onOpenBrief={onOpenBrief} onSwitchTab={setTab} onJumpJobs={jumpToJobs} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
+  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} initialScope={jobsScope} tableMode={isMobile && t.tableMode === "table" ? "cards" : t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
