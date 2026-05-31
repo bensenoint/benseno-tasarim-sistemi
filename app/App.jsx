@@ -19,6 +19,10 @@ function App() {
   // App state
   const [user, setUser] = React.useState(data.ME);
   const [tab, setTab] = React.useState("overview");
+  const [jobsScope, setJobsScope] = React.useState("all"); // Overview KPI → Jobs deep-link filtresi
+  const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
+  // Normal navigasyon (sidebar/alt-nav/buton): Jobs'a giderken KPI deep-link filtresini sıfırla
+  const navTo = (id) => { if (id === "jobs") setJobsScope("all"); setTab(id); };
   const isMobile = window.useIsMobile ? window.useIsMobile() : false;
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [viewMode, setViewMode] = React.useState(t.defaultView);
@@ -276,8 +280,8 @@ function App() {
   if (tab === "overview" || tab === "manager")
                             Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode}
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
-                                       onOpenBrief={onOpenBrief} onSwitchTab={setTab} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
-  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} tableMode={t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
+                                       onOpenBrief={onOpenBrief} onSwitchTab={navTo} onJumpJobs={jumpToJobs} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
+  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} initialScope={jobsScope} tableMode={isMobile && t.tableMode === "table" ? "cards" : t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
@@ -303,19 +307,21 @@ function App() {
         onNewBrief={() => setNewBrief(true)}
         defaultUsers={Object.assign([...data.USERS], { onPick: (u) => setUser(u) })}
       />
-      <div style={{display:"grid", gridTemplateColumns:`${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
-        <Sidebar
-          active={tab} onChange={setTab}
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(v => !v)}
-          data={liveData}
-          onOpenPalette={() => setPalette(true)}
-        />
+      <div style={{display:"grid", gridTemplateColumns: isMobile ? "1fr" : `${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
+        {!isMobile && (
+          <Sidebar
+            active={tab} onChange={navTo}
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed(v => !v)}
+            data={liveData}
+            onOpenPalette={() => setPalette(true)}
+          />
+        )}
         <main key={tab + t.overviewLayout} style={{
           flex: 1, overflowY: "auto", overflowX: "hidden", minWidth: 0,
           background: "var(--paper)",
         }}>
-          <div className="bns-main-content" style={{maxWidth: 1400, margin: "0 auto", padding: "8px 32px 72px"}}>
+          <div className="bns-main-content" style={{maxWidth: 1400, margin: "0 auto", padding: isMobile ? "8px 14px 88px" : "8px 32px 72px"}}>
             {Screen}
           </div>
           {(
@@ -341,7 +347,7 @@ function App() {
 
       {/* MobileNav — always rendered, CSS controls visibility (display:none on desktop) */}
       <div className="bns-mobile-nav-wrap">
-        <MobileNav active={tab} onChange={setTab} data={liveData}/>
+        <MobileNav active={tab} onChange={navTo} data={liveData}/>
       </div>
 
       {openBrief && (

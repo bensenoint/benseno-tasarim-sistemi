@@ -48,7 +48,7 @@
     var f=el('form','width:300px;max-width:86vw;text-align:center');
     var logo=el('img','height:52px;width:auto;object-fit:contain'); logo.src='app/logo.png'; logo.alt='Benseno'; f.appendChild(logo);
     f.appendChild(el('div','font:400 13px/1.5 sans-serif;color:#6b6b70;margin:14px 0 24px','Tasarım Panosu · giriş'));
-    var i=el('input','width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e3e0d8;border-radius:10px;font-size:15px;background:#fff;outline:none');
+    var i=el('input','width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e3e0d8;border-radius:10px;font-size:16px;background:#fff;outline:none');
     i.type='password'; i.placeholder='Şifre'; i.autocomplete='current-password';
     f.appendChild(i);
     var err=el('div','height:18px;font:500 12px/18px sans-serif;color:#C24A2C;margin:8px 0');
@@ -58,11 +58,12 @@
     o.appendChild(f); document.body.appendChild(o); i.focus();
     f.addEventListener('submit',function(e){
       e.preventDefault();
+      if(!crypto || !crypto.subtle){ err.textContent='Tarayıcı desteklemiyor (HTTPS gerekli)'; return; }
       crypto.subtle.digest('SHA-256',new TextEncoder().encode(i.value)).then(function(buf){
         var hex=Array.from(new Uint8Array(buf)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');
         if(hex===HASH){ sessionStorage.setItem('bns_auth','1'); location.reload(); }
         else { err.textContent='Şifre hatalı'; i.value=''; i.focus(); }
-      });
+      }).catch(function(){ err.textContent='Bir hata oluştu, tekrar dene'; });
     });
   }
   if(document.body) mount(); else document.addEventListener('DOMContentLoaded',mount);
@@ -101,10 +102,10 @@ window.EMBEDDED_DATA = {
 </script>
 
 <!-- data.js: EMBEDDED_DATA → window.BNS_DATA bridge (plain script, no Babel) -->
-<script src="app/data.js?v=1780208816"></script>
+<script src="app/data.js?v=1780210955"></script>
 
 <!-- Pre-built bundle (esbuild — no Babel runtime) -->
-<script src="app/bundle.js?v=1780208816"></script>
+<script src="app/bundle.js?v=1780210955"></script>
 
 <!-- Bootstrap: mount React app -->
 <script>

@@ -1,7 +1,7 @@
 // app/screens/Overview.jsx — landing tab · 3 layout variants.
 // Variants: "editorial" (default) | "dense" | "story"
 
-function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwitchTab, onRefresh, onStatusChange, layout = "editorial", kpiVariant = "plain" }) {
+function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, layout = "editorial", kpiVariant = "plain" }) {
   // viewMode filtresi App.jsx'te merkezi olarak uygulanıyor — data.briefs zaten filtered.
   const active = data.briefs;
   const [filterOpen, setFilterOpen] = React.useState(false);
@@ -23,7 +23,7 @@ function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwit
   const blocked = filtered.filter(b => b.durum === "blokeli");
 
   const filterActive = deptFilter !== "all" || prioFilter !== "all";
-  const shared = {data,user,viewMode,setViewMode,active:filtered,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,onRefresh,onStatusChange,filterOpen,setFilterOpen,deptFilter,setDeptFilter,prioFilter,setPrioFilter,filterActive,kpiVariant};
+  const shared = {data,user,viewMode,setViewMode,active:filtered,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,onJumpJobs,onRefresh,onStatusChange,filterOpen,setFilterOpen,deptFilter,setDeptFilter,prioFilter,setPrioFilter,filterActive,kpiVariant};
 
   if (layout === "dense") return <DenseLayout {...shared}/>;
   if (layout === "story") return <StoryLayout {...shared}/>;
@@ -276,7 +276,7 @@ function Rule({ name, status, hits, last }) {
   );
 }
 
-function EditorialLayout({ data, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+function EditorialLayout({ data, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   const avgCapPct = calcAvgCapPct(data);
@@ -307,12 +307,12 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
 
       {/* KPI grid */}
       <KpiGrid>
-        <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"}/>
-        <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"}/>
-        <Kpi label="Bugün teslim"  value={today.length}   variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil"/>
-        <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri"/>
-        <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok"/>
-        <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması"/>
+        <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"} onClick={onJumpJobs ? () => onJumpJobs("overdue") : undefined}/>
+        <Kpi label="Bugün teslim"  value={today.length}   variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri" onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>
+        <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması" onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}/>
       </KpiGrid>
 
       {/* Tablo — tam genişlik */}
