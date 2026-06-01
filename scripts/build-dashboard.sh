@@ -38,7 +38,7 @@ cat \
       --jsx=transform \
       --jsx-factory=React.createElement \
       --jsx-fragment=React.Fragment \
-      --minify-whitespace \
+      --minify \
   > "$APP/bundle.js"
 
 # Root app/ ile senkronize et (data.js dahil)
