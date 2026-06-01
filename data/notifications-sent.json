@@ -1,252 +1,267 @@
 [
-  {
-    "brief_ts": "1779104369.515529",
-    "template": "24+25_past_deadline_skipped",
-    "sent_at": "2026-05-21T17:32:42+03:00",
-    "user_id": "skip-Hasvet-v1-delivered",
-    "reason": "İrem delivered v1 at 14:30 TR (Mockup_01+02). Cansu+Buse forwarding to client. Not a real SLA breach."
-  },
-  {
-    "brief_ts": "1779275121.721279",
-    "template": "priority_upgrade_🟡_to_🟠_noted",
-    "sent_at": "2026-05-22T08:28:34+03:00",
-    "user_id": "skip-no-template-defined",
-    "reason": "#9 VDM Petdent Whatsapp Business Kurulumu (Otomasyon ·  🟡->🟠 (delta_h=15.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
-  },
-  {
-    "brief_ts": "1779282760.860839",
-    "template": "priority_upgrade_🟠_to_🔴_noted",
-    "sent_at": "2026-05-22T08:28:34+03:00",
-    "user_id": "skip-no-template-defined",
-    "reason": "#10 Bauhaus Bahçe Düzen / 22 Mayıs (Sosyal Medya Pos 🟠->🔴 (delta_h=3.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
-  },
-  {
-    "brief_ts": "1779283214.343159",
-    "template": "priority_upgrade_🟠_to_🔴_noted",
-    "sent_at": "2026-05-22T08:28:34+03:00",
-    "user_id": "skip-no-template-defined",
-    "reason": "#14 Bauhaus Evinize Düzen / 28 Mayıs (Sosyal Medya P 🟠->🔴 (delta_h=5.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
-  },
-  {
-    "brief_ts": "1779283282.205179",
-    "template": "priority_upgrade_🟠_to_🔴_noted",
-    "sent_at": "2026-05-22T08:28:34+03:00",
-    "user_id": "skip-no-template-defined",
-    "reason": "#15 Bauhaus Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal 🟠->🔴 (delta_h=5.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
-  },
-  {
-    "brief_ts": "1779342432.583659",
-    "template": "priority_upgrade_🟠_to_🔴_noted",
-    "sent_at": "2026-05-22T08:28:34+03:00",
-    "user_id": "skip-no-template-defined",
-    "reason": "#17 VDM Petdent Yeni bayram postu (Sosyal Medya Post · 🐷 🟠->🔴 (delta_h=0.4). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
-  },
-  {
-    "brief_ts": "1779342432.583659",
-    "template": "24_past_deadline_thread_reply",
-    "sent_at": "2026-05-22T08:49:00+03:00",
-    "user_id": "C0AQLPY4TUM",
-    "message_ts": "1779429879.970299",
-    "reason": "#17 VDM Petdent Yeni bayram postu — new GEÇMİŞ (deadline 08:46 → 3dk geride at 08:49 sync). Thread reply sent warning about deadline passed + Eren sıralı 1️⃣ blocking + Görkem 2️⃣ waiting. Action: Eren v1 fast or hand to Görkem."
-  },
-  {
-    "brief_ts": "1779342432.583659",
-    "template": "25_past_deadline_dm_eren_assignee",
-    "sent_at": "2026-05-22T08:49:00+03:00",
-    "user_id": "U0AP31SAA1W",
-    "message_ts": "1779429885.068579",
-    "reason": "#17 VDM Petdent — DM to Eren (primary sıralı 1️⃣ assignee, blocker). Warned about 3dk geride + cap 4 aşımı + broşür also still GEÇMİŞ. Asked for fast v1 or hand-off."
-  },
-  {
-    "brief_ts": "sync-1779430683",
-    "template": "priority_upgrade_summary_to_director",
-    "sent_at": "2026-05-22T09:18:00+03:00",
-    "user_id": "U4XCE3532",
-    "message_ts": "1779431542.717629",
-    "reason": "09:18 ara sync — 6 brief 🟠→🔴 auto-upgrade (Cuma 17:00 deadline ortak): #11/12/13/16 (4× Bauhaus weekly batch) + #18/19 (2× Kuzeypet Org). Single summary DM to Cansu Direktör instead of individual DMs (12 would be noisy). Includes capacity impossibility flag + erteleme/dispatch öneri."
-  },
-  {
-    "brief_ts": "1779282859.178849",
-    "template": "priority_upgrade_🟠_to_🔴_logged_only",
-    "sent_at": "2026-05-22T09:18:00+03:00",
-    "user_id": "skip-aggregated-to-director-summary",
-    "reason": "#11 Bauhaus Evde Ferahlık 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
-  },
-  {
-    "brief_ts": "1779282928.074819",
-    "template": "priority_upgrade_🟠_to_🔴_logged_only",
-    "sent_at": "2026-05-22T09:18:00+03:00",
-    "user_id": "skip-aggregated-to-director-summary",
-    "reason": "#12 Bauhaus Düzenli Alanlar 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
-  },
-  {
-    "brief_ts": "1779283006.745819",
-    "template": "priority_upgrade_🟠_to_🔴_logged_only",
-    "sent_at": "2026-05-22T09:18:00+03:00",
-    "user_id": "skip-aggregated-to-director-summary",
-    "reason": "#13 Bauhaus Güneşli Günler 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
-  },
-  {
-    "brief_ts": "1779283377.829309",
-    "template": "priority_upgrade_🟠_to_🔴_logged_only",
-    "sent_at": "2026-05-22T09:18:00+03:00",
-    "user_id": "skip-aggregated-to-director-summary",
-    "reason": "#16 Bauhaus Banyo Şık 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
-  },
-  {
-    "brief_ts": "1779352449.496569",
-    "template": "priority_upgrade_🟠_to_🔴_logged_only",
-    "sent_at": "2026-05-22T09:18:00+03:00",
-    "user_id": "skip-aggregated-to-director-summary",
-    "reason": "#18 Kuzeypet Org (Serhat) 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
-  },
-  {
-    "brief_ts": "1779352849.311019",
-    "template": "priority_upgrade_🟠_to_🔴_logged_only",
-    "sent_at": "2026-05-22T09:18:00+03:00",
-    "user_id": "skip-aggregated-to-director-summary",
-    "reason": "#19 Kuzeypet Org (Reyhan GMY ⚠️ duplicate) 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
-  },
-  {
-    "brief_ts": "1779439428.236359",
-    "template": "1_new_brief_dm_aykut_assignee",
-    "sent_at": "2026-05-22T11:51:28+03:00",
-    "user_id": "U06J26R1XCJ",
-    "message_ts": "1779440288.506899",
-    "reason": "#22 SPLENDA UK / Summer Newsletter — Aykut (paralel atanan, tasarımcı). Capacity warning eklendi (9 aktif iş + Bauhaus batch çakışması)."
-  },
-  {
-    "brief_ts": "1779439428.236359",
-    "template": "1_new_brief_dm_erdem_assignee",
-    "sent_at": "2026-05-22T11:51:32+03:00",
-    "user_id": "U02SZQDAFPF",
-    "message_ts": "1779440292.076429",
-    "reason": "#22 SPLENDA UK / Summer Newsletter — erdem (paralel atanan, editör, ilk aktif iş bu sezon)."
-  },
-  {
-    "brief_ts": "1779439428.236359",
-    "template": "1+18_new_brief_dm_cansu_assignee_plus_manager_summary_17_3h_threshold",
-    "sent_at": "2026-05-22T11:51:41+03:00",
-    "user_id": "U4XCE3532",
-    "message_ts": "1779440301.091209",
-    "reason": "#22 SPLENDA UK paralel atanan DM + #17 VDM bayram 3sa eşik AŞILDI manager_summary tek DM içinde. Cansu Direktör'e müdahale opsiyonları sunuldu (Eren devre dışı / Görkem 2️⃣'ye devret / iptal)."
-  },
-  {
-    "brief_ts": "1779439428.236359",
-    "template": "confirm_dm_submitter_eda_t",
-    "sent_at": "2026-05-22T11:51:46+03:00",
-    "user_id": "U09BZHR25NG",
-    "message_ts": "1779440306.101299",
-    "reason": "#22 SPLENDA UK — submitter Eda T'ye sistem kayıt teyidi. 3 atananın DM aldığını bildirdi + dept ✍️ Editör seçimini açıkladı."
-  },
-  {
-    "brief_no": "10",
-    "brief_ts": "1779282760.860839",
-    "template": "18_manager_summary_cansu_director_brief_10_becomes_9th_overdue_plus_17_still_open",
-    "sent_at": "2026-05-22T12:15:34+03:00",
-    "user_id": "U4XCE3532",
-    "channel_id": "D030L2UD7KQ",
-    "message_ts": "1779441734.278459",
-    "note": "9. GEÇMİŞ #10 + #17 hâlâ 3sa 30dk GEÇMİŞ özet + müdahale opsiyonları (a/b/c)"
-  },
-  {
-    "brief_no": "10+11+12+13+14+19+22",
-    "brief_ts": "multi_completion_batch_2026-05-22T14:15",
-    "template": "positive_closure_dm_cansu_director_after_bauhaus_batch_completion_and_kuzeypet_resolution",
-    "sent_at": "2026-05-22T14:16:17+03:00",
-    "user_id": "U4XCE3532",
-    "channel_id": "D030L2UD7KQ",
-    "message_ts": "1779449377.477259",
-    "note": "POZİTİF CLOSURE — 12:15 manager_summary stres DM'sinin doğal cevabı. #10 Bauhaus Bahçe Düzen yayına alındı (Eda T 'onaylandı'). 4 batch (#11-#14) + #19 Reyhan TR org tamamlandı. #22 Splenda ertelemesi doğrulandı. Açık tek stres #17 VDM bayram (Görkem self-aware). Hafta sonu girişi pozitif tonda kapatıldı."
-  },
-  {
-    "brief_ts": "1779450529.976979",
-    "template": "1_new_brief_skipped_eda_t_thread_ping",
-    "sent_at": "2026-05-22T15:15:48+03:00",
-    "user_id": "skip-U09BFPBKQG7-arda",
-    "reason": "#23 Bauhaus Kaçırılmayacak Fırsatlar! · YENİ brief Arda atanan · Şablon 1 DM SKIPPED — Eda T 14:49 'çıkışa kadar yardımcı olabilir misinn' Arda'ya thread ping zaten yaptı · bot DM spam riski · Arda 5 aktif iş (cap 6 · 83%) son 1.5sa'da batch mega üretim sonrası yorgun · Bauhaus channel'da Arda zaten haberdar"
-  },
-  {
-    "brief_ts": "1779342432.583659",
-    "template": "threshold_6sa_warning_skipped_gorkem_self_aware",
-    "sent_at": "2026-05-22T15:15:48+03:00",
-    "user_id": "skip-U030C48PL23-gorkem",
-    "reason": "#17 VDM bayram postu · 6sa eşiği AŞILDI (6sa 29dk GEÇMİŞ) · Threshold transition · Görkem GM'ye uyarı DM SKIPPED — Görkem self-aware (orchestrator çıktısı + 09:04 TR thread otomatik uyarı) · Cansu Direktör 12:15+14:15 2 DM zaten gönderildi spam riski · 4 raunt thread escalation cevapsız · ek DM faydasız"
-  },
-  {
-    "brief_ts": "1779450529.976979",
-    "template": "ara_sync_1545_skip_23_arda_eda_t_thread_ping_still_active",
-    "sent_at": "2026-05-22T15:45:44+03:00",
-    "user_id": "skip-U09BFPBKQG7-arda",
-    "reason": "Arda 57dk pasif (27dk→57dk) #23 brief'te ama Eda T 14:49 'çıkışa kadar yardımcı' thread ping hâlâ aktif · bot DM spam riski · 1sa 14dk deadline'a"
-  },
-  {
-    "brief_ts": "1779342432.583659",
-    "template": "ara_sync_1545_skip_17_gorkem_self_aware_continued",
-    "sent_at": "2026-05-22T15:45:44+03:00",
-    "user_id": "skip-U030C48PL23-gorkem",
-    "reason": "#17 6sa 29dk→6sa 59dk · 7sa eşiği yaklaşıyor (1dk kaldı) · Görkem orchestrator çıktısı izliyor · Cansu 2 DM cevapsız · ek DM spam"
-  },
-  {
-    "brief_ts": "1779450529.976979",
-    "template": "ara_sync_1615_skip_23_arda_critical_45min_remaining",
-    "sent_at": "2026-05-22T16:15:48+03:00",
-    "user_id": "skip-U09BFPBKQG7-arda",
-    "reason": "#23 Arda 1sa 27dk pasif (57dk→1sa 27dk) · deadline 45dk · Eda T 14:49 thread ping hâlâ aktif · bot DM hâlâ spam riski ancak KRİTİK seviyeye yaklaşıyor · 16:45 sync next decision point (15dk kala otomatik tetiklenecek)"
-  },
-  {
-    "brief_ts": "1779342432.583659",
-    "template": "ara_sync_1615_skip_17_8sa_eşiği_30dk",
-    "sent_at": "2026-05-22T16:15:48+03:00",
-    "user_id": "skip-U030C48PL23-gorkem",
-    "reason": "#17 7sa 30dk GEÇMİŞ · 8sa eşiğine 30dk kaldı · 16:45 sync'inde 8sa eşiği aşılırsa otomatik Görkem DM tetiklenir · şu an DM yok (Görkem self-aware + Cansu 2 DM spam)"
-  },
-  {
-    "brief_ts": "1779456154.216919",
-    "template": "1_new_brief_dm",
-    "sent_at": "2026-05-22T16:28:30+03:00",
-    "user_id": "U06J26R1XCJ",
-    "message_ts": "1779456509.865839",
-    "reason": "#24 Bauhaus Bayrama Özel Dev Kampanya · YENİ brief Şablon 1 DM Aykut'a gönderildi · 18:00 TR deadline · Paralel atama Aykut+Arda · 2 görsel ekli"
-  },
-  {
-    "brief_ts": "1779456154.216919",
-    "template": "1_new_brief_dm",
-    "sent_at": "2026-05-22T16:28:34+03:00",
-    "user_id": "U09BFPBKQG7",
-    "message_ts": "1779456514.320639",
-    "reason": "#24 Bauhaus Bayrama Özel Dev Kampanya · YENİ brief Şablon 1 DM Arda'ya gönderildi + KAPASİTE UYARISI eklendi (6/6 · 100% · 3 brief 30dk-1sa35dk pencerede)"
-  },
-  {
-    "brief_ts": "1779342432.583659",
-    "template": "4_threshold_8h_escalation",
-    "sent_at": "2026-05-22T16:47:00+03:00",
-    "user_id": "U030C48PL23",
-    "message_ts": "1779458052.803289",
-    "reason": "#17 VDM bayram postu · 8sa eşiği AŞILDI (8sa 0dk GEÇMİŞ at 16:46 sync) · predicted 16:45 trigger · Şablon 4 DM Görkem'e gönderildi · karar gerekli (Eren hızlı v1 / Görkem devral / ertele-iptal)"
-  },
-  {
-    "brief_ts": "system_alert_brief_sync_down",
-    "template": "ad_hoc_system_alert",
-    "sent_at": "2026-05-28T08:53:47+03:00",
-    "user_id": "U030C48PL23",
-    "message_ts": "1779947612.341419",
-    "reason": "Sistem uyarısı · Brief Sync 835 dakikadır çalışmadı (son çalışma 18:33) · Görkem'e DM gönderildi (launchd kontrol + manuel başlatma komutu)"
-  },
-  {
-    "brief_ts": "system_alert_brief_sync_down",
-    "template": "ad_hoc_system_alert",
-    "sent_at": "2026-05-29T12:23:35+03:00",
-    "user_id": "U030C48PL23",
-    "message_ts": "1780046606.274859",
-    "reason": "Sistem uyarısı · Brief Sync 1222 dakikadır çalışmadı (son çalışma 15:59) · Görkem'e DM gönderildi (launchd kontrol + manuel başlatma komutu) · 28 May 835dk uyarısından sonra escalation"
-  },
-  {
-    "brief_ts": "system_alert_brief_sync_down",
-    "template": "ad_hoc_system_alert",
-    "sent_at": "2026-05-29T12:54:59+03:00",
-    "user_id": "U030C48PL23",
-    "message_ts": "1780048479.589519",
-    "reason": "Sistem uyarısı · Brief Sync 1254 dakikadır çalışmadı (son çalışma 15:59) · Görkem GM'e DM gönderildi (launchd kontrol + manuel başlatma komutu) · 29 May 1222dk uyarısından 32dk sonra escalation (3. uyarı bugün)"
-  }
+    {
+        "brief_ts": "1779104369.515529",
+        "template": "24+25_past_deadline_skipped",
+        "sent_at": "2026-05-21T17:32:42+03:00",
+        "user_id": "skip-Hasvet-v1-delivered",
+        "reason": "İrem delivered v1 at 14:30 TR (Mockup_01+02). Cansu+Buse forwarding to client. Not a real SLA breach."
+    },
+    {
+        "brief_ts": "1779275121.721279",
+        "template": "priority_upgrade_🟡_to_🟠_noted",
+        "sent_at": "2026-05-22T08:28:34+03:00",
+        "user_id": "skip-no-template-defined",
+        "reason": "#9 VDM Petdent Whatsapp Business Kurulumu (Otomasyon ·  🟡->🟠 (delta_h=15.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+    },
+    {
+        "brief_ts": "1779282760.860839",
+        "template": "priority_upgrade_🟠_to_🔴_noted",
+        "sent_at": "2026-05-22T08:28:34+03:00",
+        "user_id": "skip-no-template-defined",
+        "reason": "#10 Bauhaus Bahçe Düzen / 22 Mayıs (Sosyal Medya Pos 🟠->🔴 (delta_h=3.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+    },
+    {
+        "brief_ts": "1779283214.343159",
+        "template": "priority_upgrade_🟠_to_🔴_noted",
+        "sent_at": "2026-05-22T08:28:34+03:00",
+        "user_id": "skip-no-template-defined",
+        "reason": "#14 Bauhaus Evinize Düzen / 28 Mayıs (Sosyal Medya P 🟠->🔴 (delta_h=5.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+    },
+    {
+        "brief_ts": "1779283282.205179",
+        "template": "priority_upgrade_🟠_to_🔴_noted",
+        "sent_at": "2026-05-22T08:28:34+03:00",
+        "user_id": "skip-no-template-defined",
+        "reason": "#15 Bauhaus Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal 🟠->🔴 (delta_h=5.7). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+    },
+    {
+        "brief_ts": "1779342432.583659",
+        "template": "priority_upgrade_🟠_to_🔴_noted",
+        "sent_at": "2026-05-22T08:28:34+03:00",
+        "user_id": "skip-no-template-defined",
+        "reason": "#17 VDM Petdent Yeni bayram postu (Sosyal Medya Post · 🐷 🟠->🔴 (delta_h=0.4). Orchestrator logged; no DM sent (priority_upgrade not in SKILL templates). Sabah raporu 07:52 also did not send DMs (auth timeout)."
+    },
+    {
+        "brief_ts": "1779342432.583659",
+        "template": "24_past_deadline_thread_reply",
+        "sent_at": "2026-05-22T08:49:00+03:00",
+        "user_id": "C0AQLPY4TUM",
+        "message_ts": "1779429879.970299",
+        "reason": "#17 VDM Petdent Yeni bayram postu — new GEÇMİŞ (deadline 08:46 → 3dk geride at 08:49 sync). Thread reply sent warning about deadline passed + Eren sıralı 1️⃣ blocking + Görkem 2️⃣ waiting. Action: Eren v1 fast or hand to Görkem."
+    },
+    {
+        "brief_ts": "1779342432.583659",
+        "template": "25_past_deadline_dm_eren_assignee",
+        "sent_at": "2026-05-22T08:49:00+03:00",
+        "user_id": "U0AP31SAA1W",
+        "message_ts": "1779429885.068579",
+        "reason": "#17 VDM Petdent — DM to Eren (primary sıralı 1️⃣ assignee, blocker). Warned about 3dk geride + cap 4 aşımı + broşür also still GEÇMİŞ. Asked for fast v1 or hand-off."
+    },
+    {
+        "brief_ts": "sync-1779430683",
+        "template": "priority_upgrade_summary_to_director",
+        "sent_at": "2026-05-22T09:18:00+03:00",
+        "user_id": "U4XCE3532",
+        "message_ts": "1779431542.717629",
+        "reason": "09:18 ara sync — 6 brief 🟠→🔴 auto-upgrade (Cuma 17:00 deadline ortak): #11/12/13/16 (4× Bauhaus weekly batch) + #18/19 (2× Kuzeypet Org). Single summary DM to Cansu Direktör instead of individual DMs (12 would be noisy). Includes capacity impossibility flag + erteleme/dispatch öneri."
+    },
+    {
+        "brief_ts": "1779282859.178849",
+        "template": "priority_upgrade_🟠_to_🔴_logged_only",
+        "sent_at": "2026-05-22T09:18:00+03:00",
+        "user_id": "skip-aggregated-to-director-summary",
+        "reason": "#11 Bauhaus Evde Ferahlık 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+    },
+    {
+        "brief_ts": "1779282928.074819",
+        "template": "priority_upgrade_🟠_to_🔴_logged_only",
+        "sent_at": "2026-05-22T09:18:00+03:00",
+        "user_id": "skip-aggregated-to-director-summary",
+        "reason": "#12 Bauhaus Düzenli Alanlar 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+    },
+    {
+        "brief_ts": "1779283006.745819",
+        "template": "priority_upgrade_🟠_to_🔴_logged_only",
+        "sent_at": "2026-05-22T09:18:00+03:00",
+        "user_id": "skip-aggregated-to-director-summary",
+        "reason": "#13 Bauhaus Güneşli Günler 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+    },
+    {
+        "brief_ts": "1779283377.829309",
+        "template": "priority_upgrade_🟠_to_🔴_logged_only",
+        "sent_at": "2026-05-22T09:18:00+03:00",
+        "user_id": "skip-aggregated-to-director-summary",
+        "reason": "#16 Bauhaus Banyo Şık 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+    },
+    {
+        "brief_ts": "1779352449.496569",
+        "template": "priority_upgrade_🟠_to_🔴_logged_only",
+        "sent_at": "2026-05-22T09:18:00+03:00",
+        "user_id": "skip-aggregated-to-director-summary",
+        "reason": "#18 Kuzeypet Org (Serhat) 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+    },
+    {
+        "brief_ts": "1779352849.311019",
+        "template": "priority_upgrade_🟠_to_🔴_logged_only",
+        "sent_at": "2026-05-22T09:18:00+03:00",
+        "user_id": "skip-aggregated-to-director-summary",
+        "reason": "#19 Kuzeypet Org (Reyhan GMY ⚠️ duplicate) 🟠→🔴 (delta_h=7.7). Aggregated into priority_upgrade_summary_to_director (1779431542.717629)."
+    },
+    {
+        "brief_ts": "1779439428.236359",
+        "template": "1_new_brief_dm_aykut_assignee",
+        "sent_at": "2026-05-22T11:51:28+03:00",
+        "user_id": "U06J26R1XCJ",
+        "message_ts": "1779440288.506899",
+        "reason": "#22 SPLENDA UK / Summer Newsletter — Aykut (paralel atanan, tasarımcı). Capacity warning eklendi (9 aktif iş + Bauhaus batch çakışması)."
+    },
+    {
+        "brief_ts": "1779439428.236359",
+        "template": "1_new_brief_dm_erdem_assignee",
+        "sent_at": "2026-05-22T11:51:32+03:00",
+        "user_id": "U02SZQDAFPF",
+        "message_ts": "1779440292.076429",
+        "reason": "#22 SPLENDA UK / Summer Newsletter — erdem (paralel atanan, editör, ilk aktif iş bu sezon)."
+    },
+    {
+        "brief_ts": "1779439428.236359",
+        "template": "1+18_new_brief_dm_cansu_assignee_plus_manager_summary_17_3h_threshold",
+        "sent_at": "2026-05-22T11:51:41+03:00",
+        "user_id": "U4XCE3532",
+        "message_ts": "1779440301.091209",
+        "reason": "#22 SPLENDA UK paralel atanan DM + #17 VDM bayram 3sa eşik AŞILDI manager_summary tek DM içinde. Cansu Direktör'e müdahale opsiyonları sunuldu (Eren devre dışı / Görkem 2️⃣'ye devret / iptal)."
+    },
+    {
+        "brief_ts": "1779439428.236359",
+        "template": "confirm_dm_submitter_eda_t",
+        "sent_at": "2026-05-22T11:51:46+03:00",
+        "user_id": "U09BZHR25NG",
+        "message_ts": "1779440306.101299",
+        "reason": "#22 SPLENDA UK — submitter Eda T'ye sistem kayıt teyidi. 3 atananın DM aldığını bildirdi + dept ✍️ Editör seçimini açıkladı."
+    },
+    {
+        "brief_no": "10",
+        "brief_ts": "1779282760.860839",
+        "template": "18_manager_summary_cansu_director_brief_10_becomes_9th_overdue_plus_17_still_open",
+        "sent_at": "2026-05-22T12:15:34+03:00",
+        "user_id": "U4XCE3532",
+        "channel_id": "D030L2UD7KQ",
+        "message_ts": "1779441734.278459",
+        "note": "9. GEÇMİŞ #10 + #17 hâlâ 3sa 30dk GEÇMİŞ özet + müdahale opsiyonları (a/b/c)"
+    },
+    {
+        "brief_no": "10+11+12+13+14+19+22",
+        "brief_ts": "multi_completion_batch_2026-05-22T14:15",
+        "template": "positive_closure_dm_cansu_director_after_bauhaus_batch_completion_and_kuzeypet_resolution",
+        "sent_at": "2026-05-22T14:16:17+03:00",
+        "user_id": "U4XCE3532",
+        "channel_id": "D030L2UD7KQ",
+        "message_ts": "1779449377.477259",
+        "note": "POZİTİF CLOSURE — 12:15 manager_summary stres DM'sinin doğal cevabı. #10 Bauhaus Bahçe Düzen yayına alındı (Eda T 'onaylandı'). 4 batch (#11-#14) + #19 Reyhan TR org tamamlandı. #22 Splenda ertelemesi doğrulandı. Açık tek stres #17 VDM bayram (Görkem self-aware). Hafta sonu girişi pozitif tonda kapatıldı."
+    },
+    {
+        "brief_ts": "1779450529.976979",
+        "template": "1_new_brief_skipped_eda_t_thread_ping",
+        "sent_at": "2026-05-22T15:15:48+03:00",
+        "user_id": "skip-U09BFPBKQG7-arda",
+        "reason": "#23 Bauhaus Kaçırılmayacak Fırsatlar! · YENİ brief Arda atanan · Şablon 1 DM SKIPPED — Eda T 14:49 'çıkışa kadar yardımcı olabilir misinn' Arda'ya thread ping zaten yaptı · bot DM spam riski · Arda 5 aktif iş (cap 6 · 83%) son 1.5sa'da batch mega üretim sonrası yorgun · Bauhaus channel'da Arda zaten haberdar"
+    },
+    {
+        "brief_ts": "1779342432.583659",
+        "template": "threshold_6sa_warning_skipped_gorkem_self_aware",
+        "sent_at": "2026-05-22T15:15:48+03:00",
+        "user_id": "skip-U030C48PL23-gorkem",
+        "reason": "#17 VDM bayram postu · 6sa eşiği AŞILDI (6sa 29dk GEÇMİŞ) · Threshold transition · Görkem GM'ye uyarı DM SKIPPED — Görkem self-aware (orchestrator çıktısı + 09:04 TR thread otomatik uyarı) · Cansu Direktör 12:15+14:15 2 DM zaten gönderildi spam riski · 4 raunt thread escalation cevapsız · ek DM faydasız"
+    },
+    {
+        "brief_ts": "1779450529.976979",
+        "template": "ara_sync_1545_skip_23_arda_eda_t_thread_ping_still_active",
+        "sent_at": "2026-05-22T15:45:44+03:00",
+        "user_id": "skip-U09BFPBKQG7-arda",
+        "reason": "Arda 57dk pasif (27dk→57dk) #23 brief'te ama Eda T 14:49 'çıkışa kadar yardımcı' thread ping hâlâ aktif · bot DM spam riski · 1sa 14dk deadline'a"
+    },
+    {
+        "brief_ts": "1779342432.583659",
+        "template": "ara_sync_1545_skip_17_gorkem_self_aware_continued",
+        "sent_at": "2026-05-22T15:45:44+03:00",
+        "user_id": "skip-U030C48PL23-gorkem",
+        "reason": "#17 6sa 29dk→6sa 59dk · 7sa eşiği yaklaşıyor (1dk kaldı) · Görkem orchestrator çıktısı izliyor · Cansu 2 DM cevapsız · ek DM spam"
+    },
+    {
+        "brief_ts": "1779450529.976979",
+        "template": "ara_sync_1615_skip_23_arda_critical_45min_remaining",
+        "sent_at": "2026-05-22T16:15:48+03:00",
+        "user_id": "skip-U09BFPBKQG7-arda",
+        "reason": "#23 Arda 1sa 27dk pasif (57dk→1sa 27dk) · deadline 45dk · Eda T 14:49 thread ping hâlâ aktif · bot DM hâlâ spam riski ancak KRİTİK seviyeye yaklaşıyor · 16:45 sync next decision point (15dk kala otomatik tetiklenecek)"
+    },
+    {
+        "brief_ts": "1779342432.583659",
+        "template": "ara_sync_1615_skip_17_8sa_eşiği_30dk",
+        "sent_at": "2026-05-22T16:15:48+03:00",
+        "user_id": "skip-U030C48PL23-gorkem",
+        "reason": "#17 7sa 30dk GEÇMİŞ · 8sa eşiğine 30dk kaldı · 16:45 sync'inde 8sa eşiği aşılırsa otomatik Görkem DM tetiklenir · şu an DM yok (Görkem self-aware + Cansu 2 DM spam)"
+    },
+    {
+        "brief_ts": "1779456154.216919",
+        "template": "1_new_brief_dm",
+        "sent_at": "2026-05-22T16:28:30+03:00",
+        "user_id": "U06J26R1XCJ",
+        "message_ts": "1779456509.865839",
+        "reason": "#24 Bauhaus Bayrama Özel Dev Kampanya · YENİ brief Şablon 1 DM Aykut'a gönderildi · 18:00 TR deadline · Paralel atama Aykut+Arda · 2 görsel ekli"
+    },
+    {
+        "brief_ts": "1779456154.216919",
+        "template": "1_new_brief_dm",
+        "sent_at": "2026-05-22T16:28:34+03:00",
+        "user_id": "U09BFPBKQG7",
+        "message_ts": "1779456514.320639",
+        "reason": "#24 Bauhaus Bayrama Özel Dev Kampanya · YENİ brief Şablon 1 DM Arda'ya gönderildi + KAPASİTE UYARISI eklendi (6/6 · 100% · 3 brief 30dk-1sa35dk pencerede)"
+    },
+    {
+        "brief_ts": "1779342432.583659",
+        "template": "4_threshold_8h_escalation",
+        "sent_at": "2026-05-22T16:47:00+03:00",
+        "user_id": "U030C48PL23",
+        "message_ts": "1779458052.803289",
+        "reason": "#17 VDM bayram postu · 8sa eşiği AŞILDI (8sa 0dk GEÇMİŞ at 16:46 sync) · predicted 16:45 trigger · Şablon 4 DM Görkem'e gönderildi · karar gerekli (Eren hızlı v1 / Görkem devral / ertele-iptal)"
+    },
+    {
+        "brief_ts": "system_alert_brief_sync_down",
+        "template": "ad_hoc_system_alert",
+        "sent_at": "2026-05-28T08:53:47+03:00",
+        "user_id": "U030C48PL23",
+        "message_ts": "1779947612.341419",
+        "reason": "Sistem uyarısı · Brief Sync 835 dakikadır çalışmadı (son çalışma 18:33) · Görkem'e DM gönderildi (launchd kontrol + manuel başlatma komutu)"
+    },
+    {
+        "brief_ts": "system_alert_brief_sync_down",
+        "template": "ad_hoc_system_alert",
+        "sent_at": "2026-05-29T12:23:35+03:00",
+        "user_id": "U030C48PL23",
+        "message_ts": "1780046606.274859",
+        "reason": "Sistem uyarısı · Brief Sync 1222 dakikadır çalışmadı (son çalışma 15:59) · Görkem'e DM gönderildi (launchd kontrol + manuel başlatma komutu) · 28 May 835dk uyarısından sonra escalation"
+    },
+    {
+        "brief_ts": "system_alert_brief_sync_down",
+        "template": "ad_hoc_system_alert",
+        "sent_at": "2026-05-29T12:54:59+03:00",
+        "user_id": "U030C48PL23",
+        "message_ts": "1780048479.589519",
+        "reason": "Sistem uyarısı · Brief Sync 1254 dakikadır çalışmadı (son çalışma 15:59) · Görkem GM'e DM gönderildi (launchd kontrol + manuel başlatma komutu) · 29 May 1222dk uyarısından 32dk sonra escalation (3. uyarı bugün)"
+    },
+    {
+        "brief_ts": "1780290478.864579",
+        "template": "1_new_brief_dm_test_flag",
+        "sent_at": "2026-06-01T13:37:54+03:00",
+        "user_id": "U030C48PL23",
+        "message_ts": "1780310260.646679",
+        "reason": "#25 VDM Petdent · içerik 'test' algılandı · Cansu'ya otomatik atama YAPILMADI · owner Görkem'e teyit DM'i (gerçekse ilet / 🔒 ile kapat). Headless run."
+    },
+    {
+        "brief_ts": "tour2america_1779355957.360249",
+        "template": "past_deadline_skip",
+        "sent_at": "2026-06-01T13:37:54+03:00",
+        "user_id": "skip-already-sent-by-mac",
+        "reason": "#20 Tour2America deadline 1Haz12:31 geçti (🟡→🔴). Canvas (12:55 Mac sync) zaten 'DM → Eren 12:55' gösteriyor — duplicate önlemek için headless run DM ATLADI."
+    }
 ]
