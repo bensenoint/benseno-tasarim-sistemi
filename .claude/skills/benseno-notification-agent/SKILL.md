@@ -161,12 +161,64 @@ SLA aşımı (4h/8h/24h eşikleri geçildiyse):
 Stale brief (🔴>1g, 🟠>3g, 🟡>7g, 🟢>14g güncelleme yoksa):
 - Brief satırına `STALE 🔴` gibi etiket → Data Agent'a flag geçir
 
+### 8.5 Gecikme Escalation + Blokeli DM (P1.1)
+
+`mode` alanı `silent_log_only` ise → DM ATMA, sadece log'a yaz. `active` ise gönder.
+
+**Sorumlu yönetici eşlemesi** (lead_role → manager id):
+`tasarim → U055EDESLSE (İpek)` · `editor → U02SZQDAFPF (erdem)` · `ai → U030C48PL23 (Görkem)` · belirsiz → `UD96GH76E (Reyhan)`
+**5 yönetici (48h kademesi):** U030C48PL23, UD96GH76E, U4XCE3532, U055EDESLSE, U02SZQDAFPF
+
+**`escalation[]`** içindeki her brief için (idempotency: `notifications-sent.json` `{ts, template}` — her kademe 1 kez):
+- `gecikme_h ≥ 1` VE şablon 30 gönderilmedi → lead_id'ye **Şablon 30**
+- `gecikme_h ≥ 24` VE şablon 31 gönderilmedi → sorumlu yöneticiye **Şablon 31**
+- `gecikme_h ≥ 48` VE şablon 32 gönderilmedi → 5 yöneticiye DM + #benseno-grafik'e **Şablon 32**
+- `gecikme_h ≥ 72` VE şablon 29 gönderilmedi → lead_id'ye **Şablon 29** (otomatik blokeli)
+
+**`blokeli[]`** içindeki her brief için: şablon 29 gönderilmedi → lead_id'ye **Şablon 29**.
+
+> Headless modda Canvas'a "blokeli" yazılmaz; 72h escalation yalnızca DM tetikler (dashboard Blokeli kolonu `bns_briefs.durum`'dan beslenir).
+
+**Şablon 30 — Gecikme hatırlatma (lead'e, ≥1 saat)**
+```
+⏰ *{marka} · {is}* gecikiyor. Deadline {deadline_str} geçti ({gecikme_h} saat önce).
+Bugün bitirebilir misin? Zorlanıyorsan yöneticine haber ver.
+[Brief'e git]({permalink})
+```
+
+**Şablon 31 — Yönetici uyarısı (≥24 saat)**
+```
+⚠️ *Müdahale gerekiyor — {marka}* · *{is}* {gecikme_h} saattir gecikiyor.
+👤 Atanan: <@{lead_id}> · 📅 Deadline: {deadline_str}
+Öneri: atananla iletişime geç veya brief'i yeniden ata. [Brief'e git]({permalink})
+```
+
+**Şablon 32 — Kritik duyuru (≥48 saat — 5 yönetici DM + kanal)**
+DM (her yöneticiye):
+```
+🚨 *Kritik gecikme — {marka}* · *{is}* {gecikme_h} saattir teslim edilmedi.
+👤 Atanan: <@{lead_id}> · 📅 Deadline: {deadline_str}
+72 saat dolunca sistem otomatik "blokeli" işaretler.
+```
+Kanal (#benseno-grafik):
+```
+🚨 *{marka} · {is}* — *{gecikme_h} saat gecikme* · Atanan: <@{lead_id}> · Acil müdahale.
+```
+
+**Şablon 29 — Blokeli brief DM (lead'e)**
+```
+🔴 *{marka} · {is}* blokeli olarak işaretlendi.
+*Ne engel var?* İlerletmek için neye/kime ihtiyacın var?
+Çözüldüyse → brief'e ✅ koy. Devam ediyorsa → #benseno-grafik'te "@yönetici" ile müdahale iste.
+[Brief'e git]({permalink})
+```
+
 ### 9. notifications-sent.json Güncelle
-Tüm gönderimler tamamlandıktan sonra dosyayı kaydet.
+Tüm gönderimler tamamlandıktan sonra dosyayı kaydet (escalation/blokeli `{ts, template}` kayıtları dahil).
 
 ## Çıktı (tek satır)
 ```
-Notification Agent OK · DM:{N} · Thread:{N} · Calendar:{N} · Atlandı(idempotent):{N}
+Notification Agent OK · DM:{N} · Thread:{N} · Calendar:{N} · Esc(30/31/32/29):{a}/{b}/{c}/{d} · Blokeli:{N} · Atlandı(idempotent):{N}
 ```
 
 ---
