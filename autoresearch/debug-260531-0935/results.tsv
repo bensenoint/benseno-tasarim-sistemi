@@ -1,0 +1,10 @@
+# metric_direction: higher_is_better
+iteration	timestamp	hypothesis	status	technique	evidence	file_line
+1	260531-0935	Mobilde KPI kartları tıklanamaz (DenseLayout onClick yok)	disproven	trace	mobil varsayılan EditorialLayout, onClick mevcut; dense opt-in edge	Overview.jsx:30
+2	260531-0936	Gate crypto.subtle reject olunca kullanıcı kilitlenir	confirmed-lowsev	trace	catch yok; non-secure context'te giriş yapılamaz (prod HTTPS güvenli)	index.html:61
+3	260531-0937	Kök app/*.jsx commit edilmemiş -> runtime etkiler	disproven	trace	runtime bundle.js okuyor, JSX kullanılmıyor; sadece git hijyeni	index.html
+4	260531-0938	H12 watermark fix regresyona ugradi	disproven	differential	3 ref + seed mevcut	data-agent SKILL
+5	260531-0939	H17 push kapsami regresyona ugradi	disproven	differential	data/ dosyalari hala push'ta	dashboard-agent:65
+6	260531-0940	Gate input font-size 15px -> iOS focus'ta otomatik zoom	confirmed-lowsev	pattern-search	font-size:15px <16px; iOS Safari zoom yapar	index.html:51
+7	260531-0941	KPI deep-link filtresi alt-nav İşler'e basınca takılı kalır	confirmed-lowsev	trace	nav setTab scope resetlemiyor; jobsScope kalıcı, useEffect tekrar uygular	App.jsx:311,348
+8	260531-0945	H6/H2/H7 üç fix uygulandı ve doğrulandı	confirmed-FIXED	trace	gate font16+catch; navTo scope reset (KPI=14, nav=16)	App.jsx:24

@@ -1,0 +1,7 @@
+# metric_direction: higher_is_better
+iteration	timestamp	hypothesis	status	technique	evidence	file_line
+1	16:44	gecikme_h birim tutarsızlığı (ms/s)	disproven	differential	spec satır 123+283 ikisi de deadline_unix	data-agent:283
+2	16:44	notification-flags mode alanı dolmuyor	disproven	trace	data-agent:142-143 doldurur, notif-agent:166 okur	data-agent:264
+3	16:44	17:00 üç-cron çakışması (Cuma+ayson)	confirmed	pattern	gunluk-ozet+haftalik+aylik aynı 0 17 → 3 eşzamanlı claude+push	scheduler.js:70,72,78
+4	16:44	orchestrator 17:15/17:45 ateşliyor (hedef 16:45)	confirmed	pattern	cron 8-17 + gate gt17 → 17:15/17:45 geçer	scheduler.js:66
+5	16:44	full-minify ekran/modal bozuyor (production)	disproven	minimal-repro	29 nav öğesi + modallar render, 0 JS hatası (Playwright)	build-dashboard.sh:41

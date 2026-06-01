@@ -1,0 +1,28 @@
+{
+ "version": "2.1.0",
+ "source": "debug",
+ "timestamp": "2026-06-01T16:45:00+03:00",
+ "status": "COMPLETE",
+ "results_tsv": "autoresearch/debug-260601-1640/results.tsv",
+ "findings": [
+  {
+   "id": "H3",
+   "sev": "low",
+   "desc": "17:00 üç-cron çakışması",
+   "file": "scripts/scheduler.js",
+   "fixed": true
+  },
+  {
+   "id": "H4",
+   "sev": "low",
+   "desc": "orchestrator 17:15/17:45 fazladan ateşleme",
+   "file": "scripts/scheduler.js",
+   "fixed": true
+  }
+ ],
+ "config": {
+  "scope": "entire codebase",
+  "symptom": "hunt all bugs",
+  "depth": "deep"
+ }
+}

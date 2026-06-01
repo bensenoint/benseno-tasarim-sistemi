@@ -62,20 +62,21 @@ function run(script) {
   console.log(`[scheduler] tetiklendi: ${script} @ ${new Date().toLocaleString('tr-TR', { timeZone: TZ })}`);
 }
 
-// Orchestrator — hafta içi 08–17 arası :15 ve :45
-cron.schedule('15,45 8-17 * * 1-5', () => run('run-orchestrator.sh'), opts);
+// Orchestrator — hafta içi 08:15–16:45 arası :15 ve :45 (8-16: son ateşleme 16:45)
+cron.schedule('15,45 8-16 * * 1-5', () => run('run-orchestrator.sh'), opts);
 // Sabah raporu — hafta içi 07:50
 cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
-// Haftalık retro — Cuma 17:00
-cron.schedule('0 17 * * 5', () => run('run-haftalik-retro.sh'), opts);
-// Aylık strateji — ayın 25–31'i 17:00 (script "bugün ayın son günü mü?" kontrol eder)
-cron.schedule('0 17 25-31 * *', () => run('run-aylik-strateji.sh'), opts);
+// 17:00 raporları kaydırıldı (aynı anda spawn olmasın → çift-claude/push yarışı yok):
+// Günlük sistem özeti — hafta içi 17:05, sadece Görkem'e (P2.3)
+cron.schedule('5 17 * * 1-5', () => run('run-gunluk-ozet.sh'), opts);
+// Haftalık retro — Cuma 17:10
+cron.schedule('10 17 * * 5', () => run('run-haftalik-retro.sh'), opts);
+// Aylık strateji — ayın 25–31'i 17:15 (script "bugün ayın son günü mü?" kontrol eder)
+cron.schedule('15 17 25-31 * *', () => run('run-aylik-strateji.sh'), opts);
 // Log temizliği — her gece 03:30
 cron.schedule('30 3 * * *', () => run('run-log-temizle.sh'), opts);
 // PAT süre/geçerlilik kontrolü — Pazartesi 09:00 (P1.3; geçersizse kendi DM'ini atar)
 cron.schedule('0 9 * * 1', () => run('check-pat-expiry.sh'), opts);
-// Günlük sistem özeti — hafta içi 17:00, sadece Görkem'e (P2.3)
-cron.schedule('0 17 * * 1-5', () => run('run-gunluk-ozet.sh'), opts);
 
 console.log(`[scheduler] cron job'lar kuruldu (TZ=${TZ}). Slack bot başlatılıyor...`);
 

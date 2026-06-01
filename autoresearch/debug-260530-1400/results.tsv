@@ -1,0 +1,26 @@
+# metric_direction: higher_is_better
+iteration	timestamp	hypothesis	status	technique	evidence	file_line
+1	260530-1400	CLAUDE.md uncommitted değişiklik bir saldırı/regresyon	disproven	differential	Karpathy davranış kuralları (global ile aynı), zararsız	CLAUDE.md
+2	260530-1401	CLAUDE.md'de stale/çelişkili Slack kanal ID	disproven	pattern-search	Canvas ID F0B1B6XUD44 tüm dosyalarda tutarlı	CLAUDE.md:148
+3	260530-1402	data-agent çıktı dosya adı ile dashboard fetch uyuşmuyor	disproven	trace	ikisi de app/live-data.json	App.jsx:121
+4	260530-1403	Bulutta kök app/live-data.json bayat kalıyor (Pages kökü sunuyor)	disproven	trace	dashboard-agent cp+rsync+git add index.html app/ yapıyor	dashboard-agent:56-67
+5	260530-1404	EMBEDDED_DATA sadece dashboard/ index.html'e inject, kök bayat	disproven	trace	cp dashboard/index.html index.html adımı kökü senkronluyor	dashboard-agent:58
+6	260530-1405	Veri sözleşmesi uyuşmazlığı (App.jsx ed.* vs data-agent çıktı)	disproven	differential	tüm ed.* alanları live-data.json'da mevcut	live-data.json
+7	260530-1406	07:50 sabah + 08:15 orchestrator çift-DM gönderir	disproven	trace	farklı içerik/amaç + pencere guard + ayrı dedup	notification-agent:23
+8	260530-1407	Bulut dedup deposu gitignore'da -> her run yeniden DM	disproven	pattern-search	notifications-sent.json tracked; ignored olanlar yalnız Mac brief-sync	gitignore
+9	260530-1408	blokeli/escalation DM Mac kapalıyken hiç gönderilmez	confirmed-lowsev	trace	brief-sync-only; bulut notification-agent'ta blokeli flag yok	notification-flags.json
+10	260530-1410	brief-queue.json bulutta bayat -> brief kaçar	disproven	trace	boş+tracked, conversations.history fallback devrede	data-agent:290
+11	260530-1411	cron UTC/TR uyuşmazlığı raporları yanlış saatte tetikler	disproven	differential	04:50UTC=07:50TR, orchestrator 08:15-16:45TR, hepsi doğru	workflows/*.yml
+12	260530-1412	Headless watermark donması -> kanal >30 msg olunca brief kaybı	confirmed-HIGH	trace	Canvas write-back atlanıyor, agent-state'te last_sync_ts yok, canvas_cache gitignored	data-agent:303
+13	260530-1413	Mobil telefon genişliğinde yatay taşma	disproven	differential	isMobile<768 + matchMedia + overflow-x:auto; bilinen <1250px zaten listede	Chrome.jsx:6
+14	260530-1414	agent-state history bulutta duplike/bozuk tarih	disproven	trace	4 kayıt unique tarih + concurrency:false	agent-state.json
+15	260530-1415	Canvas HTML sabit sütun sırası varsayımı kırık parse	inconclusive	pattern-search	kırılgan ama şema sistem-üretimli sabit; aktif hata değil	data-agent:285
+16	260530-1416	Headless galeri görseli indirilmez -> kırık galeri	disproven	trace	url_private_download ile indiriliyor+rsync+commit; doc örneği yanıltıcı (low)	data-agent:181
+17	260531-0010	Bulut push dar git-add -> agent-state+notifications-sent commit edilmez (watermark+dedup persist olmaz, cift DM)	confirmed-HIGH-FIXED	trace	dashboard-agent push'a data/ state dosyalari eklendi	dashboard-agent:65
+18	260531-0020	Push oncesi rebase yok + 4 skill main'e push -> non-fast-forward reddi run kaybi + cift DM	confirmed-HIGH-FIXED	trace	dashboard-agent push'a pull --rebase + 3x retry eklendi	dashboard-agent:66
+19	260531-0021	E3 marka_stats 1 Haz aktivasyonu bulutta persist olmaz	disproven	trace	H17 fix marka_stats+agent-state push kapsamina aldi	data-agent:143
+20	260531-0022	rsync --delete app/ gerekli dosyalari siler	disproven	differential	app/ tamamen dashboard/app/ aynasi	dashboard-agent:59
+21	260531-0030	4 workflow env/git/PAT paritesi eksik	disproven	differential	sabah/haftalik/aylik/orchestrator hepsi tam parite	workflows/*.yml
+22	260531-0035	data-agent + dashboard-agent tek run'da cift push (data-agent'ta rebase yok)	confirmed-FIXED	trace	orchestrator akisinda data-agent push kaldirildi, standalone'a rebase+retry	data-agent:313
+23	260531-0036	haftalik-retro github-prep/dashboard push bulutta kirik + olu repo	confirmed-HIGH-FIXED	trace	github-prep gitignored+ayri repo bensenoint/dashboard (21May terk); ana repo yoluna cevrildi	haftalik:121
+24	260531-0050	H18 rebase fix generated-dosya conflict'inde asili kalir (live-data/index.html satir cakismasi)	confirmed-FIXED	trace	3 push noktasi -X theirs + rebase --abort + 3x loop yapildi	dashboard-agent:72

@@ -1,0 +1,13 @@
+{
+  "version": "2.1.0",
+  "source": "debug",
+  "timestamp": "2026-05-31T09:45:00+03:00",
+  "status": "COMPLETE",
+  "results_tsv": "autoresearch/debug-260531-0935/results.tsv",
+  "findings": [
+    {"id":"H6","severity":"low","desc":"Gate input font-size <16px iOS zoom","file_line":"index.html:51","status":"fixed"},
+    {"id":"H7","severity":"low","desc":"KPI deep-link filter persisted on nav","file_line":"App.jsx:24","status":"fixed"},
+    {"id":"H2","severity":"low","desc":"Gate crypto.subtle no catch","file_line":"index.html:62","status":"fixed"}
+  ],
+  "config": {"scope":"tüm sistem","symptom":"oturum yeni-kod taraması + regresyon","depth":"deep-30","action":"ask-each"}
+}
