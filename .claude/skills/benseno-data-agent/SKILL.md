@@ -328,8 +328,21 @@ curl -s -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
   "https://slack.com/api/conversations.replies?channel={CHANNEL_ID}&ts={TS}&limit=50"
 ```
 
-### Canvas GÜNCELLE (slack_update_canvas yerine) — ATLA
-**Actions modunda Canvas'a geri-yazma YAPMA.** Format dönüşümü riski (HTML↔markdown) ve production Canvas bozma riski nedeniyle headless'ta atlanır. Bunun yerine:
+### Canvas GÜNCELLE (slack_update_canvas yerine) — BAYRAK KONTROLLÜ (P3.3)
+
+**Varsayılan: ATLA.** Geri-yazma yalnızca `data/agent-state.json → canvas_writeback === true` ise yapılır. Bayrak yok/false ise (varsayılan) headless'ta Canvas'a YAZMA — format dönüşümü (HTML↔markdown) + 16 kişinin kullandığı production Canvas bozma riski.
+
+> ⚠️ **Açmadan önce gözetimli test ZORUNLU.** İlk açıkken bir run'ı canlı izle (Canvas snapshot'ını önce yedekle). Kurallar: H1 ekleme, `section_id` kullanma, footer `LAST_SYNC_TS`'i koru, EMBEDDED_DATA bloğunu AYNEN bırak, full-replace yerine yalnızca tablo satırlarını güncelle. Bozulma görürsen bayrağı kapat.
+
+**Bayrak true ise** — `canvases.edit` curl ile (yalnızca öncelik etiketi/durum sütunlarını güncelle):
+```bash
+curl -s -X POST "https://slack.com/api/canvases.edit" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" -H "Content-Type: application/json" \
+  -d '{"canvas_id":"F0B1B6XUD44","changes":[{"operation":"replace","document_content":{"type":"markdown","markdown":"<TAM güncel markdown — footer+EMBEDDED_DATA korunmuş>"}}]}'
+```
+Yanıt `"ok":false` ise log'la, **HALT etme**, live-data.json akışına devam et.
+
+**Her durumda (bayrak ne olursa olsun):**
 - live-data.json'u güncelle + push et (asıl dashboard kaynağı budur)
 - **WATERMARK PERSIST (ZORUNLU):** Canvas'a yazmadığın için, bu run'da gördüğün **en yeni brief mesajının `ts`'ini** (yoksa şu anki unix zamanı) `data/agent-state.json` → `last_sync_ts` alanına yaz + commit et. Sonraki headless run bunu okuyup ilerletir. **Bu adım atlanırsa watermark bulutta donar → kanal >100 mesaj birikince brief sessizce kaybolur.** agent-state.json'un diğer alanlarını koru (oku→merge→yaz).
 - Log'a yaz: `Canvas write-back: skipped (headless mode) · last_sync_ts→{unix} (agent-state.json)`
