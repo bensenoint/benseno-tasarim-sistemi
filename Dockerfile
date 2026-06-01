@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV TZ=Europe/Istanbul
 ENV HOME=/root
+# Container root olarak çalışıyor; claude-code --dangerously-skip-permissions'ı
+# root'ta reddeder. İzole container = sandbox → belgelenmiş bypass.
+ENV IS_SANDBOX=1
 
 # Claude Code CLI (headless: claude -p, ANTHROPIC_API_KEY ile auth)
 RUN npm install -g @anthropic-ai/claude-code
