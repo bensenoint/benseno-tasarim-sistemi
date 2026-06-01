@@ -20,13 +20,20 @@ const TZ = 'Europe/Istanbul';
 const opts = { timezone: TZ };
 
 function run(script) {
+  const t0 = Date.now();
   const child = spawn('bash', [path.join('scripts', script)], {
     cwd: PROJ,
     env: process.env,
     detached: true,
     stdio: 'ignore',
   });
-  child.on('error', (e) => console.error(`[scheduler] ${script} başlatılamadı: ${e.message}`));
+  child.on('error', (e) => console.error(`[scheduler] HATA ${script} başlatılamadı: ${e.message}`));
+  // Detay run scripti logs/*.log dosyasına yazıyor; burada Railway log'unda
+  // görünür olsun diye başlangıç + bitiş(exit kodu, süre) işaretliyoruz.
+  child.on('exit', (code, sig) => {
+    const dk = ((Date.now() - t0) / 60000).toFixed(1);
+    console.log(`[scheduler] bitti: ${script} (exit=${code ?? sig}, ${dk}dk)`);
+  });
   child.unref();
   console.log(`[scheduler] tetiklendi: ${script} @ ${new Date().toLocaleString('tr-TR', { timeZone: TZ })}`);
 }

@@ -82,12 +82,21 @@ This file also provides guidance to Claude Code (claude.ai/code) when working wi
 Sistem 4 katmanlı agent mimarisine bölünmüştür (Mayıs 2026):
 
 ```
-launchd (her dakika)
-  └─ run-orchestrator.sh
-       └─ Skill: benseno-orchestrator
-            ├─ Skill: benseno-data-agent      → canvas_cache.md, live-data.json, notification-flags.json
-            ├─ Skill: benseno-notification-agent → DM'ler, thread cevapları, calendar events
-            └─ Skill: benseno-dashboard-agent → EMBEDDED_DATA inject, GitHub push
+Railway (tek container, TZ=Europe/Istanbul)
+  ├─ scripts/scheduler.js (node-cron)
+  │    ├─ :15/:45 hft içi → run-orchestrator.sh
+  │    │    └─ Skill: benseno-orchestrator
+  │    │         ├─ Skill: benseno-data-agent      → canvas_cache.md, live-data.json, notification-flags.json
+  │    │         ├─ Skill: benseno-notification-agent → DM'ler, thread cevapları, calendar events
+  │    │         └─ Skill: benseno-dashboard-agent → EMBEDDED_DATA inject, GitHub push
+  │    ├─ 07:50 hft içi → run-sabah-raporu.sh   (dashboard-agent — sabah-raporu)
+  │    ├─ Cuma 17:00   → run-haftalik-retro.sh  (dashboard-agent — haftalik-retro)
+  │    └─ ay sonu 17:00 → run-aylik-strateji.sh (dashboard-agent — aylik-strateji)
+  └─ scripts/slack-bot.js (always-on, Socket Mode) — aynı süreçte require ile başlar
+
+Hosting: Railway (proje: friendly-art). GitHub'a `git push origin main` → otomatik build+deploy.
+Dashboard: GitHub Pages (bensenoint.github.io), git push ile güncellenir.
+Mac: SOĞUK YEDEK — scriptler değiştirilmedi, gerekirse `claude -p "Skill: benseno-orchestrator — run"` ile manuel.
 ```
 
 **Haberleşme dosyaları (agent'lar arası):**
@@ -126,18 +135,19 @@ claude -p "Skill: benseno-data-agent — run" --dangerously-skip-permissions
 # Sabah raporu manuel
 claude -p "Skill: benseno-dashboard-agent — sabah-raporu" --dangerously-skip-permissions
 
-# Slack Bot yeniden başlat
-pkill -f "slack-bot.js"; bash scripts/run-slack-bot.sh &
-
 # Slack List manuel güncelle
 node scripts/create-slack-list.js --update
 
-# Aktif launchd job'ları
-launchctl list | grep benseno
+# ── Railway (canlı sistem) ──
+railway status                       # servis durumu (Online/Crashed)
+railway logs                         # scheduler + bot stdout
+railway redeploy --yes               # yeniden başlat (bot + scheduler)
+railway ssh "tail -30 logs/orchestrator.log"   # container içi run logları
+railway variables --json             # env var'lar (değerler dahil — dikkat)
 
-# Canlı log izle
-tail -f logs/orchestrator.log
-tail -f logs/slack-bot.log
+# ── Mac soğuk yedek (gerekirse) ──
+# launchctl load ~/Library/LaunchAgents/com.benseno.slack-bot.plist   # bot'u Mac'te aç
+# claude -p "Skill: benseno-orchestrator — run" --dangerously-skip-permissions  # manuel run
 ```
 
 ---
@@ -228,13 +238,16 @@ mcp__8d40c455-...__slack_read_user_profile
 
 ## Scheduled Task'lar
 
+Zamanlama **Railway + node-cron** (`scripts/scheduler.js`, TZ=Europe/Istanbul) ile yapılır. Her cron run-*.sh'i detached spawn eder; cron tanımları scheduler.js'tedir.
+
 | Task | Zamanlama | Script | Skill |
 |---|---|---|---|
 | Orchestrator (Brief Sync) | Hft içi :15/:45 (08-17) | `run-orchestrator.sh` | `benseno-orchestrator` |
 | Sabah Raporu | Hft içi 07:50 | `run-sabah-raporu.sh` | `benseno-dashboard-agent — sabah-raporu` |
 | Haftalık Retro | Cuma 17:00 | `run-haftalik-retro.sh` | `benseno-dashboard-agent — haftalik-retro` |
 | Aylık Strateji | Ay sonu 17:00 | `run-aylik-strateji.sh` | `benseno-dashboard-agent — aylik-strateji` |
-| Slack Bot | Her zaman | `run-slack-bot.sh` | — |
+| Log temizle | Her gece 03:30 | `run-log-temizle.sh` | — |
+| Slack Bot | Her zaman (always-on) | `scheduler.js` içinde require | — |
 | Onboarding | Manuel | — | `benseno-onboarding — başlat: {ID} {İsim} {Tarih}` |
 
 ---
@@ -250,8 +263,9 @@ mcp__8d40c455-...__slack_read_user_profile
 **Canvas cache stale:**
 → `data/canvas_cache.md`'yi sil, bir sonraki sync'te yenilenir.
 
-**Slack Bot ölmüş:**
-→ `ps aux | grep slack-bot` kontrol et, `bash scripts/run-slack-bot.sh &` ile yeniden başlat.
+**Slack Bot ölmüş / cron ateşlemiyor:**
+→ `railway status` (Crashed mı?), `railway logs` ile bak. Gerekirse `railway redeploy --yes`.
+→ Env eksikse bot `appToken` hatasıyla çöker — `railway variables --json` ile SLACK_*/ANTHROPIC kontrol et.
 
 **GitHub push 401:**
 → `data/.github-pat-sistem` yenile, 90 günlük expiry dolmuş.
