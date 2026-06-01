@@ -7,6 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "start": "bash scripts/railway-entrypoint.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,6 +15,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@slack/bolt": "^4.7.2"
+    "@slack/bolt": "^4.7.2",
+    "node-cron": "^3.0.3"
   }
 }

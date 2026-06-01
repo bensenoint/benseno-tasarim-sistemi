@@ -1,0 +1,19 @@
+# Build context'ten dışla — image'i küçük ve secret-free tut
+node_modules
+logs
+*.log
+.DS_Store
+autoresearch
+backups
+graphify-out
+.remember
+docs/*.docx
+docs/*.pdf
+
+# Gizli dosyalar image'e GİRMESİN — entrypoint bunları Railway env'den üretir
+data/.github-pat*
+data/.slack*
+data/.dashboard-auth-hash
+data/canvas_cache.md
+
+# .git push için GEREKLİ → dışlanmıyor
