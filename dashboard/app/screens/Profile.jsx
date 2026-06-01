@@ -204,7 +204,7 @@ function ProfileScreen({ data, user, onOpenBrief }) {
       <div style={{display:"grid", gridTemplateColumns:"1.6fr 1fr", gap:"var(--grid-gap)", marginBottom:"var(--grid-gap)"}} className="bn-grid-2">
 
         {/* Sol: aktif işler */}
-        <Card padding={0}>
+        <Card padding={0} style={{minWidth:0}}>
           <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
             <div>
               <h2 style={{font:"600 14px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Üzerimdeki aktif işler</h2>

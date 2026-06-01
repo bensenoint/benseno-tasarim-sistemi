@@ -87,7 +87,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
         </Card>
 
         {/* Briefs */}
-        <Card padding={0}>
+        <Card padding={0} style={{minWidth:0}}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
             <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>{r.name} işleri</h2>
             <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{rows.length} aktif</div>
