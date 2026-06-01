@@ -163,6 +163,10 @@ function App() {
         if (Array.isArray(ed.bns_completed) && window.bnsHydrateCompleted) {
           window.BNS_DATA.completed = ed.bns_completed.map(window.bnsHydrateCompleted);
         }
+        // Gerçek aktivite akışı (P3.2) — yoksa data.js mock'u korunur
+        if (Array.isArray(ed.bns_activity) && ed.bns_activity.length > 0) {
+          window.BNS_DATA.activity = ed.bns_activity;
+        }
         // Departman + marka istatistikleri
         if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object") {
           window.BNS_DATA.deptStats = typeof bnsNormDeptStats === "function" ? bnsNormDeptStats(ed.bns_dept_stats) : ed.bns_dept_stats;

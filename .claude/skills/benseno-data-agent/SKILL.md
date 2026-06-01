@@ -239,6 +239,16 @@ Her completed brief için (max son 12 brief):
     // Son 14 kaydı al (zaten günlük, ~3 hafta), yoksa [] gönder
     // Her eleman: { "ts": <unix>, "date": "YYYY-MM-DD", "active": N, "overdue": N, "dm_sent": N, "errors": N, "ok": true|false }
   ],
+  "bns_activity": [
+    // GERÇEK aktivite akışı (P3.2) — Geçmiş ekranı bunu gösterir (yoksa mock).
+    // Bu run'da gözlemlenen olaylardan en yeni ~20 olay (yeni→eski). Şekil:
+    //   { "t": <unix_ms>, "who": "<user_id>", "verb": "<fiil>", "target": "<marka · iş>", "meta": "<ops>" }
+    // Kaynaklar (mevcut verilerden, ek Slack çağrısı GEREKMEZ):
+    //   • Tamamlananlar (bns_completed): t=bitis(ms), who=leadId, verb="tamamladı", target="{marka} · {baslik}"
+    //   • Bu run yeni brief'ler (new_briefs): t=now_ms, who=atanan[0]||opener, verb="yeni brief açtı", target="{marka} · {is}"
+    //   • Threshold geçişleri: t=now_ms, who="U030C48PL23", verb="öncelik değişti", target, meta="{prev}→{yeni}"
+    // who bilinmiyorsa atla. En fazla 20 olay, t'ye göre azalan sırada.
+  ],
   "last_sync": "<ISO timestamp>",
   "sync_ts": <unix>,
   "source": "data-agent-run-{unix}"
