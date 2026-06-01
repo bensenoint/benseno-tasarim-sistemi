@@ -58,7 +58,7 @@ echo "[$TIMESTAMP] Son sync: ${LAST_HUMAN} (${DIFF_MIN} dk önce)" >> "$LOG"
 
 # 2 saatten uzun sessizlik → uyar
 if [[ $DIFF -gt 7200 ]]; then
-  MSG="⚠️ *Brief Sync ${DIFF_MIN} dakikadır çalışmadı!* (Son çalışma: ${LAST_HUMAN})\nLaunchd kontrolü: \`launchctl list | grep benseno-brief\`\nManüel başlatma: \`bash ~/benseno-tasarim-sistemi/scripts/run-brief-sync.sh\`"
+  MSG="⚠️ *Orchestrator ${DIFF_MIN} dakikadır çalışmadı!* (Son çalışma: ${LAST_HUMAN})\nManüel başlatma: \`bash ~/benseno-tasarim-sistemi/scripts/run-orchestrator.sh\`"
   echo "[$TIMESTAMP] UYARI gönderiliyor: ${DIFF_MIN} dk sessizlik" >> "$LOG"
   /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --print --dangerously-skip-permissions >> "$LOG" 2>&1
 fi
