@@ -5,41 +5,24 @@
 
 ---
 
-## 🔴 P1 — Yüksek öncelik (taşımadan doğan işlevsel/güvenilirlik boşlukları)
-
-### P1.2 — Watchdog'u Railway'e uyarla
-- **Neden kritik:** Şu an **hiçbir hata izleme yok**. Railway orchestrator sessizce çökerse (claude hatası, push fail) kimse haberdar olmaz. Mac'teki watchdog kapandı.
-- **Engel:** `watchdog.sh` heartbeat'i `logs/brief-sync-last.ts`'ten okuyor ama Railway dosya sistemi **ephemeral** (her deploy/restart sıfırlanır) → olduğu gibi taşınırsa sürekli yanlış alarm verir.
-- **Fix seçenekleri:** (a) heartbeat'i git'e push edilen `agent-state.json → last_sync_ts`'ten oku (zaten persist), (b) scheduler.js'in `bitti (exit≠0)` log'unda doğrudan DM tetikle, (c) Railway healthcheck + harici uptime servisi.
-- **Risk:** Orta.
-
-### P1.3 — PAT süre takibini geri getir
-- **Neden:** `check-pat-expiry.sh` Mac launchd'deydi (pat-check), şimdi kapalı. `data/.github-pat-sistem` ~78 gün sonra dolacak; dolduğunda **tüm push'lar sessizce 401 verir** (orchestrator çalışır ama dashboard güncellenmez).
-- **Fix:** pat-check'i Railway scheduler'a ekle (haftalık cron) ya da takvime manuel hatırlatma. Süre dolmadan PAT yenile + `railway variable set BENSENO_GITHUB_PAT=...`.
+## 🔴 P1 — ✅ TÜMÜ TAMAMLANDI
+P1.1 (blokeli/escalation DM), P1.2 (Railway watchdog — exit≠0'da Görkem'e DM), P1.3 (PAT takibi — Pazartesi cron). Bkz. "Tamamlananlar".
 
 ---
 
-## 🟡 P2 — Orta öncelik (güvenlik + maliyet + görünürlük)
+## 🟡 P2 — Orta öncelik (👤 = senin aksiyonun gerekiyor)
 
-### P2.1 — Classic PAT'lere expiration ekle (güvenlik hijyeni)
+### P2.1 — Classic PAT'lere expiration ekle (güvenlik hijyeni) — 👤 SEN
 - `benseno-workflow` ve `benseno-sistem-full` classic token'larının **ikisinde de expiration yok** → sızarsa sonsuza dek geçerli.
-- **Fix:** İkisine de süre ekle (yeni token üret + Railway env + `.github-pat-sistem` güncelle) veya net rotasyon takvimi. Süre eklenince P1.3 takibi anlamlı olur.
+- **Fix (sen):** GitHub → Settings → Developer settings → Tokens → her ikisine süre ekle (yeni token üret) → `railway variable set BENSENO_GITHUB_PAT=<yeni>` + local `data/.github-pat-sistem` güncelle. (Token girişini ben yapamam.)
 
-### P2.2 — ANTHROPIC API kullanım maliyeti izleme
-- **Neden:** Yeni `ANTHROPIC_API_KEY` (console.anthropic.com) kullanım-başına faturalanıyor — Mac'teki abonelik OAuth'undan farklı. Şu an harcama görünürlüğü yok.
-- **Fix:** console.anthropic.com → Usage limits / billing alert kur. Aylık beklenen: orchestrator ~günde 18 run × 22 gün + raporlar. İlk fatura sonrası kalibre et.
-
-### P2.3 — Günlük-özet raporunu yeniden etkinleştir
-- **Durum:** Eski 17:00 "Günlük Sistem Özeti" DM'i devre dışı (taşımada bırakıldı), Railway scheduler'a eklenmedi.
-- **Fix:** `run-gunluk-ozet.sh` zaten var → scheduler.js'e cron ekle (`0 17 * * 1-5`) ya da gereksizse scripti/notu tümden kaldır (karar ver).
+### P2.2 — ANTHROPIC API kullanım maliyeti izleme — 👤 SEN
+- **Neden:** Yeni `ANTHROPIC_API_KEY` (console.anthropic.com) kullanım-başına faturalanıyor. Şu an harcama görünürlüğü yok.
+- **Fix (sen):** console.anthropic.com → Billing → Usage limits / alert kur. Aylık beklenen: orchestrator ~günde 18 run × 22 gün + raporlar. İlk fatura sonrası kalibre et.
 
 ---
 
 ## 🟢 P3 — Düşük öncelik / opsiyonel
-
-### P3.1 — Department + Profil ekranlarında iç layout taşması
-- Main <1250px'e düşünce tablo kartı sağa taşıyor (13" MBA varsayılanda görünmez, sadece daraltınca).
-- **Fix:** `Department.jsx` + `Profile.jsx` tablo kolonuna `minWidth:0` (Overview pattern'i).
 
 ### P3.2 — Geçmiş ekranı mock aktivite gösteriyor
 - `History.jsx` → `data.activity` hep sahte; live-data.json'da doldurulmuyor.
@@ -63,6 +46,10 @@
 
 ## ✅ Tamamlananlar (referans)
 - **P1.1 — Blokeli + escalation DM** → notification-agent'a port edildi (Şablon 29-32, eski "#3a")
+- **P1.2 — Railway watchdog** → run-orchestrator gerçek exit kodu döndürüyor + scheduler exit≠0'da Görkem'e DM
+- **P1.3 — PAT takibi** → check-pat-expiry Pazartesi 09:00 cron + date portable (GNU/BSD)
+- **P2.3 — Günlük-özet** → hft içi 17:00 cron yeniden etkin
+- **P3.1 — Department/Profil layout** → tablo kolonuna minWidth:0
 - Headless watermark + state + push robustluğu (H12/H17/H18/H23/H24/H25)
 - Slack Bot always-on host'a taşındı → **Railway** (eski "#3")
 - ~~Workflow-scope PAT yenileme~~ / ~~Node.js 24 (Actions)~~ → Actions silindi, gereksiz
