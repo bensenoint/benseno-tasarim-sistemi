@@ -766,7 +766,7 @@ Bkz. Bölüm 7.4.
 
 ### 8.4 Günlük Sistem Özeti — Her Hafta İçi 17:00 *(şu an DEVRE DIŞI)*
 
-> ⚠️ Bu rapor bulut göçünde devre dışı bırakıldı (Mac launchd kapalı, GitHub Actions karşılığı henüz yok). Yayın-sonrası eklenmesi planlanıyor. Aşağıdaki içerik hedeflenen kapsamdır.
+> ⚠️ Bu rapor şu an devre dışı (Railway scheduler'a henüz eklenmedi). Yayın-sonrası eklenmesi planlanıyor. Aşağıdaki içerik hedeflenen kapsamdır.
 
 Yöneticilere (öncelikli Görkem'e) kısa sistem sağlığı DM'i:
 - Kaç orchestrator run yapıldı
@@ -814,25 +814,28 @@ Her iş günü sabah **09:30'da** yeni ekip üyesine DM gönderilir:
 
 ## 10. Sistem Çalışma Takvimi
 
-### 10.1 Mimari — Bulut + Mac (Hibrit)
+### 10.1 Mimari — Railway (tek bulut container)
 
-Sistem **iki katmanda** çalışır:
+Tüm sistem **Railway'de tek bir always-on container'da** çalışır (proje: `friendly-art`):
 
-- **☁️ Bulut (GitHub Actions):** Zamanlanmış tüm işler (brief tarama, raporlar, dashboard güncelleme) GitHub'ın sunucularında cron ile çalışır. **Mac kapalı olsa bile çalışır.**
-- **💻 Mac (launchd):** Yalnızca **gerçek-zamanlı Slack Bot** (slash komut, reaction override, brief formu) Mac'te çalışır. Mac kapalıyken bu özellikler beklemede kalır; ama brief'ler bulut tarafından yine yakalanır (kanal taraması).
+- **⏰ Zamanlayıcı (node-cron):** Brief tarama, raporlar, dashboard güncelleme — hepsi container içindeki `scheduler.js` ile TR saatine göre tetiklenir. **7/24 çalışır, Mac kapalı olsa da.**
+- **💬 Slack Bot (Socket Mode):** Slash komut, reaction override, brief formu — aynı container'da kesintisiz çalışır.
+- **🖥️ Dashboard:** GitHub Pages'te kalır (`bensenoint.github.io`), container her run'da `git push` ile günceller.
+- **💾 Mac:** **Soğuk yedek** — normalde kapalı. Railway çökerse manuel `claude -p "Skill: benseno-orchestrator — run"` ile devreye alınır.
 
 > Çalışma saatleri **hafta içi (Pzt–Cuma)**. Orchestrator TR saatiyle **08:15–16:45** arası her saat :15 ve :45'te çalışır. Hafta sonu zamanlanmış iş yok.
 
-### 10.2 Bulut Çalışma Zamanları (GitHub Actions)
+### 10.2 Çalışma Zamanları (Railway scheduler)
 
-| Zaman (TR) | İşlem | Workflow |
-|------------|-------|----------|
-| **Hft içi :15 ve :45 (08:15–16:45)** | Orchestrator (brief tarama, bildirim, dashboard) | `orchestrator.yml` |
-| **07:50 hafta içi** | Sabah raporu | `sabah-raporu.yml` |
-| **Cuma 17:00** | Haftalık retrospektif | `haftalik-retro.yml` |
-| **Ay sonu 17:00** | Aylık stratejik özet | `aylik-strateji.yml` |
+| Zaman (TR) | İşlem | Script |
+|------------|-------|--------|
+| **Hft içi :15 ve :45 (08:15–16:45)** | Orchestrator (brief tarama, bildirim, dashboard) | `run-orchestrator.sh` |
+| **07:50 hafta içi** | Sabah raporu | `run-sabah-raporu.sh` |
+| **Cuma 17:00** | Haftalık retrospektif | `run-haftalik-retro.sh` |
+| **Ay sonu 17:00** | Aylık stratejik özet | `run-aylik-strateji.sh` |
+| **Her gece 03:30** | Log temizliği | `run-log-temizle.sh` |
 
-> ℹ️ **"Günlük Sistem Özeti" (eski 17:00 DM) şu an çalışmıyor** — bulut göçünde devre dışı bırakıldı, henüz Actions karşılığı yok (yayın-sonrası ele alınacak).
+> ℹ️ **"Günlük Sistem Özeti" (eski 17:00 DM) şu an çalışmıyor** — devre dışı, yayın-sonrası ele alınacak.
 
 ### 10.3 Orchestrator Adımları (Her :15/:45)
 
@@ -869,7 +872,7 @@ Her 30 dakikada bir sistem şu adımları sırayla tamamlar:
 
 ### 10.4 Eşzamanlılık Koruması
 
-Bir orchestrator çalışması devam ederken yenisi başlamaz — GitHub Actions `concurrency` grubu (`benseno-orchestrator`, `cancel-in-progress: false`) bunu garanti eder. (Eski Mac-yerleşik sürümde `/tmp/benseno-orchestrator.lock` kullanılıyordu; bulutta artık gerek yok.)
+Bir orchestrator çalışması devam ederken yenisi başlamaz — `run-orchestrator.sh` içindeki `/tmp/benseno-orchestrator.lock` (PID kontrolü) bunu garanti eder. Railway tek container/tek scheduler olduğu için zaten çift tetikleme olmaz; lock uzun süren bir run bir sonraki :15/:45'e taşarsa örtüşmeyi engeller.
 
 > **Not (bulut özel davranış):** Headless bulut modunda data-agent Slack Canvas'a **geri yazmaz** (format bozma riski) — dashboard yine güncel kalır (`live-data.json` üzerinden), sadece Slack Canvas'taki öncelik etiketleri Mac açılınca senkronlanır.
 
@@ -954,17 +957,16 @@ Bir orchestrator çalışması devam ederken yenisi başlamaz — GitHub Actions
 ```
 ~/benseno-tasarim-sistemi/
 ├── .claude/
-│   └── skills/                    # Agent skill tanımları
+│   └── skills/                    # Agent skill tanımları (7)
 │       ├── benseno-orchestrator/  # Ana orkestratör
 │       ├── benseno-data-agent/    # Canvas okuma / parsing
 │       ├── benseno-notification-agent/ # DM / calendar
-│       ├── benseno-dashboard-agent/    # GitHub push
-│       ├── benseno-gunluk-performans/  # Sabah raporu
-│       ├── benseno-haftalik-retrospektif/
-│       ├── benseno-aylik-strateji/
+│       ├── benseno-dashboard-agent/    # GitHub push + sabah/haftalik/aylik raporlar
 │       ├── benseno-onboarding/
 │       ├── benseno-brief-tamamla/
 │       └── benseno-reaction-override/
+├── Dockerfile                     # Railway container
+├── railway.json                   # Railway build config
 ├── dashboard/
 │   ├── index.html                 # Ana HTML (EMBEDDED_DATA burada)
 │   └── app/
@@ -984,13 +986,14 @@ Bir orchestrator çalışması devam ederken yenisi başlamaz — GitHub Actions
 │   ├── marka_stats.json           # E3 marka istatistikleri
 │   └── notifications-sent.json    # İdempotent DM log
 ├── scripts/
+│   ├── scheduler.js               # node-cron zamanlayıcı + bot (Railway entry)
+│   ├── railway-entrypoint.sh      # secret'ları env'den üretir, git kurar
 │   ├── build-dashboard.sh         # Bundle yeniden derle
-│   ├── run-orchestrator.sh        # launchd wrapper
+│   ├── run-orchestrator.sh        # :15/:45 orchestrator
 │   ├── run-sabah-raporu.sh        # 07:50 sabah raporu
-│   ├── run-haftalik.sh            # Cuma 17:00
-│   ├── run-aylik.sh               # Ay sonu
-│   ├── run-gunluk-ozet.sh         # 17:00 günlük özet
-│   ├── run-slack-bot.sh           # Slack Bot başlat
+│   ├── run-haftalik-retro.sh      # Cuma 17:00
+│   ├── run-aylik-strateji.sh      # Ay sonu 17:00
+│   ├── run-log-temizle.sh         # 03:30 log temizliği
 │   └── slack-bot.js               # Socket Mode bot
 └── logs/
     ├── orchestrator.log
@@ -1014,43 +1017,32 @@ claude -p "Skill: benseno-orchestrator — run" --dangerously-skip-permissions
 claude -p "Skill: benseno-data-agent — run" --dangerously-skip-permissions
 
 # Sabah raporunu manuel tetikle
-claude -p "Skill: benseno-gunluk-performans — run now" --dangerously-skip-permissions
+claude -p "Skill: benseno-dashboard-agent — sabah-raporu" --dangerously-skip-permissions
 
-# Slack Bot'u yeniden başlat
-pkill -f "slack-bot.js"; bash scripts/run-slack-bot.sh &
-
-# Aktif launchd job'ları listele
-launchctl list | grep benseno
-
-# Canlı orchestrator log'u izle
-tail -f logs/orchestrator.log
-
-# Canlı Slack Bot log'u izle
-tail -f logs/slack-bot.log
+# ── Railway (canlı sistem) ──
+railway status                                  # Online/Crashed
+railway logs                                    # scheduler + bot
+railway redeploy --yes                          # bot + scheduler yeniden başlat
+railway ssh "tail -f logs/orchestrator.log"     # container içi canlı log
 ```
 
 ---
 
-### 12.3 Zamanlama — Bulut (GitHub Actions) + Mac (launchd)
+### 12.3 Zamanlama — Railway (node-cron)
 
-**☁️ GitHub Actions workflow'ları** (`.github/workflows/`) — Mac kapalıyken de çalışır. Cron UTC'dir; TR = UTC+3.
+Tüm zamanlama **container içindeki `scripts/scheduler.js`** ile yapılır (node-cron, TZ=Europe/Istanbul). Cron tanımları doğrudan TR saatindedir (UTC çevirisi gerekmez).
 
-| Workflow | Cron (UTC) | TR karşılığı |
-|----------|-----------|--------------|
-| `orchestrator.yml` | `15,45 5-13 * * 1-5` | Hft içi 08:15–16:45, :15/:45 |
-| `sabah-raporu.yml` | `50 4 * * 1-5` | Hft içi 07:50 |
-| `haftalik-retro.yml` | `0 14 * * 5` | Cuma 17:00 |
-| `aylik-strateji.yml` | `0 14 28 * *` | Ayın 28'i 17:00 |
+| Cron (TR) | İşlem | Script |
+|-----------|-------|--------|
+| `15,45 8-17 * * 1-5` | Orchestrator | `run-orchestrator.sh` |
+| `50 7 * * 1-5` | Sabah raporu | `run-sabah-raporu.sh` |
+| `0 17 * * 5` | Haftalık retro | `run-haftalik-retro.sh` |
+| `0 17 25-31 * *` | Aylık strateji (script ay-sonu kontrol eder) | `run-aylik-strateji.sh` |
+| `30 3 * * *` | Log temizliği | `run-log-temizle.sh` |
 
-**💻 Mac launchd job'ları** (yalnız aşağıdakiler aktif):
+**Slack Bot** aynı container'da `scheduler.js` içinden `require('./slack-bot.js')` ile always-on çalışır (ayrı job değil).
 
-| Job | Tetiklenme | Rol |
-|-----|-----------|-----|
-| `com.benseno.slack-bot` | Boot + crash-restart | Gerçek-zamanlı Slack Bot (Socket Mode) |
-| `com.benseno.pat-check` | Günlük | PAT süre kontrolü |
-| `com.benseno.log-temizle` | Haftalık | Log temizliği |
-
-> Eski zamanlama job'ları (`orchestrator`, `sabah-raporu`, `haftalik-retro`, `aylik-strateji`, `gunluk-ozet`, `startup-recovery`, `watchdog`) bulut göçünde **devre dışı** bırakıldı → `~/Library/LaunchAgents/benseno-disabled/`. Mac + bulut'un aynı anda çalışıp çift-işlem yapmaması için.
+> **GitHub Actions yok:** Eski `.github/workflows/*.yml` cron'ları güvenilmez (best-effort, hiç ateşlemedi) olduğu için **silindi**. **Mac launchd:** tüm benseno job'ları kapalı (soğuk yedek) → `~/Library/LaunchAgents/benseno-disabled/`. Tek aktif runner: **Railway**.
 
 ---
 
@@ -1126,7 +1118,7 @@ Canvas güncellemeleri yanlış yapılırsa veri bozulur. Kesinlikle uyulması g
 | **Stale / Hareketsiz** | 3+ gündür güncellenmeyen brief |
 | **Blokeli** | İlerlemesi engellenmiş (>72sa geçmiş veya engelli) brief |
 | **Soft gate** | Dashboard giriş şifre ekranı — UI'ı gizler (sunucu-tarafı koruma değil) |
-| **Headless** | Bulutta (GitHub Actions) ekran/MCP olmadan çalışan mod; Canvas'a geri yazmaz |
+| **Headless** | Railway container'da ekran/MCP olmadan çalışan mod (claude -p, curl fallback); Canvas'a geri yazmaz |
 
 ---
 
