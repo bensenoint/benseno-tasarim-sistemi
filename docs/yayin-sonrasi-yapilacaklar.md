@@ -22,18 +22,12 @@ P1.1 (blokeli/escalation DM), P1.2 (Railway watchdog — exit≠0'da Görkem'e D
 
 ---
 
-## 🟢 P3 — Düşük öncelik / opsiyonel
+## 🟢 P3 — Talep-üzerine (bug değil, opsiyonel optimizasyon)
 
-### P3.2 — Geçmiş ekranı mock aktivite gösteriyor
-- `History.jsx` → `data.activity` hep sahte; live-data.json'da doldurulmuyor.
-- **Fix:** data-agent gerçek aktivite olayları üretsin + App.jsx bridge okusun.
-
-### P3.3 — Canvas headless geri-yazma (kozmetik)
-- Headless modda data-agent Canvas'a yazmıyor (format bozma riski). Slack Canvas öncelik renkleri güncellenmiyor; dashboard güncel.
-- **Fix (opsiyonel):** `canvases.edit` API ile, izole test ortamında.
-
-### P3.4 — autoresearch optimizasyon döngüleri (izole branch)
-- bundle.js küçültme (248KB), sabah-raporu prompt kalitesi. Ayrı `autoresearch/*` branch'inde, Benseno Bot otomatik commit'leriyle karışmadan.
+### P3.4 — autoresearch optimizasyon döngüleri — ⏸️ TALEP-ÜZERİNE
+- bundle.js küçültme (248KB — zaten küçük), sabah-raporu prompt kalitesi. Otonom döngü = token/işlem maliyeti + UI-bozma riski + düşük değer; bir gap değil.
+- **Tetikleme (istendiğinde):** `python scripts/setup_experiment.py --scope project --domain engineering --name bundle-size ...` ayrı `autoresearch/*` branch'inde; her iterasyon Playwright 15-ekran render testi. Benseno Bot commit'leriyle karışmaması için ayrı branch şart.
+- **Karar:** Gerçek bir performans ihtiyacı doğmadıkça ertelendi.
 
 ---
 
@@ -50,6 +44,8 @@ P1.1 (blokeli/escalation DM), P1.2 (Railway watchdog — exit≠0'da Görkem'e D
 - **P1.3 — PAT takibi** → check-pat-expiry Pazartesi 09:00 cron + date portable (GNU/BSD)
 - **P2.3 — Günlük-özet** → hft içi 17:00 cron yeniden etkin
 - **P3.1 — Department/Profil layout** → tablo kolonuna minWidth:0
+- **P3.2 — Geçmiş gerçek aktivite** → data-agent bns_activity[] + App.jsx bridge
+- **P3.3 — Canvas geri-yazma** → bayrak-kontrollü (varsayılan kapalı), gözetimli-test prosedürlü
 - Headless watermark + state + push robustluğu (H12/H17/H18/H23/H24/H25)
 - Slack Bot always-on host'a taşındı → **Railway** (eski "#3")
 - ~~Workflow-scope PAT yenileme~~ / ~~Node.js 24 (Actions)~~ → Actions silindi, gereksiz
