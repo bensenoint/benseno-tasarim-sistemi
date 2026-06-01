@@ -64,3 +64,7 @@ if [ $CLAUDE_EXIT -ne 0 ]; then
 fi
 
 echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator tamamlandı. (exit: $CLAUDE_EXIT)" >> "$LOG"
+
+# Gerçek claude exit kodunu döndür (scheduler izlesin — eskiden son echo 0 döndürüp
+# claude hatalarını maskeliyordu). Lock trap'i yine çalışır.
+exit $CLAUDE_EXIT

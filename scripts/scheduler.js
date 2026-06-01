@@ -18,6 +18,28 @@ const path = require('path');
 const PROJ = path.join(process.env.HOME, 'benseno-tasarim-sistemi');
 const TZ = 'Europe/Istanbul';
 const opts = { timezone: TZ };
+const GM_ID = 'U030C48PL23'; // Görkem GM — hata bildirimleri
+
+// P1.2 — Watchdog: bir run claude-hatasıyla çıkarsa (exit≠0) Görkem'e DM.
+// run-orchestrator.sh artık gerçek claude exit kodunu döndürüyor (eskiden maskeleniyordu).
+async function notifyFailure(script, code, dk) {
+  const tok = process.env.SLACK_BOT_TOKEN;
+  if (!tok) { console.error('[scheduler] hata DM atlandı: SLACK_BOT_TOKEN yok'); return; }
+  const ts = new Date().toLocaleString('tr-TR', { timeZone: TZ });
+  const text = `🔴 *Benseno scheduler hatası* — \`${script}\` exit=${code} (${dk}dk) · ${ts}\n` +
+    'Kontrol: `railway logs` veya `railway ssh "tail -30 logs/orchestrator.log"`.';
+  try {
+    const r = await fetch('https://slack.com/api/chat.postMessage', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channel: GM_ID, text }),
+    });
+    const j = await r.json();
+    console.log(`[scheduler] hata DM ${j.ok ? 'gönderildi' : 'BAŞARISIZ: ' + j.error}`);
+  } catch (e) {
+    console.error(`[scheduler] hata DM exception: ${e.message}`);
+  }
+}
 
 function run(script) {
   const t0 = Date.now();
@@ -33,6 +55,7 @@ function run(script) {
   child.on('exit', (code, sig) => {
     const dk = ((Date.now() - t0) / 60000).toFixed(1);
     console.log(`[scheduler] bitti: ${script} (exit=${code ?? sig}, ${dk}dk)`);
+    if (code !== 0) notifyFailure(script, code ?? sig, dk);
   });
   child.unref();
   console.log(`[scheduler] tetiklendi: ${script} @ ${new Date().toLocaleString('tr-TR', { timeZone: TZ })}`);
