@@ -44,7 +44,7 @@ fi
 
 # Oluşturma tarihinden expire tahmin (GitHub fine-grained PAT max 1 yıl)
 # .github-pat-created formatı: YYYY-MM-DD
-CREATED_EPOCH=$(date -j -f "%Y-%m-%d" "$CREATED" "+%s" 2>/dev/null)
+CREATED_EPOCH=$(date -d "$CREATED" "+%s" 2>/dev/null || date -j -f "%Y-%m-%d" "$CREATED" "+%s" 2>/dev/null)
 if [[ -z "$CREATED_EPOCH" ]]; then
   echo "[$TIMESTAMP] Tarih parse hatası: $CREATED" >> "$LOG"
   exit 1
@@ -54,7 +54,7 @@ fi
 EXPIRE_EPOCH=$(( CREATED_EPOCH + 365 * 86400 ))
 NOW_EPOCH=$(date +%s)
 DAYS_LEFT=$(( (EXPIRE_EPOCH - NOW_EPOCH) / 86400 ))
-EXPIRE_DATE=$(date -j -f "%s" "$EXPIRE_EPOCH" "+%d %B %Y" 2>/dev/null)
+EXPIRE_DATE=$(date -d "@$EXPIRE_EPOCH" "+%d %B %Y" 2>/dev/null || date -j -f "%s" "$EXPIRE_EPOCH" "+%d %B %Y" 2>/dev/null)
 
 echo "[$TIMESTAMP] PAT geçerli. Tahmini expire: $EXPIRE_DATE ($DAYS_LEFT gün kaldı)" >> "$LOG"
 

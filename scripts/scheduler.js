@@ -55,7 +55,8 @@ function run(script) {
   child.on('exit', (code, sig) => {
     const dk = ((Date.now() - t0) / 60000).toFixed(1);
     console.log(`[scheduler] bitti: ${script} (exit=${code ?? sig}, ${dk}dk)`);
-    if (code !== 0) notifyFailure(script, code ?? sig, dk);
+    // check-pat-expiry kendi DM'ini atıyor (exit 1 = PAT geçersiz) → çift DM olmasın
+    if (code !== 0 && script !== 'check-pat-expiry.sh') notifyFailure(script, code ?? sig, dk);
   });
   child.unref();
   console.log(`[scheduler] tetiklendi: ${script} @ ${new Date().toLocaleString('tr-TR', { timeZone: TZ })}`);
@@ -71,6 +72,8 @@ cron.schedule('0 17 * * 5', () => run('run-haftalik-retro.sh'), opts);
 cron.schedule('0 17 25-31 * *', () => run('run-aylik-strateji.sh'), opts);
 // Log temizliği — her gece 03:30
 cron.schedule('30 3 * * *', () => run('run-log-temizle.sh'), opts);
+// PAT süre/geçerlilik kontrolü — Pazartesi 09:00 (P1.3; geçersizse kendi DM'ini atar)
+cron.schedule('0 9 * * 1', () => run('check-pat-expiry.sh'), opts);
 
 console.log(`[scheduler] 5 cron job kuruldu (TZ=${TZ}). Slack bot başlatılıyor...`);
 
