@@ -22,12 +22,9 @@ P1.1 (blokeli/escalation DM), P1.2 (Railway watchdog — exit≠0'da Görkem'e D
 
 ---
 
-## 🟢 P3 — Talep-üzerine (bug değil, opsiyonel optimizasyon)
+## 🟢 P3 — ✅ TÜMÜ TAMAMLANDI (P3.1 layout, P3.2 aktivite, P3.3 Canvas-bayrak, P3.4 bundle-minify)
 
-### P3.4 — autoresearch optimizasyon döngüleri — ⏸️ TALEP-ÜZERİNE
-- bundle.js küçültme (248KB — zaten küçük), sabah-raporu prompt kalitesi. Otonom döngü = token/işlem maliyeti + UI-bozma riski + düşük değer; bir gap değil.
-- **Tetikleme (istendiğinde):** `python scripts/setup_experiment.py --scope project --domain engineering --name bundle-size ...` ayrı `autoresearch/*` branch'inde; her iterasyon Playwright 15-ekran render testi. Benseno Bot commit'leriyle karışmaması için ayrı branch şart.
-- **Karar:** Gerçek bir performans ihtiyacı doğmadıkça ertelendi.
+> Kalan tek açık optimizasyon: sabah-raporu prompt kalitesi (autoresearch) — gerçek ihtiyaç doğarsa izole branch'te.
 
 ---
 
@@ -46,6 +43,7 @@ P1.1 (blokeli/escalation DM), P1.2 (Railway watchdog — exit≠0'da Görkem'e D
 - **P3.1 — Department/Profil layout** → tablo kolonuna minWidth:0
 - **P3.2 — Geçmiş gerçek aktivite** → data-agent bns_activity[] + App.jsx bridge
 - **P3.3 — Canvas geri-yazma** → bayrak-kontrollü (varsayılan kapalı), gözetimli-test prosedürlü
+- **P3.4 — bundle küçültme** → esbuild full --minify, 254KB→231KB (%9), Playwright ile doğrulandı (0 hata)
 - Headless watermark + state + push robustluğu (H12/H17/H18/H23/H24/H25)
 - Slack Bot always-on host'a taşındı → **Railway** (eski "#3")
 - ~~Workflow-scope PAT yenileme~~ / ~~Node.js 24 (Actions)~~ → Actions silindi, gereksiz
