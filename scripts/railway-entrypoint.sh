@@ -6,6 +6,11 @@ set -u
 PROJ="$HOME/benseno-tasarim-sistemi"
 cd "$PROJ"
 
+# logs/ .dockerignore ile hariç tutuluyor → image'de yok. run-*.sh hepsi
+# `>> logs/*.log` yazıyor; dizin yoksa redirect açılamaz → claude hiç çalışmaz
+# (exit 1, 0sn). Her boot'ta oluştur (ephemeral fs).
+mkdir -p "$PROJ/logs"
+
 # env var doluysa ilgili gizli dosyayı yaz
 write_secret() { [ -n "${2:-}" ] && printf '%s' "$2" > "data/$1" && echo "  ✓ data/$1"; }
 
