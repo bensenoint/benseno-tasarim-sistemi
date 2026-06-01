@@ -74,8 +74,10 @@ cron.schedule('0 17 25-31 * *', () => run('run-aylik-strateji.sh'), opts);
 cron.schedule('30 3 * * *', () => run('run-log-temizle.sh'), opts);
 // PAT süre/geçerlilik kontrolü — Pazartesi 09:00 (P1.3; geçersizse kendi DM'ini atar)
 cron.schedule('0 9 * * 1', () => run('check-pat-expiry.sh'), opts);
+// Günlük sistem özeti — hafta içi 17:00, sadece Görkem'e (P2.3)
+cron.schedule('0 17 * * 1-5', () => run('run-gunluk-ozet.sh'), opts);
 
-console.log(`[scheduler] 5 cron job kuruldu (TZ=${TZ}). Slack bot başlatılıyor...`);
+console.log(`[scheduler] cron job'lar kuruldu (TZ=${TZ}). Slack bot başlatılıyor...`);
 
 // Slack bot'u başlat (dosya sonundaki IIFE app.start()'ı çağırır)
 require('./slack-bot.js');
