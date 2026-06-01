@@ -7,12 +7,6 @@
 
 ## 🔴 P1 — Yüksek öncelik (taşımadan doğan işlevsel/güvenilirlik boşlukları)
 
-### P1.1 — Blokeli + escalation DM mantığını notification-agent'a taşı
-- **Neden kritik:** Bu mantık silinen `benseno-brief-sync` skill'indeydi. Mac artık kalıcı kapalı olduğundan blokeli/escalation DM'leri **hiç gönderilmiyor** (eskiden "Mac kapalıyken kayıp"tı, şimdi tamamen kayıp).
-- **Etki:** Blokeli brief'ler dashboard'da **Blokeli kolonunda görünmeye devam ediyor**; sadece proaktif DM gitmiyor.
-- **Fix:** `data-agent`'a `blokeli` flag üretimi + `notification-agent`'a blokeli/escalation DM şablonu ekle. Dedup deposunu (`blokeli-notified.json`, `escalation-log.json`) `notifications-sent.json` gibi tracked + push kapsamına al.
-- **Risk:** Orta — yeni flag + agent değişikliği, izole test.
-
 ### P1.2 — Watchdog'u Railway'e uyarla
 - **Neden kritik:** Şu an **hiçbir hata izleme yok**. Railway orchestrator sessizce çökerse (claude hatası, push fail) kimse haberdar olmaz. Mac'teki watchdog kapandı.
 - **Engel:** `watchdog.sh` heartbeat'i `logs/brief-sync-last.ts`'ten okuyor ama Railway dosya sistemi **ephemeral** (her deploy/restart sıfırlanır) → olduğu gibi taşınırsa sürekli yanlış alarm verir.
@@ -67,10 +61,15 @@
 
 ---
 
-## ✅ Tamamlananlar (referans — Railway taşıması)
-- Headless watermark + state + push robustluğu (H12/H17/H18/H23/H24/H25) — doğrulandı
+## ✅ Tamamlananlar (referans)
+- **P1.1 — Blokeli + escalation DM** → notification-agent'a port edildi (Şablon 29-32, eski "#3a")
+- Headless watermark + state + push robustluğu (H12/H17/H18/H23/H24/H25)
 - Slack Bot always-on host'a taşındı → **Railway** (eski "#3")
-- ~~Workflow-scope PAT yenileme~~ → GitHub Actions silindi, gereksiz
-- ~~Node.js 24 deprecation (Actions)~~ → Actions silindi, gereksiz
-- Pazartesi ilk scheduled run izleme → cron 13:15 + 13:45'te ateşledi, doğrulandı
+- ~~Workflow-scope PAT yenileme~~ / ~~Node.js 24 (Actions)~~ → Actions silindi, gereksiz
 - Ölü kod temizliği (4 supersede skill + arşiv + graphify)
+- **Railway taşıması uçtan uca doğrulandı** (15:15 run: yeni brief #26 tespit → işleme → push)
+
+### 🐞 Taşımada bulunan + düzeltilen 3 altyapı bug'ı (davranışsal testle)
+1. **logs/ dizini yok** (.dockerignore) → `claude >> logs/*.log` redirect fail → claude hiç çalışmıyordu. Fix: entrypoint `mkdir -p logs`.
+2. **Headless Slack erişimi yok** — .mcp.json gitignored (container'da yok) + curl fallback `$GITHUB_ACTIONS` bekliyordu. Fix: kapı `$RAILWAY_ENVIRONMENT`'ı da tanıyor.
+3. **root + --dangerously-skip-permissions reddi** — claude root'ta çalışmayı reddediyordu. Fix: Dockerfile `IS_SANDBOX=1`.
