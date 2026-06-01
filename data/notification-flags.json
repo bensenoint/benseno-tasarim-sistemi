@@ -1,46 +1,62 @@
 {
- "sync_ts": 1780310133,
- "sync_iso": "2026-06-01T13:35:33+03:00",
+ "sync_ts": 1780316113,
+ "sync_iso": "2026-06-01T15:15:13+03:00",
  "run_type": "orchestrator_headless_sync",
+ "mode": "active",
  "new_briefs": [
   {
-   "no": "25",
-   "marka": "VDM Petdent",
-   "is": "test",
+   "no": "26",
+   "marka": "Bauhaus",
+   "is": "test yayın",
    "dept": "editor",
    "priority": "🟠",
    "atanan_ids": [
-    "U4XCE3532",
-    "U030C48PL23"
+    "U030C48PL23",
+    "U4XCE3532"
    ],
-   "deadline": "2 Haziran 2026 10:00 TR",
-   "channel": "C0AQLPY4TUM",
-   "ts": "1780290478.864579",
-   "note": "⚠️ İçerik 'test' — gerçek brief mi teyit gerek"
+   "deadline": "2 Haziran 2026 14:55 TR",
+   "channel": "C4Y43AW2E",
+   "ts": "1780315060.052969",
+   "note": "⚠️ İçerik 'test yayın' — gerçek brief mi teyit gerek (Görkem açtı · no.25 ile aynı pattern)"
   }
  ],
  "completed_this_run": [],
- "past_deadline": [
-  {
-   "no": "20",
-   "reason": "deadline bugün geçti"
-  }
- ],
+ "past_deadline": [],
  "past_confirmed": [],
  "saat_eksik": [],
  "dept_belirsiz": [],
  "marka_yetersiz_sure": [],
  "marka_anormal_uzun": [],
  "calendar_events": [],
+ "escalation": [],
+ "blokeli": [],
  "threshold_transitions": [
   {
-   "no": "20",
-   "marka": "Tour2America",
-   "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · ",
-   "prev": "🟡",
-   "new": "🔴",
-   "reason": "deadline geçti (auto-recalc)",
-   "iso": "2026-06-01T13:35:33+03:00"
+   "no": "5",
+   "marka": "Bauhaus",
+   "prev_g": 10,
+   "new_g": 11,
+   "iso": "2026-06-01T13:42:00+03:00",
+   "dm": false,
+   "reason": "zaten 🔴 Blokeli · Eren v1 yok · günlük G artışı · log-only"
+  },
+  {
+   "no": "15",
+   "marka": "Bauhaus",
+   "prev_g": 10,
+   "new_g": 11,
+   "iso": "2026-06-01T14:00:00+03:00",
+   "dm": false,
+   "reason": "zaten 🔴 Blokeli · v1 verildi pasif onay · log-only"
+  },
+  {
+   "no": "21",
+   "marka": "VDM Petdent",
+   "prev_g": 9,
+   "new_g": 10,
+   "iso": "2026-06-01T14:42:00+03:00",
+   "dm": false,
+   "reason": "zaten 🔴 Blokeli · Şablon 29 sent · log-only"
   }
  ]
 }

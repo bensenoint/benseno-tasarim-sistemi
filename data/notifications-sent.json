@@ -263,5 +263,34 @@
         "sent_at": "2026-06-01T13:37:54+03:00",
         "user_id": "skip-already-sent-by-mac",
         "reason": "#20 Tour2America deadline 1Haz12:31 geçti (🟡→🔴). Canvas (12:55 Mac sync) zaten 'DM → Eren 12:55' gösteriyor — duplicate önlemek için headless run DM ATLADI."
+    },
+    {
+        "brief_ts": "1780315060.052969",
+        "template": "1_new_brief_dm_test_flag",
+        "sent_at": "2026-06-01T15:20:03+03:00",
+        "user_id": "U030C48PL23",
+        "message_ts": "1780316403.531179",
+        "reason": "#26 Bauhaus 'test yayın' · içerik test algılandı · Cansu'ya otomatik atama YAPILMADI · owner Görkem'e teyit DM (gerçekse ilet / 🔒 ile kapat). #25 ile aynı pattern. Headless run."
+    },
+    {
+        "brief_ts": "1779187350.819039",
+        "template": "threshold_11g_daily_increment_logged_only",
+        "sent_at": "2026-06-01T15:20:03+03:00",
+        "user_id": "skip-already-blokeli-no5",
+        "reason": "#5 11g eşiği 2026-06-01T13:42:00+03:00 aşıldı (auto-recalc · log-only) · zaten 🔴 Blokeli · Eren v1 yok · günlük G artışı · DM yok (escalation şablonları zaten gönderilmiş)"
+    },
+    {
+        "brief_ts": "1779283282.205179",
+        "template": "threshold_11g_daily_increment_logged_only",
+        "sent_at": "2026-06-01T15:20:03+03:00",
+        "user_id": "skip-already-blokeli-no15",
+        "reason": "#15 11g eşiği 2026-06-01T14:00:00+03:00 aşıldı (auto-recalc · log-only) · zaten 🔴 Blokeli · v1 verildi · Eda T pasif onay · DM yok (escalation şablonları zaten gönderilmiş)"
+    },
+    {
+        "brief_ts": "1779363838.575629",
+        "template": "threshold_10g_daily_increment_logged_only",
+        "sent_at": "2026-06-01T15:20:03+03:00",
+        "user_id": "skip-already-blokeli-no21",
+        "reason": "#21 10g eşiği 2026-06-01T14:42:00+03:00 aşıldı (auto-recalc · log-only) · zaten 🔴 Blokeli · Şablon 29 sent · Eren cevapsız · DM yok (escalation şablonları zaten gönderilmiş)"
     }
 ]

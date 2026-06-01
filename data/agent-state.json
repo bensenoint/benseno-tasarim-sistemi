@@ -1,15 +1,15 @@
 {
-  "last_run": "2026-06-01T13:38:41+03:00",
-  "last_run_ts": 1780310321,
+  "last_run": "2026-06-01T15:15:13+03:00",
+  "last_run_ts": 1780316113,
   "run_type": "orchestrator_headless_sync",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
-  "active_briefs": 17,
+  "active_briefs": 18,
   "completed_briefs": 8,
   "priority_summary": {
     "red": 14,
-    "orange": 1,
+    "orange": 2,
     "yellow": 0,
     "green": 2
   },
@@ -18,141 +18,96 @@
   "new_briefs_this_run": 1,
   "completed_this_run": 0,
   "dm_sent": 1,
-  "dm_skipped_idempotent": 1,
+  "dm_skipped_idempotent": 0,
   "canvas_updated": false,
-  "canvas_update_reason": "Headless (GitHub Actions) — Canvas write-back skipped · live-data.json güncellendi + push",
-  "threshold_transitions_this_run": 8,
+  "canvas_update_reason": "Headless (Railway) — Canvas write-back skipped · live-data.json güncellendi + push",
+  "threshold_transitions_this_run": 3,
   "threshold_transitions_detail": [
-    {
-      "no": "1",
-      "marka": "JNJ Vision TR",
-      "prev_g": 10,
-      "new_g": 11,
-      "transition_iso": "2026-05-29T16:00:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · teyit edilmiş bakanlık · hafta sonu · log-only"
-    },
-    {
-      "no": "2",
-      "marka": "Hasvet",
-      "prev_g": 7,
-      "new_g": 8,
-      "transition_iso": "2026-05-29T16:00:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · v1 verildi · log-only"
-    },
-    {
-      "no": "3",
-      "marka": "Bauhaus",
-      "prev_g": 9,
-      "new_g": 10,
-      "transition_iso": "2026-05-30T10:00:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · hafta sonu · log-only"
-    },
-    {
-      "no": "6",
-      "marka": "Bauhaus",
-      "prev_g": 8,
-      "new_g": 9,
-      "transition_iso": "2026-05-29T18:00:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · Arda hafta sonu pasif · log-only"
-    },
-    {
-      "no": "9",
-      "marka": "VDM Petdent",
-      "prev_g": 6,
-      "new_g": 7,
-      "transition_iso": "2026-05-29T23:59:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · Şablon 29 sent · log-only"
-    },
-    {
-      "no": "16",
-      "marka": "Bauhaus",
-      "prev_g": 6,
-      "new_g": 7,
-      "transition_iso": "2026-05-29T17:00:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · v1 verildi · log-only"
-    },
-    {
-      "no": "17",
-      "marka": "VDM Petdent",
-      "prev_g": 7,
-      "new_g": 8,
-      "transition_iso": "2026-05-30T08:46:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · 4 raunt escalation cevapsız · log-only"
-    },
-    {
-      "no": "24",
-      "marka": "Bauhaus",
-      "prev_g": 6,
-      "new_g": 7,
-      "transition_iso": "2026-05-29T18:00:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · Aykut yarı onay · log-only"
-    }
-  ],
-  "github_commit": "61df5fa",
-  "github_push": "ok",
-  "imminent_deadline": {
-    "no": "20",
-    "marka": "Tour2America",
-    "deadline_iso": "2026-06-01T12:31:00+03:00",
-    "kalan_dk": 2983,
-    "priority": "🟡",
-    "note": "2g 1sa 43dk · 🟡 Normal · 24sa eşiği 31May12:31"
-  },
-  "next_thresholds_anticipated": [
-    {
-      "no": "4",
-      "marka": "Bauhaus",
-      "g_threshold": 9,
-      "transition_iso": "2026-05-30T13:00:00+03:00",
-      "minutes_away": 132
-    },
-    {
-      "no": "8",
-      "marka": "VDM Petdent",
-      "g_threshold": 9,
-      "transition_iso": "2026-05-30T13:24:00+03:00",
-      "minutes_away": 156
-    },
     {
       "no": "5",
       "marka": "Bauhaus",
-      "g_threshold": 9,
-      "transition_iso": "2026-05-30T13:42:00+03:00",
-      "minutes_away": 174
+      "prev_g": 10,
+      "new_g": 11,
+      "transition_iso": "2026-06-01T13:42:00+03:00",
+      "dm_sent": false,
+      "reason": "zaten 🔴 Blokeli · Eren v1 yok · günlük G artışı · log-only"
     },
     {
       "no": "15",
       "marka": "Bauhaus",
-      "g_threshold": 8,
-      "transition_iso": "2026-05-30T14:00:00+03:00",
-      "minutes_away": 192
+      "prev_g": 10,
+      "new_g": 11,
+      "transition_iso": "2026-06-01T14:00:00+03:00",
+      "dm_sent": false,
+      "reason": "zaten 🔴 Blokeli · v1 verildi pasif onay · log-only"
     },
     {
       "no": "21",
       "marka": "VDM Petdent",
-      "g_threshold": 7,
-      "transition_iso": "2026-05-30T14:42:00+03:00",
-      "minutes_away": 234
+      "prev_g": 9,
+      "new_g": 10,
+      "transition_iso": "2026-06-01T14:42:00+03:00",
+      "dm_sent": false,
+      "reason": "zaten 🔴 Blokeli · Şablon 29 sent · log-only"
+    }
+  ],
+  "github_commit": "pending",
+  "github_push": "pending",
+  "imminent_deadline": {
+    "no": "25",
+    "marka": "VDM Petdent",
+    "deadline_iso": "2026-06-02T10:00:00+03:00",
+    "kalan_dk": 1125,
+    "priority": "🟠",
+    "note": "+0g 18sa 45dk · 🟠 Yüksek · ⚠️ test brief'i"
+  },
+  "next_thresholds_anticipated": [
+    {
+      "no": "1",
+      "marka": "JNJ Vision TR",
+      "g_threshold": 14,
+      "transition_iso": "2026-06-01T16:00:00+03:00",
+      "minutes_away": 45
+    },
+    {
+      "no": "2",
+      "marka": "Hasvet",
+      "g_threshold": 11,
+      "transition_iso": "2026-06-01T16:00:00+03:00",
+      "minutes_away": 45
+    },
+    {
+      "no": "16",
+      "marka": "Bauhaus",
+      "g_threshold": 10,
+      "transition_iso": "2026-06-01T17:00:00+03:00",
+      "minutes_away": 105
+    },
+    {
+      "no": "6",
+      "marka": "Bauhaus",
+      "g_threshold": 12,
+      "transition_iso": "2026-06-01T18:00:00+03:00",
+      "minutes_away": 165
+    },
+    {
+      "no": "24",
+      "marka": "Bauhaus",
+      "g_threshold": 10,
+      "transition_iso": "2026-06-01T18:00:00+03:00",
+      "minutes_away": 165
     }
   ],
   "pat_status": {
     "created": "2026-05-18",
-    "days_since_creation": 12,
-    "days_to_expiry": 78,
+    "days_since_creation": 14,
+    "days_to_expiry": 76,
     "warning": false
   },
-  "marka_stats_mode": "silent_log_only",
+  "marka_stats_mode": "active",
   "marka_stats_active_from": "2026-06-01T00:00:00+03:00",
   "errors": [],
-  "notes": "Cmt 30May 10:48 TR hafta sonu manuel refresh (orchestrator) · Cuma 14:48 sync sonrası ~20sa downtime · 37 marka kanalı tarandı → 0 yeni brief / 0 tamamlanma · 8 threshold transition AŞILDI (gece/sabah, hepsi 🔴 Blokeli · log-only): #1 11g, #2 8g, #3 10g, #6 9g, #9 7g, #16 7g, #17 8g, #24 7g · DM:0 (hafta sonu · batched · escalation şablonları zaten gönderilmiş) · Canvas write-back skipped (headless) · live-data.json güncellendi + push 61df5fa · 5 imminent threshold bugün 13:00-14:42 arası · #20 Tour2America deadline 1Haz 12:31 (~2g) · marka_stats active_from 1 Haziran (~1g 13sa kaldı)",
+  "notes": "Pzt 01Haz 15:15 TR headless Railway sync (orchestrator) · brief-queue'dan 1 yeni brief işlendi: #26 Bauhaus 'test yayın' (Görkem GM · 2Haz 14:55 TR · 🟠 Yüksek · Sıralı Görkem→Cansu · ⚠️ test içeriği · #25 ile aynı pattern) · Cansu'ya otomatik atama YAPILMADI · owner Görkem'e teyit DM (ts 1780316403) · 3 threshold günlük G artışı (#5 11g · #15 11g · #21 10g) hepsi 🔴 Blokeli log-only · marka_stats active mode (1 Haz aktifleşti · brands n=0 → sapma kontrolü yok) · Canvas write-back skipped (headless) · live-data.json güncellendi + push · last_sync_ts→1780316113 · imminent #25 2Haz 10:00 (~18sa 45dk)",
   "history": [
     {
       "ts": 1779864420,
@@ -191,14 +146,14 @@
       "ok": true
     },
     {
-      "ts": 1780310321,
+      "ts": 1780316113,
       "date": "2026-06-01",
-      "active": 17,
+      "active": 18,
       "overdue": 14,
-      "dm_sent": 1,
+      "dm_sent": 2,
       "errors": 0,
       "ok": true
     }
   ],
-  "last_sync_ts": 1780310321
+  "last_sync_ts": 1780316113
 }
