@@ -78,7 +78,7 @@ U030C48PL23 Görkem · UD96GH76E Reyhan · U4XCE3532 Cansu · U055EDESLSE İpek 
 - Varsa ve <30dk ise → cache'den oku, `slack_read_canvas` ÇAĞIRMA
 - Yoksa veya >30dk ise → `slack_read_canvas(F0B1B6XUD44)` çağır, cache'i güncelle
 - `LAST_SYNC_TS`'yi oku — **kaynak önceliği:**
-  1. **Headless (Actions) modda:** `data/agent-state.json` → `last_sync_ts` alanı varsa ONU kullan (bulutta ilerleyen tracked watermark; Canvas write-back atlandığı için Canvas footer'ı bulutta donar). Yoksa Canvas footer'a düş.
+  1. **Headless bulut modda** (`$GITHUB_ACTIONS==true` VEYA `$RAILWAY_ENVIRONMENT` set): `data/agent-state.json` → `last_sync_ts` alanı varsa ONU kullan (bulutta ilerleyen tracked watermark; Canvas write-back atlandığı için Canvas footer'ı bulutta donar). Yoksa Canvas footer'a düş.
   2. **Mac modda:** Canvas footer'dan oku (mevcut davranış).
 
 ### 2. Yeni Brief'leri Ara — Queue Öncelikli
@@ -251,6 +251,7 @@ Her completed brief için (max son 12 brief):
 `data/notification-flags.json` dosyasına yaz (Notification Agent bunu okur):
 ```json
 {
+  "mode": "active",             // config.current_mode (active | silent_log_only)
   "new_briefs": [...],          // yeni eklenen brief'ler
   "past_deadline": [...],       // GEÇMİŞ flag'li brief'ler
   "past_confirmed": [...],      // teyit edilmiş geç brief'ler
@@ -258,9 +259,23 @@ Her completed brief için (max son 12 brief):
   "dept_belirsiz": [...],       // departman belirsiz brief'ler
   "marka_yetersiz_sure": [...], // E3 yetersiz süre flag'li
   "marka_anormal_uzun": [...],  // E3 anormal uzun flag'li
-  "calendar_events": [...]      // eklenecek calendar event'ları
+  "calendar_events": [...],     // eklenecek calendar event'ları
+  "escalation": [...],          // geciken brief'ler (gecikme tırmanması — aşağıda)
+  "blokeli": [...]              // durumu blokeli olan brief'ler
 }
 ```
+
+**`escalation[]` üretimi** — `delta_hours ≤ 0` VE `durum ≠ tamamlandı` olan her brief için:
+```json
+{ "ts": "<brief slack ts>", "no": 20, "marka": "Bauhaus", "is": "Sosyal medya",
+  "lead_id": "U0AN6DD79M0", "lead_role": "tasarim",   // bns_users'tan rol lookup
+  "deadline_str": "21 Mayıs 17:00 TR", "permalink": "<slack_url>",
+  "gecikme_h": 26 }                                     // = (now_unix - deadline_unix)/3600, tam saat
+```
+- `lead_role`: lead_id'nin `bns_users` rol'ü (tasarim|editor|ai). Belirsizse "tasarim".
+- Notification Agent eşik + idempotency'yi yönetir; Data Agent yalnızca veriyi sağlar.
+
+**`blokeli[]` üretimi** — durumu "blokeli" (🔴 Blokeli) tespit edilen brief'ler aynı şekil (`gecikme_h` opsiyonel). Headless modda Canvas'a yazılmadığı için blokeli durumu yalnızca DM tetikler (dashboard Blokeli kolonu `bns_briefs.durum`'dan beslenir).
 
 ## Çıktı (tek satır)
 ```
@@ -272,9 +287,9 @@ Geçmiş: yeni={N} teyitli={C} · Saat_eksik={N} · E3: mode={X} sapma={N}
 
 ---
 
-## GITHUB ACTIONS ORTAMI — Slack curl fallback (v1.1)
+## HEADLESS BULUT ORTAMI — Slack curl fallback (v1.2)
 
-**Tetikleyici:** `$GITHUB_ACTIONS` == `"true"` (Actions runner). Bu modda Slack MCP sunucusu YOK — `mcp__slack__*` tool'ları çağırma, aşağıdaki curl eşdeğerlerini kullan. Token: `$SLACK_BOT_TOKEN` (env). HALT ETME — curl ile devam et.
+**Tetikleyici:** `$GITHUB_ACTIONS` == `"true"` **VEYA** `$RAILWAY_ENVIRONMENT` set (Railway container — bugünkü canlı ortam). Bu modda Slack MCP sunucusu YOK — `mcp__slack__*` tool'ları çağırma, aşağıdaki curl eşdeğerlerini kullan. Token: `$SLACK_BOT_TOKEN` (env). HALT ETME — curl ile devam et.
 
 ### Canvas OKU (slack_read_canvas yerine)
 ```bash

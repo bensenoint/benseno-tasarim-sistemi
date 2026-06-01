@@ -171,9 +171,9 @@ Notification Agent OK · DM:{N} · Thread:{N} · Calendar:{N} · Atlandı(idempo
 
 ---
 
-## GITHUB ACTIONS ORTAMI — Slack curl fallback (v1.1)
+## HEADLESS BULUT ORTAMI — Slack curl fallback (v1.2)
 
-**Tetikleyici:** `$GITHUB_ACTIONS` == `"true"`. Slack MCP YOK — `mcp__slack__*` çağırma, curl kullan. Token: `$SLACK_BOT_TOKEN`. HALT ETME.
+**Tetikleyici:** `$GITHUB_ACTIONS` == `"true"` **VEYA** `$RAILWAY_ENVIRONMENT` set (Railway container — bugünkü canlı ortam). Slack MCP YOK — `mcp__slack__*` çağırma, curl kullan. Token: `$SLACK_BOT_TOKEN`. HALT ETME.
 
 ### DM gönder (slack_send_message / DM yerine)
 `chat.postMessage`'da `channel` alanına doğrudan USER_ID ver — Slack otomatik IM açar:

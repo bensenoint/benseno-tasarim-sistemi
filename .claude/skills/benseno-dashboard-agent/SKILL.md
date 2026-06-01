@@ -22,6 +22,9 @@ AUTH_HASH_FILE    = ~/benseno-tasarim-sistemi/data/.dashboard-auth-hash
 GRAFIK_CHANNEL_ID = C02SZRJGY0M
 ```
 
+## HEADLESS BULUT ORTAMI (Railway / Actions)
+`$GITHUB_ACTIONS == "true"` **VEYA** `$RAILWAY_ENVIRONMENT` set ise: Slack MCP YOK. Tüm DM/kanal mesajlarını (hata DM'leri, sabah-raporu, haftalik, aylik) `chat.postMessage` curl ile gönder — `mcp__slack__*` çağırma. Token: `$SLACK_BOT_TOKEN` (env). DM için `channel` alanına doğrudan USER_ID ver. HALT ETME; curl başarısızsa log'la, devam et. (Detaylı curl örnekleri: notification-agent SKILL.md.)
+
 ---
 
 ## ADIM ADIM
