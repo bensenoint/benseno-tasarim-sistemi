@@ -65,10 +65,13 @@ function pushFiles(msg) {
   } catch (e) { logLine(`⚠️ pushFiles hata: ${e.message}`); }
 }
 
-// (state, rev) → durum etiketi
-function durumEtiketi(state, rev) {
-  if (state === 'review') return rev > 0 ? `👀 Revizede · rev ${rev}` : '👀 Revizede';
-  return rev > 0 ? `🎨 Tasarımda · rev ${rev}` : '🎨 Tasarımda';
+// Departmana özel "çalışıyor/başladı" reaction'ları → durum state'i
+const WORK = { art: '🎨 Tasarımda', writing_hand: '✍️ Editörde', robot_face: "🤖 AI'da" };
+
+// state='review' → 👀, aksi halde workLabel (🎨/✍️/🤖). rev>0 ise "· rev N" ekle.
+function durumEtiketi(state, rev, workLabel) {
+  const base = state === 'review' ? '👀 Revizede' : (workLabel || '🎨 Tasarımda');
+  return rev > 0 ? `${base} · rev ${rev}` : base;
 }
 
 // brief'e durum/rev uygula
@@ -100,10 +103,11 @@ function main() {
     return;
   }
 
-  // ── INSTANT (🎨/👀 event) ───────────────────────────────────────────────────
-  const [ts, emoji, byUser, saat] = argv;
-  if (!ts || !emoji || !byUser) { logLine('kullanım: brief-status.js <ts> <art|eyes> <by_user> [saat]'); process.exit(1); }
-  if (emoji !== 'art' && emoji !== 'eyes') { logLine(`geçersiz emoji: ${emoji}`); process.exit(0); }
+  // ── INSTANT (🎨/✍️/🤖/👀 event) ─────────────────────────────────────────────
+  let [ts, emoji, byUser, saat] = argv;
+  if (!ts || !emoji || !byUser) { logLine('kullanım: brief-status.js <ts> <art|writing_hand|robot_face|eyes> <by_user> [saat]'); process.exit(1); }
+  emoji = emoji.replace(/::skin-tone-\d+$/, ''); // ✍️ skin-tone varyantlarını normalize et
+  if (!WORK[emoji] && emoji !== 'eyes') { logLine(`geçersiz emoji: ${emoji}`); process.exit(0); }
 
   let live; try { live = readLive(); } catch { logLine('live-data okunamadı'); process.exit(0); }
   const brief = (live.bns_briefs || []).find(b => tsFromLink(b.link) === ts);
@@ -115,17 +119,18 @@ function main() {
 
   const state = loadState();
   const prev = state[ts] || { state: 'new', rev: 0 };
-  let newState, rev = prev.rev || 0;
+  let newState, rev = prev.rev || 0, workLabel = prev.workLabel || '🎨 Tasarımda';
 
-  if (emoji === 'art') {
-    if (prev.state === 'review') rev = rev + 1;  // 👀 → 🎨 = REVİZE başladı (sayaç++)
-    newState = 'design';
+  if (WORK[emoji]) {
+    if (prev.state === 'review') rev = rev + 1;  // 👀 → çalışma = REVİZE başladı (sayaç++)
+    newState = 'work';
+    workLabel = WORK[emoji];
   } else { // eyes
     newState = 'review';
   }
 
-  const durum = durumEtiketi(newState, rev);
-  state[ts] = { state: newState, rev, durum, by: byUser, at: new Date().toISOString(), no: brief.no, marka: brief.marka };
+  const durum = durumEtiketi(newState, rev, workLabel);
+  state[ts] = { state: newState, workLabel, rev, durum, by: byUser, at: new Date().toISOString(), no: brief.no, marka: brief.marka };
   try { fs.mkdirSync(path.dirname(STATE), { recursive: true }); } catch {}
   fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
 

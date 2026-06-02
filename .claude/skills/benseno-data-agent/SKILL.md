@@ -142,8 +142,9 @@ her döngü sonunda `reaction-override.js --reapply` ile bu override'ları taze 
 - `gecmis_teyit`: thread'de `✅ ok` / `teyit` → confirmed flag (✅ REACTION'ı headless'ta okuma)
 - `mesai_disi`: saat < 08:00 veya > 17:30 → flag
 
-> **Durum geçişleri (🎨/👀 reaction) — DETERMİNİSTİK (v7.13):** Tasarımcılar durumu 🎨 (başla/revize)
-> ve 👀 (revize sun) reaction'larıyla ilerletiyor. Headless'ta okunamadığı için `scripts/brief-status.js`
+> **Durum geçişleri (🎨/✍️/🤖/👀 reaction) — DETERMİNİSTİK (v7.13):** Ekip durumu departmana özel
+> başla emojileriyle ilerletiyor: 🎨 Tasarımda · ✍️ Editörde · 🤖 AI'da · 👀 Revizede (revize sun).
+> Headless'ta okunamadığı için `scripts/brief-status.js`
 > slack-bot event'inden anlık işler (durum + revizyon sayacı) ve `data/status-overrides.json`'a yazar;
 > orchestrator döngü sonunda `brief-status.js --reapply` taze veriye geri uygular. Sen Canvas'tan
 > oku, 🎨/👀 reaction'ı okuma — reapply senin durumunun üstüne override'ı yazar.

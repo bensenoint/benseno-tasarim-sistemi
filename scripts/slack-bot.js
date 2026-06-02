@@ -407,12 +407,14 @@ app.event('reaction_added', async ({ event, client }) => {
     return;
   }
 
-  // 🎨/👀 durum geçişi (atanan/editör/yönetici — yetkiyi script kontrol eder).
-  // 🎨 art = başladı/revize, 👀 eyes = revizede. Deterministik, MCP gerektirmez.
-  if (event.reaction === 'art' || event.reaction === 'eyes') {
+  // Durum geçişi (atanan/editör/yönetici — yetkiyi script kontrol eder). Departmana özel
+  // başla emojileri: 🎨 art (tasarım) · ✍️ writing_hand (editör) · 🤖 robot_face (AI) · 👀 eyes (revize sun).
+  // Deterministik, MCP gerektirmez. Skin-tone varyantını normalize et (✍️🏽 vb).
+  const reactionBase = event.reaction.replace(/::skin-tone-\d+$/, '');
+  if (['art', 'writing_hand', 'robot_face', 'eyes'].includes(reactionBase)) {
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
-    log(`durum reaction: :${event.reaction}: ${event.item.ts} — ${event.user}`);
-    execFile('node', [`${PROJECT_DIR}/scripts/brief-status.js`, event.item.ts, event.reaction, event.user, saat],
+    log(`durum reaction: :${reactionBase}: ${event.item.ts} — ${event.user}`);
+    execFile('node', [`${PROJECT_DIR}/scripts/brief-status.js`, event.item.ts, reactionBase, event.user, saat],
       { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
       (err, stdout, stderr) => {
         if (err) log(`brief-status hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
