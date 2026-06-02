@@ -1,9 +1,15 @@
 ---
 name: benseno-reaction-override
-description: Yönetici reaction override'ını anlık işler. Slack Bot'un reaction_added event'inden çağrılır. Canvas'taki ilgili brief satırını bulur, önceliği günceller, Canvas'ı full replace ile yeniden yazar.
+description: "[DEPRECATED v7.13] Artık KULLANILMIYOR. Reaction override deterministik scripts/reaction-override.js ile işleniyor (MCP/Canvas gerektirmez, headless çalışır). Bu skill MCP Canvas araçlarına bağımlıydı → Railway headless'ta çöküyordu. Çağrılmamalı."
 ---
 
-# Benseno — Reaction Override (Anlık İşlem)
+# ⚠️ DEPRECATED (v7.13) — scripts/reaction-override.js KULLANILIYOR
+
+> Bu skill MCP `slack_read_canvas`/`slack_update_canvas` araçlarına bağımlıydı. Railway headless
+> ortamında MCP yok → her çağrıda sessizce çöküyordu. Yerini deterministik **`scripts/reaction-override.js`**
+> aldı (slack-bot reaction_added handler'ı doğrudan onu çağırır). Bu dosya yalnızca arşiv amaçlı durur.
+
+# Benseno — Reaction Override (Anlık İşlem) [eski]
 
 Bu skill Slack Bot tarafından şu formatta çağrılır:
 `Skill: benseno-reaction-override — brief_ts: {ts} kanal: {channel} emoji: {emoji} yonetici: {user_id} saat: {HH:MM}`

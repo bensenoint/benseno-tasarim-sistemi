@@ -65,6 +65,13 @@ fi
 
 echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator tamamlandı. (exit: $CLAUDE_EXIT)" >> "$LOG"
 
+# Yönetici reaction override'larını taze live-data'ya yeniden uygula (deterministik) —
+# data-agent headless'ta reaction okuyamadığı için auto-priority override'ı geri almasın.
+if [ $CLAUDE_EXIT -eq 0 ]; then
+  node "$PROJ/scripts/reaction-override.js" --reapply >> "$PROJ/logs/reaction-override.log" 2>&1 || \
+    echo "[$(date '+%d.%m.%Y %H:%M')] reaction-override --reapply hata" >> "$LOG"
+fi
+
 # Gecikme escalation (deterministik script — LLM değil) — sadece başarılı run'da,
 # taze live-data.json üzerinde. Kendi state'ini (escalation-state.json) push eder.
 if [ $CLAUDE_EXIT -eq 0 ]; then

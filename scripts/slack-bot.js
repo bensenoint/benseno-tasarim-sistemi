@@ -405,14 +405,14 @@ app.event('reaction_added', async ({ event, client }) => {
 
   log(`Reaction override: ${emoji} — ${yonetici} @ ${ts}`);
 
-  // Brief Sync skill'ini çağır: override'ı işlesin, Canvas'ı güncellesin
+  // Deterministik script (LLM değil): live-data priority'yi anında günceller, EMBEDDED_DATA'yı
+  // enjekte eder, priority-overrides.json'a yazar (kalıcı), git push. MCP/claude gerektirmez.
   try {
-    const prompt = `Skill: benseno-reaction-override — brief_ts: ${ts} kanal: ${channel} emoji: ${emoji} yonetici: ${yonetici} saat: ${saat}`;
-    execFile('/bin/sh', ['-c', `/opt/homebrew/bin/claude -p "${prompt}" --print --dangerously-skip-permissions < /dev/null`],
-      { cwd: PROJECT_DIR, timeout: 300000, env: { ...process.env, PATH: '/opt/homebrew/bin:/usr/local/bin:' + process.env.PATH } },
+    execFile('node', [`${PROJECT_DIR}/scripts/reaction-override.js`, ts, emoji, yonetici, saat],
+      { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
       (err, stdout, stderr) => {
-        if (err) log(`reaction-override hata: ${err.message}`);
-        else log(`reaction-override tamamlandı: ${stdout.slice(0, 100)}`);
+        if (err) log(`reaction-override hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
+        else log(`reaction-override: ${(stdout || '').trim().split('\n').pop()}`);
       }
     );
   } catch (err) {

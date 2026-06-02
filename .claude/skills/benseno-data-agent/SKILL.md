@@ -128,8 +128,13 @@ Queue entry formatı: `{ts, channel, text, user, is, queued_at}`
 - `> 72` → 🟢 Düşük
 Saatsiz brief: deadline.date 23:59 TR üzerinden.
 
-#### 3g. Yönetici reaction override (v7.12)
-Brief mesajının reaction'larını oku. Yönetici listesinden biri `🔴/🟠/🟡/🟢` eklemişse önceliği override et. Geçmiş sütununa `🔴Yön15:30` kaydet. Yönetici dışı reaction yoksay.
+#### 3g. Yönetici reaction override (v7.13 — DETERMİNİSTİK)
+**Headless modda reaction OKUMA** (reactions.get curl tanımlı değil + güvenilmez). Reaction override
+artık `scripts/reaction-override.js` tarafından deterministik işlenir: yönetici 🔴/🟠/🟡/🟢 koyunca
+slack-bot anında `live-data.json`'u günceller + `data/priority-overrides.json`'a yazar; orchestrator
+her döngü sonunda `reaction-override.js --reapply` ile bu override'ları taze veriye geri uygular.
+**Bu yüzden:** auto-priority (3f) hesabını normal yap — `priority-overrides.json`'daki ts'lerle
+çakışsa bile sorun değil, reapply senin çıktının ÜSTÜNE override'ı yazar. Sen reaction okuma.
 
 #### 3h. Validation flag'leri
 - `saat_eksik`: deadline bugün AND saat yok → flag
