@@ -21,8 +21,10 @@ TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "[$TIMESTAMP] Aylık Strateji başlatıldı (Ay sonu: $TODAY/$MONTH/$YEAR)..." >> logs/aylik-strateji.log
 
 /opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — aylik-strateji — run now" --print --dangerously-skip-permissions >> logs/aylik-strateji.log 2>&1
+CLAUDE_EXIT=$?
 
-echo "[$TIMESTAMP] Aylık Strateji tamamlandı." >> logs/aylik-strateji.log
+echo "[$TIMESTAMP] Aylık Strateji tamamlandı. (exit: $CLAUDE_EXIT)" >> logs/aylik-strateji.log
+[ $CLAUDE_EXIT -ne 0 ] && echo "claude_exit=$CLAUDE_EXIT ts=$(date +%s) script=aylik-strateji" >> logs/orchestrator-errors.log
 
 # GitHub'a push (değişiklik varsa)
 GITHUB_PAT=$(cat ~/benseno-tasarim-sistemi/data/.github-pat-sistem 2>/dev/null)
@@ -35,3 +37,5 @@ if [[ -n "$GITHUB_PAT" ]]; then
     git push origin main >> logs/$(basename $0 .sh).log 2>&1
   fi
 fi
+
+exit ${CLAUDE_EXIT:-0}

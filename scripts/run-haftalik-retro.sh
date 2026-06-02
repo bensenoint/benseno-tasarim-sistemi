@@ -11,8 +11,11 @@ TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "[$TIMESTAMP] Haftalık Retro başlatıldı..." >> logs/haftalik-retro.log
 
 /opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — haftalik-retro — run now" --print --dangerously-skip-permissions >> logs/haftalik-retro.log 2>&1
+CLAUDE_EXIT=$?
 
-echo "[$TIMESTAMP] Haftalık Retro tamamlandı." >> logs/haftalik-retro.log
+echo "[$TIMESTAMP] Haftalık Retro tamamlandı. (exit: $CLAUDE_EXIT)" >> logs/haftalik-retro.log
+# Sessiz kırılma olmasın: claude başarısızsa scheduler notifyFailure görsün
+[ $CLAUDE_EXIT -ne 0 ] && echo "claude_exit=$CLAUDE_EXIT ts=$(date +%s) script=haftalik-retro" >> logs/orchestrator-errors.log
 
 # GitHub'a push (değişiklik varsa)
 GITHUB_PAT=$(cat ~/benseno-tasarim-sistemi/data/.github-pat-sistem 2>/dev/null)
@@ -25,3 +28,5 @@ if [[ -n "$GITHUB_PAT" ]]; then
     git push origin main >> logs/$(basename $0 .sh).log 2>&1
   fi
 fi
+
+exit ${CLAUDE_EXIT:-0}
