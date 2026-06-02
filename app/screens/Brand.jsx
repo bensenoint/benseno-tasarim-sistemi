@@ -117,13 +117,15 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
     for (const b of active) {
       const persons = [...nm(b.atanan_ids), ...nm(b.editor_ids)];
       const dl = parseTRDeadline(b.deadline);
-      out.push({ kind:"active", no:b.no, is:b.is, durum:b.durum || "—", priority:b.priority || "", persons, personIds:[...(b.atanan_ids||[]), ...(b.editor_ids||[])], deadline:dl, deadlineLabel:b.deadline || "—", bitis:null, bitisLabel:"—", ref:b });
+      // priority hydrate edilince {code,label,color} objesi olabilir → React'a obje basma, sadece rengi al
+      const prioColor = (b.priority && typeof b.priority === "object") ? b.priority.color : null;
+      out.push({ kind:"active", no:b.no, is:b.is, durum:b.durum || "—", prioColor, persons, personIds:[...(b.atanan_ids||[]), ...(b.editor_ids||[])], deadline:dl, deadlineLabel:b.deadline || "—", bitis:null, bitisLabel:"—", ref:b });
     }
     for (const c of done) {
       const persons = nm([c.leadId, ...(c.contribIds || [])].filter(Boolean));
       const dl = c.deadline ? new Date(c.deadline) : null;
       const bt = c.bitis ? new Date(c.bitis) : null;
-      out.push({ kind:"done", no:c.no, is:c.baslik || c.is, durum:"✅ Tamamlandı", priority:"", persons, personIds:[c.leadId, ...(c.contribIds||[])].filter(Boolean), deadline:dl, deadlineLabel: dl ? fmtDate(dl) : "—", bitis:bt, bitisLabel: bt ? fmtDate(bt) : "—", ref:c });
+      out.push({ kind:"done", no:c.no, is:c.baslik || c.is, durum:"✅ Tamamlandı", prioColor:null, persons, personIds:[c.leadId, ...(c.contribIds||[])].filter(Boolean), deadline:dl, deadlineLabel: dl ? fmtDate(dl) : "—", bitis:bt, bitisLabel: bt ? fmtDate(bt) : "—", ref:c });
     }
     return out;
   }, [brand, data]);
@@ -228,7 +230,7 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
               )}
               {filtered.map((r, idx) => (
                 <tr key={r.kind + r.no} onClick={() => r.kind === "active" && onOpenBrief && onOpenBrief(r.ref)} style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)", cursor: r.kind === "active" ? "pointer" : "default" }}>
-                  <td style={bCs(true, "right")}>{r.priority} {r.no}</td>
+                  <td style={bCs(true, "right")}>{r.prioColor && <span style={{ display:"inline-block", width:8, height:8, borderRadius:999, background:r.prioColor, marginRight:6, verticalAlign:"middle" }}/>}{r.no}</td>
                   <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:280 }}>{r.is}</td>
                   <td style={bCs()}><span style={{ font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-2)" }}>{r.durum}</span></td>
                   <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:200 }}>{r.persons.join(", ") || "—"}</td>
