@@ -308,5 +308,39 @@
   "user_id": "U06J26R1XCJ",
   "message_ts": "1780377659.167909",
   "reason": "#27 Bauhaus 'Plastik Dolaplar' · Sosyal Medya Post · Paralel · atama DM (Hasan Serdar+Aykut) · 🔴 Acil · Headless run"
+ },
+ {
+  "brief_ts": "1780382082.092499",
+  "brief_no": "29",
+  "template": "1_new_brief_dm_consolidated",
+  "sent_at": "2026-06-02T10:50:36+03:00",
+  "user_id": "U06J26R1XCJ",
+  "message_ts": "1780386636.727759",
+  "reason": "#28+#29 Bauhaus Vantilatörler(🔴 2Haz17:00)+Scheppach(🟡 3Haz13:00) · Aykut'a konsolide atama DM (2 brief tek mesaj, spam azaltma) · Paralel · Headless run"
+ },
+ {
+  "brief_ts": "1780382082.092499",
+  "brief_no": "29",
+  "template": "1_new_brief_dm_consolidated",
+  "sent_at": "2026-06-02T10:50:37+03:00",
+  "user_id": "U09BFPBKQG7",
+  "message_ts": "1780386637.008549",
+  "reason": "#28+#29 Bauhaus Vantilatörler+Scheppach · Hasan Serdar'a konsolide atama DM (2 brief tek mesaj) · Paralel · Headless run"
+ },
+ {
+  "brief_ts": "1780382002.414219",
+  "brief_no": "28",
+  "template": "1_new_brief_dm_consolidated",
+  "sent_at": "2026-06-02T10:50:37+03:00",
+  "user_id": "covered-in-29-consolidated",
+  "reason": "#28 Scheppach Ekskavatör · #29 ile aynı konsolide DM'de Aykut+Hasan Serdar'a iletildi (ayrı DM gönderilmedi)"
+ },
+ {
+  "brief_ts": "1780290478.864579",
+  "brief_no": "25",
+  "template": "past_deadline_skip_test_brief",
+  "sent_at": "2026-06-02T10:50:37+03:00",
+  "user_id": "skip-U030C48PL23-test-teyit-already-sent",
+  "reason": "#25 VDM Petdent test brief deadline 2Haz10:00 aşıldı (0sa geçti) · Görkem'e teyit DM zaten 01Haz13:37 gönderildi (1_new_brief_dm_test_flag) · test içeriği · Şablon24/25 ATLANDI (duplicate önleme)"
  }
 ]

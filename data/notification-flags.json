@@ -1,18 +1,97 @@
 {
- "sync_ts": 1780380912,
- "sync_iso": "2026-06-02T09:15:12+03:00",
+ "sync_ts": 1780386326,
+ "sync_iso": "2026-06-02T10:45:26+03:00",
  "run_type": "orchestrator_headless_sync",
  "mode": "active",
- "new_briefs": [],
+ "new_briefs": [
+  {
+   "no": "29",
+   "marka": "Bauhaus",
+   "is": "Vantilatörler",
+   "dept": "tasarim",
+   "atanan_ids": [
+    "U06J26R1XCJ",
+    "U09BFPBKQG7"
+   ],
+   "editor_ids": [],
+   "priority": "🔴",
+   "priority_label": "🔴 Acil",
+   "deadline_str": "2 Haziran 17:00 TR",
+   "deadline_unix": 1780408800,
+   "opener": "B0B3UBSQ6M7",
+   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780382082092499",
+   "tip": "Sosyal Medya Post"
+  },
+  {
+   "no": "28",
+   "marka": "Bauhaus",
+   "is": "Scheppach Ekskavatör",
+   "dept": "tasarim",
+   "atanan_ids": [
+    "U06J26R1XCJ",
+    "U09BFPBKQG7"
+   ],
+   "editor_ids": [],
+   "priority": "🟡",
+   "priority_label": "🟡 Normal",
+   "deadline_str": "3 Haziran 13:00 TR",
+   "deadline_unix": 1780480800,
+   "opener": "B0B3UBSQ6M7",
+   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780382002414219",
+   "tip": "Sosyal Medya Post"
+  }
+ ],
  "completed_this_run": [],
- "past_deadline": [],
+ "past_deadline": [
+  {
+   "no": "25",
+   "marka": "VDM Petdent",
+   "is": "test (Görkem teyit bekliyor)",
+   "lead_id": "U030C48PL23",
+   "lead_role": "editor",
+   "deadline_str": "2 Haziran 10:00 TR",
+   "gecikme_h": 0,
+   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/",
+   "note": "test brief'i · teyit DM zaten gönderildi"
+  }
+ ],
  "past_confirmed": [],
  "saat_eksik": [],
  "dept_belirsiz": [],
  "marka_yetersiz_sure": [],
  "marka_anormal_uzun": [],
- "calendar_events": [],
+ "calendar_events": [
+  {
+   "no": "29",
+   "title": "Bauhaus · Vantilatörler (deadline)",
+   "unix": 1780408800,
+   "marka": "Bauhaus"
+  },
+  {
+   "no": "28",
+   "title": "Bauhaus · Scheppach Ekskavatör (deadline)",
+   "unix": 1780480800,
+   "marka": "Bauhaus"
+  }
+ ],
  "escalation": [],
  "blokeli": [],
- "threshold_transitions": []
+ "threshold_transitions": [
+  {
+   "no": "27",
+   "marka": "Bauhaus",
+   "is": "Plastik Dolaplar",
+   "from": "🟢",
+   "to": "🔴",
+   "reason": "deadline ~2sa14dk (≤8h → 🔴 Acil)"
+  },
+  {
+   "no": "25",
+   "marka": "VDM Petdent",
+   "is": "test",
+   "from": "🔴",
+   "to": "🔴 GEÇMİŞ",
+   "reason": "deadline 10:00 TR aşıldı"
+  }
+ ]
 }
