@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-06-02T12:45:13+03:00",
-  "last_run_ts": 1780393513,
+  "last_run": "2026-06-02T13:17:46+03:00",
+  "last_run_ts": 1780395466,
   "run_type": "orchestrator_headless_sync",
   "data_agent": "ok",
   "notification_agent": "ok",
@@ -9,50 +9,48 @@
   "completed_briefs": 9,
   "priority_summary": {
     "red": 17,
-    "orange": 2,
-    "yellow": 1,
+    "orange": 3,
+    "yellow": 0,
     "green": 2
   },
-  "overdue_count": 14,
+  "overdue_count": 15,
   "blokeli_count": 12,
   "new_briefs_this_run": 0,
   "completed_this_run": 0,
-  "dm_sent": 1,
-  "dm_skipped_idempotent": 25,
+  "dm_sent": 0,
+  "dm_skipped_idempotent": 27,
   "canvas_updated": false,
   "canvas_update_reason": "Headless (Railway) — Canvas write-back skipped · live-data.json güncellendi + push",
-  "threshold_transitions_this_run": 0,
-  "threshold_transitions_detail": [],
-  "github_commit": "4e9b0bb",
-  "github_push": "pending",
-  "imminent_deadline": {
-    "no": "27",
-    "marka": "Bauhaus",
-    "deadline_iso": "2026-06-02T13:00:00+03:00",
-    "kalan_dk": 15,
-    "priority": "🔴",
-    "note": "🔴 Acil · Hasan Serdar+Aykut · Plastik Dolaplar"
-  },
-  "next_thresholds_anticipated": [
-    {
-      "no": "20",
-      "marka": "Tour2America",
-      "note": "deadline 1Haz12:31 · gecikme 23h→24h ~16dk içinde (2Haz12:31) → Şablon 31 yönetici uyarısı tetiklenecek"
-    },
+  "threshold_transitions_this_run": 1,
+  "threshold_transitions_detail": [
     {
       "no": "28",
       "marka": "Bauhaus",
-      "note": "deadline 3Haz13:00 · 🟡→🟠 2Haz13:00 (24h sınırı, ~45dk içinde) · Scheppach Ekskavatör"
-    },
+      "from": "🟡",
+      "to": "🟠",
+      "note": "Scheppach Ekskavatör · 3Haz13:00 · 24h sınırı geçildi 13:00"
+    }
+  ],
+  "github_commit": "4e9b0bb",
+  "github_push": "pending",
+  "imminent_deadline": {
+    "no": "26",
+    "marka": "Bauhaus",
+    "deadline_iso": "2026-06-02T14:55:00+03:00",
+    "kalan_dk": 97,
+    "priority": "🔴",
+    "note": "🔴 Acil · test yayın · Görkem+Cansu (test brief teyit bekliyor)"
+  },
+  "next_thresholds_anticipated": [
     {
-      "no": "26",
+      "no": "27",
       "marka": "Bauhaus",
-      "note": "deadline 2Haz14:55 · 🔴 (~2sa39dk) · test yayın"
+      "note": "deadline 2Haz13:00 GEÇMİŞ (gecikme 0h→1h ~13:45'te) → Şablon 30 lead Hasan Serdar tetiklenecek (:45 run)"
     },
     {
       "no": "29",
       "marka": "Bauhaus",
-      "note": "deadline 2Haz17:00 · 🔴 (~4sa44dk) · Vantilatörler"
+      "note": "deadline 2Haz17:00 · 🔴 (~3sa42dk) · Vantilatörler"
     },
     {
       "no": "30",
@@ -63,6 +61,11 @@
       "no": "31",
       "marka": "KZY Supreme",
       "note": "deadline 3Haz11:52 · 🟠→🔴 3Haz03:52 · Supreme Wet"
+    },
+    {
+      "no": "20",
+      "marka": "Tour2America",
+      "note": "gecikme 24h→48h 3Haz12:31 → Şablon 32 (5 yönetici + kanal) tetiklenecek"
     }
   ],
   "pat_status": {
@@ -74,7 +77,7 @@
   "marka_stats_mode": "active",
   "marka_stats_active_from": "2026-06-01T00:00:00+03:00",
   "errors": [],
-  "notes": "Sal 02Haz 12:45 TR headless Railway sync (orchestrator) · 0 yeni brief (queue boş + kanal taraması temiz, watermark'tan sonra sadece #31 zaten işlenmiş) · delta recalc +30dk drift (22 brief) · prio değişmedi (🔴17 🟠2 🟡1 🟢2) · 14 overdue · 12 blokeli · ESKALASYON: #20 Tour2America gecikme 23h→24h eşiği aştı → Şablon 31 yönetici uyarısı Görkem'e DM (ai role) · diğer 13 escalation + 12 blokeli idempotent (zaten gönderilmiş/blokeli) · #25 test brief suppressed · imminent #27 Plastik Dolaplar 13:00 (~15dk) · #28 🟡→🟠 24h sınırına ~15dk (13:00) · marka_stats active sapma yok · Canvas write-back skipped (headless) · last_sync_ts→1780393513",
+  "notes": "Sal 02Haz 13:17 TR headless Railway sync (orchestrator) · 0 yeni brief (queue boş + 37 marka kanalı taraması temiz, watermark 12:45 sonrası mesaj yok) · delta recalc +32dk drift (22 brief) · THRESHOLD: #28 Scheppach 🟡→🟠 (24h sınırı 13:00 geçti, DM yok—prio upgrade şablonsuz log-only) · #27 Plastik Dolaplar deadline 13:00 GEÇMİŞ (yeni overdue, gecikme 0h<1h → Şablon 30 henüz tetiklenmedi) · overdue 14→15 · prio 🔴17 🟠3 🟡0 🟢2 · 12 blokeli · NOTIFY: 0 DM gönderildi — tümü idempotent/eşik-altı: #20 Şablon31 zaten gönderildi (log: 31_manager_escalation_24h), 12 blokeli Şablon29 uzun süredir gönderilmiş (durum/gecmis kayıtlı, 9-14g), #25 test brief suppressed, #27 gecikme<1h · Canvas write-back skipped (headless) · last_sync_ts→1780395466",
   "history": [
     {
       "ts": 1779864420,
@@ -122,14 +125,14 @@
       "ok": true
     },
     {
-      "ts": 1780393513,
+      "ts": 1780395466,
       "date": "2026-06-02",
       "active": 22,
-      "overdue": 14,
+      "overdue": 15,
       "dm_sent": 6,
       "errors": 0,
       "ok": true
     }
   ],
-  "last_sync_ts": 1780393513
+  "last_sync_ts": 1780395466
 }

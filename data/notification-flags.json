@@ -1,6 +1,6 @@
 {
   "mode": "active",
-  "generated": "2026-06-02T12:45:13+03:00",
+  "generated": "2026-06-02T13:17:46+03:00",
   "new_briefs": [],
   "past_deadline": [
     1,
@@ -16,7 +16,8 @@
     20,
     21,
     24,
-    25
+    25,
+    27
   ],
   "past_confirmed": [
     1
@@ -36,7 +37,7 @@
       "lead_role": "editor",
       "deadline_str": "18 May 16:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "gecikme_h": 356
+      "gecikme_h": 357
     },
     {
       "ts": "1779167651.759819",
@@ -47,7 +48,7 @@
       "lead_role": "tasarim",
       "deadline_str": "20 May 10:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "gecikme_h": 314
+      "gecikme_h": 315
     },
     {
       "ts": "1779167921.567269",
@@ -58,7 +59,7 @@
       "lead_role": "tasarim",
       "deadline_str": "21 May 13:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "gecikme_h": 287
+      "gecikme_h": 288
     },
     {
       "ts": "1779187350.819039",
@@ -80,7 +81,7 @@
       "lead_role": "tasarim",
       "deadline_str": "20 May 18:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "gecikme_h": 306
+      "gecikme_h": 307
     },
     {
       "ts": "1779272694.698569",
@@ -102,7 +103,7 @@
       "lead_role": "ai",
       "deadline_str": "22 May 23:59 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
-      "gecikme_h": 252
+      "gecikme_h": 253
     },
     {
       "ts": "1779283282.205179",
@@ -113,7 +114,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 14:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179",
-      "gecikme_h": 262
+      "gecikme_h": 263
     },
     {
       "ts": "1779283377.829309",
@@ -124,7 +125,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 17:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309",
-      "gecikme_h": 259
+      "gecikme_h": 260
     },
     {
       "ts": "1779342432.583659",
@@ -135,7 +136,7 @@
       "lead_role": "ai",
       "deadline_str": "22 May 08:46 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659",
-      "gecikme_h": 267
+      "gecikme_h": 268
     },
     {
       "ts": "1779355957.360249",
@@ -168,7 +169,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 18:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919",
-      "gecikme_h": 258
+      "gecikme_h": 259
     },
     {
       "ts": "1780290478.864579",
@@ -179,7 +180,18 @@
       "lead_role": "editor",
       "deadline_str": "2 Haz 10:00 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1780290478864579",
-      "gecikme_h": 2
+      "gecikme_h": 3
+    },
+    {
+      "ts": "1780318126.239499",
+      "no": 27,
+      "marka": "Bauhaus",
+      "is": "Plastik Dolaplar",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "2 Haz 13:00 TR",
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780318126239499",
+      "gecikme_h": 0
     }
   ],
   "blokeli": [
@@ -192,7 +204,7 @@
       "lead_role": "editor",
       "deadline_str": "18 May 16:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "gecikme_h": 356
+      "gecikme_h": 357
     },
     {
       "ts": "1779167651.759819",
@@ -203,7 +215,7 @@
       "lead_role": "tasarim",
       "deadline_str": "20 May 10:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "gecikme_h": 314
+      "gecikme_h": 315
     },
     {
       "ts": "1779167921.567269",
@@ -214,7 +226,7 @@
       "lead_role": "tasarim",
       "deadline_str": "21 May 13:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "gecikme_h": 287
+      "gecikme_h": 288
     },
     {
       "ts": "1779187350.819039",
@@ -236,7 +248,7 @@
       "lead_role": "tasarim",
       "deadline_str": "20 May 18:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "gecikme_h": 306
+      "gecikme_h": 307
     },
     {
       "ts": "1779272694.698569",
@@ -258,7 +270,7 @@
       "lead_role": "ai",
       "deadline_str": "22 May 23:59 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
-      "gecikme_h": 252
+      "gecikme_h": 253
     },
     {
       "ts": "1779283282.205179",
@@ -269,7 +281,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 14:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179",
-      "gecikme_h": 262
+      "gecikme_h": 263
     },
     {
       "ts": "1779283377.829309",
@@ -280,7 +292,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 17:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309",
-      "gecikme_h": 259
+      "gecikme_h": 260
     },
     {
       "ts": "1779342432.583659",
@@ -291,7 +303,7 @@
       "lead_role": "ai",
       "deadline_str": "22 May 08:46 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659",
-      "gecikme_h": 267
+      "gecikme_h": 268
     },
     {
       "ts": "1779363838.575629",
@@ -313,7 +325,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 18:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919",
-      "gecikme_h": 258
+      "gecikme_h": 259
     }
   ],
   "new_briefs_detail": []
