@@ -41,13 +41,33 @@ echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator başlatılıyor..." >> "$LOG"
 cd "$PROJ"
 source ~/.zshrc 2>/dev/null
 
-timeout 900 $CLAUDE -p "Skill: benseno-orchestrator — run" \
-  --model sonnet \
-  --dangerously-skip-permissions \
-  --print \
-  >> "$LOG" 2>&1
+# ── Boş-run guard ─────────────────────────────────────────────────────────────
+# Yeni brief yoksa (brief-queue boş) VE son tam-run <2sa önceyse → claude'u ATLA,
+# deterministik recalc çalıştır (auto-priority güncel kalır). Aksi halde tam run.
+# Bot her yeni brief'i queue'ya yazar → kuyruk dolu = işlenecek yeni iş var (≤30dk gecikme korunur).
+QUEUE="$PROJ/data/brief-queue.json"
+LASTFULL="$PROJ/logs/last-full-run.ts"
+NOW_TS=$(date +%s)
+LF_TS=$(cat "$LASTFULL" 2>/dev/null || echo 0)
+QN=$(node -e "try{console.log((JSON.parse(require('fs').readFileSync('$QUEUE','utf8'))||[]).length)}catch(e){console.log(0)}" 2>/dev/null || echo 0)
+NEED_FULL=0
+[ "${QN:-0}" -gt 0 ] && NEED_FULL=1                  # kuyrukta yeni brief var
+[ $(( NOW_TS - LF_TS )) -ge 7200 ] && NEED_FULL=1    # 2 saattir tam run yok (güvenlik ağı — bot kaçırmışsa yakalar)
 
-CLAUDE_EXIT=$?
+if [ $NEED_FULL -eq 1 ]; then
+  echo "[$(date '+%d.%m.%Y %H:%M')] TAM run (queue=$QN, son tam run $(( (NOW_TS - LF_TS) / 60 ))dk önce)..." >> "$LOG"
+  timeout 900 $CLAUDE -p "Skill: benseno-orchestrator — run" \
+    --model sonnet \
+    --dangerously-skip-permissions \
+    --print \
+    >> "$LOG" 2>&1
+  CLAUDE_EXIT=$?
+  [ $CLAUDE_EXIT -eq 0 ] && date +%s > "$LASTFULL"
+else
+  echo "[$(date '+%d.%m.%Y %H:%M')] BOŞ döngü — claude atlandı (yeni brief yok). Deterministik recalc." >> "$LOG"
+  node "$PROJ/scripts/recalc.js" >> "$PROJ/logs/recalc.log" 2>&1 || echo "[$(date '+%d.%m.%Y %H:%M')] recalc hata" >> "$LOG"
+  CLAUDE_EXIT=0
+fi
 
 # timeout komutu 124 döndürür — özel mesaj yaz
 if [ $CLAUDE_EXIT -eq 124 ]; then
