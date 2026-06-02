@@ -376,7 +376,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "2 Haziran 2026",
-   "saat": "10:00 TR (+0g 1sa 14dk kaldı · 🔴 Acil)",
+   "saat": "10:00 TR (+0g 0sa 44dk kaldı · 🔴 Acil)",
    "durum": "yeni · Cansu+Görkem · ⚠️ test içeriği (İş='test')",
    "rev": "0",
    "gecmis": "⏳01Jun13:35 (Görkem açtı · workflow · 🔔 otomatik 🟠)",
@@ -398,7 +398,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "2 Haziran 2026",
-   "saat": "14:55 TR (+0g 6sa 9dk kaldı · 🔴 Acil)",
+   "saat": "14:55 TR (+0g 5sa 39dk kaldı · 🔴 Acil)",
    "durum": "yeni · Görkem+Cansu · ⚠️ test içeriği (İş='test yayın')",
    "rev": "0",
    "gecmis": "⏳01Jun14:57 (Görkem açtı · workflow · 🔔 otomatik 🟠)",
@@ -420,7 +420,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "2 Haziran 2026",
-   "saat": "13:00 TR (+0g 4sa 14dk kaldı · 🔴 Acil)",
+   "saat": "13:00 TR (+0g 3sa 44dk kaldı · 🔴 Acil)",
    "durum": "yeni · Hasan Serdar+Aykut · Sosyal Medya Post · Paralel akış · 💬 video içeriği",
    "rev": "0",
    "gecmis": "⏳01Jun 15:48 brief açıldı (Eda T)",
@@ -915,11 +915,11 @@
   "green": 2
  },
  "overdue_count": 14,
- "last_sync": "2026-06-02T08:45:13+03:00",
- "sync_ts": 1780379113,
- "now": 1780379113,
- "source": "data-agent-run-1780379113",
- "sync_iso": "2026-06-02T08:45:13+03:00",
+ "last_sync": "2026-06-02T09:15:12+03:00",
+ "sync_ts": 1780380912,
+ "now": 1780380912000,
+ "source": "data-agent-run-1780380912",
+ "sync_iso": "2026-06-02T09:15:12+03:00",
  "run_type": "orchestrator_headless_sync",
  "bns_history": [
   {
@@ -968,7 +968,7 @@
    "ok": true
   },
   {
-   "ts": 1780377795,
+   "ts": 1780380912,
    "date": "2026-06-02",
    "active": 19,
    "overdue": 14,
