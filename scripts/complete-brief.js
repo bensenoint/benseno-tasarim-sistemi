@@ -76,19 +76,33 @@ function injectEmbedded(live) {
 }
 
 const COMMIT_FILES = ['dashboard/app/live-data.json', 'dashboard/index.html', 'index.html', 'app/live-data.json', 'data/completion-overrides.json'];
+// Eşzamanlı reaction script'leri git push'ta yarışmasın diye paylaşımlı kilit (tüm scriptler aynı dosya)
+const GIT_LOCK = '/tmp/benseno-git.lock';
+function withGitLock(fn) {
+  for (let i = 0; i < 60; i++) {
+    try { fs.mkdirSync(GIT_LOCK); try { return fn(); } finally { try { fs.rmdirSync(GIT_LOCK); } catch {} } }
+    catch {
+      try { if (Date.now() - fs.statSync(GIT_LOCK).mtimeMs > 60000) { fs.rmdirSync(GIT_LOCK); continue; } } catch {}
+      try { execFileSync('sleep', ['0.1']); } catch {}
+    }
+  }
+  return fn();
+}
 function pushFiles(msg) {
   if (process.env.RO_NO_PUSH === '1') { logLine('RO_NO_PUSH=1 → push atlandı (test)'); return; }
   const git = (...a) => execFileSync('git', a, { cwd: PROJ, stdio: 'pipe' });
-  try {
-    git('add', ...COMMIT_FILES);
-    try { git('diff', '--cached', '--quiet'); return; } catch {}
-    git('commit', '-m', msg);
-    for (let i = 0; i < 3; i++) {
-      try { git('pull', '--rebase', '-X', 'theirs', 'origin', 'main'); git('push', 'origin', 'main'); logLine('✓ push edildi'); return; }
-      catch { try { git('rebase', '--abort'); } catch {} logLine(`push denemesi ${i + 1} başarısız, tekrar...`); }
-    }
-    logLine('⚠️ push edilemedi (lokal kaldı)');
-  } catch (e) { logLine(`⚠️ pushFiles hata: ${e.message}`); }
+  withGitLock(() => {
+    try {
+      git('add', ...COMMIT_FILES);
+      try { git('diff', '--cached', '--quiet'); return; } catch {}
+      git('commit', '-m', msg);
+      for (let i = 0; i < 5; i++) {
+        try { git('pull', '--rebase', '-X', 'theirs', 'origin', 'main'); git('push', 'origin', 'main'); logLine('✓ push edildi'); return; }
+        catch { try { git('rebase', '--abort'); } catch {} logLine(`push denemesi ${i + 1} başarısız, tekrar...`); }
+      }
+      logLine('⚠️ push edilemedi (lokal kaldı — sonraki döngü toparlar)');
+    } catch (e) { logLine(`⚠️ pushFiles hata: ${e.message}`); }
+  });
 }
 
 function buildCompletedRecord(b, byUser, nowMs) {

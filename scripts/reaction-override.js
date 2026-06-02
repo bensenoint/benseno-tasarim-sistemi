@@ -82,20 +82,35 @@ function writeLive(live) {
   try { if (fs.existsSync(LIVE_ROOT)) fs.writeFileSync(LIVE_ROOT, JSON.stringify(live, null, 2)); } catch {}
 }
 
+// Eşzamanlı reaction script'leri git push'ta yarışmasın diye paylaşımlı kilit (tüm scriptler aynı dosya)
+const GIT_LOCK = '/tmp/benseno-git.lock';
+function withGitLock(fn) {
+  for (let i = 0; i < 60; i++) {
+    try { fs.mkdirSync(GIT_LOCK); try { return fn(); } finally { try { fs.rmdirSync(GIT_LOCK); } catch {} } }
+    catch {
+      try { if (Date.now() - fs.statSync(GIT_LOCK).mtimeMs > 60000) { fs.rmdirSync(GIT_LOCK); continue; } } catch {}
+      try { execFileSync('sleep', ['0.1']); } catch {}
+    }
+  }
+  return fn(); // kilit alınamadı → en iyi çaba (sonraki döngü push'u toparlar)
+}
+
 // değişen dosyaları push et — rebase-retry, shell yok (escalation.js ile aynı desen)
 function pushFiles(files, msg) {
   if (process.env.RO_NO_PUSH === '1') { logLine('RO_NO_PUSH=1 → push atlandı (test)'); return; }
   const git = (...a) => execFileSync('git', a, { cwd: PROJ, stdio: 'pipe' });
-  try {
-    git('add', ...files);
-    try { git('diff', '--cached', '--quiet'); return; } catch { /* staged değişiklik var */ }
-    git('commit', '-m', msg);
-    for (let i = 0; i < 3; i++) {
-      try { git('pull', '--rebase', '-X', 'theirs', 'origin', 'main'); git('push', 'origin', 'main'); logLine('✓ push edildi'); return; }
-      catch { try { git('rebase', '--abort'); } catch {} logLine(`push denemesi ${i + 1} başarısız, tekrar...`); }
-    }
-    logLine('⚠️ push edilemedi (lokal kaldı)');
-  } catch (e) { logLine(`⚠️ pushFiles hata: ${e.message}`); }
+  withGitLock(() => {
+    try {
+      git('add', ...files);
+      try { git('diff', '--cached', '--quiet'); return; } catch { /* staged değişiklik var */ }
+      git('commit', '-m', msg);
+      for (let i = 0; i < 5; i++) {
+        try { git('pull', '--rebase', '-X', 'theirs', 'origin', 'main'); git('push', 'origin', 'main'); logLine('✓ push edildi'); return; }
+        catch { try { git('rebase', '--abort'); } catch {} logLine(`push denemesi ${i + 1} başarısız, tekrar...`); }
+      }
+      logLine('⚠️ push edilemedi (lokal kaldı — sonraki döngü toparlar)');
+    } catch (e) { logLine(`⚠️ pushFiles hata: ${e.message}`); }
+  });
 }
 
 const COMMIT_FILES = ['dashboard/app/live-data.json', 'dashboard/index.html', 'index.html', 'app/live-data.json', 'data/priority-overrides.json'];

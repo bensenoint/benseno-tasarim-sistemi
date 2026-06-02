@@ -173,17 +173,31 @@ function templateFor(t, b) {
 })();
 
 // escalation-state.json'u git'e push et (idempotency redeploy'da kaybolmasın) — rebase-retry, shell yok
+// Eşzamanlı reaction script push'larıyla yarışmasın diye paylaşımlı kilit (tüm scriptler aynı dosya).
 function pushState() {
   const { execFileSync } = require('child_process');
   const git = (...args) => execFileSync('git', args, { cwd: PROJ, stdio: 'pipe' });
-  try {
-    git('add', 'data/escalation-state.json');
-    try { git('diff', '--cached', '--quiet'); return; } catch { /* staged değişiklik var */ }
-    git('commit', '-m', 'escalation: state güncellendi (DM idempotency)');
-    for (let i = 0; i < 3; i++) {
-      try { git('pull', '--rebase', '-X', 'theirs', 'origin', 'main'); git('push', 'origin', 'main'); log('  ✓ escalation-state push edildi'); return; }
-      catch { try { git('rebase', '--abort'); } catch {} log(`  push denemesi ${i + 1} başarısız, tekrar...`); }
+  const GIT_LOCK = '/tmp/benseno-git.lock';
+  const withGitLock = (fn) => {
+    for (let i = 0; i < 60; i++) {
+      try { fs.mkdirSync(GIT_LOCK); try { return fn(); } finally { try { fs.rmdirSync(GIT_LOCK); } catch {} } }
+      catch {
+        try { if (Date.now() - fs.statSync(GIT_LOCK).mtimeMs > 60000) { fs.rmdirSync(GIT_LOCK); continue; } } catch {}
+        try { execFileSync('sleep', ['0.1']); } catch {}
+      }
     }
-    log('  ⚠️ escalation-state push edilemedi (state lokal kaldı)');
-  } catch (e) { log(`  ⚠️ pushState hata: ${e.message}`); }
+    return fn();
+  };
+  withGitLock(() => {
+    try {
+      git('add', 'data/escalation-state.json');
+      try { git('diff', '--cached', '--quiet'); return; } catch { /* staged değişiklik var */ }
+      git('commit', '-m', 'escalation: state güncellendi (DM idempotency)');
+      for (let i = 0; i < 5; i++) {
+        try { git('pull', '--rebase', '-X', 'theirs', 'origin', 'main'); git('push', 'origin', 'main'); log('  ✓ escalation-state push edildi'); return; }
+        catch { try { git('rebase', '--abort'); } catch {} log(`  push denemesi ${i + 1} başarısız, tekrar...`); }
+      }
+      log('  ⚠️ escalation-state push edilemedi (state lokal kaldı — sonraki döngü toparlar)');
+    } catch (e) { log(`  ⚠️ pushState hata: ${e.message}`); }
+  });
 }
