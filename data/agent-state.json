@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-06-02T10:45:26+03:00",
-  "last_run_ts": 1780386326,
+  "last_run": "2026-06-02T11:18:01+03:00",
+  "last_run_ts": 1780388281,
   "run_type": "orchestrator_headless_sync",
   "data_agent": "ok",
   "notification_agent": "ok",
@@ -15,52 +15,39 @@
   },
   "overdue_count": 14,
   "blokeli_count": 13,
-  "new_briefs_this_run": 2,
+  "new_briefs_this_run": 0,
   "completed_this_run": 0,
-  "dm_sent": 2,
-  "dm_skipped_idempotent": 1,
+  "dm_sent": 0,
+  "dm_skipped_idempotent": 0,
   "canvas_updated": false,
   "canvas_update_reason": "Headless (Railway) — Canvas write-back skipped · live-data.json güncellendi + push",
-  "threshold_transitions_this_run": 2,
-  "threshold_transitions_detail": [
-    {
-      "no": "27",
-      "from": "🟢",
-      "to": "🔴",
-      "reason": "deadline ~2sa14dk ≤8h"
-    },
-    {
-      "no": "25",
-      "from": "🔴",
-      "to": "🔴 GEÇMİŞ",
-      "reason": "deadline 10:00 TR aşıldı (0sa)"
-    }
-  ],
+  "threshold_transitions_this_run": 0,
+  "threshold_transitions_detail": [],
   "github_commit": "4f911f4",
   "github_push": "ok",
   "imminent_deadline": {
     "no": "27",
     "marka": "Bauhaus",
     "deadline_iso": "2026-06-02T13:00:00+03:00",
-    "kalan_dk": 134,
+    "kalan_dk": 101,
     "priority": "🔴",
     "note": "🔴 Acil · Hasan Serdar+Aykut · Plastik Dolaplar"
   },
   "next_thresholds_anticipated": [
     {
-      "no": "29",
+      "no": "28",
       "marka": "Bauhaus",
-      "note": "deadline 2Haz17:00 · 🔴 (~6sa14dk) · Vantilatörler · Aykut+Hasan Serdar"
+      "note": "deadline 3Haz13:00 · 🟡→🔴 2Haz13:00 (~24h sınırı, ~1sa42dk içinde) · Scheppach Ekskavatör"
     },
     {
       "no": "26",
       "marka": "Bauhaus",
-      "note": "deadline 2Haz14:55 · 🔴 (~4sa9dk) · test yayın"
+      "note": "deadline 2Haz14:55 · 🔴 (~3sa37dk) · test yayın"
     },
     {
-      "no": "28",
+      "no": "29",
       "marka": "Bauhaus",
-      "note": "deadline 3Haz13:00 · 🟡 (~26sa) · Scheppach Ekskavatör"
+      "note": "deadline 2Haz17:00 · 🔴 (~5sa42dk) · Vantilatörler"
     }
   ],
   "pat_status": {
@@ -72,7 +59,7 @@
   "marka_stats_mode": "active",
   "marka_stats_active_from": "2026-06-01T00:00:00+03:00",
   "errors": [],
-  "notes": "Sal 02Haz 10:45 TR headless Railway sync (orchestrator) · 70 marka kanalı tarandı (watermark 09:15→10:45): 3 yeni mesaj · 2 YENİ BRIEF (#28 Scheppach Ekskavatör 🟡 3Haz13:00, #29 Vantilatörler 🔴 2Haz17:00 · ikisi Bauhaus · Aykut+Hasan Serdar · Sosyal Medya Post Paralel) + 1 plain mesaj (Hasvet Carni Diet — brief değil, atlandı) · 2 threshold geçişi: #27 🟢→🔴 (deadline ~2sa14dk düzeltme), #25 test brief deadline 10:00 aşıldı (0sa) · konsolide atama DM x2 (Aykut+Hasan Serdar, 2 brief tek mesaj) · #25 teyit DM idempotent atlandı (test, 01Haz gönderilmiş) · 14 overdue 🔴 Blokeli steady-state (escalation [] idempotent) · marka_stats active (n=0 sapma yok) · Canvas write-back skipped (headless) · live-data+index.html+EMBEDDED_DATA güncellendi · last_sync_ts→1780386326",
+  "notes": "Sal 02Haz 11:18 TR headless Railway sync (orchestrator) · 70 marka kanalı tarandı (watermark 10:45→11:18): 0 yeni mesaj, 0 yeni brief · 0 threshold geçişi (steady-state) · 19 brief saat/delta yeniden hesaplandı (+32dk drift) · prio değişmedi (🔴17 🟡1 🟢2) · 14 overdue 🔴 Blokeli steady-state (escalation [] idempotent, DM yok) · imminent #27 Plastik Dolaplar 13:00 (~1sa41dk) · #28 24h sınırına yaklaşıyor (2Haz13:00 🟡→🔴) · marka_stats active (n=0 sapma yok) · reaction-override reapply no-op · complete-brief reapply 1 zaten uygulandı · Canvas write-back skipped (headless) · live-data+index.html+EMBEDDED_DATA güncellendi · last_sync_ts→1780388281",
   "history": [
     {
       "ts": 1779864420,
@@ -120,7 +107,7 @@
       "ok": true
     },
     {
-      "ts": 1780386326,
+      "ts": 1780388281,
       "date": "2026-06-02",
       "active": 20,
       "overdue": 14,
@@ -129,5 +116,5 @@
       "ok": true
     }
   ],
-  "last_sync_ts": 1780386326
+  "last_sync_ts": 1780388281
 }
