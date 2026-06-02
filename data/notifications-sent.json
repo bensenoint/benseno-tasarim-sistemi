@@ -412,5 +412,11 @@
   "sent_at": "2026-06-02T14:45:14+03:00",
   "user_id": "skip-consolidated",
   "reason": "14:45 ara-sync · 15 escalation + 12 blokeli değerlendirildi · 0 yeni eşik geçişi · #27 Şablon30 (14:20 gönderildi) #20 Şablon31 (12:50, g=26h<48h sonraki kademe yok) · 12 uzun süreli blokeli (g=240-358h, bakanlık/pasif onay/bilinen durumlar — önceki run'larda da atlandı, retroaktif blast YOK) · #25 test brief (teyit beklemede, escalation suppress) · Calendar: skipped (headless)"
+ },
+ {
+  "brief_ts": null,
+  "template": "ara_sync_1515_escalation_eval_no_new_crossings",
+  "user_id": "skip-consolidated",
+  "sent_at": "2026-06-02T15:15:12+03:00"
  }
 ]
