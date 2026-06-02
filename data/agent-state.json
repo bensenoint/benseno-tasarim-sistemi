@@ -1,6 +1,6 @@
 {
-  "last_run": "2026-06-02T14:21:30+03:00",
-  "last_run_ts": 1780399309,
+  "last_run": "2026-06-02T14:45:14+03:00",
+  "last_run_ts": 1780400714,
   "run_type": "orchestrator_headless_sync",
   "data_agent": "ok",
   "notification_agent": "ok",
@@ -8,17 +8,17 @@
   "active_briefs": 24,
   "completed_briefs": 9,
   "priority_summary": {
-    "red": 17,
-    "orange": 5,
+    "red": 18,
+    "orange": 4,
     "yellow": 0,
     "green": 2
   },
   "overdue_count": 15,
   "blokeli_count": 12,
-  "new_briefs_this_run": 2,
+  "new_briefs_this_run": 0,
   "completed_this_run": 0,
-  "dm_sent": 2,
-  "dm_skipped_idempotent": 26,
+  "dm_sent": 0,
+  "dm_skipped_idempotent": 27,
   "canvas_updated": false,
   "canvas_update_reason": "Headless (Railway) — Canvas write-back skipped · live-data.json güncellendi + push",
   "threshold_transitions_this_run": 0,
@@ -29,9 +29,9 @@
     "no": "26",
     "marka": "Bauhaus",
     "deadline_iso": "2026-06-02T14:55:00+03:00",
-    "kalan_dk": 70,
+    "kalan_dk": 9,
     "priority": "🔴",
-    "note": "🔴 Acil · test yayın · Görkem+Cansu (test brief teyit bekliyor)"
+    "note": "yeni · Görkem+Cansu · ⚠️ test içeriği (İş='test yayın')"
   },
   "next_thresholds_anticipated": [
     {
@@ -117,7 +117,7 @@
       "ok": true
     },
     {
-      "ts": 1780399309,
+      "ts": 1780400714,
       "date": "2026-06-02",
       "active": 24,
       "overdue": 15,
@@ -126,5 +126,5 @@
       "ok": true
     }
   ],
-  "last_sync_ts": 1780399309
+  "last_sync_ts": 1780400714
 }

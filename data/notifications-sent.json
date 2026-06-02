@@ -404,5 +404,13 @@
   "sent_at": "2026-06-02T14:20:29+03:00",
   "user_id": "covered-in-32-consolidated",
   "reason": "#33 Hasvet 'test ai' · #32 ile aynı konsolide test-flag DM'inde Görkem'e iletildi (ayrı DM gönderilmedi) · Eren'e otomatik atama YAPILMADI"
+ },
+ {
+  "brief_ts": null,
+  "brief_no": "ALL",
+  "template": "ara_sync_1445_escalation_eval_no_new_crossings",
+  "sent_at": "2026-06-02T14:45:14+03:00",
+  "user_id": "skip-consolidated",
+  "reason": "14:45 ara-sync · 15 escalation + 12 blokeli değerlendirildi · 0 yeni eşik geçişi · #27 Şablon30 (14:20 gönderildi) #20 Şablon31 (12:50, g=26h<48h sonraki kademe yok) · 12 uzun süreli blokeli (g=240-358h, bakanlık/pasif onay/bilinen durumlar — önceki run'larda da atlandı, retroaktif blast YOK) · #25 test brief (teyit beklemede, escalation suppress) · Calendar: skipped (headless)"
  }
 ]
