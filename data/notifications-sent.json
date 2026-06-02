@@ -378,5 +378,31 @@
   "user_id": "U030C48PL23",
   "message_ts": "1780393851.508299",
   "reason": "#20 Tour2America 'bayram içeriği' gecikme 24h eşiği aşıldı (deadline 1Haz12:31) · ai role → sorumlu yönetici Görkem'e Şablon 31 yönetici uyarısı · Atanan Eren · state file'da anticipated · Headless run"
+ },
+ {
+  "brief_ts": "1780318126.239499",
+  "brief_no": "27",
+  "template": "30_gecikme_lead_reminder_1h",
+  "sent_at": "2026-06-02T14:20:29+03:00",
+  "user_id": "U09BFPBKQG7",
+  "message_ts": "1780399229.086449",
+  "reason": "#27 Bauhaus 'Plastik Dolaplar' gecikme 1sa eşiği aşıldı (deadline 2Haz13:00 · 1sa18dk GEÇMİŞ) · lead Hasan Serdar'a Şablon 30 hatırlatma · ilk kez (13:45 run'da 45dk<1h idi) · Headless run"
+ },
+ {
+  "brief_ts": "1780398800.600119",
+  "brief_no": "32",
+  "template": "1_new_brief_dm_test_flag",
+  "sent_at": "2026-06-02T14:20:29+03:00",
+  "user_id": "U030C48PL23",
+  "message_ts": "1780399229.365019",
+  "reason": "#32 Egosport 'test editör' + #33 Hasvet 'test ai' · içerik test algılandı · erdem/Eren'e otomatik atama YAPILMADI · owner Görkem'e konsolide teyit DM (gerçekse ilet / 🔒 ile kapat) · #25/#26 pattern · Headless run"
+ },
+ {
+  "brief_ts": "1780398881.492359",
+  "brief_no": "33",
+  "template": "1_new_brief_dm_test_flag",
+  "sent_at": "2026-06-02T14:20:29+03:00",
+  "user_id": "covered-in-32-consolidated",
+  "reason": "#33 Hasvet 'test ai' · #32 ile aynı konsolide test-flag DM'inde Görkem'e iletildi (ayrı DM gönderilmedi) · Eren'e otomatik atama YAPILMADI"
  }
 ]
