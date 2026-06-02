@@ -1,0 +1,10 @@
+# pre-launch readiness
+iteration	hypothesis	status	evidence
+1	Servis Online + doğru workspace	PASS	BenSenO Marketing Technologies · Online · ec960348
+2	Çift-runner (Mac/Actions)	PASS	Mac soğuk + workflow yok
+3	Git senkron	PASS	5605077 lokal=remote
+4	Tokenlar (PAT/Slack/ANTHROPIC)	PASS	HTTP 200/200 + ANTHROPIC SET
+5	claude root+sandbox çalışıyor	PASS	HAZIR döndü
+6	scheduler + yeni cron canlı	PASS	cron job kuruldu + bot başladı
+7	Faturalandırma (firma workspace)	PASS	Pro plan satın alındı — askıya alma riski yok
+8	Son tam pipeline run	PASS	15:15 Benseno Bot commit + dashboard taze (18 brief)
