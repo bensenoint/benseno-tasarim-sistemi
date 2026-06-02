@@ -1,25 +1,9 @@
 {
- "sync_ts": 1780377595,
- "sync_iso": "2026-06-02T08:19:55+03:00",
+ "sync_ts": 1780379113,
+ "sync_iso": "2026-06-02T08:45:13+03:00",
  "run_type": "orchestrator_headless_sync",
  "mode": "active",
- "new_briefs": [
-  {
-   "no": "27",
-   "marka": "Bauhaus",
-   "is": "Plastik Dolaplar",
-   "dept": "tasarim",
-   "priority": "🔴",
-   "atanan_ids": [
-    "U09BFPBKQG7",
-    "U06J26R1XCJ"
-   ],
-   "deadline": "2 Haziran 2026 13:00 TR",
-   "channel": "C4Y43AW2E",
-   "ts": "1780318126.239499",
-   "note": "Sosyal Medya Post · Paralel akış · 💬 video içeriği · Ref Google Doc · 🐷 Eda T açtı · 🔴 Acil (~4.5sa) · gerçek brief — atama DM"
-  }
- ],
+ "new_briefs": [],
  "completed_this_run": [],
  "past_deadline": [],
  "past_confirmed": [],
@@ -30,24 +14,5 @@
  "calendar_events": [],
  "escalation": [],
  "blokeli": [],
- "threshold_transitions": [
-  {
-   "no": "25",
-   "marka": "VDM Petdent",
-   "prev": "🟠",
-   "new": "🔴",
-   "iso": "2026-06-02T08:19:55+03:00",
-   "dm": false,
-   "reason": "deadline ~1.7sa kaldı (≤8sa eşiği) · 🟠→🔴 Acil · ⚠️ test brief'i Görkem teyit bekliyor · log-only"
-  },
-  {
-   "no": "26",
-   "marka": "Bauhaus",
-   "prev": "🟠",
-   "new": "🔴",
-   "iso": "2026-06-02T08:19:55+03:00",
-   "dm": false,
-   "reason": "deadline ~6.6sa kaldı (≤8sa eşiği) · 🟠→🔴 Acil · ⚠️ test brief'i Görkem teyit bekliyor · log-only"
-  }
- ]
+ "threshold_transitions": []
 }
