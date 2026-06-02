@@ -41,7 +41,7 @@ if [[ "$HTTP_STATUS" == "000" ]]; then
 elif [[ "$HTTP_STATUS" != "200" ]]; then
   MSG="🚨 *GitHub PAT GEÇERSİZ!* (HTTP $HTTP_STATUS)\nBrief Sync ve GitHub push çalışmıyor. PAT'i hemen yenile: https://github.com/settings/tokens"
   echo "[$TIMESTAMP] KRITIK: PAT geçersiz (HTTP $HTTP_STATUS)" >> "$LOG"
-  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --print --dangerously-skip-permissions >> "$LOG" 2>&1
+  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --model haiku --print --dangerously-skip-permissions >> "$LOG" 2>&1
   exit 1
 fi
 
@@ -83,5 +83,5 @@ fi
 
 if [[ $SEND -eq 1 ]]; then
   echo "[$TIMESTAMP] Slack uyarısı gönderiliyor: $DAYS_LEFT gün kaldı" >> "$LOG"
-  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --print --dangerously-skip-permissions >> "$LOG" 2>&1
+  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --model haiku --print --dangerously-skip-permissions >> "$LOG" 2>&1
 fi

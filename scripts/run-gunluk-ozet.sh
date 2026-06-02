@@ -52,7 +52,7 @@ MSG="📊 *Günlük Sistem Özeti — $(date '+%d %B %Y')*
 
 _Son sync: $(python3 -c "import json; d=json.load(open('$AGENT_STATE')); print(d.get('last_run','?')[:16].replace('T',' '))" 2>/dev/null)_"
 
-OUTPUT=$(timeout 120 /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı SADECE Görkem'e (GM) Slack DM olarak gönder, başka işlem yapma: $MSG" --print --dangerously-skip-permissions 2>&1)
+OUTPUT=$(timeout 120 /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı SADECE Görkem'e (GM) Slack DM olarak gönder, başka işlem yapma: $MSG" --model haiku --print --dangerously-skip-permissions 2>&1)
 EXIT_CODE=$?
 
 echo "$OUTPUT" >> "$LOG"

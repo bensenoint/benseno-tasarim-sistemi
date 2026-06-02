@@ -10,7 +10,7 @@ source ~/.zshrc 2>/dev/null
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "[$TIMESTAMP] Sabah Raporu başlatıldı..." >> logs/sabah-raporu.log
 
-OUTPUT=$(timeout 900 /opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — sabah-raporu" --print --dangerously-skip-permissions 2>&1)
+OUTPUT=$(timeout 900 /opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — sabah-raporu" --model sonnet --print --dangerously-skip-permissions 2>&1)
 EXIT_CODE=$?
 
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')

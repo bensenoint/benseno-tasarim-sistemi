@@ -51,7 +51,7 @@ if [[ $OFFLINE_H -ge 2 ]]; then
   MSG="$MSG · Startup Recovery çalışıyor, birkaç dakika içinde hazır."
   echo "[$TIMESTAMP] Slack bildirimi gönderiliyor..." >> "$LOG"
   /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" \
-    --print --dangerously-skip-permissions >> "$LOG" 2>&1
+    --model haiku --print --dangerously-skip-permissions >> "$LOG" 2>&1
 fi
 
 # ── Recovery run ─────────────────────────────────────────────────────────────
@@ -63,7 +63,7 @@ if [[ $OFFLINE_H -ge 24 ]]; then
 fi
 
 /opt/homebrew/bin/claude -p "Skill: benseno-orchestrator — ${RUN_TYPE}: sistem ${OFFLINE_H}sa ${OFFLINE_MIN}dk kapalıydı. Queue: ${QUEUE_SIZE} brief. Canvas'ı sıfırdan oku, tüm birikmiş brief'leri işle, deadline'ları yeniden hesapla, gerekli DM'leri gönder. FORCE_REBUILD." \
-  --print --dangerously-skip-permissions >> "$LOG" 2>&1
+  --model sonnet --print --dangerously-skip-permissions >> "$LOG" 2>&1
 
 # ── Heartbeat güncelle ───────────────────────────────────────────────────────
 date +%s > "$HEARTBEAT_FILE"

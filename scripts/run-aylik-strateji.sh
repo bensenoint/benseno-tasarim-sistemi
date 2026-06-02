@@ -20,7 +20,7 @@ source ~/.zshrc 2>/dev/null
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "[$TIMESTAMP] Aylık Strateji başlatıldı (Ay sonu: $TODAY/$MONTH/$YEAR)..." >> logs/aylik-strateji.log
 
-/opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — aylik-strateji — run now" --print --dangerously-skip-permissions >> logs/aylik-strateji.log 2>&1
+/opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — aylik-strateji — run now" --model sonnet --print --dangerously-skip-permissions >> logs/aylik-strateji.log 2>&1
 CLAUDE_EXIT=$?
 
 echo "[$TIMESTAMP] Aylık Strateji tamamlandı. (exit: $CLAUDE_EXIT)" >> logs/aylik-strateji.log

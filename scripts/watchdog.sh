@@ -46,7 +46,7 @@ fi
 # Hiçbir kaynak yoksa → uyar
 if [[ -z "$LAST_SYNC" ]]; then
   echo "[$TIMESTAMP] UYARI: Heartbeat ve agent-state bulunamadı — sistem hiç çalışmamış olabilir." >> "$LOG"
-  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: ⚠️ *Brief Sync Watchdog:* Heartbeat ve agent-state bulunamadı. Brief Sync hiç çalışmamış veya log silinmiş olabilir. Kontrol et: launchctl list | grep benseno" --print --dangerously-skip-permissions >> "$LOG" 2>&1
+  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: ⚠️ *Brief Sync Watchdog:* Heartbeat ve agent-state bulunamadı. Brief Sync hiç çalışmamış veya log silinmiş olabilir. Kontrol et: launchctl list | grep benseno" --model haiku --print --dangerously-skip-permissions >> "$LOG" 2>&1
   exit 1
 fi
 
@@ -60,5 +60,5 @@ echo "[$TIMESTAMP] Son sync: ${LAST_HUMAN} (${DIFF_MIN} dk önce)" >> "$LOG"
 if [[ $DIFF -gt 7200 ]]; then
   MSG="⚠️ *Orchestrator ${DIFF_MIN} dakikadır çalışmadı!* (Son çalışma: ${LAST_HUMAN})\nManüel başlatma: \`bash ~/benseno-tasarim-sistemi/scripts/run-orchestrator.sh\`"
   echo "[$TIMESTAMP] UYARI gönderiliyor: ${DIFF_MIN} dk sessizlik" >> "$LOG"
-  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --print --dangerously-skip-permissions >> "$LOG" 2>&1
+  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --model haiku --print --dangerously-skip-permissions >> "$LOG" 2>&1
 fi

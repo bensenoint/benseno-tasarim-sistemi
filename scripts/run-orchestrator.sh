@@ -42,6 +42,7 @@ cd "$PROJ"
 source ~/.zshrc 2>/dev/null
 
 timeout 900 $CLAUDE -p "Skill: benseno-orchestrator — run" \
+  --model sonnet \
   --dangerously-skip-permissions \
   --print \
   >> "$LOG" 2>&1

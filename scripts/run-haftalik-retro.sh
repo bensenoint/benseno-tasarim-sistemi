@@ -10,7 +10,7 @@ source ~/.zshrc 2>/dev/null
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "[$TIMESTAMP] Haftalık Retro başlatıldı..." >> logs/haftalik-retro.log
 
-/opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — haftalik-retro — run now" --print --dangerously-skip-permissions >> logs/haftalik-retro.log 2>&1
+/opt/homebrew/bin/claude -p "Skill: benseno-dashboard-agent — haftalik-retro — run now" --model sonnet --print --dangerously-skip-permissions >> logs/haftalik-retro.log 2>&1
 CLAUDE_EXIT=$?
 
 echo "[$TIMESTAMP] Haftalık Retro tamamlandı. (exit: $CLAUDE_EXIT)" >> logs/haftalik-retro.log
