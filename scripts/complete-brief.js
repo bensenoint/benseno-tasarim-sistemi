@@ -138,7 +138,9 @@ function main() {
     let moved = 0;
     for (const ts of tsList) {
       const s = state[ts];
-      if (s.done) {
+      // Geriye uyumluluk: eski format (done/required yok) = tamamlanmış kabul et.
+      const isDone = s.done === true || (s.done === undefined && !(Array.isArray(s.required) && s.required.length));
+      if (isDone) {
         // tamamlanmış → completed'de tut (data-agent aktif geri getirdiyse taşı)
         if (moveToCompleted(live, ts, s.by, s.at_ms || nowMs)) moved++;
       } else if (Array.isArray(s.required) && s.required.length) {
