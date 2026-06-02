@@ -11,11 +11,14 @@ CREATED_FILE="data/.github-pat-created"
 LOG="logs/pat-check.log"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-# PAT dosyaları yoksa çıkış
-[[ ! -f "$PAT_FILE" || ! -f "$CREATED_FILE" ]] && echo "[$TIMESTAMP] PAT dosyası bulunamadı." >> "$LOG" && exit 1
+# PAT dosyası yoksa çıkış (HTTP kontrolü için zorunlu). CREATED opsiyonel: container'da
+# .github-pat-created olmayabilir (gitignored) → sayım atlanır ama HTTP kontrolü YİNE çalışır.
+[[ ! -f "$PAT_FILE" ]] && echo "[$TIMESTAMP] PAT dosyası bulunamadı." >> "$LOG" && exit 1
 
-CREATED=$(cat "$CREATED_FILE" | tr -d '[:space:]')
 PAT=$(cat "$PAT_FILE" | tr -d '[:space:]')
+# Oluşturma tarihi: önce env (Railway: BENSENO_PAT_CREATED=YYYY-MM-DD), yoksa dosya
+CREATED="${BENSENO_PAT_CREATED:-}"
+[[ -z "$CREATED" && -f "$CREATED_FILE" ]] && CREATED=$(cat "$CREATED_FILE" | tr -d '[:space:]')
 
 # GitHub API üzerinden PAT'in gerçekte geçerli olup olmadığını kontrol et
 # HTTP 000 = ağ bağlantı hatası → 3 kez retry yap, ardından ağ hatası olarak işaretle
@@ -40,6 +43,12 @@ elif [[ "$HTTP_STATUS" != "200" ]]; then
   echo "[$TIMESTAMP] KRITIK: PAT geçersiz (HTTP $HTTP_STATUS)" >> "$LOG"
   /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --print --dangerously-skip-permissions >> "$LOG" 2>&1
   exit 1
+fi
+
+# Oluşturma tarihi yoksa: HTTP kontrolü zaten geçti (PAT geçerli) → sayımı atla, temiz çık.
+if [[ -z "$CREATED" ]]; then
+  echo "[$TIMESTAMP] PAT geçerli (HTTP 200). Oluşturma tarihi yok (BENSENO_PAT_CREATED set değil) → gün sayımı atlandı." >> "$LOG"
+  exit 0
 fi
 
 # Oluşturma tarihinden expire tahmin (GitHub fine-grained PAT max 1 yıl)

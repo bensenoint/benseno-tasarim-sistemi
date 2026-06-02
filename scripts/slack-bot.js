@@ -468,18 +468,22 @@ app.event('app_home_opened', async ({ event, client }) => {
   }
 });
 
+// Türkçe deadline ("2 Haziran 2026" + "10:00 TR") geçmiş mi? (JS new Date() Türkçe ayı parse edemez)
+const TR_AYLAR = { ocak:0, şubat:1, subat:1, mart:2, nisan:3, mayıs:4, mayis:4, may:4, haziran:5, haz:5, temmuz:6, tem:6, ağustos:7, agustos:7, eylül:8, eylul:8, ekim:9, eki:9, kasım:10, kasim:10, aralık:11, aralik:11 };
+function deadlineGecti(deadline, saat) {
+  const dm = (deadline || '').trim().match(/^(\d{1,2})\s+(\S+)\s+(\d{4})/);
+  if (!dm) return false;
+  const mon = TR_AYLAR[dm[2].toLowerCase()];
+  if (mon == null) return false;
+  const sm = (saat || '').match(/(\d{1,2}):(\d{2})/);
+  const hh = sm ? +sm[1] : 23, mm = sm ? +sm[2] : 59;
+  return Date.UTC(+dm[3], mon, +dm[1], hh - 3, mm) < Date.now(); // TR=UTC+3
+}
+
 function buildManagerHomeTab(briefs) {
   const acil    = briefs.filter(b => b.oncelik.includes('🔴'));
-  // Deadline geçmiş brief'leri tespit et: durum alanında 'GEÇMİŞ' veya deadline tarihi bugünden önce
-  const simdi = new Date();
-  const gecmis = briefs.filter(b => {
-    if (b.durum && b.durum.includes('GEÇMİŞ')) return true;
-    if (b.deadline) {
-      const d = new Date(b.deadline);
-      if (!isNaN(d.getTime()) && d < simdi) return true;
-    }
-    return false;
-  });
+  // Gecikmiş: deadline gerçekten geçmiş (Türkçe parse) VEYA durum 'GEÇMİŞ' diyor
+  const gecmis = briefs.filter(b => (b.durum && b.durum.includes('GEÇMİŞ')) || deadlineGecti(b.deadline, b.saat));
 
   // marka_stats.json'dan E3 mod durumunu oku
   let e3Durum = 'bilinmiyor';
