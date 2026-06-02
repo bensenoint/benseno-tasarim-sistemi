@@ -1,7 +1,10 @@
 {
   "mode": "active",
-  "generated": "2026-06-02T11:45:14+03:00",
-  "new_briefs": [],
+  "generated": "2026-06-02T12:15:43+03:00",
+  "new_briefs": [
+    30,
+    31
+  ],
   "past_deadline": [
     1,
     3,
@@ -36,7 +39,7 @@
       "lead_role": "editor",
       "deadline_str": "18 May 16:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "gecikme_h": 355
+      "gecikme_h": 356
     },
     {
       "ts": "1779167651.759819",
@@ -47,7 +50,7 @@
       "lead_role": "tasarim",
       "deadline_str": "20 May 10:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "gecikme_h": 313
+      "gecikme_h": 314
     },
     {
       "ts": "1779167921.567269",
@@ -58,7 +61,7 @@
       "lead_role": "tasarim",
       "deadline_str": "21 May 13:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "gecikme_h": 286
+      "gecikme_h": 287
     },
     {
       "ts": "1779187350.819039",
@@ -80,7 +83,7 @@
       "lead_role": "tasarim",
       "deadline_str": "20 May 18:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "gecikme_h": 305
+      "gecikme_h": 306
     },
     {
       "ts": "1779272694.698569",
@@ -102,7 +105,7 @@
       "lead_role": "ai",
       "deadline_str": "22 May 23:59 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
-      "gecikme_h": 251
+      "gecikme_h": 252
     },
     {
       "ts": "1779283282.205179",
@@ -113,7 +116,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 14:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179",
-      "gecikme_h": 261
+      "gecikme_h": 262
     },
     {
       "ts": "1779283377.829309",
@@ -124,7 +127,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 17:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309",
-      "gecikme_h": 258
+      "gecikme_h": 259
     },
     {
       "ts": "1779342432.583659",
@@ -135,7 +138,7 @@
       "lead_role": "ai",
       "deadline_str": "22 May 08:46 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659",
-      "gecikme_h": 266
+      "gecikme_h": 267
     },
     {
       "ts": "1779355957.360249",
@@ -168,7 +171,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 18:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919",
-      "gecikme_h": 257
+      "gecikme_h": 258
     },
     {
       "ts": "1780290478.864579",
@@ -179,7 +182,7 @@
       "lead_role": "editor",
       "deadline_str": "2 Haz 10:00 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1780290478864579",
-      "gecikme_h": 1
+      "gecikme_h": 2
     }
   ],
   "blokeli": [
@@ -192,7 +195,7 @@
       "lead_role": "editor",
       "deadline_str": "18 May 16:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "gecikme_h": 355
+      "gecikme_h": 356
     },
     {
       "ts": "1779167651.759819",
@@ -203,7 +206,7 @@
       "lead_role": "tasarim",
       "deadline_str": "20 May 10:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "gecikme_h": 313
+      "gecikme_h": 314
     },
     {
       "ts": "1779167921.567269",
@@ -214,7 +217,7 @@
       "lead_role": "tasarim",
       "deadline_str": "21 May 13:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "gecikme_h": 286
+      "gecikme_h": 287
     },
     {
       "ts": "1779187350.819039",
@@ -236,7 +239,7 @@
       "lead_role": "tasarim",
       "deadline_str": "20 May 18:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "gecikme_h": 305
+      "gecikme_h": 306
     },
     {
       "ts": "1779272694.698569",
@@ -258,7 +261,7 @@
       "lead_role": "ai",
       "deadline_str": "22 May 23:59 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
-      "gecikme_h": 251
+      "gecikme_h": 252
     },
     {
       "ts": "1779283282.205179",
@@ -269,7 +272,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 14:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179",
-      "gecikme_h": 261
+      "gecikme_h": 262
     },
     {
       "ts": "1779283377.829309",
@@ -280,7 +283,7 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 17:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309",
-      "gecikme_h": 258
+      "gecikme_h": 259
     },
     {
       "ts": "1779342432.583659",
@@ -291,7 +294,7 @@
       "lead_role": "ai",
       "deadline_str": "22 May 08:46 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659",
-      "gecikme_h": 266
+      "gecikme_h": 267
     },
     {
       "ts": "1779363838.575629",
@@ -313,7 +316,44 @@
       "lead_role": "tasarim",
       "deadline_str": "22 May 18:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919",
-      "gecikme_h": 257
+      "gecikme_h": 258
+    }
+  ],
+  "new_briefs_detail": [
+    {
+      "no": 30,
+      "ts": "1780390340.369139",
+      "marka": "Bauhaus",
+      "is": "Weber 1&2",
+      "tip": "Sosyal Medya Post",
+      "akis": "Paralel",
+      "not": "Weber sekmesinden iki videonun da briefini bulabilirsiniz",
+      "ref": "https://docs.google.com/document/d/1_Cr1HZDiUAgcduiKWOxz0-PuBaT52IEZlE3frDHHOh0/edit",
+      "deadline_str": "3 Haziran 2026 12:00 TR",
+      "priority": "🟠",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "channel": "C4Y43AW2E",
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780390340369139"
+    },
+    {
+      "no": 31,
+      "ts": "1780390360.140899",
+      "marka": "KZY Supreme",
+      "is": "Supreme Wet 85 gram // Haziran 2026 Kampanya",
+      "tip": "Print / Broşür",
+      "akis": "",
+      "not": "",
+      "ref": "",
+      "deadline_str": "3 Haziran 2026 11:52 TR",
+      "priority": "🟠",
+      "atanan_ids": [
+        "U08HLMHTGEL"
+      ],
+      "channel": "C05KKSV6EF7",
+      "permalink": "https://benseno.slack.com/archives/C05KKSV6EF7/p1780390360140899"
     }
   ]
 }
