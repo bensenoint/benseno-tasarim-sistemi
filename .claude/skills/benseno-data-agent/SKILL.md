@@ -139,8 +139,14 @@ her döngü sonunda `reaction-override.js --reapply` ile bu override'ları taze 
 #### 3h. Validation flag'leri
 - `saat_eksik`: deadline bugün AND saat yok → flag
 - `gecmis_tarih`: deadline < now → flag
-- `gecmis_teyit`: thread'de `✅ ok` / `teyit` veya ✅ reaction → confirmed flag
+- `gecmis_teyit`: thread'de `✅ ok` / `teyit` → confirmed flag (✅ REACTION'ı headless'ta okuma)
 - `mesai_disi`: saat < 08:00 veya > 17:30 → flag
+
+> **Brief TAMAMLAMA (✅ reaction) — DETERMİNİSTİK (v7.13):** Ekip tamamlamayı brief mesajına ✅
+> koyarak yapıyor; headless'ta ✅ reaction okunamadığı için `scripts/complete-brief.js` bunu
+> slack-bot event'inden anlık işler (brief'i bns_completed'e taşır). Sen Canvas'tan ne okuyorsan
+> onu üret — `data/completion-overrides.json`'daki ts'ler hâlâ Canvas'ta aktif görünse bile sorun
+> değil: orchestrator döngü sonunda `complete-brief.js --reapply` onları completed'e geri taşır.
 
 #### 3i. Marka davranış kıyaslaması (v7.13 — E3)
 `marka_stats.json` oku:

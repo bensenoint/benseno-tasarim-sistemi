@@ -390,12 +390,26 @@ app.command('/kapasite', async ({ command, ack, respond, client }) => {
 // ─── Aşama D: Reaction Override (anlık) ───────────────────────────────────────
 
 app.event('reaction_added', async ({ event, client }) => {
-  // Yönetici değilse yoksay
-  if (!MANAGER_IDS.has(event.user)) return;
-  // Öncelik reaction'ı değilse yoksay
-  if (!PRIORITY_REACTIONS.has(event.reaction)) return;
   // Mesaj tipinde değilse yoksay (dosya, canvas üzeri olabilir)
   if (event.item.type !== 'message') return;
+
+  // ✅ Brief tamamlama (atanan/editör/yönetici — yetkiyi script kontrol eder).
+  // Deterministik: brief'i bns_briefs→bns_completed taşır + push. MCP/claude gerektirmez.
+  if (event.reaction === 'white_check_mark') {
+    const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
+    log(`✅ tamamlama: ${event.item.ts} — ${event.user}`);
+    execFile('node', [`${PROJECT_DIR}/scripts/complete-brief.js`, event.item.ts, event.user, saat],
+      { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
+      (err, stdout, stderr) => {
+        if (err) log(`complete-brief hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
+        else log(`complete-brief: ${(stdout || '').trim().split('\n').pop()}`);
+      });
+    return;
+  }
+
+  // Yönetici öncelik override'ı (🔴/🟠/🟡/🟢) — sadece yöneticiler
+  if (!MANAGER_IDS.has(event.user)) return;
+  if (!PRIORITY_REACTIONS.has(event.reaction)) return;
 
   const emoji    = REACTION_EMOJI[event.reaction];
   const ts       = event.item.ts;
@@ -420,40 +434,10 @@ app.event('reaction_added', async ({ event, client }) => {
   }
 });
 
-// ─── Öneri 3: Brief Tamamlama Action ──────────────────────────────────────────
-
-app.action('brief_tamamla', async ({ body, ack, client }) => {
-  await ack();
-
-  const userId  = body.user.id;
-  const briefNo = body.actions[0].value; // brief numarası
-
-  log(`brief_tamamla: ${briefNo} — ${userId}`);
-
-  // Brief Sync'i çağır — tamamlandı işlemi
-  execFile('/bin/sh',
-    ['-c', `/opt/homebrew/bin/claude -p "Skill: benseno-brief-tamamla — no: ${briefNo} tasarimci: ${userId}" --print --dangerously-skip-permissions < /dev/null`],
-    { cwd: PROJECT_DIR, timeout: 300000, env: { ...process.env, PATH: '/opt/homebrew/bin:/usr/local/bin:' + process.env.PATH } },
-    async (err, stdout) => {
-      if (err) {
-        await client.chat.postEphemeral({ channel: body.channel?.id || userId, user: userId, text: `❌ İşaretleme başarısız: ${err.message}` });
-      } else {
-        await client.chat.postEphemeral({ channel: body.channel?.id || userId, user: userId, text: `✅ Brief tamamlandı olarak işaretlendi! Canvas güncelleniyor...` });
-      }
-    }
-  );
-});
-
-app.action('brief_sure_uzat', async ({ body, ack, client }) => {
-  await ack();
-  await client.chat.postEphemeral({
-    channel: body.channel?.id || body.user.id,
-    user: body.user.id,
-    text: `📅 Süre uzatmak için #marka-brief-form kanalında ilgili brief mesajına yeni deadline'ı reply olarak yaz. Brief Sync otomatik güncelleyecek.`,
-  });
-});
-
-// save_as_brief shortcut kaldırıldı — Slack Workflow zaten bu işi yapıyor
+// Brief tamamlama: ✅ reaction ile (yukarıdaki reaction_added handler → complete-brief.js).
+// Eski brief_tamamla / brief_sure_uzat Block Kit buton handler'ları KALDIRILDI:
+// hiçbir mesaj bu butonları render etmiyordu (ölü kod) + brief_tamamla bozuk MCP claude -p
+// desenini kullanıyordu. Tamamlama artık ✅ reaction üzerinden deterministik çalışıyor.
 
 // ─── Öneri 4: App Home Tab ────────────────────────────────────────────────────
 

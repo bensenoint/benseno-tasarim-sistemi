@@ -70,6 +70,9 @@ echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator tamamlandı. (exit: $CLAUDE_EXIT)
 if [ $CLAUDE_EXIT -eq 0 ]; then
   node "$PROJ/scripts/reaction-override.js" --reapply >> "$PROJ/logs/reaction-override.log" 2>&1 || \
     echo "[$(date '+%d.%m.%Y %H:%M')] reaction-override --reapply hata" >> "$LOG"
+  # ✅ tamamlanmış brief'leri completed'de tut (data-agent Canvas'tan aktif geri getirdiyse taşı)
+  node "$PROJ/scripts/complete-brief.js" --reapply >> "$PROJ/logs/complete-brief.log" 2>&1 || \
+    echo "[$(date '+%d.%m.%Y %H:%M')] complete-brief --reapply hata" >> "$LOG"
 fi
 
 # Gecikme escalation (deterministik script — LLM değil) — sadece başarılı run'da,
