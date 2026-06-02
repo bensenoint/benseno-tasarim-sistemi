@@ -1,6 +1,6 @@
 {
   "mode": "active",
-  "generated": "2026-06-02T13:17:46+03:00",
+  "generated": "2026-06-02T13:45:13+03:00",
   "new_briefs": [],
   "past_deadline": [
     1,
@@ -70,7 +70,7 @@
       "lead_role": "ai",
       "deadline_str": "21 May 13:42 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-      "gecikme_h": 287
+      "gecikme_h": 288
     },
     {
       "ts": "1779266016.085909",
@@ -92,7 +92,7 @@
       "lead_role": "tasarim",
       "deadline_str": "21 May 13:24 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569",
-      "gecikme_h": 287
+      "gecikme_h": 288
     },
     {
       "ts": "1779275121.721279",
@@ -147,7 +147,7 @@
       "lead_role": "ai",
       "deadline_str": "1 Haz 12:31 TR",
       "permalink": "https://benseno.slack.com/archives/C05J5PXBPGS/p1779355957360249",
-      "gecikme_h": 24
+      "gecikme_h": 25
     },
     {
       "ts": "1779363838.575629",
@@ -158,7 +158,7 @@
       "lead_role": "editor",
       "deadline_str": "23 May 14:42 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629",
-      "gecikme_h": 238
+      "gecikme_h": 239
     },
     {
       "ts": "1779456154.216919",
@@ -237,7 +237,7 @@
       "lead_role": "ai",
       "deadline_str": "21 May 13:42 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-      "gecikme_h": 287
+      "gecikme_h": 288
     },
     {
       "ts": "1779266016.085909",
@@ -259,7 +259,7 @@
       "lead_role": "tasarim",
       "deadline_str": "21 May 13:24 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569",
-      "gecikme_h": 287
+      "gecikme_h": 288
     },
     {
       "ts": "1779275121.721279",
@@ -314,7 +314,7 @@
       "lead_role": "editor",
       "deadline_str": "23 May 14:42 TR",
       "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629",
-      "gecikme_h": 238
+      "gecikme_h": 239
     },
     {
       "ts": "1779456154.216919",
