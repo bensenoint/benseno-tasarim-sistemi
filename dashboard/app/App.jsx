@@ -1,5 +1,22 @@
 // app/App.jsx — root, owns global state and tweaks.
 
+// Bir ekran render sırasında hata atarsa TÜM dashboard'ı blank'lamasın diye sınır.
+// key={tab} ile sarılır → sekme değişince resetlenir, diğer ekranlar çalışmaya devam eder.
+class ScreenErrorBoundary extends React.Component {
+  constructor(p) { super(p); this.state = { err: null }; }
+  static getDerivedStateFromError(err) { return { err }; }
+  componentDidCatch(err, info) { try { console.error("Ekran hatası:", err, info); } catch (e) {} }
+  render() {
+    if (this.state.err) {
+      return React.createElement("div", { style: { padding: 24, font: "14px/1.6 var(--font-sans)", color: "var(--ink)" } },
+        React.createElement("div", { style: { fontWeight: 600, marginBottom: 8 } }, "⚠️ Bu ekran yüklenemedi"),
+        React.createElement("div", { style: { color: "var(--ink-3)", fontSize: 12, fontFamily: "var(--font-mono)" } }, String((this.state.err && this.state.err.message) || this.state.err)),
+        React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: "var(--ink-4)" } }, "Diğer sekmeler çalışıyor. Lütfen bu hatayı bildir."));
+    }
+    return this.props.children;
+  }
+}
+
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "light",
   "density": "comfortable",
@@ -326,7 +343,7 @@ function App() {
           background: "var(--paper)",
         }}>
           <div className="bns-main-content" style={{maxWidth: 1400, margin: "0 auto", padding: isMobile ? "8px 14px 88px" : "8px 32px 72px"}}>
-            {Screen}
+            <ScreenErrorBoundary key={tab}>{Screen}</ScreenErrorBoundary>
           </div>
           {(
             <footer className="bns-desktop-footer" style={{
