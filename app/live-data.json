@@ -21,7 +21,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "18 May 2026",
-   "saat": "16:00 TR ⚠️ GEÇMİŞ (13g 21sa 35dk geride · 🆕11g eşiği 29May16:00 AŞILDI · ⚠️12g eşiği ~5sa 12dk (30May16:00) · ✓ teyit edilmiş — bakanlık süreci · 🔴 Blokeli >72sa)",
+   "saat": "16:00 TR ⚠️ GEÇMİŞ (14g 16sa 19dk geride · 🆕11g eşiği 29May16:00 AŞILDI · ⚠️12g eşiği ~5sa 12dk (30May16:00) · ✓ teyit edilmiş — bakanlık süreci · 🔴 Blokeli >72sa)",
    "durum": "👀 Revize bekliyor (v2 teslim · bakanlık geri dönüşü) · 🔴 Blokeli",
    "rev": "1",
    "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22 / 📈29May16:00 🆕11g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only · teyit edilmiş bakanlık süreci)",
@@ -48,7 +48,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "21 May 2026",
-   "saat": "16:00 TR ⚠️ GEÇMİŞ (10g 21sa 35dk geride · 🆕8g eşiği 29May16:00 AŞILDI · ⚠️9g eşiği ~5sa 12dk (30May16:00) · v1 verildi · 🔴 Blokeli >72sa)",
+   "saat": "16:00 TR ⚠️ GEÇMİŞ (11g 16sa 19dk geride · 🆕8g eşiği 29May16:00 AŞILDI · ⚠️9g eşiği ~5sa 12dk (30May16:00) · v1 verildi · 🔴 Blokeli >72sa)",
    "durum": "🎨 v1 verildi · Buse mockup iste · 5g+ pasif onay flow · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡→↪️20May10:22 İpek dispatch İrem→✅20May10:35 İrem kabul→📈21May09:00 öncelik 🟡→🔴 (auto-recalc) / ⏰GEÇMİŞ21May16:00 / 🎨22May~17:00 İrem v1 verdi · Buse 17:00 'mockup iste' (22May17:15 sync'inde) / 📈28May16:00 🆕7g eşiği aşıldı / 📈29May16:00 🆕8g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
@@ -70,7 +70,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "20 May 2026",
-   "saat": "10:00 TR ⚠️ GEÇMİŞ (12g 3sa 35dk geride · 🆕10g eşiği 30May10:00 AŞILDI (48dk önce) · ⚠️11g eşiği ~23sa 12dk (31May10:00) · 🔴 Blokeli >72sa)",
+   "saat": "10:00 TR ⚠️ GEÇMİŞ (12g 22sa 19dk geride · 🆕10g eşiği 30May10:00 AŞILDI (48dk önce) · ⚠️11g eşiği ~23sa 12dk (31May10:00) · 🔴 Blokeli >72sa)",
    "durum": "6g+ pasif · 🔴 Blokeli · Aykut > Eda T pasif",
    "rev": "0",
    "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (55sa 45dk geride · 22May17:45 sync'inde) / 📈29May10:00 🆕9g eşiği aşıldı (auto-recalc · 29May12:45 sync'inde · log-only) / 📈30May10:00 🆕10g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
@@ -92,7 +92,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "21 May 2026",
-   "saat": "13:00 TR ⚠️ GEÇMİŞ (11g 0sa 35dk geride · 🆕8g eşiği 29May13:00 AŞILDI · ⚠️9g eşiği ~2sa 12dk (30May13:00) · 🔴 Blokeli >72sa)",
+   "saat": "13:00 TR ⚠️ GEÇMİŞ (11g 19sa 19dk geride · 🆕8g eşiği 29May13:00 AŞILDI · ⚠️9g eşiği ~2sa 12dk (30May13:00) · 🔴 Blokeli >72sa)",
    "durum": "tasarımcı yok · İpek dispatch > Görkem · 8g eşiği AŞILDI · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini) / 📈20May13:17 öncelik 🟡→🟠 / 📈21May~04:00 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:00 (28sa 45dk geride · 22May17:45 sync'inde) / 📈28May13:00 🆕7g eşiği aşıldı / 📈29May13:00 🆕8g eşiği aşıldı (auto-recalc · 29May13:15 sync · log-only · tasarımcı atanmamış)",
@@ -113,7 +113,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "21 May 2026",
-   "saat": "13:42 TR ⚠️ GEÇMİŞ (10g 23sa 53dk geride · 🆕8g eşiği 29May13:42 AŞILDI · ⚠️9g eşiği ~2sa 54dk (30May13:42) · 🔴 Blokeli >72sa)",
+   "saat": "13:42 TR ⚠️ GEÇMİŞ (11g 18sa 37dk geride · 🆕8g eşiği 29May13:42 AŞILDI · ⚠️9g eşiği ~2sa 54dk (30May13:42) · 🔴 Blokeli >72sa)",
    "durum": "🚨 v1 yok · Eren · 8g eşiği AŞILDI · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 / 📈21May~04:42 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:42 / 📈28May13:42 🆕7g eşiği aşıldı / 📈29May13:42 🆕8g eşiği aşıldı (auto-recalc · 29May13:45 sync · log-only)",
@@ -134,7 +134,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "20 May 2026",
-   "saat": "18:00 TR ⚠️ GEÇMİŞ (11g 19sa 35dk geride · 🆕9g eşiği 29May18:00 AŞILDI · ⚠️10g eşiği ~7sa 12dk (30May18:00) · 🔴 Blokeli >72sa)",
+   "saat": "18:00 TR ⚠️ GEÇMİŞ (12g 14sa 19dk geride · 🆕9g eşiği 29May18:00 AŞILDI · ⚠️10g eşiği ~7sa 12dk (30May18:00) · 🔴 Blokeli >72sa)",
    "durum": "v1 yok · Arda hafta sonu pasif · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳20May11:33 (Eda T açtı · workflow) / ⏰GEÇMİŞ20May18:00 / 📈28May18:00 🆕8g eşiği aşıldı / 📈29May18:00 🆕9g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
@@ -155,7 +155,7 @@
    "priority": "🟢",
    "priority_label": "🟢 Düşük",
    "deadline": "21 Haziran 2026",
-   "saat": "17:00 TR (+20g 3sa 24dk kaldı)",
+   "saat": "17:00 TR (+19g 8sa 41dk kaldı · 🟢 Düşük)",
    "durum": "uzun lead · İpek",
    "rev": "0",
    "gecmis": "⏳20May13:10 (Buse açtı · workflow · 🔔 otomatik 🟢 [>72sa])",
@@ -176,7 +176,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "21 May 2026",
-   "saat": "13:24 TR ⚠️ GEÇMİŞ (11g 0sa 11dk geride · 🆕8g eşiği 29May13:24 AŞILDI · ⚠️9g eşiği ~2sa 36dk (30May13:24) · 🔴 Blokeli >72sa)",
+   "saat": "13:24 TR ⚠️ GEÇMİŞ (11g 18sa 55dk geride · 🆕8g eşiği 29May13:24 AŞILDI · ⚠️9g eşiği ~2sa 36dk (30May13:24) · 🔴 Blokeli >72sa)",
    "durum": "🚨 dept ambiguity · Arda dispatch sırada · 8g eşiği AŞILDI · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳20May13:24 (Eren AI açtı · workflow · 🔔 otomatik 🟠) / 📈21May~04:24 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:24 / 📈28May13:24 🆕7g eşiği aşıldı / 📈29May13:24 🆕8g eşiği aşıldı (auto-recalc · 29May13:45 sync · log-only · dept ambiguity sürüyor)",
@@ -197,7 +197,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "22 May 2026",
-   "saat": "23:59 TR ⚠️ GEÇMİŞ (9g 13sa 36dk geride · 🆕7g eşiği 29May23:59 AŞILDI · ⚠️8g eşiği ~13sa 11dk (30May23:59) · 🔴 Blokeli >72sa · Şablon 29 → Eren 26May09:33)",
+   "saat": "23:59 TR ⚠️ GEÇMİŞ (10g 8sa 20dk geride · 🆕7g eşiği 29May23:59 AŞILDI · ⚠️8g eşiği ~13sa 11dk (30May23:59) · 🔴 Blokeli >72sa · Şablon 29 → Eren 26May09:33)",
    "durum": "🔴 Blokeli · 72sa AÇILDI · Şablon 29 DM → Eren (26May09:33) · v1 yok",
    "rev": "0",
    "gecmis": "⏳20May14:05 (Eren AI açtı · workflow · self-assign · 🔔 otomatik 🟡) / 📈29May23:59 🆕7g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
@@ -219,7 +219,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "22 May 2026",
-   "saat": "14:00 TR ⚠️ GEÇMİŞ (9g 23sa 35dk geride · 🆕7g eşiği 29May14:00 AŞILDI · ⚠️8g eşiği ~3sa 12dk (30May14:00) · v1 verildi · 🔴 Blokeli >72sa)",
+   "saat": "14:00 TR ⚠️ GEÇMİŞ (10g 18sa 19dk geride · 🆕7g eşiği 29May14:00 AŞILDI · ⚠️8g eşiği ~3sa 12dk (30May14:00) · v1 verildi · 🔴 Blokeli >72sa)",
    "durum": "🎨 v1 13:28 🌸 · Eda T 14:04 yarı kabul · 5g+ onay pasif · 7g eşiği AŞILDI · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳20May16:21 (Eda T açtı) / 📈21May14:51 öncelik 🟡→🟠 / 📈22May~06:00 öncelik 🟠→🔴 / 🎨22May13:28 Arda v1 verdi 🌸 / 💬22May14:04 Eda T 'ellerine sağlık canoo' + 🌸 / ⏰GEÇMİŞ22May14:00 / 📈28May14:00 🆕6g eşiği aşıldı / 📈29May14:00 🆕7g eşiği aşıldı (auto-recalc · 29May14:15 sync · log-only · v1 verildi ama Eda T pasif onay yok)",
@@ -241,7 +241,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "22 May 2026",
-   "saat": "17:00 TR ⚠️ GEÇMİŞ (9g 20sa 35dk geride · 🆕7g eşiği 29May17:00 AŞILDI · ⚠️8g eşiği ~6sa 12dk (30May17:00) · v1 verildi · 🔴 Blokeli >72sa)",
+   "saat": "17:00 TR ⚠️ GEÇMİŞ (10g 15sa 19dk geride · 🆕7g eşiği 29May17:00 AŞILDI · ⚠️8g eşiği ~6sa 12dk (30May17:00) · v1 verildi · 🔴 Blokeli >72sa)",
    "durum": "🎨 v1 14:40 🌸 · Eda T 14:50 ellerine sağlıkk · 3g+ pasif onay yok · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳20May16:22 (Eda T açtı) / 📈21May17:25 öncelik 🟡→🟠 / 📈22May09:18 öncelik 🟠→🔴 / 🎨22May14:40 Arda v1 verdi 🌸 / 💬22May14:50 Eda T 'ellerine sağlıkk' / ⏰GEÇMİŞ22May17:00 / 📈28May17:00 🆕6g eşiği aşıldı / 📈29May17:00 🆕7g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only · v1 verildi ama Eda T pasif onay yok)",
@@ -263,7 +263,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "22 May 2026",
-   "saat": "08:46 TR ⚠️ GEÇMİŞ (10g 4sa 49dk geride · 🆕8g eşiği 30May08:46 AŞILDI (2sa 2dk önce) · ⚠️9g eşiği ~21sa 58dk (31May08:46) · 🔴 Blokeli >72sa · 72sa AŞILDI)",
+   "saat": "08:46 TR ⚠️ GEÇMİŞ (10g 23sa 33dk geride · 🆕8g eşiği 30May08:46 AŞILDI (2sa 2dk önce) · ⚠️9g eşiği ~21sa 58dk (31May08:46) · 🔴 Blokeli >72sa · 72sa AŞILDI)",
    "durum": "🚨 v1 yok · Görkem DM Cuma 16:45 · 72sa + 8g eşiği AŞILDI · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳21May08:47 (Görkem GM açtı) / 📈22May~04:46 öncelik 🟠→🔴 / ⏰GEÇMİŞ22May08:46 / 💬22May08:49+09:04+09:18+11:51 4 raunt escalation cevapsız / 📈29May08:46 🆕7g eşiği aşıldı / 📈30May08:46 🆕8g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
@@ -285,7 +285,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "1 Haziran 2026",
-   "saat": "12:31 TR ⚠️ GEÇMİŞ (0g 1sa 4dk geride · DEADLINE AŞILDI · 8sa+24sa eşikleri aşıldı)",
+   "saat": "12:31 TR ⚠️ GEÇMİŞ (0g 19sa 48dk geride · DEADLINE AŞILDI · 8sa+24sa eşikleri aşıldı)",
    "durum": "yeni · Eren+Görkem · 72sa eşik geçişi · Normal öncelik",
    "rev": "0",
    "gecmis": "⏳21May12:32 (Görkem GM açtı · workflow · 🔔 otomatik 🟢 [>72sa]) / 📈29May12:31 öncelik 🟢→🟡 (auto-recalc · 72sa eşiği geçti · 29May12:45 sync'inde · log-only · Eren+Görkem zaten atanmış)",
@@ -308,7 +308,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "23 May 2026",
-   "saat": "14:42 TR ⚠️ GEÇMİŞ (8g 22sa 53dk geride · 🆕6g eşiği 29May14:42 AŞILDI · ⚠️7g eşiği ~3sa 54dk (30May14:42) · 🔴 Blokeli >72sa · 72sa AŞILDI 26May14:42 · Şablon 29 → Eren 14:46)",
+   "saat": "14:42 TR ⚠️ GEÇMİŞ (9g 17sa 37dk geride · 🆕6g eşiği 29May14:42 AŞILDI · ⚠️7g eşiği ~3sa 54dk (30May14:42) · 🔴 Blokeli >72sa · 72sa AŞILDI 26May14:42 · Şablon 29 → Eren 14:46)",
    "durum": "🚨 GEÇMİŞ · Şablon 24+25+29 gönderildi (29→Eren 26May14:46) · 72sa AŞILDI · 6g eşiği AŞILDI · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳21May14:43 (Görkem GM açtı · workflow · 🔔 otomatik 🟡) / 📈22May14:45 öncelik 🟡→🟠 / 📈28May14:42 🆕5g eşiği aşıldı / 📈29May14:42 🆕6g eşiği aşıldı (auto-recalc · 29May14:45 sync · log-only · zaten 🔴 Blokeli · 72sa AŞILDI · Şablon 29 sent · Eren+Cansu+Görkem atanmış · v1 yok)",
@@ -354,7 +354,7 @@
    "priority": "🔴",
    "priority_label": "🔴 Acil",
    "deadline": "22 May 2026",
-   "saat": "18:00 TR ⚠️ GEÇMİŞ (9g 19sa 35dk geride · 🆕7g eşiği 29May18:00 AŞILDI · ⚠️8g eşiği ~7sa 12dk (30May18:00) · 🔴 Blokeli >72sa)",
+   "saat": "18:00 TR ⚠️ GEÇMİŞ (10g 14sa 19dk geride · 🆕7g eşiği 29May18:00 AŞILDI · ⚠️8g eşiği ~7sa 12dk (30May18:00) · 🔴 Blokeli >72sa)",
    "durum": "⚠️ GEÇMİŞ · Aykut yarı onay Cuma 17:35 · Arda kısmı belirsiz · 🔴 Blokeli",
    "rev": "0",
    "gecmis": "⏳22May16:22 (Eda T açtı · workflow · 🔔 otomatik 🔴) / 💬22May16:33 ekip sarı şerit detayını netleştirdi / 🎨22May17:02 Aykut 'burası hazırrr' video v1 / 💬22May17:35 Eda T 'ellerine sağlıkk' Aykut'a yarı onay / 📈28May18:00 🆕6g eşiği aşıldı / 📈29May18:00 🆕7g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
@@ -373,10 +373,10 @@
    "editor_ids": [
     "U4XCE3532"
    ],
-   "priority": "🟠",
-   "priority_label": "🟠 Yüksek",
+   "priority": "🔴",
+   "priority_label": "🔴 Acil",
    "deadline": "2 Haziran 2026",
-   "saat": "10:00 TR (+0g 20sa 24dk kaldı · 🟠 Yüksek)",
+   "saat": "10:00 TR (+0g 1sa 41dk kaldı · 🔴 Acil)",
    "durum": "yeni · Cansu+Görkem · ⚠️ test içeriği (İş='test')",
    "rev": "0",
    "gecmis": "⏳01Jun13:35 (Görkem açtı · workflow · 🔔 otomatik 🟠)",
@@ -395,14 +395,36 @@
    "editor_ids": [
     "U4XCE3532"
    ],
-   "priority": "🟠",
-   "priority_label": "🟠 Yüksek",
+   "priority": "🔴",
+   "priority_label": "🔴 Acil",
    "deadline": "2 Haziran 2026",
-   "saat": "14:55 TR (+0g 23sa 40dk kaldı · 🟠 Yüksek)",
+   "saat": "14:55 TR (+0g 6sa 36dk kaldı · 🔴 Acil)",
    "durum": "yeni · Görkem+Cansu · ⚠️ test içeriği (İş='test yayın')",
    "rev": "0",
    "gecmis": "⏳01Jun14:57 (Görkem açtı · workflow · 🔔 otomatik 🟠)",
    "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1780315060052969)"
+  },
+  {
+   "no": "27",
+   "dept": "tasarim",
+   "dept_emoji": "📋",
+   "marka": "Bauhaus",
+   "is": "Plastik Dolaplar",
+   "atanan_ids": [
+    "U09BFPBKQG7",
+    "U06J26R1XCJ"
+   ],
+   "editor_ids": [
+    "U09BZHR25NG"
+   ],
+   "priority": "🔴",
+   "priority_label": "🔴 Acil",
+   "deadline": "2 Haziran 2026",
+   "saat": "13:00 TR (+0g 4sa 41dk kaldı · 🔴 Acil)",
+   "durum": "yeni · Hasan Serdar+Aykut · Sosyal Medya Post · Paralel akış · 💬 video içeriği",
+   "rev": "0",
+   "gecmis": "⏳01Jun 15:48 brief açıldı (Eda T)",
+   "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1780318126239499)"
   }
  ],
  "bns_completed": [
@@ -724,7 +746,7 @@
   "tasarim": {
    "name": "Tasarım",
    "people": 7,
-   "active": 11,
+   "active": 12,
    "overdue": 10,
    "capacity": 42,
    "completed30": 8,
@@ -887,17 +909,17 @@
   }
  ],
  "priority_summary": {
-  "red": 14,
-  "orange": 2,
+  "red": 17,
+  "orange": 0,
   "yellow": 0,
   "green": 2
  },
  "overdue_count": 14,
- "last_sync": "2026-06-01T15:15:13+03:00",
- "sync_ts": 1780316113,
- "now": 1780316113,
- "source": "data-agent-run-1780316113",
- "sync_iso": "2026-06-01T15:15:13+03:00",
+ "last_sync": "2026-06-02T08:19:00+03:00",
+ "sync_ts": 1780377540,
+ "now": 1780377540,
+ "source": "data-agent-run-1780377540",
+ "sync_iso": "2026-06-02T08:19:00+03:00",
  "run_type": "orchestrator_headless_sync",
  "bns_history": [
   {
@@ -944,6 +966,81 @@
    "dm_sent": 2,
    "errors": 0,
    "ok": true
+  },
+  {
+   "ts": 1780377795,
+   "date": "2026-06-02",
+   "active": 19,
+   "overdue": 14,
+   "dm_sent": 2,
+   "errors": 0,
+   "ok": true
+  }
+ ],
+ "active_briefs": 19,
+ "bns_activity": [
+  {
+   "t": 1780377540000,
+   "who": "U030C48PL23",
+   "verb": "öncelik değişti",
+   "target": "VDM Petdent · test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
+   "meta": "🟠→🔴"
+  },
+  {
+   "t": 1780377540000,
+   "who": "U030C48PL23",
+   "verb": "öncelik değişti",
+   "target": "Bauhaus · test yayın (Sosyal Medya Post · 🐷 Görkem · Sıralı Görkem→Cansu · ⚠️ test brief'i)",
+   "meta": "🟠→🔴"
+  },
+  {
+   "t": 1780318126239,
+   "who": "U09BZHR25NG",
+   "verb": "yeni brief açtı",
+   "target": "Bauhaus · Plastik Dolaplar",
+   "meta": "2Haz13:00 · Hasan Serdar+Aykut"
+  },
+  {
+   "t": 1779448200000,
+   "who": "U09BFPBKQG7",
+   "verb": "tamamladı",
+   "target": "Bauhaus · Güneşli Günler / 26 Mayıs (batch 4/7)",
+   "meta": ""
+  },
+  {
+   "t": 1779447900000,
+   "who": "U09BFPBKQG7",
+   "verb": "tamamladı",
+   "target": "Bauhaus · Düzenli Alanlar / 24 Mayıs (batch 3/7)",
+   "meta": ""
+  },
+  {
+   "t": 1779447600000,
+   "who": "U09BFPBKQG7",
+   "verb": "tamamladı",
+   "target": "Bauhaus · Bahçe Düzen / 22 Mayıs (batch 1/7)",
+   "meta": ""
+  },
+  {
+   "t": 1779447600000,
+   "who": "U09BFPBKQG7",
+   "verb": "tamamladı",
+   "target": "Bauhaus · Evde Ferahlık / 23 Mayıs (batch 2/7)",
+   "meta": ""
+  },
+  {
+   "t": 1779447600000,
+   "who": "U09BFPBKQG7",
+   "verb": "tamamladı",
+   "target": "Bauhaus · Evinize Düzen / 28 Mayıs (batch 5/7)",
+   "meta": ""
+  },
+  {
+   "t": 1779447600000,
+   "who": "U08HLMHTGEL",
+   "verb": "tamamladı",
+   "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması (Serhat) [İPTAL · DUPLICATE]",
+   "meta": ""
   }
  ]
 }

@@ -1,23 +1,23 @@
 {
- "sync_ts": 1780316113,
- "sync_iso": "2026-06-01T15:15:13+03:00",
+ "sync_ts": 1780377595,
+ "sync_iso": "2026-06-02T08:19:55+03:00",
  "run_type": "orchestrator_headless_sync",
  "mode": "active",
  "new_briefs": [
   {
-   "no": "26",
+   "no": "27",
    "marka": "Bauhaus",
-   "is": "test yayın",
-   "dept": "editor",
-   "priority": "🟠",
+   "is": "Plastik Dolaplar",
+   "dept": "tasarim",
+   "priority": "🔴",
    "atanan_ids": [
-    "U030C48PL23",
-    "U4XCE3532"
+    "U09BFPBKQG7",
+    "U06J26R1XCJ"
    ],
-   "deadline": "2 Haziran 2026 14:55 TR",
+   "deadline": "2 Haziran 2026 13:00 TR",
    "channel": "C4Y43AW2E",
-   "ts": "1780315060.052969",
-   "note": "⚠️ İçerik 'test yayın' — gerçek brief mi teyit gerek (Görkem açtı · no.25 ile aynı pattern)"
+   "ts": "1780318126.239499",
+   "note": "Sosyal Medya Post · Paralel akış · 💬 video içeriği · Ref Google Doc · 🐷 Eda T açtı · 🔴 Acil (~4.5sa) · gerçek brief — atama DM"
   }
  ],
  "completed_this_run": [],
@@ -32,31 +32,22 @@
  "blokeli": [],
  "threshold_transitions": [
   {
-   "no": "5",
-   "marka": "Bauhaus",
-   "prev_g": 10,
-   "new_g": 11,
-   "iso": "2026-06-01T13:42:00+03:00",
-   "dm": false,
-   "reason": "zaten 🔴 Blokeli · Eren v1 yok · günlük G artışı · log-only"
-  },
-  {
-   "no": "15",
-   "marka": "Bauhaus",
-   "prev_g": 10,
-   "new_g": 11,
-   "iso": "2026-06-01T14:00:00+03:00",
-   "dm": false,
-   "reason": "zaten 🔴 Blokeli · v1 verildi pasif onay · log-only"
-  },
-  {
-   "no": "21",
+   "no": "25",
    "marka": "VDM Petdent",
-   "prev_g": 9,
-   "new_g": 10,
-   "iso": "2026-06-01T14:42:00+03:00",
+   "prev": "🟠",
+   "new": "🔴",
+   "iso": "2026-06-02T08:19:55+03:00",
    "dm": false,
-   "reason": "zaten 🔴 Blokeli · Şablon 29 sent · log-only"
+   "reason": "deadline ~1.7sa kaldı (≤8sa eşiği) · 🟠→🔴 Acil · ⚠️ test brief'i Görkem teyit bekliyor · log-only"
+  },
+  {
+   "no": "26",
+   "marka": "Bauhaus",
+   "prev": "🟠",
+   "new": "🔴",
+   "iso": "2026-06-02T08:19:55+03:00",
+   "dm": false,
+   "reason": "deadline ~6.6sa kaldı (≤8sa eşiği) · 🟠→🔴 Acil · ⚠️ test brief'i Görkem teyit bekliyor · log-only"
   }
  ]
 }

@@ -1,15 +1,15 @@
 {
-  "last_run": "2026-06-01T15:15:13+03:00",
-  "last_run_ts": 1780316113,
+  "last_run": "2026-06-02T08:23:15+03:00",
+  "last_run_ts": 1780377795,
   "run_type": "orchestrator_headless_sync",
   "data_agent": "ok",
   "notification_agent": "ok",
   "dashboard_agent": "ok",
-  "active_briefs": 18,
+  "active_briefs": 19,
   "completed_briefs": 8,
   "priority_summary": {
-    "red": 14,
-    "orange": 2,
+    "red": 17,
+    "orange": 0,
     "yellow": 0,
     "green": 2
   },
@@ -17,38 +17,29 @@
   "blokeli_count": 13,
   "new_briefs_this_run": 1,
   "completed_this_run": 0,
-  "dm_sent": 1,
+  "dm_sent": 2,
   "dm_skipped_idempotent": 0,
   "canvas_updated": false,
   "canvas_update_reason": "Headless (Railway) — Canvas write-back skipped · live-data.json güncellendi + push",
-  "threshold_transitions_this_run": 3,
+  "threshold_transitions_this_run": 2,
   "threshold_transitions_detail": [
     {
-      "no": "5",
-      "marka": "Bauhaus",
-      "prev_g": 10,
-      "new_g": 11,
-      "transition_iso": "2026-06-01T13:42:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · Eren v1 yok · günlük G artışı · log-only"
-    },
-    {
-      "no": "15",
-      "marka": "Bauhaus",
-      "prev_g": 10,
-      "new_g": 11,
-      "transition_iso": "2026-06-01T14:00:00+03:00",
-      "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · v1 verildi pasif onay · log-only"
-    },
-    {
-      "no": "21",
+      "no": "25",
       "marka": "VDM Petdent",
-      "prev_g": 9,
-      "new_g": 10,
-      "transition_iso": "2026-06-01T14:42:00+03:00",
+      "prev_p": "🟠",
+      "new_p": "🔴",
+      "transition_iso": "2026-06-02T08:23:15+03:00",
       "dm_sent": false,
-      "reason": "zaten 🔴 Blokeli · Şablon 29 sent · log-only"
+      "reason": "deadline 2Haz10:00 ~1.7sa kaldı (≤8sa) · 🟠→🔴 Acil · test brief Görkem teyit bekliyor · log-only"
+    },
+    {
+      "no": "26",
+      "marka": "Bauhaus",
+      "prev_p": "🟠",
+      "new_p": "🔴",
+      "transition_iso": "2026-06-02T08:23:15+03:00",
+      "dm_sent": false,
+      "reason": "deadline 2Haz14:55 ~6.6sa kaldı (≤8sa) · 🟠→🔴 Acil · test brief Görkem teyit bekliyor · log-only"
     }
   ],
   "github_commit": "4f911f4",
@@ -57,57 +48,32 @@
     "no": "25",
     "marka": "VDM Petdent",
     "deadline_iso": "2026-06-02T10:00:00+03:00",
-    "kalan_dk": 1125,
-    "priority": "🟠",
-    "note": "+0g 18sa 45dk · 🟠 Yüksek · ⚠️ test brief'i"
+    "kalan_dk": 96,
+    "priority": "🔴",
+    "note": "🔴 Acil · ⚠️ test brief'i · Görkem teyit bekliyor"
   },
   "next_thresholds_anticipated": [
     {
-      "no": "1",
-      "marka": "JNJ Vision TR",
-      "g_threshold": 14,
-      "transition_iso": "2026-06-01T16:00:00+03:00",
-      "minutes_away": 45
-    },
-    {
-      "no": "2",
-      "marka": "Hasvet",
-      "g_threshold": 11,
-      "transition_iso": "2026-06-01T16:00:00+03:00",
-      "minutes_away": 45
-    },
-    {
-      "no": "16",
+      "no": "27",
       "marka": "Bauhaus",
-      "g_threshold": 10,
-      "transition_iso": "2026-06-01T17:00:00+03:00",
-      "minutes_away": 105
+      "note": "deadline 2Haz13:00 · 🔴 (~4.5sa) · yeni atama Hasan Serdar+Aykut"
     },
     {
-      "no": "6",
+      "no": "26",
       "marka": "Bauhaus",
-      "g_threshold": 12,
-      "transition_iso": "2026-06-01T18:00:00+03:00",
-      "minutes_away": 165
-    },
-    {
-      "no": "24",
-      "marka": "Bauhaus",
-      "g_threshold": 10,
-      "transition_iso": "2026-06-01T18:00:00+03:00",
-      "minutes_away": 165
+      "note": "deadline 2Haz14:55 · 🔴 (~6.6sa)"
     }
   ],
   "pat_status": {
     "created": "2026-05-18",
-    "days_since_creation": 14,
-    "days_to_expiry": 76,
+    "days_since_creation": 15,
+    "days_to_expiry": 75,
     "warning": false
   },
   "marka_stats_mode": "active",
   "marka_stats_active_from": "2026-06-01T00:00:00+03:00",
   "errors": [],
-  "notes": "Pzt 01Haz 15:15 TR headless Railway sync (orchestrator) · brief-queue'dan 1 yeni brief işlendi: #26 Bauhaus 'test yayın' (Görkem GM · 2Haz 14:55 TR · 🟠 Yüksek · Sıralı Görkem→Cansu · ⚠️ test içeriği · #25 ile aynı pattern) · Cansu'ya otomatik atama YAPILMADI · owner Görkem'e teyit DM (ts 1780316403) · 3 threshold günlük G artışı (#5 11g · #15 11g · #21 10g) hepsi 🔴 Blokeli log-only · marka_stats active mode (1 Haz aktifleşti · brands n=0 → sapma kontrolü yok) · Canvas write-back skipped (headless) · live-data.json güncellendi + push · last_sync_ts→1780316113 · imminent #25 2Haz 10:00 (~18sa 45dk)",
+  "notes": "Sal 02Haz 08:17 TR headless Railway sync (orchestrator) · 3 yeni mesaj tarandı (watermark 1Haz15:15→şimdi): 1 yeni brief #27 Bauhaus 'Plastik Dolaplar' (🐷 Eda T · 2Haz13:00 TR · 🔴 Acil ~4.5sa · Sosyal Medya · Paralel · Hasan Serdar+Aykut) → atama DM (2 kişi) · 1 thread sorusu jnj-vision-tr (QR kod · brief değil) · 1 informal not kmr-lamy (workflow değil · atlandı) · 2 threshold geçişi #25(🟠→🔴 ~1.7sa) #26(🟠→🔴 ~6.6sa) ikisi de test brief Görkem teyit bekliyor · log-only · 14 overdue 🔴 Blokeli steady-state (escalation [] — prior run ile tutarlı) · marka_stats active (brands n=0 · sapma yok) · Canvas write-back skipped (headless) · live-data.json+index.html güncellendi · last_sync_ts→1780377795",
   "history": [
     {
       "ts": 1779864420,
@@ -153,7 +119,16 @@
       "dm_sent": 2,
       "errors": 0,
       "ok": true
+    },
+    {
+      "ts": 1780377795,
+      "date": "2026-06-02",
+      "active": 19,
+      "overdue": 14,
+      "dm_sent": 2,
+      "errors": 0,
+      "ok": true
     }
   ],
-  "last_sync_ts": 1780316113
+  "last_sync_ts": 1780377795
 }
