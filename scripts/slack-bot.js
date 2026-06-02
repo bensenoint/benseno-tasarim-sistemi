@@ -243,6 +243,33 @@ function briefsToBlocks(briefs, baslik) {
   return blocks;
 }
 
+/**
+ * Brief'leri dashboard/app/live-data.json'dan okur (parseAktifIsler şekliyle uyumlu).
+ * canvas_cache.md Railway'de yok (gitignored/dockerignored) → bunun yerine git'te
+ * tracked + her boot reset --hard ile gelen + her orchestrator run'ında tazelenen
+ * live-data.json'u kaynak alıyoruz. atanan: "<@ID> <@ID>" (extractUserIds uyumlu).
+ */
+function loadBriefs() {
+  try {
+    const raw = fs.readFileSync(path.join(PROJECT_DIR, 'dashboard/app/live-data.json'), 'utf8');
+    const d = JSON.parse(raw);
+    return (d.bns_briefs || []).map(b => ({
+      no: b.no,
+      dept: b.dept || '',
+      marka: b.marka || '',
+      konu: b.is || '',
+      atanan: (b.atanan_ids || []).map(id => `<@${id}>`).join(' '),
+      oncelik: b.priority || '',
+      deadline: b.deadline || '',
+      saat: b.saat || '',
+      durum: b.durum || '',
+    }));
+  } catch (err) {
+    log(`loadBriefs hata: ${err.message}`);
+    return [];
+  }
+}
+
 // ─── /brief-durum ─────────────────────────────────────────────────────────────
 
 app.command('/brief-durum', async ({ command, ack, respond, client }) => {
@@ -253,8 +280,7 @@ app.command('/brief-durum', async ({ command, ack, respond, client }) => {
   const yonetici = MANAGER_IDS.has(userId);
 
   try {
-    const markdown = await fetchCanvas(client);
-    let briefs = parseAktifIsler(markdown);
+    let briefs = loadBriefs();
 
     // Marka filtresi varsa uygula
     if (filtre) {
@@ -292,8 +318,7 @@ app.command('/kapasite', async ({ command, ack, respond, client }) => {
   }
 
   try {
-    const markdown = await fetchCanvas(client);
-    const briefs   = parseAktifIsler(markdown);
+    const briefs   = loadBriefs();
 
     // Tasarımcı sayımı
     const tasarimciSayim = {};
@@ -437,8 +462,7 @@ app.event('app_home_opened', async ({ event, client }) => {
   const yonetici = MANAGER_IDS.has(userId);
 
   try {
-    const markdown = await fetchCanvas(client);
-    const briefs   = parseAktifIsler(markdown);
+    const briefs   = loadBriefs();
 
     let blocks;
     if (yonetici) {
