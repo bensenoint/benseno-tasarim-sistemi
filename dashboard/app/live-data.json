@@ -28,33 +28,6 @@
       "link": "[link](https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989)"
     },
     {
-      "no": "2",
-      "dept": "tasarim",
-      "dept_emoji": "📋",
-      "marka": "Hasvet",
-      "is": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
-      "atanan_ids": [
-        "U4XCE3532",
-        "U055EDESLSE",
-        "U02SZQDAFPF",
-        "U030C48PL23",
-        "U063T8M5HL4",
-        "U0AAC3YK20G",
-        "U0AK8U7L57F"
-      ],
-      "editor_ids": [
-        "U08NQJ27G5S"
-      ],
-      "priority": "🔴",
-      "priority_label": "🔴 Acil",
-      "deadline": "21 May 2026",
-      "saat": "16:00 TR ⚠️ GEÇMİŞ (11g 16sa 19dk geride · 🆕8g eşiği 29May16:00 AŞILDI · ⚠️9g eşiği ~5sa 12dk (30May16:00) · v1 verildi · 🔴 Blokeli >72sa)",
-      "durum": "🎨 v1 verildi · Buse mockup iste · 5g+ pasif onay flow · 🔴 Blokeli",
-      "rev": "0",
-      "gecmis": "⏳18May14:39→📈19May08:01 öncelik 🟢→🟡→↪️20May10:22 İpek dispatch İrem→✅20May10:35 İrem kabul→📈21May09:00 öncelik 🟡→🔴 (auto-recalc) / ⏰GEÇMİŞ21May16:00 / 🎨22May~17:00 İrem v1 verdi · Buse 17:00 'mockup iste' (22May17:15 sync'inde) / 📈28May16:00 🆕7g eşiği aşıldı / 📈29May16:00 🆕8g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
-      "link": "[link](https://benseno.slack.com/archives/C081GAK936J/p1779104369515529)"
-    },
-    {
       "no": "3",
       "dept": "tasarim",
       "dept_emoji": "📋",
@@ -428,6 +401,29 @@
     }
   ],
   "bns_completed": [
+    {
+      "no": "2",
+      "marka": "Hasvet",
+      "baslik": "MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
+      "leadId": "U4XCE3532",
+      "contribIds": [
+        "U055EDESLSE",
+        "U02SZQDAFPF",
+        "U030C48PL23",
+        "U063T8M5HL4",
+        "U0AAC3YK20G",
+        "U0AK8U7L57F",
+        "U08NQJ27G5S"
+      ],
+      "deadline": 1779368400000,
+      "baslangic": null,
+      "bitis": 1780386050077,
+      "revision": "0",
+      "rating": null,
+      "slack_url": "https://benseno.slack.com/archives/C081GAK936J/p1779104369515529",
+      "image_url": "",
+      "notes": "✅ U030C48PL23"
+    },
     {
       "no": "10",
       "marka": "Bauhaus",
