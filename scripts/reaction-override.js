@@ -31,6 +31,7 @@ const OVERRIDES = path.join(PROJ, 'data/priority-overrides.json');
 const LOG = path.join(PROJ, 'logs/reaction-override.log');
 
 const LABELS = { '🔴': '🔴 Acil', '🟠': '🟠 Yüksek', '🟡': '🟡 Normal', '🟢': '🟢 Düşük' };
+const MANAGERS = ['U030C48PL23', 'UD96GH76E', 'U4XCE3532', 'U055EDESLSE', 'U02SZQDAFPF'];
 
 function logLine(msg) {
   try { fs.appendFileSync(LOG, `[${new Date().toISOString()}] ${msg}\n`); } catch {}
@@ -142,6 +143,10 @@ function main() {
 
   const brief = (live.bns_briefs || []).find(b => tsFromLink(b.link) === ts);
   if (!brief) { logLine(`UYARI: brief_ts=${ts} için eşleşme yok — işlem iptal (Canvas'a dokunulmadı)`); process.exit(0); }
+
+  // Yetki: brief'in atananları (tasarım+editör) + yöneticiler öncelik koyabilir (v7.13).
+  const allowed = new Set([...(brief.atanan_ids || []), ...(brief.editor_ids || []), ...MANAGERS]);
+  if (!allowed.has(mgr)) { logLine(`yetkisiz öncelik: ${mgr} #${brief.no}'e atanmamış/yönetici değil → yoksayıldı`); process.exit(0); }
 
   // override dosyasına kaydet (kalıcılık)
   const ov = loadOverrides();

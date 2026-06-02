@@ -423,8 +423,8 @@ app.event('reaction_added', async ({ event, client }) => {
     return;
   }
 
-  // Yönetici öncelik override'ı (🔴/🟠/🟡/🟢) — sadece yöneticiler
-  if (!MANAGER_IDS.has(event.user)) return;
+  // Öncelik override (🔴/🟠/🟡/🟢) — atanan + yönetici koyabilir (v7.13: artık sadece yönetici değil).
+  // Yetkiyi reaction-override.js kontrol eder (brief atananları ∪ editör ∪ yöneticiler).
   if (!PRIORITY_REACTIONS.has(event.reaction)) return;
 
   const emoji    = REACTION_EMOJI[event.reaction];
