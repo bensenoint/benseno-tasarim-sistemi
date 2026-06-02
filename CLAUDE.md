@@ -159,10 +159,11 @@ CANVAS_ID          = F0B1B6XUD44          (Ana iş takip canvas)
 BRAND_BOOK         = F0B2ANKBBFV
 LESSONS_LEARNED    = F0B2H49SXPC
 TEMPLATES          = F0B2F2REETG
-GRAFIK_CHANNEL     = C02SZRJGY0M          (#benseno-grafik)
+GRAFIK_CHANNEL     = C02SZRJGY0M          (#benseno-grafik · private · bot ÜYE olmalı)
 GITHUB_REPO        = bensenoint/benseno-tasarim-sistemi
 DASHBOARD_URL      = https://bensenoint.github.io/benseno-tasarim-sistemi/
 TIMEZONE           = Europe/Istanbul (UTC+3)
+SLACK_APP          = "Work Tracking" (display) · bot handle: @demo_app · user_id: U0B5AGDEZRN
 ```
 
 **Token dosyaları** (`data/` — git'e commit edilmez):

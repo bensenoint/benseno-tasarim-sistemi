@@ -65,6 +65,13 @@ fi
 
 echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator tamamlandı. (exit: $CLAUDE_EXIT)" >> "$LOG"
 
+# Gecikme escalation (deterministik script — LLM değil) — sadece başarılı run'da,
+# taze live-data.json üzerinde. Kendi state'ini (escalation-state.json) push eder.
+if [ $CLAUDE_EXIT -eq 0 ]; then
+  node "$PROJ/scripts/escalation.js" --send >> "$PROJ/logs/escalation.log" 2>&1 || \
+    echo "[$(date '+%d.%m.%Y %H:%M')] escalation.js hata (logs/escalation.log)" >> "$LOG"
+fi
+
 # Gerçek claude exit kodunu döndür (scheduler izlesin — eskiden son echo 0 döndürüp
 # claude hatalarını maskeliyordu). Lock trap'i yine çalışır.
 exit $CLAUDE_EXIT
