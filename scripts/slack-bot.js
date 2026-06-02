@@ -407,6 +407,20 @@ app.event('reaction_added', async ({ event, client }) => {
     return;
   }
 
+  // 🎨/👀 durum geçişi (atanan/editör/yönetici — yetkiyi script kontrol eder).
+  // 🎨 art = başladı/revize, 👀 eyes = revizede. Deterministik, MCP gerektirmez.
+  if (event.reaction === 'art' || event.reaction === 'eyes') {
+    const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
+    log(`durum reaction: :${event.reaction}: ${event.item.ts} — ${event.user}`);
+    execFile('node', [`${PROJECT_DIR}/scripts/brief-status.js`, event.item.ts, event.reaction, event.user, saat],
+      { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
+      (err, stdout, stderr) => {
+        if (err) log(`brief-status hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
+        else log(`brief-status: ${(stdout || '').trim().split('\n').pop()}`);
+      });
+    return;
+  }
+
   // Yönetici öncelik override'ı (🔴/🟠/🟡/🟢) — sadece yöneticiler
   if (!MANAGER_IDS.has(event.user)) return;
   if (!PRIORITY_REACTIONS.has(event.reaction)) return;

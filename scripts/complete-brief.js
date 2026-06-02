@@ -137,7 +137,16 @@ function main() {
     let live; try { live = readLive(); } catch { logLine('reapply: live-data okunamadı'); return; }
     let moved = 0;
     for (const ts of tsList) {
-      if (moveToCompleted(live, ts, state[ts].by, state[ts].at_ms || nowMs)) moved++;
+      const s = state[ts];
+      if (s.done) {
+        // tamamlanmış → completed'de tut (data-agent aktif geri getirdiyse taşı)
+        if (moveToCompleted(live, ts, s.by, s.at_ms || nowMs)) moved++;
+      } else if (Array.isArray(s.required) && s.required.length) {
+        // kısmi onay → aktif brief'te kısmi durumu zorla (data-agent ezmesin)
+        const b = (live.bns_briefs || []).find(x => tsFromLink(x.link) === ts);
+        const dur = `✅ kısmi onay (${(s.acked || []).length}/${s.required.length})`;
+        if (b && b.durum !== dur) { b.durum = dur; moved++; }
+      }
     }
     if (moved === 0) { logLine(`reapply: ${tsList.length} tamamlama zaten uygulanmış, değişiklik yok`); return; }
     writeLive(live); injectEmbedded(live);
@@ -166,16 +175,40 @@ function main() {
     process.exit(0);
   }
 
+  // Çoklu atanan: kılavuz kuralı "hepsi ✅ verince tamamlanır". required = Atanan'lar
+  // (yoksa editörler, o da yoksa boş → tek ✅ tamamlar). Yönetici (atanan değilse) force-complete.
+  const required = (brief.atanan_ids && brief.atanan_ids.length) ? brief.atanan_ids.slice()
+                 : (brief.editor_ids && brief.editor_ids.length) ? brief.editor_ids.slice() : [];
+  const isManager = MANAGERS.includes(byUser);
+
   const state = loadState();
-  state[ts] = { by: byUser, at: new Date().toISOString(), at_ms: nowMs, no: brief.no, marka: brief.marka };
+  const cur = state[ts] || { acked: [] };
+  const acked = new Set(cur.acked || []);
+  let done;
+  if (isManager && !required.includes(byUser)) {
+    done = true; // yönetici (atanan değil) → force-complete
+  } else {
+    acked.add(byUser);
+    done = required.length === 0 ? true : required.every(u => acked.has(u));
+  }
+
+  state[ts] = { acked: [...acked], required, done, by: byUser, at: new Date().toISOString(), at_ms: nowMs, no: brief.no, marka: brief.marka };
   try { fs.mkdirSync(path.dirname(STATE), { recursive: true }); } catch {}
   fs.writeFileSync(STATE, JSON.stringify(state, null, 1));
 
   const label = `${brief.marka} · ${brief.is}`;
-  moveToCompleted(live, ts, byUser, nowMs);
-  writeLive(live); injectEmbedded(live);
-  pushFiles(`complete-brief: ${label} ✅ tamamlandı (${byUser})`);
-  logLine(`✓ #${brief.no} ${label} → TAMAMLANDI (✅ ${byUser} @ ${saat || ''})`);
+  if (done) {
+    moveToCompleted(live, ts, byUser, nowMs);
+    writeLive(live); injectEmbedded(live);
+    pushFiles(`complete-brief: ${label} ✅ tamamlandı (${byUser})`);
+    logLine(`✓ #${brief.no} ${label} → TAMAMLANDI (✅ ${byUser} @ ${saat || ''})`);
+  } else {
+    // kısmi onay — henüz tüm atananlar ✅ vermedi
+    brief.durum = `✅ kısmi onay (${acked.size}/${required.length})`;
+    writeLive(live); injectEmbedded(live);
+    pushFiles(`complete-brief: ${label} ✅ kısmi (${acked.size}/${required.length}) — ${byUser}`);
+    logLine(`◐ #${brief.no} ${label} → kısmi onay ${acked.size}/${required.length} (✅ ${byUser})`);
+  }
 }
 
 main();

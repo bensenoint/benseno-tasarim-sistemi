@@ -70,6 +70,9 @@ echo "[$(date '+%d.%m.%Y %H:%M')] Orchestrator tamamlandı. (exit: $CLAUDE_EXIT)
 if [ $CLAUDE_EXIT -eq 0 ]; then
   node "$PROJ/scripts/reaction-override.js" --reapply >> "$PROJ/logs/reaction-override.log" 2>&1 || \
     echo "[$(date '+%d.%m.%Y %H:%M')] reaction-override --reapply hata" >> "$LOG"
+  # 🎨/👀 durum geçişlerini taze veriye geri uygula (data-agent reaction okuyamıyor)
+  node "$PROJ/scripts/brief-status.js" --reapply >> "$PROJ/logs/brief-status.log" 2>&1 || \
+    echo "[$(date '+%d.%m.%Y %H:%M')] brief-status --reapply hata" >> "$LOG"
   # ✅ tamamlanmış brief'leri completed'de tut (data-agent Canvas'tan aktif geri getirdiyse taşı)
   node "$PROJ/scripts/complete-brief.js" --reapply >> "$PROJ/logs/complete-brief.log" 2>&1 || \
     echo "[$(date '+%d.%m.%Y %H:%M')] complete-brief --reapply hata" >> "$LOG"
