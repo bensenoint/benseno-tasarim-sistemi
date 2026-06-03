@@ -93,7 +93,10 @@ function main() {
   const now = Math.floor(Date.now() / 1000);
   let changed = 0;
   for (const b of (live.bns_briefs || [])) {
-    if ((b.durum || '').toLowerCase().includes('tamamland')) continue;     // tamamlanmış atla
+    // Tamamlanmış brief bns_completed'e taşınır; bns_briefs hepsi AKTİF. durum metninde
+    // "tamamlandı" geçmesi (ör. "copy edit tamamlandı") brief'i bitmiş yapmaz — sadece durum
+    // BAŞINDA ✅/Tamamlandı varsa atla (substring değil).
+    if (/^(✅|tamamland)/i.test((b.durum || '').trim())) continue;
     const ts = tsFromLink(b.link);
     if (ts && ov[ts]) continue;                                            // manager/atanan override KORUNUR
     const dl = deadlineUnix(b.deadline, b.saat);

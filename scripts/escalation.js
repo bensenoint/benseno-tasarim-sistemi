@@ -68,8 +68,9 @@ function computeOverdue() {
   const now = Math.floor(Date.now() / 1000);
   const out = [];
   for (const b of (d.bns_briefs || [])) {
-    const durum = (b.durum || '').toLowerCase();
-    if (durum.includes('tamamland')) continue;
+    // bns_briefs hepsi aktif; durum metninde "tamamlandı" geçmesi (ör. "copy edit tamamlandı")
+    // brief'i bitmiş yapmaz → sadece durum BAŞINDA ✅/Tamamlandı varsa atla (substring değil).
+    if (/^(✅|tamamland)/i.test((b.durum || '').trim())) continue;
     const dl = deadlineUnix(b.deadline, b.saat);
     if (dl == null) continue;
     const gecikme_h = Math.floor((now - dl) / 3600);
