@@ -152,11 +152,11 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
   function exportCsv() {
     let head, lines;
     if (view === "active") {
-      head = ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev"];
-      lines = filteredActive.map(b => [b.no, csvCell(brand), csvCell(b.baslik || b.is), csvCell(b.priority && b.priority.label || ""), csvCell([b.lead && b.lead.name, ...((b.contributors || []).map(c => c && c.name))].filter(Boolean).join("; ")), csvCell(fmtDate(dlMs(b) ? new Date(dlMs(b)) : null)), csvCell(b.durum), b.revision || 0].join(","));
+      head = ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev", "Maliyet", "Satış"];
+      lines = filteredActive.map(b => [b.no, csvCell(brand), csvCell(b.baslik || b.is), csvCell(b.priority && b.priority.label || ""), csvCell([b.lead && b.lead.name, ...((b.contributors || []).map(c => c && c.name))].filter(Boolean).join("; ")), csvCell(fmtDate(dlMs(b) ? new Date(dlMs(b)) : null)), csvCell(b.durum), b.revision || 0, b.maliyet != null ? b.maliyet : "", b.satis != null ? b.satis : ""].join(","));
     } else {
-      head = ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma", "Rev", "Puan"];
-      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell(rowNames(c).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : ""), c.revision || 0, c.rating != null ? c.rating : ""].join(","));
+      head = ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma", "Rev", "Puan", "Maliyet", "Satış"];
+      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell(rowNames(c).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : ""), c.revision || 0, c.rating != null ? c.rating : "", c.maliyet != null ? c.maliyet : "", c.satis != null ? c.satis : ""].join(","));
     }
     const blob = new Blob(["﻿" + [head.join(",")].concat(lines).join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -217,7 +217,7 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
         // Aktif işler — Aktif İşler sayfasıyla birebir zengin tablo (BriefTable)
         <Card padding={0}>
           <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
-            <BriefTable rows={filteredActive} onRowClick={onOpenBrief}/>
+            <BriefTable rows={filteredActive} onRowClick={onOpenBrief} financeCols/>
           </div>
         </Card>
       ) : (
@@ -227,13 +227,13 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
             <table style={{ width:"100%", minWidth:720, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
               <thead>
                 <tr style={{ background:"var(--surface-sub)" }}>
-                  {[["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["🔗","center"]].map(([v, al], i) => (
+                  {[["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["Maliyet","right"],["Satış","right"],["🔗","center"]].map(([v, al], i) => (
                     <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: al, whiteSpace:"nowrap" }}>{v}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {filteredDone.length === 0 && <tr><td colSpan={9} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
+                {filteredDone.length === 0 && <tr><td colSpan={11} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
                 {filteredDone.map((c, idx) => (
                   <tr key={"d" + c.no} style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)" }}>
                     <td style={bCs(true, "right")}>{c.no}</td>
@@ -252,6 +252,8 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
                     <td style={bCs(true, "right")}>{c.sureH != null ? Math.round(c.sureH) + " sa" : "—"}</td>
                     <td style={bCs(true, "right", (c.revision || 0) > 0 ? "var(--prio-orange)" : undefined)}>{c.revision || 0}</td>
                     <td style={bCs(true, "right")}>{c.rating != null ? <span style={{ color:"var(--prio-yellow)" }}>★ {c.rating}</span> : "—"}</td>
+                    <td style={bCs(true, "right")}>{fmtTRY(c.maliyet)}</td>
+                    <td style={bCs(true, "right")}>{fmtTRY(c.satis)}</td>
                     <td style={bCs(false, "center")}>{c.slack_url && c.slack_url !== "#" ? <a href={c.slack_url} target="_blank" rel="noreferrer" style={{ color:"var(--ember,#C24A2C)", textDecoration:"none" }}>↗</a> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                   </tr>
                 ))}

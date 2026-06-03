@@ -445,6 +445,8 @@ function bnsHydrateBrief(raw, idx) {
     slack_url:    raw.link ? raw.link.replace(/^\[link\]\((.+)\)$/, "$1") : (raw.slack_url || "#"),
     notes:        raw.notes || raw.saat || "",
     gecmis:       raw.gecmis || "",
+    maliyet:      raw.maliyet != null ? raw.maliyet : null,   // ₺ — Slack /maliyet ile girilir
+    satis:        raw.satis != null ? raw.satis : null,       // ₺
     _kimden_id:   raw._kimden_id || null
   };
 }
@@ -479,7 +481,9 @@ function bnsHydrateCompleted(raw, idx) {
     rating: raw.rating != null ? raw.rating : null,
     slack_url:  raw.slack_url || "#",
     image_url:  raw.image_url || null,  // Slack thread'indeki ilk görsel (Brief Sync tarafından doldurulur)
-    notes: raw.notes || ""
+    notes: raw.notes || "",
+    maliyet: raw.maliyet != null ? raw.maliyet : null,   // ₺ — Slack /maliyet ile girilir
+    satis:   raw.satis != null ? raw.satis : null        // ₺
   };
 }
 

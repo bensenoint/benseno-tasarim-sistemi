@@ -1,7 +1,13 @@
 // app/BriefTable.jsx — Aktif İşler table.
 // 11 cols · density-aware · sortable headers · inline status change.
 
-function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table" }) {
+// ₺ formatı: null/boş/NaN → "—" ; sayı → "₺1.500"
+function fmtTRY(n) {
+  if (n == null || n === "" || isNaN(Number(n))) return "—";
+  return "₺" + Number(n).toLocaleString("tr-TR");
+}
+
+function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false }) {
   const [sort, setSort] = React.useState({ col: "deltaH", dir: "asc" });
   const sorted = React.useMemo(() => {
     if (!sortable) return rows;
@@ -37,6 +43,12 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
     { id: "acilma",  label: "Gecikme",  sort: true,  align: "right", mobileHide: true },
     { id: "link",    label: "🔗",       sort: false }
   ];
+  if (financeCols) {
+    cols.push(
+      { id: "maliyet", label: "Maliyet", sort: true, align: "right", mobileHide: true },
+      { id: "satis",   label: "Satış",   sort: true, align: "right", mobileHide: true }
+    );
+  }
 
   return (
     <div className="bns-table-wrap" style={{
@@ -71,7 +83,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
         </thead>
         <tbody>
           {sorted.length === 0 && (
-            <tr><td colSpan={11} style={{padding:"40px 16px", textAlign:"center"}}>
+            <tr><td colSpan={cols.length} style={{padding:"40px 16px", textAlign:"center"}}>
               <EmptyRow/>
             </td></tr>
           )}
@@ -79,6 +91,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
             <BriefRow key={b.id} brief={b}
               onClick={() => onRowClick && onRowClick(b)}
               onStatusChange={onStatusChange}
+              financeCols={financeCols}
               stripe={idx % 2 === 1}/>
           ))}
         </tbody>
@@ -87,7 +100,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
   );
 }
 
-function BriefRow({ brief, onClick, onStatusChange, stripe }) {
+function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
   const [hover, setHover] = React.useState(false);
   const [menu, setMenu] = React.useState(false);
   return (
@@ -132,6 +145,8 @@ function BriefRow({ brief, onClick, onStatusChange, stripe }) {
           <I.Link size={14}/>
         </a>
       </td>
+      {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{fmtTRY(brief.maliyet)}</td>}
+      {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{fmtTRY(brief.satis)}</td>}
     </tr>
   );
 }
@@ -212,6 +227,7 @@ function relTime(ts) {
 
 window.BriefTable = BriefTable;
 window.BriefRow = BriefRow;
+window.fmtTRY = fmtTRY;
 window.formatDate = formatDate;
 window.relTime = relTime;
 window.EmptyRow = EmptyRow;

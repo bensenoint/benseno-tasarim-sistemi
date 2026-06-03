@@ -3,7 +3,7 @@
 /**
  * Benseno Slack Bot — v1.0
  * Socket Mode ile çalışır, public URL gerekmez.
- * Komutlar: /brief-durum, /kapasite
+ * Komutlar: /brief-durum, /kapasite, /maliyet
  * Events: reaction_added (yönetici öncelik override), app_home_opened
  * Actions: brief_tamamla, brief_sure_uzat
  */
@@ -386,6 +386,67 @@ app.command('/kapasite', async ({ command, ack, respond, client }) => {
 });
 
 // /yeni-brief kaldırıldı — Slack Workflow zaten bu işi yapıyor
+
+// ─── /maliyet — Brief bazında maliyet + satış girişi (modal) ──────────────────
+// Dashboard statik (GitHub Pages) olduğu için kaydı Slack üzerinden alıyoruz: modal submit →
+// deterministik set-financials.js → brief-financials.json + live-data + push. Herkes girebilir.
+app.command('/maliyet', async ({ command, ack, client }) => {
+  await ack();
+  try {
+    // Komut metni varsa brief no'yu ön-doldur: "/maliyet 27"
+    const preNo = (command.text || '').trim().replace(/[^\d]/g, '');
+    await client.views.open({
+      trigger_id: command.trigger_id,
+      view: {
+        type: 'modal',
+        callback_id: 'maliyet_modal',
+        title: { type: 'plain_text', text: 'Maliyet / Satış' },
+        submit: { type: 'plain_text', text: 'Kaydet' },
+        close: { type: 'plain_text', text: 'İptal' },
+        blocks: [
+          { type: 'input', block_id: 'no_b', label: { type: 'plain_text', text: 'Brief No (#)' },
+            element: { type: 'plain_text_input', action_id: 'no', initial_value: preNo, placeholder: { type: 'plain_text', text: 'ör. 27' } } },
+          { type: 'input', block_id: 'maliyet_b', optional: true, label: { type: 'plain_text', text: 'Maliyet (₺)' },
+            element: { type: 'plain_text_input', action_id: 'maliyet', placeholder: { type: 'plain_text', text: 'ör. 1500 — boş = temizle' } } },
+          { type: 'input', block_id: 'satis_b', optional: true, label: { type: 'plain_text', text: 'Satış (₺)' },
+            element: { type: 'plain_text_input', action_id: 'satis', placeholder: { type: 'plain_text', text: 'ör. 4000 — boş = temizle' } } },
+          { type: 'context', elements: [{ type: 'mrkdwn', text: 'Sadece sayı gir. Her ikisi de boşsa kayıt temizlenir. Birkaç dk içinde dashboard\'a yansır.' }] },
+        ],
+      },
+    });
+  } catch (err) { log(`/maliyet modal aç hata: ${err.message}`); }
+});
+
+// Modal submit → set-financials.js (no maliyet satis by). Doğrulama: no zorunlu + sayı.
+app.view('maliyet_modal', async ({ ack, body, view, client }) => {
+  const v = view.state.values;
+  const noRaw      = (v.no_b?.no?.value || '').trim();
+  const maliyetRaw = (v.maliyet_b?.maliyet?.value || '').trim();
+  const satisRaw   = (v.satis_b?.satis?.value || '').trim();
+  const no = noRaw.replace(/[^\d]/g, '');
+  if (!no) { await ack({ response_action: 'errors', errors: { no_b: 'Geçerli bir brief no gir (ör. 27).' } }); return; }
+  // sayı doğrulama (boş kabul — temizler)
+  const bad = s => s !== '' && isNaN(Number(s.replace(/[^\d.,-]/g, '').replace(/\./g, '').replace(',', '.')));
+  if (bad(maliyetRaw)) { await ack({ response_action: 'errors', errors: { maliyet_b: 'Sadece sayı gir.' } }); return; }
+  if (bad(satisRaw))   { await ack({ response_action: 'errors', errors: { satis_b: 'Sadece sayı gir.' } }); return; }
+  await ack();
+  const by = body.user?.id || '';
+  try {
+    await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, no, maliyetRaw, satisRaw, by],
+      { cwd: PROJECT_DIR, timeout: 120000 });
+    log(`/maliyet → #${no} maliyet="${maliyetRaw}" satış="${satisRaw}" (by ${by})`);
+    // Girene özel onay DM'i
+    try {
+      const txt = (maliyetRaw === '' && satisRaw === '')
+        ? `✅ Brief #${no} maliyet/satış kaydı temizlendi.`
+        : `✅ Brief #${no} kaydedildi — maliyet: ${maliyetRaw || '—'}₺ · satış: ${satisRaw || '—'}₺. Birkaç dk içinde dashboard'da görünür.`;
+      await client.chat.postMessage({ channel: by, text: txt });
+    } catch {}
+  } catch (err) {
+    log(`/maliyet set-financials hata: ${err.message}`);
+    try { await client.chat.postMessage({ channel: by, text: `❌ Brief #${no} kaydedilemedi: ${err.message}` }); } catch {}
+  }
+});
 
 // ─── Aşama D: Reaction Override (anlık) ───────────────────────────────────────
 

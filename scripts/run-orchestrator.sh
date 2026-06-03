@@ -97,6 +97,9 @@ if [ $CLAUDE_EXIT -eq 0 ]; then
   # ✅ tamamlanmış brief'leri completed'de tut (data-agent Canvas'tan aktif geri getirdiyse taşı)
   node "$PROJ/scripts/complete-brief.js" --reapply >> "$PROJ/logs/complete-brief.log" 2>&1 || \
     echo "[$(date '+%d.%m.%Y %H:%M')] complete-brief --reapply hata" >> "$LOG"
+  # 💰 maliyet/satış'ı taze live-data'ya geri uygula (data-agent finansalları okuyamaz)
+  node "$PROJ/scripts/set-financials.js" --reapply >> "$PROJ/logs/set-financials.log" 2>&1 || \
+    echo "[$(date '+%d.%m.%Y %H:%M')] set-financials --reapply hata" >> "$LOG"
 fi
 
 # Gecikme escalation (deterministik script — LLM değil) — sadece başarılı run'da,
