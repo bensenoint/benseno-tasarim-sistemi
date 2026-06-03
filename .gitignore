@@ -42,3 +42,5 @@ logs/*.err
 
 # Graphify çıktıları
 graphify-out/
+data/.db-url
+server/node_modules/
