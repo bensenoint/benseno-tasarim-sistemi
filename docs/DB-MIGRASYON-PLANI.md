@@ -138,5 +138,13 @@ Ekibin "tüm işler" görünümü = **Slack Home Tab** (zaten kurulu) + dashboar
 - Faz 3'e eklenir: **dashboard yazma yolları** (yeni brief formu + edit) ve **bot'un Slack-yansıtma**
   katmanı (post/chat.update/DM). Faz 3 biraz büyür.
 
+### KESİNLEŞEN KARARLAR (3 Haz)
+- **Edit yansıması:** Her değişimde brief mesajı `chat.update` + **thread'e not** + ilgili kişilere **DM**
+  (tam izlenebilirlik). Her edit Slack thread'inde iz bırakır.
+- **Yeni brief kanalı:** **Markaya göre** (marka→kanal eşlemesi; ör. #benseno-grafik / marka kanalı).
+  → `brands` tablosuna `slack_channel` sütunu eklenir.
+- **Ekip görünümü:** **Slack Home Tab + dashboard.** Home Tab kişisel/genel özet, detay+filtre dashboard.
+- **Dashboard yazma yetkisi:** yönetici → tüm briefler; atanan → kendi briefi (rol bazlı API auth).
+
 ---
 *Sonraki adım: Faz 1 (Postgres provision + şema + read API + seed) — sıfır riskli, paralel. Onayla başlanır.*
