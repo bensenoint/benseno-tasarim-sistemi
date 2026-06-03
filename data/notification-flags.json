@@ -1,408 +1,486 @@
 {
- "mode": "active",
- "new_briefs": [],
- "past_deadline": [
-  {
-   "no": "1",
-   "marka": "JNJ Vision TR",
-   "is": "24 Haziran Kontakt Lens Davetiyesi",
-   "lead_id": "U4XCE3532"
-  },
-  {
-   "no": "3",
-   "marka": "Bauhaus",
-   "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
-   "lead_id": "U06J26R1XCJ"
-  },
-  {
-   "no": "4",
-   "marka": "Bauhaus",
-   "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
-   "lead_id": "U055EDESLSE"
-  },
-  {
-   "no": "5",
-   "marka": "Bauhaus",
-   "is": "Broşür (Print · AI · Eren self-assign)",
-   "lead_id": "U0AP31SAA1W"
-  },
-  {
-   "no": "6",
-   "marka": "Bauhaus",
-   "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
-   "lead_id": "U09BFPBKQG7"
-  },
-  {
-   "no": "8",
-   "marka": "VDM Petdent",
-   "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
-   "lead_id": "U09BFPBKQG7"
-  },
-  {
-   "no": "9",
-   "marka": "VDM Petdent",
-   "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
-   "lead_id": "U0AP31SAA1W"
-  },
-  {
-   "no": "15",
-   "marka": "Bauhaus",
-   "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
-   "lead_id": "U06J26R1XCJ"
-  },
-  {
-   "no": "16",
-   "marka": "Bauhaus",
-   "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
-   "lead_id": "U06J26R1XCJ"
-  },
-  {
-   "no": "17",
-   "marka": "VDM Petdent",
-   "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
-   "lead_id": "U0AP31SAA1W"
-  },
-  {
-   "no": "20",
-   "marka": "Tour2America",
-   "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
-   "lead_id": "U0AP31SAA1W"
-  },
-  {
-   "no": "21",
-   "marka": "VDM Petdent",
-   "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
-   "lead_id": "U4XCE3532"
-  },
-  {
-   "no": "24",
-   "marka": "Bauhaus",
-   "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
-   "lead_id": "U06J26R1XCJ"
-  },
-  {
-   "no": "25",
-   "marka": "VDM Petdent",
-   "is": "test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
-   "lead_id": "U4XCE3532"
-  },
-  {
-   "no": "26",
-   "marka": "Bauhaus",
-   "is": "test yayın (Sosyal Medya Post · 🐷 Görkem · Sıralı Görkem→Cansu · ⚠️ test brief'i)",
-   "lead_id": "U030C48PL23"
-  },
-  {
-   "no": "27",
-   "marka": "Bauhaus",
-   "is": "Plastik Dolaplar",
-   "lead_id": "U09BFPBKQG7"
-  }
- ],
- "past_confirmed": [],
- "saat_eksik": [],
- "dept_belirsiz": [],
- "marka_yetersiz_sure": [],
- "marka_anormal_uzun": [],
- "calendar_events": [],
- "escalation": [
-  {
-   "ts": "",
-   "no": "1",
-   "marka": "JNJ Vision TR",
-   "is": "24 Haziran Kontakt Lens Davetiyesi",
-   "lead_id": "U4XCE3532",
-   "lead_role": "editor",
-   "deadline_str": "16:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-   "gecikme_h": 359
-  },
-  {
-   "ts": "",
-   "no": "3",
-   "marka": "Bauhaus",
-   "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
-   "lead_id": "U06J26R1XCJ",
-   "lead_role": "tasarim",
-   "deadline_str": "10:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-   "gecikme_h": 317
-  },
-  {
-   "ts": "",
-   "no": "4",
-   "marka": "Bauhaus",
-   "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
-   "lead_id": "U055EDESLSE",
-   "lead_role": "tasarim",
-   "deadline_str": "13:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-   "gecikme_h": 290
-  },
-  {
-   "ts": "",
-   "no": "5",
-   "marka": "Bauhaus",
-   "is": "Broşür (Print · AI · Eren self-assign)",
-   "lead_id": "U0AP31SAA1W",
-   "lead_role": "ai",
-   "deadline_str": "13:42 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-   "gecikme_h": 289
-  },
-  {
-   "ts": "",
-   "no": "6",
-   "marka": "Bauhaus",
-   "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
-   "lead_id": "U09BFPBKQG7",
-   "lead_role": "tasarim",
-   "deadline_str": "18:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-   "gecikme_h": 309
-  },
-  {
-   "ts": "",
-   "no": "8",
-   "marka": "VDM Petdent",
-   "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
-   "lead_id": "U09BFPBKQG7",
-   "lead_role": "tasarim",
-   "deadline_str": "13:24 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569",
-   "gecikme_h": 289
-  },
-  {
-   "ts": "",
-   "no": "9",
-   "marka": "VDM Petdent",
-   "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
-   "lead_id": "U0AP31SAA1W",
-   "lead_role": "ai",
-   "deadline_str": "23:59 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
-   "gecikme_h": 255
-  },
-  {
-   "ts": "",
-   "no": "15",
-   "marka": "Bauhaus",
-   "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
-   "lead_id": "U06J26R1XCJ",
-   "lead_role": "tasarim",
-   "deadline_str": "14:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179",
-   "gecikme_h": 265
-  },
-  {
-   "ts": "",
-   "no": "16",
-   "marka": "Bauhaus",
-   "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
-   "lead_id": "U06J26R1XCJ",
-   "lead_role": "tasarim",
-   "deadline_str": "17:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309",
-   "gecikme_h": 262
-  },
-  {
-   "ts": "",
-   "no": "17",
-   "marka": "VDM Petdent",
-   "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
-   "lead_id": "U0AP31SAA1W",
-   "lead_role": "ai",
-   "deadline_str": "08:46 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659",
-   "gecikme_h": 270
-  },
-  {
-   "ts": "",
-   "no": "20",
-   "marka": "Tour2America",
-   "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
-   "lead_id": "U0AP31SAA1W",
-   "lead_role": "ai",
-   "deadline_str": "12:31 TR",
-   "permalink": "https://benseno.slack.com/archives/C05J5PXBPGS/p1779355957360249",
-   "gecikme_h": 26
-  },
-  {
-   "ts": "",
-   "no": "21",
-   "marka": "VDM Petdent",
-   "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
-   "lead_id": "U4XCE3532",
-   "lead_role": "editor",
-   "deadline_str": "14:42 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629",
-   "gecikme_h": 240
-  },
-  {
-   "ts": "",
-   "no": "24",
-   "marka": "Bauhaus",
-   "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
-   "lead_id": "U06J26R1XCJ",
-   "lead_role": "tasarim",
-   "deadline_str": "18:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919",
-   "gecikme_h": 261
-  },
-  {
-   "ts": "",
-   "no": "25",
-   "marka": "VDM Petdent",
-   "is": "test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
-   "lead_id": "U4XCE3532",
-   "lead_role": "editor",
-   "deadline_str": "10:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1780290478864579",
-   "gecikme_h": 5
-  },
-  {
-   "ts": "",
-   "no": "26",
-   "marka": "Bauhaus",
-   "is": "test yayın (Sosyal Medya Post · 🐷 Görkem · Sıralı Görkem→Cansu · ⚠️ test brief'i)",
-   "lead_id": "U030C48PL23",
-   "lead_role": "yonetici",
-   "deadline_str": "14:55 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780315060052969",
-   "gecikme_h": 0
-  },
-  {
-   "ts": "",
-   "no": "27",
-   "marka": "Bauhaus",
-   "is": "Plastik Dolaplar",
-   "lead_id": "U09BFPBKQG7",
-   "lead_role": "tasarim",
-   "deadline_str": "13:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780318126239499",
-   "gecikme_h": 2
-  }
- ],
- "blokeli": [
-  {
-   "ts": "",
-   "no": "1",
-   "marka": "JNJ Vision TR",
-   "is": "24 Haziran Kontakt Lens Davetiyesi",
-   "lead_id": "U4XCE3532",
-   "lead_role": "editor",
-   "deadline_str": "16:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989"
-  },
-  {
-   "ts": "",
-   "no": "3",
-   "marka": "Bauhaus",
-   "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
-   "lead_id": "U06J26R1XCJ",
-   "lead_role": "tasarim",
-   "deadline_str": "10:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819"
-  },
-  {
-   "ts": "",
-   "no": "4",
-   "marka": "Bauhaus",
-   "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
-   "lead_id": "U055EDESLSE",
-   "lead_role": "tasarim",
-   "deadline_str": "13:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269"
-  },
-  {
-   "ts": "",
-   "no": "5",
-   "marka": "Bauhaus",
-   "is": "Broşür (Print · AI · Eren self-assign)",
-   "lead_id": "U0AP31SAA1W",
-   "lead_role": "ai",
-   "deadline_str": "13:42 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039"
-  },
-  {
-   "ts": "",
-   "no": "6",
-   "marka": "Bauhaus",
-   "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
-   "lead_id": "U09BFPBKQG7",
-   "lead_role": "tasarim",
-   "deadline_str": "18:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909"
-  },
-  {
-   "ts": "",
-   "no": "8",
-   "marka": "VDM Petdent",
-   "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
-   "lead_id": "U09BFPBKQG7",
-   "lead_role": "tasarim",
-   "deadline_str": "13:24 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569"
-  },
-  {
-   "ts": "",
-   "no": "9",
-   "marka": "VDM Petdent",
-   "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
-   "lead_id": "U0AP31SAA1W",
-   "lead_role": "ai",
-   "deadline_str": "23:59 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279"
-  },
-  {
-   "ts": "",
-   "no": "15",
-   "marka": "Bauhaus",
-   "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
-   "lead_id": "U06J26R1XCJ",
-   "lead_role": "tasarim",
-   "deadline_str": "14:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179"
-  },
-  {
-   "ts": "",
-   "no": "16",
-   "marka": "Bauhaus",
-   "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
-   "lead_id": "U06J26R1XCJ",
-   "lead_role": "tasarim",
-   "deadline_str": "17:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309"
-  },
-  {
-   "ts": "",
-   "no": "17",
-   "marka": "VDM Petdent",
-   "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
-   "lead_id": "U0AP31SAA1W",
-   "lead_role": "ai",
-   "deadline_str": "08:46 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659"
-  },
-  {
-   "ts": "",
-   "no": "21",
-   "marka": "VDM Petdent",
-   "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
-   "lead_id": "U4XCE3532",
-   "lead_role": "editor",
-   "deadline_str": "14:42 TR",
-   "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629"
-  },
-  {
-   "ts": "",
-   "no": "24",
-   "marka": "Bauhaus",
-   "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
-   "lead_id": "U06J26R1XCJ",
-   "lead_role": "tasarim",
-   "deadline_str": "18:00 TR",
-   "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919"
-  }
- ]
+  "mode": "active",
+  "new_briefs": [],
+  "past_deadline": [
+    {
+      "ts": "",
+      "no": "1",
+      "marka": "JNJ Vision TR",
+      "is": "24 Haziran Kontakt Lens Davetiyesi",
+      "lead_id": "U4XCE3532",
+      "lead_role": "tasarim",
+      "deadline_str": "18 Mayıs 16:00 TR",
+      "gecikme_h": 376,
+      "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989"
+    },
+    {
+      "ts": "",
+      "no": "3",
+      "marka": "Bauhaus",
+      "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "20 Mayıs 10:00 TR",
+      "gecikme_h": 334,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819"
+    },
+    {
+      "ts": "",
+      "no": "4",
+      "marka": "Bauhaus",
+      "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "lead_id": "U055EDESLSE",
+      "lead_role": "tasarim",
+      "deadline_str": "21 Mayıs 13:00 TR",
+      "gecikme_h": 307,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269"
+    },
+    {
+      "ts": "",
+      "no": "5",
+      "marka": "Bauhaus",
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "21 Mayıs 13:42 TR",
+      "gecikme_h": 306,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039"
+    },
+    {
+      "ts": "",
+      "no": "6",
+      "marka": "Bauhaus",
+      "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "20 Mayıs 18:00 TR",
+      "gecikme_h": 326,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909"
+    },
+    {
+      "ts": "",
+      "no": "8",
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "21 Mayıs 13:24 TR",
+      "gecikme_h": 306,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569"
+    },
+    {
+      "ts": "",
+      "no": "9",
+      "marka": "VDM Petdent",
+      "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "22 Mayıs 23:59 TR",
+      "gecikme_h": 272,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279"
+    },
+    {
+      "ts": "",
+      "no": "15",
+      "marka": "Bauhaus",
+      "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 14:00 TR",
+      "gecikme_h": 282,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179"
+    },
+    {
+      "ts": "",
+      "no": "16",
+      "marka": "Bauhaus",
+      "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 17:00 TR",
+      "gecikme_h": 279,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309"
+    },
+    {
+      "ts": "",
+      "no": "17",
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 08:46 TR",
+      "gecikme_h": 287,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659"
+    },
+    {
+      "ts": "",
+      "no": "20",
+      "marka": "Tour2America",
+      "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "1 Haziran 12:31 TR",
+      "gecikme_h": 43,
+      "permalink": "https://benseno.slack.com/archives/C05J5PXBPGS/p1779355957360249"
+    },
+    {
+      "ts": "",
+      "no": "21",
+      "marka": "VDM Petdent",
+      "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
+      "lead_id": "U4XCE3532",
+      "lead_role": "ai",
+      "deadline_str": "23 Mayıs 14:42 TR",
+      "gecikme_h": 257,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629"
+    },
+    {
+      "ts": "",
+      "no": "24",
+      "marka": "Bauhaus",
+      "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 18:00 TR",
+      "gecikme_h": 278,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919"
+    },
+    {
+      "ts": "",
+      "no": "25",
+      "marka": "VDM Petdent",
+      "is": "test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
+      "lead_id": "U4XCE3532",
+      "lead_role": "editor",
+      "deadline_str": "2 Haziran 10:00 TR",
+      "gecikme_h": 22,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1780290478864579"
+    },
+    {
+      "ts": "",
+      "no": "26",
+      "marka": "Bauhaus",
+      "is": "test yayın (Sosyal Medya Post · 🐷 Görkem · Sıralı Görkem→Cansu · ⚠️ test brief'i)",
+      "lead_id": "U030C48PL23",
+      "lead_role": "editor",
+      "deadline_str": "2 Haziran 14:55 TR",
+      "gecikme_h": 17,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780315060052969"
+    },
+    {
+      "ts": "",
+      "no": "27",
+      "marka": "Bauhaus",
+      "is": "Plastik Dolaplar",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "2 Haziran 13:00 TR",
+      "gecikme_h": 19,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780318126239499"
+    },
+    {
+      "ts": "",
+      "no": "29",
+      "marka": "Bauhaus",
+      "is": "Vantilatörler",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "2 Haziran 17:00 TR",
+      "gecikme_h": 15,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780382082092499"
+    }
+  ],
+  "past_confirmed": [],
+  "saat_eksik": [],
+  "dept_belirsiz": [],
+  "marka_yetersiz_sure": [],
+  "marka_anormal_uzun": [],
+  "calendar_events": [],
+  "escalation": [
+    {
+      "ts": "",
+      "no": "1",
+      "marka": "JNJ Vision TR",
+      "is": "24 Haziran Kontakt Lens Davetiyesi",
+      "lead_id": "U4XCE3532",
+      "lead_role": "tasarim",
+      "deadline_str": "18 Mayıs 16:00 TR",
+      "gecikme_h": 376,
+      "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989"
+    },
+    {
+      "ts": "",
+      "no": "3",
+      "marka": "Bauhaus",
+      "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "20 Mayıs 10:00 TR",
+      "gecikme_h": 334,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819"
+    },
+    {
+      "ts": "",
+      "no": "4",
+      "marka": "Bauhaus",
+      "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "lead_id": "U055EDESLSE",
+      "lead_role": "tasarim",
+      "deadline_str": "21 Mayıs 13:00 TR",
+      "gecikme_h": 307,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269"
+    },
+    {
+      "ts": "",
+      "no": "5",
+      "marka": "Bauhaus",
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "21 Mayıs 13:42 TR",
+      "gecikme_h": 306,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039"
+    },
+    {
+      "ts": "",
+      "no": "6",
+      "marka": "Bauhaus",
+      "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "20 Mayıs 18:00 TR",
+      "gecikme_h": 326,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909"
+    },
+    {
+      "ts": "",
+      "no": "8",
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "21 Mayıs 13:24 TR",
+      "gecikme_h": 306,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569"
+    },
+    {
+      "ts": "",
+      "no": "9",
+      "marka": "VDM Petdent",
+      "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "22 Mayıs 23:59 TR",
+      "gecikme_h": 272,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279"
+    },
+    {
+      "ts": "",
+      "no": "15",
+      "marka": "Bauhaus",
+      "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 14:00 TR",
+      "gecikme_h": 282,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179"
+    },
+    {
+      "ts": "",
+      "no": "16",
+      "marka": "Bauhaus",
+      "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 17:00 TR",
+      "gecikme_h": 279,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309"
+    },
+    {
+      "ts": "",
+      "no": "17",
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 08:46 TR",
+      "gecikme_h": 287,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659"
+    },
+    {
+      "ts": "",
+      "no": "20",
+      "marka": "Tour2America",
+      "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "1 Haziran 12:31 TR",
+      "gecikme_h": 43,
+      "permalink": "https://benseno.slack.com/archives/C05J5PXBPGS/p1779355957360249"
+    },
+    {
+      "ts": "",
+      "no": "21",
+      "marka": "VDM Petdent",
+      "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
+      "lead_id": "U4XCE3532",
+      "lead_role": "ai",
+      "deadline_str": "23 Mayıs 14:42 TR",
+      "gecikme_h": 257,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629"
+    },
+    {
+      "ts": "",
+      "no": "24",
+      "marka": "Bauhaus",
+      "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 18:00 TR",
+      "gecikme_h": 278,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919"
+    },
+    {
+      "ts": "",
+      "no": "25",
+      "marka": "VDM Petdent",
+      "is": "test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
+      "lead_id": "U4XCE3532",
+      "lead_role": "editor",
+      "deadline_str": "2 Haziran 10:00 TR",
+      "gecikme_h": 22,
+      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1780290478864579"
+    },
+    {
+      "ts": "",
+      "no": "26",
+      "marka": "Bauhaus",
+      "is": "test yayın (Sosyal Medya Post · 🐷 Görkem · Sıralı Görkem→Cansu · ⚠️ test brief'i)",
+      "lead_id": "U030C48PL23",
+      "lead_role": "editor",
+      "deadline_str": "2 Haziran 14:55 TR",
+      "gecikme_h": 17,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780315060052969"
+    },
+    {
+      "ts": "",
+      "no": "27",
+      "marka": "Bauhaus",
+      "is": "Plastik Dolaplar",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "2 Haziran 13:00 TR",
+      "gecikme_h": 19,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780318126239499"
+    },
+    {
+      "ts": "",
+      "no": "29",
+      "marka": "Bauhaus",
+      "is": "Vantilatörler",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "2 Haziran 17:00 TR",
+      "gecikme_h": 15,
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780382082092499"
+    }
+  ],
+  "blokeli": [
+    {
+      "ts": "",
+      "no": "1",
+      "marka": "JNJ Vision TR",
+      "is": "24 Haziran Kontakt Lens Davetiyesi",
+      "lead_id": "U4XCE3532",
+      "gecikme_h": 376
+    },
+    {
+      "ts": "",
+      "no": "3",
+      "marka": "Bauhaus",
+      "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "lead_id": "U06J26R1XCJ",
+      "gecikme_h": 334
+    },
+    {
+      "ts": "",
+      "no": "4",
+      "marka": "Bauhaus",
+      "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "lead_id": "U055EDESLSE",
+      "gecikme_h": 307
+    },
+    {
+      "ts": "",
+      "no": "5",
+      "marka": "Bauhaus",
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "gecikme_h": 306
+    },
+    {
+      "ts": "",
+      "no": "6",
+      "marka": "Bauhaus",
+      "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "lead_id": "U09BFPBKQG7",
+      "gecikme_h": 326
+    },
+    {
+      "ts": "",
+      "no": "8",
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "lead_id": "U09BFPBKQG7",
+      "gecikme_h": 306
+    },
+    {
+      "ts": "",
+      "no": "9",
+      "marka": "VDM Petdent",
+      "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "gecikme_h": 272
+    },
+    {
+      "ts": "",
+      "no": "15",
+      "marka": "Bauhaus",
+      "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
+      "lead_id": "U06J26R1XCJ",
+      "gecikme_h": 282
+    },
+    {
+      "ts": "",
+      "no": "16",
+      "marka": "Bauhaus",
+      "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
+      "lead_id": "U06J26R1XCJ",
+      "gecikme_h": 279
+    },
+    {
+      "ts": "",
+      "no": "17",
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
+      "lead_id": "U0AP31SAA1W",
+      "gecikme_h": 287
+    },
+    {
+      "ts": "",
+      "no": "21",
+      "marka": "VDM Petdent",
+      "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
+      "lead_id": "U4XCE3532",
+      "gecikme_h": 257
+    },
+    {
+      "ts": "",
+      "no": "24",
+      "marka": "Bauhaus",
+      "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
+      "lead_id": "U06J26R1XCJ",
+      "gecikme_h": 278
+    }
+  ]
 }
