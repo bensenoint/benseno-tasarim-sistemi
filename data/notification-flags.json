@@ -1,28 +1,388 @@
 {
   "mode": "active",
-  "new_briefs": [
+  "new_briefs": [],
+  "past_deadline": [
     {
-      "no": "34",
-      "marka": "KMR Panfix",
-      "is": "yaza merhaba postu",
+      "no": 1,
+      "marka": "JNJ Vision TR",
+      "is": "24 Haziran Kontakt Lens Davetiyesi",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779109200000,
+      "deadline_str": "18 Mayıs 2026 16:00 TR ⚠️ GEÇM",
+      "atanan": "Cansu+erdem+İpek+Görkem+Simge+Eda T+Aylin T",
+      "atanan_ids": [
+        "U4XCE3532",
+        "U02SZQDAFPF",
+        "U055EDESLSE",
+        "U030C48PL23",
+        "U0AAC3YK20G",
+        "U09BZHR25NG",
+        "U0AN6DD79M0"
+      ],
+      "lead_id": "U4XCE3532",
+      "durum": "👀 Revize bekliyor (v2 teslim · bakanlık geri dönüşü) · 🔴 Blokeli",
+      "dept": "editor",
+      "blokeli": true,
+      "delta_h": -383.8
+    },
+    {
+      "no": 3,
+      "marka": "Bauhaus",
+      "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779260400000,
+      "deadline_str": "20 Mayıs 2026 10:00 TR ⚠️ GEÇM",
+      "atanan": "Aykut+Eda T",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BZHR25NG"
+      ],
+      "lead_id": "U06J26R1XCJ",
+      "durum": "6g+ pasif · 🔴 Blokeli · Aykut > Eda T pasif",
       "dept": "tasarim",
-      "tip": "Print / Broşür",
-      "akis": "Paralel",
-      "not": "deneme deneme",
-      "ref": "www.benseno.com.tr",
-      "deadline_str": "10 Haziran 2026 13:09 TR",
-      "priority_label": "🟢 Düşük",
+      "blokeli": true,
+      "delta_h": -341.8
+    },
+    {
+      "no": 4,
+      "marka": "Bauhaus",
+      "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779357600000,
+      "deadline_str": "21 Mayıs 2026 13:00 TR ⚠️ GEÇM",
+      "atanan": "İpek+Görkem",
       "atanan_ids": [
         "U055EDESLSE",
-        "U4XCE3532"
+        "U030C48PL23"
       ],
-      "submitter_id": "U030C48PL23",
-      "ts": "1780481489.619019",
-      "permalink": "https://benseno.slack.com/archives/C0A5CQ7RSJJ/p1780481489619019",
-      "channel": "C0A5CQ7RSJJ"
+      "lead_id": "U055EDESLSE",
+      "durum": "tasarımcı yok · İpek dispatch > Görkem · 8g eşiği AŞILDI · 🔴 Blokeli",
+      "dept": "tasarim",
+      "blokeli": true,
+      "delta_h": -314.8
+    },
+    {
+      "no": 5,
+      "marka": "Bauhaus",
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779360120000,
+      "deadline_str": "21 Mayıs 2026 13:42 TR ⚠️ GEÇM",
+      "atanan": "Eren",
+      "atanan_ids": [
+        "U0AP31SAA1W"
+      ],
+      "lead_id": "U0AP31SAA1W",
+      "durum": "🚨 v1 yok · Eren · 8g eşiği AŞILDI · 🔴 Blokeli",
+      "dept": "ai",
+      "blokeli": true,
+      "delta_h": -314.1
+    },
+    {
+      "no": 6,
+      "marka": "Bauhaus",
+      "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779289200000,
+      "deadline_str": "20 Mayıs 2026 18:00 TR ⚠️ GEÇM",
+      "atanan": "Hasan Serdar",
+      "atanan_ids": [
+        "U09BFPBKQG7"
+      ],
+      "lead_id": "U09BFPBKQG7",
+      "durum": "v1 yok · Arda hafta sonu pasif · 🔴 Blokeli",
+      "dept": "tasarim",
+      "blokeli": true,
+      "delta_h": -333.8
+    },
+    {
+      "no": 8,
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779359040000,
+      "deadline_str": "21 Mayıs 2026 13:24 TR ⚠️ GEÇM",
+      "atanan": "Hasan Serdar",
+      "atanan_ids": [
+        "U09BFPBKQG7"
+      ],
+      "lead_id": "U09BFPBKQG7",
+      "durum": "🚨 dept ambiguity · Arda dispatch sırada · 8g eşiği AŞILDI · 🔴 Blokeli",
+      "dept": "tasarim",
+      "blokeli": true,
+      "delta_h": -314.4
+    },
+    {
+      "no": 9,
+      "marka": "VDM Petdent",
+      "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779483540000,
+      "deadline_str": "22 Mayıs 2026 23:59 TR ⚠️ GEÇM",
+      "atanan": "Eren",
+      "atanan_ids": [
+        "U0AP31SAA1W"
+      ],
+      "lead_id": "U0AP31SAA1W",
+      "durum": "🔴 Blokeli · 72sa AÇILDI · Şablon 29 DM → Eren (26May09:33) · v1 yok",
+      "dept": "ai",
+      "blokeli": true,
+      "delta_h": -279.8
+    },
+    {
+      "no": 15,
+      "marka": "Bauhaus",
+      "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779447600000,
+      "deadline_str": "22 Mayıs 2026 14:00 TR ⚠️ GEÇM",
+      "atanan": "Aykut+Hasan Serdar",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "lead_id": "U06J26R1XCJ",
+      "durum": "🎨 v1 13:28 🌸 · Eda T 14:04 yarı kabul · 5g+ onay pasif · 7g eşiği AŞILDI · 🔴 Blo",
+      "dept": "tasarim",
+      "blokeli": true,
+      "delta_h": -289.8
+    },
+    {
+      "no": 16,
+      "marka": "Bauhaus",
+      "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779458400000,
+      "deadline_str": "22 Mayıs 2026 17:00 TR ⚠️ GEÇM",
+      "atanan": "Aykut+Hasan Serdar",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "lead_id": "U06J26R1XCJ",
+      "durum": "🎨 v1 14:40 🌸 · Eda T 14:50 ellerine sağlıkk · 3g+ pasif onay yok · 🔴 Blokeli",
+      "dept": "tasarim",
+      "blokeli": true,
+      "delta_h": -286.8
+    },
+    {
+      "no": 17,
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779428760000,
+      "deadline_str": "22 Mayıs 2026 08:46 TR ⚠️ GEÇM",
+      "atanan": "Eren+Görkem",
+      "atanan_ids": [
+        "U0AP31SAA1W",
+        "U030C48PL23"
+      ],
+      "lead_id": "U0AP31SAA1W",
+      "durum": "🚨 v1 yok · Görkem DM Cuma 16:45 · 72sa + 8g eşiği AŞILDI · 🔴 Blokeli",
+      "dept": "ai",
+      "blokeli": true,
+      "delta_h": -295.0
+    },
+    {
+      "no": 20,
+      "marka": "Tour2America",
+      "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1780306260000,
+      "deadline_str": "1 Haziran 2026 12:31 TR ⚠️ GEÇ",
+      "atanan": "Eren+Görkem",
+      "atanan_ids": [
+        "U0AP31SAA1W",
+        "U030C48PL23"
+      ],
+      "lead_id": "U0AP31SAA1W",
+      "durum": "yeni · Eren+Görkem · 72sa eşik geçişi · Normal öncelik",
+      "dept": "ai",
+      "blokeli": false,
+      "delta_h": -51.3
+    },
+    {
+      "no": 21,
+      "marka": "VDM Petdent",
+      "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779536520000,
+      "deadline_str": "23 Mayıs 2026 14:42 TR ⚠️ GEÇM",
+      "atanan": "Cansu+Görkem+Eren",
+      "atanan_ids": [
+        "U4XCE3532",
+        "U030C48PL23",
+        "U0AP31SAA1W"
+      ],
+      "lead_id": "U4XCE3532",
+      "durum": "🚨 GEÇMİŞ · Şablon 24+25+29 gönderildi (29→Eren 26May14:46) · 72sa AŞILDI · 6g eş",
+      "dept": "editor",
+      "blokeli": true,
+      "delta_h": -265.1
+    },
+    {
+      "no": 24,
+      "marka": "Bauhaus",
+      "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1779462000000,
+      "deadline_str": "22 Mayıs 2026 18:00 TR ⚠️ GEÇM",
+      "atanan": "Aykut+Hasan Serdar",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "lead_id": "U06J26R1XCJ",
+      "durum": "⚠️ GEÇMİŞ · Aykut yarı onay Cuma 17:35 · Arda kısmı belirsiz · 🔴 Blokeli",
+      "dept": "tasarim",
+      "blokeli": true,
+      "delta_h": -285.8
+    },
+    {
+      "no": 25,
+      "marka": "VDM Petdent",
+      "is": "test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1780383600000,
+      "deadline_str": "2 Haziran 2026 10:00 TR ⚠️ GEÇ",
+      "atanan": "Cansu+Görkem",
+      "atanan_ids": [
+        "U4XCE3532",
+        "U030C48PL23"
+      ],
+      "lead_id": "U4XCE3532",
+      "durum": "yeni · Cansu+Görkem · ⚠️ test içeriği (İş='test')",
+      "dept": "editor",
+      "blokeli": false,
+      "delta_h": -29.8
+    },
+    {
+      "no": 27,
+      "marka": "Bauhaus",
+      "is": "Plastik Dolaplar",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1780394400000,
+      "deadline_str": "2 Haziran 2026 13:00 TR ⚠️ GEÇ",
+      "atanan": "Hasan Serdar+Aykut",
+      "atanan_ids": [
+        "U09BFPBKQG7",
+        "U06J26R1XCJ"
+      ],
+      "lead_id": "U09BFPBKQG7",
+      "durum": "yeni · Hasan Serdar+Aykut · Sosyal Medya Post · Paralel akış · 💬 video içeriği",
+      "dept": "tasarim",
+      "blokeli": false,
+      "delta_h": -26.8
+    },
+    {
+      "no": 28,
+      "marka": "Bauhaus",
+      "is": "Scheppach Ekskavatör",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1780480800000,
+      "deadline_str": "3 Haziran 2026 13:00 TR ⚠️ GEÇ",
+      "atanan": "Aykut+Hasan Serdar",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "lead_id": "U06J26R1XCJ",
+      "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
+      "dept": "tasarim",
+      "blokeli": false,
+      "delta_h": -2.8
+    },
+    {
+      "no": 29,
+      "marka": "Bauhaus",
+      "is": "Vantilатörler",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1780408800000,
+      "deadline_str": "2 Haziran 2026 17:00 TR ⚠️ GEÇ",
+      "atanan": "Aykut+Hasan Serdar",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "lead_id": "U06J26R1XCJ",
+      "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
+      "dept": "tasarim",
+      "blokeli": false,
+      "delta_h": -22.8
+    },
+    {
+      "no": 30,
+      "marka": "Bauhaus",
+      "is": "Weber 1&2 (Sosyal Medya Post · Paralel · 🎬 2 video)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1780477200000,
+      "deadline_str": "3 Haziran 2026 12:00 TR ⚠️ GEÇ",
+      "atanan": "Aykut+Hasan Serdar",
+      "atanan_ids": [
+        "U06J26R1XCJ",
+        "U09BFPBKQG7"
+      ],
+      "lead_id": "U06J26R1XCJ",
+      "durum": "🎨 Tasarımda · rev 1",
+      "dept": "tasarim",
+      "blokeli": false,
+      "delta_h": -3.8
+    },
+    {
+      "no": 31,
+      "marka": "KZY Supreme",
+      "is": "Supreme Wet 85 gram // Haziran 2026 Kampanya (Print / Broşür)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1780476720000,
+      "deadline_str": "3 Haziran 2026 11:52 TR ⚠️ GEÇ",
+      "atanan": "Serhat",
+      "atanan_ids": [
+        "U08HLMHTGEL"
+      ],
+      "lead_id": "U08HLMHTGEL",
+      "durum": "yeni · Serhat · Print / Broşür",
+      "dept": "tasarim",
+      "blokeli": false,
+      "delta_h": -3.9
+    },
+    {
+      "no": 33,
+      "marka": "Hasvet",
+      "is": "test ai (Araştırma · 🐷 Görkem Kaya · ⚠️ test brief'i)",
+      "oncelik": "🔴",
+      "gecmis": true,
+      "deadline": 1780485240000,
+      "deadline_str": "3 Haziran 2026 14:14 TR ⚠️ GEÇ",
+      "atanan": "Eren",
+      "atanan_ids": [
+        "U0AP31SAA1W"
+      ],
+      "lead_id": "U0AP31SAA1W",
+      "durum": "👀 Revizede",
+      "dept": "ai",
+      "blokeli": false,
+      "delta_h": -1.5
     }
   ],
-  "past_deadline": [],
   "past_confirmed": [],
   "saat_eksik": [],
   "dept_belirsiz": [],
@@ -31,60 +391,311 @@
   "calendar_events": [],
   "escalation": [
     {
-      "ts": "1779355957.360249",
-      "no": 20,
-      "marka": "Tour2America",
-      "is": "bayram icerigi",
-      "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "1 Haziran 2026 12:31 TR",
-      "permalink": "https://benseno.slack.com/archives/C05J5PXBPGS/p1779355957360249",
-      "gecikme_h": 48
+      "ts": null,
+      "no": 1,
+      "marka": "JNJ Vision TR",
+      "is": "24 Haziran Kontakt Lens Davetiyesi",
+      "lead_id": "U4XCE3532",
+      "lead_role": "editor",
+      "deadline_str": "18 Mayıs 2026 16:00 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 384
     },
     {
-      "ts": "1780318126.239499",
+      "ts": null,
+      "no": 3,
+      "marka": "Bauhaus",
+      "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "20 Mayıs 2026 10:00 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 342
+    },
+    {
+      "ts": null,
+      "no": 4,
+      "marka": "Bauhaus",
+      "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "lead_id": "U055EDESLSE",
+      "lead_role": "tasarim",
+      "deadline_str": "21 Mayıs 2026 13:00 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 315
+    },
+    {
+      "ts": null,
+      "no": 5,
+      "marka": "Bauhaus",
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "21 Mayıs 2026 13:42 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 314
+    },
+    {
+      "ts": null,
+      "no": 6,
+      "marka": "Bauhaus",
+      "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "20 Mayıs 2026 18:00 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 334
+    },
+    {
+      "ts": null,
+      "no": 8,
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "lead_id": "U09BFPBKQG7",
+      "lead_role": "tasarim",
+      "deadline_str": "21 Mayıs 2026 13:24 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 314
+    },
+    {
+      "ts": null,
+      "no": 9,
+      "marka": "VDM Petdent",
+      "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "22 Mayıs 2026 23:59 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 280
+    },
+    {
+      "ts": null,
+      "no": 15,
+      "marka": "Bauhaus",
+      "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 2026 14:00 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 290
+    },
+    {
+      "ts": null,
+      "no": 16,
+      "marka": "Bauhaus",
+      "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 2026 17:00 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 287
+    },
+    {
+      "ts": null,
+      "no": 17,
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "22 Mayıs 2026 08:46 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 295
+    },
+    {
+      "ts": null,
+      "no": 20,
+      "marka": "Tour2America",
+      "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "1 Haziran 2026 12:31 TR ⚠️ GEÇ",
+      "permalink": null,
+      "gecikme_h": 51
+    },
+    {
+      "ts": null,
+      "no": 21,
+      "marka": "VDM Petdent",
+      "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
+      "lead_id": "U4XCE3532",
+      "lead_role": "editor",
+      "deadline_str": "23 Mayıs 2026 14:42 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 265
+    },
+    {
+      "ts": null,
+      "no": 24,
+      "marka": "Bauhaus",
+      "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 2026 18:00 TR ⚠️ GEÇM",
+      "permalink": null,
+      "gecikme_h": 286
+    },
+    {
+      "ts": null,
+      "no": 25,
+      "marka": "VDM Petdent",
+      "is": "test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
+      "lead_id": "U4XCE3532",
+      "lead_role": "editor",
+      "deadline_str": "2 Haziran 2026 10:00 TR ⚠️ GEÇ",
+      "permalink": null,
+      "gecikme_h": 30
+    },
+    {
+      "ts": null,
       "no": 27,
       "marka": "Bauhaus",
       "is": "Plastik Dolaplar",
       "lead_id": "U09BFPBKQG7",
       "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 13:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780318126239499",
-      "gecikme_h": 24
+      "deadline_str": "2 Haziran 2026 13:00 TR ⚠️ GEÇ",
+      "permalink": null,
+      "gecikme_h": 27
     },
     {
-      "ts": "1780390340.369139",
-      "no": 30,
-      "marka": "Bauhaus",
-      "is": "Weber 1&2",
-      "lead_id": "U06J26R1XCJ",
-      "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 12:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780390340369139",
-      "gecikme_h": 1
-    },
-    {
-      "ts": "1780390360.140899",
-      "no": 31,
-      "marka": "KZY Supreme",
-      "is": "Supreme Wet 85 gram",
-      "lead_id": "U08HLMHTGEL",
-      "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 11:52 TR",
-      "permalink": "https://benseno.slack.com/archives/C05KKSV6EF7/p1780390360140899",
-      "gecikme_h": 1
-    },
-    {
-      "ts": "1780480800",
+      "ts": null,
       "no": 28,
       "marka": "Bauhaus",
       "is": "Scheppach Ekskavatör",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 13:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780382002414219",
-      "gecikme_h": 0
+      "deadline_str": "3 Haziran 2026 13:00 TR ⚠️ GEÇ",
+      "permalink": null,
+      "gecikme_h": 3
+    },
+    {
+      "ts": null,
+      "no": 29,
+      "marka": "Bauhaus",
+      "is": "Vantilатörler",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "2 Haziran 2026 17:00 TR ⚠️ GEÇ",
+      "permalink": null,
+      "gecikme_h": 23
+    },
+    {
+      "ts": null,
+      "no": 30,
+      "marka": "Bauhaus",
+      "is": "Weber 1&2 (Sosyal Medya Post · Paralel · 🎬 2 video)",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "3 Haziran 2026 12:00 TR ⚠️ GEÇ",
+      "permalink": null,
+      "gecikme_h": 4
+    },
+    {
+      "ts": null,
+      "no": 31,
+      "marka": "KZY Supreme",
+      "is": "Supreme Wet 85 gram // Haziran 2026 Kampanya (Print / Broşür)",
+      "lead_id": "U08HLMHTGEL",
+      "lead_role": "tasarim",
+      "deadline_str": "3 Haziran 2026 11:52 TR ⚠️ GEÇ",
+      "permalink": null,
+      "gecikme_h": 4
+    },
+    {
+      "ts": null,
+      "no": 33,
+      "marka": "Hasvet",
+      "is": "test ai (Araştırma · 🐷 Görkem Kaya · ⚠️ test brief'i)",
+      "lead_id": "U0AP31SAA1W",
+      "lead_role": "ai",
+      "deadline_str": "3 Haziran 2026 14:14 TR ⚠️ GEÇ",
+      "permalink": null,
+      "gecikme_h": 2
     }
   ],
-  "blokeli": []
+  "blokeli": [
+    {
+      "no": 1,
+      "marka": "JNJ Vision TR",
+      "is": "24 Haziran Kontakt Lens Davetiyesi",
+      "lead_id": "U4XCE3532",
+      "durum": "👀 Revize bekliyor (v2 teslim · bakanlık geri dönüşü) · 🔴 Blokeli"
+    },
+    {
+      "no": 3,
+      "marka": "Bauhaus",
+      "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
+      "lead_id": "U06J26R1XCJ",
+      "durum": "6g+ pasif · 🔴 Blokeli · Aykut > Eda T pasif"
+    },
+    {
+      "no": 4,
+      "marka": "Bauhaus",
+      "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
+      "lead_id": "U055EDESLSE",
+      "durum": "tasarımcı yok · İpek dispatch > Görkem · 8g eşiği AŞILDI · 🔴 Blokeli"
+    },
+    {
+      "no": 5,
+      "marka": "Bauhaus",
+      "is": "Broşür (Print · AI · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "durum": "🚨 v1 yok · Eren · 8g eşiği AŞILDI · 🔴 Blokeli"
+    },
+    {
+      "no": 6,
+      "marka": "Bauhaus",
+      "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
+      "lead_id": "U09BFPBKQG7",
+      "durum": "v1 yok · Arda hafta sonu pasif · 🔴 Blokeli"
+    },
+    {
+      "no": 8,
+      "marka": "VDM Petdent",
+      "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
+      "lead_id": "U09BFPBKQG7",
+      "durum": "🚨 dept ambiguity · Arda dispatch sırada · 8g eşiği AŞILDI · 🔴 Blokeli"
+    },
+    {
+      "no": 9,
+      "marka": "VDM Petdent",
+      "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
+      "lead_id": "U0AP31SAA1W",
+      "durum": "🔴 Blokeli · 72sa AÇILDI · Şablon 29 DM → Eren (26May09:33) · v1 yok"
+    },
+    {
+      "no": 15,
+      "marka": "Bauhaus",
+      "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
+      "lead_id": "U06J26R1XCJ",
+      "durum": "🎨 v1 13:28 🌸 · Eda T 14:04 yarı kabul · 5g+ onay pasif · 7g eşiği AŞILDI · 🔴 Blo"
+    },
+    {
+      "no": 16,
+      "marka": "Bauhaus",
+      "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
+      "lead_id": "U06J26R1XCJ",
+      "durum": "🎨 v1 14:40 🌸 · Eda T 14:50 ellerine sağlıkk · 3g+ pasif onay yok · 🔴 Blokeli"
+    },
+    {
+      "no": 17,
+      "marka": "VDM Petdent",
+      "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
+      "lead_id": "U0AP31SAA1W",
+      "durum": "🚨 v1 yok · Görkem DM Cuma 16:45 · 72sa + 8g eşiği AŞILDI · 🔴 Blokeli"
+    },
+    {
+      "no": 21,
+      "marka": "VDM Petdent",
+      "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
+      "lead_id": "U4XCE3532",
+      "durum": "🚨 GEÇMİŞ · Şablon 24+25+29 gönderildi (29→Eren 26May14:46) · 72sa AŞILDI · 6g eş"
+    },
+    {
+      "no": 24,
+      "marka": "Bauhaus",
+      "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
+      "lead_id": "U06J26R1XCJ",
+      "durum": "⚠️ GEÇMİŞ · Aykut yarı onay Cuma 17:35 · Arda kısmı belirsiz · 🔴 Blokeli"
+    }
+  ],
+  "sync_ts": 1780490967
 }
