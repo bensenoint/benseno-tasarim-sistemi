@@ -1,4 +1,12 @@
 {
+  "26": {
+    "maliyet": 2000,
+    "satis": 5000,
+    "fatura": true,
+    "odeme": true,
+    "by": "U030C48PL23",
+    "ts": 1780473102
+  },
   "27": {
     "maliyet": 50,
     "satis": 125,

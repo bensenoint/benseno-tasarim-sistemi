@@ -456,10 +456,10 @@
       "gecmis": "⏳01Jun14:57 (Görkem açtı · workflow · 🔔 otomatik 🟠) · 🟠Yön10:42",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1780315060052969)",
       "deadline_unix": 1780401300,
-      "maliyet": null,
-      "satis": null,
-      "fatura": false,
-      "odeme": false
+      "maliyet": 2000,
+      "satis": 5000,
+      "fatura": true,
+      "odeme": true
     },
     {
       "no": "27",
@@ -628,7 +628,11 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C0ANY1ZMH2A/p1780398800600119",
       "image_url": "",
-      "notes": "✅ U030C48PL23"
+      "notes": "✅ U030C48PL23",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": "2",
