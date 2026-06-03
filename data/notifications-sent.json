@@ -561,5 +561,12 @@
     "sent_at": "2026-06-03T15:52:37+03:00",
     "user_id": "skip-consolidated",
     "reason": "15:05 TR sync · 20 escalation + 12 blokeli değerlendirildi · 0 yeni eşik geçişi · #33 Hasvet 44dk GEÇMİŞ (Şablon30 eşiği=1h, henüz yok) · #29 Vantilatörler 22h (Şablon31 eşiği=24h, 17:00'da) · Uzun süreli blokeli (100-384h) onceki runlarda escalate edildi · 0 yeni brief · Priority: 🔴20 🟠1 🟡0 🟢3 · Calendar: skipped (headless)"
+  },
+  {
+    "brief_ts": null,
+    "template": "orchestrator_sync_1780494420_no_new_notifications",
+    "sent_at": "2026-06-03T16:47:00+03:00",
+    "user_id": "skip-consolidated",
+    "notes": "Çar 3Haz 16:47 TR headless sync — 0 yeni brief, 21 GEÇMİŞ (T30-31-32 tüm aktif eskalasyonlar zaten gönderildi), #29 24h eşiği 13dk'ya kaldı"
   }
 ]
