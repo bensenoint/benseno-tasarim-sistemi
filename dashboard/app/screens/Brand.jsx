@@ -148,15 +148,22 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
 
   const overdue = active.filter(b => { const m = dlMs(b); return m != null && m < now * 1000; }).length;
   const shown = view === "active" ? filteredActive.length : filteredDone.length;
+  // Tamamlanan finans toplamı (görüntülenen satırlar): faturalanan/tahsil = Σ satış · ilgili bayrak
+  const sumDone = filteredDone.reduce((a, c) => {
+    a.m += Number(c.maliyet) || 0; a.s += Number(c.satis) || 0;
+    if (c.fatura) a.fa += Number(c.satis) || 0;
+    if (c.odeme)  a.od += Number(c.satis) || 0;
+    return a;
+  }, { m: 0, s: 0, fa: 0, od: 0 });
 
   function exportCsv() {
     let head, lines;
     if (view === "active") {
-      head = ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev", "Maliyet", "Satış"];
-      lines = filteredActive.map(b => [b.no, csvCell(brand), csvCell(b.baslik || b.is), csvCell(b.priority && b.priority.label || ""), csvCell([b.lead && b.lead.name, ...((b.contributors || []).map(c => c && c.name))].filter(Boolean).join("; ")), csvCell(fmtDate(dlMs(b) ? new Date(dlMs(b)) : null)), csvCell(b.durum), b.revision || 0, b.maliyet != null ? b.maliyet : "", b.satis != null ? b.satis : ""].join(","));
+      head = ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev", "Maliyet", "Satış", "Fatura", "Ödeme"];
+      lines = filteredActive.map(b => [b.no, csvCell(brand), csvCell(b.baslik || b.is), csvCell(b.priority && b.priority.label || ""), csvCell([b.lead && b.lead.name, ...((b.contributors || []).map(c => c && c.name))].filter(Boolean).join("; ")), csvCell(fmtDate(dlMs(b) ? new Date(dlMs(b)) : null)), csvCell(b.durum), b.revision || 0, b.maliyet != null ? b.maliyet : "", b.satis != null ? b.satis : "", b.fatura ? "Evet" : "Hayır", b.odeme ? "Evet" : "Hayır"].join(","));
     } else {
-      head = ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma", "Rev", "Puan", "Maliyet", "Satış"];
-      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell(rowNames(c).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : ""), c.revision || 0, c.rating != null ? c.rating : "", c.maliyet != null ? c.maliyet : "", c.satis != null ? c.satis : ""].join(","));
+      head = ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma", "Rev", "Puan", "Maliyet", "Satış", "Fatura", "Ödeme"];
+      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell(rowNames(c).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : ""), c.revision || 0, c.rating != null ? c.rating : "", c.maliyet != null ? c.maliyet : "", c.satis != null ? c.satis : "", c.fatura ? "Evet" : "Hayır", c.odeme ? "Evet" : "Hayır"].join(","));
     }
     const blob = new Blob(["﻿" + [head.join(",")].concat(lines).join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -227,13 +234,13 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
             <table style={{ width:"100%", minWidth:720, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
               <thead>
                 <tr style={{ background:"var(--surface-sub)" }}>
-                  {[["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["Maliyet","right"],["Satış","right"],["🔗","center"]].map(([v, al], i) => (
+                  {[["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["Maliyet","right"],["Satış","right"],["Fatura","center"],["Ödeme","center"],["🔗","center"]].map(([v, al], i) => (
                     <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: al, whiteSpace:"nowrap" }}>{v}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {filteredDone.length === 0 && <tr><td colSpan={11} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
+                {filteredDone.length === 0 && <tr><td colSpan={13} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
                 {filteredDone.map((c, idx) => (
                   <tr key={"d" + c.no} style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)" }}>
                     <td style={bCs(true, "right")}>{c.no}</td>
@@ -254,10 +261,24 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
                     <td style={bCs(true, "right")}>{c.rating != null ? <span style={{ color:"var(--prio-yellow)" }}>★ {c.rating}</span> : "—"}</td>
                     <td style={bCs(true, "right")}>{fmtTRY(c.maliyet)}</td>
                     <td style={bCs(true, "right")}>{fmtTRY(c.satis)}</td>
+                    <td style={bCs(false, "center")}>{c.fatura ? <span title="Fatura kesildi" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
+                    <td style={bCs(false, "center")}>{c.odeme ? <span title="Ödeme yapıldı" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                     <td style={bCs(false, "center")}>{c.slack_url && c.slack_url !== "#" ? <a href={c.slack_url} target="_blank" rel="noreferrer" style={{ color:"var(--ember,#C24A2C)", textDecoration:"none" }}>↗</a> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                   </tr>
                 ))}
               </tbody>
+              {filteredDone.length > 0 && (
+                <tfoot>
+                  <tr style={{ background:"var(--surface-sub)", borderTop:"2px solid var(--line-strong)" }}>
+                    <td colSpan={8} style={{ ...bCs(), textAlign:"right", font:"700 11px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase", color:"var(--ink-2)" }}>Toplam</td>
+                    <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink)" }}>{fmtTRY(sumDone.m)}</td>
+                    <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink)" }}>{fmtTRY(sumDone.s)}</td>
+                    <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink-2)" }} title="Faturalanan tutar (Σ satış · fatura kesilmiş)">{fmtTRY(sumDone.fa)}</td>
+                    <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ok,#1a8f5a)" }} title="Tahsil edilen tutar (Σ satış · ödeme yapılmış)">{fmtTRY(sumDone.od)}</td>
+                    <td style={bCs()}></td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </Card>

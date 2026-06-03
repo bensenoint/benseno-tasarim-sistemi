@@ -432,7 +432,7 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
   await ack();
   const by = body.user?.id || '';
   try {
-    await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, no, maliyetRaw, satisRaw, by],
+    await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, 'set', no, by, JSON.stringify({ maliyet: maliyetRaw, satis: satisRaw })],
       { cwd: PROJECT_DIR, timeout: 120000 });
     log(`/maliyet → #${no} maliyet="${maliyetRaw}" satış="${satisRaw}" (by ${by})`);
     // Girene özel onay DM'i
@@ -711,9 +711,9 @@ function resolveBriefByTs(parentTs) {
 
 const FIN_STORE = path.join(PROJECT_DIR, 'data/brief-financials.json');
 
-// Brief thread'ine yazılan "maliyet 1500 satış 4000" tipi mesajı işler.
-// Brief, thread parent ts'inden otomatik çözülür (kullanıcı no girmez). Kısmi güncelleme:
-// sadece "maliyet X" yazılırsa satış korunur (mevcut değerle birleştirilir).
+// Brief thread'ine yazılan finansal mesajı işler — brief no thread parent ts'inden otomatik çözülür.
+// Anahtar kelimeler (yalnızca geçenler güncellenir, gerisi korunur — patch birleştirme set-financials'ta):
+//   maliyet 1500 · satış 4000 · "fatura ok"→kesildi · "fatura iptal"→geri · "ödeme ok"→yapıldı · "ödeme iptal"→geri
 async function handleFinancialsThread(event, client) {
   const parentTs = event.thread_ts;
   const text = event.text || '';
@@ -721,27 +721,31 @@ async function handleFinancialsThread(event, client) {
   const reply = (t) => client.chat.postMessage({ channel: event.channel, thread_ts: parentTs, text: t }).catch(() => {});
 
   const found = resolveBriefByTs(parentTs);
-  if (!found) { await reply('ℹ️ Bu thread bir brief mesajına bağlı değil (ya da brief henüz sisteme düşmedi). Maliyet/satışı *brief mesajının* altında thread olarak yaz.'); return; }
+  if (!found) { await reply('ℹ️ Bu thread bir brief mesajına bağlı değil (ya da brief henüz sisteme düşmedi). Bilgiyi *brief mesajının* altında thread olarak yaz.'); return; }
 
-  const mMatch = text.match(/maliyet[:\s]*₺?\s*([\d.,]+)/i);
-  const sMatch = text.match(/sat[ıi][şs][:\s]*₺?\s*([\d.,]+)/i);
-  if (!mMatch && !sMatch) {
-    await reply(`ℹ️ Format: \`maliyet 1500 satış 4000\` (ikisi birlikte) veya tek tek \`maliyet 1500\` / \`satış 4000\`. Brief #${found.no}.`);
+  // Sadece geçen alanları patch'e koy
+  const patch = {};
+  const mM = text.match(/maliyet[:\s]*₺?\s*([\d.,]+)/i); if (mM) patch.maliyet = mM[1];
+  const sM = text.match(/sat[ıi][şs][:\s]*₺?\s*([\d.,]+)/i); if (sM) patch.satis = sM[1];
+  if (/fatura\s*(ok|kesildi|tamam|evet|✅)/i.test(text)) patch.fatura = true;
+  else if (/fatura\s*(iptal|yok|geri|sil|hay[ıi]r|❌)/i.test(text)) patch.fatura = false;
+  if (/[öo]deme\s*(ok|yap[ıi]ld[ıi]|al[ıi]nd[ıi]|tamam|evet|✅)/i.test(text)) patch.odeme = true;
+  else if (/[öo]deme\s*(iptal|yok|geri|sil|hay[ıi]r|❌)/i.test(text)) patch.odeme = false;
+
+  if (Object.keys(patch).length === 0) {
+    await reply(`ℹ️ Format (#${found.no}): \`maliyet 1500 satış 4000\` · \`fatura ok\` · \`ödeme ok\` · geri almak için \`fatura iptal\` / \`ödeme iptal\`.`);
     return;
   }
 
-  // Mevcut store ile birleştir (verilmeyen alan korunur)
-  let store = {}; try { store = JSON.parse(fs.readFileSync(FIN_STORE, 'utf8')); } catch {}
-  const cur = store[String(found.no)] || {};
-  const maliyetArg = mMatch ? mMatch[1] : (cur.maliyet != null ? String(cur.maliyet) : '');
-  const satisArg   = sMatch ? sMatch[1] : (cur.satis   != null ? String(cur.satis)   : '');
-
   try {
-    await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, String(found.no), maliyetArg, satisArg, by],
+    await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, 'set', String(found.no), by, JSON.stringify(patch)],
       { cwd: PROJECT_DIR, timeout: 120000 });
-    log(`thread financials → #${found.no} maliyet="${maliyetArg}" satış="${satisArg}" (by ${by})`);
-    const fmt = (v) => (v === '' || v == null) ? '—' : v + '₺';
-    await reply(`✅ *${found.baslik}* (#${found.no}) kaydedildi — maliyet: ${fmt(maliyetArg)} · satış: ${fmt(satisArg)}.\nGüncellemek için bu thread'e tekrar yaz (ör. \`maliyet 2000\`). Birkaç dk içinde dashboard'a yansır.`);
+    log(`thread financials → #${found.no} patch=${JSON.stringify(patch)} (by ${by})`);
+    // Kaydedilen güncel tam durumu store'dan oku ve bildir
+    let st = {}; try { st = (JSON.parse(fs.readFileSync(FIN_STORE, 'utf8'))[String(found.no)]) || {}; } catch {}
+    const m = (v) => (v == null) ? '—' : Number(v).toLocaleString('tr-TR') + '₺';
+    const flag = (v) => v ? '✅' : '—';
+    await reply(`✅ *${found.baslik}* (#${found.no}) güncellendi:\n• Maliyet: ${m(st.maliyet)}  • Satış: ${m(st.satis)}\n• Fatura: ${flag(st.fatura)}  • Ödeme: ${flag(st.odeme)}\n_Güncellemek için bu thread'e tekrar yaz. Birkaç dk içinde dashboard'a yansır._`);
   } catch (err) {
     log(`thread financials hata: ${err.message}`);
     await reply(`❌ Kaydedilemedi (#${found.no}): ${err.message}`);
@@ -757,7 +761,7 @@ app.event('message', async ({ event, client }) => {
   // ── Thread'e yazılan maliyet/satış girişi (brief no otomatik çözülür) ──
   // Reply (parent değil) + insan (bot değil) + maliyet/satış anahtar kelimesi → finansal işle.
   if (event.thread_ts && event.thread_ts !== event.ts && !event.bot_id &&
-      /(maliyet|sat[ıi][şs])/i.test(event.text)) {
+      /(maliyet|sat[ıi][şs]|fatura|[öo]deme)/i.test(event.text)) {
     await handleFinancialsThread(event, client);
     return;
   }

@@ -6,6 +6,12 @@ function fmtTRY(n) {
   if (n == null || n === "" || isNaN(Number(n))) return "—";
   return "₺" + Number(n).toLocaleString("tr-TR");
 }
+// fatura/ödeme durum rozeti: true → yeşil ✓ ; false → gri —
+function FlagCell({ on, label }) {
+  return on
+    ? <span title={label + " ✓"} style={{ color: "var(--ok,#1a8f5a)", fontWeight: 700 }}>✓</span>
+    : <span style={{ color: "var(--ink-5)" }}>—</span>;
+}
 
 function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false }) {
   const [sort, setSort] = React.useState({ col: "deltaH", dir: "asc" });
@@ -46,9 +52,23 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
   if (financeCols) {
     cols.push(
       { id: "maliyet", label: "Maliyet", sort: true, align: "right", mobileHide: true },
-      { id: "satis",   label: "Satış",   sort: true, align: "right", mobileHide: true }
+      { id: "satis",   label: "Satış",   sort: true, align: "right", mobileHide: true },
+      { id: "fatura",  label: "Fatura",  sort: false, align: "center", mobileHide: true },
+      { id: "odeme",   label: "Ödeme",   sort: false, align: "center", mobileHide: true }
     );
   }
+
+  // Toplam satırı (sadece financeCols) — görüntülenen satırlar üzerinden
+  const totals = React.useMemo(() => {
+    let m = 0, s = 0, fa = 0, od = 0;
+    for (const b of sorted) {
+      m += Number(b.maliyet) || 0;
+      s += Number(b.satis) || 0;
+      if (b.fatura) fa += Number(b.satis) || 0;   // faturalanan tutar
+      if (b.odeme)  od += Number(b.satis) || 0;   // tahsil edilen tutar
+    }
+    return { m, s, fa, od };
+  }, [sorted]);
 
   return (
     <div className="bns-table-wrap" style={{
@@ -95,6 +115,17 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
               stripe={idx % 2 === 1}/>
           ))}
         </tbody>
+        {financeCols && sorted.length > 0 && (
+          <tfoot>
+            <tr style={{ background: "var(--surface-sub)", borderTop: "2px solid var(--line-strong)" }}>
+              <td colSpan={cols.length - 4} style={{ ...cellStyle(), textAlign: "right", font: "700 11px/1 var(--font-sans)", letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--ink-2)" }}>Toplam</td>
+              <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ink)" }}>{fmtTRY(totals.m)}</td>
+              <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ink)" }}>{fmtTRY(totals.s)}</td>
+              <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ink-2)" }} title="Faturalanan tutar (Σ satış · fatura kesilmiş)">{fmtTRY(totals.fa)}</td>
+              <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ok,#1a8f5a)" }} title="Tahsil edilen tutar (Σ satış · ödeme yapılmış)">{fmtTRY(totals.od)}</td>
+            </tr>
+          </tfoot>
+        )}
       </table>
     </div>
   );
@@ -147,6 +178,8 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
       </td>
       {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{fmtTRY(brief.maliyet)}</td>}
       {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{fmtTRY(brief.satis)}</td>}
+      {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(false, "center")}><FlagCell on={brief.fatura} label="Fatura kesildi"/></td>}
+      {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(false, "center")}><FlagCell on={brief.odeme} label="Ödeme yapıldı"/></td>}
     </tr>
   );
 }

@@ -10,10 +10,13 @@
  * (priority-overrides ile aynı mantık) data-agent yeniden kurarsa diye --reapply her döngüde geri uygular.
  *
  * Mod:
- *   node set-financials.js <no> <maliyet> <satis> <by>   → tek brief'i ayarla + push
- *   node set-financials.js --reapply                      → fin store'u taze live-data'ya geri uygula
+ *   node set-financials.js set <no> <by> <patchJSON>   → patch'i mevcut kayda birleştir + push
+ *   node set-financials.js --reapply                    → fin store'u taze live-data'ya geri uygula
  *
- * maliyet/satis: boş ("" veya "-") → null (alanı temizler). TR para formatı kabul ("1.500,50" → 1500.5).
+ * patch alanları (yalnızca verilenler uygulanır, gerisi korunur):
+ *   maliyet/satis: string ("1.500,50"→1500.5) ya da "" → null (temizle)
+ *   fatura/odeme: boolean (fatura kesildi mi · ödeme yapıldı mı)
+ * Kayıt: { maliyet, satis, fatura, odeme, by, ts }. Dört alan da boş/false → kayıt silinir.
  */
 
 const fs = require('fs');
@@ -53,11 +56,12 @@ function applyToLive(live, fin) {
   const lists = [live.bns_briefs || [], live.bns_completed || []];
   for (const list of lists) {
     for (const b of list) {
-      const f = fin[String(b.no)];
-      const m = f ? (f.maliyet ?? null) : null;
-      const s = f ? (f.satis ?? null) : null;
+      const f = fin[String(b.no)] || {};
+      const m = f.maliyet ?? null, s = f.satis ?? null, fa = !!f.fatura, od = !!f.odeme;
       if (b.maliyet !== m) { b.maliyet = m; changed++; }
       if (b.satis !== s)   { b.satis = s; changed++; }
+      if (b.fatura !== fa) { b.fatura = fa; changed++; }
+      if (b.odeme !== od)  { b.odeme = od; changed++; }
     }
   }
   return changed;
@@ -106,15 +110,22 @@ function main() {
   const fin = loadStore();
 
   if (!reapply) {
-    // node set-financials.js <no> <maliyet> <satis> <by>
-    const [no, maliyetRaw, satisRaw, by] = args;
-    if (no == null) { logLine('kullanım: set-financials.js <no> <maliyet> <satis> <by>  |  --reapply'); process.exit(1); }
-    const key = String(no).trim();
-    const maliyet = parseMoney(maliyetRaw);
-    const satis = parseMoney(satisRaw);
-    // hem maliyet hem satış null → kaydı sil (temizle)
-    if (maliyet == null && satis == null) { delete fin[key]; logLine(`#${key} finansal kayıt temizlendi (by ${by || '?'})`); }
-    else { fin[key] = { maliyet, satis, by: by || null, ts: Math.floor(Date.now() / 1000) }; logLine(`#${key} → maliyet=${maliyet} satış=${satis} (by ${by || '?'})`); }
+    // node set-financials.js set <no> <by> <patchJSON>
+    if (args[0] !== 'set') { logLine('kullanım: set-financials.js set <no> <by> <patchJSON>  |  --reapply'); process.exit(1); }
+    const key = String(args[1] || '').trim();
+    const by = args[2] || null;
+    let patch = {}; try { patch = JSON.parse(args[3] || '{}'); } catch { logLine('geçersiz patchJSON'); process.exit(1); }
+    if (!key) { logLine('no zorunlu'); process.exit(1); }
+    const cur = fin[key] || {};
+    const next = { ...cur };
+    if ('maliyet' in patch) next.maliyet = parseMoney(patch.maliyet);
+    if ('satis'  in patch)  next.satis   = parseMoney(patch.satis);
+    if ('fatura' in patch)  next.fatura  = !!patch.fatura;
+    if ('odeme'  in patch)  next.odeme   = !!patch.odeme;
+    next.by = by; next.ts = Math.floor(Date.now() / 1000);
+    const empty = (next.maliyet == null) && (next.satis == null) && !next.fatura && !next.odeme;
+    if (empty) { delete fin[key]; logLine(`#${key} finansal kayıt temizlendi (by ${by || '?'})`); }
+    else { fin[key] = next; logLine(`#${key} → maliyet=${next.maliyet} satış=${next.satis} fatura=${!!next.fatura} ödeme=${!!next.odeme} (by ${by || '?'})`); }
     saveStore(fin);
   }
 
