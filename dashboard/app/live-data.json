@@ -26,7 +26,9 @@
       "rev": "1",
       "gecmis": "⏳18May13:16→🎨18May13:22→👀18May16:48→🎨18May16:49→👀18May17:22 / 📈29May16:00 🆕11g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only · teyit edilmiş bakanlık süreci)",
       "link": "[link](https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989)",
-      "deadline_unix": 1779109200
+      "deadline_unix": 1779109200,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "3",
@@ -49,7 +51,9 @@
       "rev": "0",
       "gecmis": "⏳19May08:14 (Görkem GM açtı) / 🔴Yön19May08:26 / ⚠️STALE🔴 19May~10:00 / ⏰GEÇMİŞ20May10:00 (55sa 45dk geride · 22May17:45 sync'inde) / 📈29May10:00 🆕9g eşiği aşıldı (auto-recalc · 29May12:45 sync'inde · log-only) / 📈30May10:00 🆕10g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819)",
-      "deadline_unix": 1779260400
+      "deadline_unix": 1779260400,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "4",
@@ -72,7 +76,9 @@
       "rev": "0",
       "gecmis": "⏳19May08:18 (Görkem GM açtı · ⚠️ atama disiplini) / 📈20May13:17 öncelik 🟡→🟠 / 📈21May~04:00 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:00 (28sa 45dk geride · 22May17:45 sync'inde) / 📈28May13:00 🆕7g eşiği aşıldı / 📈29May13:00 🆕8g eşiği aşıldı (auto-recalc · 29May13:15 sync · log-only · tasarımcı atanmamış)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269)",
-      "deadline_unix": 1779357600
+      "deadline_unix": 1779357600,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "5",
@@ -94,7 +100,9 @@
       "rev": "0",
       "gecmis": "⏳19May13:42 (Eren AI açtı · self-assign) / 📈20May13:46 öncelik 🟡→🟠 / 📈21May~04:42 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:42 / 📈28May13:42 🆕7g eşiği aşıldı / 📈29May13:42 🆕8g eşiği aşıldı (auto-recalc · 29May13:45 sync · log-only)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039)",
-      "deadline_unix": 1779360120
+      "deadline_unix": 1779360120,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "6",
@@ -116,7 +124,9 @@
       "rev": "0",
       "gecmis": "⏳20May11:33 (Eda T açtı · workflow) / ⏰GEÇMİŞ20May18:00 / 📈28May18:00 🆕8g eşiği aşıldı / 📈29May18:00 🆕9g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909)",
-      "deadline_unix": 1779289200
+      "deadline_unix": 1779289200,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "7",
@@ -138,7 +148,9 @@
       "rev": "0",
       "gecmis": "⏳20May13:10 (Buse açtı · workflow · 🔔 otomatik 🟢 [>72sa])",
       "link": "[link](https://benseno.slack.com/archives/C03M070G8HY/p1779271830010029)",
-      "deadline_unix": 1782050400
+      "deadline_unix": 1782050400,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "8",
@@ -160,7 +172,9 @@
       "rev": "0",
       "gecmis": "⏳20May13:24 (Eren AI açtı · workflow · 🔔 otomatik 🟠) / 📈21May~04:24 öncelik 🟠→🔴 / ⏰GEÇMİŞ21May13:24 / 📈28May13:24 🆕7g eşiği aşıldı / 📈29May13:24 🆕8g eşiği aşıldı (auto-recalc · 29May13:45 sync · log-only · dept ambiguity sürüyor)",
       "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569)",
-      "deadline_unix": 1779359040
+      "deadline_unix": 1779359040,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "9",
@@ -182,7 +196,9 @@
       "rev": "0",
       "gecmis": "⏳20May14:05 (Eren AI açtı · workflow · self-assign · 🔔 otomatik 🟡) / 📈29May23:59 🆕7g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
       "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279)",
-      "deadline_unix": 1779483540
+      "deadline_unix": 1779483540,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "15",
@@ -205,7 +221,9 @@
       "rev": "0",
       "gecmis": "⏳20May16:21 (Eda T açtı) / 📈21May14:51 öncelik 🟡→🟠 / 📈22May~06:00 öncelik 🟠→🔴 / 🎨22May13:28 Arda v1 verdi 🌸 / 💬22May14:04 Eda T 'ellerine sağlık canoo' + 🌸 / ⏰GEÇMİŞ22May14:00 / 📈28May14:00 🆕6g eşiği aşıldı / 📈29May14:00 🆕7g eşiği aşıldı (auto-recalc · 29May14:15 sync · log-only · v1 verildi ama Eda T pasif onay yok)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179)",
-      "deadline_unix": 1779447600
+      "deadline_unix": 1779447600,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "16",
@@ -228,7 +246,9 @@
       "rev": "0",
       "gecmis": "⏳20May16:22 (Eda T açtı) / 📈21May17:25 öncelik 🟡→🟠 / 📈22May09:18 öncelik 🟠→🔴 / 🎨22May14:40 Arda v1 verdi 🌸 / 💬22May14:50 Eda T 'ellerine sağlıkk' / ⏰GEÇMİŞ22May17:00 / 📈28May17:00 🆕6g eşiği aşıldı / 📈29May17:00 🆕7g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only · v1 verildi ama Eda T pasif onay yok)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309)",
-      "deadline_unix": 1779458400
+      "deadline_unix": 1779458400,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "17",
@@ -251,7 +271,9 @@
       "rev": "0",
       "gecmis": "⏳21May08:47 (Görkem GM açtı) / 📈22May~04:46 öncelik 🟠→🔴 / ⏰GEÇMİŞ22May08:46 / 💬22May08:49+09:04+09:18+11:51 4 raunt escalation cevapsız / 📈29May08:46 🆕7g eşiği aşıldı / 📈30May08:46 🆕8g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
       "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659)",
-      "deadline_unix": 1779428760
+      "deadline_unix": 1779428760,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "20",
@@ -274,7 +296,9 @@
       "rev": "0",
       "gecmis": "⏳21May12:32 (Görkem GM açtı · workflow · 🔔 otomatik 🟢 [>72sa]) / 📈29May12:31 öncelik 🟢→🟡 (auto-recalc · 72sa eşiği geçti · 29May12:45 sync'inde · log-only · Eren+Görkem zaten atanmış)",
       "link": "[link](https://benseno.slack.com/archives/C05J5PXBPGS/p1779355957360249)",
-      "deadline_unix": 1780306260
+      "deadline_unix": 1780306260,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "21",
@@ -298,7 +322,9 @@
       "rev": "0",
       "gecmis": "⏳21May14:43 (Görkem GM açtı · workflow · 🔔 otomatik 🟡) / 📈22May14:45 öncelik 🟡→🟠 / 📈28May14:42 🆕5g eşiği aşıldı / 📈29May14:42 🆕6g eşiği aşıldı (auto-recalc · 29May14:45 sync · log-only · zaten 🔴 Blokeli · 72sa AŞILDI · Şablon 29 sent · Eren+Cansu+Görkem atanmış · v1 yok)",
       "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629)",
-      "deadline_unix": 1779536520
+      "deadline_unix": 1779536520,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "22",
@@ -322,7 +348,9 @@
       "durum": "⏸ Cansu Direktör onayı · erdem copy edit tamamlandı · bayram sonrası devam",
       "rev": "0",
       "gecmis": "⏳22May11:43 (Eda T açtı · workflow · 🔔 otomatik 🔴) / 💬22May~13:00 Eda T 4 kreatif önerdi / 💬22May~13:30 Cansu #1 önerisi / ⏸22May14:00+ ERTELENDİ (Cansu Direktör onayı · 🔴→🟢) / 💬22May17:00-17:32 erdem detaylı copy edit feedback",
-      "link": "[link](https://benseno.slack.com/archives/C02SZRFPARK/p1779439428236359)"
+      "link": "[link](https://benseno.slack.com/archives/C02SZRFPARK/p1779439428236359)",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "24",
@@ -345,7 +373,9 @@
       "rev": "0",
       "gecmis": "⏳22May16:22 (Eda T açtı · workflow · 🔔 otomatik 🔴) / 💬22May16:33 ekip sarı şerit detayını netleştirdi / 🎨22May17:02 Aykut 'burası hazırrr' video v1 / 💬22May17:35 Eda T 'ellerine sağlıkk' Aykut'a yarı onay / 📈28May18:00 🆕6g eşiği aşıldı / 📈29May18:00 🆕7g eşiği aşıldı (auto-recalc · 30May10:48 sync · log-only)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919)",
-      "deadline_unix": 1779462000
+      "deadline_unix": 1779462000,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "25",
@@ -368,7 +398,9 @@
       "rev": "0",
       "gecmis": "⏳01Jun13:35 (Görkem açtı · workflow · 🔔 otomatik 🟠)",
       "link": "[link](https://benseno.slack.com/archives/C0AQLPY4TUM/p1780290478864579)",
-      "deadline_unix": 1780383600
+      "deadline_unix": 1780383600,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "26",
@@ -391,7 +423,9 @@
       "rev": "0",
       "gecmis": "⏳01Jun14:57 (Görkem açtı · workflow · 🔔 otomatik 🟠)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1780315060052969)",
-      "deadline_unix": 1780401300
+      "deadline_unix": 1780401300,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "27",
@@ -414,7 +448,9 @@
       "rev": "0",
       "gecmis": "⏳01Jun 15:48 brief açıldı (Eda T) · 🔴Yön10:14 · 🟢Yön10:15",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1780318126239499)",
-      "deadline_unix": 1780394400
+      "deadline_unix": 1780394400,
+      "maliyet": 50,
+      "satis": 125
     },
     {
       "no": "28",
@@ -435,7 +471,9 @@
       "rev": "0",
       "gecmis": "⏳02Haz 10:33 brief açıldı (Yeni Brief Aç)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1780382002414219)",
-      "deadline_unix": 1780480800
+      "deadline_unix": 1780480800,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "29",
@@ -456,7 +494,9 @@
       "rev": "0",
       "gecmis": "⏳02Haz 10:34 brief açıldı (Yeni Brief Aç)",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1780382082092499)",
-      "deadline_unix": 1780408800
+      "deadline_unix": 1780408800,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "30",
@@ -477,7 +517,9 @@
       "rev": 1,
       "gecmis": "⏳02Haz 11:52 brief açıldı (Yeni Brief Aç · Eda T) · 🔔 otomatik 🟠 [≤24sa]",
       "link": "[link](https://benseno.slack.com/archives/C4Y43AW2E/p1780390340369139)",
-      "deadline_unix": 1780477200
+      "deadline_unix": 1780477200,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "31",
@@ -497,7 +539,9 @@
       "rev": "0",
       "gecmis": "⏳02Haz 11:52 brief açıldı (Yeni Brief Aç · Aylin C) · 🔔 otomatik 🟠 [≤24sa]",
       "link": "[link](https://benseno.slack.com/archives/C05KKSV6EF7/p1780390360140899)",
-      "deadline_unix": 1780476720
+      "deadline_unix": 1780476720,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "32",
@@ -519,7 +563,9 @@
       "rev": 0,
       "gecmis": "⏳02Haz 14:18 brief açıldı (Yeni Brief Aç · Görkem Kaya) · 🔔 otomatik 🟠 [≤24sa]",
       "link": "[link](https://benseno.slack.com/archives/C0ANY1ZMH2A/p1780398800600119)",
-      "deadline_unix": 1780485120
+      "deadline_unix": 1780485120,
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "33",
@@ -539,7 +585,9 @@
       "rev": 0,
       "gecmis": "⏳02Haz 14:18 brief açıldı (Yeni Brief Aç · Görkem Kaya) · 🔔 otomatik 🟠 [≤24sa] · 🔴Yön14:48",
       "link": "[link](https://benseno.slack.com/archives/C081GAK936J/p1780398881492359)",
-      "deadline_unix": 1780485240
+      "deadline_unix": 1780485240,
+      "maliyet": null,
+      "satis": null
     }
   ],
   "bns_completed": [
@@ -564,7 +612,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C081GAK936J/p1779104369515529",
       "image_url": "",
-      "notes": "✅ U030C48PL23"
+      "notes": "✅ U030C48PL23",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "10",
@@ -581,7 +631,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779282760860839",
       "notes": "Eda T 'burayı da yayına aldım onaylandı' · 2sa 0dk GEÇMİŞ sonra onaylandı",
-      "image_url": "app/gallery/10.jpg"
+      "image_url": "app/gallery/10.jpg",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "11",
@@ -598,7 +650,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779282859178849",
       "notes": "3sa erken teslim",
-      "image_url": "app/gallery/11.jpg"
+      "image_url": "app/gallery/11.jpg",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "12",
@@ -615,7 +669,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779282928074819",
       "notes": "3sa erken teslim",
-      "image_url": "app/gallery/12.jpg"
+      "image_url": "app/gallery/12.jpg",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "13",
@@ -632,7 +688,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283006745819",
       "notes": "slogan + fiyat revize ile tamamlandı · 3sa erken",
-      "image_url": "app/gallery/13.jpg"
+      "image_url": "app/gallery/13.jpg",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "14",
@@ -649,7 +707,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283214343159",
       "notes": "KRİTİK pencerede tam zamanında",
-      "image_url": "app/gallery/14.jpg"
+      "image_url": "app/gallery/14.jpg",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "18",
@@ -664,7 +724,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C03MCS7R0KB/p1779352449496569",
       "notes": "İPTAL · DUPLICATE temizlendi",
-      "image_url": "app/gallery/18.jpg"
+      "image_url": "app/gallery/18.jpg",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "19",
@@ -679,7 +741,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C03MCS7R0KB/p1779352849311019",
       "notes": "2sa 50dk erken teslim · Montserrat font",
-      "image_url": "app/gallery/19.jpg"
+      "image_url": "app/gallery/19.jpg",
+      "maliyet": null,
+      "satis": null
     },
     {
       "no": "23",
@@ -694,7 +758,9 @@
       "rating": null,
       "slack_url": "https://benseno.slack.com/archives/C4Y43AW2E/p1779450529976979",
       "notes": "46dk GEÇMİŞ teslim · 1 revize",
-      "image_url": "app/gallery/23.jpg"
+      "image_url": "app/gallery/23.jpg",
+      "maliyet": null,
+      "satis": null
     }
   ],
   "bns_brands": [
