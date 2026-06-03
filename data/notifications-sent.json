@@ -434,5 +434,12 @@
     "sent_at": "2026-06-03T10:20:56+03:00",
     "user_id": "skip-consolidated",
     "reason": "10:15 TR sync · 17 escalation + 12 blokeli değerlendirildi · 0 yeni eşik geçişi · #25 test brief (teyit beklemede, escalation suppress) · 0 yeni brief · Priority: 🔴23 🟠0 🟡0 🟢1 · Calendar: skipped (headless)"
+  },
+  {
+    "brief_ts": null,
+    "template": "orchestrator_sync_1780472727_no_new_notifications",
+    "sent_at": "2026-06-03T10:45:27+03:00",
+    "user_id": "skip-consolidated",
+    "reason": "10:45 TR sync · 17 escalation + 12 blokeli değerlendirildi · 0 yeni eşik geçişi · #25/#26 test briefs (escalation suppress) · 0 yeni brief · Priority: 🔴21 🟠1 🟡0 🟢1 · #20 Tour2America 48h eşiği 12:31'de · #27 Plastik 24h eşiği 13:00'da · Calendar: skipped (headless)"
   }
 ]
