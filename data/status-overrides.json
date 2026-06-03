@@ -66,12 +66,12 @@
   "at": "2026-06-03T06:12:13.110Z"
  },
  "1780315060.052969": {
-  "state": "review",
+  "state": "work",
   "workLabel": "🎨 Tasarımda",
-  "rev": 0,
-  "durum": "👀 Revizede",
+  "rev": 1,
+  "durum": "🎨 Tasarımda · rev 1",
   "by": "U030C48PL23",
-  "at": "2026-06-03T07:46:43.371Z",
+  "at": "2026-06-03T07:47:00.105Z",
   "no": "26",
   "marka": "Bauhaus"
  },
