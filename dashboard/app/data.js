@@ -370,8 +370,9 @@ function bnsNormalizeDurum(durum, status) {
 function bnsHydrateBrief(raw, idx) {
   // acilma: önce raw.acilma, yoksa gecmis'ten ilk ⏳ zaman damgasını çıkar
   let acilma = typeof raw.acilma === "string" ? Date.parse(raw.acilma) : (raw.acilma || null);
-  if (!acilma && raw.gecmis) {
-    // "⏳18May13:16→..." formatından ilk tarihi çıkar
+  if (!acilma && typeof raw.gecmis === "string") {
+    // "⏳18May13:16→..." formatından ilk tarihi çıkar. NOT: data-agent gecmis'i bazen boolean
+    // (geçmiş/overdue bayrağı) yazıyor — tip guard olmadan .match() boolean'da patlıyordu.
     const m = raw.gecmis.match(/(\d{1,2})([A-Za-z]{3})(\d{1,2}:\d{2})/);
     if (m) {
       const TR_MON = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11,
@@ -444,7 +445,7 @@ function bnsHydrateBrief(raw, idx) {
     stale:        !!raw.stale || /stale|pasif|hareketsiz|\*\*\d+g.*pasif/i.test(raw.durum || raw.status || ""),
     slack_url:    raw.link ? raw.link.replace(/^\[link\]\((.+)\)$/, "$1") : (raw.slack_url || "#"),
     notes:        raw.notes || raw.saat || "",
-    gecmis:       raw.gecmis || "",
+    gecmis:       typeof raw.gecmis === "string" ? raw.gecmis : "",   // boolean/null gelebilir → string garanti
     maliyet:      raw.maliyet != null ? raw.maliyet : null,   // ₺ — Slack thread ile girilir
     satis:        raw.satis != null ? raw.satis : null,       // ₺
     fatura:       !!raw.fatura,   // fatura kesildi mi
