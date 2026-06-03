@@ -388,9 +388,9 @@
       "dept": "editor",
       "blokeli": false,
       "delta_h": -25.9,
-      "maliyet": 2000,
-      "satis": 5000,
-      "fatura": true,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
       "odeme": false
     },
     {
@@ -411,8 +411,8 @@
       "dept": "tasarim",
       "blokeli": false,
       "delta_h": -27.8,
-      "maliyet": 50,
-      "satis": 125,
+      "maliyet": null,
+      "satis": null,
       "fatura": false,
       "odeme": false
     },
@@ -480,10 +480,10 @@
       "dept": "tasarim",
       "blokeli": false,
       "delta_h": -4.8,
-      "maliyet": 300,
-      "satis": 500,
+      "maliyet": null,
+      "satis": null,
       "fatura": false,
-      "odeme": true
+      "odeme": false
     },
     {
       "no": 31,
