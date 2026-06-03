@@ -109,6 +109,12 @@ if [ $CLAUDE_EXIT -eq 0 ]; then
     echo "[$(date '+%d.%m.%Y %H:%M')] escalation.js hata (logs/escalation.log)" >> "$LOG"
 fi
 
+# EMBEDDED normalize (deterministik güvenlik) — data-agent canvas_markdown'ı backtick literal
+# olarak gömüyor; her döngü sonunda EMBEDDED'ı live-data.json'dan saf JSON'a yeniden yaz
+# (canvas_markdown düşer, backtick kalmaz → tarayıcı parse'ı asla kırılmaz). Her zaman çalışır.
+node "$PROJ/scripts/reinject-embedded.js" >> "$PROJ/logs/reinject-embedded.log" 2>&1 || \
+  echo "[$(date '+%d.%m.%Y %H:%M')] reinject-embedded hata" >> "$LOG"
+
 # Gerçek claude exit kodunu döndür (scheduler izlesin — eskiden son echo 0 döndürüp
 # claude hatalarını maskeliyordu). Lock trap'i yine çalışır.
 exit $CLAUDE_EXIT
