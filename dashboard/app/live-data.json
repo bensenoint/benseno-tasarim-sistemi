@@ -561,7 +561,7 @@
       "maliyet": 300,
       "satis": 500,
       "fatura": true,
-      "odeme": false
+      "odeme": true
     },
     {
       "no": "31",
