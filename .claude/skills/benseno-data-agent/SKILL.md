@@ -239,13 +239,30 @@ Her completed brief için (max son 12 brief):
   "bns_completed": [...],
   "bns_brands": [...],
   "bns_users": [
-    { "id": "U030C48PL23", "name": "Görkem Kaya",      "rol": "yonetici", "initials": "GK", "color": "#7C3AED" },
-    { "id": "U4XCE3532",   "name": "Cansu Kazgan 👑",  "rol": "editor",   "initials": "CK", "color": "#10B981" },
-    { "id": "U09BFPBKQG7", "name": "Hasan Serdar Arda","rol": "tasarim",  "initials": "HA", "color": "#6366F1" },
-    ...tüm aktif ekip üyeleri (YÖNETİCİLER dahil — U030C48PL23 Görkem HER ZAMAN dahil edilmeli)
+    // ⚠️⚠️ KANONİK 18 KİŞİ — İSİMLERİ AYNEN KOPYALA. SLACK PROFİLİNDEN OKUMA, SOYAD UYDURMA.
+    // (Geçmişte data-agent "Eren Mahzunlar"ı "Eren Yıldız" gibi 13 ismi UYDURDU. Bu tablo sabittir.)
+    { "id": "U030C48PL23", "name": "Görkem Kaya",       "rol": "yonetici", "initials": "GK", "color": "#7C3AED" },
+    { "id": "UD96GH76E",   "name": "Reyhan Nur Pınar",  "rol": "yonetici", "initials": "RP", "color": "#7C3AED" },
+    { "id": "U4XCE3532",   "name": "Cansu Kazgan",      "rol": "editor",   "initials": "CK", "color": "#10B981" },
+    { "id": "U055EDESLSE", "name": "İpek Akdeniz",      "rol": "tasarim",  "initials": "İA", "color": "#6366F1" },
+    { "id": "U02SZQDAFPF", "name": "Erdem Akoğlu",      "rol": "editor",   "initials": "EA", "color": "#10B981" },
+    { "id": "U0AN6DD79M0", "name": "Aylin Tozkoparan",  "rol": "tasarim",  "initials": "AT", "color": "#6366F1" },
+    { "id": "U06J26R1XCJ", "name": "Aykut Arslan",      "rol": "tasarim",  "initials": "AA", "color": "#6366F1" },
+    { "id": "U09BFPBKQG7", "name": "Hasan Serdar Arda", "rol": "tasarim",  "initials": "HA", "color": "#6366F1" },
+    { "id": "U0B3K2WE7SB", "name": "Pelin Özdemir",     "rol": "tasarim",  "initials": "PÖ", "color": "#6366F1" },
+    { "id": "U0AK8U7L57F", "name": "İrem Özkan",        "rol": "tasarim",  "initials": "İÖ", "color": "#6366F1" },
+    { "id": "U08HLMHTGEL", "name": "Serhat Yıldız",     "rol": "tasarim",  "initials": "SY", "color": "#6366F1" },
+    { "id": "U09BZHR25NG", "name": "Eda Tireli",        "rol": "editor",   "initials": "ET", "color": "#10B981" },
+    { "id": "U07PV0RA9L2", "name": "Eda Ayral",         "rol": "editor",   "initials": "EY", "color": "#10B981" },
+    { "id": "U08NQJ27G5S", "name": "Melis Can",         "rol": "editor",   "initials": "MC", "color": "#10B981" },
+    { "id": "U05PP70GQTX", "name": "Aylin Canel",       "rol": "editor",   "initials": "AC", "color": "#10B981" },
+    { "id": "U063T8M5HL4", "name": "Buse Gürbüzer",     "rol": "editor",   "initials": "BG", "color": "#10B981" },
+    { "id": "U0AAC3YK20G", "name": "Simge Acar",        "rol": "editor",   "initials": "SA", "color": "#10B981" },
+    { "id": "U0AP31SAA1W", "name": "Eren Mahzunlar",    "rol": "ai",       "initials": "EM", "color": "#F59E0B" }
   ],
-  // bns_users formatı: her user { id, name, rol (tasarim|editor|ai|yonetici), initials, color, avatar? }
-  // YÖNETİCİLER (her zaman dahil et): U030C48PL23 Görkem, UD96GH76E Reyhan
+  // ⚠️ Yukarıdaki 18 kişi KANONİKTİR. İsimleri/initials'ı AYNEN kopyala. Bu listede OLMAYAN yeni bir
+  // üye görürsen (Canvas'ta yeni mention) ekle; ama mevcut 18'in ismini ASLA değiştirme/uydurma.
+  // rol dağılımı: yonetici=Görkem+Reyhan, tasarim=7 (İpek dahil), editor=8 (Cansu+Erdem dahil), ai=1.
   "bns_dept_stats": {
     "tasarim": { "name": "Tasarım", "people": N, "active": N, "overdue": N, "capacity": N, "completed30": N, "avgComplete": N, "revRate": N },
     "editor":  { "name": "Editör",  "people": N, "active": N, "overdue": N, "capacity": N, "completed30": N, "avgComplete": N, "revRate": N },
