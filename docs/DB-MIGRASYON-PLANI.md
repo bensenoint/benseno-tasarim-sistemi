@@ -151,8 +151,8 @@ Ekibin "tüm işler" görünümü = **Slack Home Tab** (zaten kurulu) + dashboar
   katmanı (post/chat.update/DM). Faz 3 biraz büyür.
 
 ### KESİNLEŞEN KARARLAR (3 Haz)
-- **Edit yansıması:** Her değişimde brief mesajı `chat.update` + **thread'e not** + ilgili kişilere **DM**
-  (tam izlenebilirlik). Her edit Slack thread'inde iz bırakır.
+- **Edit yansıması:** Her değişimde brief mesajı `chat.update` + **thread'e not** + **yalnızca o brief'in
+  kişilerine** (lead + atanan + gözlemci) **DM** — herkese değil. Her edit Slack thread'inde iz bırakır.
 - **Yeni brief kanalı:** **Markaya göre** (marka→kanal eşlemesi; ör. #benseno-grafik / marka kanalı).
   → `brands` tablosuna `slack_channel` sütunu eklenir.
 - **Ekip görünümü:** **Slack Home Tab + dashboard.** Home Tab kişisel/genel özet, detay+filtre dashboard.
@@ -188,7 +188,9 @@ Buton fikri ELENDİ (brief mesajını kalabalıklaştırıyor + thread'den paren
 
 ### 9.2 Maliyet/Satış girişi: HEM dashboard HEM Slack thread (ikisi de açık).
 
-### 9.3 Bildirim kuralları: şimdilik **her edit → DM** (gürültü olursa kritik-only'ye düşürülür).
+### 9.3 Bildirim kuralları: şimdilik **her edit → DM**, AMA **yalnızca o brief'in kişilerine**
+(lead + atanan + gözlemci) — ASLA tüm ekibe/herkese değil. Brief'le ilgisi olmayan kimseye DM gitmez.
+(Gürültü olursa kişi-bazlı kritik-only / günlük digest'e düşürülür.)
 
 ### 9.4 Audit/Geçmiş: `events` tablosu kim-ne-zaman-ne-değiştirdi tutar; brief **tamamlandıktan 18 ay**
 sonra ilgili kayıtlar temizlenir (cron).
