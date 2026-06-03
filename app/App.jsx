@@ -169,7 +169,7 @@ function App() {
         }
         // User list (Slack workspace) — briefs hidrasyonundan ÖNCE
         if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
-          window.BNS_DATA.USERS = ed.bns_users.map(u => ({ ...u, rol: u.rol || u.dept || "" }));
+          window.BNS_DATA.USERS = ed.bns_users.map(u => window.bnsMergeUser ? window.bnsMergeUser(u) : ({ ...u, rol: u.rol || u.dept || "" }));
         }
         // Brief'leri yeniden hidrate et + state'i güncelle
         if (Array.isArray(ed.bns_briefs) && window.bnsHydrateBrief) {

@@ -6,10 +6,18 @@
 (function () {
 
 // ─── USERS ──────────────────────────────────────────────────────────────────
+// Kanonik kullanıcı ismi overlay'i. data-agent bns_users isimleri HALÜSİNE olabiliyor (gerçek
+// soyadları uyduruyor: "Eren Yıldız" oysa "Eren Mahzunlar"). İsmi her zaman bu git-tracked
+// fixture'dan al; renk/initials/dept agent'tan kalır. İki yerde kullanılır (bu bridge + App.jsx poll).
+function bnsMergeUser(u) {
+  const c = (typeof BNS_CANON_USERS !== "undefined") ? BNS_CANON_USERS[u.id] : null;
+  return { ...u, name: (c && c.name) || u.name, rol: u.rol || u.dept || "" };
+}
+
 const USERS = [
   // Yöneticiler (5)
   { id: "U030C48PL23", name: "Görkem Kaya",       mono: "GK", rol: "yonetici", title: "Genel Müdür" },
-  { id: "UD96GH76E",   name: "Reyhan Nur Pınar",  mono: "RP", rol: "yonetici", title: "GMY" },
+  { id: "UD96GH76E",   name: "Reyhan Nur Pınar",  mono: "RP", rol: "yonetici", title: "GMY" }, // NOTE: kanonik isimler — değiştirme
   { id: "U4XCE3532",   name: "Cansu Kazgan",      mono: "CK", rol: "yonetici", title: "Direktör" },
   { id: "U055EDESLSE", name: "İpek Akdeniz",      mono: "İA", rol: "yonetici", title: "Tasarım Yön." },
   { id: "U02SZQDAFPF", name: "Erdem Akoğlu",      mono: "EA", rol: "yonetici", title: "Editör Yön." },
@@ -30,6 +38,9 @@ const USERS = [
   // AI (1)
   { id: "U0AP31SAA1W", name: "Eren Mahzunlar",    mono: "EM", rol: "ai",     title: "AI Operatör" }
 ];
+
+const BNS_CANON_USERS = USERS.reduce((m, u) => { m[u.id] = u; return m; }, {});
+try { window.bnsMergeUser = bnsMergeUser; window.BNS_CANON_USERS = BNS_CANON_USERS; } catch (e) {}
 
 const ME = USERS[0]; // Görkem default
 
@@ -515,8 +526,8 @@ try {
     }
     // User list (Slack workspace) — bots/silinmiş hariç tüm aktif kişiler
     if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
-      // live-data'da alan adı "dept", mock'ta "rol" — ikisini normalize et
-      window.BNS_DATA.USERS = ed.bns_users.map(u => ({ ...u, rol: u.rol || u.dept || "" }));
+      // live-data'da alan adı "dept", mock'ta "rol" — normalize + kanonik isim overlay
+      window.BNS_DATA.USERS = ed.bns_users.map(bnsMergeUser);
       // ME varsa koru, yoksa Görkem'i bul, yoksa ilk yönetici
       const meId = window.BNS_DATA.ME?.id;
       const me = ed.bns_users.find(u => u.id === meId) ||
