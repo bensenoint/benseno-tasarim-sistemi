@@ -100,9 +100,13 @@
   "at": "2026-06-03T08:33:13.152Z"
  },
  "1780481489.619019": {
-  "pending": true,
-  "emoji": "art",
+  "state": "work",
+  "workLabel": "🎨 Tasarımda",
+  "rev": 0,
+  "durum": "🎨 Tasarımda",
   "by": "U055EDESLSE",
-  "at": "2026-06-03T10:20:08.360Z"
+  "at": "2026-06-03T10:20:08.360Z",
+  "no": "34",
+  "marka": "KMR Panfix"
  }
 }
