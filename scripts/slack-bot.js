@@ -690,11 +690,77 @@ function queueeEkle(entry) {
   }
 }
 
+// link "...p1779099416366989" → "1779099416.366989" (thread_ts ile eşleşir)
+function tsFromLink(link) {
+  const m = (link || '').match(/\/p(\d{16})/);
+  return m ? m[1].slice(0, 10) + '.' + m[1].slice(10) : null;
+}
+
+// Thread parent ts'ine göre brief no'sunu bul (aktif + tamamlanan). Yoksa null.
+function resolveBriefByTs(parentTs) {
+  try {
+    const d = JSON.parse(fs.readFileSync(path.join(PROJECT_DIR, 'dashboard/app/live-data.json'), 'utf8'));
+    for (const list of [d.bns_briefs || [], d.bns_completed || []]) {
+      for (const b of list) {
+        if (tsFromLink(b.link) === parentTs) return { no: b.no, baslik: b.baslik || b.is || '' };
+      }
+    }
+  } catch (e) { log(`resolveBriefByTs hata: ${e.message}`); }
+  return null;
+}
+
+const FIN_STORE = path.join(PROJECT_DIR, 'data/brief-financials.json');
+
+// Brief thread'ine yazılan "maliyet 1500 satış 4000" tipi mesajı işler.
+// Brief, thread parent ts'inden otomatik çözülür (kullanıcı no girmez). Kısmi güncelleme:
+// sadece "maliyet X" yazılırsa satış korunur (mevcut değerle birleştirilir).
+async function handleFinancialsThread(event, client) {
+  const parentTs = event.thread_ts;
+  const text = event.text || '';
+  const by = event.user || '';
+  const reply = (t) => client.chat.postMessage({ channel: event.channel, thread_ts: parentTs, text: t }).catch(() => {});
+
+  const found = resolveBriefByTs(parentTs);
+  if (!found) { await reply('ℹ️ Bu thread bir brief mesajına bağlı değil (ya da brief henüz sisteme düşmedi). Maliyet/satışı *brief mesajının* altında thread olarak yaz.'); return; }
+
+  const mMatch = text.match(/maliyet[:\s]*₺?\s*([\d.,]+)/i);
+  const sMatch = text.match(/sat[ıi][şs][:\s]*₺?\s*([\d.,]+)/i);
+  if (!mMatch && !sMatch) {
+    await reply(`ℹ️ Format: \`maliyet 1500 satış 4000\` (ikisi birlikte) veya tek tek \`maliyet 1500\` / \`satış 4000\`. Brief #${found.no}.`);
+    return;
+  }
+
+  // Mevcut store ile birleştir (verilmeyen alan korunur)
+  let store = {}; try { store = JSON.parse(fs.readFileSync(FIN_STORE, 'utf8')); } catch {}
+  const cur = store[String(found.no)] || {};
+  const maliyetArg = mMatch ? mMatch[1] : (cur.maliyet != null ? String(cur.maliyet) : '');
+  const satisArg   = sMatch ? sMatch[1] : (cur.satis   != null ? String(cur.satis)   : '');
+
+  try {
+    await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, String(found.no), maliyetArg, satisArg, by],
+      { cwd: PROJECT_DIR, timeout: 120000 });
+    log(`thread financials → #${found.no} maliyet="${maliyetArg}" satış="${satisArg}" (by ${by})`);
+    const fmt = (v) => (v === '' || v == null) ? '—' : v + '₺';
+    await reply(`✅ *${found.baslik}* (#${found.no}) kaydedildi — maliyet: ${fmt(maliyetArg)} · satış: ${fmt(satisArg)}.\nGüncellemek için bu thread'e tekrar yaz (ör. \`maliyet 2000\`). Birkaç dk içinde dashboard'a yansır.`);
+  } catch (err) {
+    log(`thread financials hata: ${err.message}`);
+    await reply(`❌ Kaydedilemedi (#${found.no}): ${err.message}`);
+  }
+}
+
 app.event('message', async ({ event, client }) => {
   // Düzenleme/silme event'lerini yoksay
   if (event.subtype && event.subtype !== 'bot_message') return;
   // Text yoksa yoksay
   if (!event.text) return;
+
+  // ── Thread'e yazılan maliyet/satış girişi (brief no otomatik çözülür) ──
+  // Reply (parent değil) + insan (bot değil) + maliyet/satış anahtar kelimesi → finansal işle.
+  if (event.thread_ts && event.thread_ts !== event.ts && !event.bot_id &&
+      /(maliyet|sat[ıi][şs])/i.test(event.text)) {
+    await handleFinancialsThread(event, client);
+    return;
+  }
 
   // Brief mi? (bot_id olsa da workflow brief'leri dahil)
   const brief = parseBriefMesaji(event.text);

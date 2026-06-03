@@ -29,15 +29,17 @@ const LOG = path.join(PROJ, 'logs/set-financials.log');
 
 function logLine(msg) { try { fs.appendFileSync(LOG, `[${new Date().toISOString()}] ${msg}\n`); } catch {} console.log('[financials]', msg); }
 
-// "1.500,50" / "1500" / "₺2.000" → number ; "" / "-" / null → null
+// "1.500,50" / "1500" / "1.500" / "₺2.000" → number ; "" / "-" / null → null
 function parseMoney(s) {
   if (s == null) return null;
   let t = String(s).trim();
   if (t === '' || t === '-' || t === '—') return null;
   t = t.replace(/[^\d.,-]/g, '');          // ₺, boşluk vb. at
   if (t === '' || t === '-') return null;
-  // TR: '.' binlik, ',' ondalık varsayımı — ama tek ayraç '.' ise ondalık olabilir
-  if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.');
+  const hasC = t.includes(','), hasD = t.includes('.');
+  if (hasC && hasD) t = t.replace(/\./g, '').replace(',', '.');           // 1.500,50 → 1500.50
+  else if (hasC) t = t.replace(',', '.');                                 // 1500,50 → 1500.50
+  else if (hasD && /^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, ''); // 1.500 → 1500 (binlik); 1500.5 ondalık kalır
   const n = Number(t);
   return isNaN(n) ? null : n;
 }
