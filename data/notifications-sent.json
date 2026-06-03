@@ -427,5 +427,12 @@
     "user_id": "U06J26R1XCJ",
     "message_ts": "1780464182.668689",
     "reason": "#29 Bauhaus 'Vantilatörler' gecikme 15sa eşiği (deadline 2Haz17:00 GEÇMİŞ) · lead Aykut'a Şablon 30 hatırlatma · Headless run"
+  },
+  {
+    "brief_ts": null,
+    "template": "orchestrator_sync_1780471256_no_new_notifications",
+    "sent_at": "2026-06-03T10:20:56+03:00",
+    "user_id": "skip-consolidated",
+    "reason": "10:15 TR sync · 17 escalation + 12 blokeli değerlendirildi · 0 yeni eşik geçişi · #25 test brief (teyit beklemede, escalation suppress) · 0 yeni brief · Priority: 🔴23 🟠0 🟡0 🟢1 · Calendar: skipped (headless)"
   }
 ]
