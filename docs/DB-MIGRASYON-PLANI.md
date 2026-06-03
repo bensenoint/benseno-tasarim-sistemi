@@ -45,14 +45,19 @@ briefs(
   maliyet NUMERIC, satis NUMERIC, fatura BOOL, odeme BOOL,
   musteri_notu TEXT,           -- (eklendi) müşteri notu
   tahmini_sure_h NUMERIC,      -- (eklendi) tahmini süre (saat)
+  akis,                        -- (eklendi) sirali | paralel (açılışta belirlenir; onay/iş sırasını yönetir)
   stale BOOL, gecmis TEXT,
   created_at, completed_at, updated_at   -- bitis/30g/History DOĞAL
 )
 
-brief_assignees(brief_id FK, user_id FK, role)   -- atanan/editör/contributor (M:N)
-brief_tags(brief_id FK, tag)                     -- (eklendi) etiketler (M:N)
-brief_attachments(id PK, brief_id FK, url, filename, mime, uploaded_by FK, ts)  -- (eklendi) dosya/ek
-brief_approvals(id PK, brief_id FK, approver_id FK, sira INT, durum, ts)         -- (eklendi) onay zinciri (sıralı)
+brief_assignees(brief_id FK, user_id FK, role, sira INT)
+  -- role: lead | contributor | editor | gozlemci(observer). lead DEĞİŞTİRİLEBİLİR, gozlemci EKLENEBİLİR,
+  -- atanan(doer) DEĞİŞTİRİLEBİLİR. sira: sıralı akışta iş/onay sırası.
+brief_tags(brief_id FK, tag)                     -- (eklendi) etiketler — seçilebilir VEYA serbest; boşsa Claude önerir
+brief_attachments(id PK, brief_id FK, url, filename, mime, uploaded_by FK, source, ts)
+  -- (eklendi) dosya/ek. source: dashboard_upload | slack_thread (Slack thread'indeki dosyalar OTOMATİK yakalanır)
+brief_approvals(id PK, brief_id FK, approver_id FK, sira INT, durum, ts)
+  -- (eklendi) onay zinciri. akis=sirali → sira'ya göre tek tek; akis=paralel → hepsi eşzamanlı.
 
 events(                         -- aktivite/audit logu → History + denetim
   id PK, brief_id FK, user_id FK, verb, detail, source, ts
@@ -191,8 +196,23 @@ sonra ilgili kayıtlar temizlenir (cron).
 
 ### 9.8 Raporlama/Analiz: 
 - **Otomatik dışa aktarma** (zamanlı DB dump → dosya/e-posta; yedek + arşiv).
-- Dashboard'da **genel rapor & analiz alanı** (dönemsel ciro/maliyet/tahsilat, departman performansı,
-  marka kârlılığı, teslim/gecikme trendleri — SQL üstünde).
+- Dashboard'da **genel rapor & analiz alanı** (SQL üstünde). Öncelikli raporlar:
+  **departman yükü** · **marka bazlı harcanan süre** · **iş adetleri** (dönemsel) ·
+  **iş tipi yoğunluğu** (Sosyal Medya/Print/Video/Araştırma... dağılımı) · ciro/maliyet/tahsilat ·
+  marka kârlılığı · teslim/gecikme trendleri.
+
+### 9.11 Onay & Atama modeli (detay)
+- **Akış:** brief açılışında `akis` = **sıralı** (sıra ile onay/iş) veya **paralel** (eşzamanlı) belirlenir.
+- **Lead (işi lead eden):** değiştirilebilir (brief_assignees lead rolü güncellenir → thread notu + DM).
+- **Gözlemci (işi gözlemleyen):** sonradan eklenebilir (bildirim alır, düzenleyemez).
+- **Atanan (işi yapan):** değiştirilebilir.
+- **Onay ilerleme:** thread'e `onay ok` (veya dashboard) → sıralı ise bir sonraki onaylayıcıya geçer,
+  paralel ise herkesinki bağımsız; hepsi tamam → brief onaylı/ilerleyebilir.
+
+### 9.12 Etiketler: mevcut etiketlerden **seçilebilir** + kullanıcı **serbest** yazabilir; brief açılışında
+etiket boşsa **Claude önerir** (başlık/marka/dept'e göre, küçük izole çağrı).
+
+### 9.13 Dosya/ek: dashboard'dan **yükleme** + Slack thread'indeki dosyalar **otomatik yakalanır** (ikisi de).
 
 ### 9.9 Veri stratejisi:
 - **Test aşamasında:** mevcut tüm veri (temiz hali) akışı anlamak için kullanılır.
