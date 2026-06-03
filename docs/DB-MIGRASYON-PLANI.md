@@ -162,24 +162,29 @@ Ekibin "tüm işler" görünümü = **Slack Home Tab** (zaten kurulu) + dashboar
 
 ## 9. Ek Gereksinimler & Aksiyon Modeli Değişikliği (3 Haz, 2. tur)
 
-### 9.1 AKSİYON MODELİ DEĞİŞİYOR — reaction yerine thread-komut (büyük)
-**Reaction imojileri KALDIRILIYOR.** Tüm aksiyonlar brief **thread'ine yazılan kelime/emoji** ile
-(finans modelindeki "maliyet 1500" / "fatura ok" mantığının aynısı). Tek komut yüzeyi = brief thread'i.
+### 9.1 AKSİYON MODELİ — HİBRİT: reaction (hızlı) + thread-yazı (zengin)
+**Reaction KALIR** (kaldırma kararı iptal). Sebep: her-zaman-açık bot `reaction_added` event'ini
+anında alıyor (Socket Mode push) — bu oturumda 🎨/👀/✅/🔴 canlı kanıtlandı. "reactions.get okunamıyor"
+sorunu yalnızca eski POLL yöntemindeydi; event push her zaman çalışıyor. İş thread'de devam ettiği için
+reaction (thread'deki herhangi mesaja, tek tık, parent'a dönmeden) ekibin akışına en uygun.
+Buton fikri ELENDİ (brief mesajını kalabalıklaştırıyor + thread'den parent'a dönüş gerektiriyor).
 
-| Aksiyon | Thread'e yazılır (emoji veya kelime) | DB etkisi |
+| Aksiyon | Yöntem | DB etkisi |
 |---|---|---|
-| Durum: Tasarımda | `🎨` / `tasarımda` | durum=calisiliyor, dept=tasarim |
-| Durum: Editörde | `✍️` / `editörde` | durum=calisiliyor, dept=editor |
-| Durum: AI'da | `🤖` / `ai` | durum=calisiliyor, dept=ai |
-| Revize | `👀` / `revize` | durum=incelemede, rev++ |
-| Tamamlandı | `✅` / `tamamlandı` | completed_at=now (çoklu-atanan kuralı korunur) |
-| Öncelik | `🔴/🟠/🟡/🟢` / `acil/yüksek/normal/düşük` | priority (atanan+yönetici yetkisi) |
-| Maliyet/Satış | `maliyet 1500 satış 4000` | maliyet/satis |
-| Fatura/Ödeme | `fatura ok` / `ödeme ok` (+ `iptal`) | fatura/odeme |
+| Durum: Tasarımda | **reaction** `🎨` | durum=calisiliyor, dept=tasarim |
+| Durum: Editörde | **reaction** `✍️` | durum=calisiliyor, dept=editor |
+| Durum: AI'da | **reaction** `🤖` | durum=calisiliyor, dept=ai |
+| Revize | **reaction** `👀` | durum=incelemede, rev++ |
+| Tamamlandı | **reaction** `✅` | completed_at=now (çoklu-atanan kuralı korunur) |
+| Öncelik | **reaction** `🔴/🟠/🟡/🟢` | priority (atanan+yönetici yetkisi) |
+| Maliyet/Satış | **thread'e yazı** `maliyet 1500 satış 4000` | maliyet/satis |
+| Fatura/Ödeme | **thread'e yazı** `fatura ok` / `ödeme ok` (+`iptal`) | fatura/odeme |
+| Onay | **thread'e yazı** `onay ok` | onay zinciri ilerler |
+| Müşteri notu / etiket vb. | **thread'e yazı** veya dashboard | ilgili alan |
 
-- **Avantaj:** tek tutarlı yüzey, niyet net (kim-ne-yazdı thread'de iz), reaction'ın headless/okuma
-  sorunları biter, hepsi DB'ye deterministik yazılır.
-- Bot thread mesajını parse eder → DB update → Slack mesajını `chat.update` + (gerekirse) DM.
+- **Hızlı aksiyonlar = reaction** (tek tık, thread'de, kalabalık yok). **Zengin/rakamlı = thread-yazı.**
+- Bot her ikisini de event olarak alır → **DB'ye deterministik yazar** → Slack mesajını `chat.update`
+  + (gerekirse) DM + `events` defterine satır.
 
 ### 9.2 Maliyet/Satış girişi: HEM dashboard HEM Slack thread (ikisi de açık).
 
