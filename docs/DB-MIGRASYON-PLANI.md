@@ -36,25 +36,32 @@ users(id PK, name, rol, initials, color, title, active)
 brands(id PK, name UNIQUE, color, wheel_idx)
 
 briefs(
-  id PK, no UNIQUE, slack_ts, slack_url,
+  id PK, no UNIQUE, slack_ts, slack_channel, slack_url,
   marka_id FK→brands, baslik, dept,
   deadline TIMESTAMPTZ, saat,
   durum,                       -- yeni|calisiliyor|incelemede|blokeli|tamamlandi
-  priority, priority_label,    -- reaction override DOĞRUDAN sütun
+  priority, priority_label,    -- DOĞRUDAN sütun (override dosyası yok)
   rev INT DEFAULT 0,
   maliyet NUMERIC, satis NUMERIC, fatura BOOL, odeme BOOL,
+  musteri_notu TEXT,           -- (eklendi) müşteri notu
+  tahmini_sure_h NUMERIC,      -- (eklendi) tahmini süre (saat)
   stale BOOL, gecmis TEXT,
   created_at, completed_at, updated_at   -- bitis/30g/History DOĞAL
 )
 
-brief_assignees(brief_id FK, user_id FK, role)  -- atanan/editör/contributor (M:N)
+brief_assignees(brief_id FK, user_id FK, role)   -- atanan/editör/contributor (M:N)
+brief_tags(brief_id FK, tag)                     -- (eklendi) etiketler (M:N)
+brief_attachments(id PK, brief_id FK, url, filename, mime, uploaded_by FK, ts)  -- (eklendi) dosya/ek
+brief_approvals(id PK, brief_id FK, approver_id FK, sira INT, durum, ts)         -- (eklendi) onay zinciri (sıralı)
 
-events(                         -- aktivite logu → History/Geçmiş sayfası gerçek
-  id PK, brief_id FK, user_id FK, verb, detail, ts
-)
+events(                         -- aktivite/audit logu → History + denetim
+  id PK, brief_id FK, user_id FK, verb, detail, source, ts
+)  -- retention: brief completed_at + 18 ay sonra temizlenir (cron)
 ```
 - Tamamlanan iş = `briefs.completed_at IS NOT NULL` (ayrı tablo gerekmez).
 - dept/marka/30g/medyan/revize/puan = **SQL view/sorgu** (LLM toplama YOK).
+- `brands(... slack_channel)` — markaya göre brief mesaj kanalı.
+- `users(... dept, yetki)` — rol + departman bazlı yetki.
 
 ---
 
@@ -145,6 +152,53 @@ Ekibin "tüm işler" görünümü = **Slack Home Tab** (zaten kurulu) + dashboar
   → `brands` tablosuna `slack_channel` sütunu eklenir.
 - **Ekip görünümü:** **Slack Home Tab + dashboard.** Home Tab kişisel/genel özet, detay+filtre dashboard.
 - **Dashboard yazma yetkisi:** yönetici → tüm briefler; atanan → kendi briefi (rol bazlı API auth).
+
+---
+
+## 9. Ek Gereksinimler & Aksiyon Modeli Değişikliği (3 Haz, 2. tur)
+
+### 9.1 AKSİYON MODELİ DEĞİŞİYOR — reaction yerine thread-komut (büyük)
+**Reaction imojileri KALDIRILIYOR.** Tüm aksiyonlar brief **thread'ine yazılan kelime/emoji** ile
+(finans modelindeki "maliyet 1500" / "fatura ok" mantığının aynısı). Tek komut yüzeyi = brief thread'i.
+
+| Aksiyon | Thread'e yazılır (emoji veya kelime) | DB etkisi |
+|---|---|---|
+| Durum: Tasarımda | `🎨` / `tasarımda` | durum=calisiliyor, dept=tasarim |
+| Durum: Editörde | `✍️` / `editörde` | durum=calisiliyor, dept=editor |
+| Durum: AI'da | `🤖` / `ai` | durum=calisiliyor, dept=ai |
+| Revize | `👀` / `revize` | durum=incelemede, rev++ |
+| Tamamlandı | `✅` / `tamamlandı` | completed_at=now (çoklu-atanan kuralı korunur) |
+| Öncelik | `🔴/🟠/🟡/🟢` / `acil/yüksek/normal/düşük` | priority (atanan+yönetici yetkisi) |
+| Maliyet/Satış | `maliyet 1500 satış 4000` | maliyet/satis |
+| Fatura/Ödeme | `fatura ok` / `ödeme ok` (+ `iptal`) | fatura/odeme |
+
+- **Avantaj:** tek tutarlı yüzey, niyet net (kim-ne-yazdı thread'de iz), reaction'ın headless/okuma
+  sorunları biter, hepsi DB'ye deterministik yazılır.
+- Bot thread mesajını parse eder → DB update → Slack mesajını `chat.update` + (gerekirse) DM.
+
+### 9.2 Maliyet/Satış girişi: HEM dashboard HEM Slack thread (ikisi de açık).
+
+### 9.3 Bildirim kuralları: şimdilik **her edit → DM** (gürültü olursa kritik-only'ye düşürülür).
+
+### 9.4 Audit/Geçmiş: `events` tablosu kim-ne-zaman-ne-değiştirdi tutar; brief **tamamlandıktan 18 ay**
+sonra ilgili kayıtlar temizlenir (cron).
+
+### 9.5 Yetki: **rol + departman bazlı.** (ör. yönetici tümü; departman lideri kendi dept'i; atanan kendi briefi.)
+
+### 9.6 Mobil: dashboard **tam mobil** (görüntüleme + form girişi dahil).
+
+### 9.7 Hosting: dashboard **Railway'de** (özel neden yoksa) — tek origin, CORS yok.
+
+### 9.8 Raporlama/Analiz: 
+- **Otomatik dışa aktarma** (zamanlı DB dump → dosya/e-posta; yedek + arşiv).
+- Dashboard'da **genel rapor & analiz alanı** (dönemsel ciro/maliyet/tahsilat, departman performansı,
+  marka kârlılığı, teslim/gecikme trendleri — SQL üstünde).
+
+### 9.9 Veri stratejisi:
+- **Test aşamasında:** mevcut tüm veri (temiz hali) akışı anlamak için kullanılır.
+- **Canlıya geçmeden ÖNCE:** tüm veri SİLİNİR → **sıfır veri** ile başlanır. (Migration seed yalnızca test için.)
+
+### 9.10 Şema eklemeleri (yukarıda işlendi): müşteri_notu, tahmini_süre, etiketler, dosya/ek, onay zinciri.
 
 ---
 *Sonraki adım: Faz 1 (Postgres provision + şema + read API + seed) — sıfır riskli, paralel. Onayla başlanır.*
