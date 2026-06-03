@@ -19,7 +19,7 @@
         "U08NQJ27G5S"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "18 May 2026",
       "saat": "18 Mayıs 2026 16:00 TR ⚠️ GEÇMİŞ (15g 16sa 17dk geride) · 🔴 Blokeli",
       "durum": "👀 Revize bekliyor (v2 teslim · bakanlık geri dönüşü) · 🔴 Blokeli",
@@ -42,7 +42,7 @@
         "U030C48PL23"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "20 May 2026",
       "saat": "20 Mayıs 2026 10:00 TR ⚠️ GEÇMİŞ (13g 22sa 17dk geride) · 🔴 Blokeli",
       "durum": "6g+ pasif · 🔴 Blokeli · Aykut > Eda T pasif",
@@ -65,7 +65,7 @@
         "U030C48PL23"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
       "saat": "21 Mayıs 2026 13:00 TR ⚠️ GEÇMİŞ (12g 19sa 17dk geride) · 🔴 Blokeli",
       "durum": "tasarımcı yok · İpek dispatch > Görkem · 8g eşiği AŞILDI · 🔴 Blokeli",
@@ -87,7 +87,7 @@
         "U0AP31SAA1W"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
       "saat": "21 Mayıs 2026 13:42 TR ⚠️ GEÇMİŞ (12g 18sa 35dk geride) · 🔴 Blokeli",
       "durum": "🚨 v1 yok · Eren · 8g eşiği AŞILDI · 🔴 Blokeli",
@@ -109,7 +109,7 @@
         "U09BZHR25NG"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "20 May 2026",
       "saat": "20 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ (13g 14sa 17dk geride) · 🔴 Blokeli",
       "durum": "v1 yok · Arda hafta sonu pasif · 🔴 Blokeli",
@@ -153,7 +153,7 @@
         "U0AP31SAA1W"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "21 May 2026",
       "saat": "21 Mayıs 2026 13:24 TR ⚠️ GEÇMİŞ (12g 18sa 53dk geride) · 🔴 Blokeli",
       "durum": "🚨 dept ambiguity · Arda dispatch sırada · 8g eşiği AŞILDI · 🔴 Blokeli",
@@ -175,7 +175,7 @@
         "U0AP31SAA1W"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
       "saat": "22 Mayıs 2026 23:59 TR ⚠️ GEÇMİŞ (11g 8sa 18dk geride) · 🔴 Blokeli",
       "durum": "🔴 Blokeli · 72sa AÇILDI · Şablon 29 DM → Eren (26May09:33) · v1 yok",
@@ -198,7 +198,7 @@
         "U09BZHR25NG"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
       "saat": "22 Mayıs 2026 14:00 TR ⚠️ GEÇMİŞ (11g 18sa 17dk geride) · 🔴 Blokeli",
       "durum": "🎨 v1 13:28 🌸 · Eda T 14:04 yarı kabul · 5g+ onay pasif · 7g eşiği AŞILDI · 🔴 Blokeli",
@@ -221,7 +221,7 @@
         "U09BZHR25NG"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
       "saat": "22 Mayıs 2026 17:00 TR ⚠️ GEÇMİŞ (11g 15sa 17dk geride) · 🔴 Blokeli",
       "durum": "🎨 v1 14:40 🌸 · Eda T 14:50 ellerine sağlıkk · 3g+ pasif onay yok · 🔴 Blokeli",
@@ -244,7 +244,7 @@
         "U030C48PL23"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
       "saat": "22 Mayıs 2026 08:46 TR ⚠️ GEÇMİŞ (11g 23sa 31dk geride) · 🔴 Blokeli",
       "durum": "🚨 v1 yok · Görkem DM Cuma 16:45 · 72sa + 8g eşiği AŞILDI · 🔴 Blokeli",
@@ -267,7 +267,7 @@
         "U030C48PL23"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "1 Haziran 2026",
       "saat": "1 Haziran 2026 12:31 TR ⚠️ GEÇMİŞ (1g 19sa 46dk geride)",
       "durum": "yeni · Eren+Görkem · 72sa eşik geçişi · Normal öncelik",
@@ -291,7 +291,7 @@
         "U030C48PL23"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "23 May 2026",
       "saat": "23 Mayıs 2026 14:42 TR ⚠️ GEÇMİŞ (10g 17sa 35dk geride) · 🔴 Blokeli",
       "durum": "🚨 GEÇMİŞ · Şablon 24+25+29 gönderildi (29→Eren 26May14:46) · 72sa AŞILDI · 6g eşiği AŞILDI · 🔴 Blokeli",
@@ -338,7 +338,7 @@
         "U09BZHR25NG"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
       "saat": "22 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ (11g 14sa 17dk geride) · 🔴 Blokeli",
       "durum": "⚠️ GEÇMİŞ · Aykut yarı onay Cuma 17:35 · Arda kısmı belirsiz · 🔴 Blokeli",
@@ -361,7 +361,7 @@
         "U4XCE3532"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "2 Haziran 2026",
       "saat": "2 Haziran 2026 10:00 TR ⚠️ GEÇMİŞ (0g 22sa 17dk geride)",
       "durum": "yeni · Cansu+Görkem · ⚠️ test içeriği (İş='test')",
@@ -384,7 +384,7 @@
         "U4XCE3532"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "2 Haziran 2026",
       "saat": "2 Haziran 2026 14:55 TR ⚠️ GEÇMİŞ (0g 17sa 22dk geride)",
       "durum": "yeni · Görkem+Cansu · ⚠️ test içeriği (İş='test yayın')",
@@ -407,7 +407,7 @@
         "U09BZHR25NG"
       ],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "2 Haziran 2026",
       "saat": "2 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ (0g 19sa 17dk geride)",
       "durum": "yeni · Hasan Serdar+Aykut · Sosyal Medya Post · Paralel akış · 💬 video içeriği",
@@ -449,7 +449,7 @@
       ],
       "editor_ids": [],
       "priority": "🔴",
-      "priority_label": "🔴 GEÇMİŞ",
+      "priority_label": "🔴 Acil",
       "deadline": "2 Haziran 2026",
       "saat": "2 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ (0g 15sa 17dk geride)",
       "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
