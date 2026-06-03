@@ -216,38 +216,41 @@ function App() {
           });
           window.BNS_DATA.matrix = mx;
         }
-        if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
-          window.BNS_DATA.brandStats = ed.bns_brand_stats; setBrandStats(ed.bns_brand_stats);
-        } else if (window.BNS_DATA.BRANDS && window.BNS_DATA.briefs) {
-          // bns_brand_stats henüz doldurulmamışsa live brief'lerden hesapla
-          const allB = window.BNS_DATA.briefs;
+        // brandStats'ı HER ZAMAN gerçek hidratlanmış brief∪completed'ten hesapla.
+        // (data-agent'ın bns_brand_stats'ı sadece {marka,active,overdue} veriyor → isim/renk/metrik
+        //  eksik kalıyordu. Marka adı brief.marka, renk hidratlanmış brief.brand.color'dan gelir.)
+        {
+          const allB = window.BNS_DATA.briefs || [];
           const allC = window.BNS_DATA.completed || [];
           const now  = Date.now();
           const cutoff30 = now - 30 * 24 * 3600 * 1000;
-          const freshBS = window.BNS_DATA.BRANDS.map(b => {
-            const active = allB.filter(x => x.marka === b.name).length;
-            // done30: bitis zaten ms cinsinden — doğrudan karşılaştır
-            const done30 = allC.filter(x => x.marka === b.name && (x.bitis || 0) >= cutoff30).length;
-            // medyan süre: tamamlanan işlerin sureH değerlerinden
-            const sures = allC.filter(x => x.marka === b.name && x.sureH > 0).map(x => x.sureH).sort((a,z)=>a-z);
-            const medH = sures.length ? sures[Math.floor(sures.length/2)] : null;
-            const madH = sures.length ? Math.round(sures.reduce((s,v)=>s+Math.abs(v-(medH||0)),0)/sures.length) : null;
-            // ort. revize: tamamlananlardan
-            const revs = allC.filter(x => x.marka === b.name).map(x => x.revision || 0);
+          const names = [...new Set([...allB, ...allC].map(x => x.marka).filter(Boolean))];
+          const colorFor = (name) => {
+            const hit = allB.find(x => x.marka === name && x.brand && x.brand.color)
+                     || allC.find(x => x.marka === name && x.brand && x.brand.color);
+            if (hit) return hit.brand.color;
+            if (window.WHEEL && window.brandHash) return window.WHEEL[window.brandHash(name)] || "#888";
+            return "#888";
+          };
+          const freshBS = names.map(name => {
+            const bs = allB.filter(x => x.marka === name);
+            const cs = allC.filter(x => x.marka === name);
+            const done30 = cs.filter(x => (x.bitis || 0) >= cutoff30).length;
+            const sures  = cs.filter(x => x.sureH > 0).map(x => x.sureH).sort((a,z)=>a-z);
+            const medH   = sures.length ? sures[Math.floor(sures.length/2)] : null;
+            const madH   = sures.length ? Math.round(sures.reduce((s,v)=>s+Math.abs(v-(medH||0)),0)/sures.length) : null;
+            const revs   = cs.map(x => x.revision || 0);
             const avgRev = revs.length ? (revs.reduce((a,v)=>a+v,0)/revs.length).toFixed(1) : null;
-            const hasStale = allB.some(x => x.marka === b.name && x.stale);
-            const hasOverdue = allB.some(x => x.marka === b.name && x.deltaH <= 0);
+            const rs     = cs.map(x => x.rating).filter(r => r != null);
+            const rating = rs.length ? (rs.reduce((a,v)=>a+v,0)/rs.length).toFixed(1) : null;
+            const stale  = bs.some(x => x.stale) || bs.some(x => x.deltaH <= 0);
             return {
-              ...b,
-              active,
-              done30,
+              name, color: colorFor(name),
+              active: bs.length, done30,
               medianH: medH != null ? Math.round(medH) : null,
-              madH,
-              avgRev,
-              rating:  null,
-              stale:   hasStale || hasOverdue
+              madH, avgRev, rating, stale
             };
-          });
+          }).sort((a, z) => z.active - a.active);
           window.BNS_DATA.brandStats = freshBS;
           setBrandStats(freshBS);
         }
