@@ -157,6 +157,12 @@ function main() {
       if (isDone) {
         // tamamlanmış → completed'de tut (data-agent aktif geri getirdiyse taşı)
         if (moveToCompleted(live, ts, s.by, s.at_ms || nowMs)) moved++;
+        else {
+          // Zaten completed'de (data-agent Canvas'tan bitis'siz kurmuş olabilir) → tamamlanma
+          // zamanını geri yaz. bitis dashboard'da done30/süre/History-zamanı için gerekli.
+          const c = (live.bns_completed || []).find(x => String(x.no) === String(s.no));
+          if (c && s.at_ms && c.bitis == null) { c.bitis = s.at_ms; moved++; }
+        }
       } else if (Array.isArray(s.required) && s.required.length) {
         // kısmi onay → aktif brief'te kısmi durumu zorla (data-agent ezmesin)
         const b = (live.bns_briefs || []).find(x => tsFromLink(x.link) === ts);
