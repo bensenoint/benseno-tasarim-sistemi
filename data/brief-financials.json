@@ -17,8 +17,8 @@
     "maliyet": 300,
     "satis": 500,
     "by": "U030C48PL23",
-    "ts": 1780482444,
-    "fatura": true,
+    "ts": 1780482452,
+    "fatura": false,
     "odeme": true
   }
 }
