@@ -14,6 +14,19 @@ function bnsMergeUser(u) {
   return { ...u, name: (c && c.name) || u.name, rol: u.rol || u.dept || "" };
 }
 
+// Brief-başına dayanıklı map: TEK bir bozuk kayıt (data-agent drift) tüm dashboard'ı çökertmesin.
+// Bozuk olanı atla + uyar, gerisini döndür. (Eskiden bir hata tüm bridge'i mock'a düşürüyordu.)
+function bnsSafeMap(arr, fn, label) {
+  const out = []; let skipped = 0;
+  for (let i = 0; i < arr.length; i++) {
+    try { out.push(fn(arr[i], i)); }
+    catch (e) { skipped++; if (skipped <= 3) try { console.warn("[BNS] " + (label || "hydrate") + " atlandı #" + (arr[i] && arr[i].no) + ": " + e.message); } catch (_) {} }
+  }
+  if (skipped) try { console.warn("[BNS] " + (label || "hydrate") + ": " + skipped + " kayıt atlandı (gerisi gösteriliyor)"); } catch (_) {}
+  return out;
+}
+try { window.bnsSafeMap = bnsSafeMap; } catch (e) {}
+
 const USERS = [
   // Yöneticiler (5)
   { id: "U030C48PL23", name: "Görkem Kaya",       mono: "GK", rol: "yonetici", title: "Genel Müdür" },
@@ -537,11 +550,11 @@ try {
       if (me) window.BNS_DATA.ME = me;
     }
     if (Array.isArray(ed.bns_briefs) && ed.bns_briefs.length > 0) {
-      window.BNS_DATA.briefs = ed.bns_briefs.map(bnsHydrateBrief);
+      window.BNS_DATA.briefs = bnsSafeMap(ed.bns_briefs, bnsHydrateBrief, "brief");
       window.BNS_DATA.__source = "live_briefs";
     }
     if (Array.isArray(ed.bns_completed) && ed.bns_completed.length > 0) {
-      window.BNS_DATA.completed = ed.bns_completed.map(bnsHydrateCompleted);
+      window.BNS_DATA.completed = bnsSafeMap(ed.bns_completed, bnsHydrateCompleted, "completed");
     }
     // Departman istatistikleri (canlı brief'lerden bot tarafından hesaplandı)
     if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object" && Object.keys(ed.bns_dept_stats).length > 0) {

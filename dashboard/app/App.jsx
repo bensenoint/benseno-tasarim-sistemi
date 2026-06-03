@@ -173,12 +173,14 @@ function App() {
         }
         // Brief'leri yeniden hidrate et + state'i güncelle
         if (Array.isArray(ed.bns_briefs) && window.bnsHydrateBrief) {
-          const fresh = ed.bns_briefs.map(window.bnsHydrateBrief);
+          const sm = window.bnsSafeMap || ((a, f) => a.map(f));
+          const fresh = sm(ed.bns_briefs, window.bnsHydrateBrief, "brief");
           setBriefs(fresh);
           window.BNS_DATA.briefs = fresh;
         }
         if (Array.isArray(ed.bns_completed) && window.bnsHydrateCompleted) {
-          window.BNS_DATA.completed = ed.bns_completed.map(window.bnsHydrateCompleted);
+          const sm = window.bnsSafeMap || ((a, f) => a.map(f));
+          window.BNS_DATA.completed = sm(ed.bns_completed, window.bnsHydrateCompleted, "completed");
         }
         // Gerçek aktivite akışı (P3.2) — yoksa data.js mock'u korunur
         if (Array.isArray(ed.bns_activity) && ed.bns_activity.length > 0) {
