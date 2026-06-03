@@ -315,8 +315,8 @@
         "U4XCE3532",
         "U02SZQDAFPF"
       ],
-      "priority": "🟢",
-      "priority_label": "🟢 Düşük",
+      "priority": "🔴",
+      "priority_label": "🔴 Acil",
       "deadline": "22 May 2026",
       "saat": "17:00 TR ↻ Ertelendi (bayram sonrası)",
       "durum": "⏸ Cansu Direktör onayı · erdem copy edit tamamlandı · bayram sonrası devam",
@@ -427,8 +427,8 @@
         "U09BFPBKQG7"
       ],
       "editor_ids": [],
-      "priority": "🟠",
-      "priority_label": "🟠 Yüksek",
+      "priority": "🔴",
+      "priority_label": "🔴 Acil",
       "deadline": "3 Haziran 2026",
       "saat": "13:00 TR (+0g 21sa 44dk kaldı · 🟠 Yüksek)",
       "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
@@ -469,8 +469,8 @@
         "U09BFPBKQG7"
       ],
       "editor_ids": [],
-      "priority": "🟠",
-      "priority_label": "🟠 Yüksek",
+      "priority": "🔴",
+      "priority_label": "🔴 Acil",
       "deadline": "3 Haziran 2026",
       "saat": "12:00 TR (+0g 20sa 44dk kaldı · 🟠 Yüksek)",
       "durum": "🎨 Tasarımda · rev 1",
@@ -489,8 +489,8 @@
         "U08HLMHTGEL"
       ],
       "editor_ids": [],
-      "priority": "🟠",
-      "priority_label": "🟠 Yüksek",
+      "priority": "🔴",
+      "priority_label": "🔴 Acil",
       "deadline": "3 Haziran 2026",
       "saat": "11:52 TR (+0g 20sa 36dk kaldı · 🟠 Yüksek)",
       "durum": "yeni · Serhat · Print / Broşür",
@@ -511,8 +511,8 @@
       "editor_ids": [
         "U02SZQDAFPF"
       ],
-      "priority": "🟠",
-      "priority_label": "🟠 Yüksek",
+      "priority": "🔴",
+      "priority_label": "🔴 Acil",
       "deadline": "3 Haziran 2026",
       "saat": "14:12 TR (+0g 22sa 56dk kaldı · 🟠 Yüksek)",
       "durum": "✍️ Editörde",
