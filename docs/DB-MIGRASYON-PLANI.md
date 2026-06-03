@@ -106,4 +106,37 @@ Slack mutasyonları bot içinden doğrudan DB (HTTP gerekmez).
 - Geri dönüş (rollback): cutover'a dek eski Canvas+Pages sistemi dokunulmadan durur.
 
 ---
+
+## 8. İKİ YÖNLÜ SENKRON (eklendi 3 Haz) — Slack ⇄ Dashboard
+
+**İlke:** DB = hub. Slack VE dashboard ikisi de DB'ye yazar/okur → veri katmanında zaten iki yönlü.
+Üstüne: bir tarafta yapılan değişiklik **diğer tarafın yüzeyine de yansır**.
+
+### Brief'in Slack'teki yeni "evi": tek mesaj (Canvas satırı yerine)
+Canvas emekli olunca her brief = brief kanalında **tek kanonik Slack mesajı**. `briefs.slack_ts` +
+`slack_channel` sütunları o mesajı işaret eder. Thread'i reaction + finans + tartışma taşır.
+Ekibin "tüm işler" görünümü = **Slack Home Tab** (zaten kurulu) + dashboard.
+
+### Akışlar
+| Kaynak | Olay | DB | Slack yüzeyi |
+|---|---|---|---|
+| **Dashboard** | Yeni brief (tüm alanlar formu) | INSERT | bot kanonik mesajı **postlar** + atananları DM'ler + ts'yi satıra yazar |
+| **Dashboard** | Düzenleme (öncelik/durum/deadline/atanan/finans) | UPDATE | bot orijinal mesajı **`chat.update`** ile günceller; önemli değişimde (deadline/atanan) thread'e not + DM |
+| **Slack** | reaction / thread / komut | UPDATE | (dashboard bir sonraki sorgu/poll'da yansıtır) |
+| **Slack** | yeni brief mesajı (form/serbest) | INSERT | mesaj zaten Slack'te; dashboard yansıtır |
+
+### Kritik tasarım
+- **Echo/loop koruması:** dashboard→bot→Slack mesajı, bot'un kendi event'i olarak geri dönüp DB'yi
+  yeniden tetiklemesin (`bot_id` guard + `source` damgası).
+- **Çakışma:** aynı brief Slack+dashboard'dan yakın anda düzenlenirse `updated_at` ile last-write-wins
+  (bu ekip boyutunda yeterli) + opsiyonel "X saniye önce başkası düzenledi" uyarısı.
+- **Dashboard yazma yetkisi:** POST/PATCH auth'lu (yetkiye göre: yönetici tümünü, atanan kendi briefini).
+- **Brief mesajı hangi kanala:** marka→kanal eşlemesi (ör. #benseno-grafik) ya da merkezi #briefs.
+
+### Faz etkisi
+- Faz 1-2 (read API + dashboard) değişmez.
+- Faz 3'e eklenir: **dashboard yazma yolları** (yeni brief formu + edit) ve **bot'un Slack-yansıtma**
+  katmanı (post/chat.update/DM). Faz 3 biraz büyür.
+
+---
 *Sonraki adım: Faz 1 (Postgres provision + şema + read API + seed) — sıfır riskli, paralel. Onayla başlanır.*
