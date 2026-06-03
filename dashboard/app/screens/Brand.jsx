@@ -109,70 +109,71 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
 
   // Marka brief'lerini birleşik satır modeline çevir (aktif + tamamlanan)
-  const rows = React.useMemo(() => {
-    const active = (data._allBriefs || data.briefs || []).filter(b => b.marka === brand);
-    const done = (data._allCompleted || data.completed || []).filter(c => c.marka === brand);
-    const nm = ids => (ids || []).map(id => (uById[id] && uById[id].name) || id);
-    const out = [];
-    for (const b of active) {
-      const persons = [...nm(b.atanan_ids), ...nm(b.editor_ids)];
-      const dl = parseTRDeadline(b.deadline);
-      // priority hydrate edilince {code,label,color} objesi olabilir → React'a obje basma, sadece rengi al
-      const prioColor = (b.priority && typeof b.priority === "object") ? b.priority.color : null;
-      out.push({ kind:"active", no:b.no, is:b.is, durum:b.durum || "—", prioColor, persons, personIds:[...(b.atanan_ids||[]), ...(b.editor_ids||[])], deadline:dl, deadlineLabel:b.deadline || "—", bitis:null, bitisLabel:"—", ref:b });
-    }
-    for (const c of done) {
-      const persons = nm([c.leadId, ...(c.contribIds || [])].filter(Boolean));
-      const dl = c.deadline ? new Date(c.deadline) : null;
-      const bt = c.bitis ? new Date(c.bitis) : null;
-      out.push({ kind:"done", no:c.no, is:c.baslik || c.is, durum:"✅ Tamamlandı", prioColor:null, persons, personIds:[c.leadId, ...(c.contribIds||[])].filter(Boolean), deadline:dl, deadlineLabel: dl ? fmtDate(dl) : "—", bitis:bt, bitisLabel: bt ? fmtDate(bt) : "—", ref:c });
-    }
-    return out;
-  }, [brand, data]);
+  // Aktif brief'ler HYDRATE edilmiş (lead/priority obje/deltaH/...) → doğrudan BriefTable'a verilir.
+  const active = React.useMemo(() => (data._allBriefs || data.briefs || []).filter(b => b.marka === brand), [brand, data]);
+  const done   = React.useMemo(() => (data._allCompleted || data.completed || []).filter(c => c.marka === brand), [brand, data]);
+
+  // hydrate brief deadline'ı ms (number) ya da TR string olabilir → ms'e normalize et
+  const dlMs = b => { const d = b.deadline; if (typeof d === 'number') return d; const p = parseTRDeadline(d); return p ? p.getTime() : null; };
+  const activeIds = b => [b.lead && b.lead.id, ...((b.contributors || []).map(c => c && c.id))].filter(Boolean);
 
   const [person, setPerson] = React.useState("");
   const [from, setFrom] = React.useState("");
   const [to, setTo] = React.useState("");
-  const [kind, setKind] = React.useState("all");
+  const [view, setView] = React.useState("active");   // active | done
 
-  // kişi seçenekleri (id+isim)
+  // kişi seçenekleri (aktif lead+contributors ∪ tamamlanan lead+contrib)
   const people = React.useMemo(() => {
     const seen = {};
-    for (const r of rows) r.personIds.forEach((id, i) => { if (id && !seen[id]) seen[id] = r.persons[i] || id; });
+    for (const b of active) { if (b.lead && b.lead.id) seen[b.lead.id] = b.lead.name || b.lead.id; (b.contributors || []).forEach(c => { if (c && c.id) seen[c.id] = c.name || c.id; }); }
+    for (const c of done) { [c.leadId, ...(c.contribIds || [])].filter(Boolean).forEach(id => { if (!seen[id]) seen[id] = (uById[id] && uById[id].name) || id; }); }
     return Object.entries(seen).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, "tr"));
-  }, [rows]);
+  }, [active, done]);
 
-  const fromD = from ? new Date(from + "T00:00:00") : null;
-  const toD = to ? new Date(to + "T23:59:59") : null;
-  const filtered = rows.filter(r => {
-    if (kind !== "all" && r.kind !== kind) return false;
-    if (person && !r.personIds.includes(person)) return false;
-    if (fromD && (!r.deadline || r.deadline < fromD)) return false;
-    if (toD && (!r.deadline || r.deadline > toD)) return false;
+  const fromMs = from ? new Date(from + "T00:00:00").getTime() : null;
+  const toMs = to ? new Date(to + "T23:59:59").getTime() : null;
+  const inRange = ms => { if (ms == null) return !fromMs && !toMs ? true : false; if (fromMs && ms < fromMs) return false; if (toMs && ms > toMs) return false; return true; };
+
+  const filteredActive = active.filter(b => {
+    if (person && !activeIds(b).includes(person)) return false;
+    if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
     return true;
-  }).sort((a, b) => (b.deadline ? b.deadline.getTime() : 0) - (a.deadline ? a.deadline.getTime() : 0));
+  });
+  const filteredDone = done.filter(c => {
+    if (person && ![c.leadId, ...(c.contribIds || [])].includes(person)) return false;
+    if ((fromMs || toMs) && !inRange(c.deadline || null)) return false;
+    return true;
+  });
 
-  const activeCount = rows.filter(r => r.kind === "active").length;
-  const doneCount = rows.filter(r => r.kind === "done").length;
-  const overdue = rows.filter(r => r.kind === "active" && r.deadline && r.deadline.getTime() < now).length;
+  const overdue = active.filter(b => { const m = dlMs(b); return m != null && m < now * 1000; }).length;
+  const shown = view === "active" ? filteredActive.length : filteredDone.length;
 
   function exportCsv() {
-    const head = ["No", "İş", "Durum", "Atananlar", "Deadline", "Tamamlanma"];
-    const lines = [head.join(",")].concat(filtered.map(r => [r.no, csvCell(r.is), csvCell(r.durum), csvCell(r.persons.join("; ")), csvCell(r.deadlineLabel), csvCell(r.bitisLabel)].join(",")));
-    const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    let head, lines;
+    if (view === "active") {
+      head = ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev"];
+      lines = filteredActive.map(b => [b.no, csvCell(brand), csvCell(b.baslik || b.is), csvCell(b.priority && b.priority.label || ""), csvCell([b.lead && b.lead.name, ...((b.contributors || []).map(c => c && c.name))].filter(Boolean).join("; ")), csvCell(fmtDate(dlMs(b) ? new Date(dlMs(b)) : null)), csvCell(b.durum), b.revision || 0].join(","));
+    } else {
+      head = ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma"];
+      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell([c.leadId, ...(c.contribIds || [])].filter(Boolean).map(id => (uById[id] && uById[id].name) || id).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : "")].join(","));
+    }
+    const blob = new Blob(["﻿" + [head.join(",")].concat(lines).join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `${brand}-isler.csv`; document.body.appendChild(a); a.click();
+    a.href = url; a.download = `${brand}-${view}.csv`; document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
   const fldStyle = { padding:"6px 9px", border:"1px solid var(--line)", borderRadius:6, background:"var(--surface)", color:"var(--ink)", font:"400 12px/1.2 var(--font-sans)" };
+  const seg = (id, label) => (
+    <button key={id} onClick={() => setView(id)} style={{ ...fldStyle, cursor:"pointer", background: view === id ? "var(--ember,#C24A2C)" : "var(--surface)", color: view === id ? "#fff" : "var(--ink-3)", borderColor: view === id ? "var(--ember,#C24A2C)" : "var(--line)" }}>{label}</button>
+  );
 
   return (
     <div className="bn-tab-in">
       <PageHead
         title={brand}
-        subtitle={`${activeCount} aktif · ${doneCount} tamamlanan · ${overdue} gecikmiş${stats.medianH != null ? " · medyan " + stats.medianH + " sa" : ""}`}
+        subtitle={`${active.length} aktif · ${done.length} tamamlanan · ${overdue} gecikmiş${stats.medianH != null ? " · medyan " + stats.medianH + " sa" : ""}`}
         actions={<>
           <button onClick={onBack} style={{ ...fldStyle, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:5 }}>
             <span style={{ font:"600 13px/1 var(--font-sans)" }}>←</span> Markalar
@@ -184,8 +185,8 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
       />
 
       <div className="bns-kpi-4" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)" }}>
-        <Kpi label="Aktif iş" value={activeCount} color={stats.color}/>
-        <Kpi label="Tamamlanan" value={doneCount}/>
+        <Kpi label="Aktif iş" value={active.length} color={stats.color}/>
+        <Kpi label="Tamamlanan" value={done.length}/>
         <Kpi label="Gecikmiş" value={overdue} color={overdue > 0 ? "var(--prio-red)" : undefined}/>
         <Kpi label="Ort. revize" value={stats.avgRev != null ? stats.avgRev : "—"} sub={stats.rating != null ? "puan " + stats.rating : undefined}/>
       </div>
@@ -193,11 +194,8 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
       {/* Filtreler */}
       <Card style={{ marginBottom:"var(--section-gap)" }}>
         <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
-          <select value={kind} onChange={e => setKind(e.target.value)} style={fldStyle}>
-            <option value="all">Tüm işler</option>
-            <option value="active">Aktif</option>
-            <option value="done">Tamamlanan</option>
-          </select>
+          {seg("active", `Aktif · ${filteredActive.length}`)}
+          {seg("done", `Tamamlanan · ${filteredDone.length}`)}
           <select value={person} onChange={e => setPerson(e.target.value)} style={fldStyle}>
             <option value="">Herkes</option>
             {people.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -208,40 +206,47 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
             <span style={{ color:"var(--ink-4)" }}>→</span>
             <input type="date" value={to} onChange={e => setTo(e.target.value)} style={fldStyle}/>
           </label>
-          {(person || from || to || kind !== "all") &&
-            <button onClick={() => { setPerson(""); setFrom(""); setTo(""); setKind("all"); }} style={{ ...fldStyle, cursor:"pointer", color:"var(--ink-3)" }}>Temizle</button>}
-          <span style={{ marginLeft:"auto", font:"500 12px/1 var(--font-mono)", color:"var(--ink-3)" }}>{filtered.length} kayıt</span>
+          {(person || from || to) &&
+            <button onClick={() => { setPerson(""); setFrom(""); setTo(""); }} style={{ ...fldStyle, cursor:"pointer", color:"var(--ink-3)" }}>Temizle</button>}
+          <span style={{ marginLeft:"auto", font:"500 12px/1 var(--font-mono)", color:"var(--ink-3)" }}>{shown} kayıt</span>
         </div>
       </Card>
 
-      <Card padding={0}>
-        <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
-          <table style={{ width:"100%", minWidth:640, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
-            <thead>
-              <tr style={{ background:"var(--surface-sub)" }}>
-                {["#","İş","Durum","Atanan(lar)","Deadline","Tamamlanma"].map((v, i) => (
-                  <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: i === 0 ? "right" : "left", whiteSpace:"nowrap" }}>{v}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 && (
-                <tr><td colSpan={6} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Filtreye uyan iş yok</td></tr>
-              )}
-              {filtered.map((r, idx) => (
-                <tr key={r.kind + r.no} onClick={() => r.kind === "active" && onOpenBrief && onOpenBrief(r.ref)} style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)", cursor: r.kind === "active" ? "pointer" : "default" }}>
-                  <td style={bCs(true, "right")}>{r.prioColor && <span style={{ display:"inline-block", width:8, height:8, borderRadius:999, background:r.prioColor, marginRight:6, verticalAlign:"middle" }}/>}{r.no}</td>
-                  <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:280 }}>{r.is}</td>
-                  <td style={bCs()}><span style={{ font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-2)" }}>{r.durum}</span></td>
-                  <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:200 }}>{r.persons.join(", ") || "—"}</td>
-                  <td style={bCs(true)}>{r.deadlineLabel}</td>
-                  <td style={bCs(true)}>{r.bitisLabel}</td>
+      {view === "active" ? (
+        // Aktif işler — Aktif İşler sayfasıyla birebir zengin tablo (BriefTable)
+        <Card padding={0}>
+          <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
+            <BriefTable rows={filteredActive} onRowClick={onOpenBrief}/>
+          </div>
+        </Card>
+      ) : (
+        // Tamamlananlar — özet liste
+        <Card padding={0}>
+          <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
+            <table style={{ width:"100%", minWidth:560, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
+              <thead>
+                <tr style={{ background:"var(--surface-sub)" }}>
+                  {["#","İş","Atanan","Deadline","Tamamlanma"].map((v, i) => (
+                    <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: i === 0 ? "right" : "left", whiteSpace:"nowrap" }}>{v}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              </thead>
+              <tbody>
+                {filteredDone.length === 0 && <tr><td colSpan={5} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
+                {filteredDone.map((c, idx) => (
+                  <tr key={"d" + c.no} style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)" }}>
+                    <td style={bCs(true, "right")}>{c.no}</td>
+                    <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:300 }}>{c.baslik || c.is}</td>
+                    <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:200 }}>{[c.leadId, ...(c.contribIds || [])].filter(Boolean).map(id => (uById[id] && uById[id].name) || id).join(", ") || "—"}</td>
+                    <td style={bCs(true)}>{c.deadline ? fmtDate(new Date(c.deadline)) : "—"}</td>
+                    <td style={bCs(true)}>{c.bitis ? fmtDate(new Date(c.bitis)) : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
