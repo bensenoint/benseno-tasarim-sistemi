@@ -20,5 +20,17 @@
   "at_ms": 1780472947523,
   "no": "26",
   "marka": "Bauhaus"
+ },
+ "1780398800.600119": {
+  "acked": [],
+  "required": [
+   "U02SZQDAFPF"
+  ],
+  "done": true,
+  "by": "U030C48PL23",
+  "at": "2026-06-03T07:49:14.061Z",
+  "at_ms": 1780472954060,
+  "no": "32",
+  "marka": "Egosport"
  }
 }
