@@ -1,6 +1,27 @@
 {
   "mode": "active",
-  "new_briefs": [],
+  "new_briefs": [
+    {
+      "no": "34",
+      "marka": "KMR Panfix",
+      "is": "yaza merhaba postu",
+      "dept": "tasarim",
+      "tip": "Print / Broşür",
+      "akis": "Paralel",
+      "not": "deneme deneme",
+      "ref": "www.benseno.com.tr",
+      "deadline_str": "10 Haziran 2026 13:09 TR",
+      "priority_label": "🟢 Düşük",
+      "atanan_ids": [
+        "U055EDESLSE",
+        "U4XCE3532"
+      ],
+      "submitter_id": "U030C48PL23",
+      "ts": "1780481489.619019",
+      "permalink": "https://benseno.slack.com/archives/C0A5CQ7RSJJ/p1780481489619019",
+      "channel": "C0A5CQ7RSJJ"
+    }
+  ],
   "past_deadline": [],
   "past_confirmed": [],
   "saat_eksik": [],
@@ -10,169 +31,15 @@
   "calendar_events": [],
   "escalation": [
     {
-      "ts": "1779099416.366989",
-      "no": 1,
-      "marka": "JNJ Vision TR",
-      "is": "24 Haziran Kontakt Lens Davetiyesi",
-      "lead_id": "U0AN6DD79M0",
-      "lead_role": "tasarim",
-      "deadline_str": "18 Mayıs 2026 16:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y58FEUU/p1779099416366989",
-      "gecikme_h": 382
-    },
-    {
-      "ts": "1779167651.759819",
-      "no": 3,
-      "marka": "Bauhaus",
-      "is": "bahar kampanyası",
-      "lead_id": "U06J26R1XCJ",
-      "lead_role": "tasarim",
-      "deadline_str": "20 Mayıs 2026 10:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167651759819",
-      "gecikme_h": 336
-    },
-    {
-      "ts": "1779167921.567269",
-      "no": 4,
-      "marka": "Bauhaus",
-      "is": "mayıs kampanyası",
-      "lead_id": "U055EDESLSE",
-      "lead_role": "tasarim",
-      "deadline_str": "21 Mayıs 2026 13:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779167921567269",
-      "gecikme_h": 309
-    },
-    {
-      "ts": "1779187350.819039",
-      "no": 5,
-      "marka": "Bauhaus",
-      "is": "Broşür (AI)",
-      "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "21 Mayıs 2026 13:42 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779187350819039",
-      "gecikme_h": 309
-    },
-    {
-      "ts": "1779266016.085909",
-      "no": 6,
-      "marka": "Bauhaus",
-      "is": "20 Mayıs İçerik",
-      "lead_id": "U09BFPBKQG7",
-      "lead_role": "tasarim",
-      "deadline_str": "20 Mayıs 2026 18:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779266016085909",
-      "gecikme_h": 329
-    },
-    {
-      "ts": "1779272694.698569",
-      "no": 8,
-      "marka": "VDM Petdent",
-      "is": "GA4 Analiz",
-      "lead_id": "U09BFPBKQG7",
-      "lead_role": "tasarim",
-      "deadline_str": "21 Mayıs 2026 13:24 TR",
-      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779272694698569",
-      "gecikme_h": 309
-    },
-    {
-      "ts": "1779275121.721279",
-      "no": 9,
-      "marka": "VDM Petdent",
-      "is": "Whatsapp Business",
-      "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "22 Mayıs 2026 23:59 TR",
-      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779275121721279",
-      "gecikme_h": 275
-    },
-    {
-      "ts": "1779283282.205179",
-      "no": 15,
-      "marka": "Bauhaus",
-      "is": "Bahçeniz / 30May",
-      "lead_id": "U09BFPBKQG7",
-      "lead_role": "tasarim",
-      "deadline_str": "22 Mayıs 2026 14:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283282205179",
-      "gecikme_h": 285
-    },
-    {
-      "ts": "1779283377.829309",
-      "no": 16,
-      "marka": "Bauhaus",
-      "is": "Banyo Şık",
-      "lead_id": "U09BFPBKQG7",
-      "lead_role": "tasarim",
-      "deadline_str": "22 Mayıs 2026 17:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779283377829309",
-      "gecikme_h": 282
-    },
-    {
-      "ts": "1779342432.583659",
-      "no": 17,
-      "marka": "VDM Petdent",
-      "is": "Yeni bayram postu",
-      "lead_id": "U0AP31SAA1W",
-      "lead_role": "tasarim",
-      "deadline_str": "22 Mayıs 2026 08:46 TR",
-      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779342432583659",
-      "gecikme_h": 290
-    },
-    {
       "ts": "1779355957.360249",
       "no": 20,
       "marka": "Tour2America",
-      "is": "bayram içeriği",
+      "is": "bayram icerigi",
       "lead_id": "U0AP31SAA1W",
       "lead_role": "ai",
       "deadline_str": "1 Haziran 2026 12:31 TR",
       "permalink": "https://benseno.slack.com/archives/C05J5PXBPGS/p1779355957360249",
-      "gecikme_h": 46
-    },
-    {
-      "ts": "1779363838.575629",
-      "no": 21,
-      "marka": "VDM Petdent",
-      "is": "bahar video",
-      "lead_id": "U4XCE3532",
-      "lead_role": "editor",
-      "deadline_str": "23 Mayıs 2026 14:42 TR",
-      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1779363838575629",
-      "gecikme_h": 262
-    },
-    {
-      "ts": "1779456154.216919",
-      "no": 24,
-      "marka": "Bauhaus",
-      "is": "Bayrama Özel Dev Kampanya",
-      "lead_id": "U06J26R1XCJ",
-      "lead_role": "tasarim",
-      "deadline_str": "22 Mayıs 2026 18:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1779456154216919",
-      "gecikme_h": 282
-    },
-    {
-      "ts": "1780290478.864579",
-      "no": 25,
-      "marka": "VDM Petdent",
-      "is": "test ⚠️",
-      "lead_id": "U4XCE3532",
-      "lead_role": "editor",
-      "deadline_str": "2 Haziran 2026 10:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C0AQLPY4TUM/p1780290478864579",
-      "gecikme_h": 23
-    },
-    {
-      "ts": "1780315060.052969",
-      "no": 26,
-      "marka": "Bauhaus",
-      "is": "test yayın ⚠️",
-      "lead_id": "U030C48PL23",
-      "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 14:55 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780315060052969",
-      "gecikme_h": 20
+      "gecikme_h": 48
     },
     {
       "ts": "1780318126.239499",
@@ -183,80 +50,41 @@
       "lead_role": "tasarim",
       "deadline_str": "2 Haziran 2026 13:00 TR",
       "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780318126239499",
-      "gecikme_h": 22
+      "gecikme_h": 24
     },
     {
-      "ts": "1780382082.092499",
-      "no": 29,
+      "ts": "1780390340.369139",
+      "no": 30,
       "marka": "Bauhaus",
-      "is": "Vantilatörler",
+      "is": "Weber 1&2",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 17:00 TR",
-      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780382082092499",
-      "gecikme_h": 15
+      "deadline_str": "3 Haziran 2026 12:00 TR",
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780390340369139",
+      "gecikme_h": 1
+    },
+    {
+      "ts": "1780390360.140899",
+      "no": 31,
+      "marka": "KZY Supreme",
+      "is": "Supreme Wet 85 gram",
+      "lead_id": "U08HLMHTGEL",
+      "lead_role": "tasarim",
+      "deadline_str": "3 Haziran 2026 11:52 TR",
+      "permalink": "https://benseno.slack.com/archives/C05KKSV6EF7/p1780390360140899",
+      "gecikme_h": 1
+    },
+    {
+      "ts": "1780480800",
+      "no": 28,
+      "marka": "Bauhaus",
+      "is": "Scheppach Ekskavatör",
+      "lead_id": "U06J26R1XCJ",
+      "lead_role": "tasarim",
+      "deadline_str": "3 Haziran 2026 13:00 TR",
+      "permalink": "https://benseno.slack.com/archives/C4Y43AW2E/p1780382002414219",
+      "gecikme_h": 0
     }
   ],
-  "blokeli": [
-    {
-      "ts": "1779099416.366989",
-      "no": 1,
-      "marka": "JNJ Vision TR"
-    },
-    {
-      "ts": "1779167651.759819",
-      "no": 3,
-      "marka": "Bauhaus"
-    },
-    {
-      "ts": "1779167921.567269",
-      "no": 4,
-      "marka": "Bauhaus"
-    },
-    {
-      "ts": "1779187350.819039",
-      "no": 5,
-      "marka": "Bauhaus"
-    },
-    {
-      "ts": "1779266016.085909",
-      "no": 6,
-      "marka": "Bauhaus"
-    },
-    {
-      "ts": "1779272694.698569",
-      "no": 8,
-      "marka": "VDM Petdent"
-    },
-    {
-      "ts": "1779275121.721279",
-      "no": 9,
-      "marka": "VDM Petdent"
-    },
-    {
-      "ts": "1779283282.205179",
-      "no": 15,
-      "marka": "Bauhaus"
-    },
-    {
-      "ts": "1779283377.829309",
-      "no": 16,
-      "marka": "Bauhaus"
-    },
-    {
-      "ts": "1779342432.583659",
-      "no": 17,
-      "marka": "VDM Petdent"
-    },
-    {
-      "ts": "1779363838.575629",
-      "no": 21,
-      "marka": "VDM Petdent"
-    },
-    {
-      "ts": "1779456154.216919",
-      "no": 24,
-      "marka": "Bauhaus"
-    }
-  ]
+  "blokeli": []
 }

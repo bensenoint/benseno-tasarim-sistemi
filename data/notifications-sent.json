@@ -441,5 +441,104 @@
     "sent_at": "2026-06-03T10:45:27+03:00",
     "user_id": "skip-consolidated",
     "reason": "10:45 TR sync · 17 escalation + 12 blokeli değerlendirildi · 0 yeni eşik geçişi · #25/#26 test briefs (escalation suppress) · 0 yeni brief · Priority: 🔴21 🟠1 🟡0 🟢1 · #20 Tour2America 48h eşiği 12:31'de · #27 Plastik 24h eşiği 13:00'da · Calendar: skipped (headless)"
+  },
+  {
+    "brief_ts": "1780481489.619019",
+    "brief_no": "34",
+    "template": "1_new_brief_dm",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U055EDESLSE",
+    "message_ts": "1780482327.502259",
+    "reason": "#34 KMR Panfix 'yaza merhaba postu' · Print/Broşür · Paralel · atama DM (İpek) · 🟢 Düşük 10Haz13:09 TR · Headless run"
+  },
+  {
+    "brief_ts": "1780481489.619019",
+    "brief_no": "34",
+    "template": "1_new_brief_dm",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U4XCE3532",
+    "message_ts": "1780482327.803619",
+    "reason": "#34 KMR Panfix 'yaza merhaba postu' · atama DM (Cansu) · Headless run"
+  },
+  {
+    "brief_ts": "1780390340.369139",
+    "brief_no": "30",
+    "template": "30_gecikme_lead_reminder_1h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U06J26R1XCJ",
+    "message_ts": "1780482343.731449",
+    "reason": "#30 Bauhaus 'Weber 1&2' gecikme 1sa20dk eşiği aşıldı (deadline 3Haz12:00) · lead Aykut'a Şablon 30 · Headless run"
+  },
+  {
+    "brief_ts": "1780390360.140899",
+    "brief_no": "31",
+    "template": "30_gecikme_lead_reminder_1h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U08HLMHTGEL",
+    "message_ts": "1780482344.022829",
+    "reason": "#31 KZY Supreme gecikme 1sa28dk eşiği aşıldı (deadline 3Haz11:52) · lead Serhat'a Şablon 30 · Headless run"
+  },
+  {
+    "brief_ts": "1780318126.239499",
+    "brief_no": "27",
+    "template": "31_manager_escalation_24h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U055EDESLSE",
+    "message_ts": "1780482344.327479",
+    "reason": "#27 Bauhaus 'Plastik Dolaplar' gecikme 24sa33dk · tasarim sorumlu yönetici İpek'e Şablon 31 · Headless run"
+  },
+  {
+    "brief_ts": "1779355957.360249",
+    "brief_no": "20",
+    "template": "32_kritik_5yonetici_kanal_48h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U030C48PL23",
+    "message_ts": "1780482356.856919",
+    "reason": "#20 Tour2America 48sa eşiği aşıldı (48.82h) · Şablon 32 → Görkem · Headless run"
+  },
+  {
+    "brief_ts": "1779355957.360249",
+    "brief_no": "20",
+    "template": "32_kritik_5yonetici_kanal_48h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "UD96GH76E",
+    "message_ts": "1780482357.176559",
+    "reason": "#20 Tour2America 48h → Şablon 32 → Reyhan · Headless run"
+  },
+  {
+    "brief_ts": "1779355957.360249",
+    "brief_no": "20",
+    "template": "32_kritik_5yonetici_kanal_48h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U4XCE3532",
+    "message_ts": "1780482357.447999",
+    "reason": "#20 Tour2America 48h → Şablon 32 → Cansu · Headless run"
+  },
+  {
+    "brief_ts": "1779355957.360249",
+    "brief_no": "20",
+    "template": "32_kritik_5yonetici_kanal_48h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U055EDESLSE",
+    "message_ts": "1780482357.730859",
+    "reason": "#20 Tour2America 48h → Şablon 32 → İpek · Headless run"
+  },
+  {
+    "brief_ts": "1779355957.360249",
+    "brief_no": "20",
+    "template": "32_kritik_5yonetici_kanal_48h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "U02SZQDAFPF",
+    "message_ts": "1780482358.015839",
+    "reason": "#20 Tour2America 48h → Şablon 32 → erdem · Headless run"
+  },
+  {
+    "brief_ts": "1779355957.360249",
+    "brief_no": "20",
+    "template": "32_kritik_kanal_48h",
+    "sent_at": "2026-06-03T13:20:06+03:00",
+    "user_id": "C02SZRJGY0M",
+    "message_ts": "1780482358.303359",
+    "reason": "#20 Tour2America 48h → Şablon 32 kanal #benseno-grafik · Headless run"
   }
 ]
