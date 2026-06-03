@@ -12,9 +12,6 @@ function fmtDate(d) {
   if (!d) return "—";
   try { return d.toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" }); } catch { return "—"; }
 }
-function usersMap() {
-  return ((window.BNS_DATA && window.BNS_DATA.USERS) || []).reduce((m, u) => { m[u.id] = u; return m; }, {});
-}
 function csvCell(s) { s = String(s == null ? "" : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 
 function BrandScreen({ data, onOpenBrief }) {
@@ -105,7 +102,6 @@ function BrandScreen({ data, onOpenBrief }) {
 
 // ── Tek marka detay sayfası ─────────────────────────────────────────────────
 function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
-  const uById = usersMap();
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
 
   // Marka brief'lerini birleşik satır modeline çevir (aktif + tamamlanan)
@@ -115,7 +111,12 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
 
   // hydrate brief deadline'ı ms (number) ya da TR string olabilir → ms'e normalize et
   const dlMs = b => { const d = b.deadline; if (typeof d === 'number') return d; const p = parseTRDeadline(d); return p ? p.getTime() : null; };
-  const activeIds = b => [b.lead && b.lead.id, ...((b.contributors || []).map(c => c && c.id))].filter(Boolean);
+  // Hem aktif hem tamamlanan kayıtlar HYDRATE edilmiş aynı shape'e sahip (lead obje, contributors dizi)
+  // → tek helper ikisinde de çalışır. (Eskiden completed c.leadId/c.contribIds okuyordu; hydrate bunları
+  //   lead/contributors objesine çevirdiği için atanan "—" görünüyordu.)
+  const rowIds   = b => [b.lead && b.lead.id, ...((b.contributors || []).map(c => c && c.id))].filter(Boolean);
+  const rowNames = b => [b.lead && b.lead.name, ...((b.contributors || []).map(c => c && c.name))].filter(Boolean);
+  const activeIds = rowIds;
 
   const [person, setPerson] = React.useState("");
   const [from, setFrom] = React.useState("");
@@ -126,7 +127,7 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
   const people = React.useMemo(() => {
     const seen = {};
     for (const b of active) { if (b.lead && b.lead.id) seen[b.lead.id] = b.lead.name || b.lead.id; (b.contributors || []).forEach(c => { if (c && c.id) seen[c.id] = c.name || c.id; }); }
-    for (const c of done) { [c.leadId, ...(c.contribIds || [])].filter(Boolean).forEach(id => { if (!seen[id]) seen[id] = (uById[id] && uById[id].name) || id; }); }
+    for (const c of done) { if (c.lead && c.lead.id) seen[c.lead.id] = c.lead.name || c.lead.id; (c.contributors || []).forEach(x => { if (x && x.id && !seen[x.id]) seen[x.id] = x.name || x.id; }); }
     return Object.entries(seen).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, "tr"));
   }, [active, done]);
 
@@ -140,7 +141,7 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
     return true;
   });
   const filteredDone = done.filter(c => {
-    if (person && ![c.leadId, ...(c.contribIds || [])].includes(person)) return false;
+    if (person && !rowIds(c).includes(person)) return false;
     if ((fromMs || toMs) && !inRange(c.deadline || null)) return false;
     return true;
   });
@@ -154,8 +155,8 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
       head = ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev"];
       lines = filteredActive.map(b => [b.no, csvCell(brand), csvCell(b.baslik || b.is), csvCell(b.priority && b.priority.label || ""), csvCell([b.lead && b.lead.name, ...((b.contributors || []).map(c => c && c.name))].filter(Boolean).join("; ")), csvCell(fmtDate(dlMs(b) ? new Date(dlMs(b)) : null)), csvCell(b.durum), b.revision || 0].join(","));
     } else {
-      head = ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma"];
-      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell([c.leadId, ...(c.contribIds || [])].filter(Boolean).map(id => (uById[id] && uById[id].name) || id).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : "")].join(","));
+      head = ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma", "Rev", "Puan"];
+      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell(rowNames(c).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : ""), c.revision || 0, c.rating != null ? c.rating : ""].join(","));
     }
     const blob = new Blob(["﻿" + [head.join(",")].concat(lines).join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -220,26 +221,38 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
           </div>
         </Card>
       ) : (
-        // Tamamlananlar — özet liste
+        // Tamamlananlar — zengin tablo (atanan avatarları, süre, revize, puan, link)
         <Card padding={0}>
           <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
-            <table style={{ width:"100%", minWidth:560, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
+            <table style={{ width:"100%", minWidth:720, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
               <thead>
                 <tr style={{ background:"var(--surface-sub)" }}>
-                  {["#","İş","Atanan","Deadline","Tamamlanma"].map((v, i) => (
-                    <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: i === 0 ? "right" : "left", whiteSpace:"nowrap" }}>{v}</th>
+                  {[["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["🔗","center"]].map(([v, al], i) => (
+                    <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: al, whiteSpace:"nowrap" }}>{v}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {filteredDone.length === 0 && <tr><td colSpan={5} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
+                {filteredDone.length === 0 && <tr><td colSpan={9} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
                 {filteredDone.map((c, idx) => (
                   <tr key={"d" + c.no} style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)" }}>
                     <td style={bCs(true, "right")}>{c.no}</td>
-                    <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:300 }}>{c.baslik || c.is}</td>
-                    <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:200 }}>{[c.leadId, ...(c.contribIds || [])].filter(Boolean).map(id => (uById[id] && uById[id].name) || id).join(", ") || "—"}</td>
+                    <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:280 }}>{c.baslik || c.is}</td>
+                    <td style={bCs()}>
+                      {c.lead || (c.contributors && c.contributors.length) ? (
+                        <span style={{ display:"inline-flex", alignItems:"center", gap:6 }}>
+                          {c.lead && <Avatar user={c.lead} size={20}/>}
+                          {c.contributors && c.contributors.length > 0 && <AvatarStack users={c.contributors} max={2} size={18}/>}
+                          <span style={{ font:"400 12px/1.2 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"nowrap", maxWidth:140, overflow:"hidden", textOverflow:"ellipsis" }}>{rowNames(c).join(", ")}</span>
+                        </span>
+                      ) : <span style={{ color:"var(--ink-4)" }}>—</span>}
+                    </td>
                     <td style={bCs(true)}>{c.deadline ? fmtDate(new Date(c.deadline)) : "—"}</td>
                     <td style={bCs(true)}>{c.bitis ? fmtDate(new Date(c.bitis)) : "—"}</td>
+                    <td style={bCs(true, "right")}>{c.sureH != null ? Math.round(c.sureH) + " sa" : "—"}</td>
+                    <td style={bCs(true, "right", (c.revision || 0) > 0 ? "var(--prio-orange)" : undefined)}>{c.revision || 0}</td>
+                    <td style={bCs(true, "right")}>{c.rating != null ? <span style={{ color:"var(--prio-yellow)" }}>★ {c.rating}</span> : "—"}</td>
+                    <td style={bCs(false, "center")}>{c.slack_url && c.slack_url !== "#" ? <a href={c.slack_url} target="_blank" rel="noreferrer" style={{ color:"var(--ember,#C24A2C)", textDecoration:"none" }}>↗</a> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -265,3 +278,4 @@ function bCs(mono, align, color) {
 }
 
 window.BrandScreen = BrandScreen;
+window.BrandDetail = BrandDetail;
