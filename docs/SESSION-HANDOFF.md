@@ -61,8 +61,9 @@ App.jsx helper reviewer değişimini `gozlemci_ids` PATCH'ine bağlar (boş dizi
   - ⚠️ **C3 yapılmadı** → DB hâlâ test verisiyle dolu; canlı raporlar şişkin sayılar gösterir (21 geçmiş vb.). Temiz raporlar için C3 (TRUNCATE) gerekir.
   - Manuel test: `node scripts/rapor-sabah.js` (Görkem'e DM) · `BNS_REPORT_LIVE=1 node ...` (canlı).
   - **Orchestrator-kill (C2 final):** raporlar artık `live-data.json` okumadığı için `scheduler.js:66` orchestrator cron'u kapatılabilir — **AMA önce ekip Canvas yerine `/yeni-brief` kullanmaya geçmeli** (yoksa Canvas'a eklenen brief'ler DB'ye düşmez). Org-readiness'e bağlı.
-- **C3:** DB'yi sıfırla (TRUNCATE) — veri önemsiz, sıfır-veri go-live. ⚠️ Yıkıcı, açık onayla yapılır.
-- **Kullanıcı aksiyonu:** eski Slack **Workflow**'u kapat (ekip `/yeni-brief` kullansın). Bot adı görünen: **Work Tracking** (handle `@demo_app`).
+- **C3 — ✅ YAPILDI (4 Haz):** Sıfır-veri go-live. `TRUNCATE briefs, brief_assignees, brief_tags, brief_attachments, brief_approvals, events RESTART IDENTITY CASCADE` — brands(13)/users(18) KORUNDU. Yedek: `~/benseno-db-backups/brief-data-*.json` (repo dışı, geri yüklenebilir). API embedded: 0 brief / 13 marka / 18 kullanıcı.
+- **Kullanıcı aksiyonu (BEKLİYOR):** eski Slack **Workflow**'u kapat (ekip `/yeni-brief` kullansın). Bot adı görünen: **Work Tracking** (handle `@demo_app`). Orchestrator kapalı olduğu için Workflow/Canvas'a eklenen briefler ARTIK DB'ye düşmez — ekip mutlaka `/yeni-brief` kullanmalı.
+- **Smoke test (BEKLİYOR):** Slack'te `/yeni-brief` ile gerçek brief aç → marka kanalında post + dashboard'da görün → thread'e ✅ → dashboard'da tamamlandı'ya geçtiğini doğrula (uçtan uca: create + Slack post + reaction→DB).
 
 ## Güvenlik
 data/.db-url, data/.slack*, data/.github-pat*, data/.dashboard-auth-hash ASLA commit edilmez. Token'ları chat'te maskele.
