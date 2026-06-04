@@ -9,6 +9,7 @@
 
 const express = require('express');
 const { getState, getEmbedded } = require('./queries');
+const writes = require('./writes');
 
 const app = express();
 app.use(express.json());
@@ -42,6 +43,34 @@ app.get('/api/embedded', async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
+// ── Yazma yolu (Faz 3) ───────────────────────────────────────
+// Opsiyonel guard: BNS_WRITE_TOKEN set ise x-bns-token eşleşmeli. Set değilse açık (staging).
+function writeGuard(req, res, next) {
+  const want = process.env.BNS_WRITE_TOKEN;
+  if (!want) return next();
+  if (req.get('x-bns-token') === want) return next();
+  return res.status(401).json({ error: 'yetkisiz (x-bns-token gerekli)' });
+}
+
+// Zod/iş hatalarını okunaklı 400/404'e çevir
+function handleWrite(fn) {
+  return async (req, res) => {
+    try {
+      res.json({ ok: true, ...(await fn(req)) });
+    } catch (e) {
+      if (e && e.name === 'ZodError') return res.status(400).json({ error: 'doğrulama', issues: e.issues });
+      const code = /bulunamadı/.test(e.message || '') ? 404 : 400;
+      console.error('[api] write hata:', e.message);
+      res.status(code).json({ error: e.message });
+    }
+  };
+}
+
+app.post('/api/briefs', writeGuard, handleWrite(req => writes.createBrief(req.body)));
+app.patch('/api/briefs/:id', writeGuard, handleWrite(req => writes.patchBrief(+req.params.id, req.body)));
+app.post('/api/briefs/:id/status', writeGuard, handleWrite(req => writes.setStatus(+req.params.id, req.body)));
+app.post('/api/briefs/:id/financials', writeGuard, handleWrite(req => writes.setFinancials(+req.params.id, req.body)));
 
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => console.log(`[api] dinleniyor :${PORT}`));
