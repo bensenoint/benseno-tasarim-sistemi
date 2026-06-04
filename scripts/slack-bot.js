@@ -33,6 +33,24 @@ const BRANDS_LIST = [
   'Marmara Holding', 'Muffik', 'Polisan', 'Splenda', 'Tour2America', 'VDM Petdent',
 ];
 
+// DB'ye best-effort yazma (b3 — Slack aksiyonları DB'ye de düşsün). Hata bot'u BOZMAZ.
+async function dbWrite(method, urlPath, body) {
+  try {
+    const r = await fetch(`${API_BASE}${urlPath}`, {
+      method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); log(`DB ${method} ${urlPath} → ${r.status} ${j.error || ''}`); return false; }
+    log(`DB ${method} ${urlPath} ✓`);
+    return true;
+  } catch (e) { log(`DB ${method} ${urlPath} hata: ${e.message}`); return false; }
+}
+// TR para metni → sayı ("1.500,50"→1500.5, "1500"→1500). Boş/geçersiz → null.
+function parseTRMoney(s) {
+  if (s == null || s === '') return null;
+  const n = Number(String(s).replace(/[^\d.,-]/g, '').replace(/\./g, '').replace(',', '.'));
+  return isNaN(n) ? null : n;
+}
+
 const MANAGER_IDS = new Set([
   'U030C48PL23', // Görkem Kaya
   'UD96GH76E',   // Reyhan Nur Pınar
@@ -557,6 +575,8 @@ app.event('reaction_added', async ({ event, client }) => {
         if (err) log(`complete-brief hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
         else log(`complete-brief: ${(stdout || '').trim().split('\n').pop()}`);
       });
+    // DB'ye de (b3, best-effort): brief'i slack_ts ile bul → tamamlandı.
+    dbWrite('POST', `/api/briefs/by-ts/${event.item.ts}/status`, { durum: 'tamamlandi', by: event.user, source: 'slack' });
     return;
   }
 
@@ -573,6 +593,9 @@ app.event('reaction_added', async ({ event, client }) => {
         if (err) log(`brief-status hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
         else log(`brief-status: ${(stdout || '').trim().split('\n').pop()}`);
       });
+    // DB'ye de (b3, best-effort): emoji → durum kodu.
+    const DURUM_MAP = { art: 'calisiliyor', writing_hand: 'calisiliyor', robot_face: 'calisiliyor', eyes: 'incelemede' };
+    dbWrite('POST', `/api/briefs/by-ts/${event.item.ts}/status`, { durum: DURUM_MAP[reactionBase], by: event.user, source: 'slack' });
     return;
   }
 
@@ -833,6 +856,13 @@ async function handleFinancialsThread(event, client) {
     await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, 'set', String(found.no), by, JSON.stringify(patch)],
       { cwd: PROJECT_DIR, timeout: 120000 });
     log(`thread financials → #${found.no} patch=${JSON.stringify(patch)} (by ${by})`);
+    // DB'ye de (b3, best-effort): thread parent ts = brief slack_ts.
+    const dbFin = { by, source: 'slack' };
+    if (patch.maliyet !== undefined) dbFin.maliyet = parseTRMoney(patch.maliyet);
+    if (patch.satis !== undefined) dbFin.satis = parseTRMoney(patch.satis);
+    if (patch.fatura !== undefined) dbFin.fatura = patch.fatura;
+    if (patch.odeme !== undefined) dbFin.odeme = patch.odeme;
+    dbWrite('POST', `/api/briefs/by-ts/${parentTs}/financials`, dbFin);
     // Kaydedilen güncel tam durumu store'dan oku ve bildir
     let st = {}; try { st = (JSON.parse(fs.readFileSync(FIN_STORE, 'utf8'))[String(found.no)]) || {}; } catch {}
     const m = (v) => (v == null) ? '—' : Number(v).toLocaleString('tr-TR') + '₺';
