@@ -245,6 +245,18 @@ async function setFinancials(id, raw) {
   return res;
 }
 
+// Brief'i alternatif tanımlayıcılarla çöz (Slack tarafı no/slack_ts bilir, DB id bilmez).
+async function noToId(no) {
+  const r = await pool.query('SELECT id FROM briefs WHERE no=$1', [no]);
+  if (!r.rows[0]) throw new Error('brief bulunamadı (no): ' + no);
+  return r.rows[0].id;
+}
+async function tsToId(ts) {
+  const r = await pool.query('SELECT id FROM briefs WHERE slack_ts=$1', [ts]);
+  if (!r.rows[0]) throw new Error('brief bulunamadı (slack_ts): ' + ts);
+  return r.rows[0].id;
+}
+
 // b2 — değişikliği Slack thread'ine yansıt + ilgili briefteki kişilere DM. Best-effort, echo-korumalı.
 async function reflectChange(briefId, summary, source) {
   if (source === 'slack' || !slack.hasToken()) return;
@@ -262,4 +274,4 @@ async function reflectChange(briefId, summary, source) {
   } catch (e) { console.error('[writes] reflect hata:', e.message); }
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, DURUMLAR };
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, noToId, tsToId, DURUMLAR };
