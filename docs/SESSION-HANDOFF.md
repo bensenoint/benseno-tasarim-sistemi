@@ -44,8 +44,15 @@ b2 sayesinde yazma Slack thread'ine de yansır. **Reviewer sync DIŞI** — embe
 (round-trip yok) + API'de temiz rol param'ı yok. Doğrulandı: PATCH+status prod'a yazıldı/okundu/geri alındı.
 Not: id korunuyor (`data.js` hydrate `raw.id`; embedded `bns_briefs[].id` numeric verir).
 
-### Bug 1 (netleştirme bekliyor) — Slack ✅ dashboard'a yansımadı
-Bot ✅'i `event.item.ts` ile `by-ts` DB'de arıyor. Kullanıcı ✅'i thread yanıtına mı / ana brief mesajına mı koydu + emoji tam ✅ mı (white_check_mark) — netleşince: ya kullanım notu, ya handler sağlamlaştırma.
+### Bug 1 — ✅ ÇÖZÜLDÜ (4 Haz) — Slack ✅ thread yanıtında dashboard'a yansımıyordu
+Netleşti: kullanıcı ✅'i **thread yanıtına** koymuştu → `event.item.ts` yanıtın ts'i, brief'in `slack_ts`'i değil → `by-ts` araması başarısız.
+Düzeltme (`scripts/slack-bot.js`): `resolveBriefTs(client, channel, ts)` — `conversations.replies` ile parent (brief) ts'e çözer.
+Üç reaction handler'ı da (✅ tamamlama / 🎨✍️🤖👀 durum / 🔴🟠🟡🟢 öncelik) artık `briefTs` kullanıyor; ana mesaj VE thread yanıtı ikisinde de çalışır.
+Bot 952609b ile temiz redeploy oldu (`node --check` geçti).
+
+### Reviewer kalıcılığı — ✅ EKLENDİ (4 Haz)
+Dashboard "reviewer" → DB `gozlemci` rolüne eşlendi (yeni şema yok). `queries.js` embedded'a `reviewerId` (=ilk gozlemci) ekler;
+App.jsx helper reviewer değişimini `gozlemci_ids` PATCH'ine bağlar (boş dizi → temizler). API stamp-trick ile deploy edildi, round-trip prod'da doğrulandı.
 
 ## Kalan cutover
 - C2: raporları DB'den okuyacak şekilde yaz (sırayla sabah→günlük→haftalık→aylık; mevcut: `claude -p "Skill: benseno-dashboard-agent — sabah-raporu"`). **Test: önce sadece Görkem'e DM.** Sonra `scheduler.js` satır ~66 orchestrator cron'unu kapat.
