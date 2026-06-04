@@ -38,16 +38,18 @@ const MARKA_KANAL = {
 
 // Yapılandırılmış API tabanı (App.jsx poll'u ile aynı mantık) — yoksa null.
 function bnsResolveApiBase() {
+  // Cutover: VARSAYILAN API. ?api=0 / localStorage bns_api=0 → kapalı (eski Slack-yönlendirme).
   const DEFAULT_API = "https://benseno-api-production.up.railway.app";
   try {
     const p = new URLSearchParams(window.location.search).get("api");
-    if (p === "1" || p === "true") return DEFAULT_API;
+    if (p === "0" || p === "false") return null;
     if (p && /^https?:\/\//.test(p)) return p.replace(/\/+$/, "");
     const ls = window.localStorage.getItem("bns_api");
-    if (ls) return ls === "1" ? DEFAULT_API : ls.replace(/\/+$/, "");
+    if (ls === "0") return null;
+    if (ls && ls !== "1") return ls.replace(/\/+$/, "");
     if (window.BNS_API_BASE) return String(window.BNS_API_BASE).replace(/\/+$/, "");
   } catch (e) { /* sandbox */ }
-  return null;
+  return DEFAULT_API;
 }
 window.bnsResolveApiBase = bnsResolveApiBase;
 

@@ -150,16 +150,18 @@ function App() {
     // Veri kaynağı: opt-in API (Faz 2). Öncelik: ?api= param → localStorage → window.BNS_API_BASE.
     // Hiçbiri yoksa eski statik dosya (app/live-data.json) — varsayılan, kanıtlanmış yol.
     function resolveDataUrl() {
+      // Cutover: VARSAYILAN artık API (DB). Escape hatch: ?api=0 → eski statik live-data.json.
       const DEFAULT_API = "https://benseno-api-production.up.railway.app";
-      let base = null;
       try {
         const p = new URLSearchParams(window.location.search).get("api");
-        if (p === "1" || p === "true") base = DEFAULT_API;
-        else if (p && /^https?:\/\//.test(p)) base = p.replace(/\/+$/, "");
-        if (!base) { const ls = window.localStorage.getItem("bns_api"); if (ls) base = ls === "1" ? DEFAULT_API : ls.replace(/\/+$/, ""); }
-        if (!base && window.BNS_API_BASE) base = String(window.BNS_API_BASE).replace(/\/+$/, "");
-      } catch (e) { /* sandbox/SSR */ }
-      return base ? (base + "/api/embedded?t=" + Date.now()) : ("app/live-data.json?t=" + Date.now());
+        if (p === "0" || p === "false") return "app/live-data.json?t=" + Date.now();   // escape
+        if (p && /^https?:\/\//.test(p)) return p.replace(/\/+$/, "") + "/api/embedded?t=" + Date.now();
+        const ls = window.localStorage.getItem("bns_api");
+        if (ls === "0") return "app/live-data.json?t=" + Date.now();
+        if (ls && ls !== "1") return ls.replace(/\/+$/, "") + "/api/embedded?t=" + Date.now();
+        const base = (window.BNS_API_BASE ? String(window.BNS_API_BASE).replace(/\/+$/, "") : DEFAULT_API);
+        return base + "/api/embedded?t=" + Date.now();
+      } catch (e) { return DEFAULT_API + "/api/embedded?t=" + Date.now(); }
     }
     async function poll() {
       try {
