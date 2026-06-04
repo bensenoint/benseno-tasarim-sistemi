@@ -12,7 +12,7 @@ async function allBriefsWithAssignees() {
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
            b.akis, b.stale, b.created_at, b.completed_at, b.updated_at,
            COALESCE(json_agg(
-             json_build_object('id',u.id,'name',u.name,'role',a.role,'initials',u.initials,'color',u.color)
+             json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color)
              ORDER BY a.sira NULLS LAST
            ) FILTER (WHERE u.id IS NOT NULL), '[]') AS assignees
     FROM briefs b
@@ -23,13 +23,17 @@ async function allBriefsWithAssignees() {
     ORDER BY b.no`);
   return r.rows.map(row => {
     const as = row.assignees || [];
-    const lead = as.find(x => x.role === 'lead') || null;
+    const workers = as.filter(x => x.role === 'contributor');   // işi yapanlar
+    const leads = as.filter(x => x.role === 'lead');            // lead(ler)
+    const observers = as.filter(x => x.role === 'gozlemci');    // gözlemciler
     return {
       ...row,
-      lead,
-      contributors: as.filter(x => x.role === 'contributor'),
+      workers, leads, observers,
+      // geriye uyum (getState eski tüketiciler):
+      lead: leads[0] || null,
+      contributors: workers,
       editors: as.filter(x => x.role === 'editor'),
-      gozlemciler: as.filter(x => x.role === 'gozlemci'),
+      gozlemciler: observers,
     };
   });
 }
@@ -98,22 +102,30 @@ async function getEmbedded() {
   ]);
   const ms = (d) => (d ? new Date(d).getTime() : 0);
 
+  // Ekler: brief_id → [{name, permalink}]
+  const att = await pool.query(`SELECT brief_id, filename AS name, url AS permalink FROM brief_attachments ORDER BY id`);
+  const attByBrief = {};
+  for (const a of att.rows) (attByBrief[a.brief_id] ||= []).push({ name: a.name, permalink: a.permalink });
+
   const bns_briefs = all.filter(b => !b.completed_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, dept: b.dept || '',
-    atanan_ids: [b.lead && b.lead.id, ...b.contributors.map(c => c.id)].filter(Boolean),
-    editor_ids: b.editors.map(e => e.id),
-    reviewerId: (b.gozlemciler[0] && b.gozlemciler[0].id) || null,  // dashboard "reviewer" = gozlemci rolü
+    workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '' })),
+    leads:     b.leads.map(l => ({ id: l.id, name: l.name })),
+    observers: b.observers.map(o => ({ id: o.id, name: o.name })),
     deadline: ms(b.deadline), durum: b.durum, rev: b.rev || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
-    slack_url: b.slack_url || (b.slack_ts ? '#' : '#'),
+    slack_url: b.slack_url || '#',
+    attachments: attByBrief[b.id] || [],
   }));
 
   const bns_completed = all.filter(b => b.completed_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik,
-    leadId: b.lead && b.lead.id, contribIds: b.contributors.map(c => c.id),
+    leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
+    workers: b.workers.map(w => ({ id: w.id, name: w.name })),
     deadline: ms(b.deadline), bitis: ms(b.completed_at), rev: b.rev || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || '#',
+    attachments: attByBrief[b.id] || [],
   }));
 
   const bns_dept_stats = {};
