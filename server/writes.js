@@ -113,6 +113,17 @@ async function deriveDept(client, worker_ids) {
   return depts.length ? depts.join(',') : null;
 }
 
+// İlgili departman(lar)ın yöneticileri (yetki='yonetici') — gözlemciye otomatik eklenir.
+async function deptManagers(client, worker_ids) {
+  if (!Array.isArray(worker_ids) || !worker_ids.length) return [];
+  const r = await client.query(
+    `SELECT id FROM users
+     WHERE active AND yetki='yonetici'
+       AND dept IN (SELECT DISTINCT dept FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> '')`,
+    [worker_ids]);
+  return r.rows.map(x => x.id);
+}
+
 // ── operasyonlar ─────────────────────────────────────────────
 async function createBrief(raw) {
   const d = briefCreate.parse(raw);
@@ -134,7 +145,10 @@ async function createBrief(raw) {
        d.akis || 'sirali', d.maliyet ?? null, d.satis ?? null, d.musteri_notu || null,
        d.slack_ts || null, null]);
     const id = r.rows[0].id;
-    await setAssignees(client, id, { worker_ids: d.worker_ids, lead_ids: leadIds, gozlemci_ids: d.gozlemci_ids });
+    // gözlemci = manuel seçilenler ∪ ilgili dept yöneticileri (her zaman)
+    const mgrs = await deptManagers(client, d.worker_ids);
+    const observerIds = [...new Set([...(d.gozlemci_ids || []), ...mgrs])];
+    await setAssignees(client, id, { worker_ids: d.worker_ids, lead_ids: leadIds, gozlemci_ids: observerIds });
     if (Array.isArray(d.tags)) for (const t of d.tags)
       await client.query(`INSERT INTO brief_tags(brief_id,tag) VALUES ($1,$2) ON CONFLICT DO NOTHING`, [id, t]);
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'olusturuldu',
@@ -197,10 +211,14 @@ async function patchBrief(id, raw) {
       if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
     }
     await setAssignees(client, id, d);
-    // işi yapanlar değiştiyse dept yeniden türet
+    // işi yapanlar değiştiyse: dept yeniden türet + dept yöneticilerini gözlemciye ekle (silmeden, idempotent)
     if (d.worker_ids !== undefined) {
       const dept = await deriveDept(client, d.worker_ids);
       await client.query(`UPDATE briefs SET dept=$1 WHERE id=$2`, [dept, id]);
+      const mgrs = await deptManagers(client, d.worker_ids);
+      for (const m of mgrs) await client.query(
+        `INSERT INTO brief_assignees(brief_id,user_id,role,sira) VALUES ($1,$2,'gozlemci',NULL)
+         ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [id, m]);
     }
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'düzenlendi',
       detail: { alanlar: Object.keys(d).filter(k => !['by', 'source', 'slack_ts'].includes(k)) },
