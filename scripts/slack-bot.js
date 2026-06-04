@@ -560,23 +560,38 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
 
 // ─── Aşama D: Reaction Override (anlık) ───────────────────────────────────────
 
+// Reaction bir thread YANITINA konmuşsa parent (brief) ts'ini döndür — aksi halde
+// by-ts araması yanıtın ts'iyle yapılır ve brief bulunamaz (Bug 1). Standalone mesajda ts'i aynen döner.
+async function resolveBriefTs(client, channel, ts) {
+  try {
+    const r = await client.conversations.replies({ channel, ts, limit: 1 });
+    const m = r.messages && r.messages[0];
+    if (m && m.thread_ts) return m.thread_ts;   // reply → parent; parent-with-replies → kendi ts'i
+  } catch (e) { log(`resolveBriefTs hata: ${e.message}`); }
+  return ts;
+}
+
 app.event('reaction_added', async ({ event, client }) => {
   // Mesaj tipinde değilse yoksay (dosya, canvas üzeri olabilir)
   if (event.item.type !== 'message') return;
+
+  // ✅/durum/öncelik reaction'ları brief'in ANA mesajına bağlıdır. Kullanıcı thread
+  // yanıtına koyduysa parent ts'e çöz (Bug 1) — tüm handler'lar bunu kullanır.
+  const briefTs = await resolveBriefTs(client, event.item.channel, event.item.ts);
 
   // ✅ Brief tamamlama (atanan/editör/yönetici — yetkiyi script kontrol eder).
   // Deterministik: brief'i bns_briefs→bns_completed taşır + push. MCP/claude gerektirmez.
   if (event.reaction === 'white_check_mark') {
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
-    log(`✅ tamamlama: ${event.item.ts} — ${event.user}`);
-    execFile('node', [`${PROJECT_DIR}/scripts/complete-brief.js`, event.item.ts, event.user, saat],
+    log(`✅ tamamlama: ${briefTs} — ${event.user}`);
+    execFile('node', [`${PROJECT_DIR}/scripts/complete-brief.js`, briefTs, event.user, saat],
       { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
       (err, stdout, stderr) => {
         if (err) log(`complete-brief hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
         else log(`complete-brief: ${(stdout || '').trim().split('\n').pop()}`);
       });
     // DB'ye de (b3, best-effort): brief'i slack_ts ile bul → tamamlandı.
-    dbWrite('POST', `/api/briefs/by-ts/${event.item.ts}/status`, { durum: 'tamamlandi', by: event.user, source: 'slack' });
+    dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: 'tamamlandi', by: event.user, source: 'slack' });
     return;
   }
 
@@ -586,8 +601,8 @@ app.event('reaction_added', async ({ event, client }) => {
   const reactionBase = event.reaction.replace(/::skin-tone-\d+$/, '');
   if (['art', 'writing_hand', 'robot_face', 'eyes'].includes(reactionBase)) {
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
-    log(`durum reaction: :${reactionBase}: ${event.item.ts} — ${event.user}`);
-    execFile('node', [`${PROJECT_DIR}/scripts/brief-status.js`, event.item.ts, reactionBase, event.user, saat],
+    log(`durum reaction: :${reactionBase}: ${briefTs} — ${event.user}`);
+    execFile('node', [`${PROJECT_DIR}/scripts/brief-status.js`, briefTs, reactionBase, event.user, saat],
       { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
       (err, stdout, stderr) => {
         if (err) log(`brief-status hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
@@ -595,7 +610,7 @@ app.event('reaction_added', async ({ event, client }) => {
       });
     // DB'ye de (b3, best-effort): emoji → durum kodu.
     const DURUM_MAP = { art: 'calisiliyor', writing_hand: 'calisiliyor', robot_face: 'calisiliyor', eyes: 'incelemede' };
-    dbWrite('POST', `/api/briefs/by-ts/${event.item.ts}/status`, { durum: DURUM_MAP[reactionBase], by: event.user, source: 'slack' });
+    dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: DURUM_MAP[reactionBase], by: event.user, source: 'slack' });
     return;
   }
 
@@ -604,7 +619,7 @@ app.event('reaction_added', async ({ event, client }) => {
   if (!PRIORITY_REACTIONS.has(event.reaction)) return;
 
   const emoji    = REACTION_EMOJI[event.reaction];
-  const ts       = event.item.ts;
+  const ts       = briefTs;
   const channel  = event.item.channel;
   const yonetici = event.user;
   const saat     = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });

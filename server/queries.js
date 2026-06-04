@@ -102,6 +102,7 @@ async function getEmbedded() {
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, dept: b.dept || '',
     atanan_ids: [b.lead && b.lead.id, ...b.contributors.map(c => c.id)].filter(Boolean),
     editor_ids: b.editors.map(e => e.id),
+    reviewerId: (b.gozlemciler[0] && b.gozlemciler[0].id) || null,  // dashboard "reviewer" = gozlemci rolü
     deadline: ms(b.deadline), durum: b.durum, rev: b.rev || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || (b.slack_ts ? '#' : '#'),

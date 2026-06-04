@@ -64,6 +64,10 @@ async function bnsPersistBriefChange(prev, next, byId) {
   if ((next.notes || "") !== (prev.notes || "")) patch.musteri_notu = next.notes || "";
   const prevIds = bnsBriefIds(prev), nextIds = bnsBriefIds(next);
   if (prevIds.join(",") !== nextIds.join(",")) patch.atanan_ids = nextIds;
+  // reviewer → gozlemci rolü (tekil). Kaldırılırsa boş dizi ile sıfırla.
+  const prevRev = (prev.reviewer && prev.reviewer.id) || null;
+  const nextRev = (next.reviewer && next.reviewer.id) || null;
+  if (prevRev !== nextRev) patch.gozlemci_ids = nextRev ? [nextRev] : [];
   if (Object.keys(patch).length) await post("", patch);
   return { ok: true };
 }
