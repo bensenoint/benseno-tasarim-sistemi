@@ -10,9 +10,11 @@
 const express = require('express');
 const { getState, getEmbedded } = require('./queries');
 const writes = require('./writes');
+const slack = require('./slack');
+const { pool } = require('./db');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));   // dosya ekleri base64 ile gelir
 
 // CORS — Faz 2 dashboard origin'i için (dinamik; geçici geniş)
 app.use((req, res, next) => {
@@ -78,6 +80,40 @@ app.post('/api/briefs/by-no/:no/financials', writeGuard, handleWrite(async req =
 app.patch('/api/briefs/by-no/:no', writeGuard, handleWrite(async req => writes.patchBrief(await writes.noToId(+req.params.no), req.body)));
 app.post('/api/briefs/by-ts/:ts/status', writeGuard, handleWrite(async req => writes.setStatus(await writes.tsToId(req.params.ts), req.body)));
 app.post('/api/briefs/by-ts/:ts/financials', writeGuard, handleWrite(async req => writes.setFinancials(await writes.tsToId(req.params.ts), req.body)));
+
+// Dosya ekleri (dashboard) — base64 JSON: { files:[{name,mime,b64}], by }. Slack thread'e yükler + DB.
+app.post('/api/briefs/:id/attachments', writeGuard, async (req, res) => {
+  try {
+    const id = +req.params.id;
+    const r = await pool.query('SELECT slack_ts, slack_channel FROM briefs WHERE id=$1', [id]);
+    const brief = r.rows[0];
+    if (!brief) return res.status(404).json({ error: 'brief bulunamadı: ' + id });
+    if (!brief.slack_channel || !brief.slack_ts) return res.status(409).json({ error: 'brief Slack thread yok (henüz post edilmedi)' });
+    const files = Array.isArray(req.body.files) ? req.body.files : [];
+    const out = [];
+    for (const f of files) {
+      if (!f || !f.b64 || !f.name) continue;
+      const buf = Buffer.from(f.b64, 'base64');
+      const u = await slack.uploadFile({ channel: brief.slack_channel, thread_ts: brief.slack_ts, filename: f.name, buf });
+      if (!u.ok) { out.push({ name: f.name, error: u.error || 'upload_fail' }); continue; }
+      await pool.query(
+        `INSERT INTO brief_attachments(brief_id,url,filename,mime,uploaded_by,source) VALUES ($1,$2,$3,$4,$5,'slack')`,
+        [id, u.permalink || '', f.name, f.mime || null, req.body.by || null]);
+      out.push({ name: f.name, permalink: u.permalink });
+    }
+    res.json({ ok: true, attachments: out });
+  } catch (e) { console.error('[api] attachments hata:', e.message); res.status(400).json({ error: e.message }); }
+});
+
+// Sadece-meta ekle (Slack tarafı: dosya ZATEN Slack'te, tekrar yüklemeden DB'ye kaydet).
+app.post('/api/briefs/:id/attachments-meta', writeGuard, async (req, res) => {
+  try {
+    const id = +req.params.id;
+    await pool.query(`INSERT INTO brief_attachments(brief_id,url,filename,mime,uploaded_by,source) VALUES ($1,$2,$3,$4,$5,'slack')`,
+      [id, req.body.url || '', req.body.filename || null, null, req.body.by || null]);
+    res.json({ ok: true });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
 
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => console.log(`[api] dinleniyor :${PORT}`));

@@ -82,4 +82,28 @@ async function dm(userId, text) {
   return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 
-module.exports = { postBrief, postThread, dm, channelForBrand, hasToken, CHANNELS };
+// Dosyayı Slack'e yükle + brief thread'ine iliştir (external upload flow). buf: Buffer.
+async function uploadFile({ channel, thread_ts, filename, buf, title }) {
+  if (!hasToken() || !channel) return { ok: false, skipped: true };
+  const tok = process.env.SLACK_BOT_TOKEN;
+  // 1) upload URL al
+  const g = await fetch("https://slack.com/api/files.getUploadURLExternal", {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded", authorization: `Bearer ${tok}` },
+    body: new URLSearchParams({ filename, length: String(buf.length) }),
+  }).then(r => r.json());
+  if (!g.ok) return { ok: false, error: g.error };
+  // 2) bytes'ı upload_url'e yükle
+  const up = await fetch(g.upload_url, { method: "POST", body: buf });
+  if (!up.ok) return { ok: false, error: "upload_post_" + up.status };
+  // 3) tamamla + thread'e paylaş
+  const c = await slackCall("files.completeUploadExternal", {
+    files: [{ id: g.file_id, title: title || filename }],
+    channel_id: channel, thread_ts,
+  });
+  if (!c.ok) return { ok: false, error: c.error };
+  const f = (c.files && c.files[0]) || {};
+  return { ok: true, file_id: g.file_id, permalink: f.permalink || null, name: filename };
+}
+
+module.exports = { postBrief, postThread, dm, uploadFile, channelForBrand, hasToken, CHANNELS };
