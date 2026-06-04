@@ -196,8 +196,8 @@ function APIBriefForm({ apiBase, data, onClose }) {
       </div>
 
       <PeoplePicker label="İşi yapan(lar) *" users={users} selected={f.workerIds} onChange={ids => set("workerIds", ids)} grouped />
-      <PeoplePicker label="Lead(ler) — son kontrol (boş = sen)" users={users} selected={f.leadIds} onChange={ids => set("leadIds", ids)} />
-      <PeoplePicker label="Gözlemciler" users={users} selected={f.gozlemciIds} onChange={ids => set("gozlemciIds", ids)} />
+      <PeoplePicker label="Lead(ler) — son kontrol (boş bırakırsan briefi açan lead olur)" users={users} selected={f.leadIds} onChange={ids => set("leadIds", ids)} />
+      <PeoplePicker label="Gözlemciler (ilgili departman yöneticisi otomatik eklenir)" users={users} selected={f.gozlemciIds} onChange={ids => set("gozlemciIds", ids)} />
 
       <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <span style={FIELD_LABEL}>Dosyalar (ops.)</span>
