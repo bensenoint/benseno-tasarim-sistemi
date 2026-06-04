@@ -70,3 +70,10 @@ App.jsx helper reviewer değişimini `gozlemci_ids` PATCH'ine bağlar (boş dizi
 ## Güvenlik
 data/.db-url, data/.slack*, data/.github-pat*, data/.dashboard-auth-hash ASLA commit edilmez. Token'ları chat'te maskele.
 Gerçek marka kanallarına test mesajı atma (test için `BNS_FORCE_CHANNEL=#benseno-grafik` env ekle, sonra `railway variables delete BNS_FORCE_CHANNEL`).
+
+## Ölü kod temizliği — ✅ YAPILDI (4 Haz)
+Silindi: skill'ler (benseno-orchestrator/data-agent/dashboard-agent/notification-agent/brief-tamamla/reaction-override),
+script'ler (run-orchestrator, run-startup-recovery, watchdog, run-slack-bot), stale state (agent-state.json, canvas_cache.md), server/scripts/seed-from-livedata.js.
+`check-pat-expiry.sh` → claude/notification-agent yerine doğrudan Slack API (`notify()`, Railway-uyumlu).
+**KORUNDU:** benseno-onboarding skill (manuel onboarding aracı), escape hatch (live-data.json + EMBEDDED_DATA + ?api=0), marka_stats.json + brief-queue.json (slack-bot.js hâlâ okuyor — App Home E3 satırı + queueeEkle).
+**DEFER:** App Home'daki E3-mod satırı + queueeEkle ölü kodu (canlı-bot cerrahisi gerektirir, ayrı adım). Bot 8aa9d9a ile temiz redeploy oldu.
