@@ -10,6 +10,7 @@
 
 const { z } = require('zod');
 const { pool, tx } = require('./db');
+const slack = require('./slack');
 
 const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'blokeli', 'tamamlandi'];
 
@@ -118,7 +119,7 @@ async function setAssignees(client, briefId, { atanan_ids, editor_ids, gozlemci_
 // ── operasyonlar ─────────────────────────────────────────────
 async function createBrief(raw) {
   const d = briefCreate.parse(raw);
-  return tx(async (client) => {
+  const result = await tx(async (client) => {
     const markaId = await brandIdByName(client, d.marka);
     // no: verilmemişse max+1
     let no = d.no;
@@ -140,6 +141,41 @@ async function createBrief(raw) {
       detail: { marka: d.marka, baslik: d.baslik, no }, source: d.source, slack_ts: d.slack_ts });
     return { id, no };
   });
+
+  // Slack çıkışı (b1.2) — dashboard-kökenli oluşturmalarda markanın kanalına post et.
+  // Slack-kökenli (source='slack') olanlarda ECHO yapma. Best-effort: hata create'i bozmaz.
+  if (d.source !== 'slack' && slack.hasToken()) {
+    try {
+      const ids = (d.atanan_ids || []).filter(Boolean);
+      let leadName = null, contribNames = [];
+      if (ids.length) {
+        const u = await pool.query('SELECT id,name FROM users WHERE id = ANY($1)', [ids]);
+        const byId = Object.fromEntries(u.rows.map(r => [r.id, r.name]));
+        leadName = byId[ids[0]] || null;
+        contribNames = ids.slice(1).map(i => byId[i]).filter(Boolean);
+      }
+      const deadlineMs = d.deadline ? (typeof d.deadline === 'number' ? d.deadline : Date.parse(d.deadline)) : null;
+      const post = await slack.postBrief({ marka: d.marka, baslik: d.baslik, no: result.no,
+        deadlineMs, dept: d.dept, akis: d.akis, leadName, contribNames });
+      if (post.ok) {
+        await pool.query('UPDATE briefs SET slack_ts=$1, slack_channel=$2, slack_url=$3 WHERE id=$4',
+          [post.ts, post.channel, post.permalink || null, result.id]);
+        await pool.query(`INSERT INTO events(brief_id,verb,detail,source) VALUES ($1,'slack:gönderildi',$2,'system')`,
+          [result.id, JSON.stringify({ channel: post.channel, ts: post.ts })]);
+        result.slack = { ts: post.ts, channel: post.channel, permalink: post.permalink };
+      } else if (!post.skipped) {
+        await pool.query(`INSERT INTO events(brief_id,verb,detail,source) VALUES ($1,'slack:hata',$2,'system')`,
+          [result.id, JSON.stringify({ error: post.error })]);
+        result.slack = { error: post.error };
+      } else {
+        result.slack = { skipped: post.error };
+      }
+    } catch (e) {
+      console.error('[writes] slack post hata:', e.message);
+      result.slack = { error: e.message };
+    }
+  }
+  return result;
 }
 
 async function patchBrief(id, raw) {
