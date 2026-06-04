@@ -21,7 +21,11 @@
       "durum": "👀 Revize bekliyor (v2 teslim · bakanlık geri dönüşü) · 🔴 Blokeli",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 400
+      "gecikme_h": 400,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 3,
@@ -39,7 +43,11 @@
       "durum": "6g+ pasif · 🔴 Blokeli · Aykut > Eda T pasif",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 358
+      "gecikme_h": 358,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 4,
@@ -57,7 +65,11 @@
       "durum": "tasarımcı yok · İpek dispatch > Görkem · 8g eşiği AŞILDI · 🔴 Blokeli",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 331
+      "gecikme_h": 331,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 5,
@@ -74,7 +86,11 @@
       "durum": "🚨 v1 yok · Eren · 8g eşiği AŞILDI · 🔴 Blokeli",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 330
+      "gecikme_h": 330,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 6,
@@ -91,7 +107,11 @@
       "durum": "v1 yok · Arda hafta sonu pasif · 🔴 Blokeli",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 350
+      "gecikme_h": 350,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 7,
@@ -108,7 +128,11 @@
       "durum": "uzun lead · İpek",
       "blokeli": false,
       "gecmis": false,
-      "gecikme_h": 0
+      "gecikme_h": 0,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 8,
@@ -125,7 +149,11 @@
       "durum": "🚨 dept ambiguity · Arda dispatch sırada · 8g eşiği AŞILDI · 🔴 Blokeli",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 330
+      "gecikme_h": 330,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 9,
@@ -142,7 +170,11 @@
       "durum": "🔴 Blokeli · 72sa AÇILDI · Şablon 29 DM → Eren (26May09:33) · v1 yok",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 296
+      "gecikme_h": 296,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 15,
@@ -160,7 +192,11 @@
       "durum": "🎨 v1 13:28 🌸 · Eda T 14:04 yarı kabul · 5g+ onay pasif · 7g eşiği AŞILDI · 🔴 Blo",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 306
+      "gecikme_h": 306,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 16,
@@ -178,7 +214,11 @@
       "durum": "🎨 v1 14:40 🌸 · Eda T 14:50 ellerine sağlıkk · 3g+ pasif onay yok · 🔴 Blokeli",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 303
+      "gecikme_h": 303,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 17,
@@ -196,7 +236,11 @@
       "durum": "🚨 v1 yok · Görkem DM Cuma 16:45 · 72sa + 8g eşiği AŞILDI · 🔴 Blokeli",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 311
+      "gecikme_h": 311,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 20,
@@ -214,7 +258,11 @@
       "durum": "yeni · Eren+Görkem · 72sa eşik geçişi · Normal öncelik",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 67
+      "gecikme_h": 67,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 21,
@@ -233,7 +281,11 @@
       "durum": "🚨 GEÇMİŞ · Şablon 24+25+29 gönderildi (29→Eren 26May14:46) · 72sa AŞILDI · 6g eş",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 281
+      "gecikme_h": 281,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 22,
@@ -252,7 +304,11 @@
       "durum": "⏸ Cansu Direktör onayı · erdem copy edit tamamlandı · bayram sonrası devam",
       "blokeli": false,
       "gecmis": false,
-      "gecikme_h": 0
+      "gecikme_h": 0,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 24,
@@ -270,7 +326,11 @@
       "durum": "⚠️ GEÇMİŞ · Aykut yarı onay Cuma 17:35 · Arda kısmı belirsiz · 🔴 Blokeli",
       "blokeli": true,
       "gecmis": true,
-      "gecikme_h": 302
+      "gecikme_h": 302,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 25,
@@ -288,7 +348,11 @@
       "durum": "yeni · Cansu+Görkem · ⚠️ test içeriği (İş='test')",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 46
+      "gecikme_h": 46,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 26,
@@ -306,7 +370,11 @@
       "durum": "🎨 Tasarımda · rev 1",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 41
+      "gecikme_h": 41,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 27,
@@ -324,7 +392,11 @@
       "durum": "yeni · Hasan Serdar+Aykut · Sosyal Medya Post · Paralel akış · 💬 video içeriği",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 43
+      "gecikme_h": 43,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 28,
@@ -342,7 +414,11 @@
       "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 19
+      "gecikme_h": 19,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 29,
@@ -360,7 +436,11 @@
       "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 39
+      "gecikme_h": 39,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 30,
@@ -378,7 +458,11 @@
       "durum": "🎨 Tasarımda · rev 1",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 20
+      "gecikme_h": 20,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 31,
@@ -395,7 +479,11 @@
       "durum": "yeni · Serhat · Print / Broşür",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 20
+      "gecikme_h": 20,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 33,
@@ -412,7 +500,11 @@
       "durum": "👀 Revizede",
       "blokeli": false,
       "gecmis": true,
-      "gecikme_h": 18
+      "gecikme_h": 18,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 34,
@@ -430,7 +522,11 @@
       "durum": "🎨 Tasarımda",
       "blokeli": false,
       "gecmis": false,
-      "gecikme_h": 0
+      "gecikme_h": 0,
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     }
   ],
   "bns_completed": [
@@ -447,7 +543,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "✅ Görkem"
+      "notes": "✅ Görkem",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 2,
@@ -462,7 +562,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "✅ Görkem"
+      "notes": "✅ Görkem",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 10,
@@ -477,7 +581,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "v1 + yayında onaylandı"
+      "notes": "v1 + yayında onaylandı",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 11,
@@ -492,7 +600,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "3sa erken teslim"
+      "notes": "3sa erken teslim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 12,
@@ -507,7 +619,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "onaylandı"
+      "notes": "onaylandı",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 13,
@@ -522,7 +638,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "slogan+fiyat revize · onaylandı"
+      "notes": "slogan+fiyat revize · onaylandı",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 14,
@@ -537,7 +657,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "kritik pencerede tam zamanında"
+      "notes": "kritik pencerede tam zamanında",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 18,
@@ -552,7 +676,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "İPTAL · DUPLICATE · #19 gerçek"
+      "notes": "İPTAL · DUPLICATE · #19 gerçek",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 19,
@@ -567,7 +695,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "2sa 50dk erken"
+      "notes": "2sa 50dk erken",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 23,
@@ -582,7 +714,11 @@
       "rating": null,
       "slack_url": null,
       "image_url": null,
-      "notes": "v1+v2 → onaylandı"
+      "notes": "v1+v2 → onaylandı",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     }
   ],
   "bns_brands": [
