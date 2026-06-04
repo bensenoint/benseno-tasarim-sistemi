@@ -8,7 +8,7 @@
  */
 
 const express = require('express');
-const { getState } = require('./queries');
+const { getState, getEmbedded } = require('./queries');
 
 const app = express();
 app.use(express.json());
@@ -29,6 +29,16 @@ app.get('/api/state', async (req, res) => {
     res.json(await getState());
   } catch (e) {
     console.error('[api] /api/state hata:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Dashboard'ın doğrudan tükettiği HAM bns_* shape (poll buraya bağlanacak; Faz 2).
+app.get('/api/embedded', async (req, res) => {
+  try {
+    res.json(await getEmbedded());
+  } catch (e) {
+    console.error('[api] /api/embedded hata:', e.message);
     res.status(500).json({ error: e.message });
   }
 });

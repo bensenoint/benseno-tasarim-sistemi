@@ -78,4 +78,53 @@ async function getState() {
   };
 }
 
-module.exports = { getState, allBriefsWithAssignees };
+// DB → dashboard'ın HAM beklediği bns_* shape (index.html EMBEDDED_DATA + poll ile aynı).
+// Dashboard kendi bnsHydrate* hattından geçirir; biz sadece doğru ham alan adlarını üretiriz.
+async function getEmbedded() {
+  const [all, brands, users, dept] = await Promise.all([
+    allBriefsWithAssignees(),
+    pool.query(`SELECT name, color, wheel_idx FROM brands ORDER BY name`),
+    pool.query(`SELECT id,name,rol,dept,yetki,initials,color FROM users WHERE active ORDER BY rol,name`),
+    pool.query(`
+      SELECT u.dept,
+        count(DISTINCT u.id)::int people,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL)::int active,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.deadline < now())::int overdue,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at >= now() - interval '30 days')::int completed30
+      FROM users u
+      LEFT JOIN brief_assignees a ON a.user_id = u.id
+      LEFT JOIN briefs b ON b.id = a.brief_id
+      WHERE u.dept IS NOT NULL GROUP BY u.dept`),
+  ]);
+  const ms = (d) => (d ? new Date(d).getTime() : 0);
+
+  const bns_briefs = all.filter(b => !b.completed_at).map(b => ({
+    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, dept: b.dept || '',
+    atanan_ids: [b.lead && b.lead.id, ...b.contributors.map(c => c.id)].filter(Boolean),
+    editor_ids: b.editors.map(e => e.id),
+    deadline: ms(b.deadline), durum: b.durum, rev: b.rev || 0,
+    maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
+    slack_url: b.slack_url || (b.slack_ts ? '#' : '#'),
+  }));
+
+  const bns_completed = all.filter(b => b.completed_at).map(b => ({
+    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik,
+    leadId: b.lead && b.lead.id, contribIds: b.contributors.map(c => c.id),
+    deadline: ms(b.deadline), bitis: ms(b.completed_at), rev: b.rev || 0,
+    maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
+    slack_url: b.slack_url || '#',
+  }));
+
+  const bns_dept_stats = {};
+  for (const r of dept.rows) bns_dept_stats[r.dept] = r;
+
+  return {
+    now: new Date().toISOString(),
+    bns_brands: brands.rows.map(b => ({ name: b.name, color: b.color, wheelIdx: b.wheel_idx })),
+    bns_users: users.rows,
+    bns_briefs, bns_completed, bns_dept_stats,
+    source: 'postgres', generated_at: new Date().toISOString(),
+  };
+}
+
+module.exports = { getState, getEmbedded, allBriefsWithAssignees };
