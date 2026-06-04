@@ -55,9 +55,12 @@ Dashboard "reviewer" → DB `gozlemci` rolüne eşlendi (yeni şema yok). `queri
 App.jsx helper reviewer değişimini `gozlemci_ids` PATCH'ine bağlar (boş dizi → temizler). API stamp-trick ile deploy edildi, round-trip prod'da doğrulandı.
 
 ## Kalan cutover
-- C2: raporları DB'den okuyacak şekilde yaz (sırayla sabah→günlük→haftalık→aylık; mevcut: `claude -p "Skill: benseno-dashboard-agent — sabah-raporu"`). **Test: önce sadece Görkem'e DM.** Sonra `scheduler.js` satır ~66 orchestrator cron'unu kapat.
-- C3: DB'yi sıfırla (TRUNCATE) — veri önemsiz, sıfır-veri go-live.
-- Kullanıcı aksiyonu: eski Slack **Workflow**'u kapat (ekip `/yeni-brief` kullansın). Bot adı görünen: **Work Tracking** (handle `@demo_app`).
+- **C2 — ✅ YAPILDI (4 Haz):** 4 rapor (sabah/günlük/haftalık/aylık) deterministik Node'a geçti, `/api/embedded`'den okuyor + claude (haiku) yorum katmanı. Dosyalar: `scripts/rapor-lib.js` + `scripts/rapor-{sabah,gunluk,haftalik,aylik}.js`. `run-*.sh` wrapper'ları artık `claude -p` yerine node çağırıyor (Railway'de claude CLI yoktu → raporlar sessizce ölüydü; artık çalışıyor). Scheduler crons değişmedi.
+  - **Mod:** varsayılan **Görkem-only** (test). Canlıya almak: Railway `benseno-tasarim-sistemi` servisine `BNS_REPORT_LIVE=1` env ekle → 5 yönetici + #benseno-grafik.
+  - Manuel test: `node scripts/rapor-sabah.js` (Görkem'e DM) · `BNS_REPORT_LIVE=1 node ...` (canlı).
+  - **Orchestrator-kill (C2 final):** raporlar artık `live-data.json` okumadığı için `scheduler.js:66` orchestrator cron'u kapatılabilir — **AMA önce ekip Canvas yerine `/yeni-brief` kullanmaya geçmeli** (yoksa Canvas'a eklenen brief'ler DB'ye düşmez). Org-readiness'e bağlı.
+- **C3:** DB'yi sıfırla (TRUNCATE) — veri önemsiz, sıfır-veri go-live. ⚠️ Yıkıcı, açık onayla yapılır.
+- **Kullanıcı aksiyonu:** eski Slack **Workflow**'u kapat (ekip `/yeni-brief` kullansın). Bot adı görünen: **Work Tracking** (handle `@demo_app`).
 
 ## Güvenlik
 data/.db-url, data/.slack*, data/.github-pat*, data/.dashboard-auth-hash ASLA commit edilmez. Token'ları chat'te maskele.
