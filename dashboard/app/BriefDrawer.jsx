@@ -91,28 +91,12 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
 
           <Eyebrow>Atama</Eyebrow>
           <div style={{display:"flex", flexDirection:"column", gap:8, marginTop:10}}>
-            {b.lead
-              ? <RoleRow tag="LEAD" user={b.lead} users={allUsers} onChange={(u) => set({ lead: u })}/>
-              : <div style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-4)", padding:"4px 0"}}>— Lead atanmamış</div>
-            }
-            {(b.contributors || []).filter(Boolean).map((u, i) => (
-              <RoleRow key={u.id || i} tag="CONTRIB" user={u} users={allUsers}
-                onChange={(nu) => {
-                  const next = [...b.contributors]; next[i] = nu; set({ contributors: next });
-                }}
-                onRemove={() => {
-                  const next = b.contributors.filter((_, idx) => idx !== i);
-                  set({ contributors: next });
-                }}/>
-            ))}
-            {b.reviewer && <RoleRow tag="REV" user={b.reviewer} users={allUsers}
-              onChange={(u) => set({ reviewer: u })}
-              onRemove={() => set({ reviewer: null })}/>}
-            <AddRoleRow
-              onAddContrib={(u) => set({ contributors: [...(b.contributors||[]), u] })}
-              onAddReviewer={(u) => set({ reviewer: u })}
-              allUsers={allUsers || []}
-              hasReviewer={!!b.reviewer}/>
+            <RoleGroup tag="İŞİ YAPAN" list={b.workers} allUsers={allUsers}
+              onChange={(arr) => set({ workers: arr })} showDept/>
+            <RoleGroup tag="LEAD" list={b.leads} allUsers={allUsers}
+              onChange={(arr) => set({ leads: arr })}/>
+            <RoleGroup tag="GÖZLEMCİ" list={b.observers} allUsers={allUsers}
+              onChange={(arr) => set({ observers: arr })}/>
           </div>
 
           <Hr/>
@@ -260,6 +244,30 @@ function StatusEditor({ current, onPick }) {
         </div>
       )}
     </span>
+  );
+}
+
+// Bir rol grubu (işi yapan / lead / gözlemci) — liste + ekle/çıkar. onChange(yeniDizi).
+function RoleGroup({ tag, list, allUsers, onChange }) {
+  const [adding, setAdding] = React.useState(false);
+  const arr = (list || []).filter(Boolean);
+  return (
+    <div style={{display:"flex", flexDirection:"column", gap:6}}>
+      {arr.length === 0 && (
+        <div style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-4)", padding:"2px 0"}}>{tag}: —</div>
+      )}
+      {arr.map((u, i) => (
+        <RoleRow key={u.id || i} tag={tag} user={u} users={allUsers}
+          onChange={(nu) => { const n = [...arr]; n[i] = nu; onChange(n); }}
+          onRemove={() => onChange(arr.filter((_, idx) => idx !== i))}/>
+      ))}
+      <div style={{position:"relative"}}>
+        <button onClick={() => setAdding(v => !v)} style={ghostBtn}><I.Plus size={12}/> {tag} ekle</button>
+        {adding && <UserPicker users={allUsers || []}
+          onPick={(u) => { if (!arr.some(x => x.id === u.id)) onChange([...arr, u]); setAdding(false); }}
+          onClose={() => setAdding(false)}/>}
+      </div>
+    </div>
   );
 }
 

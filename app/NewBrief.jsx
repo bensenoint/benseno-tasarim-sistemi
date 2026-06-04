@@ -56,23 +56,59 @@ window.bnsResolveApiBase = bnsResolveApiBase;
 const FIELD_LABEL = { font: "500 11px/1 var(--font-sans)", letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-3)" };
 const FIELD_BOX = { font: "500 14px/1.3 var(--font-sans)", color: "var(--ink)", background: "var(--surface-sub)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 11px", outline: "none", width: "100%", boxSizing: "border-box" };
 
+// Çoklu kişi seçici — grouped:true ise departmana göre gruplar.
+function PeoplePicker({ label, users, selected, onChange, grouped }) {
+  const toggle = (id) => onChange(selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
+  const groups = grouped
+    ? {
+        Tasarım: users.filter(u => u.dept === "tasarim"),
+        Editör: users.filter(u => u.dept === "editor"),
+        AI: users.filter(u => u.dept === "ai"),
+        Diğer: users.filter(u => !["tasarim", "editor", "ai"].includes(u.dept)),
+      }
+    : { "": users };
+  return (
+    <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={FIELD_LABEL}>{label}</span>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 180, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 8, padding: 8 }}>
+        {Object.entries(groups).map(([g, us]) => (!us.length ? null :
+          <div key={g}>
+            {g && <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ink-4)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{g}</div>}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {us.map(u => {
+                const on = selected.includes(u.id);
+                return (
+                  <button key={u.id} type="button" onClick={() => toggle(u.id)} style={{
+                    cursor: "pointer", border: "1px solid " + (on ? "var(--ember)" : "var(--line)"),
+                    background: on ? "var(--ember)" : "var(--surface-sub)", color: on ? "#fff" : "var(--ink-2)",
+                    borderRadius: 999, padding: "5px 10px", font: "500 12px/1 var(--font-sans)",
+                  }}>{u.name}</button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </label>
+  );
+}
+
 // ── API modu: tam intake formu → POST /api/briefs ────────────
 function APIBriefForm({ apiBase, data, onClose }) {
   const users = (data.USERS || []).filter(u => u.active !== false);
   const brands = data.BRANDS || [];
   const me = data.ME || {};
   const [f, setF] = React.useState({
-    marka: "", baslik: "", dept: "", deadlineDate: "", deadlineTime: "17:00",
-    leadId: "", contribIds: [], musteri_notu: "", akis: "sirali", maliyet: "", satis: "",
+    marka: "", baslik: "", deadlineDate: "", deadlineTime: "17:00",
+    workerIds: [], leadIds: me.id ? [me.id] : [], gozlemciIds: [],
+    musteri_notu: "", akis: "sirali", maliyet: "", satis: "",
   });
+  const [files, setFiles] = React.useState([]);
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState(null);
   const set = (k, v) => setF(s => ({ ...s, [k]: v }));
-  const toggleContrib = (id) => setF(s => ({
-    ...s, contribIds: s.contribIds.includes(id) ? s.contribIds.filter(x => x !== id) : [...s.contribIds, id]
-  }));
 
-  const valid = f.marka && f.baslik.trim();
+  const valid = f.marka && f.baslik.trim() && f.workerIds.length;
 
   async function submit() {
     if (!valid || busy) return;
@@ -83,11 +119,11 @@ function APIBriefForm({ apiBase, data, onClose }) {
       const t = f.deadlineTime || "17:00";
       deadline = new Date(`${f.deadlineDate}T${t}:00`).toISOString();
     }
-    const atanan_ids = [f.leadId, ...f.contribIds].filter(Boolean);
     const body = {
-      marka: f.marka, baslik: f.baslik.trim(),
-      dept: f.dept || undefined, deadline,
-      atanan_ids: atanan_ids.length ? atanan_ids : undefined,
+      marka: f.marka, baslik: f.baslik.trim(), deadline,
+      worker_ids: f.workerIds.length ? f.workerIds : undefined,
+      lead_ids: f.leadIds.length ? f.leadIds : undefined,
+      gozlemci_ids: f.gozlemciIds.length ? f.gozlemciIds : undefined,
       musteri_notu: f.musteri_notu.trim() || undefined,
       akis: f.akis,
       maliyet: f.maliyet !== "" ? Number(f.maliyet) : undefined,
@@ -103,6 +139,19 @@ function APIBriefForm({ apiBase, data, onClose }) {
       if (!r.ok) throw new Error(j.error === "doğrulama"
         ? "Doğrulama hatası: " + (j.issues || []).map(i => (i.path || []).join(".")).join(", ")
         : (j.error || ("HTTP " + r.status)));
+      // Dosyalar varsa brief thread'ine yükle (best-effort)
+      if (files.length && j.id) {
+        const payloadFiles = await Promise.all(files.map(file => new Promise((resolve) => {
+          const rd = new FileReader();
+          rd.onload = () => resolve({ name: file.name, mime: file.type, b64: String(rd.result).split(",")[1] });
+          rd.onerror = () => resolve(null);
+          rd.readAsDataURL(file);
+        })));
+        await fetch(apiBase + `/api/briefs/${j.id}/attachments`, {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ files: payloadFiles.filter(Boolean), by: me.id || undefined }),
+        }).catch(() => {});
+      }
       if (window.bnsRefresh) window.bnsRefresh();
       if (window.bnsToast) window.bnsToast(`✅ Brief #${j.no} oluşturuldu`);
       onClose();
@@ -126,24 +175,14 @@ function APIBriefForm({ apiBase, data, onClose }) {
         <input value={f.baslik} onChange={e => set("baslik", e.target.value)} placeholder="ör. Sosyal medya paketi — Mayıs" style={FIELD_BOX} />
       </label>
 
-      <div style={{ display: "flex", gap: 10 }}>
-        <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-          <span style={FIELD_LABEL}>Departman</span>
-          <select value={f.dept} onChange={e => set("dept", e.target.value)} style={FIELD_BOX}>
-            <option value="">—</option>
-            <option value="tasarim">Tasarım</option>
-            <option value="editor">Editör</option>
-            <option value="ai">AI</option>
-          </select>
-        </label>
-        <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-          <span style={FIELD_LABEL}>Akış</span>
-          <select value={f.akis} onChange={e => set("akis", e.target.value)} style={FIELD_BOX}>
-            <option value="sirali">Sıralı</option>
-            <option value="paralel">Paralel</option>
-          </select>
-        </label>
-      </div>
+      <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <span style={FIELD_LABEL}>Akış</span>
+        <select value={f.akis} onChange={e => set("akis", e.target.value)} style={FIELD_BOX}>
+          <option value="sirali">Sıralı</option>
+          <option value="paralel">Paralel</option>
+        </select>
+        <span style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)" }}>Departman, işi yapan kişilerden otomatik belirlenir.</span>
+      </label>
 
       <div style={{ display: "flex", gap: 10 }}>
         <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: 2 }}>
@@ -156,29 +195,16 @@ function APIBriefForm({ apiBase, data, onClose }) {
         </label>
       </div>
 
-      <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <span style={FIELD_LABEL}>İşi yapan (lead)</span>
-        <select value={f.leadId} onChange={e => set("leadId", e.target.value)} style={FIELD_BOX}>
-          <option value="">—</option>
-          {users.map(u => <option key={u.id} value={u.id}>{u.name}{u.rol ? ` · ${u.rol}` : ""}</option>)}
-        </select>
-      </label>
+      <PeoplePicker label="İşi yapan(lar) *" users={users} selected={f.workerIds} onChange={ids => set("workerIds", ids)} grouped />
+      <PeoplePicker label="Lead(ler) — son kontrol (boş = sen)" users={users} selected={f.leadIds} onChange={ids => set("leadIds", ids)} />
+      <PeoplePicker label="Gözlemciler" users={users} selected={f.gozlemciIds} onChange={ids => set("gozlemciIds", ids)} />
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <span style={FIELD_LABEL}>Katkıda bulunanlar</span>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {users.filter(u => u.id !== f.leadId).map(u => {
-            const on = f.contribIds.includes(u.id);
-            return (
-              <button key={u.id} type="button" onClick={() => toggleContrib(u.id)} style={{
-                cursor: "pointer", border: "1px solid " + (on ? "var(--ember)" : "var(--line)"),
-                background: on ? "var(--ember)" : "var(--surface-sub)", color: on ? "#fff" : "var(--ink-2)",
-                borderRadius: 999, padding: "5px 10px", font: "500 12px/1 var(--font-sans)",
-              }}>{u.name}</button>
-            );
-          })}
-        </div>
-      </div>
+      <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <span style={FIELD_LABEL}>Dosyalar (ops.)</span>
+        <input type="file" multiple onChange={e => setFiles(Array.from(e.target.files || []))}
+          style={{ font: "12px var(--font-sans)" }} />
+        {files.length > 0 && <span style={{ font: "400 11px/1.3 var(--font-mono)", color: "var(--ink-4)" }}>{files.length} dosya seçili</span>}
+      </label>
 
       <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <span style={FIELD_LABEL}>Müşteri notu / açıklama</span>

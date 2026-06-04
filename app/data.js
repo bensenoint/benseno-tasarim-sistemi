@@ -442,21 +442,36 @@ function bnsHydrateBrief(raw, idx) {
     color: WHEEL[brandHash(raw.marka)],
     wheelIdx: brandHash(raw.marka)
   };
-  // Lead: leadId (eski format) veya atanan_ids[0] (yeni data-agent formatı)
   const liveUsers = (window.BNS_DATA && window.BNS_DATA.USERS) || USERS;
-  const leadId = raw.leadId || (Array.isArray(raw.atanan_ids) && raw.atanan_ids[0]) || null;
-  const contribIds = raw.contribIds || (Array.isArray(raw.atanan_ids) ? raw.atanan_ids.slice(1) : []);
-  const editorIds = Array.isArray(raw.editor_ids) ? raw.editor_ids : [];
+  // Yeni shape: workers/leads/observers (embedded). Yoksa eski format (escape-hatch live-data.json).
+  const resolveU = (x) => liveUsers.find(u => u.id === (x && x.id ? x.id : x)) || (x && x.name ? x : null);
+  let workers, leads, observers;
+  if (raw.workers || raw.leads || raw.observers) {
+    workers   = (raw.workers   || []).map(resolveU).filter(Boolean);
+    leads     = (raw.leads     || []).map(resolveU).filter(Boolean);
+    observers = (raw.observers || []).map(resolveU).filter(Boolean);
+  } else {
+    // Eski/escape-hatch: leadId/contribIds veya atanan_ids[0]=lead
+    const leadId = raw.leadId || (Array.isArray(raw.atanan_ids) && raw.atanan_ids[0]) || null;
+    const contribIds = raw.contribIds || (Array.isArray(raw.atanan_ids) ? raw.atanan_ids.slice(1) : []);
+    const editorIds = Array.isArray(raw.editor_ids) ? raw.editor_ids : [];
+    leads     = leadId ? [liveUsers.find(u => u.id === leadId)].filter(Boolean) : [];
+    workers   = [...new Set([...contribIds, ...editorIds].filter(id => id !== leadId))]
+                  .map(id => liveUsers.find(u => u.id === id)).filter(Boolean);
+    observers = [];
+  }
   return {
     id:           raw.id || ("br_live_" + idx),
     no:           raw.no != null ? raw.no : (200 - idx),
     marka:        raw.marka,
     brand,
     baslik:       raw.baslik || raw.is || "",
-    lead:         liveUsers.find(u => u.id === leadId) || null,
-    contributors: [...new Set([...contribIds, ...editorIds].filter(id => id !== leadId))]
-                    .map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
-    reviewer:     raw.reviewerId ? (liveUsers.find(u => u.id === raw.reviewerId) || null) : null,
+    workers, leads, observers,
+    attachments:  Array.isArray(raw.attachments) ? raw.attachments : [],
+    // geriye uyum (mevcut görüntüleme kodu): lead=ilk lead, contributors=işi yapanlar
+    lead:         leads[0] || null,
+    contributors: workers,
+    reviewer:     null,
     acilma,
     deadline,
     dept:         raw.dept || "",

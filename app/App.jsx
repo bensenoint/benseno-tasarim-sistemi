@@ -33,9 +33,6 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 // Drawer/status değişikliklerini API'ye yazar. Brief'in lead+contributors'ını
 // atanan_ids'e, drawer "notes"'unu musteri_notu'na eşler. Numeric id varsa
 // /:id, yoksa by-no/:no fallback. Best-effort: hata fırlatır, çağıran toast'lar.
-function bnsBriefIds(b) {
-  return [b && b.lead && b.lead.id, ...((b && b.contributors) || []).map(c => c && c.id)].filter(Boolean);
-}
 async function bnsPersistBriefChange(prev, next, byId) {
   const base = (window.bnsResolveApiBase && window.bnsResolveApiBase());
   if (!base) return { skipped: "api kapalı" };                 // ?api=0 → DB'ye yazma
@@ -58,16 +55,17 @@ async function bnsPersistBriefChange(prev, next, byId) {
   };
   // 1) Durum
   if (next.durum !== prev.durum) await post("/status", { durum: next.durum });
-  // 2) PATCH alanları (baslik / not / atananlar)
+  // 2) PATCH alanları (baslik / not / roller)
   const patch = {};
   if (next.baslik !== prev.baslik) patch.baslik = next.baslik;
   if ((next.notes || "") !== (prev.notes || "")) patch.musteri_notu = next.notes || "";
-  const prevIds = bnsBriefIds(prev), nextIds = bnsBriefIds(next);
-  if (prevIds.join(",") !== nextIds.join(",")) patch.atanan_ids = nextIds;
-  // reviewer → gozlemci rolü (tekil). Kaldırılırsa boş dizi ile sıfırla.
-  const prevRev = (prev.reviewer && prev.reviewer.id) || null;
-  const nextRev = (next.reviewer && next.reviewer.id) || null;
-  if (prevRev !== nextRev) patch.gozlemci_ids = nextRev ? [nextRev] : [];
+  const idsOf = (arr) => (arr || []).map(x => x && x.id).filter(Boolean);
+  const w0 = idsOf(prev.workers), w1 = idsOf(next.workers);
+  if (w0.join(",") !== w1.join(",")) patch.worker_ids = w1;
+  const l0 = idsOf(prev.leads), l1 = idsOf(next.leads);
+  if (l0.join(",") !== l1.join(",")) patch.lead_ids = l1;
+  const o0 = idsOf(prev.observers), o1 = idsOf(next.observers);
+  if (o0.join(",") !== o1.join(",")) patch.gozlemci_ids = o1;
   if (Object.keys(patch).length) await post("", patch);
   return { ok: true };
 }
