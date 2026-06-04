@@ -48,7 +48,11 @@ function App() {
   const [palette, setPalette] = React.useState(false);
   const [newBrief, setNewBrief] = React.useState(false);
   // Global erişim: Department/diğer ekranlar buradan modal açabilir
-  React.useEffect(() => { window.openNewBriefModal = () => setNewBrief(true); }, []);
+  React.useEffect(() => {
+    window.openNewBriefModal = () => setNewBrief(true);
+    window.bnsRefresh = () => setPollTick(x => x + 1);   // yazma sonrası anlık poll (NewBrief formu çağırır)
+    window.bnsToast = (msg) => setToast(msg);            // başarı/hata bildirimi
+  }, []);
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
   const [brandStats, setBrandStats] = React.useState(data.brandStats);
