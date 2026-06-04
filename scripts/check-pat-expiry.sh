@@ -6,6 +6,16 @@ cd ~/benseno-tasarim-sistemi
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 source ~/.zshrc 2>/dev/null
 
+# Doğrudan Slack DM (claude/notification-agent yerine — Railway-uyumlu, $LOG çağrı anında set).
+GORKEM="U030C48PL23"
+notify() {
+  local tok=$(cat data/.slack-bot-token 2>/dev/null | tr -d '[:space:]')
+  [ -z "$tok" ] && return 0
+  local body=$(python3 -c "import json,sys; print(json.dumps({'channel':'$GORKEM','text':sys.argv[1],'unfurl_links':False}))" "$1")
+  curl -s -X POST https://slack.com/api/chat.postMessage \
+    -H "Authorization: Bearer $tok" -H "content-type: application/json" --data "$body" >> "$LOG" 2>&1
+}
+
 PAT_FILE="data/.github-pat-sistem"
 CREATED_FILE="data/.github-pat-created"
 LOG="logs/pat-check.log"
@@ -41,7 +51,7 @@ if [[ "$HTTP_STATUS" == "000" ]]; then
 elif [[ "$HTTP_STATUS" != "200" ]]; then
   MSG="🚨 *GitHub PAT GEÇERSİZ!* (HTTP $HTTP_STATUS)\nBrief Sync ve GitHub push çalışmıyor. PAT'i hemen yenile: https://github.com/settings/tokens"
   echo "[$TIMESTAMP] KRITIK: PAT geçersiz (HTTP $HTTP_STATUS)" >> "$LOG"
-  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --model haiku --print --dangerously-skip-permissions >> "$LOG" 2>&1
+  notify "$MSG"
   exit 1
 fi
 
@@ -83,5 +93,5 @@ fi
 
 if [[ $SEND -eq 1 ]]; then
   echo "[$TIMESTAMP] Slack uyarısı gönderiliyor: $DAYS_LEFT gün kaldı" >> "$LOG"
-  /opt/homebrew/bin/claude -p "Skill: benseno-notification-agent — şu mesajı benseno yöneticilerine (Görkem GM) Slack DM olarak gönder: $MSG" --model haiku --print --dangerously-skip-permissions >> "$LOG" 2>&1
+  notify "$MSG"
 fi

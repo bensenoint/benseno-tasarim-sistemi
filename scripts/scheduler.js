@@ -62,10 +62,8 @@ function run(script) {
   console.log(`[scheduler] tetiklendi: ${script} @ ${new Date().toLocaleString('tr-TR', { timeZone: TZ })}`);
 }
 
-// Orchestrator — KAPATILDI (Cutover C2 final, 4 Haz). Raporlar artık /api/embedded (DB)
-// okuyor, live-data.json'a bağımlı değil; ekip Canvas yerine /yeni-brief kullanıyor.
-// Geri açmak için: alttaki satırın yorumunu kaldır (canvas→live-data sync geri gelir).
-// cron.schedule('15,45 8-16 * * 1-5', () => run('run-orchestrator.sh'), opts);
+// Orchestrator KALDIRILDI (Cutover tamam, 4 Haz): canvas→live-data pipeline emekli;
+// raporlar /api/embedded (DB) okuyor, briefler /yeni-brief ile DB'ye düşüyor.
 // Sabah raporu — hafta içi 07:50
 cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
 // 17:00 raporları kaydırıldı (aynı anda spawn olmasın → çift-claude/push yarışı yok):
