@@ -22,6 +22,17 @@ const PROJECT_DIR = path.join(process.env.HOME, 'benseno-tasarim-sistemi');
 const CANVAS_ID   = 'F0B1B6XUD44';
 const GRAFIK_CH   = 'C02SZRJGY0M';
 
+// DB API (Faz 3 — /yeni-brief modalı buraya POST eder). global fetch (Node 18+).
+const API_BASE = (process.env.BNS_API_BASE || 'https://benseno-api-production.up.railway.app').replace(/\/+$/, '');
+// Marka listesi (modal dropdown) — slack.js CHANNELS ile aynı kümeyi yansıtır.
+const BRANDS_LIST = [
+  'Bauhaus', 'Beta', 'Cimporglobal', 'Cureffect', 'Egosport', 'Gürsoy', 'Hasvet', 'Hendex',
+  'JNJ', 'JNJ Acuvue ME', 'JNJ Vision TR', 'Jungleous', 'KMR Amos', 'KMR Copic', 'KMR Lamy',
+  'KMR Marshmallow', 'KMR Max', 'KMR Panfix', 'KMR Serve', 'Kuzeypet', 'KZY Bark', 'KZY Everclean',
+  'KZY Ferplast', 'KZY Flamingo', 'KZY Simple Solution', 'KZY Supreme', "KZY Vet's Best",
+  'Marmara Holding', 'Muffik', 'Polisan', 'Splenda', 'Tour2America', 'VDM Petdent',
+];
+
 const MANAGER_IDS = new Set([
   'U030C48PL23', // Görkem Kaya
   'UD96GH76E',   // Reyhan Nur Pınar
@@ -445,6 +456,87 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
   } catch (err) {
     log(`/maliyet set-financials hata: ${err.message}`);
     try { await client.chat.postMessage({ channel: by, text: `❌ Brief #${no} kaydedilemedi: ${err.message}` }); } catch {}
+  }
+});
+
+// ─── /yeni-brief — Slack'ten deterministik brief açma (Faz 3, LLM'siz) ────────
+// Block Kit modal → POST /api/briefs → DB + markanın kanalına post. Slash command'ı
+// Slack app config'inde (api.slack.com/apps → Slash Commands) /yeni-brief olarak kayıtlı olmalı.
+app.command('/yeni-brief', async ({ command, ack, client }) => {
+  await ack();
+  try {
+    await client.views.open({
+      trigger_id: command.trigger_id,
+      view: {
+        type: 'modal',
+        callback_id: 'yeni_brief_modal',
+        title: { type: 'plain_text', text: 'Yeni Brief' },
+        submit: { type: 'plain_text', text: 'Oluştur' },
+        close: { type: 'plain_text', text: 'İptal' },
+        blocks: [
+          { type: 'input', block_id: 'marka_b', label: { type: 'plain_text', text: 'Marka' },
+            element: { type: 'static_select', action_id: 'marka', placeholder: { type: 'plain_text', text: 'Marka seç' },
+              options: BRANDS_LIST.map(b => ({ text: { type: 'plain_text', text: b.slice(0, 75) }, value: b })) } },
+          { type: 'input', block_id: 'baslik_b', label: { type: 'plain_text', text: 'Başlık / İş' },
+            element: { type: 'plain_text_input', action_id: 'baslik', placeholder: { type: 'plain_text', text: 'ör. Sosyal medya paketi — Mayıs' } } },
+          { type: 'input', block_id: 'dept_b', optional: true, label: { type: 'plain_text', text: 'Departman' },
+            element: { type: 'static_select', action_id: 'dept', placeholder: { type: 'plain_text', text: 'Seç (ops.)' },
+              options: [
+                { text: { type: 'plain_text', text: 'Tasarım' }, value: 'tasarim' },
+                { text: { type: 'plain_text', text: 'Editör' }, value: 'editor' },
+                { text: { type: 'plain_text', text: 'AI' }, value: 'ai' },
+              ] } },
+          { type: 'input', block_id: 'deadline_b', optional: true, label: { type: 'plain_text', text: 'Deadline' },
+            element: { type: 'datepicker', action_id: 'deadline', placeholder: { type: 'plain_text', text: 'Tarih (ops.)' } } },
+          { type: 'input', block_id: 'lead_b', optional: true, label: { type: 'plain_text', text: 'İşi yapan (lead)' },
+            element: { type: 'users_select', action_id: 'lead', placeholder: { type: 'plain_text', text: 'Kişi (ops.)' } } },
+          { type: 'input', block_id: 'katki_b', optional: true, label: { type: 'plain_text', text: 'Katkıda bulunanlar' },
+            element: { type: 'multi_users_select', action_id: 'katki', placeholder: { type: 'plain_text', text: 'Kişiler (ops.)' } } },
+          { type: 'input', block_id: 'not_b', optional: true, label: { type: 'plain_text', text: 'Müşteri notu / açıklama' },
+            element: { type: 'plain_text_input', action_id: 'aciklama', multiline: true } },
+          { type: 'context', elements: [{ type: 'mrkdwn', text: 'Brief DB\'ye yazılır ve markanın kanalına thread olarak düşer.' }] },
+        ],
+      },
+    });
+  } catch (err) { log(`/yeni-brief modal aç hata: ${err.message}`); }
+});
+
+// Modal submit → POST /api/briefs (source=dashboard → kanal postu + slack_ts tetiklenir).
+app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
+  const v = view.state.values;
+  const marka  = v.marka_b?.marka?.selected_option?.value || '';
+  const baslik = (v.baslik_b?.baslik?.value || '').trim();
+  if (!marka)  { await ack({ response_action: 'errors', errors: { marka_b: 'Marka seç.' } }); return; }
+  if (!baslik) { await ack({ response_action: 'errors', errors: { baslik_b: 'Başlık gir.' } }); return; }
+  await ack();
+  const by      = body.user?.id || '';
+  const dept    = v.dept_b?.dept?.selected_option?.value || undefined;
+  const dateStr = v.deadline_b?.deadline?.selected_date || null;      // YYYY-MM-DD
+  const lead    = v.lead_b?.lead?.selected_user || null;
+  const katki   = v.katki_b?.katki?.selected_users || [];
+  const aciklama = (v.not_b?.aciklama?.value || '').trim();
+  const atanan_ids = [lead, ...katki.filter(u => u !== lead)].filter(Boolean);
+  const payload = {
+    marka, baslik, dept,
+    deadline: dateStr ? `${dateStr}T17:00:00` : null,
+    atanan_ids: atanan_ids.length ? atanan_ids : undefined,
+    musteri_notu: aciklama || undefined,
+    by, source: 'dashboard',   // !== 'slack' → createBrief markanın kanalına post eder
+  };
+  try {
+    const r = await fetch(`${API_BASE}/api/briefs`, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error === 'doğrulama'
+      ? 'doğrulama: ' + (j.issues || []).map(i => (i.path || []).join('.')).join(', ')
+      : (j.error || ('HTTP ' + r.status)));
+    log(`/yeni-brief → #${j.no} ${marka} (by ${by})`);
+    const link = j.slack && j.slack.permalink ? `\n${j.slack.permalink}` : '';
+    try { await client.chat.postMessage({ channel: by, text: `✅ Brief *#${j.no}* oluşturuldu — ${marka}: ${baslik}${link}` }); } catch {}
+  } catch (err) {
+    log(`/yeni-brief POST hata: ${err.message}`);
+    try { await client.chat.postMessage({ channel: by, text: `❌ Brief oluşturulamadı: ${err.message}` }); } catch {}
   }
 });
 
