@@ -497,19 +497,16 @@ app.command('/yeni-brief', async ({ command, ack, client }) => {
               options: BRANDS_LIST.map(b => ({ text: { type: 'plain_text', text: b.slice(0, 75) }, value: b })) } },
           { type: 'input', block_id: 'baslik_b', label: { type: 'plain_text', text: 'Başlık / İş' },
             element: { type: 'plain_text_input', action_id: 'baslik', placeholder: { type: 'plain_text', text: 'ör. Sosyal medya paketi — Mayıs' } } },
-          { type: 'input', block_id: 'dept_b', optional: true, label: { type: 'plain_text', text: 'Departman' },
-            element: { type: 'static_select', action_id: 'dept', placeholder: { type: 'plain_text', text: 'Seç (ops.)' },
-              options: [
-                { text: { type: 'plain_text', text: 'Tasarım' }, value: 'tasarim' },
-                { text: { type: 'plain_text', text: 'Editör' }, value: 'editor' },
-                { text: { type: 'plain_text', text: 'AI' }, value: 'ai' },
-              ] } },
           { type: 'input', block_id: 'deadline_b', optional: true, label: { type: 'plain_text', text: 'Deadline' },
             element: { type: 'datepicker', action_id: 'deadline', placeholder: { type: 'plain_text', text: 'Tarih (ops.)' } } },
-          { type: 'input', block_id: 'lead_b', optional: true, label: { type: 'plain_text', text: 'İşi yapan (lead)' },
-            element: { type: 'users_select', action_id: 'lead', placeholder: { type: 'plain_text', text: 'Kişi (ops.)' } } },
-          { type: 'input', block_id: 'katki_b', optional: true, label: { type: 'plain_text', text: 'Katkıda bulunanlar' },
-            element: { type: 'multi_users_select', action_id: 'katki', placeholder: { type: 'plain_text', text: 'Kişiler (ops.)' } } },
+          { type: 'input', block_id: 'workers_b', label: { type: 'plain_text', text: 'İşi yapan(lar)' },
+            element: { type: 'multi_users_select', action_id: 'workers', placeholder: { type: 'plain_text', text: 'Kişi(ler) — departman buradan belirlenir' } } },
+          { type: 'input', block_id: 'leads_b', optional: true, label: { type: 'plain_text', text: 'Lead(ler) — son kontrol (boş = sen)' },
+            element: { type: 'multi_users_select', action_id: 'leads', placeholder: { type: 'plain_text', text: 'Kişi(ler) (ops.)' } } },
+          { type: 'input', block_id: 'gozlemci_b', optional: true, label: { type: 'plain_text', text: 'Gözlemciler' },
+            element: { type: 'multi_users_select', action_id: 'gozlemci', placeholder: { type: 'plain_text', text: 'Kişi(ler) (ops.)' } } },
+          { type: 'input', block_id: 'dosya_b', optional: true, label: { type: 'plain_text', text: 'Dosyalar' },
+            element: { type: 'file_input', action_id: 'dosya' } },
           { type: 'input', block_id: 'not_b', optional: true, label: { type: 'plain_text', text: 'Müşteri notu / açıklama' },
             element: { type: 'plain_text_input', action_id: 'aciklama', multiline: true } },
           { type: 'context', elements: [{ type: 'mrkdwn', text: 'Brief DB\'ye yazılır ve markanın kanalına thread olarak düşer.' }] },
@@ -526,18 +523,21 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
   const baslik = (v.baslik_b?.baslik?.value || '').trim();
   if (!marka)  { await ack({ response_action: 'errors', errors: { marka_b: 'Marka seç.' } }); return; }
   if (!baslik) { await ack({ response_action: 'errors', errors: { baslik_b: 'Başlık gir.' } }); return; }
+  const workers = v.workers_b?.workers?.selected_users || [];
+  if (!workers.length) { await ack({ response_action: 'errors', errors: { workers_b: 'En az bir işi yapan seç.' } }); return; }
   await ack();
   const by      = body.user?.id || '';
-  const dept    = v.dept_b?.dept?.selected_option?.value || undefined;
   const dateStr = v.deadline_b?.deadline?.selected_date || null;      // YYYY-MM-DD
-  const lead    = v.lead_b?.lead?.selected_user || null;
-  const katki   = v.katki_b?.katki?.selected_users || [];
+  const leads   = v.leads_b?.leads?.selected_users || [];
+  const gozlemci = v.gozlemci_b?.gozlemci?.selected_users || [];
+  const fileIds = (v.dosya_b?.dosya?.files || []).map(f => f.id);
   const aciklama = (v.not_b?.aciklama?.value || '').trim();
-  const atanan_ids = [lead, ...katki.filter(u => u !== lead)].filter(Boolean);
   const payload = {
-    marka, baslik, dept,
+    marka, baslik,
     deadline: dateStr ? `${dateStr}T17:00:00` : null,
-    atanan_ids: atanan_ids.length ? atanan_ids : undefined,
+    worker_ids: workers,
+    lead_ids: leads.length ? leads : undefined,
+    gozlemci_ids: gozlemci.length ? gozlemci : undefined,
     musteri_notu: aciklama || undefined,
     by, source: 'dashboard',   // !== 'slack' → createBrief markanın kanalına post eder
   };
@@ -550,6 +550,21 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
       ? 'doğrulama: ' + (j.issues || []).map(i => (i.path || []).join('.')).join(', ')
       : (j.error || ('HTTP ' + r.status)));
     log(`/yeni-brief → #${j.no} ${marka} (by ${by})`);
+    // Dosyalar (file_input) zaten Slack'te → brief thread'ine permalink + DB meta (best-effort)
+    if (fileIds.length && j.id && j.slack && j.slack.ts) {
+      for (const fid of fileIds) {
+        try {
+          const info = await client.files.info({ file: fid });
+          const perma = info.file?.permalink || '';
+          const fname = info.file?.name || 'dosya';
+          await client.chat.postMessage({ channel: j.slack.channel, thread_ts: j.slack.ts, text: `📎 ${perma}` });
+          await fetch(`${API_BASE}/api/briefs/${j.id}/attachments-meta`, {
+            method: 'POST', headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ url: perma, filename: fname, by }),
+          }).catch(() => {});
+        } catch (e) { log(`dosya iliştir hata: ${e.message}`); }
+      }
+    }
     const link = j.slack && j.slack.permalink ? `\n${j.slack.permalink}` : '';
     try { await client.chat.postMessage({ channel: by, text: `✅ Brief *#${j.no}* oluşturuldu — ${marka}: ${baslik}${link}` }); } catch {}
   } catch (err) {
