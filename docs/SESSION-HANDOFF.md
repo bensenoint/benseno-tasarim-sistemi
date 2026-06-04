@@ -62,8 +62,9 @@ App.jsx helper reviewer değişimini `gozlemci_ids` PATCH'ine bağlar (boş dizi
   - Manuel test: `node scripts/rapor-sabah.js` (Görkem'e DM) · `BNS_REPORT_LIVE=1 node ...` (canlı).
   - **Orchestrator-kill (C2 final):** raporlar artık `live-data.json` okumadığı için `scheduler.js:66` orchestrator cron'u kapatılabilir — **AMA önce ekip Canvas yerine `/yeni-brief` kullanmaya geçmeli** (yoksa Canvas'a eklenen brief'ler DB'ye düşmez). Org-readiness'e bağlı.
 - **C3 — ✅ YAPILDI (4 Haz):** Sıfır-veri go-live. `TRUNCATE briefs, brief_assignees, brief_tags, brief_attachments, brief_approvals, events RESTART IDENTITY CASCADE` — brands(13)/users(18) KORUNDU. Yedek: `~/benseno-db-backups/brief-data-*.json` (repo dışı, geri yüklenebilir). API embedded: 0 brief / 13 marka / 18 kullanıcı.
-- **Kullanıcı aksiyonu (BEKLİYOR):** eski Slack **Workflow**'u kapat (ekip `/yeni-brief` kullansın). Bot adı görünen: **Work Tracking** (handle `@demo_app`). Orchestrator kapalı olduğu için Workflow/Canvas'a eklenen briefler ARTIK DB'ye düşmez — ekip mutlaka `/yeni-brief` kullanmalı.
-- **Smoke test (BEKLİYOR):** Slack'te `/yeni-brief` ile gerçek brief aç → marka kanalında post + dashboard'da görün → thread'e ✅ → dashboard'da tamamlandı'ya geçtiğini doğrula (uçtan uca: create + Slack post + reaction→DB).
+- **Eski Slack Workflow — ✅ KALDIRILDI (4 Haz).** Ekip artık `/yeni-brief` kullanmalı. Bot görünen adı: **Work Tracking** (handle `@demo_app`).
+- **Smoke test (BEKLİYOR — kullanıcı):** Slack'te `/yeni-brief` ile gerçek brief aç → marka kanalında post + dashboard'da görün → thread'e ✅ → dashboard'da tamamlandı'ya geçtiğini doğrula (uçtan uca: create + Slack post + reaction→DB).
+- **DEFER → toplu yapılacak (tüm değişiklikler bitince):** dokümantasyon güncellemesi — `kullanim-klavuzu.html` "2.2 Workflow Yöntemi (Önerilen)" → `/yeni-brief` komutu olacak. Ayrıca ölü kod temizliği (benseno-dashboard-agent skill, live-data.json, EMBEDDED_DATA injection).
 
 ## Güvenlik
 data/.db-url, data/.slack*, data/.github-pat*, data/.dashboard-auth-hash ASLA commit edilmez. Token'ları chat'te maskele.
