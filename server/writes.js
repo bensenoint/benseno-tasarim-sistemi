@@ -113,15 +113,22 @@ async function deriveDept(client, worker_ids) {
   return depts.length ? depts.join(',') : null;
 }
 
-// İlgili departman(lar)ın yöneticileri (yetki='yonetici') — gözlemciye otomatik eklenir.
+// Yöneticisi DB'de tanımlı olmayan departmanlar için elle eşleme (gözlemci olarak eklenir).
+// AI departmanının kendi yöneticisi yok → Görkem yönetici sayılır.
+const DEPT_MANAGER_FALLBACK = { ai: 'U030C48PL23' };
+
+// İlgili departman(lar)ın yöneticileri (yetki='yonetici' + fallback) — gözlemciye otomatik eklenir.
 async function deptManagers(client, worker_ids) {
   if (!Array.isArray(worker_ids) || !worker_ids.length) return [];
+  const dr = await client.query(
+    `SELECT DISTINCT dept FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> ''`, [worker_ids]);
+  const depts = dr.rows.map(x => x.dept);
+  if (!depts.length) return [];
   const r = await client.query(
-    `SELECT id FROM users
-     WHERE active AND yetki='yonetici'
-       AND dept IN (SELECT DISTINCT dept FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> '')`,
-    [worker_ids]);
-  return r.rows.map(x => x.id);
+    `SELECT id FROM users WHERE active AND yetki='yonetici' AND dept = ANY($1)`, [depts]);
+  const ids = r.rows.map(x => x.id);
+  for (const d of depts) if (DEPT_MANAGER_FALLBACK[d]) ids.push(DEPT_MANAGER_FALLBACK[d]);
+  return [...new Set(ids)];
 }
 
 // ── operasyonlar ─────────────────────────────────────────────
