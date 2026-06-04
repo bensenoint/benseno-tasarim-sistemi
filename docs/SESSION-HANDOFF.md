@@ -56,7 +56,9 @@ App.jsx helper reviewer değişimini `gozlemci_ids` PATCH'ine bağlar (boş dizi
 
 ## Kalan cutover
 - **C2 — ✅ YAPILDI (4 Haz):** 4 rapor (sabah/günlük/haftalık/aylık) deterministik Node'a geçti, `/api/embedded`'den okuyor + claude (haiku) yorum katmanı. Dosyalar: `scripts/rapor-lib.js` + `scripts/rapor-{sabah,gunluk,haftalik,aylik}.js`. `run-*.sh` wrapper'ları artık `claude -p` yerine node çağırıyor (Railway'de claude CLI yoktu → raporlar sessizce ölüydü; artık çalışıyor). Scheduler crons değişmedi.
-  - **Mod:** varsayılan **Görkem-only** (test). Canlıya almak: Railway `benseno-tasarim-sistemi` servisine `BNS_REPORT_LIVE=1` env ekle → 5 yönetici + #benseno-grafik.
+  - **Mod:** ✅ **CANLI** (4 Haz) — Railway'de `BNS_REPORT_LIVE=1` set → raporlar 5 yönetici + #benseno-grafik'e gidiyor. Görkem-only'ye dönmek: var'ı sil/0 yap.
+  - **Orchestrator:** ✅ KAPATILDI (scheduler.js:66 yorumlandı, commit a908569).
+  - ⚠️ **C3 yapılmadı** → DB hâlâ test verisiyle dolu; canlı raporlar şişkin sayılar gösterir (21 geçmiş vb.). Temiz raporlar için C3 (TRUNCATE) gerekir.
   - Manuel test: `node scripts/rapor-sabah.js` (Görkem'e DM) · `BNS_REPORT_LIVE=1 node ...` (canlı).
   - **Orchestrator-kill (C2 final):** raporlar artık `live-data.json` okumadığı için `scheduler.js:66` orchestrator cron'u kapatılabilir — **AMA önce ekip Canvas yerine `/yeni-brief` kullanmaya geçmeli** (yoksa Canvas'a eklenen brief'ler DB'ye düşmez). Org-readiness'e bağlı.
 - **C3:** DB'yi sıfırla (TRUNCATE) — veri önemsiz, sıfır-veri go-live. ⚠️ Yıkıcı, açık onayla yapılır.
