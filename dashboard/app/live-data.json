@@ -24,7 +24,11 @@
       "durum": "👀 Revize bekliyor (v2 teslim · bakanlık geri dönüşü) · 🔴 Blokeli",
       "revision": 0,
       "slack_url": "",
-      "dept": "editor"
+      "dept": "editor",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 3,
@@ -45,7 +49,11 @@
       "durum": "6g+ pasif · 🔴 Blokeli · Aykut > Eda T pasif",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 4,
@@ -66,7 +74,11 @@
       "durum": "tasarımcı yok · İpek dispatch > Görkem · 8g eşiği AŞILDI · 🔴 Blokeli",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 5,
@@ -86,7 +98,11 @@
       "durum": "🚨 v1 yok · Eren · 8g eşiği AŞILDI · 🔴 Blokeli",
       "revision": 0,
       "slack_url": "",
-      "dept": "ai"
+      "dept": "ai",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 6,
@@ -106,7 +122,11 @@
       "durum": "v1 yok · Arda hafta sonu pasif · 🔴 Blokeli",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 7,
@@ -126,7 +146,11 @@
       "durum": "uzun lead · İpek",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 8,
@@ -146,7 +170,11 @@
       "durum": "🚨 dept ambiguity · Arda dispatch sırada · 8g eşiği AŞILDI · 🔴 Blokeli",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 9,
@@ -166,7 +194,11 @@
       "durum": "🔴 Blokeli · 72sa AÇILDI · Şablon 29 DM → Eren (26May09:33) · v1 yok",
       "revision": 0,
       "slack_url": "",
-      "dept": "ai"
+      "dept": "ai",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 15,
@@ -187,7 +219,11 @@
       "durum": "🎨 v1 13:28 🌸 · Eda T 14:04 yarı kabul · 5g+ onay pasif · 7g eşiği AŞILDI · 🔴 Blo",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 16,
@@ -208,7 +244,11 @@
       "durum": "🎨 v1 14:40 🌸 · Eda T 14:50 ellerine sağlıkk · 3g+ pasif onay yok · 🔴 Blokeli",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 17,
@@ -229,7 +269,11 @@
       "durum": "🚨 v1 yok · Görkem DM Cuma 16:45 · 72sa + 8g eşiği AŞILDI · 🔴 Blokeli",
       "revision": 0,
       "slack_url": "",
-      "dept": "ai"
+      "dept": "ai",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 20,
@@ -250,7 +294,11 @@
       "durum": "yeni · Eren+Görkem · 72sa eşik geçişi · Normal öncelik",
       "revision": 0,
       "slack_url": "",
-      "dept": "ai"
+      "dept": "ai",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 21,
@@ -272,7 +320,11 @@
       "durum": "🚨 GEÇMİŞ · Şablon 24+25+29 gönderildi (29→Eren 26May14:46) · 72sa AŞILDI · 6g eş",
       "revision": 0,
       "slack_url": "",
-      "dept": "ai"
+      "dept": "ai",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 22,
@@ -294,7 +346,11 @@
       "durum": "⏸ Cansu Direktör onayı · erdem copy edit tamamlandı · bayram sonrası devam",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 24,
@@ -315,7 +371,11 @@
       "durum": "⚠️ GEÇMİŞ · Aykut yarı onay Cuma 17:35 · Arda kısmı belirsiz · 🔴 Blokeli",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 25,
@@ -336,7 +396,11 @@
       "durum": "yeni · Cansu+Görkem · ⚠️ test içeriği (İş='test')",
       "revision": 0,
       "slack_url": "",
-      "dept": "editor"
+      "dept": "editor",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 26,
@@ -357,7 +421,11 @@
       "durum": "🎨 Tasarımda · rev 1",
       "revision": 0,
       "slack_url": "",
-      "dept": "editor"
+      "dept": "editor",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 27,
@@ -378,7 +446,11 @@
       "durum": "yeni · Hasan Serdar+Aykut · Sosyal Medya Post · Paralel akış · 💬 video içeriği",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 28,
@@ -399,7 +471,11 @@
       "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 29,
@@ -420,7 +496,11 @@
       "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 30,
@@ -441,7 +521,11 @@
       "durum": "🎨 Tasarımda · rev 1",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 31,
@@ -461,7 +545,11 @@
       "durum": "yeni · Serhat · Print / Broşür",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 33,
@@ -481,7 +569,11 @@
       "durum": "👀 Revizede",
       "revision": 0,
       "slack_url": "",
-      "dept": "ai"
+      "dept": "ai",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 34,
@@ -502,7 +594,11 @@
       "durum": "🎨 Tasarımda",
       "revision": 0,
       "slack_url": "",
-      "dept": "editor"
+      "dept": "editor",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 35,
@@ -524,7 +620,11 @@
       "durum": "Açık",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 36,
@@ -545,7 +645,11 @@
       "durum": "Açık",
       "revision": 0,
       "slack_url": "",
-      "dept": "editor"
+      "dept": "editor",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 37,
@@ -565,7 +669,11 @@
       "durum": "Açık",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     },
     {
       "no": 38,
@@ -585,7 +693,11 @@
       "durum": "Açık",
       "revision": 0,
       "slack_url": "",
-      "dept": "tasarim"
+      "dept": "tasarim",
+      "maliyet": null,
+      "satis": null,
+      "fatura": false,
+      "odeme": false
     }
   ],
   "bns_completed": [
