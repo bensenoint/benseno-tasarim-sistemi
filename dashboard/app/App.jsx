@@ -143,9 +143,23 @@ function App() {
   React.useEffect(() => {
     let cancelled = false;
     let lastEtag = null;
+    // Veri kaynağı: opt-in API (Faz 2). Öncelik: ?api= param → localStorage → window.BNS_API_BASE.
+    // Hiçbiri yoksa eski statik dosya (app/live-data.json) — varsayılan, kanıtlanmış yol.
+    function resolveDataUrl() {
+      const DEFAULT_API = "https://benseno-api-production.up.railway.app";
+      let base = null;
+      try {
+        const p = new URLSearchParams(window.location.search).get("api");
+        if (p === "1" || p === "true") base = DEFAULT_API;
+        else if (p && /^https?:\/\//.test(p)) base = p.replace(/\/+$/, "");
+        if (!base) { const ls = window.localStorage.getItem("bns_api"); if (ls) base = ls === "1" ? DEFAULT_API : ls.replace(/\/+$/, ""); }
+        if (!base && window.BNS_API_BASE) base = String(window.BNS_API_BASE).replace(/\/+$/, "");
+      } catch (e) { /* sandbox/SSR */ }
+      return base ? (base + "/api/embedded?t=" + Date.now()) : ("app/live-data.json?t=" + Date.now());
+    }
     async function poll() {
       try {
-        const r = await fetch("app/live-data.json?t=" + Date.now(), { cache: "no-store" });
+        const r = await fetch(resolveDataUrl(), { cache: "no-store" });
         if (!r.ok || cancelled) return;
         const ed = await r.json();
         if (cancelled) return;
