@@ -33,11 +33,16 @@ Yeni oturuma "bu dosyayı oku, Bug 2'den devam et" de.
 - DB temizlik: `node /tmp/bns_cleanup_test.js` benzeri; `server/db.js` `data/.db-url`'den bağlanır.
 
 ## AÇIK BUG'LAR (sırayla)
-### Bug 2 (kesin teşhis) — Dashboard düzenlemesi DB'ye yazmıyor
-`dashboard/app/BriefDrawer.jsx` "Kaydet" butonu sadece yerel `saved` state — hiç API çağrısı yok.
-Düzeltme: drawer düzenleme aksiyonlarını (kişi ekle/çıkar → `PATCH /api/briefs/:id {atanan_ids, by, source:'dashboard'}`;
-durum → `.../status`; finans → `.../financials`) bağla, başarıda `window.bnsRefresh()`. b2 sayesinde Slack thread'ine otomatik yansır.
-Not: brief'in DB `id`'si lazım — `/api/embedded` bns_briefs[].id veriyor (hidratlamada korunmalı; App.jsx bns_briefs id'yi taşıyor mu kontrol et).
+### Bug 2 — ✅ ÇÖZÜLDÜ (4 Haz) — Dashboard düzenlemesi DB'ye yazmıyordu
+Kök neden mimariydi: `BriefDrawer` zaten düzenlenmiş brief'i `onUpdate(next)` ile veriyordu;
+`App.jsx`'teki `onUpdateBrief`/`onStatusChange` sadece local state'e yazıp DB'ye hiç dokunmuyordu.
+Düzeltme (`dashboard/app/App.jsx`): module-scope `bnsPersistBriefChange(prev,next,by)` helper'ı —
+prev↔next diff'ler, değişen alana göre endpoint ateşler:
+durum→`POST /:id/status`; baslik→`PATCH baslik`; not→`PATCH musteri_notu`; lead+contributors→`PATCH atanan_ids`.
+Numeric id varsa `/:id`, yoksa `by-no/:no` fallback. Optimistic UI + hata toast'ı. Başarıda `bnsRefresh()`.
+b2 sayesinde yazma Slack thread'ine de yansır. **Reviewer sync DIŞI** — embedded payload reviewerId döndürmüyor
+(round-trip yok) + API'de temiz rol param'ı yok. Doğrulandı: PATCH+status prod'a yazıldı/okundu/geri alındı.
+Not: id korunuyor (`data.js` hydrate `raw.id`; embedded `bns_briefs[].id` numeric verir).
 
 ### Bug 1 (netleştirme bekliyor) — Slack ✅ dashboard'a yansımadı
 Bot ✅'i `event.item.ts` ile `by-ts` DB'de arıyor. Kullanıcı ✅'i thread yanıtına mı / ana brief mesajına mı koydu + emoji tam ✅ mı (white_check_mark) — netleşince: ya kullanım notu, ya handler sağlamlaştırma.

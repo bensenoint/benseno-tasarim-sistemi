@@ -29,6 +29,45 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "overviewLayout": "editorial"
 }/*EDITMODE-END*/;
 
+// ─── DB persistence (Bug 2 fix) ──────────────────────────────────────
+// Drawer/status değişikliklerini API'ye yazar. Brief'in lead+contributors'ını
+// atanan_ids'e, drawer "notes"'unu musteri_notu'na eşler. Numeric id varsa
+// /:id, yoksa by-no/:no fallback. Best-effort: hata fırlatır, çağıran toast'lar.
+function bnsBriefIds(b) {
+  return [b && b.lead && b.lead.id, ...((b && b.contributors) || []).map(c => c && c.id)].filter(Boolean);
+}
+async function bnsPersistBriefChange(prev, next, byId) {
+  const base = (window.bnsResolveApiBase && window.bnsResolveApiBase());
+  if (!base) return { skipped: "api kapalı" };                 // ?api=0 → DB'ye yazma
+  const idNum = Number(next.id);
+  const path = Number.isInteger(idNum) && idNum > 0
+    ? `/api/briefs/${idNum}`
+    : (next.no != null ? `/api/briefs/by-no/${next.no}` : null);
+  if (!path) throw new Error("brief id/no yok — yazılamadı");
+  const post = async (suffix, body) => {
+    const r = await fetch(base + path + suffix, {
+      method: suffix ? "POST" : "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ ...body, by: byId || undefined, source: "dashboard" }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error === "doğrulama"
+      ? "Doğrulama: " + (j.issues || []).map(i => (i.path || []).join(".")).join(", ")
+      : (j.error || ("HTTP " + r.status)));
+    return j;
+  };
+  // 1) Durum
+  if (next.durum !== prev.durum) await post("/status", { durum: next.durum });
+  // 2) PATCH alanları (baslik / not / atananlar)
+  const patch = {};
+  if (next.baslik !== prev.baslik) patch.baslik = next.baslik;
+  if ((next.notes || "") !== (prev.notes || "")) patch.musteri_notu = next.notes || "";
+  const prevIds = bnsBriefIds(prev), nextIds = bnsBriefIds(next);
+  if (prevIds.join(",") !== nextIds.join(",")) patch.atanan_ids = nextIds;
+  if (Object.keys(patch).length) await post("", patch);
+  return { ok: true };
+}
+
 function App() {
   const data = window.BNS_DATA;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -306,14 +345,21 @@ function App() {
   };
   const onCloseBrief = () => setOpenBrief(null);
   const onUpdateBrief = (next) => {
-    setBriefs(arr => arr.map(b => b.id === next.id ? next : b));
+    const prev = briefs.find(b => b.id === next.id) || next;
+    setBriefs(arr => arr.map(b => b.id === next.id ? next : b));   // optimistic
     setOpenBrief(next);
+    bnsPersistBriefChange(prev, next, user && user.id)
+      .then(res => { if (res && res.ok) setToast("✓ Kaydedildi"); if (res && res.ok && window.bnsRefresh) window.bnsRefresh(); })
+      .catch(e => setToast("⚠ Kaydedilemedi: " + (e.message || e)));
   };
   const onStatusChange = (b, s) => {
     const next = { ...b, durum: s };
-    setBriefs(arr => arr.map(x => x.id === b.id ? next : x));
+    setBriefs(arr => arr.map(x => x.id === b.id ? next : x));   // optimistic
     if (openBrief && openBrief.id === b.id) setOpenBrief(next);
     setToast(`${b.brand?.name || b.marka} · durum güncellendi: ${labelForStatus(s)}`);
+    bnsPersistBriefChange(b, next, user && user.id)
+      .then(res => { if (res && res.ok && window.bnsRefresh) window.bnsRefresh(); })
+      .catch(e => setToast("⚠ Durum kaydedilemedi: " + (e.message || e)));
   };
   const onCreateBrief = (b) => {
     setBriefs(arr => [b, ...arr]);
