@@ -568,5 +568,14 @@
     "sent_at": "2026-06-03T16:47:00+03:00",
     "user_id": "skip-consolidated",
     "notes": "Çar 3Haz 16:47 TR headless sync — 0 yeni brief, 21 GEÇMİŞ (T30-31-32 tüm aktif eskalasyonlar zaten gönderildi), #29 24h eşiği 13dk'ya kaldı"
+  },
+  {
+    "brief_ts": "1780382082.092499",
+    "brief_no": "29",
+    "template": "31_manager_escalation_24h",
+    "sent_at": "2026-06-04T08:23:02+03:00",
+    "user_id": "U055EDESLSE",
+    "message_ts": "1780550583.095579",
+    "reason": "#29 Bauhaus 'Vantilatörler' gecikme 39sa eşiği aşıldı (deadline 2Haz17:00) · tasarim sorumlu yönetici İpek'e Şablon 31 · Headless run"
   }
 ]
