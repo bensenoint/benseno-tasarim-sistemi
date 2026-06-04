@@ -56,39 +56,53 @@ window.bnsResolveApiBase = bnsResolveApiBase;
 const FIELD_LABEL = { font: "500 11px/1 var(--font-sans)", letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-3)" };
 const FIELD_BOX = { font: "500 14px/1.3 var(--font-sans)", color: "var(--ink)", background: "var(--surface-sub)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 11px", outline: "none", width: "100%", boxSizing: "border-box" };
 
-// Çoklu kişi seçici — grouped:true ise departmana göre gruplar.
+// Çoklu kişi seçici — dropdown'dan ekle, seçilenler chip olarak listelenir + çıkar.
+// grouped:true ise dropdown departmana göre optgroup'lar.
 function PeoplePicker({ label, users, selected, onChange, grouped }) {
-  const toggle = (id) => onChange(selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
-  const groups = grouped
-    ? {
-        Tasarım: users.filter(u => u.dept === "tasarim"),
-        Editör: users.filter(u => u.dept === "editor"),
-        AI: users.filter(u => u.dept === "ai"),
-        Diğer: users.filter(u => !["tasarim", "editor", "ai"].includes(u.dept)),
-      }
-    : { "": users };
+  const byId = (id) => users.find(u => u.id === id);
+  const avail = users.filter(u => !selected.includes(u.id));
+  const add = (id) => { if (id && !selected.includes(id)) onChange([...selected, id]); };
+  const remove = (id) => onChange(selected.filter(x => x !== id));
+  const DEPT_LABEL = { tasarim: "Tasarım", editor: "Editör", ai: "AI" };
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={FIELD_LABEL}>{label}</span>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 180, overflowY: "auto", border: "1px solid var(--line)", borderRadius: 8, padding: 8 }}>
-        {Object.entries(groups).map(([g, us]) => (!us.length ? null :
-          <div key={g}>
-            {g && <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ink-4)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>{g}</div>}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {us.map(u => {
-                const on = selected.includes(u.id);
-                return (
-                  <button key={u.id} type="button" onClick={() => toggle(u.id)} style={{
-                    cursor: "pointer", border: "1px solid " + (on ? "var(--ember)" : "var(--line)"),
-                    background: on ? "var(--ember)" : "var(--surface-sub)", color: on ? "#fff" : "var(--ink-2)",
-                    borderRadius: 999, padding: "5px 10px", font: "500 12px/1 var(--font-sans)",
-                  }}>{u.name}</button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+      <select value="" onChange={e => { add(e.target.value); e.target.value = ""; }} style={FIELD_BOX}>
+        <option value="">+ Kişi ekle…</option>
+        {grouped
+          ? ["tasarim", "editor", "ai", "_other"].map(dep => {
+              const us = dep === "_other"
+                ? avail.filter(u => !["tasarim", "editor", "ai"].includes(u.dept))
+                : avail.filter(u => u.dept === dep);
+              if (!us.length) return null;
+              return (
+                <optgroup key={dep} label={DEPT_LABEL[dep] || "Diğer"}>
+                  {us.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                </optgroup>
+              );
+            })
+          : avail.map(u => <option key={u.id} value={u.id}>{u.name}{u.dept ? ` · ${DEPT_LABEL[u.dept] || u.dept}` : ""}</option>)}
+      </select>
+      {selected.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {selected.map(id => {
+            const u = byId(id);
+            return (
+              <span key={id} style={{
+                display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 8px",
+                borderRadius: 999, background: "var(--surface-sub)", border: "1px solid var(--line)",
+                font: "500 12px/1 var(--font-sans)", color: "var(--ink)",
+              }}>
+                {u ? u.name : id}
+                <button type="button" onClick={() => remove(id)} style={{
+                  border: 0, background: "transparent", cursor: "pointer", color: "var(--ink-4)",
+                  font: "600 13px/1 var(--font-sans)", padding: 0, lineHeight: 1,
+                }}>×</button>
+              </span>
+            );
+          })}
+        </div>
+      )}
     </label>
   );
 }
@@ -100,7 +114,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
   const me = data.ME || {};
   const [f, setF] = React.useState({
     marka: "", baslik: "", deadlineDate: "", deadlineTime: "17:00",
-    workerIds: [], leadIds: me.id ? [me.id] : [], gozlemciIds: [],
+    workerIds: [], leadIds: [], gozlemciIds: [],   // lead boş → server işi vereni lead yapar
     musteri_notu: "", akis: "sirali", maliyet: "", satis: "",
   });
   const [files, setFiles] = React.useState([]);
