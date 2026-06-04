@@ -179,13 +179,23 @@ async function createBrief(raw) {
       }
       const deadlineMs = d.deadline ? (typeof d.deadline === 'number' ? d.deadline : Date.parse(d.deadline)) : null;
       const post = await slack.postBrief({ marka: d.marka, baslik: d.baslik, no: result.no,
-        deadlineMs, dept: null, akis: d.akis, leadName, contribNames });
+        deadlineMs, dept: null, akis: d.akis, leadName, contribNames, not: d.musteri_notu || null });
       if (post.ok) {
         await pool.query('UPDATE briefs SET slack_ts=$1, slack_channel=$2, slack_url=$3 WHERE id=$4',
           [post.ts, post.channel, post.permalink || null, result.id]);
         await pool.query(`INSERT INTO events(brief_id,verb,detail,source) VALUES ($1,'slack:gönderildi',$2,'system')`,
           [result.id, JSON.stringify({ channel: post.channel, ts: post.ts })]);
         result.slack = { ts: post.ts, channel: post.channel, permalink: post.permalink };
+        // Brief'teki herkese (işi yapan + lead + gözlemci) DM — yeni brief bildirimi. Best-effort.
+        try {
+          const dmText = [
+            `🆕 Yeni brief *#${result.no}* — ${d.marka}: ${d.baslik}`,
+            d.musteri_notu ? `📝 ${d.musteri_notu}` : null,
+            post.permalink || null,
+          ].filter(Boolean).join('\n');
+          const au = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND user_id IS NOT NULL`, [result.id]);
+          for (const row of au.rows) await slack.dm(row.user_id, dmText);
+        } catch (e) { console.error('[writes] yeni brief DM hata:', e.message); }
       } else if (!post.skipped) {
         await pool.query(`INSERT INTO events(brief_id,verb,detail,source) VALUES ($1,'slack:hata',$2,'system')`,
           [result.id, JSON.stringify({ error: post.error })]);

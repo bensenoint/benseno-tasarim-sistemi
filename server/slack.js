@@ -47,7 +47,7 @@ const fmtDate = (ms) => {
 };
 
 // Brief mesajını kanala post et → {ok, ts, channel, permalink?, error}
-async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, contribNames }) {
+async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, contribNames, not }) {
   const channel = channelForBrand(marka);
   if (!channel) return { ok: false, error: "kanal_yok", skipped: true };
   if (!hasToken()) return { ok: false, error: "token_yok", skipped: true };
@@ -57,6 +57,7 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
     `*${baslik}*`,
     `⏰ ${fmtDate(deadlineMs)}${dept ? `   ·   📁 ${dept}` : ""}${akis ? `   ·   ${akis === "paralel" ? "⇉ paralel" : "→ sıralı"}` : ""}`,
     leadName ? `👤 ${leadName}${contribNames && contribNames.length ? `  ·  ${contribNames.join(", ")}` : ""}` : null,
+    not ? `📝 ${not}` : null,
     `_Dashboard'dan oluşturuldu · iş bu thread'de devam eder._`,
   ].filter(Boolean);
 

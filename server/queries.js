@@ -112,6 +112,7 @@ async function getEmbedded() {
     workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '' })),
     leads:     b.leads.map(l => ({ id: l.id, name: l.name })),
     observers: b.observers.map(o => ({ id: o.id, name: o.name })),
+    notes: b.musteri_notu || '',
     deadline: ms(b.deadline), durum: b.durum, rev: b.rev || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || '#',
