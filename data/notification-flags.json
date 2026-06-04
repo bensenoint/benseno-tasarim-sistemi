@@ -1,96 +1,98 @@
 {
   "mode": "active",
-  "new_briefs": [],
+  "new_briefs": [
+    {
+      "no": 35,
+      "marka": "Bauhaus",
+      "is": "deneme",
+      "leadId": "U06J26R1XCJ",
+      "oncelik": "🔴",
+      "deadline_str": "04 Haz 2026 17:00 TR",
+      "delta_h": 6.6
+    },
+    {
+      "no": 36,
+      "marka": "Cimporglobal",
+      "is": "deneme 2",
+      "leadId": "U4XCE3532",
+      "oncelik": "🟠",
+      "deadline_str": "04 Haz 2026 20:00 TR",
+      "delta_h": 9.6
+    },
+    {
+      "no": 37,
+      "marka": "KMR Amos",
+      "is": "deneme 3",
+      "leadId": "U055EDESLSE",
+      "oncelik": "🟡",
+      "deadline_str": "05 Haz 2026 20:00 TR",
+      "delta_h": 33.6
+    },
+    {
+      "no": 38,
+      "marka": "Kuzeypet",
+      "is": "Ever Clean / Supreme Mekanik - HAZİRAN",
+      "leadId": "U08HLMHTGEL",
+      "oncelik": "🔴",
+      "deadline_str": "04 Haz 2026 15:00 TR",
+      "delta_h": 4.6
+    }
+  ],
   "past_deadline": [
     {
-      "ts": null,
+      "ts": "",
       "no": 20,
       "marka": "Tour2America",
       "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
       "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "1 Haziran 2026 12:31 TR ⚠️ GEÇMİŞ 2g 3sa 15dk geri",
-      "gecikme_h": 67
+      "lead_role": "tasarim",
+      "deadline_str": "1 Haziran 2026 12:31 TR ⚠️ GEÇMİŞ 3g 0sa 0dk geride",
+      "permalink": "",
+      "gecikme_h": 69.8
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 25,
       "marka": "VDM Petdent",
       "is": "test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
       "lead_id": "U4XCE3532",
-      "lead_role": "editor",
-      "deadline_str": "2 Haziran 2026 10:00 TR ⚠️ GEÇMİŞ 1g 5sa 46dk geri",
-      "gecikme_h": 46
+      "lead_role": "tasarim",
+      "deadline_str": "2 Haziran 2026 10:00 TR ⚠️ GEÇMİŞ 2g 2sa 30dk geride",
+      "permalink": "",
+      "gecikme_h": 48.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 26,
       "marka": "Bauhaus",
       "is": "test yayın (Sosyal Medya Post · 🐷 Görkem · Sıralı Görkem→Cansu · ⚠️ test brief'i)",
       "lead_id": "U030C48PL23",
       "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 14:55 TR ⚠️ GEÇMİŞ 1g 0sa 51dk geri",
-      "gecikme_h": 41
+      "deadline_str": "2 Haziran 2026 14:55 TR ⚠️ GEÇMİŞ 1g 21sa 36dk geride",
+      "permalink": "",
+      "gecikme_h": 43.4
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 27,
       "marka": "Bauhaus",
       "is": "Plastik Dolaplar",
       "lead_id": "U09BFPBKQG7",
       "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 1g 2sa 46dk geri",
-      "gecikme_h": 43
+      "deadline_str": "2 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 1g 23sa 30dk geride",
+      "permalink": "",
+      "gecikme_h": 45.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 28,
       "marka": "Bauhaus",
       "is": "Scheppach Ekskavatör",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 0g 2sa 46dk geri",
-      "gecikme_h": 19
-    },
-    {
-      "ts": null,
-      "no": 29,
-      "marka": "Bauhaus",
-      "is": "Vantilatörler",
-      "lead_id": "U06J26R1XCJ",
-      "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 0g 22sa 46dk ger",
-      "gecikme_h": 39
-    },
-    {
-      "ts": null,
-      "no": 30,
-      "marka": "Bauhaus",
-      "is": "Weber 1&2 (Sosyal Medya Post · Paralel · 🎬 2 video)",
-      "lead_id": "U06J26R1XCJ",
-      "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 12:00 TR ⚠️ GEÇMİŞ 0g 3sa 46dk geri",
-      "gecikme_h": 20
-    },
-    {
-      "ts": null,
-      "no": 31,
-      "marka": "KZY Supreme",
-      "is": "Supreme Wet 85 gram // Haziran 2026 Kampanya (Print / Broşür)",
-      "lead_id": "U08HLMHTGEL",
-      "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 11:52 TR ⚠️ GEÇMİŞ 0g 3sa 54dk geri",
-      "gecikme_h": 20
-    },
-    {
-      "ts": null,
-      "no": 33,
-      "marka": "Hasvet",
-      "is": "test ai (Araştırma · 🐷 Görkem Kaya · ⚠️ test brief'i)",
-      "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "3 Haziran 2026 14:14 TR ⚠️ GEÇMİŞ 0g 1sa 32dk geri",
-      "gecikme_h": 18
+      "deadline_str": "3 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 0g 23sa 30dk geride",
+      "permalink": "",
+      "gecikme_h": 21.3
     }
   ],
   "past_confirmed": [],
@@ -101,235 +103,235 @@
   "calendar_events": [],
   "escalation": [
     {
-      "ts": null,
+      "ts": "",
       "no": 1,
       "marka": "JNJ Vision TR",
       "is": "24 Haziran Kontakt Lens Davetiyesi",
       "lead_id": "U4XCE3532",
-      "lead_role": "editor",
-      "deadline_str": "18 Mayıs 2026 16:00 TR ⚠️ GEÇMİŞ 15g 23sa 46dk ger",
-      "permalink": null,
-      "gecikme_h": 400
+      "lead_role": "tasarim",
+      "deadline_str": "18 Mayıs 2026 16:00 TR ⚠️ GEÇMİŞ 16g 20sa 30dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 402.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 3,
       "marka": "Bauhaus",
       "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "20 Mayıs 2026 10:00 TR ⚠️ GEÇMİŞ 14g 5sa 46dk geri",
-      "permalink": null,
-      "gecikme_h": 358
+      "deadline_str": "20 Mayıs 2026 10:00 TR ⚠️ GEÇMİŞ 15g 2sa 30dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 360.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 4,
       "marka": "Bauhaus",
       "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
       "lead_id": "U055EDESLSE",
       "lead_role": "tasarim",
-      "deadline_str": "21 Mayıs 2026 13:00 TR ⚠️ GEÇMİŞ 13g 2sa 46dk geri",
-      "permalink": null,
-      "gecikme_h": 331
+      "deadline_str": "21 Mayıs 2026 13:00 TR ⚠️ GEÇMİŞ 13g 23sa 30dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 333.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 5,
       "marka": "Bauhaus",
       "is": "Broşür (Print · AI · Eren self-assign)",
       "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "21 Mayıs 2026 13:42 TR ⚠️ GEÇMİŞ 13g 2sa 4dk gerid",
-      "permalink": null,
-      "gecikme_h": 330
+      "lead_role": "tasarim",
+      "deadline_str": "21 Mayıs 2026 13:42 TR ⚠️ GEÇMİŞ 13g 22sa 48dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 332.6
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 6,
       "marka": "Bauhaus",
       "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
       "lead_id": "U09BFPBKQG7",
       "lead_role": "tasarim",
-      "deadline_str": "20 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ 13g 21sa 46dk ger",
-      "permalink": null,
-      "gecikme_h": 350
+      "deadline_str": "20 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ 14g 18sa 30dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 352.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 8,
       "marka": "VDM Petdent",
       "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
       "lead_id": "U09BFPBKQG7",
       "lead_role": "tasarim",
-      "deadline_str": "21 Mayıs 2026 13:24 TR ⚠️ GEÇMİŞ 13g 2sa 22dk geri",
-      "permalink": null,
-      "gecikme_h": 330
+      "deadline_str": "21 Mayıs 2026 13:24 TR ⚠️ GEÇMİŞ 13g 23sa 6dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 332.9
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 9,
       "marka": "VDM Petdent",
       "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
       "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "22 Mayıs 2026 23:59 TR ⚠️ GEÇMİŞ 11g 15sa 47dk ger",
-      "permalink": null,
-      "gecikme_h": 296
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 2026 23:59 TR ⚠️ GEÇMİŞ 12g 12sa 30dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 298.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 15,
       "marka": "Bauhaus",
       "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "22 Mayıs 2026 14:00 TR ⚠️ GEÇMİŞ 12g 1sa 46dk geri",
-      "permalink": null,
-      "gecikme_h": 306
+      "deadline_str": "22 Mayıs 2026 14:00 TR ⚠️ GEÇMİŞ 12g 22sa 30dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 308.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 16,
       "marka": "Bauhaus",
       "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "22 Mayıs 2026 17:00 TR ⚠️ GEÇMİŞ 11g 22sa 46dk ger",
-      "permalink": null,
-      "gecikme_h": 303
+      "deadline_str": "22 Mayıs 2026 17:00 TR ⚠️ GEÇMİŞ 12g 19sa 30dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 305.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 17,
       "marka": "VDM Petdent",
       "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
       "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "22 Mayıs 2026 08:46 TR ⚠️ GEÇMİŞ 12g 7sa 0dk gerid",
-      "permalink": null,
-      "gecikme_h": 311
+      "lead_role": "tasarim",
+      "deadline_str": "22 Mayıs 2026 08:46 TR ⚠️ GEÇMİŞ 13g 3sa 44dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 313.5
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 20,
       "marka": "Tour2America",
       "is": "bayram icerigi (Sosyal Medya Post · 🐷 Görkem GM · Paralel Eren+Görkem)",
       "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "1 Haziran 2026 12:31 TR ⚠️ GEÇMİŞ 2g 3sa 15dk geri",
-      "permalink": null,
-      "gecikme_h": 67
+      "lead_role": "tasarim",
+      "deadline_str": "1 Haziran 2026 12:31 TR ⚠️ GEÇMİŞ 3g 0sa 0dk geride",
+      "permalink": "",
+      "gecikme_h": 69.8
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 21,
       "marka": "VDM Petdent",
       "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
       "lead_id": "U4XCE3532",
-      "lead_role": "editor",
-      "deadline_str": "23 Mayıs 2026 14:42 TR ⚠️ GEÇMİŞ 11g 1sa 4dk gerid",
-      "permalink": null,
-      "gecikme_h": 281
+      "lead_role": "tasarim",
+      "deadline_str": "23 Mayıs 2026 14:42 TR ⚠️ GEÇMİŞ 11g 21sa 48dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 283.6
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 24,
       "marka": "Bauhaus",
       "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "22 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ 11g 21sa 46dk ger",
-      "permalink": null,
-      "gecikme_h": 302
+      "deadline_str": "22 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ 12g 18sa 30dk geride · 🔴 Blokeli",
+      "permalink": "",
+      "gecikme_h": 304.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 25,
       "marka": "VDM Petdent",
       "is": "test (Sosyal Medya Post · 🐷 Görkem · Paralel · ⚠️ test brief'i)",
       "lead_id": "U4XCE3532",
-      "lead_role": "editor",
-      "deadline_str": "2 Haziran 2026 10:00 TR ⚠️ GEÇMİŞ 1g 5sa 46dk geri",
-      "permalink": null,
-      "gecikme_h": 46
+      "lead_role": "tasarim",
+      "deadline_str": "2 Haziran 2026 10:00 TR ⚠️ GEÇMİŞ 2g 2sa 30dk geride",
+      "permalink": "",
+      "gecikme_h": 48.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 26,
       "marka": "Bauhaus",
       "is": "test yayın (Sosyal Medya Post · 🐷 Görkem · Sıralı Görkem→Cansu · ⚠️ test brief'i)",
       "lead_id": "U030C48PL23",
       "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 14:55 TR ⚠️ GEÇMİŞ 1g 0sa 51dk geri",
-      "permalink": null,
-      "gecikme_h": 41
+      "deadline_str": "2 Haziran 2026 14:55 TR ⚠️ GEÇMİŞ 1g 21sa 36dk geride",
+      "permalink": "",
+      "gecikme_h": 43.4
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 27,
       "marka": "Bauhaus",
       "is": "Plastik Dolaplar",
       "lead_id": "U09BFPBKQG7",
       "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 1g 2sa 46dk geri",
-      "permalink": null,
-      "gecikme_h": 43
+      "deadline_str": "2 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 1g 23sa 30dk geride",
+      "permalink": "",
+      "gecikme_h": 45.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 28,
       "marka": "Bauhaus",
       "is": "Scheppach Ekskavatör",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 0g 2sa 46dk geri",
-      "permalink": null,
-      "gecikme_h": 19
+      "deadline_str": "3 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 0g 23sa 30dk geride",
+      "permalink": "",
+      "gecikme_h": 21.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 29,
       "marka": "Bauhaus",
       "is": "Vantilatörler",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "2 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 0g 22sa 46dk ger",
-      "permalink": null,
-      "gecikme_h": 39
+      "deadline_str": "2 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 1g 19sa 30dk geride",
+      "permalink": "",
+      "gecikme_h": 41.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 30,
       "marka": "Bauhaus",
       "is": "Weber 1&2 (Sosyal Medya Post · Paralel · 🎬 2 video)",
       "lead_id": "U06J26R1XCJ",
       "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 12:00 TR ⚠️ GEÇMİŞ 0g 3sa 46dk geri",
-      "permalink": null,
-      "gecikme_h": 20
+      "deadline_str": "3 Haziran 2026 12:00 TR ⚠️ GEÇMİŞ 1g 0sa 30dk geride",
+      "permalink": "",
+      "gecikme_h": 22.3
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 31,
       "marka": "KZY Supreme",
       "is": "Supreme Wet 85 gram // Haziran 2026 Kampanya (Print / Broşür)",
       "lead_id": "U08HLMHTGEL",
       "lead_role": "tasarim",
-      "deadline_str": "3 Haziran 2026 11:52 TR ⚠️ GEÇMİŞ 0g 3sa 54dk geri",
-      "permalink": null,
-      "gecikme_h": 20
+      "deadline_str": "3 Haziran 2026 11:52 TR ⚠️ GEÇMİŞ 1g 0sa 36dk geride",
+      "permalink": "",
+      "gecikme_h": 22.4
     },
     {
-      "ts": null,
+      "ts": "",
       "no": 33,
       "marka": "Hasvet",
       "is": "test ai (Araştırma · 🐷 Görkem Kaya · ⚠️ test brief'i)",
       "lead_id": "U0AP31SAA1W",
-      "lead_role": "ai",
-      "deadline_str": "3 Haziran 2026 14:14 TR ⚠️ GEÇMİŞ 0g 1sa 32dk geri",
-      "permalink": null,
-      "gecikme_h": 18
+      "lead_role": "tasarim",
+      "deadline_str": "3 Haziran 2026 14:14 TR ⚠️ GEÇMİŞ 0g 22sa 18dk geride",
+      "permalink": "",
+      "gecikme_h": 20.1
     }
   ],
   "blokeli": [
@@ -338,94 +340,84 @@
       "marka": "JNJ Vision TR",
       "is": "24 Haziran Kontakt Lens Davetiyesi",
       "lead_id": "U4XCE3532",
-      "gecikme_h": 400
+      "gecikme_h": 402.3
     },
     {
       "no": 3,
       "marka": "Bauhaus",
       "is": "bahar kampanyası (%10 indirim · Sosyal Medya Post)",
       "lead_id": "U06J26R1XCJ",
-      "gecikme_h": 358
+      "gecikme_h": 360.3
     },
     {
       "no": 4,
       "marka": "Bauhaus",
       "is": "🚨 mayıs kampanyası (%20 indirim · Sosyal Medya Post)",
       "lead_id": "U055EDESLSE",
-      "gecikme_h": 331
+      "gecikme_h": 333.3
     },
     {
       "no": 5,
       "marka": "Bauhaus",
       "is": "Broşür (Print · AI · Eren self-assign)",
       "lead_id": "U0AP31SAA1W",
-      "gecikme_h": 330
+      "gecikme_h": 332.6
     },
     {
       "no": 6,
       "marka": "Bauhaus",
       "is": "20 Mayıs İçerik (Sosyal Medya Post · video)",
       "lead_id": "U09BFPBKQG7",
-      "gecikme_h": 350
+      "gecikme_h": 352.3
     },
     {
       "no": 8,
       "marka": "VDM Petdent",
       "is": "GA4 Analiz (Veri analizi · Eren'den Arda'ya · cross-dept)",
       "lead_id": "U09BFPBKQG7",
-      "gecikme_h": 330
+      "gecikme_h": 332.9
     },
     {
       "no": 9,
       "marka": "VDM Petdent",
       "is": "Whatsapp Business Kurulumu (Otomasyon · Eren self-assign)",
       "lead_id": "U0AP31SAA1W",
-      "gecikme_h": 296
+      "gecikme_h": 298.3
     },
     {
       "no": 15,
       "marka": "Bauhaus",
       "is": "Bahçeniz İçin Her Şey / 30 Mayıs (Sosyal Medya Post · weekly content batch 6/7)",
       "lead_id": "U06J26R1XCJ",
-      "gecikme_h": 306
+      "gecikme_h": 308.3
     },
     {
       "no": 16,
       "marka": "Bauhaus",
       "is": "Banyo Şık ve Pratik (Sosyal Medya Post · weekly content batch 7/7)",
       "lead_id": "U06J26R1XCJ",
-      "gecikme_h": 303
+      "gecikme_h": 305.3
     },
     {
       "no": 17,
       "marka": "VDM Petdent",
       "is": "Yeni bayram postu (Sosyal Medya Post · 🐷 Görkem GM · Sıralı Eren→Görkem · 📎 jpg ref)",
       "lead_id": "U0AP31SAA1W",
-      "gecikme_h": 311
+      "gecikme_h": 313.5
     },
     {
       "no": 21,
       "marka": "VDM Petdent",
       "is": "bahar video (Video · 🐷 Görkem GM · Paralel Cansu+Görkem+Eren)",
       "lead_id": "U4XCE3532",
-      "gecikme_h": 281
+      "gecikme_h": 283.6
     },
     {
       "no": 24,
       "marka": "Bauhaus",
       "is": "Bayrama Özel Dev Kampanya (Sosyal Medya Post · Paralel · 'sarı şerit')",
       "lead_id": "U06J26R1XCJ",
-      "gecikme_h": 302
+      "gecikme_h": 304.3
     }
-  ],
-  "summary": {
-    "active": 24,
-    "overdue": 21,
-    "blokeli": 12,
-    "new_briefs": 0,
-    "prio_red": 21,
-    "prio_orange": 0,
-    "prio_yellow": 0,
-    "prio_green": 3
-  }
+  ]
 }

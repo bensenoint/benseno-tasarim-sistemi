@@ -577,5 +577,68 @@
     "user_id": "U055EDESLSE",
     "message_ts": "1780550583.095579",
     "reason": "#29 Bauhaus 'Vantilatörler' gecikme 39sa eşiği aşıldı (deadline 2Haz17:00) · tasarim sorumlu yönetici İpek'e Şablon 31 · Headless run"
+  },
+  {
+    "brief_ts": "1780556954.402309",
+    "brief_no": "35",
+    "template": "1_new_brief_dm",
+    "sent_at": "2026-06-04T10:26:10+03:00",
+    "user_id": "U06J26R1XCJ",
+    "notes": "#35 Bauhaus 'deneme' → Aykut Arslan (dashboard brief)"
+  },
+  {
+    "brief_ts": "1780557039.483769",
+    "brief_no": "36",
+    "template": "1_new_brief_dm",
+    "sent_at": "2026-06-04T10:26:10+03:00",
+    "user_id": "U4XCE3532",
+    "notes": "#36 Cimporglobal 'deneme 2' → Cansu Kazgan (dashboard brief)"
+  },
+  {
+    "brief_ts": "1780557144.061489",
+    "brief_no": "37",
+    "template": "1_new_brief_dm",
+    "sent_at": "2026-06-04T10:26:10+03:00",
+    "user_id": "U055EDESLSE",
+    "notes": "#37 KMR Amos 'deneme 3' → İpek Akdeniz (dashboard brief)"
+  },
+  {
+    "brief_ts": "1780555379.691469",
+    "brief_no": "38",
+    "template": "1_new_brief_dm",
+    "sent_at": "2026-06-04T10:26:10+03:00",
+    "user_id": "U08HLMHTGEL",
+    "notes": "#38 Kuzeypet 'Ever Clean / Supreme Mekanik - HAZİRAN' → Serhat Yıldız (workflow brief)"
+  },
+  {
+    "brief_no": "28",
+    "template": "31_manager_escalation_24h",
+    "sent_at": "2026-06-04T10:26:10+03:00",
+    "user_id": "U055EDESLSE",
+    "message_ts": "1780557949.029069",
+    "notes": "#28 Bauhaus 'Scheppach Ekskavatör' ~360h overdue → İpek (tasarim manager)"
+  },
+  {
+    "brief_no": "30",
+    "template": "31_manager_escalation_24h",
+    "sent_at": "2026-06-04T10:26:10+03:00",
+    "user_id": "U055EDESLSE",
+    "message_ts": "1780557949.369269",
+    "notes": "#30 Bauhaus 'Weber 1&2' ~240h overdue → İpek (tasarim manager)"
+  },
+  {
+    "brief_no": "31",
+    "template": "31_manager_escalation_24h",
+    "sent_at": "2026-06-04T10:26:10+03:00",
+    "user_id": "U055EDESLSE",
+    "message_ts": "1780557949.660839",
+    "notes": "#31 KZY Supreme Kampanya ~240h overdue → İpek (tasarim manager)"
+  },
+  {
+    "brief_ts": null,
+    "template": "orchestrator_sync_1780557970_4_new_briefs_processed",
+    "sent_at": "2026-06-04T10:26:10+03:00",
+    "user_id": "skip-consolidated",
+    "notes": "4Haz 10:22 TR sync · 4 yeni brief (Bauhaus#35, Cimporglobal#36, KMR Amos#37, Kuzeypet#38) · Şablon1 x4 DM · Şablon31 x3 (İpek: #28,#30,#31 atlanmış escalation) · 21 GEÇMİŞ (pre-history 100-400h skip) · 12 blokeli · Calendar: skipped (headless)"
   }
 ]
