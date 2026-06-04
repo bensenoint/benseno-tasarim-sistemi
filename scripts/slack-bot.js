@@ -572,6 +572,8 @@ async function resolveBriefTs(client, channel, ts) {
 }
 
 app.event('reaction_added', async ({ event, client }) => {
+  // TEŞHİS (Bug 1): gelen her reaction'ı logla — event subscription + emoji değerini doğrulamak için.
+  log(`reaction_added alındı: :${event.reaction}: item.type=${event.item.type} item.ts=${event.item.ts} ch=${event.item.channel} user=${event.user}`);
   // Mesaj tipinde değilse yoksay (dosya, canvas üzeri olabilir)
   if (event.item.type !== 'message') return;
 
