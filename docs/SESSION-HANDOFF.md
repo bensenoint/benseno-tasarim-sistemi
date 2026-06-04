@@ -77,3 +77,12 @@ script'ler (run-orchestrator, run-startup-recovery, watchdog, run-slack-bot), st
 `check-pat-expiry.sh` → claude/notification-agent yerine doğrudan Slack API (`notify()`, Railway-uyumlu).
 **KORUNDU:** benseno-onboarding skill (manuel onboarding aracı), escape hatch (live-data.json + EMBEDDED_DATA + ?api=0), marka_stats.json + brief-queue.json (slack-bot.js hâlâ okuyor — App Home E3 satırı + queueeEkle).
 **DEFER:** App Home'daki E3-mod satırı + queueeEkle ölü kodu (canlı-bot cerrahisi gerektirir, ayrı adım). Bot 8aa9d9a ile temiz redeploy oldu.
+
+## Brief oluşturma yeniden tasarımı — ✅ CANLI (4 Haz)
+Spec/plan: docs/superpowers/{specs,plans}/2026-06-04-brief-creation-redesign*. 3-rol modeli:
+- `contributor`=**işi yapan(lar)** (dept buradan türetilir, virgül-join), `lead`=**lead(ler)** (çoklu, boşsa oluşturan), `gozlemci`=**gözlemciler**. `editor` rolü + `reviewer` kavramı kaldırıldı.
+- API body: `worker_ids`(zorunlu)/`lead_ids`/`gozlemci_ids` (atanan_ids/editor_ids/dept kalktı). `getEmbedded` shape: `workers[]/leads[]/observers[]/attachments[]`.
+- Dosya: `POST /api/briefs/:id/attachments` (base64 JSON → Slack thread external-upload → brief_attachments). express.json limit 25mb. Slack modal: `file_input` → `attachments-meta`.
+- Dashboard NewBrief: dept-gruplu 3 kişi seçici + dosya. data.js hydrate yeni shape + escape-hatch fallback + geriye uyum (lead=leads[0], contributors=workers). BriefDrawer: 3 RoleGroup.
+- **BEKLEYEN smoke:** Slack `/yeni-brief` ile gerçek brief (işi yapan + lead + gözlemci + dosya) → DB'de roller + dept türemiş + thread'de dosya → dashboard'da görün/düzenle.
+- **DEFER:** kullanim-klavuzu.html güncellemesi (toplu doküman turu); Cards/BriefTable salt-okunur gösterim geriye-uyumla çalışıyor (işi yapanlar=atananlar), istenirse ayrıştırılır.
