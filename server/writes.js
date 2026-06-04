@@ -21,11 +21,10 @@ const zDate = z.union([z.string(), z.number()]).nullable().optional(); // ISO/ms
 const briefCreate = z.object({
   marka: z.string().min(1),
   baslik: z.string().min(1),
-  dept: z.string().optional(),
   deadline: zDate,
-  atanan_ids: z.array(zUserId).optional(),     // [lead, ...contributors]
-  editor_ids: z.array(zUserId).optional(),
-  gozlemci_ids: z.array(zUserId).optional(),
+  worker_ids: z.array(zUserId).min(1, 'en az bir işi yapan kişi gerekli'),  // = contributor rolü; dept buradan türetilir
+  lead_ids: z.array(zUserId).optional(),       // = lead rolü (çoklu); boşsa [by]
+  gozlemci_ids: z.array(zUserId).optional(),   // = gozlemci rolü (gözlemciler)
   priority: z.string().optional(),
   akis: z.enum(['sirali', 'paralel']).optional(),
   maliyet: z.number().nullable().optional(),
@@ -41,14 +40,13 @@ const briefCreate = z.object({
 const briefPatch = z.object({
   marka: z.string().min(1).optional(),
   baslik: z.string().min(1).optional(),
-  dept: z.string().optional(),
   deadline: zDate,
   priority: z.string().optional(),
   akis: z.enum(['sirali', 'paralel']).optional(),
   musteri_notu: z.string().optional(),
-  atanan_ids: z.array(zUserId).optional(),     // verilirse lead+contributor TAM değiştirilir
-  editor_ids: z.array(zUserId).optional(),
-  gozlemci_ids: z.array(zUserId).optional(),
+  worker_ids: z.array(zUserId).optional(),     // verilirse contributor TAM değiştirilir (dept yeniden türetilir)
+  lead_ids: z.array(zUserId).optional(),       // verilirse lead TAM değiştirilir
+  gozlemci_ids: z.array(zUserId).optional(),   // verilirse gozlemci TAM değiştirilir
   by: zUserId.optional(),
   source: z.enum(['dashboard', 'slack', 'system']).default('dashboard'),
   slack_ts: z.string().optional(),
@@ -92,28 +90,27 @@ async function logEvent(client, { brief_id, user_id, verb, detail, source, slack
   );
 }
 
-async function setAssignees(client, briefId, { atanan_ids, editor_ids, gozlemci_ids }) {
-  // verilen rol gruplarını TAM değiştir (verilmeyene dokunma)
-  const apply = async (ids, role, withSira) => {
+async function setAssignees(client, briefId, { worker_ids, lead_ids, gozlemci_ids }) {
+  // her verilen rol grubunu TAM değiştir (verilmeyene dokunma)
+  const apply = async (ids, role) => {
     if (!Array.isArray(ids)) return;
-    const roles = role === 'lead+contrib' ? ['lead', 'contributor'] : [role];
-    await client.query(`DELETE FROM brief_assignees WHERE brief_id=$1 AND role = ANY($2)`, [briefId, roles]);
-    if (role === 'lead+contrib') {
-      if (ids[0]) await client.query(
-        `INSERT INTO brief_assignees(brief_id,user_id,role,sira) VALUES ($1,$2,'lead',0)
-         ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [briefId, ids[0]]);
-      for (let i = 1; i < ids.length; i++) await client.query(
-        `INSERT INTO brief_assignees(brief_id,user_id,role,sira) VALUES ($1,$2,'contributor',$3)
-         ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [briefId, ids[i], i]);
-    } else {
-      for (let i = 0; i < ids.length; i++) await client.query(
-        `INSERT INTO brief_assignees(brief_id,user_id,role,sira) VALUES ($1,$2,$3,$4)
-         ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [briefId, ids[i], role, withSira ? i : null]);
-    }
+    await client.query(`DELETE FROM brief_assignees WHERE brief_id=$1 AND role=$2`, [briefId, role]);
+    for (let i = 0; i < ids.length; i++) await client.query(
+      `INSERT INTO brief_assignees(brief_id,user_id,role,sira) VALUES ($1,$2,$3,$4)
+       ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [briefId, ids[i], role, i]);
   };
-  if (atanan_ids !== undefined) await apply(atanan_ids, 'lead+contrib', true);
-  if (editor_ids !== undefined) await apply(editor_ids, 'editor', false);
-  if (gozlemci_ids !== undefined) await apply(gozlemci_ids, 'gozlemci', false);
+  if (worker_ids   !== undefined) await apply(worker_ids,   'contributor');  // işi yapanlar
+  if (lead_ids     !== undefined) await apply(lead_ids,     'lead');         // lead(ler)
+  if (gozlemci_ids !== undefined) await apply(gozlemci_ids, 'gozlemci');     // gözlemciler
+}
+
+// İşi yapanların dept'lerinden brief dept'i türet (distinct, virgül-join).
+async function deriveDept(client, worker_ids) {
+  if (!Array.isArray(worker_ids) || !worker_ids.length) return null;
+  const r = await client.query(
+    `SELECT DISTINCT dept FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> ''`, [worker_ids]);
+  const depts = r.rows.map(x => x.dept).sort();
+  return depts.length ? depts.join(',') : null;
 }
 
 // ── operasyonlar ─────────────────────────────────────────────
@@ -127,14 +124,17 @@ async function createBrief(raw) {
       const r = await client.query(`SELECT COALESCE(max(no),0)+1 AS n FROM briefs`);
       no = r.rows[0].n;
     }
+    // lead default = oluşturan; dept işi yapanlardan türetilir
+    const leadIds = (d.lead_ids && d.lead_ids.length) ? d.lead_ids : (d.by ? [d.by] : []);
+    const dept = await deriveDept(client, d.worker_ids);
     const r = await client.query(
       `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
-      [no, markaId, d.baslik, d.dept || null, toTs(d.deadline), d.priority || null,
+      [no, markaId, d.baslik, dept, toTs(d.deadline), d.priority || null,
        d.akis || 'sirali', d.maliyet ?? null, d.satis ?? null, d.musteri_notu || null,
        d.slack_ts || null, null]);
     const id = r.rows[0].id;
-    await setAssignees(client, id, d);
+    await setAssignees(client, id, { worker_ids: d.worker_ids, lead_ids: leadIds, gozlemci_ids: d.gozlemci_ids });
     if (Array.isArray(d.tags)) for (const t of d.tags)
       await client.query(`INSERT INTO brief_tags(brief_id,tag) VALUES ($1,$2) ON CONFLICT DO NOTHING`, [id, t]);
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'olusturuldu',
@@ -146,17 +146,19 @@ async function createBrief(raw) {
   // Slack-kökenli (source='slack') olanlarda ECHO yapma. Best-effort: hata create'i bozmaz.
   if (d.source !== 'slack' && slack.hasToken()) {
     try {
-      const ids = (d.atanan_ids || []).filter(Boolean);
+      const leadIdsForPost = (d.lead_ids && d.lead_ids.length) ? d.lead_ids : (d.by ? [d.by] : []);
+      const workerIds = (d.worker_ids || []).filter(Boolean);
       let leadName = null, contribNames = [];
-      if (ids.length) {
-        const u = await pool.query('SELECT id,name FROM users WHERE id = ANY($1)', [ids]);
+      const allIds = [...new Set([...leadIdsForPost, ...workerIds])];
+      if (allIds.length) {
+        const u = await pool.query('SELECT id,name FROM users WHERE id = ANY($1)', [allIds]);
         const byId = Object.fromEntries(u.rows.map(r => [r.id, r.name]));
-        leadName = byId[ids[0]] || null;
-        contribNames = ids.slice(1).map(i => byId[i]).filter(Boolean);
+        leadName = leadIdsForPost.map(i => byId[i]).filter(Boolean).join(', ') || null;
+        contribNames = workerIds.map(i => byId[i]).filter(Boolean);
       }
       const deadlineMs = d.deadline ? (typeof d.deadline === 'number' ? d.deadline : Date.parse(d.deadline)) : null;
       const post = await slack.postBrief({ marka: d.marka, baslik: d.baslik, no: result.no,
-        deadlineMs, dept: d.dept, akis: d.akis, leadName, contribNames });
+        deadlineMs, dept: null, akis: d.akis, leadName, contribNames });
       if (post.ok) {
         await pool.query('UPDATE briefs SET slack_ts=$1, slack_channel=$2, slack_url=$3 WHERE id=$4',
           [post.ts, post.channel, post.permalink || null, result.id]);
@@ -185,7 +187,6 @@ async function patchBrief(id, raw) {
     const put = (col, v) => { vals.push(v); sets.push(`${col}=$${vals.length}`); };
     if (d.marka !== undefined) put('marka_id', await brandIdByName(client, d.marka));
     if (d.baslik !== undefined) put('baslik', d.baslik);
-    if (d.dept !== undefined) put('dept', d.dept);
     if (d.deadline !== undefined) put('deadline', toTs(d.deadline));
     if (d.priority !== undefined) put('priority', d.priority);
     if (d.akis !== undefined) put('akis', d.akis);
@@ -196,6 +197,11 @@ async function patchBrief(id, raw) {
       if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
     }
     await setAssignees(client, id, d);
+    // işi yapanlar değiştiyse dept yeniden türet
+    if (d.worker_ids !== undefined) {
+      const dept = await deriveDept(client, d.worker_ids);
+      await client.query(`UPDATE briefs SET dept=$1 WHERE id=$2`, [dept, id]);
+    }
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'düzenlendi',
       detail: { alanlar: Object.keys(d).filter(k => !['by', 'source', 'slack_ts'].includes(k)) },
       source: d.source, slack_ts: d.slack_ts });
