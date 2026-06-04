@@ -68,4 +68,18 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
   return { ok: true, ts: res.ts, channel: res.channel, permalink };
 }
 
-module.exports = { postBrief, channelForBrand, hasToken, CHANNELS };
+// Brief'in Slack thread'ine yanıt (b2 — değişiklikler işin thread'inde devam eder).
+async function postThread({ channel, thread_ts, text }) {
+  if (!hasToken() || !channel || !thread_ts) return { ok: false, skipped: true };
+  const res = await slackCall("chat.postMessage", { channel, thread_ts, text, unfurl_links: false });
+  return res.ok ? { ok: true, ts: res.ts } : { ok: false, error: res.error };
+}
+
+// Tek kullanıcıya DM (channel=userID → bot DM açar; im:write gerekir).
+async function dm(userId, text) {
+  if (!hasToken() || !userId) return { ok: false, skipped: true };
+  const res = await slackCall("chat.postMessage", { channel: userId, text, unfurl_links: false });
+  return res.ok ? { ok: true } : { ok: false, error: res.error };
+}
+
+module.exports = { postBrief, postThread, dm, channelForBrand, hasToken, CHANNELS };

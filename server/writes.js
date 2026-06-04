@@ -180,7 +180,7 @@ async function createBrief(raw) {
 
 async function patchBrief(id, raw) {
   const d = briefPatch.parse(raw);
-  return tx(async (client) => {
+  const res = await tx(async (client) => {
     const sets = [], vals = [];
     const put = (col, v) => { vals.push(v); sets.push(`${col}=$${vals.length}`); };
     if (d.marka !== undefined) put('marka_id', await brandIdByName(client, d.marka));
@@ -201,11 +201,14 @@ async function patchBrief(id, raw) {
       source: d.source, slack_ts: d.slack_ts });
     return { id };
   });
+  const fields = Object.keys(d).filter(k => !['by', 'source', 'slack_ts'].includes(k));
+  await reflectChange(id, `✏️ düzenlendi: ${fields.join(', ')}`, d.source);
+  return res;
 }
 
 async function setStatus(id, raw) {
   const d = statusBody.parse(raw);
-  return tx(async (client) => {
+  const res = await tx(async (client) => {
     const completed = d.durum === 'tamamlandi';
     const r = await client.query(
       `UPDATE briefs SET durum=$1,
@@ -216,11 +219,13 @@ async function setStatus(id, raw) {
       detail: { durum: d.durum }, source: d.source, slack_ts: d.slack_ts });
     return r.rows[0];
   });
+  await reflectChange(id, `🔄 durum güncellendi: *${d.durum}*`, d.source);
+  return res;
 }
 
 async function setFinancials(id, raw) {
   const d = financialsBody.parse(raw);
-  return tx(async (client) => {
+  const res = await tx(async (client) => {
     const sets = [], vals = [];
     const put = (c, v) => { vals.push(v); sets.push(`${c}=$${vals.length}`); };
     if (d.maliyet !== undefined) put('maliyet', d.maliyet);
@@ -235,6 +240,26 @@ async function setFinancials(id, raw) {
       source: d.source, slack_ts: d.slack_ts });
     return { id };
   });
+  const fin = ['maliyet', 'satis', 'fatura', 'odeme'].filter(k => d[k] !== undefined).join(', ');
+  await reflectChange(id, `💰 finans güncellendi (${fin})`, d.source);
+  return res;
+}
+
+// b2 — değişikliği Slack thread'ine yansıt + ilgili briefteki kişilere DM. Best-effort, echo-korumalı.
+async function reflectChange(briefId, summary, source) {
+  if (source === 'slack' || !slack.hasToken()) return;
+  try {
+    const r = await pool.query(
+      `SELECT b.slack_ts, b.slack_channel, b.no, br.name AS marka
+       FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id WHERE b.id=$1`, [briefId]);
+    const b = r.rows[0]; if (!b) return;
+    const text = `*#${b.no} ${b.marka || ''}* — ${summary}`;
+    if (b.slack_ts && b.slack_channel) {
+      await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text });
+    }
+    const u = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1`, [briefId]);
+    for (const row of u.rows) await slack.dm(row.user_id, text);
+  } catch (e) { console.error('[writes] reflect hata:', e.message); }
 }
 
 module.exports = { createBrief, patchBrief, setStatus, setFinancials, DURUMLAR };
