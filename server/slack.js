@@ -52,16 +52,20 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
   if (!channel) return { ok: false, error: "kanal_yok", skipped: true };
   if (!hasToken()) return { ok: false, error: "token_yok", skipped: true };
 
-  const lines = [
-    `*${baslik}*`,
+  // Ana kanal mesajı: SADECE iş açıklaması (başlık). Briefin kalanı ilk thread yanıtı olur.
+  const res = await slackCall("chat.postMessage", { channel, text: `*${baslik}*`, unfurl_links: false });
+  if (!res.ok) return { ok: false, error: res.error, channel };
+
+  // Detaylar (deadline, kişiler, not, dipnot) → ilk thread yanıtı olarak düşer.
+  const detail = [
     `⏰ ${fmtDate(deadlineMs)}${dept ? `   ·   📁 ${dept}` : ""}${akis ? `   ·   ${akis === "paralel" ? "⇉ paralel" : "→ sıralı"}` : ""}`,
     leadName ? `👤 ${leadName}${contribNames && contribNames.length ? `  ·  ${contribNames.join(", ")}` : ""}` : null,
     not ? `📝 ${not}` : null,
     `_Dashboard'dan oluşturuldu · iş bu thread'de devam eder._`,
-  ].filter(Boolean);
+  ].filter(Boolean).join("\n");
+  // Best-effort: thread yanıtı atılamasa bile brief oluşturma bozulmaz.
+  await slackCall("chat.postMessage", { channel: res.channel, thread_ts: res.ts, text: detail, unfurl_links: false });
 
-  const res = await slackCall("chat.postMessage", { channel, text: lines.join("\n"), unfurl_links: false });
-  if (!res.ok) return { ok: false, error: res.error, channel };
   // Permalink'i ts+channel'dan inşa et (ekstra scope/çağrı gerektirmez).
   const ws = process.env.BNS_SLACK_WORKSPACE || "benseno";
   const permalink = `https://${ws}.slack.com/archives/${res.channel}/p${String(res.ts).replace(".", "")}`;
