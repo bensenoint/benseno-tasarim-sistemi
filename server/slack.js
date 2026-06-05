@@ -31,6 +31,10 @@ function channelForBrand(marka) {
 
 function hasToken() { return !!process.env.SLACK_BOT_TOKEN; }
 
+// Mesajlarda görünen bot adı. Slack profil önbelleği güncellenmesi gecikebildiği için
+// chat:write.customize ile her mesajda override ediyoruz (anında doğru ad görünür).
+const BOT_NAME = process.env.BNS_BOT_NAME || "WT";
+
 async function slackCall(method, payload) {
   const r = await fetch("https://slack.com/api/" + method, {
     method: "POST",
@@ -53,7 +57,7 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
   if (!hasToken()) return { ok: false, error: "token_yok", skipped: true };
 
   // Ana kanal mesajı: SADECE iş açıklaması (başlık). Briefin kalanı ilk thread yanıtı olur.
-  const res = await slackCall("chat.postMessage", { channel, text: `*${baslik}*`, unfurl_links: false });
+  const res = await slackCall("chat.postMessage", { channel, text: `*${baslik}*`, username: BOT_NAME, unfurl_links: false });
   if (!res.ok) return { ok: false, error: res.error, channel };
 
   // Detaylar (deadline, kişiler, not, dipnot) → ilk thread yanıtı olarak düşer.
@@ -64,7 +68,7 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
     `_Dashboard'dan oluşturuldu · iş bu thread'de devam eder._`,
   ].filter(Boolean).join("\n");
   // Best-effort: thread yanıtı atılamasa bile brief oluşturma bozulmaz.
-  await slackCall("chat.postMessage", { channel: res.channel, thread_ts: res.ts, text: detail, unfurl_links: false });
+  await slackCall("chat.postMessage", { channel: res.channel, thread_ts: res.ts, text: detail, username: BOT_NAME, unfurl_links: false });
 
   // Permalink'i ts+channel'dan inşa et (ekstra scope/çağrı gerektirmez).
   const ws = process.env.BNS_SLACK_WORKSPACE || "benseno";
@@ -75,14 +79,14 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
 // Brief'in Slack thread'ine yanıt (b2 — değişiklikler işin thread'inde devam eder).
 async function postThread({ channel, thread_ts, text }) {
   if (!hasToken() || !channel || !thread_ts) return { ok: false, skipped: true };
-  const res = await slackCall("chat.postMessage", { channel, thread_ts, text, unfurl_links: false });
+  const res = await slackCall("chat.postMessage", { channel, thread_ts, text, username: BOT_NAME, unfurl_links: false });
   return res.ok ? { ok: true, ts: res.ts } : { ok: false, error: res.error };
 }
 
 // Tek kullanıcıya DM (channel=userID → bot DM açar; im:write gerekir).
 async function dm(userId, text) {
   if (!hasToken() || !userId) return { ok: false, skipped: true };
-  const res = await slackCall("chat.postMessage", { channel: userId, text, unfurl_links: false });
+  const res = await slackCall("chat.postMessage", { channel: userId, text, username: BOT_NAME, unfurl_links: false });
   return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 

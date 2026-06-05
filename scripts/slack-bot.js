@@ -24,6 +24,8 @@ const GRAFIK_CH   = 'C02SZRJGY0M';
 
 // DB API (Faz 3 — /yeni-brief modalı buraya POST eder). global fetch (Node 18+).
 const API_BASE = (process.env.BNS_API_BASE || 'https://benseno-api-production.up.railway.app').replace(/\/+$/, '');
+// Mesajlarda görünen bot adı (chat:write.customize ile override — Slack profil önbelleğini bypass eder).
+const BOT_NAME = process.env.BNS_BOT_NAME || 'WT';
 // Kanal adı → marka (ör. "marka-bauhaus" → "Bauhaus"). /yeni-brief markayı
 // komutun çalıştığı kanaldan bulur — kullanıcı ayrıca marka seçmez.
 // server/slack.js CHANNELS tek kaynak; buradan ters harita kurarız.
@@ -472,11 +474,11 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
       const txt = (maliyetRaw === '' && satisRaw === '')
         ? `✅ Brief #${no} maliyet/satış kaydı temizlendi.`
         : `✅ Brief #${no} kaydedildi — maliyet: ${maliyetRaw || '—'}₺ · satış: ${satisRaw || '—'}₺. Birkaç dk içinde dashboard'da görünür.`;
-      await client.chat.postMessage({ channel: by, text: txt });
+      await client.chat.postMessage({ channel: by, text: txt, username: BOT_NAME });
     } catch {}
   } catch (err) {
     log(`/maliyet set-financials hata: ${err.message}`);
-    try { await client.chat.postMessage({ channel: by, text: `❌ Brief #${no} kaydedilemedi: ${err.message}` }); } catch {}
+    try { await client.chat.postMessage({ channel: by, text: `❌ Brief #${no} kaydedilemedi: ${err.message}`, username: BOT_NAME }); } catch {}
   }
 });
 
@@ -565,7 +567,7 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
           const info = await client.files.info({ file: fid });
           const perma = info.file?.permalink || '';
           const fname = info.file?.name || 'dosya';
-          await client.chat.postMessage({ channel: j.slack.channel, thread_ts: j.slack.ts, text: `📎 ${perma}` });
+          await client.chat.postMessage({ channel: j.slack.channel, thread_ts: j.slack.ts, text: `📎 ${perma}`, username: BOT_NAME });
           await fetch(`${API_BASE}/api/briefs/${j.id}/attachments-meta`, {
             method: 'POST', headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ url: perma, filename: fname, by }),
@@ -574,10 +576,10 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
       }
     }
     const link = j.slack && j.slack.permalink ? `\n${j.slack.permalink}` : '';
-    try { await client.chat.postMessage({ channel: by, text: `✅ Brief *#${j.no}* oluşturuldu — ${marka}: ${baslik}${link}` }); } catch {}
+    try { await client.chat.postMessage({ channel: by, text: `✅ Brief *#${j.no}* oluşturuldu — ${marka}: ${baslik}${link}`, username: BOT_NAME }); } catch {}
   } catch (err) {
     log(`/yeni-brief POST hata: ${err.message}`);
-    try { await client.chat.postMessage({ channel: by, text: `❌ Brief oluşturulamadı: ${err.message}` }); } catch {}
+    try { await client.chat.postMessage({ channel: by, text: `❌ Brief oluşturulamadı: ${err.message}`, username: BOT_NAME }); } catch {}
   }
 });
 
@@ -871,7 +873,7 @@ async function handleFinancialsThread(event, client) {
   const parentTs = event.thread_ts;
   const text = event.text || '';
   const by = event.user || '';
-  const reply = (t) => client.chat.postMessage({ channel: event.channel, thread_ts: parentTs, text: t }).catch(() => {});
+  const reply = (t) => client.chat.postMessage({ channel: event.channel, thread_ts: parentTs, text: t, username: BOT_NAME }).catch(() => {});
 
   const found = resolveBriefByTs(parentTs);
   if (!found) { await reply('ℹ️ Bu thread bir brief mesajına bağlı değil (ya da brief henüz sisteme düşmedi). Bilgiyi *brief mesajının* altında thread olarak yaz.'); return; }
