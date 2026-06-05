@@ -33,6 +33,18 @@ const BRANDS_LIST = [
   'Marmara Holding', 'Muffik', 'Polisan', 'Splenda', 'Tour2America', 'VDM Petdent',
 ];
 
+// Kanal adı → marka (ör. "marka-bauhaus" → "Bauhaus"). /yeni-brief markayı
+// komutun çalıştığı kanaldan bulur — kullanıcı ayrıca marka seçmez.
+// server/slack.js CHANNELS tek kaynak; buradan ters harita kurarız.
+const { CHANNELS: BRAND_CHANNELS } = require(path.join(PROJECT_DIR, 'server', 'slack.js'));
+const CHANNEL_TO_BRAND = {};
+for (const [brand, ch] of Object.entries(BRAND_CHANNELS)) CHANNEL_TO_BRAND[ch] = brand;
+// "#marka-bauhaus" / "marka-bauhaus" → "Bauhaus" | null
+function brandFromChannelName(name) {
+  if (!name) return null;
+  return CHANNEL_TO_BRAND[String(name).replace(/^#/, '')] || null;
+}
+
 // DB'ye best-effort yazma (b3 — Slack aksiyonları DB'ye de düşsün). Hata bot'u BOZMAZ.
 async function dbWrite(method, urlPath, body) {
   try {
@@ -480,25 +492,30 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
 // ─── /yeni-brief — Slack'ten deterministik brief açma (Faz 3, LLM'siz) ────────
 // Block Kit modal → POST /api/briefs → DB + markanın kanalına post. Slash command'ı
 // Slack app config'inde (api.slack.com/apps → Slash Commands) /yeni-brief olarak kayıtlı olmalı.
-app.command('/yeni-brief', async ({ command, ack, client }) => {
+app.command('/yeni-brief', async ({ command, ack, client, respond }) => {
   await ack();
+  // Marka kanaldan belirlenir — komut hangi marka kanalında çalıştıysa o marka.
+  const marka = brandFromChannelName(command.channel_name);
+  if (!marka) {
+    try { await respond({ response_type: 'ephemeral', text: '⚠️ /yeni-brief komutunu bir *marka kanalında* (ör. #marka-bauhaus) çalıştır — brief o marka için açılır.' }); } catch {}
+    return;
+  }
   try {
     await client.views.open({
       trigger_id: command.trigger_id,
       view: {
         type: 'modal',
         callback_id: 'yeni_brief_modal',
+        private_metadata: JSON.stringify({ marka }),   // submit handler markayı buradan okur
         title: { type: 'plain_text', text: 'Yeni Brief' },
         submit: { type: 'plain_text', text: 'Oluştur' },
         close: { type: 'plain_text', text: 'İptal' },
         blocks: [
-          { type: 'input', block_id: 'marka_b', label: { type: 'plain_text', text: 'Marka' },
-            element: { type: 'static_select', action_id: 'marka', placeholder: { type: 'plain_text', text: 'Marka seç' },
-              options: BRANDS_LIST.map(b => ({ text: { type: 'plain_text', text: b.slice(0, 75) }, value: b })) } },
+          { type: 'context', elements: [{ type: 'mrkdwn', text: `📁 Marka: *${marka}* _(kanaldan belirlendi)_` }] },
           { type: 'input', block_id: 'baslik_b', label: { type: 'plain_text', text: 'Başlık / İş' },
             element: { type: 'plain_text_input', action_id: 'baslik', placeholder: { type: 'plain_text', text: 'ör. Sosyal medya paketi — Mayıs' } } },
-          { type: 'input', block_id: 'deadline_b', optional: true, label: { type: 'plain_text', text: 'Deadline' },
-            element: { type: 'datepicker', action_id: 'deadline', placeholder: { type: 'plain_text', text: 'Tarih (ops.)' } } },
+          { type: 'input', block_id: 'deadline_b', optional: true, label: { type: 'plain_text', text: 'Deadline (tarih + saat)' },
+            element: { type: 'datetimepicker', action_id: 'deadline' } },
           { type: 'input', block_id: 'workers_b', label: { type: 'plain_text', text: 'İşi yapan(lar)' },
             element: { type: 'multi_users_select', action_id: 'workers', placeholder: { type: 'plain_text', text: 'Kişi(ler) — departman buradan belirlenir' } } },
           { type: 'input', block_id: 'leads_b', optional: true, label: { type: 'plain_text', text: 'Lead(ler) — son kontrol (boş = briefi açan)' },
@@ -519,22 +536,22 @@ app.command('/yeni-brief', async ({ command, ack, client }) => {
 // Modal submit → POST /api/briefs (source=dashboard → kanal postu + slack_ts tetiklenir).
 app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
   const v = view.state.values;
-  const marka  = v.marka_b?.marka?.selected_option?.value || '';
+  let marka = '';
+  try { marka = (JSON.parse(view.private_metadata || '{}').marka) || ''; } catch {}
   const baslik = (v.baslik_b?.baslik?.value || '').trim();
-  if (!marka)  { await ack({ response_action: 'errors', errors: { marka_b: 'Marka seç.' } }); return; }
   if (!baslik) { await ack({ response_action: 'errors', errors: { baslik_b: 'Başlık gir.' } }); return; }
   const workers = v.workers_b?.workers?.selected_users || [];
   if (!workers.length) { await ack({ response_action: 'errors', errors: { workers_b: 'En az bir işi yapan seç.' } }); return; }
   await ack();
   const by      = body.user?.id || '';
-  const dateStr = v.deadline_b?.deadline?.selected_date || null;      // YYYY-MM-DD
+  const dtSec   = v.deadline_b?.deadline?.selected_date_time || null;  // Unix saniye (tarih+saat)
   const leads   = v.leads_b?.leads?.selected_users || [];
   const gozlemci = v.gozlemci_b?.gozlemci?.selected_users || [];
   const fileIds = (v.dosya_b?.dosya?.files || []).map(f => f.id);
   const aciklama = (v.not_b?.aciklama?.value || '').trim();
   const payload = {
     marka, baslik,
-    deadline: dateStr ? `${dateStr}T17:00:00` : null,
+    deadline: dtSec ? new Date(dtSec * 1000).toISOString() : null,
     worker_ids: workers,
     lead_ids: leads.length ? leads : undefined,
     gozlemci_ids: gozlemci.length ? gozlemci : undefined,
