@@ -53,7 +53,6 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
   if (!hasToken()) return { ok: false, error: "token_yok", skipped: true };
 
   const lines = [
-    `*🆕 Yeni brief · #${no}* — ${marka}`,
     `*${baslik}*`,
     `⏰ ${fmtDate(deadlineMs)}${dept ? `   ·   📁 ${dept}` : ""}${akis ? `   ·   ${akis === "paralel" ? "⇉ paralel" : "→ sıralı"}` : ""}`,
     leadName ? `👤 ${leadName}${contribNames && contribNames.length ? `  ·  ${contribNames.join(", ")}` : ""}` : null,
