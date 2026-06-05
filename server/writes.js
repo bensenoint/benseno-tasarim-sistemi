@@ -213,6 +213,9 @@ async function createBrief(raw) {
 
 async function patchBrief(id, raw) {
   const d = briefPatch.parse(raw);
+  // Rol değişikliği bildirimi için: mutasyondan ÖNCE atanan kümesini al (çıkarılanları yakalamak için).
+  const roleChange = d.worker_ids !== undefined || d.lead_ids !== undefined || d.gozlemci_ids !== undefined;
+  const before = roleChange ? await assigneeMap(id) : null;
   const res = await tx(async (client) => {
     const sets = [], vals = [];
     const put = (col, v) => { vals.push(v); sets.push(`${col}=$${vals.length}`); };
@@ -244,6 +247,8 @@ async function patchBrief(id, raw) {
   });
   const fields = Object.keys(d).filter(k => !['by', 'source', 'slack_ts'].includes(k));
   await reflectChange(id, `✏️ düzenlendi: ${fields.join(', ')}`, d.source);
+  // Rol eklenen/çıkarılan/değişen kişilere hedefli DM (çıkarılanlar dahil).
+  if (roleChange) { const after = await assigneeMap(id); await notifyRoleDiff(id, before, after, d.source); }
   return res;
 }
 
@@ -313,6 +318,37 @@ async function reflectChange(briefId, summary, source) {
     const u = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1`, [briefId]);
     for (const row of u.rows) await slack.dm(row.user_id, text);
   } catch (e) { console.error('[writes] reflect hata:', e.message); }
+}
+
+const ROLE_TR = { contributor: 'işi yapan', lead: 'lead', gozlemci: 'gözlemci' };
+
+// brief_assignees → Map(user_id → Set(role))
+async function assigneeMap(briefId) {
+  const r = await pool.query(`SELECT user_id, role FROM brief_assignees WHERE brief_id=$1 AND user_id IS NOT NULL`, [briefId]);
+  const m = new Map();
+  for (const row of r.rows) { if (!m.has(row.user_id)) m.set(row.user_id, new Set()); m.get(row.user_id).add(row.role); }
+  return m;
+}
+
+// Rol değişimini (eklenen/çıkarılan/rolü değişen) ilgili kişilere DM'le. Echo-korumalı (slack hariç).
+async function notifyRoleDiff(briefId, before, after, source) {
+  if (source === 'slack' || !slack.hasToken() || !before) return;
+  try {
+    const r = await pool.query(
+      `SELECT b.no, b.slack_url, br.name AS marka, b.baslik FROM briefs b LEFT JOIN brands br ON br.id=b.marka_id WHERE b.id=$1`, [briefId]);
+    const b = r.rows[0]; if (!b) return;
+    const head = `*#${b.no} ${b.marka || ''}* — ${b.baslik || ''}`;
+    const link = b.slack_url && b.slack_url !== '#' ? `\n${b.slack_url}` : '';
+    const rolesStr = (set) => [...set].map(x => ROLE_TR[x] || x).join(' + ');
+    const users = new Set([...before.keys(), ...after.keys()]);
+    for (const uid of users) {
+      const was = before.get(uid), now = after.get(uid);
+      if (!was && now)        await slack.dm(uid, `➕ ${head}\nBu briefe *${rolesStr(now)}* olarak eklendin.${link}`);
+      else if (was && !now)   await slack.dm(uid, `➖ ${head}\nBu briefteki görevden çıkarıldın.`);
+      else if (was && now && [...was].sort().join() !== [...now].sort().join())
+                              await slack.dm(uid, `🔄 ${head}\nRolün güncellendi: *${rolesStr(now)}*.${link}`);
+    }
+  } catch (e) { console.error('[writes] rol diff DM hata:', e.message); }
 }
 
 module.exports = { createBrief, patchBrief, setStatus, setFinancials, noToId, tsToId, DURUMLAR };
