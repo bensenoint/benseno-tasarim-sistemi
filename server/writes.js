@@ -153,7 +153,9 @@ async function createBrief(raw) {
        d.slack_ts || null, null]);
     const id = r.rows[0].id;
     // gözlemci = manuel seçilenler ∪ ilgili dept yöneticileri (her zaman)
-    const mgrs = await deptManagers(client, d.worker_ids);
+    // Auto-yöneticiler: zaten işi yapan/lead olanları gözlemciye ekleme (tek kişi iki listede görünmesin).
+    const inWork = new Set([...d.worker_ids, ...leadIds]);
+    const mgrs = (await deptManagers(client, d.worker_ids)).filter(m => !inWork.has(m));
     const observerIds = [...new Set([...(d.gozlemci_ids || []), ...mgrs])];
     await setAssignees(client, id, { worker_ids: d.worker_ids, lead_ids: leadIds, gozlemci_ids: observerIds });
     if (Array.isArray(d.tags)) for (const t of d.tags)
@@ -235,7 +237,8 @@ async function patchBrief(id, raw) {
     if (d.worker_ids !== undefined) {
       const dept = await deriveDept(client, d.worker_ids);
       await client.query(`UPDATE briefs SET dept=$1 WHERE id=$2`, [dept, id]);
-      const mgrs = await deptManagers(client, d.worker_ids);
+      // Auto-yöneticiler: yeni işi yapanlardan biriyse gözlemciye ekleme (çift listeyi önle).
+      const mgrs = (await deptManagers(client, d.worker_ids)).filter(m => !d.worker_ids.includes(m));
       for (const m of mgrs) await client.query(
         `INSERT INTO brief_assignees(brief_id,user_id,role,sira) VALUES ($1,$2,'gozlemci',NULL)
          ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [id, m]);
@@ -246,7 +249,11 @@ async function patchBrief(id, raw) {
     return { id };
   });
   const fields = Object.keys(d).filter(k => !['by', 'source', 'slack_ts'].includes(k));
-  await reflectChange(id, `✏️ düzenlendi: ${fields.join(', ')}`, d.source);
+  const roleKeys = ['worker_ids', 'lead_ids', 'gozlemci_ids'];
+  const contentChanged = fields.some(k => !roleKeys.includes(k));   // başlık/not/termin vb.
+  const friendly = fields.map(k => FIELD_TR[k] || k).join(', ');
+  // Rol-only değişimde tüm atananlara DM atma (notifyRoleDiff hedefli atar); thread notu yine düşer.
+  await reflectChange(id, `✏️ güncellendi: ${friendly}`, d.source, { dm: contentChanged });
   // Rol eklenen/çıkarılan/değişen kişilere hedefli DM (çıkarılanlar dahil).
   if (roleChange) { const after = await assigneeMap(id); await notifyRoleDiff(id, before, after, d.source); }
   return res;
@@ -303,9 +310,11 @@ async function tsToId(ts) {
   return r.rows[0].id;
 }
 
-// b2 — değişikliği Slack thread'ine yansıt + ilgili briefteki kişilere DM. Best-effort, echo-korumalı.
-async function reflectChange(briefId, summary, source) {
+// b2 — değişikliği Slack thread'ine yansıt + (opts.dm!==false ise) ilgili kişilere DM.
+// Best-effort, echo-korumalı. Rol-only değişimlerde DM'i notifyRoleDiff yapar → opts.dm=false ile çift DM önlenir.
+async function reflectChange(briefId, summary, source, opts) {
   if (source === 'slack' || !slack.hasToken()) return;
+  const dmAll = !opts || opts.dm !== false;
   try {
     const r = await pool.query(
       `SELECT b.slack_ts, b.slack_channel, b.no, br.name AS marka
@@ -315,12 +324,16 @@ async function reflectChange(briefId, summary, source) {
     if (b.slack_ts && b.slack_channel) {
       await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text });
     }
+    if (!dmAll) return;
     const u = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1`, [briefId]);
     for (const row of u.rows) await slack.dm(row.user_id, text);
   } catch (e) { console.error('[writes] reflect hata:', e.message); }
 }
 
 const ROLE_TR = { contributor: 'işi yapan', lead: 'lead', gozlemci: 'gözlemci' };
+// Kullanıcıya gösterilen alan adları (ham anahtar yerine — DM/thread sızıntısını önler).
+const FIELD_TR = { marka: 'marka', baslik: 'başlık', deadline: 'termin', priority: 'öncelik',
+  akis: 'akış', musteri_notu: 'müşteri notu', worker_ids: 'işi yapanlar', lead_ids: 'lead', gozlemci_ids: 'gözlemciler' };
 
 // brief_assignees → Map(user_id → Set(role))
 async function assigneeMap(briefId) {

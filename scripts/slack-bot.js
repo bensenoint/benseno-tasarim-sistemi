@@ -278,24 +278,25 @@ function briefsToBlocks(briefs, baslik) {
 }
 
 /**
- * Brief'leri dashboard/app/live-data.json'dan okur (parseAktifIsler şekliyle uyumlu).
- * canvas_cache.md Railway'de yok (gitignored/dockerignored) → bunun yerine git'te
- * tracked + her boot reset --hard ile gelen + her orchestrator run'ında tazelenen
- * live-data.json'u kaynak alıyoruz. atanan: "<@ID> <@ID>" (extractUserIds uyumlu).
+ * Aktif brief'leri CANLI DB'den (/api/embedded) okur — live-data.json artık güncellenmiyor
+ * (orchestrator kaldırıldı), bu yüzden bayat veriydi. atanan = işi yapanlar (workers);
+ * /kapasite yükü buradan sayıldığı için lead/gözlemci dahil edilmez. "<@ID>" (extractUserIds uyumlu).
  */
-function loadBriefs() {
+async function loadBriefs() {
   try {
-    const raw = fs.readFileSync(path.join(PROJECT_DIR, 'dashboard/app/live-data.json'), 'utf8');
-    const d = JSON.parse(raw);
+    const r = await fetch(`${API_BASE}/api/embedded`, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const fmt = (ms, opts) => { try { return new Date(ms).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', ...opts }); } catch { return ''; } };
     return (d.bns_briefs || []).map(b => ({
       no: b.no,
       dept: b.dept || '',
       marka: b.marka || '',
-      konu: b.is || '',
-      atanan: (b.atanan_ids || []).map(id => `<@${id}>`).join(' '),
-      oncelik: b.priority || '',
-      deadline: b.deadline || '',
-      saat: b.saat || '',
+      konu: b.baslik || '',
+      atanan: (b.workers || []).map(w => `<@${w.id}>`).join(' '),
+      oncelik: '',
+      deadline: b.deadline ? fmt(b.deadline, { day: '2-digit', month: 'short' }) : '',
+      saat: b.deadline ? fmt(b.deadline, { hour: '2-digit', minute: '2-digit' }) : '',
       durum: b.durum || '',
     }));
   } catch (err) {
@@ -314,7 +315,7 @@ app.command('/brief-durum', async ({ command, ack, respond, client }) => {
   const yonetici = MANAGER_IDS.has(userId);
 
   try {
-    let briefs = loadBriefs();
+    let briefs = await loadBriefs();
 
     // Marka filtresi varsa uygula
     if (filtre) {
@@ -352,7 +353,7 @@ app.command('/kapasite', async ({ command, ack, respond, client }) => {
   }
 
   try {
-    const briefs   = loadBriefs();
+    const briefs   = await loadBriefs();
 
     // Tasarımcı sayımı
     const tasarimciSayim = {};
@@ -678,7 +679,7 @@ app.event('app_home_opened', async ({ event, client }) => {
   const yonetici = MANAGER_IDS.has(userId);
 
   try {
-    const briefs   = loadBriefs();
+    const briefs   = await loadBriefs();
 
     let blocks;
     if (yonetici) {
