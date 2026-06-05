@@ -24,15 +24,6 @@ const GRAFIK_CH   = 'C02SZRJGY0M';
 
 // DB API (Faz 3 — /yeni-brief modalı buraya POST eder). global fetch (Node 18+).
 const API_BASE = (process.env.BNS_API_BASE || 'https://benseno-api-production.up.railway.app').replace(/\/+$/, '');
-// Marka listesi (modal dropdown) — slack.js CHANNELS ile aynı kümeyi yansıtır.
-const BRANDS_LIST = [
-  'Bauhaus', 'Beta', 'Cimporglobal', 'Cureffect', 'Egosport', 'Gürsoy', 'Hasvet', 'Hendex',
-  'JNJ', 'JNJ Acuvue ME', 'JNJ Vision TR', 'Jungleous', 'KMR Amos', 'KMR Copic', 'KMR Lamy',
-  'KMR Marshmallow', 'KMR Max', 'KMR Panfix', 'KMR Serve', 'Kuzeypet', 'KZY Bark', 'KZY Everclean',
-  'KZY Ferplast', 'KZY Flamingo', 'KZY Simple Solution', 'KZY Supreme', "KZY Vet's Best",
-  'Marmara Holding', 'Muffik', 'Polisan', 'Splenda', 'Tour2America', 'VDM Petdent',
-];
-
 // Kanal adı → marka (ör. "marka-bauhaus" → "Bauhaus"). /yeni-brief markayı
 // komutun çalıştığı kanaldan bulur — kullanıcı ayrıca marka seçmez.
 // server/slack.js CHANNELS tek kaynak; buradan ters harita kurarız.
