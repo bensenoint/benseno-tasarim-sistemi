@@ -72,6 +72,77 @@ function handleWrite(fn) {
   };
 }
 
+// ── Auth ─────────────────────────────────────────────────────────────────────
+const auth = require('./auth');
+
+// POST /api/auth/login — { slack_id, password } → { token, user }
+app.post('/api/auth/login', async (req, res) => {
+  const { slack_id, password } = req.body || {};
+  if (!slack_id || !password) return res.status(400).json({ error: 'slack_id ve password gerekli' });
+  try {
+    const r = await pool.query('SELECT * FROM dashboard_users WHERE slack_id=$1', [slack_id]);
+    const user = r.rows[0];
+    if (!user || !auth.bcrypt.compareSync(password, user.password_hash)) {
+      return res.status(401).json({ error: 'kullanıcı adı veya şifre hatalı' });
+    }
+    await pool.query('UPDATE dashboard_users SET last_login=NOW() WHERE id=$1', [user.id]);
+    const token = auth.signToken({ id: user.id, slack_id: user.slack_id, name: user.name, role: user.role });
+    res.json({ token, user: { id: user.id, slack_id: user.slack_id, name: user.name, role: user.role } });
+  } catch (e) {
+    console.error('[auth] login hata:', e.message);
+    res.status(500).json({ error: 'sunucu hatası' });
+  }
+});
+
+// GET /api/auth/me — token doğrula, user bilgisi döner
+app.get('/api/auth/me', auth.authGuard, (req, res) => {
+  res.json({ user: req.user });
+});
+
+// ── Kullanıcı yönetimi (admin only) ─────────────────────────────────────────
+// GET /api/users
+app.get('/api/users', auth.authGuard, auth.adminGuard, async (req, res) => {
+  try {
+    const r = await pool.query('SELECT id, slack_id, name, role, created_at, last_login FROM dashboard_users ORDER BY id');
+    res.json({ users: r.rows });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// POST /api/users — { slack_id, name, role, password }
+app.post('/api/users', auth.authGuard, auth.adminGuard, async (req, res) => {
+  const { slack_id, name, role = 'member', password } = req.body || {};
+  if (!slack_id || !name || !password) return res.status(400).json({ error: 'slack_id, name, password gerekli' });
+  if (!['admin','member'].includes(role)) return res.status(400).json({ error: 'geçersiz rol' });
+  try {
+    const hash = auth.bcrypt.hashSync(password, 12);
+    const r = await pool.query(
+      'INSERT INTO dashboard_users (slack_id, name, role, password_hash) VALUES ($1,$2,$3,$4) RETURNING id, slack_id, name, role',
+      [slack_id, name, role, hash]
+    );
+    res.json({ ok: true, user: r.rows[0] });
+  } catch (e) {
+    if (e.code === '23505') return res.status(409).json({ error: 'bu slack_id zaten kayıtlı' });
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// PATCH /api/users/:id — { password?, role? }
+app.patch('/api/users/:id', auth.authGuard, auth.adminGuard, async (req, res) => {
+  const { password, role } = req.body || {};
+  const updates = [], params = [];
+  if (password) { updates.push(`password_hash=$${params.push(auth.bcrypt.hashSync(password, 12))}`); }
+  if (role) {
+    if (!['admin','member'].includes(role)) return res.status(400).json({ error: 'geçersiz rol' });
+    updates.push(`role=$${params.push(role)}`);
+  }
+  if (!updates.length) return res.status(400).json({ error: 'güncellenecek alan yok' });
+  params.push(+req.params.id);
+  try {
+    await pool.query(`UPDATE dashboard_users SET ${updates.join(',')} WHERE id=$${params.length}`, params);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 app.post('/api/briefs', writeGuard, handleWrite(req => writes.createBrief(req.body)));
 app.patch('/api/briefs/:id', writeGuard, handleWrite(req => writes.patchBrief(+req.params.id, req.body)));
 app.post('/api/briefs/:id/status', writeGuard, handleWrite(req => writes.setStatus(+req.params.id, req.body)));
