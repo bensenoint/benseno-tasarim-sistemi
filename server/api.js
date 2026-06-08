@@ -54,8 +54,15 @@ app.get('/api/embedded', async (req, res) => {
 function writeGuard(req, res, next) {
   const want = process.env.BNS_WRITE_TOKEN;
   if (!want) return next();
+  // Bot: paylaşılan write token (server-to-server)
   if (req.get('x-bns-token') === want) return next();
-  return res.status(401).json({ error: 'yetkisiz (x-bns-token gerekli)' });
+  // Dashboard: geçerli JWT (write token tarayıcıda tutulamaz)
+  const authz = req.get('Authorization') || '';
+  const jwtTok = authz.startsWith('Bearer ') ? authz.slice(7) : null;
+  if (jwtTok) {
+    try { req.user = auth.verifyToken(jwtTok); return next(); } catch { /* geçersiz JWT → 401 */ }
+  }
+  return res.status(401).json({ error: 'yetkisiz (giriş veya write token gerekli)' });
 }
 
 // Zod/iş hatalarını okunaklı 400/404'e çevir
