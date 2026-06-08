@@ -951,13 +951,13 @@ app.event('message', async ({ event, client }) => {
       // Durum
       { key: 'devam et',       type: 'durum',    value: 'calisiliyor' },
       { key: 'devam ediyor',   type: 'durum',    value: 'calisiliyor' },
-      { key: 'incelemede',     type: 'durum',    value: 'incelemede'  },
+      { key: 'iş incelemede',   type: 'durum',    value: 'incelemede'  },
       { key: 'beklemede',      type: 'durum',    value: 'beklemede'   },
       { key: 'bekle',          type: 'durum',    value: 'beklemede'   },
       { key: 'revizyon var',   type: 'durum',    value: 'revizyon'    },
       { key: 'revize et',      type: 'durum',    value: 'revizyon'    },
-      { key: 'tamamlandı',     type: 'durum',    value: 'tamamlandi'  },
-      { key: 'tamamlandi',     type: 'durum',    value: 'tamamlandi'  }, // ASCII varyant
+      { key: 'iş tamamlandı',  type: 'durum',    value: 'tamamlandi'  },
+      { key: 'is tamamlandi',  type: 'durum',    value: 'tamamlandi'  }, // ASCII varyant
       { key: 'yeniden aç',     type: 'durum',    value: 'calisiliyor' },
       { key: 'geri aç',        type: 'durum',    value: 'calisiliyor' },
       { key: 'bloke et',       type: 'durum',    value: 'blokeli'     },
