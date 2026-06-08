@@ -20,6 +20,10 @@ function GalleryTile({ c, idx }) {
   const seed = (c.no || 0) + idx;
   const pattern = idx % 5;
   const slackUrl = c.slack_url || "#";
+  // Normalize brand — REST path gives flat marka/marka_color; data-agent gives nested brand obj
+  const brandColor = c.brand?.color || c.marka_color ||
+    (window.WHEEL && window.brandHash ? window.WHEEL[window.brandHash(c.marka||'')] : null) || '#888';
+  const brandName = c.brand?.name || c.marka || '?';
   return (
     <div
       onClick={() => slackUrl !== "#" && window.open(slackUrl, "_blank")}
@@ -33,7 +37,7 @@ function GalleryTile({ c, idx }) {
         transition: "transform 120ms, box-shadow 120ms"
       }}>
       <div style={{
-        aspectRatio:"4/3", background: `linear-gradient(135deg, ${c.brand.color} 0%, ${shade(c.brand.color, -0.25)} 100%)`,
+        aspectRatio:"4/3", background: `linear-gradient(135deg, ${brandColor} 0%, ${shade(brandColor, -0.25)} 100%)`,
         position:"relative", overflow:"hidden"
       }}>
         {c.image_url ? (
@@ -67,7 +71,7 @@ function GalleryTile({ c, idx }) {
             {pattern === 4 && (
               <text x="100" y="90" fill="rgba(255,255,255,0.3)" textAnchor="middle"
                 fontSize="64" fontFamily="serif" fontStyle="italic">
-                {c.brand.name.charAt(0)}
+                {brandName.charAt(0)}
               </text>
             )}
           </svg>
