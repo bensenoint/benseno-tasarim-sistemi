@@ -1,15 +1,17 @@
-// app/screens/Help.jsx — Yardım: emoji kısayolları, kelime kısayolları, Slack komutları
+// app/screens/Help.jsx — Yardım: Slack komutları, emoji/kelime kısayolları, finansal, silme/geri alma.
+// Kaynak: scripts/slack-bot.js (reaction_added DURUM_MAP, EMOJI_DURUM, KEYWORD_MAP, finansal regex, brief sil + message_deleted)
 function HelpScreen() {
-  const Section = ({ title, children }) => (
+  const Section = ({ title, children, note }) => (
     <div style={{ marginBottom: 32 }}>
-      <div style={{ font: '700 16px/1 var(--font-sans)', color: 'var(--ink)', marginBottom: 14, paddingBottom: 10, borderBottom: '1px solid var(--line)' }}>{title}</div>
+      <div style={{ font: '700 16px/1 var(--font-sans)', color: 'var(--ink)', marginBottom: 12, paddingBottom: 10, borderBottom: '1px solid var(--line)' }}>{title}</div>
+      {note && <div style={{ font: '400 12px/1.5 var(--font-sans)', color: 'var(--ink-4)', marginBottom: 12 }}>{note}</div>}
       {children}
     </div>
   );
 
   const Row = ({ left, right, sub }) => (
     <div style={{ display: 'flex', gap: 12, padding: '7px 0', borderBottom: '1px solid var(--paper-2)', alignItems: 'flex-start' }}>
-      <div style={{ minWidth: 160, font: '500 13px/1.4 var(--font-mono)', color: 'var(--ink)', background: 'var(--paper-2)', borderRadius: 5, padding: '4px 8px', flexShrink: 0 }}>{left}</div>
+      <div style={{ minWidth: 150, font: '500 12px/1.4 var(--font-mono)', color: 'var(--ink)', background: 'var(--paper-2)', borderRadius: 5, padding: '4px 8px', flexShrink: 0 }}>{left}</div>
       <div>
         <div style={{ font: '400 13px/1.4 var(--font-sans)', color: 'var(--ink-2)' }}>{right}</div>
         {sub && <div style={{ font: '400 11px/1.4 var(--font-sans)', color: 'var(--ink-4)', marginTop: 2 }}>{sub}</div>}
@@ -19,7 +21,7 @@ function HelpScreen() {
 
   const EmojiRow = ({ emoji, label, desc }) => (
     <div style={{ display: 'flex', gap: 12, padding: '7px 0', borderBottom: '1px solid var(--paper-2)', alignItems: 'flex-start' }}>
-      <div style={{ fontSize: 20, lineHeight: 1, flexShrink: 0, width: 28, textAlign: 'center', paddingTop: 1 }}>{emoji}</div>
+      <div style={{ fontSize: 20, lineHeight: 1, flexShrink: 0, width: 52, textAlign: 'center', paddingTop: 1 }}>{emoji}</div>
       <div>
         <div style={{ font: '600 13px/1 var(--font-sans)', color: 'var(--ink)', marginBottom: 2 }}>{label}</div>
         <div style={{ font: '400 12px/1.4 var(--font-sans)', color: 'var(--ink-3)' }}>{desc}</div>
@@ -31,44 +33,63 @@ function HelpScreen() {
     <div style={{ maxWidth: 720 }}>
       <div style={{ marginBottom: 28 }}>
         <div style={{ font: '700 20px/1 var(--font-sans)', color: 'var(--ink)' }}>Yardım</div>
-        <div style={{ font: '400 13px/1 var(--font-sans)', color: 'var(--ink-3)', marginTop: 4 }}>Kısayollar, komutlar ve emoji referansı</div>
+        <div style={{ font: '400 13px/1 var(--font-sans)', color: 'var(--ink-3)', marginTop: 4 }}>Slack komutları, kısayollar ve brief yönetimi</div>
       </div>
 
-      <Section title="📌 Brief Thread Emoji Durumları">
-        <div style={{ font: '400 12px/1.5 var(--font-sans)', color: 'var(--ink-4)', marginBottom: 12 }}>
-          Slack'te bir brief mesajına emoji reaction olarak ekleyin veya thread'e emoji içeren mesaj yazın.
-        </div>
-        <EmojiRow emoji="✅" label="Tamamlandı" desc="Brief teslim edildi, iş bitti."/>
-        <EmojiRow emoji="🚀" label="Başladı / Devam ediyor" desc="İş aktif olarak yürütülüyor."/>
+      <Section title="🤖 Slack Komutları" note="Slack'te herhangi bir kanalda yazın.">
+        <Row left="/yeni-brief" right="Marka kanalında yeni brief açar" sub="Form: başlık, marka (kanaldan otomatik), termin, işi yapanlar, lead, gözlemci, not, dosya"/>
+        <Row left="/brief-durum" right="Sana atanmış aktif briefleri listeler"/>
+        <Row left="/kapasite" right="Ekip kapasitesini gösterir" sub="Yönetici"/>
+        <Row left="/maliyet" right="Bir brief'in maliyet/satış bilgisini girer"/>
+        <Row left="/yardim" right="Komut rehberini Slack içinde gösterir"/>
+      </Section>
+
+      <Section title="📌 Brief Durum Emojileri" note="Brief thread'ine emoji reaction olarak ekleyin VEYA thread'e o emojiyle başlayan bir mesaj yazın — ikisi de aynı sonucu verir.">
+        <EmojiRow emoji="🎨 ✍️ 🤖" label="Çalışılıyor" desc="İş başladı / devam ediyor (tasarım · editör · AI)."/>
+        <EmojiRow emoji="👀" label="İncelemede" desc="İş gözden geçiriliyor / revize sunuldu."/>
         <EmojiRow emoji="⏸️" label="Beklemede" desc="Müşteri / onay / materyal bekleniyor."/>
-        <EmojiRow emoji="✏️" label="Revizyon" desc="Müşteriden düzeltme isteği geldi."/>
-        <EmojiRow emoji="🔃" label="Yeniden açıldı" desc="Kapalı bir brief tekrar aktif hale getirildi."/>
-        <EmojiRow emoji="❌" label="İptal edildi" desc="Brief iptal, iş yapılmayacak."/>
+        <EmojiRow emoji="✏️" label="Revizyon" desc="Düzeltme isteği geldi."/>
+        <EmojiRow emoji="✅" label="Tamamlandı" desc="İş bitti. Thread'deki son görsel otomatik olarak galeriye kaydedilir."/>
+        <EmojiRow emoji="🔃" label="Yeniden açıldı" desc="Tamamlanmış brief'i tekrar çalışılıyor durumuna çeker."/>
       </Section>
 
-      <Section title="⌨️ Dashboard Kelime Kısayolları">
-        <div style={{ font: '400 12px/1.5 var(--font-sans)', color: 'var(--ink-4)', marginBottom: 12 }}>
-          Brief thread'ine yazarak durum güncelleyebilirsiniz (tam eşleşme gerekmez, içerdiği yeterli).
-        </div>
-        <Row left="tamamlandı" right="Brief'i tamamlandı olarak işaretle" sub="Alternatif: bitti, done, hazır, teslimat, gönderildi"/>
-        <Row left="başladı" right="Brief'i başladı olarak işaretle" sub="Alternatif: devam ediyor, üzerinde, aktif, başlıyorum, başlıyoruz"/>
-        <Row left="iş beklemede" right="Brief'i beklemede olarak işaretle" sub="Alternatif: beklemede, bekliyoruz, bekliyorum, on hold, hold"/>
-        <Row left="revizyon" right="Brief'i revizyon olarak işaretle" sub="Alternatif: revizyona aldım, revize, düzeltme"/>
-        <Row left="iptal" right="Brief'i iptal et" sub="Alternatif: iptal edildi, cancel"/>
-        <Row left="yeniden açıldı" right="Kapalı brief'i yeniden aç" sub="Alternatif: tekrar açıldı, reopen, restarted"/>
+      <Section title="🚦 Öncelik Emojileri" note="Brief'e reaction olarak ekleyin (atanan veya yönetici).">
+        <EmojiRow emoji="🔴" label="Acil" desc="En yüksek öncelik."/>
+        <EmojiRow emoji="🟠" label="Yüksek" desc=""/>
+        <EmojiRow emoji="🟡" label="Normal" desc=""/>
+        <EmojiRow emoji="🟢" label="Düşük" desc=""/>
       </Section>
 
-      <Section title="🤖 Slack Bot Komutları">
-        <Row left="/brief" right="Yeni brief formu aç" sub="Proje adı, marka, açıklama ve atanan kişileri sorar"/>
-        <Row left="/maliyet" right="Bir projenin maliyet ve satış bilgisini kaydet"/>
-        <Row left="/yardim" right="Bu yardım metnini Slack'te göster"/>
+      <Section title="⌨️ Kelime Kısayolları" note="Brief thread'ine TAM olarak şu kelimeyi yazın (içinde geçmesi yetmez — birebir eşleşme gerekir).">
+        <Row left="devam et · devam ediyor" right="Çalışılıyor"/>
+        <Row left="iş incelemede" right="İncelemede"/>
+        <Row left="iş beklemede · bekle" right="Beklemede"/>
+        <Row left="revizyon var · revize et" right="Revizyon"/>
+        <Row left="iş tamamlandı" right="Tamamlandı"/>
+        <Row left="yeniden aç · geri aç" right="Yeniden açıldı (çalışılıyor)"/>
+        <Row left="bloke et" right="Blokeli"/>
+        <Row left="acil öncelik" right="🔴 Acil" sub="yüksek öncelik → 🟠 · normal öncelik → 🟡 · düşük öncelik → 🟢"/>
       </Section>
 
-      <Section title="🔍 Filtre İpuçları">
-        <Row left="Departman filtresi" right="Sidebar'da 'Departmanlar' bölümünden tasarım, video, sosyal medya vb. açabilirsiniz."/>
-        <Row left="Durum filtresi" right="Üst toolbar'daki filtre ikonuyla aktif/tamamlandı/iptal gibi durum seçimi yapabilirsiniz."/>
-        <Row left="Kişi filtresi" right="Header'daki kullanıcı listesinden bir kişiyi seçerek o kişiye atanmış briefleri görebilirsiniz."/>
-        <Row left="Komut paleti" right="Cmd+K ile hızlı arama — brief adı, marka veya kişiye göre anlık filtre."/>
+      <Section title="💰 Finansal Bilgi" note="Brief thread'ine yazın. Dashboard'a birkaç dakika içinde yansır.">
+        <Row left="maliyet 1500 satış 4000" right="Maliyet ve satış tutarını kaydeder" sub="Tek tek de yazılabilir: 'maliyet 1500' / 'satış 4000'"/>
+        <Row left="fatura ok" right="Fatura kesildi olarak işaretler" sub="Geri almak için: fatura iptal"/>
+        <Row left="ödeme ok" right="Ödeme alındı olarak işaretler" sub="Geri almak için: ödeme iptal"/>
+      </Section>
+
+      <Section title="🗑️ Brief Silme & Geri Alma" note="Silme kalıcı değildir — silinen briefler 'Silinenler' ekranına taşınır ve geri alınabilir.">
+        <Row left="brief sil" right="Slack: thread'e 'brief sil' yazın → brief Silinenler'e taşınır" sub="Bot onay mesajı düşer."/>
+        <Row left="Thread'i sil" right="Slack: brief ana mesajını silerseniz brief otomatik Silinenler'e taşınır"/>
+        <Row left="🗑️ Sil (dashboard)" right="Brief detay panelinde sol alttaki Sil butonu" sub="Yönetici"/>
+        <Row left="↩ Geri al" right="Silinenler ekranından brief'i aktif listeye geri getirir" sub="Yönetici"/>
+        <Row left="🗑️ Kalıcı sil" right="Silinenler ekranından brief'i tamamen siler — GERİ ALINAMAZ" sub="Yönetici"/>
+      </Section>
+
+      <Section title="🔍 Dashboard İpuçları">
+        <Row left="Komut paleti" right="Cmd+K (Mac) / Ctrl+K — brief adı, marka veya kişiye göre hızlı arama"/>
+        <Row left="Departman" right="Sol menüden Tasarım / Editör / AI departman görünümleri"/>
+        <Row left="Silinenler" right="Sol menü → Yönetim → Silinenler (yönetici)"/>
+        <Row left="Yardım" right="Sol menüden bu ekrana her zaman ulaşabilirsiniz"/>
       </Section>
     </div>
   );
