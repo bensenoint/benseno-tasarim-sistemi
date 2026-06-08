@@ -244,7 +244,7 @@ async function patchBrief(id, raw) {
          ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [id, m]);
     }
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'düzenlendi',
-      detail: { alanlar: Object.keys(d).filter(k => !['by', 'source', 'slack_ts'].includes(k)) },
+      detail: { alanlar: Object.keys(d).filter(k => !['by', 'source', 'slack_ts'].includes(k)).map(k => FIELD_TR[k] || k) },
       source: d.source, slack_ts: d.slack_ts });
     return { id };
   });
@@ -252,8 +252,9 @@ async function patchBrief(id, raw) {
   const roleKeys = ['worker_ids', 'lead_ids', 'gozlemci_ids'];
   const contentChanged = fields.some(k => !roleKeys.includes(k));   // başlık/not/termin vb.
   const friendly = fields.map(k => FIELD_TR[k] || k).join(', ');
-  // Rol-only değişimde tüm atananlara DM atma (notifyRoleDiff hedefli atar); thread notu yine düşer.
-  await reflectChange(id, `✏️ güncellendi: ${friendly}`, d.source, { dm: contentChanged });
+  // Rol değişimi varsa bulk DM'i kapat — notifyRoleDiff hedefli atar; thread notu her zaman düşer.
+  // Mixed (içerik+rol) patch'te de aynı: çift DM'i önler, mevcut atananlar thread'den görür.
+  await reflectChange(id, `✏️ güncellendi: ${friendly}`, d.source, { dm: contentChanged && !roleChange });
   // Rol eklenen/çıkarılan/değişen kişilere hedefli DM (çıkarılanlar dahil).
   if (roleChange) { const after = await assigneeMap(id); await notifyRoleDiff(id, before, after, d.source); }
   return res;

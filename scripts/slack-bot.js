@@ -338,7 +338,7 @@ app.command('/brief-durum', async ({ command, ack, respond, client }) => {
 
   } catch (err) {
     log(`/brief-durum hata: ${err.message}`);
-    await respond({ response_type: 'ephemeral', text: `❌ Canvas okunamadı: ${err.message}` });
+    await respond({ response_type: 'ephemeral', text: `❌ Veriler yüklenemedi: ${err.message}` });
   }
 });
 
@@ -416,7 +416,7 @@ app.command('/kapasite', async ({ command, ack, respond, client }) => {
 
   } catch (err) {
     log(`/kapasite hata: ${err.message}`);
-    await respond({ response_type: 'ephemeral', text: `❌ Canvas okunamadı: ${err.message}` });
+    await respond({ response_type: 'ephemeral', text: `❌ Veriler yüklenemedi: ${err.message}` });
   }
 });
 
