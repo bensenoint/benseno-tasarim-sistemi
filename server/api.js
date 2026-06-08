@@ -154,6 +154,12 @@ app.post('/api/briefs/by-no/:no/financials', writeGuard, handleWrite(async req =
 app.patch('/api/briefs/by-no/:no', writeGuard, handleWrite(async req => writes.patchBrief(await writes.noToId(+req.params.no), req.body)));
 app.post('/api/briefs/by-ts/:ts/status', writeGuard, handleWrite(async req => writes.setStatus(await writes.tsToId(req.params.ts), req.body)));
 app.post('/api/briefs/by-ts/:ts/financials', writeGuard, handleWrite(async req => writes.setFinancials(await writes.tsToId(req.params.ts), req.body)));
+// Soft delete + geri alma
+app.delete('/api/briefs/:id',          writeGuard, handleWrite(req => writes.deleteBrief(+req.params.id, req.body?.by)));
+app.delete('/api/briefs/by-ts/:ts',    writeGuard, handleWrite(async req => writes.deleteBrief(await writes.tsToId(req.params.ts), req.body?.by)));
+app.post('/api/briefs/:id/restore',    writeGuard, handleWrite(req => writes.restoreBrief(+req.params.id, req.body?.by)));
+app.post('/api/briefs/by-ts/:ts/restore', writeGuard, handleWrite(async req => writes.restoreBrief(await writes.tsToId(req.params.ts), req.body?.by)));
+
 // Onay anındaki son görseli kaydet (Slack bot ✅ handler'ından çağrılır, best-effort)
 app.patch('/api/briefs/by-ts/:ts/set-image', writeGuard, async (req, res) => {
   try {

@@ -10,7 +10,7 @@ async function allBriefsWithAssignees() {
            br.name AS marka, br.color AS marka_color,
            b.baslik, b.dept, b.deadline, b.saat, b.durum, b.priority, b.priority_label,
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
-           b.akis, b.stale, b.created_at, b.completed_at, b.updated_at,
+           b.akis, b.stale, b.created_at, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            COALESCE(json_agg(
              json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color)
              ORDER BY a.sira NULLS LAST
@@ -72,8 +72,9 @@ async function getState() {
   return {
     users: users.rows,
     brands: brands.rows,
-    briefs: all.filter(b => !b.completed_at),
-    completed: all.filter(b => b.completed_at),
+    briefs: all.filter(b => !b.completed_at && !b.deleted_at),
+    completed: all.filter(b => b.completed_at && !b.deleted_at),
+    deleted: all.filter(b => b.deleted_at),
     deptStats,
     brandStats: brand.rows,
     events: events.rows,

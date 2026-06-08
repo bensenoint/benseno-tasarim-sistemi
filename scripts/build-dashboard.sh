@@ -33,6 +33,7 @@ cat \
   "$APP/screens/Profile.jsx" \
   "$APP/screens/Login.jsx" \
   "$APP/screens/Users.jsx" \
+  "$APP/screens/Silinenler.jsx" \
   "$APP/screens/Help.jsx" \
   "$APP/Chrome.jsx" \
   "$APP/App.jsx" \

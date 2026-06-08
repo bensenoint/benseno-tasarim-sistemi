@@ -386,4 +386,34 @@ async function notifyRoleDiff(briefId, before, after, source) {
   } catch (e) { console.error('[writes] rol diff DM hata:', e.message); }
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, noToId, tsToId, DURUMLAR };
+// Soft delete — brief'i gizle (kalıcı silme yok)
+async function deleteBrief(id, by) {
+  const r = await pool.query(
+    `UPDATE briefs SET deleted_at=NOW(), deleted_by=$1 WHERE id=$2 AND deleted_at IS NULL RETURNING id, no`,
+    [by || null, id]
+  );
+  if (!r.rows[0]) throw new Error('brief bulunamadı veya zaten silindi: ' + id);
+  await pool.query(
+    `INSERT INTO events(brief_id, user_id, verb, detail, source)
+     VALUES ($1, (SELECT id FROM users WHERE slack_id=$2 LIMIT 1), 'silindi', '{}', 'slack')`,
+    [id, by || null]
+  );
+  return { id, no: r.rows[0].no };
+}
+
+// Soft delete geri al
+async function restoreBrief(id, by) {
+  const r = await pool.query(
+    `UPDATE briefs SET deleted_at=NULL, deleted_by=NULL WHERE id=$1 AND deleted_at IS NOT NULL RETURNING id, no`,
+    [id]
+  );
+  if (!r.rows[0]) throw new Error('brief bulunamadı veya silinmiş değil: ' + id);
+  await pool.query(
+    `INSERT INTO events(brief_id, user_id, verb, detail, source)
+     VALUES ($1, (SELECT id FROM users WHERE slack_id=$2 LIMIT 1), 'geri alındı', '{}', 'dashboard')`,
+    [id, by || null]
+  );
+  return { id, no: r.rows[0].no };
+}
+
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, deleteBrief, restoreBrief, noToId, tsToId, DURUMLAR };
