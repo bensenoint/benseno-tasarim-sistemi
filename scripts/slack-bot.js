@@ -651,6 +651,26 @@ async function resolveBriefTs(client, channel, ts) {
   return ts;
 }
 
+// ✅ anında: thread'in son görselini bulup DB'ye kaydet (galeri için, best-effort)
+async function captureThreadImage(client, channel, briefTs) {
+  try {
+    const r = await client.conversations.replies({ channel, ts: briefTs, limit: 200 });
+    const msgs = r.messages || [];
+    // Mesajlar eski→yeni sıralı; her görsel bulunduğunda üzerine yaz → son = en yeni
+    let lastImageUrl = null;
+    for (const msg of msgs) {
+      if (!msg.files || !msg.files.length) continue;
+      const imgFile = msg.files.find(f => f.mimetype && f.mimetype.startsWith('image/'));
+      if (imgFile && imgFile.url_private) lastImageUrl = imgFile.url_private;
+    }
+    if (!lastImageUrl) { log(`captureImage: thread'de görsel yok (${briefTs})`); return; }
+    log(`captureImage: son görsel bulundu → kaydediliyor`);
+    await dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}/set-image`, { image_url: lastImageUrl });
+  } catch (e) {
+    log(`captureImage hata: ${e.message}`);
+  }
+}
+
 app.event('reaction_added', async ({ event, client }) => {
   // Mesaj tipinde değilse yoksay (dosya, canvas üzeri olabilir)
   if (event.item.type !== 'message') return;
@@ -664,6 +684,8 @@ app.event('reaction_added', async ({ event, client }) => {
   if (event.reaction === 'white_check_mark') {
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
     log(`✅ tamamlama: ${briefTs} — ${event.user}`);
+    // Thread'deki son görseli onay öncesi yakala → galeri için image_url'e kaydet
+    captureThreadImage(client, event.item.channel, briefTs).catch(() => {});
     execFile('node', [`${PROJECT_DIR}/scripts/complete-brief.js`, briefTs, event.user, saat],
       { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
       (err, stdout, stderr) => {

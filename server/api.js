@@ -154,6 +154,19 @@ app.post('/api/briefs/by-no/:no/financials', writeGuard, handleWrite(async req =
 app.patch('/api/briefs/by-no/:no', writeGuard, handleWrite(async req => writes.patchBrief(await writes.noToId(+req.params.no), req.body)));
 app.post('/api/briefs/by-ts/:ts/status', writeGuard, handleWrite(async req => writes.setStatus(await writes.tsToId(req.params.ts), req.body)));
 app.post('/api/briefs/by-ts/:ts/financials', writeGuard, handleWrite(async req => writes.setFinancials(await writes.tsToId(req.params.ts), req.body)));
+// Onay anındaki son görseli kaydet (Slack bot ✅ handler'ından çağrılır, best-effort)
+app.patch('/api/briefs/by-ts/:ts/set-image', writeGuard, async (req, res) => {
+  try {
+    const { image_url } = req.body || {};
+    if (!image_url) return res.status(400).json({ error: 'image_url gerekli' });
+    const r = await pool.query(
+      'UPDATE briefs SET image_url=$1 WHERE slack_ts=$2 RETURNING id',
+      [image_url, req.params.ts]
+    );
+    if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.ts });
+    res.json({ ok: true, id: r.rows[0].id });
+  } catch (e) { console.error('[api] set-image hata:', e.message); res.status(500).json({ error: e.message }); }
+});
 app.patch('/api/briefs/by-ts/:ts', writeGuard, handleWrite(async req => writes.patchBrief(await writes.tsToId(req.params.ts), req.body)));
 
 // Dosya ekleri (dashboard) — base64 JSON: { files:[{name,mime,b64}], by }. Slack thread'e yükler + DB.
