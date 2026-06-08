@@ -623,11 +623,20 @@ app.event('reaction_added', async ({ event, client }) => {
 
   // Durum geçişi (atanan/editör/yönetici — yetkiyi script kontrol eder). Departmana özel
   // başla emojileri: 🎨 art (tasarım) · ✍️ writing_hand (editör) · 🤖 robot_face (AI) · 👀 eyes (revize sun).
+  // Yeni: ✏️ pencil2 (revizyon) · ⏸️ double_vertical_bar (beklemede) · 🔃 arrows_counterclockwise (yeniden aç)
   // Deterministik, MCP gerektirmez. Skin-tone varyantını normalize et (✍️🏽 vb).
   const reactionBase = event.reaction.replace(/::skin-tone-\d+$/, '');
-  if (['art', 'writing_hand', 'robot_face', 'eyes'].includes(reactionBase)) {
+  const DURUM_MAP = {
+    art: 'calisiliyor', writing_hand: 'calisiliyor', robot_face: 'calisiliyor',
+    eyes: 'incelemede',
+    double_vertical_bar: 'beklemede',
+    pencil2: 'revizyon', pencil: 'revizyon',
+    arrows_counterclockwise: 'calisiliyor',  // yeniden aç: tamamlandı → devam ediyor
+  };
+  if (reactionBase in DURUM_MAP) {
+    const durum = DURUM_MAP[reactionBase];
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
-    log(`durum reaction: :${reactionBase}: ${briefTs} — ${event.user}`);
+    log(`durum reaction: :${reactionBase}: → ${durum} @ ${briefTs} — ${event.user}`);
     execFile('node', [`${PROJECT_DIR}/scripts/brief-status.js`, briefTs, reactionBase, event.user, saat],
       { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
       (err, stdout, stderr) => {
@@ -635,8 +644,7 @@ app.event('reaction_added', async ({ event, client }) => {
         else log(`brief-status: ${(stdout || '').trim().split('\n').pop()}`);
       });
     // DB'ye de (b3, best-effort): emoji → durum kodu.
-    const DURUM_MAP = { art: 'calisiliyor', writing_hand: 'calisiliyor', robot_face: 'calisiliyor', eyes: 'incelemede' };
-    dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: DURUM_MAP[reactionBase], by: event.user, source: 'slack' });
+    dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum, by: event.user, source: 'slack' });
     return;
   }
 
@@ -908,7 +916,7 @@ app.event('message', async ({ event, client }) => {
 
   // ── Thread'e yazılan durum emojisi (reaction'a alternatif) ──────────────────
   // Kullanıcı uzun bir thread'de ilk mesaja kaydırmadan durum bildirmek isteyebilir.
-  // Thread yanıtına sadece 👀 / 🎨 / ✍️ / 🤖 / ✅ yazılırsa DB'deki brief durumu güncellenir.
+  // Thread yanıtına sadece 👀 / 🎨 / ✍️ / 🤖 / ✅ / ⏸️ / ✏️ / 🔃 yazılırsa DB'deki brief durumu güncellenir.
   // "Her iki tarafta da işleyebilmeli" — reaction veya metin emoji, sonuç aynı.
   // NOT: thread_ts = thread'in ANA mesajının ts'i (= brief slack_ts). Çözüm gerekmez.
   if (event.thread_ts && event.thread_ts !== event.ts && !event.bot_id) {
@@ -921,6 +929,11 @@ app.event('message', async ({ event, client }) => {
       { emoji: '✍',  durum: 'calisiliyor' },   // VS-16 olmadan yazılabilir
       { emoji: '🤖', durum: 'calisiliyor' },
       { emoji: '✅', durum: 'tamamlandi'  },
+      { emoji: '⏸️', durum: 'beklemede'   },
+      { emoji: '⏸',  durum: 'beklemede'   },   // VS-16 olmadan
+      { emoji: '✏️', durum: 'revizyon'    },
+      { emoji: '✏',  durum: 'revizyon'    },   // VS-16 olmadan
+      { emoji: '🔃', durum: 'calisiliyor' },   // yeniden aç: tamamlananı devam ediyora çek
     ];
     const eMatch = EMOJI_DURUM.find(e => trimmed.startsWith(e.emoji));
     if (eMatch) {

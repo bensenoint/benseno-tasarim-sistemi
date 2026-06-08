@@ -12,7 +12,7 @@ const { z } = require('zod');
 const { pool, tx } = require('./db');
 const slack = require('./slack');
 
-const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'blokeli', 'tamamlandi'];
+const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'tamamlandi'];
 
 // ── Zod şemaları ─────────────────────────────────────────────
 const zUserId = z.string().regex(/^U[A-Z0-9]+$/, 'geçersiz Slack user id');
