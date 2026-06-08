@@ -108,7 +108,11 @@ async function getEmbedded() {
   const attByBrief = {};
   for (const a of att.rows) (attByBrief[a.brief_id] ||= []).push({ name: a.name, permalink: a.permalink });
 
-  const bns_briefs = all.filter(b => !b.completed_at).map(b => ({
+  // Marka → renk (silinenler ekranı marka_color bekliyor)
+  const brandColor = {};
+  for (const br of brands.rows) brandColor[br.name] = br.color;
+
+  const bns_briefs = all.filter(b => !b.completed_at && !b.deleted_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, dept: b.dept || '',
     workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '' })),
     leads:     b.leads.map(l => ({ id: l.id, name: l.name })),
@@ -120,7 +124,7 @@ async function getEmbedded() {
     attachments: attByBrief[b.id] || [],
   }));
 
-  const bns_completed = all.filter(b => b.completed_at).map(b => ({
+  const bns_completed = all.filter(b => b.completed_at && !b.deleted_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik,
     leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
     workers: b.workers.map(w => ({ id: w.id, name: w.name })),
@@ -130,6 +134,12 @@ async function getEmbedded() {
     attachments: attByBrief[b.id] || [],
   }));
 
+  const bns_deleted = all.filter(b => b.deleted_at).map(b => ({
+    id: b.id, no: b.no, marka: b.marka, marka_color: brandColor[b.marka] || null,
+    baslik: b.baslik, durum: b.durum,
+    deleted_at: b.deleted_at, deleted_by: b.deleted_by,
+  }));
+
   const bns_dept_stats = {};
   for (const r of dept.rows) bns_dept_stats[r.dept] = r;
 
@@ -137,7 +147,7 @@ async function getEmbedded() {
     now: new Date().toISOString(),
     bns_brands: brands.rows.map(b => ({ name: b.name, color: b.color, wheelIdx: b.wheel_idx })),
     bns_users: users.rows,
-    bns_briefs, bns_completed, bns_dept_stats,
+    bns_briefs, bns_completed, bns_deleted, bns_dept_stats,
     source: 'postgres', generated_at: new Date().toISOString(),
   };
 }
