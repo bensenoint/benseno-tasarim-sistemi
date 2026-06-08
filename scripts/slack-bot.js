@@ -608,7 +608,7 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
   };
   try {
     const r = await fetch(`${API_BASE}/api/briefs`, {
-      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload),
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' }, body: JSON.stringify(payload),
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(j.error === 'doğrulama'
