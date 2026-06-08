@@ -42,9 +42,14 @@ async function bnsPersistBriefChange(prev, next, byId) {
     : (next.no != null ? `/api/briefs/by-no/${next.no}` : null);
   if (!path) throw new Error("brief id/no yok — yazılamadı");
   const post = async (suffix, body) => {
+    const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
     const r = await fetch(base + path + suffix, {
       method: suffix ? "POST" : "PATCH",
-      headers: { "content-type": "application/json", "x-bns-token": window.BNS_WRITE_TOKEN || "" },
+      headers: {
+        "content-type": "application/json",
+        "x-bns-token": window.BNS_WRITE_TOKEN || "",
+        ...(tok ? { Authorization: "Bearer " + tok } : {}),
+      },
       body: JSON.stringify({ ...body, by: byId || undefined, source: "dashboard" }),
     });
     const j = await r.json().catch(() => ({}));

@@ -145,9 +145,15 @@ function APIBriefForm({ apiBase, data, onClose }) {
       by: me.id || undefined,
       source: "dashboard",
     };
+    const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+    const writeHeaders = {
+      "content-type": "application/json",
+      "x-bns-token": window.BNS_WRITE_TOKEN || "",
+      ...(tok ? { Authorization: "Bearer " + tok } : {}),
+    };
     try {
       const r = await fetch(apiBase + "/api/briefs", {
-        method: "POST", headers: { "content-type": "application/json", "x-bns-token": window.BNS_WRITE_TOKEN || "" }, body: JSON.stringify(body),
+        method: "POST", headers: writeHeaders, body: JSON.stringify(body),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error === "doğrulama"
@@ -162,7 +168,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
           rd.readAsDataURL(file);
         })));
         await fetch(apiBase + `/api/briefs/${j.id}/attachments`, {
-          method: "POST", headers: { "content-type": "application/json", "x-bns-token": window.BNS_WRITE_TOKEN || "" },
+          method: "POST", headers: writeHeaders,
           body: JSON.stringify({ files: payloadFiles.filter(Boolean), by: me.id || undefined }),
         }).catch(() => {});
       }
