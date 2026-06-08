@@ -808,12 +808,13 @@
 
       <h3>Sistem Ne Yapar?</h3>
       <ul>
-        <li>Her <strong>30 dakikada bir</strong> Slack'teki tüm marka kanallarını tarar, yeni brief'leri tespit eder</li>
-        <li>Brief'leri parse ederek öncelik sıralar (<span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> <span class="prio prio-yellow">🟡 Normal</span> <span class="prio prio-green">🟢 Düşük</span>)</li>
+        <li><strong>/yeni-brief</strong> komutuyla açılan briefleri anında veritabanına kaydeder ve markanın kanalına gönderir (anlık — periyodik tarama yok)</li>
+        <li>Öncelik etiketler (<span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> <span class="prio prio-yellow">🟡 Normal</span> <span class="prio prio-green">🟢 Düşük</span>)</li>
         <li>Atanan ekip üyelerine Slack DM ile bildirim gönderir</li>
-        <li>Geciken, bekleyen, sorunlu brief'leri tespit eder ve uyarı verir</li>
-        <li>Tüm veriyi canlı Dashboard'a yansıtır</li>
-        <li>Her sabah 07:50'de yöneticilere ve tüm ekibe özet rapor gönderir</li>
+        <li>Brief thread'ine eklenen emoji / kelime ile durumu anında günceller</li>
+        <li>Geciken, bekleyen brief'leri tespit eder ve uyarı verir</li>
+        <li>Tüm veriyi canlı Dashboard'a (GitHub Pages) yansıtır</li>
+        <li>Günlük, haftalık ve aylık özet raporları otomatik gönderir</li>
       </ul>
 
       <h3>Kimler Ne Yapar?</h3>
@@ -821,11 +822,11 @@
         <table>
           <thead><tr><th>Rol</th><th>Görev</th></tr></thead>
           <tbody>
-            <tr><td><strong>Editörler</strong></td><td>Marka kanallarında brief açar, tasarımcı atar, teslimi onaylar</td></tr>
-            <tr><td><strong>Tasarımcılar</strong></td><td>Atanan brief'te reaction atar (başla/sun/bitir), iş teslim eder</td></tr>
-            <tr><td><strong>AI (Eren)</strong></td><td>AI brief'lerini alır, tasarımcılarla cross-dept iş yapar</td></tr>
-            <tr><td><strong>Yöneticiler</strong></td><td>Öncelik override atar, sorunları takip eder, rapor okur</td></tr>
-            <tr><td><strong>Sistem (otomatik)</strong></td><td>Brief'leri parse eder, bildirim gönderir, dashboard'ı günceller</td></tr>
+            <tr><td><strong>Editörler</strong></td><td>/yeni-brief ile brief açar, işi yapanları atar, teslimi onaylar</td></tr>
+            <tr><td><strong>Tasarımcılar</strong></td><td>Atanan brief'te emoji/kelime ile durum bildirir, iş teslim eder</td></tr>
+            <tr><td><strong>AI (Eren, Uraş)</strong></td><td>AI brief'lerini alır, tasarımcılarla cross-dept iş yapar</td></tr>
+            <tr><td><strong>Yöneticiler</strong></td><td>Öncelik atar, sorunları takip eder, dashboard + rapor okur, brief silme/geri alma yapar</td></tr>
+            <tr><td><strong>Sistem (bot)</strong></td><td>Brief'i DB'ye yazar, bildirim gönderir, dashboard'ı günceller</td></tr>
           </tbody>
         </table>
       </div>
@@ -835,9 +836,9 @@
         <table>
           <thead><tr><th>Departman</th><th>Kişiler</th></tr></thead>
           <tbody>
-            <tr><td>🎨 Tasarım (7 kişi)</td><td>Aylin T, Aykut, Hasan Serdar, Pelin, İpek (Yön.), İrem, Serhat</td></tr>
-            <tr><td>✍️ Editör (8 kişi)</td><td>Cansu (Direktör), erdem (Yön.), Eda T, Eda A, Melis, Aylin C, Buse, Simge</td></tr>
-            <tr><td>🤖 AI (1 kişi)</td><td>Eren</td></tr>
+            <tr><td>🎨 Tasarım (6 kişi)</td><td>Aykut Arslan, Aylin Tozkoparan, Hasan Serdar Arda, İrem Özkan, Pelin Özdemir, Serhat Yıldız</td></tr>
+            <tr><td>✍️ Editör (6 kişi)</td><td>Aylin Canel, Buse Gürbüzer, Eda Ayral, Eda Tireli, Melis Can, Simge Acar</td></tr>
+            <tr><td>🤖 AI (2 kişi)</td><td>Eren Mahzunlar, Uraş Aydınlıoğlu</td></tr>
           </tbody>
         </table>
       </div>
@@ -847,43 +848,37 @@
         <table>
           <thead><tr><th>İsim</th><th>Unvan</th></tr></thead>
           <tbody>
-            <tr><td><strong>Görkem</strong></td><td>Genel Müdür</td></tr>
-            <tr><td><strong>Reyhan</strong></td><td>Genel Müdür Yardımcısı</td></tr>
-            <tr><td><strong>Cansu</strong></td><td>Direktör (3 departman)</td></tr>
-            <tr><td><strong>İpek</strong></td><td>Tasarım Ekibi Yöneticisi</td></tr>
-            <tr><td><strong>erdem</strong></td><td>Editör Ekibi Yöneticisi</td></tr>
+            <tr><td><strong>Görkem Kaya</strong></td><td>Genel Müdür</td></tr>
+            <tr><td><strong>Reyhan Nur Pınar</strong></td><td>Genel Müdür Yardımcısı</td></tr>
+            <tr><td><strong>Cansu Kazgan</strong></td><td>Direktör</td></tr>
+            <tr><td><strong>İpek Akdeniz</strong></td><td>Tasarım Ekibi Yöneticisi</td></tr>
+            <tr><td><strong>Erdem Akoğlu</strong></td><td>Editör Ekibi Yöneticisi</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3>4-Katman Agent Mimarisi</h3>
+      <h3>Sistem Mimarisi</h3>
+      <p>Sistem; Railway üzerinde sürekli çalışan bir <strong>Slack botu</strong>, bir <strong>Postgres veritabanı</strong> ve <strong>GitHub Pages</strong>'te yayınlanan bir dashboard'dan oluşur. Veriler eskiden olduğu gibi Canvas veya live-data.json'da değil, tek doğru kaynak olan veritabanında tutulur.</p>
       <div class="flow">
         <div class="flow-step">
           <div class="flow-dot">1</div>
           <div class="flow-content">
-            <div class="flow-label">Orchestrator</div>
-            <div class="flow-sub">Her :15/:45 — tüm akışı koordine eder</div>
+            <div class="flow-label">Slack Bot (Socket Mode)</div>
+            <div class="flow-sub">Her zaman açık. /yeni-brief, reaction, thread mesajı ve raporları anlık işler</div>
           </div>
         </div>
         <div class="flow-step">
           <div class="flow-dot">2</div>
           <div class="flow-content">
-            <div class="flow-label">Data Agent</div>
-            <div class="flow-sub">Canvas okuma, brief parsing, öncelik hesaplama, E3 kıyaslama</div>
+            <div class="flow-label">Railway API + Postgres</div>
+            <div class="flow-sub">Tüm brief/durum/finansal/silme verisinin tek doğru kaynağı</div>
           </div>
         </div>
         <div class="flow-step">
-          <div class="flow-dot">3</div>
+          <div class="flow-dot" style="background:var(--prio-green)">3</div>
           <div class="flow-content">
-            <div class="flow-label">Notification Agent</div>
-            <div class="flow-sub">Slack DM, Google Calendar event, idempotent kontrol</div>
-          </div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-dot" style="background:var(--prio-green)">4</div>
-          <div class="flow-content">
-            <div class="flow-label">Dashboard Agent</div>
-            <div class="flow-sub">live-data.json → GitHub Pages push</div>
+            <div class="flow-label">Dashboard (GitHub Pages)</div>
+            <div class="flow-sub">API'den canlı okur · kişiye özel giriş (login) ile korunur</div>
           </div>
         </div>
       </div>
@@ -935,23 +930,24 @@
         </table>
       </div>
 
-      <h3>2.2 Workflow Yöntemi (Önerilen)</h3>
+      <h3>2.2 /yeni-brief ile Brief Açma</h3>
+      <p>Brief açmanın <strong>tek yöntemi</strong> Slack'te <code>/yeni-brief</code> komutudur. Eski "Yeni Brief Aç" iş akışı butonu ve serbest mesaj (free-text) formatı artık kullanılmamaktadır.</p>
       <div class="flow">
         <div class="flow-step">
           <div class="flow-dot">1</div>
-          <div class="flow-content"><div class="flow-label">İlgili marka kanalını aç</div><div class="flow-sub">Örn. #marka-bauhaus</div></div>
+          <div class="flow-content"><div class="flow-label">İlgili marka kanalını aç</div><div class="flow-sub">Örn. #marka-bauhaus — marka kanaldan otomatik algılanır</div></div>
         </div>
         <div class="flow-step">
           <div class="flow-dot">2</div>
-          <div class="flow-content"><div class="flow-label">"Yeni Brief Aç" iş akışı butonuna tıkla</div></div>
+          <div class="flow-content"><div class="flow-label"><code>/yeni-brief</code> yaz</div><div class="flow-sub">Form (modal) açılır</div></div>
         </div>
         <div class="flow-step">
           <div class="flow-dot">3</div>
-          <div class="flow-content"><div class="flow-label">Formu doldur ve gönder</div><div class="flow-sub">Aşağıdaki tablodaki tüm zorunlu alanlar</div></div>
+          <div class="flow-content"><div class="flow-label">Formu doldur ve gönder</div></div>
         </div>
         <div class="flow-step">
           <div class="flow-dot" style="background:var(--prio-green)">✓</div>
-          <div class="flow-content"><div class="flow-label">Sistem otomatik işler</div><div class="flow-sub">Parse → öncelik → Canvas → DM → Dashboard</div></div>
+          <div class="flow-content"><div class="flow-label">Sistem otomatik işler</div><div class="flow-sub">DB'ye kayıt → marka kanalına post → atananlara DM → Dashboard</div></div>
         </div>
       </div>
 
@@ -959,53 +955,23 @@
         <table>
           <thead><tr><th>Alan</th><th>Açıklama</th><th>Zorunlu?</th></tr></thead>
           <tbody>
-            <tr><td>🎀 İş Özeti</td><td>Yapılacak işin kısa açıklaması</td><td>✅ Evet</td></tr>
-            <tr><td>⏰ Deadline</td><td>Teslim tarihi ve saati</td><td>✅ Evet</td></tr>
-            <tr><td>👷 Kim</td><td>Atanan kişi(ler) — Slack @mention ile</td><td>✅ Evet</td></tr>
-            <tr><td>🏷️ Tip</td><td>İş tipi (sosyal medya, banner, video, vb.)</td><td>✅ Evet</td></tr>
-            <tr><td>🔄 Akış</td><td>Paralel / Sıralı</td><td>✅ Evet</td></tr>
-            <tr><td>🔗 Ref</td><td>Referans link (varsa)</td><td>Hayır</td></tr>
-            <tr><td>💬 Not</td><td>Ek açıklama</td><td>Hayır</td></tr>
-            <tr><td>🐷 Kimden</td><td>Formu açan kişi</td><td>Otomatik</td></tr>
+            <tr><td>Başlık</td><td>İşin kısa açıklaması (ör. "Sosyal medya paketi — Mayıs")</td><td>✅ Evet</td></tr>
+            <tr><td>Marka</td><td>Komutun yazıldığı kanaldan otomatik gelir</td><td>Otomatik</td></tr>
+            <tr><td>Termin</td><td>Tarih + saat seçici ile teslim zamanı</td><td>✅ Evet</td></tr>
+            <tr><td>İşi yapanlar</td><td>Bir veya birden çok kişi — <strong>departman buradan belirlenir</strong></td><td>✅ Evet</td></tr>
+            <tr><td>Lead</td><td>Sorumlu kişi(ler)</td><td>Opsiyonel</td></tr>
+            <tr><td>Gözlemci</td><td>Bilgilendirilecek kişi(ler)</td><td>Opsiyonel</td></tr>
+            <tr><td>Not</td><td>Müşteri notu / ek açıklama</td><td>Opsiyonel</td></tr>
+            <tr><td>Dosya</td><td>Brief'e eklenecek görsel/dosya</td><td>Opsiyonel</td></tr>
           </tbody>
         </table>
       </div>
-
-      <h3>2.3 Manuel Yöntem (Fallback)</h3>
-      <p>Workflow butonu yoksa ya da çalışmıyorsa kanalda doğrudan mesaj formatı kullanılır:</p>
-
-      <div class="tmpl">
-        <div class="tmpl-header">🎨 Tasarım Brief'i</div>
-📋 [İş özeti]
-Atanan: @isim
-Deadline: GG Ay YYYY SS:DD
-Tip: [iş tipi]
-Akış: Paralel
-Not: [varsa not]
-      </div>
-
-      <div class="tmpl">
-        <div class="tmpl-header">✍️ Editör Brief'i</div>
-✍️ [İş özeti]
-Atanan: @isim
-Deadline: GG Ay YYYY SS:DD
-...
-      </div>
-
-      <div class="tmpl">
-        <div class="tmpl-header">🤖 AI Brief'i</div>
-🤖 [İş özeti]
-Atanan: @eren
-Deadline: GG Ay YYYY SS:DD
-...
-      </div>
-
       <div class="callout info">
         <span class="callout-icon">💡</span>
-        <span>İlk satırdaki emoji (<strong>📋 / ✍️ / 🤖</strong>) departmanı belirler. Bu emoji yoksa sistem atanan kişilerden departmanı tahmin eder.</span>
+        <span>Departman ayrı bir alan değildir — <strong>işi yapan olarak seçilen kişinin departmanından</strong> otomatik belirlenir.</span>
       </div>
 
-      <h3>2.4 Deadline Kuralları</h3>
+      <h3>2.3 Deadline Kuralları</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Durum</th><th>Kural</th></tr></thead>
@@ -1017,33 +983,8 @@ Deadline: GG Ay YYYY SS:DD
         </table>
       </div>
 
-      <h3>2.5 Kime Atama Yapılır?</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Atama</th><th>Ne Yapar</th><th>Ne Zaman</th></tr></thead>
-          <tbody>
-            <tr><td><code>@isim</code></td><td>Belirli kişiye atama</td><td>Her zaman geçerli</td></tr>
-            <tr><td><code>@auto</code></td><td>Smart Assign 2.0 — marka uzmanlığı + iş yükü + streak skoru</td><td>Acil brief'lerde kullanma!</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="callout danger">
-        <span class="callout-icon">🚨</span>
-        <span><strong>🔴 Acil brief'lerde <code>@auto</code> kullanılmamalıdır.</strong> Sistem otomatik atamayı sonraki sync'te işler — 8 saatin altında deadline'larda bu gecikme kabul edilemez. Acil durumlarda atananı manuel belirtin.</span>
-      </div>
-
-      <h3>2.6 Paralel vs. Sıralı Akış</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Akış</th><th>Ne Demek</th><th>Ne Zaman</th></tr></thead>
-          <tbody>
-            <tr><td><strong>Paralel</strong></td><td>Tüm atananlar aynı anda çalışabilir</td><td>Bağımsız işler</td></tr>
-            <tr><td><strong>Sıralı</strong></td><td>Birinci bitirmeden ikincisi başlamaz</td><td>Tasarım → Editör gibi ardışık süreçler</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p>Sıralı akışta: birinci kişi işi bitirince sistem otomatik olarak sıradaki kişiye "sıran geldi" DM'i gönderir.</p>
+      <h3>2.4 Kime Atama Yapılır?</h3>
+      <p>Atama, <code>/yeni-brief</code> formundaki <strong>İşi yapanlar</strong> alanından kişi(ler) seçilerek yapılır. Brief'in departmanı, seçilen kişinin departmanından otomatik belirlenir. İsteğe bağlı olarak <strong>Lead</strong> (sorumlu) ve <strong>Gözlemci</strong> (bilgilendirilecek) kişiler de eklenebilir.</p>
     </section>
 
     <!-- ─────────────────────────────────────────── -->
@@ -1054,78 +995,94 @@ Deadline: GG Ay YYYY SS:DD
         <div class="section-num">3</div>
         <div class="section-title-wrap">
           <h2 class="section-title">Slack — Brief Takibi</h2>
-          <div class="section-tag">Reaction sistemi · Durum akışı · Force-close</div>
+          <div class="section-tag">Durum emojileri · Kelime kısayolları · Finansal · Silme</div>
         </div>
       </div>
 
-      <p>Sistem tüm brief durumunu Slack <strong>reaction'ları</strong> üzerinden takip eder. Reaction'lar <strong>her zaman brief'in PARENT mesajına</strong> (ana mesaja) eklenmelidir — thread içine eklenenler işlenmez.</p>
+      <p>Brief durumu iki şekilde güncellenir ve <strong>ikisi de aynı sonucu verir</strong>: (1) brief'in <strong>ana mesajına emoji reaction</strong> eklemek, ya da (2) brief <strong>thread'ine</strong> o emojiyle başlayan veya bir durum kelimesi içeren bir mesaj yazmak. Uzun thread'lerde ana mesaja kaydırmadan thread'e yazmak pratiktir.</p>
 
-      <h3>3.1 Reaction'lar</h3>
+      <h3>3.1 Durum Emojileri</h3>
       <div class="reaction-grid">
         <div class="reaction-card">
-          <div class="reaction-emoji">🎨</div>
-          <div class="reaction-name">İşe Başladım</div>
-          <div class="reaction-desc">Durum: Çalışılıyor. Revizyon başlarken tekrar kullanılır.</div>
+          <div class="reaction-emoji">🎨 ✍️ 🤖</div>
+          <div class="reaction-name">Çalışılıyor</div>
+          <div class="reaction-desc">İş başladı / devam ediyor. Tasarım 🎨 · Editör ✍️ · AI 🤖.</div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">👀</div>
-          <div class="reaction-name">Sunum</div>
-          <div class="reaction-desc">Durum: İncelemede. Revize için sunuyorum.</div>
+          <div class="reaction-name">İncelemede</div>
+          <div class="reaction-desc">İş gözden geçiriliyor / revize sunuldu.</div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-emoji">⏸️</div>
+          <div class="reaction-name">Beklemede</div>
+          <div class="reaction-desc">Müşteri / onay / materyal bekleniyor.</div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-emoji">✏️</div>
+          <div class="reaction-name">Revizyon</div>
+          <div class="reaction-desc">Düzeltme isteği geldi.</div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">✅</div>
           <div class="reaction-name">Tamamlandı</div>
-          <div class="reaction-desc">İş bitti, teslim edildi.</div>
+          <div class="reaction-desc">İş bitti. Thread'deki son görsel otomatik galeriye kaydedilir.</div>
         </div>
         <div class="reaction-card">
-          <div class="reaction-emoji">♻️</div>
+          <div class="reaction-emoji">🔃</div>
           <div class="reaction-name">Yeniden Aç</div>
-          <div class="reaction-desc">Tamamlanan brief reopen edilir.</div>
-        </div>
-        <div class="reaction-card">
-          <div class="reaction-emoji">🔒</div>
-          <div class="reaction-name">Force-Close</div>
-          <div class="reaction-desc">Yönetici/lead eksik ✅'leri zorla kapatır.</div>
+          <div class="reaction-desc">Tamamlanmış brief'i tekrar çalışılıyor durumuna çeker.</div>
         </div>
       </div>
 
-      <h3>3.2 Tasarımcı Reaction Akışı</h3>
-      <div class="flow">
-        <div class="flow-step">
-          <div class="flow-dot alt">→</div>
-          <div class="flow-content"><div class="flow-label">Brief mesajı geldi</div></div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-dot">🎨</div>
-          <div class="flow-content"><div class="flow-label">İşe başlıyorum</div><div class="flow-sub">Durum: Çalışılıyor</div></div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-dot">👀</div>
-          <div class="flow-content"><div class="flow-label">Revize için sunuyorum</div><div class="flow-sub">Durum: İncelemede</div></div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-dot alt">↩</div>
-          <div class="flow-content"><div class="flow-label">Revizyon varsa: 🎨 tekrar ekle</div><div class="flow-sub">Revizyon sayacı +1, tekrar Çalışılıyor</div></div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-dot" style="background:var(--prio-green)">✅</div>
-          <div class="flow-content"><div class="flow-label">Tamamlandı</div><div class="flow-sub">Onay gelince ✅ ekle — iş kapanır</div></div>
-        </div>
+      <h3>3.2 Öncelik (Reaction)</h3>
+      <p>Brief'e öncelik vermek için ana mesaja şu reaction'lardan biri eklenir (atanan veya yönetici):
+        <span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> <span class="prio prio-yellow">🟡 Normal</span> <span class="prio prio-green">🟢 Düşük</span></p>
+
+      <h3>3.3 Kelime Kısayolları</h3>
+      <p>Brief thread'ine <strong>tam olarak</strong> şu kelimeyi yazın (içinde geçmesi yetmez — birebir eşleşme gerekir):</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Yazılan</th><th>Durum</th></tr></thead>
+          <tbody>
+            <tr><td><code>devam et</code> · <code>devam ediyor</code></td><td>Çalışılıyor</td></tr>
+            <tr><td><code>iş incelemede</code></td><td>İncelemede</td></tr>
+            <tr><td><code>iş beklemede</code> · <code>bekle</code></td><td>Beklemede</td></tr>
+            <tr><td><code>revizyon var</code> · <code>revize et</code></td><td>Revizyon</td></tr>
+            <tr><td><code>iş tamamlandı</code></td><td>Tamamlandı</td></tr>
+            <tr><td><code>yeniden aç</code> · <code>geri aç</code></td><td>Yeniden açıldı (çalışılıyor)</td></tr>
+            <tr><td><code>bloke et</code></td><td>Blokeli</td></tr>
+            <tr><td><code>acil/yüksek/normal/düşük öncelik</code></td><td>🔴 / 🟠 / 🟡 / 🟢</td></tr>
+          </tbody>
+        </table>
       </div>
 
-      <h3>3.3 Brief Tamamlama — Buton Yöntemi</h3>
-      <p>Slack Bot'un gönderdiği mesajlardaki <strong>"Tamamlandı"</strong> butonuna tıklayarak da iş kapatılabilir. Sistem Canvas'taki satırı Tamamlananlar'a taşır, tasarımcıya DM gönderir.</p>
-
-      <h3>3.4 Hayalet İş Uyarısı</h3>
-      <p>30 dakikalık sessizlik + onay keyword'ü tespit edilirse sistem DM ile sorar:</p>
-      <div class="tmpl" style="font-family: var(--font-sans); font-size: 13.5px;">
-        "Bu iş bitmiş olabilir mi? Tamamlandıysa ✅ ekle, devam ediyorsa 🎨 ekle."
+      <h3>3.4 Finansal Bilgi</h3>
+      <p>Brief thread'ine yazın; dashboard'a birkaç dakikada yansır.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Yazılan</th><th>Etki</th></tr></thead>
+          <tbody>
+            <tr><td><code>maliyet 1500 satış 4000</code></td><td>Maliyet ve satış tutarını kaydeder</td></tr>
+            <tr><td><code>fatura ok</code> / <code>fatura iptal</code></td><td>Fatura kesildi / geri alır</td></tr>
+            <tr><td><code>ödeme ok</code> / <code>ödeme iptal</code></td><td>Ödeme alındı / geri alır</td></tr>
+          </tbody>
+        </table>
       </div>
 
-      <h3>3.5 Force-Close (🔒)</h3>
-      <div class="callout info">
-        <span class="callout-icon">🔒</span>
-        <span>Yetkili kişiler (lead, editör yöneticisi, yöneticiler) eksik ✅'leri zorla kapatabilir. Tasarımcılar da <strong>kendi atandıkları işte</strong> 🔒 kullanabilir (sözlü onay durumunda).</span>
+      <h3>3.5 Brief Silme & Geri Alma</h3>
+      <p>Silme kalıcı değildir — silinen briefler dashboard'daki <strong>Silinenler</strong> ekranına taşınır ve geri alınabilir.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Yöntem</th><th>Ne olur</th></tr></thead>
+          <tbody>
+            <tr><td>Thread'e <code>brief sil</code> yaz</td><td>Brief Silinenler'e taşınır, bot onay mesajı düşer</td></tr>
+            <tr><td>Brief ana mesajını Slack'te sil</td><td>Brief otomatik olarak Silinenler'e taşınır</td></tr>
+            <tr><td>Dashboard → brief detayında 🗑️ Sil</td><td>Silinenler'e taşır (yönetici)</td></tr>
+            <tr><td>Silinenler → ↩ Geri al</td><td>Brief'i aktif listeye geri getirir (yönetici)</td></tr>
+            <tr><td>Silinenler → 🗑️ Kalıcı sil</td><td>Tamamen siler — GERİ ALINAMAZ (yönetici)</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
@@ -1144,20 +1101,16 @@ Deadline: GG Ay YYYY SS:DD
       <h3>Şablon 1 — Atama Bildirimi</h3>
       <div class="tmpl">
         <div class="tmpl-header">Atanan kişiye DM</div>
-📋 *[İş özeti]* — [Marka]
-⏰ Deadline: [tarih TR]
-🏷️ Tip: [iş tipi]
-🔄 Akış: [Paralel/Sıralı]
-💬 Not: [not]
+🆕 Yeni brief *[İş özeti]* — [Marka]
+📝 [Müşteri notu]
 [Mesaja git](link)
       </div>
 
-      <h3>Şablon 2 — Sıralı Akış Bildirimi</h3>
+      <h3>Şablon 2 — Rol Değişikliği Bildirimi</h3>
       <div class="tmpl">
-        <div class="tmpl-header">Sıradaki kişiye DM</div>
-📋 *[İş özeti]* — [Marka]
-Sıran yaklaşıyor — [önceki kişi] bitirince başlayabilirsin.
-Deadline: [tarih]
+        <div class="tmpl-header">Eklenen/çıkarılan kişiye DM</div>
+➕ *[İş özeti]* — [Marka]
+Bu briefe [işi yapan / lead / gözlemci] olarak eklendin.
 [Mesaja git](link)
       </div>
 
@@ -1192,16 +1145,10 @@ Deadline: [bugün — saat yok]
 Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
       </div>
 
-      <h3>Şablon 18 — Acil Brief'te @auto Uyarısı</h3>
+      <h3>Şablon 23 — Gözlemci Bilgilendirmesi</h3>
       <div class="tmpl">
-        <div class="tmpl-header">Brief açan kişiye DM</div>
-⚠️ 🔴 Acil brief'te @auto kullanma. Atananları manuel belirt.
-      </div>
-
-      <h3>Şablon 23 — Departman Belirsiz Uyarısı</h3>
-      <div class="tmpl">
-        <div class="tmpl-header">erdem'e (Editör Yöneticisi) DM</div>
-📋 Departman tespit edilemedi — kontrol et:
+        <div class="tmpl-header">Gözlemciye DM</div>
+👁️ Gözlemci olarak eklendiğin brief güncellendi:
 [İş özeti] — [Marka]
 [Mesaja git](link)
       </div>
@@ -1253,9 +1200,9 @@ Büyük iş ise normal — iş tipini kontrol et.
           <div class="kpi-sub">Sağ üst: "Canlı · Xsn"</div>
         </div>
         <div class="kpi-card" style="border-left-color: var(--info)">
-          <div class="kpi-label">Şifre</div>
-          <div class="kpi-value" style="font-size: 14px; letter-spacing: 0; line-height: 1.4; margin-top: 4px;">İpek'ten alın</div>
-          <div class="kpi-sub">Tasarım Yöneticisi</div>
+          <div class="kpi-label">Giriş</div>
+          <div class="kpi-value" style="font-size: 14px; letter-spacing: 0; line-height: 1.4; margin-top: 4px;">Kişiye özel</div>
+          <div class="kpi-sub">Kullanıcı adı + şifre</div>
         </div>
         <div class="kpi-card" style="border-left-color: var(--prio-orange)">
           <div class="kpi-label">Arama</div>
@@ -1263,6 +1210,9 @@ Büyük iş ise normal — iş tipini kontrol et.
           <div class="kpi-sub">Command Palette</div>
         </div>
       </div>
+
+      <h3>Giriş (Login)</h3>
+      <p>Dashboard kişiye özel giriş ile korunur. Her ekip üyesinin kendi <strong>kullanıcı adı + şifresi</strong> vardır; ilk şifrenizi bir yöneticiden alırsınız. Giriş yapıldıktan sonra oturum tarayıcıda 7 gün hatırlanır. Bazı işlemler (örn. brief silme, geri alma, kalıcı silme, kullanıcı yönetimi) yalnızca <strong>yönetici</strong> yetkili kullanıcılarda görünür.</p>
 
       <h3>Görünüm Seçimi</h3>
       <div class="table-wrap">
@@ -1300,10 +1250,12 @@ Büyük iş ise normal — iş tipini kontrol et.
         <div class="screen-card"><div class="screen-num">6.8</div><div class="screen-name">Geçmiş</div><div class="screen-desc">Son 14 günlük trend grafikleri</div></div>
         <div class="screen-card"><div class="screen-num">6.9</div><div class="screen-name">Galeri</div><div class="screen-desc">Tamamlanan işlerin marka bazlı galerisi</div></div>
         <div class="screen-card"><div class="screen-num">6.10</div><div class="screen-name">Multi-Atama</div><div class="screen-desc">Paralel/sıralı akış yönetim görünümü</div></div>
-        <div class="screen-card"><div class="screen-num">6.11</div><div class="screen-name">Marka</div><div class="screen-desc">39 markanın istatistik ve sorun skoru</div></div>
+        <div class="screen-card"><div class="screen-num">6.11</div><div class="screen-name">Marka</div><div class="screen-desc">Markaların istatistik ve sorun skoru</div></div>
         <div class="screen-card"><div class="screen-num">6.12</div><div class="screen-name">Ekip Matrisi</div><div class="screen-desc">Kişi × marka uzmanlık haritası</div></div>
         <div class="screen-card"><div class="screen-num">6.13</div><div class="screen-name">Tasarım/Editör/AI</div><div class="screen-desc">Departman detay ekranı — kişi bazlı istatistikler</div></div>
         <div class="screen-card"><div class="screen-num">6.14</div><div class="screen-name">Profil</div><div class="screen-desc">Kişisel istatistikler, tamamlanan işler, puan geçmişi</div></div>
+        <div class="screen-card"><div class="screen-num">6.15</div><div class="screen-name">Silinenler</div><div class="screen-desc">Silinmiş brief'ler — geri al / kalıcı sil (yönetici)</div></div>
+        <div class="screen-card"><div class="screen-num">6.16</div><div class="screen-name">Yardım</div><div class="screen-desc">Komut, emoji ve kısayol referansı</div></div>
       </div>
 
       <h3>6.1 Genel Bakış — KPI Kartları</h3>
@@ -1389,10 +1341,7 @@ Büyük iş ise normal — iş tipini kontrol et.
         </table>
       </div>
 
-      <h3>7.3 Force-Close (🔒)</h3>
-      <p>Brief tamamlanmış ama ✅ atılmamışsa, brief mesajının parent'ına 🔒 reaction ekle. Sistem eksik adımları otomatik tamamlar.</p>
-
-      <h3>7.4 Sabah Raporunu Yorumlama</h3>
+      <h3>7.3 Sabah Raporunu Yorumlama</h3>
       <p>Her hafta içi sabah <strong>07:50'de</strong> 3 çıktı üretilir:</p>
 
       <div class="table-wrap">
@@ -1414,12 +1363,12 @@ Büyük iş ise normal — iş tipini kontrol et.
             <tr><td><strong>Reyhan</strong> (GMY)</td><td>Operasyonel öncelikler, SLA durumu</td></tr>
             <tr><td><strong>Cansu</strong> (Direktör)</td><td>3 departman, marka hız trendi (E3), kalite skoru</td></tr>
             <tr><td><strong>İpek</strong> (Tasarım Yön.)</td><td>Tasarım ekibi detayı, kapasite, mentörlük notları</td></tr>
-            <tr><td><strong>erdem</strong> (Editör Yön.)</td><td>Editör ekibi detayı, açılan/bekleyen brief'ler</td></tr>
+            <tr><td><strong>Erdem</strong> (Editör Yön.)</td><td>Editör ekibi detayı, açılan/bekleyen brief'ler</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3>7.5 E3 — Marka Davranış Kıyaslaması</h3>
+      <h3>7.4 E3 — Marka Davranış Kıyaslaması</h3>
       <p>E3, 39 marka için geçmiş veriden öğrenilen "bu marka için normal deadline ne kadar?" sorusunu yanıtlayan istatistik sistemidir.</p>
 
       <div class="table-wrap">
@@ -1565,62 +1514,33 @@ Onboarding başlat: [USER_ID] [İsim] [başlangıç_tarihi]
         <div class="section-num">10</div>
         <div class="section-title-wrap">
           <h2 class="section-title">Sistem Çalışma Takvimi</h2>
-          <div class="section-tag">Saatler · Orchestrator adımları · Lockfile</div>
+          <div class="section-tag">Her zaman açık bot · Otomatik raporlar</div>
         </div>
       </div>
 
       <div class="callout info">
         <span class="callout-icon">🕐</span>
-        <span>Sistem yalnızca <strong>hafta içi (Pazartesi–Cuma) 08:00–18:00</strong> saatleri arasında aktiftir. Hafta sonu brief açılabilir ama sistem ancak Pazartesi sabahı işler.</span>
+        <span>Slack botu <strong>her zaman açıktır</strong> (Socket Mode). Brief açma, durum güncelleme, finansal ve silme işlemleri <strong>anında</strong> işlenir — periyodik tarama yoktur. Yalnızca özet raporlar zamanlanmış saatlerde gönderilir.</span>
       </div>
 
-      <h3>Orchestrator Çalışma Zamanları</h3>
+      <h3>Zamanlanmış Raporlar (Europe/Istanbul)</h3>
       <div class="schedule-grid">
         <div class="schedule-row">
-          <div class="schedule-time">Her :15 ve :45</div>
-          <div class="schedule-task"><strong>Orchestrator tam döngü</strong> — brief tarama, canvas güncelleme, bildirim, dashboard push</div>
+          <div class="schedule-time">Hafta içi 07:50</div>
+          <div class="schedule-task"><strong>Sabah raporu</strong> — aktif brief, dün tamamlananlar, günün öncelikleri</div>
         </div>
         <div class="schedule-row">
-          <div class="schedule-time">Her dakika</div>
-          <div class="schedule-task">launchd kontrol: mesai saati mi? Evet ise :15/:45 çalıştır</div>
+          <div class="schedule-time">Hafta içi 17:05</div>
+          <div class="schedule-task"><strong>Günlük özet</strong> — günün durumu</div>
         </div>
-      </div>
-
-      <h3>Orchestrator Adımları (Her :15/:45)</h3>
-      <div class="flow">
-        <div class="flow-step">
-          <div class="flow-dot">1</div>
-          <div class="flow-content">
-            <div class="flow-label">Data Agent</div>
-            <div class="flow-sub">Canvas okuma (30dk cache), brief-queue.json, parse, E3, canvas güncelleme, live-data.json üret</div>
-          </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Cuma 17:10</div>
+          <div class="schedule-task"><strong>Haftalık retro</strong> — haftanın özeti + yıldızlar</div>
         </div>
-        <div class="flow-step">
-          <div class="flow-dot">2</div>
-          <div class="flow-content">
-            <div class="flow-label">Notification Agent</div>
-            <div class="flow-sub">DM'ler, thread uyarıları, Google Calendar, idempotent kontrol</div>
-          </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Ayın 25–31'i 17:15</div>
+          <div class="schedule-task"><strong>Aylık strateji</strong> — aylık özet</div>
         </div>
-        <div class="flow-step">
-          <div class="flow-dot">3</div>
-          <div class="flow-content">
-            <div class="flow-label">Dashboard Agent</div>
-            <div class="flow-sub">live-data.json → EMBEDDED_DATA → GitHub push</div>
-          </div>
-        </div>
-        <div class="flow-step">
-          <div class="flow-dot" style="background:var(--prio-green)">4</div>
-          <div class="flow-content">
-            <div class="flow-label">State güncelle</div>
-            <div class="flow-sub">agent-state.json · GitHub PAT süresi kontrol (80+ gün → DM uyarı)</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="callout tip">
-        <span class="callout-icon">🔒</span>
-        <span><strong>Lockfile sistemi:</strong> Bir orchestrator çalışması devam ederken yenisi başlamaz (<code>/tmp/benseno-orchestrator.lock</code>). Takılı run varsa lock dosyası silinerek yenisi başlatılır.</span>
       </div>
     </section>
 
@@ -1666,8 +1586,8 @@ Onboarding başlat: [USER_ID] [İsim] [başlangıç_tarihi]
 
       <hr>
 
-      <h4><code>@auto</code> ile atama yaptım ama kimse belirlenmedi.</h4>
-      <p><code>@auto</code> Smart Assign 2.0 ile sonraki sync'te işlenir. Şu an müsait tasarımcı yoksa ya da brief 🔴 Acil ise sistem sizi uyaracaktır (Şablon 18). <strong>Acil brief'lerde daima manuel atama yapın.</strong></p>
+      <h4>Brief'i yanlışlıkla sildim, geri alabilir miyim?</h4>
+      <p>Evet. Silinen briefler kalıcı olarak silinmez — Dashboard → <strong>Silinenler</strong> ekranına taşınır. Bir yönetici "↩ Geri al" ile brief'i aktif listeye geri getirebilir. Yalnızca "🗑️ Kalıcı sil" işlemi geri alınamaz.</p>
 
       <hr>
 
@@ -1718,17 +1638,16 @@ Onboarding başlat: [USER_ID] [İsim] [başlangıç_tarihi]
 │   └── notifications-sent.json     <span class="comment"># İdempotent DM log</span>
 ├── scripts/
 │   ├── build-dashboard.sh          <span class="comment"># Bundle yeniden derle</span>
-│   ├── run-orchestrator.sh         <span class="comment"># launchd wrapper</span>
+│   ├── scheduler.js                <span class="comment"># node-cron rapor zamanlayıcı</span>
 │   ├── run-sabah-raporu.sh
-│   ├── run-haftalik.sh
-│   ├── run-aylik.sh
+│   ├── run-haftalik-retro.sh
+│   ├── run-aylik-strateji.sh
 │   ├── run-gunluk-ozet.sh
-│   ├── run-slack-bot.sh
-│   └── slack-bot.js                <span class="comment"># Socket Mode bot</span>
+│   └── slack-bot.js                <span class="comment"># Socket Mode bot (her zaman açık)</span>
+├── server/                         <span class="comment"># Railway API (Express + Postgres)</span>
+│   ├── api.js · queries.js · writes.js · auth.js
 └── logs/
-    ├── orchestrator.log
-    ├── slack-bot.log
-    └── sabah-raporu.log
+    └── slack-bot.log
       </div>
 
       <h3>12.2 Manuel Komutlar</h3>
@@ -1736,37 +1655,33 @@ Onboarding başlat: [USER_ID] [İsim] [başlangıç_tarihi]
 <span class="cm"># Dashboard bundle yeniden derle (JSX değişikliği sonrası)</span>
 bash scripts/build-dashboard.sh
 
-<span class="cm"># Manuel orchestrator çalıştır (test için)</span>
-claude -p <span class="str">"Skill: benseno-orchestrator — run"</span> --dangerously-skip-permissions
+<span class="cm"># Bot deploy: scripts/slack-bot.js'i git'e push → Railway otomatik redeploy eder</span>
+git add scripts/slack-bot.js && git commit -m "..." && git push
 
-<span class="cm"># Sadece data agent'ı çalıştır</span>
-claude -p <span class="str">"Skill: benseno-data-agent — run"</span> --dangerously-skip-permissions
+<span class="cm"># API deploy: server/ Railway'e railway up ile elle deploy edilir</span>
+<span class="cm"># (GitHub auto-deploy YOK — .deploy-stamp ile benzersizleştir)</span>
+railway up --service benseno-api --detach
 
-<span class="cm"># Sabah raporunu manuel tetikle</span>
-claude -p <span class="str">"Skill: benseno-gunluk-performans — run now"</span> --dangerously-skip-permissions
+<span class="cm"># Sabah raporunu manuel tetikle (canlı)</span>
+BNS_REPORT_LIVE=1 node scripts/rapor-sabah.js
 
-<span class="cm"># Slack Bot'u yeniden başlat</span>
-pkill -f <span class="str">"slack-bot.js"</span>; bash scripts/run-slack-bot.sh &
-
-<span class="cm"># Aktif launchd job'ları listele</span>
-launchctl list | grep benseno
-
-<span class="cm"># Canlı log izle</span>
-tail -f logs/orchestrator.log
-tail -f logs/slack-bot.log
+<span class="cm"># Railway logları</span>
+railway logs --service benseno-api
+railway logs --service benseno-tasarim-sistemi
       </div>
 
-      <h3>12.3 launchd Job'ları</h3>
+      <h3>12.3 Zamanlanmış Job'lar (node-cron)</h3>
+      <p>Sistem Railway'de tek bir container içinde çalışır. Slack botu her zaman açıktır; raporlar <code>scripts/scheduler.js</code> içindeki node-cron ile tetiklenir (TZ: Europe/Istanbul). launchd artık kullanılmaz.</p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Job</th><th>Tetiklenme</th><th>Komut</th></tr></thead>
+          <thead><tr><th>Cron</th><th>Tetiklenme</th><th>Komut</th></tr></thead>
           <tbody>
-            <tr><td><code>com.benseno.orchestrator</code></td><td>Her dakika, :15/:45 check</td><td>run-orchestrator.sh</td></tr>
-            <tr><td><code>com.benseno.sabah-raporu</code></td><td>Hft içi 07:50</td><td>run-sabah-raporu.sh</td></tr>
-            <tr><td><code>com.benseno.haftalik</code></td><td>Cuma 17:00</td><td>run-haftalik.sh</td></tr>
-            <tr><td><code>com.benseno.aylik</code></td><td>Her gün 17:05 (script tarih kontrol)</td><td>run-aylik.sh</td></tr>
-            <tr><td><code>com.benseno.gunluk-ozet</code></td><td>Hft içi 17:00</td><td>run-gunluk-ozet.sh</td></tr>
-            <tr><td><code>com.benseno.slack-bot</code></td><td>Boot'ta başlar, crash'te yeniden</td><td>run-slack-bot.sh</td></tr>
+            <tr><td><code>50 7 * * 1-5</code></td><td>Hafta içi 07:50</td><td>run-sabah-raporu.sh</td></tr>
+            <tr><td><code>5 17 * * 1-5</code></td><td>Hafta içi 17:05</td><td>run-gunluk-ozet.sh</td></tr>
+            <tr><td><code>10 17 * * 5</code></td><td>Cuma 17:10</td><td>run-haftalik-retro.sh</td></tr>
+            <tr><td><code>15 17 25-31 * *</code></td><td>Ayın 25–31'i 17:15</td><td>run-aylik-strateji.sh</td></tr>
+            <tr><td><code>30 3 * * *</code></td><td>Her gün 03:30</td><td>run-log-temizle.sh</td></tr>
+            <tr><td><code>0 9 * * 1</code></td><td>Pazartesi 09:00</td><td>check-pat-expiry.sh</td></tr>
           </tbody>
         </table>
       </div>
@@ -1807,24 +1722,17 @@ Skor = (geciken × 4) + (blokeli × 3) + (stale × 2)
       </div>
       <p>Yenileme: GitHub Settings → Tokens → yeni PAT → <code>data/.github-pat-sistem</code> dosyasına yaz → <code>data/.github-pat-created</code> güncelle.</p>
 
-      <h3>12.7 Canvas Güncelleme Kuralları (Kritik)</h3>
-      <div class="callout danger">
-        <span class="callout-icon">🚨</span>
+      <h3>12.7 Veri Kaynağı</h3>
+      <div class="callout info">
+        <span class="callout-icon">🗄️</span>
         <div>
-          <strong>Canvas güncellemeleri yanlış yapılırsa veri bozulur!</strong>
-          <ol style="margin-top: 8px; padding-left: 16px;">
-            <li><code>slack_update_canvas</code>'ta <strong>section_id parametresi KULLANMA</strong> — API bug'ı, blockquote/footer çoğalır</li>
-            <li>Canvas'a <strong>H1 başlık YAZMA</strong> — title ayrıca set edilir</li>
-            <li>Canvas güncelleme her zaman <strong>full replace</strong> — kısmi güncelleme yoktur</li>
-            <li><strong>Değişiklik yoksa canvas güncelleme ÇAĞIRMA</strong> (idempotent kontrol)</li>
-            <li>Aktif İşler <strong>13 sütun</strong>, Tamamlananlar <strong>14 sütun</strong> — karıştırma</li>
-          </ol>
+          Tüm veri (brief, durum, atama, finansal, silme) <strong>Railway Postgres veritabanında</strong> tutulur — tek doğru kaynak. Eski Slack Canvas ve <code>live-data.json</code> akışı kullanımdan kaldırılmıştır. Dashboard, API'nin <code>/api/embedded</code> ucundan canlı okur.
         </div>
       </div>
 
       <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); text-align: center;">
-        <div style="font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--ink-3); margin-bottom: 4px;">Benseno Tasarım Sistemi</div>
-        <div style="font-size: 11px; color: var(--ink-5); letter-spacing: 0.06em; text-transform: uppercase;">v7.13 · Mayıs 2026 · Kılavuz sonu</div>
+        <div style="font-family: var(--font-display); font-style: italic; font-size: 18px; color: var(--ink-3); margin-bottom: 4px;">Benseno İş Takip Sistemi</div>
+        <div style="font-size: 11px; color: var(--ink-5); letter-spacing: 0.06em; text-transform: uppercase;">Haziran 2026 · Kılavuz sonu</div>
       </div>
     </section>
 
