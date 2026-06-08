@@ -943,6 +943,46 @@ app.event('message', async ({ event, client }) => {
       dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: eMatch.durum, by: event.user, source: 'slack' });
       return;
     }
+
+    // ── Thread'e yazılan durum/öncelik anahtar kelimeleri ─────────────────────
+    // Örnek: "devam et", "tamamlandı", "acil öncelik" — emoji bulmaya gerek yok.
+    const norm = trimmed.toLowerCase().replace(/[!.,\s]+$/, ''); // sondaki noktalama temizle
+    const KEYWORD_MAP = [
+      // Durum
+      { key: 'devam et',       type: 'durum',    value: 'calisiliyor' },
+      { key: 'devam ediyor',   type: 'durum',    value: 'calisiliyor' },
+      { key: 'incelemede',     type: 'durum',    value: 'incelemede'  },
+      { key: 'beklemede',      type: 'durum',    value: 'beklemede'   },
+      { key: 'bekle',          type: 'durum',    value: 'beklemede'   },
+      { key: 'revizyon var',   type: 'durum',    value: 'revizyon'    },
+      { key: 'revize et',      type: 'durum',    value: 'revizyon'    },
+      { key: 'tamamlandı',     type: 'durum',    value: 'tamamlandi'  },
+      { key: 'tamamlandi',     type: 'durum',    value: 'tamamlandi'  }, // ASCII varyant
+      { key: 'yeniden aç',     type: 'durum',    value: 'calisiliyor' },
+      { key: 'geri aç',        type: 'durum',    value: 'calisiliyor' },
+      { key: 'bloke et',       type: 'durum',    value: 'blokeli'     },
+      // Öncelik
+      { key: 'acil öncelik',   type: 'priority', value: '🔴' },
+      { key: 'acil oncelik',   type: 'priority', value: '🔴' }, // ASCII varyant
+      { key: 'yüksek öncelik', type: 'priority', value: '🟠' },
+      { key: 'yuksek oncelik', type: 'priority', value: '🟠' },
+      { key: 'normal öncelik', type: 'priority', value: '🟡' },
+      { key: 'normal oncelik', type: 'priority', value: '🟡' },
+      { key: 'düşük öncelik',  type: 'priority', value: '🟢' },
+      { key: 'dusuk oncelik',  type: 'priority', value: '🟢' },
+    ];
+    const kMatch = KEYWORD_MAP.find(({ key }) => norm === key);
+    if (kMatch) {
+      const briefTs = event.thread_ts;
+      if (kMatch.type === 'durum') {
+        log(`durum keyword: "${kMatch.key}" → ${kMatch.value} | ${briefTs} — ${event.user}`);
+        dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: kMatch.value, by: event.user, source: 'slack' });
+      } else {
+        log(`öncelik keyword: "${kMatch.key}" → ${kMatch.value} | ${briefTs} — ${event.user}`);
+        dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { priority: kMatch.value, by: event.user, source: 'slack' });
+      }
+      return;
+    }
   }
 
   // ── Thread'e yazılan maliyet/satış girişi (brief no otomatik çözülür) ──
