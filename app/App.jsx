@@ -44,7 +44,7 @@ async function bnsPersistBriefChange(prev, next, byId) {
   const post = async (suffix, body) => {
     const r = await fetch(base + path + suffix, {
       method: suffix ? "POST" : "PATCH",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", "x-bns-token": window.BNS_WRITE_TOKEN || "" },
       body: JSON.stringify({ ...body, by: byId || undefined, source: "dashboard" }),
     });
     const j = await r.json().catch(() => ({}));

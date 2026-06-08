@@ -42,7 +42,7 @@ function brandFromChannelName(name) {
 async function dbWrite(method, urlPath, body) {
   try {
     const r = await fetch(`${API_BASE}${urlPath}`, {
-      method, headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
+      method, headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' }, body: JSON.stringify(body),
     });
     if (!r.ok) { const j = await r.json().catch(() => ({})); log(`DB ${method} ${urlPath} → ${r.status} ${j.error || ''}`); return false; }
     log(`DB ${method} ${urlPath} ✓`);
@@ -852,32 +852,15 @@ function tsFromLink(link) {
   return m ? m[1].slice(0, 10) + '.' + m[1].slice(10) : null;
 }
 
-// Thread parent ts'ine göre brief no'sunu bul (aktif + tamamlanan). Yoksa null.
-function resolveBriefByTs(parentTs) {
-  try {
-    const d = JSON.parse(fs.readFileSync(path.join(PROJECT_DIR, 'dashboard/app/live-data.json'), 'utf8'));
-    for (const list of [d.bns_briefs || [], d.bns_completed || []]) {
-      for (const b of list) {
-        if (tsFromLink(b.link) === parentTs) return { no: b.no, baslik: b.baslik || b.is || '' };
-      }
-    }
-  } catch (e) { log(`resolveBriefByTs hata: ${e.message}`); }
-  return null;
-}
-
-const FIN_STORE = path.join(PROJECT_DIR, 'data/brief-financials.json');
-
-// Brief thread'ine yazılan finansal mesajı işler — brief no thread parent ts'inden otomatik çözülür.
-// Anahtar kelimeler (yalnızca geçenler güncellenir, gerisi korunur — patch birleştirme set-financials'ta):
+// Brief thread'ine yazılan finansal mesajı işler — brief ts'i doğrudan API /by-ts endpoint'i ile çözülür.
+// live-data.json bağımlılığı kaldırıldı (WT brief'leri orada yok; DB'yi doğrudan kullan).
+// Anahtar kelimeler (yalnızca geçenler güncellenir, gerisi korunur):
 //   maliyet 1500 · satış 4000 · "fatura ok"→kesildi · "fatura iptal"→geri · "ödeme ok"→yapıldı · "ödeme iptal"→geri
 async function handleFinancialsThread(event, client) {
   const parentTs = event.thread_ts;
   const text = event.text || '';
   const by = event.user || '';
   const reply = (t) => client.chat.postMessage({ channel: event.channel, thread_ts: parentTs, text: t, username: BOT_NAME }).catch(() => {});
-
-  const found = resolveBriefByTs(parentTs);
-  if (!found) { await reply('ℹ️ Bu thread bir brief mesajına bağlı değil (ya da brief henüz sisteme düşmedi). Bilgiyi *brief mesajının* altında thread olarak yaz.'); return; }
 
   // Sadece geçen alanları patch'e koy
   const patch = {};
@@ -889,30 +872,32 @@ async function handleFinancialsThread(event, client) {
   else if (/[öo]deme\s*(iptal|yok|geri|sil|hay[ıi]r|❌)/i.test(text)) patch.odeme = false;
 
   if (Object.keys(patch).length === 0) {
-    await reply(`ℹ️ Format (#${found.no}): \`maliyet 1500 satış 4000\` · \`fatura ok\` · \`ödeme ok\` · geri almak için \`fatura iptal\` / \`ödeme iptal\`.`);
+    await reply('ℹ️ Format: `maliyet 1500 satış 4000` · `fatura ok` · `ödeme ok` · geri almak için `fatura iptal` / `ödeme iptal`.');
     return;
   }
 
-  try {
-    await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, 'set', String(found.no), by, JSON.stringify(patch)],
-      { cwd: PROJECT_DIR, timeout: 120000 });
-    log(`thread financials → #${found.no} patch=${JSON.stringify(patch)} (by ${by})`);
-    // DB'ye de (b3, best-effort): thread parent ts = brief slack_ts.
-    const dbFin = { by, source: 'slack' };
-    if (patch.maliyet !== undefined) dbFin.maliyet = parseTRMoney(patch.maliyet);
-    if (patch.satis !== undefined) dbFin.satis = parseTRMoney(patch.satis);
-    if (patch.fatura !== undefined) dbFin.fatura = patch.fatura;
-    if (patch.odeme !== undefined) dbFin.odeme = patch.odeme;
-    dbWrite('POST', `/api/briefs/by-ts/${parentTs}/financials`, dbFin);
-    // Kaydedilen güncel tam durumu store'dan oku ve bildir
-    let st = {}; try { st = (JSON.parse(fs.readFileSync(FIN_STORE, 'utf8'))[String(found.no)]) || {}; } catch {}
-    const m = (v) => (v == null) ? '—' : Number(v).toLocaleString('tr-TR') + '₺';
-    const flag = (v) => v ? '✅' : '—';
-    await reply(`✅ *${found.baslik}* (#${found.no}) güncellendi:\n• Maliyet: ${m(st.maliyet)}  • Satış: ${m(st.satis)}\n• Fatura: ${flag(st.fatura)}  • Ödeme: ${flag(st.odeme)}\n_Güncellemek için bu thread'e tekrar yaz. Birkaç dk içinde dashboard'a yansır._`);
-  } catch (err) {
-    log(`thread financials hata: ${err.message}`);
-    await reply(`❌ Kaydedilemedi (#${found.no}): ${err.message}`);
+  const dbFin = { by, source: 'slack' };
+  if (patch.maliyet !== undefined) dbFin.maliyet = parseTRMoney(patch.maliyet);
+  if (patch.satis !== undefined) dbFin.satis = parseTRMoney(patch.satis);
+  if (patch.fatura !== undefined) dbFin.fatura = patch.fatura;
+  if (patch.odeme !== undefined) dbFin.odeme = patch.odeme;
+
+  // DB'ye yaz; false dönerse brief bu ts'e bağlı değil (404) veya hata
+  const ok = await dbWrite('POST', `/api/briefs/by-ts/${parentTs}/financials`, dbFin);
+  if (!ok) {
+    await reply('⚠️ Bu thread bir brief mesajına bağlı değil (ya da brief henüz sisteme düşmedi). Bilgiyi *brief mesajının* altında thread olarak yaz.');
+    return;
   }
+
+  log(`thread financials → ts=${parentTs} patch=${JSON.stringify(patch)} (by ${by})`);
+  const m = (v) => (v == null) ? '—' : Number(v).toLocaleString('tr-TR') + '₺';
+  const flag = (v) => v === true ? '✅' : v === false ? '❌' : '—';
+  const lines = [];
+  if (dbFin.maliyet !== undefined) lines.push(`Maliyet: ${m(dbFin.maliyet)}`);
+  if (dbFin.satis !== undefined) lines.push(`Satış: ${m(dbFin.satis)}`);
+  if (patch.fatura !== undefined) lines.push(`Fatura: ${flag(patch.fatura)}`);
+  if (patch.odeme !== undefined) lines.push(`Ödeme: ${flag(patch.odeme)}`);
+  await reply(`✅ Finansal bilgi güncellendi:\n${lines.map(l => `• ${l}`).join('\n')}\n_Güncellemek için bu thread'e tekrar yaz. Birkaç dk içinde dashboard'a yansır._`);
 }
 
 app.event('message', async ({ event, client }) => {

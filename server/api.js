@@ -16,10 +16,13 @@ const { pool } = require('./db');
 const app = express();
 app.use(express.json({ limit: '25mb' }));   // dosya ekleri base64 ile gelir
 
-// CORS — Faz 2 dashboard origin'i için (dinamik; geçici geniş)
+// CORS — dashboard GitHub Pages origin'ine kısıtlı (wildcard kaldırıldı)
+const ALLOWED_ORIGINS = new Set(['https://bensenoint.github.io']);
 app.use((req, res, next) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  const origin = req.get('Origin');
+  if (origin && ALLOWED_ORIGINS.has(origin)) res.set('Access-Control-Allow-Origin', origin);
+  res.set('Vary', 'Origin');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-bns-token');
   res.set('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
