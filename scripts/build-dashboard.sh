@@ -31,6 +31,9 @@ cat \
   "$APP/screens/Brand.jsx" \
   "$APP/screens/Team.jsx" \
   "$APP/screens/Profile.jsx" \
+  "$APP/screens/Login.jsx" \
+  "$APP/screens/Users.jsx" \
+  "$APP/screens/Help.jsx" \
   "$APP/Chrome.jsx" \
   "$APP/App.jsx" \
   | npx esbuild \

@@ -57,6 +57,15 @@ const NAV_SECTIONS = [
       { id: "brand",   label: "Marka",         icon: "Tag" },
       { id: "team",    label: "Ekip matrisi",  icon: "Grid" },
       { id: "profile", label: "Profil",        icon: "User" },
+      { id: "help",    label: "Yardım",        icon: "HelpCircle" },
+    ]
+  },
+  {
+    id: "yonetim",
+    label: "Yönetim",
+    adminOnly: true,
+    items: [
+      { id: "users", label: "Kullanıcılar", icon: "Shield" },
     ]
   }
 ];
@@ -80,9 +89,11 @@ const NAV_ICONS = {
   Tag:         () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>,
   Grid:        () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
   User:        () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+  HelpCircle:  () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+  Shield:      () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
 };
 
-function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers }) {
+function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers, currentUser, onLogout }) {
   const isMobile = useIsMobile();
   const [tick, setTick] = React.useState(0);
   React.useEffect(() => {
@@ -257,6 +268,29 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
                     </div>
                   );
                 })}
+                {onLogout && (
+                  <>
+                    <div style={{height: 1, background: "var(--line)", margin: "4px 4px"}}/>
+                    {currentUser && (
+                      <div style={{padding: "5px 10px 3px", font: "600 10px/1 var(--font-sans)", letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--ink-4)"}}>
+                        {currentUser.name}
+                      </div>
+                    )}
+                    <button onClick={() => { setUserMenu(false); onLogout(); }}
+                      style={{
+                        display: "flex", width: "100%", textAlign: "left", alignItems: "center", gap: 8,
+                        padding: "7px 8px", border: 0, background: "transparent", cursor: "pointer",
+                        borderRadius: 6, color: "var(--ember)", font: "500 12px/1 var(--font-sans)",
+                        transition: "background 100ms",
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = "var(--paper-2)"}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                    >
+                      <I.LogOut size={12}/>
+                      Çıkış Yap
+                    </button>
+                  </>
+                )}
               </div>
             );
           })()}
@@ -434,7 +468,7 @@ function SidebarSearch({ onOpenPalette, collapsed }) {
   );
 }
 
-function Sidebar({ active, onChange, collapsed, onToggle, data, onOpenPalette }) {
+function Sidebar({ active, onChange, collapsed, onToggle, data, onOpenPalette, currentUser }) {
   const isMobile = useIsMobile();
   const alertCount = (data && data.briefs) ? data.briefs.filter(b => b.prio && (b.prio.code === "red" || b.prio.code === "over")).length : 0;
 
@@ -465,7 +499,7 @@ function Sidebar({ active, onChange, collapsed, onToggle, data, onOpenPalette })
 
       {/* Nav sections */}
       <nav style={{flex: 1, overflowY: "auto", overflowX: "hidden", padding: "8px 0 8px"}}>
-        {NAV_SECTIONS.map((section, si) => (
+        {NAV_SECTIONS.filter(s => !s.adminOnly || currentUser?.role === 'admin').map((section, si) => (
           <div key={section.id} style={{marginBottom: si < NAV_SECTIONS.length - 1 ? 4 : 0}}>
             {!collapsed && si > 0 && (
               <div style={{height:1, background:"var(--line-soft)", margin:"4px 14px 6px"}}/>

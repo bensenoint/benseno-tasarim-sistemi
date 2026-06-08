@@ -31,52 +31,11 @@
 </style>
 </head>
 <body>
-<!-- ============================================================
-     GİRİŞ GATE (client-side soft gate) — şifre hash'i gömülü, düz şifre yok.
-     NOT: Bu yalnızca UI'ı gizler; app/live-data.json public erişilebilir.
-     ============================================================ -->
-<script>
-(function(){
-  var HASH="90e47349701cb763bd59faafe906ad91a0b5d37565b79c13ee057ef66691c28f";
-  if(sessionStorage.getItem('bns_auth')==='1') return;
-  var s=document.createElement('style');
-  s.textContent='#root,#bns-loading{display:none!important}';
-  document.head.appendChild(s);
-  function el(tag,css,text){ var e=document.createElement(tag); if(css)e.style.cssText=css; if(text!=null)e.textContent=text; return e; }
-  function mount(){
-    var o=el('div','position:fixed;inset:0;z-index:99999;background:#FBFAF7;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif');
-    var f=el('form','width:300px;max-width:86vw;text-align:center');
-    var logo=el('img','height:52px;width:auto;object-fit:contain'); logo.src='app/logo.png'; logo.alt='Benseno'; f.appendChild(logo);
-    f.appendChild(el('div','font:400 13px/1.5 sans-serif;color:#6b6b70;margin:14px 0 24px','Tasarım Panosu · giriş'));
-    var i=el('input','width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e3e0d8;border-radius:10px;font-size:16px;background:#fff;outline:none');
-    i.type='password'; i.placeholder='Şifre'; i.autocomplete='current-password';
-    f.appendChild(i);
-    var err=el('div','height:18px;font:500 12px/18px sans-serif;color:#C24A2C;margin:8px 0');
-    f.appendChild(err);
-    var b=el('button','width:100%;padding:12px;border:0;border-radius:10px;background:#C24A2C;color:#fff;font:600 15px/1 sans-serif;cursor:pointer','Giriş');
-    b.type='submit'; f.appendChild(b);
-    o.appendChild(f); document.body.appendChild(o); i.focus();
-    f.addEventListener('submit',function(e){
-      e.preventDefault();
-      if(!crypto || !crypto.subtle){ err.textContent='Tarayıcı desteklemiyor (HTTPS gerekli)'; return; }
-      crypto.subtle.digest('SHA-256',new TextEncoder().encode(i.value)).then(function(buf){
-        var hex=Array.from(new Uint8Array(buf)).map(function(x){return x.toString(16).padStart(2,'0')}).join('');
-        if(hex===HASH){ sessionStorage.setItem('bns_auth','1'); location.reload(); }
-        else { err.textContent='Şifre hatalı'; i.value=''; i.focus(); }
-      }).catch(function(){ err.textContent='Bir hata oluştu, tekrar dene'; });
-    });
-  }
-  if(document.body) mount(); else document.addEventListener('DOMContentLoaded',mount);
-})();
-</script>
 <div id="bns-loading">
   <div class="spinner"></div>
   <span>Benseno Dashboard yükleniyor…</span>
 </div>
 <div id="root"></div>
-
-<!-- runtime config — BNS_WRITE_TOKEN writeGuard için gerekli -->
-<script>window.BNS_WRITE_TOKEN = "f5a7f8f05c659d9b63dfcc85ab664048a23dfa78312d58decd6989602f235a4a";</script>
 
 <!-- ============================================================
      EMBEDDED_DATA — Brief Sync her run'da burayı günceller
@@ -1441,15 +1400,15 @@ window.EMBEDDED_DATA = {
 </script>
 
 <!-- data.js: EMBEDDED_DATA → window.BNS_DATA bridge (plain script, no Babel) -->
-<script src="app/data.js?v=1780573630"></script>
+<script src="app/data.js?v=1780907770"></script>
 
 <!-- Pre-built bundle (esbuild — no Babel runtime) -->
-<script src="app/bundle.js?v=1780573630"></script>
+<script src="app/bundle.js?v=1780907770"></script>
 
 <!-- Bootstrap: mount React app -->
 <script>
   const root = ReactDOM.createRoot(document.getElementById("root"));
-  root.render(React.createElement(App));
+  root.render(React.createElement(AppRoot));
 </script>
 
 <!-- Loading screen hide — plain script, polls until React has mounted (#root has children) -->

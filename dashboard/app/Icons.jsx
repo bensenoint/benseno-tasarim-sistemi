@@ -65,7 +65,8 @@ const I = {
   Move:    (p) => <Ic {...p}><path d="M9 18l-3 3-3-3M3 21V3M3 6l3-3 3 3M21 6l-3-3-3 3M18 3v18M15 18l3 3 3-3M6 9 3 12l3 3M18 15l3-3-3-3M3 12h18"/></Ic>,
   TrendUp: (p) => <Ic {...p}><path d="m3 17 6-6 4 4 8-8M14 7h7v7"/></Ic>,
   TrendDn: (p) => <Ic {...p}><path d="m3 7 6 6 4-4 8 8M14 17h7v-7"/></Ic>,
-  Cap:     (p) => <Ic {...p}><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></Ic>
+  Cap:     (p) => <Ic {...p}><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></Ic>,
+  LogOut:  (p) => <Ic {...p}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></Ic>,
 };
 
 window.I = I;

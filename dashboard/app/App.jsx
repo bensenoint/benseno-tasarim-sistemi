@@ -70,7 +70,29 @@ async function bnsPersistBriefChange(prev, next, byId) {
   return { ok: true };
 }
 
-function App() {
+// ── Auth helpers ──────────────────────────────────────────────────────────
+function bnsGetStoredUser() {
+  try {
+    const token = localStorage.getItem('bns_token');
+    const user  = JSON.parse(localStorage.getItem('bns_user') || 'null');
+    if (!token || !user) return null;
+    const payload = token.split('.')[1];
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+      localStorage.removeItem('bns_token');
+      localStorage.removeItem('bns_user');
+      return null;
+    }
+    return user;
+  } catch { return null; }
+}
+function bnsLogout() {
+  localStorage.removeItem('bns_token');
+  localStorage.removeItem('bns_user');
+  location.reload();
+}
+
+function App({ currentUser, onLogout }) {
   const data = window.BNS_DATA;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
 
@@ -389,6 +411,10 @@ function App() {
   else if (tab === "brand")    Screen = <BrandScreen    data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "team")     Screen = <TeamScreen     data={liveData}/>;
   else if (tab === "history")  Screen = <HistoryScreen  data={liveData}/>;
+  else if (tab === "help")    Screen = <HelpScreen />;
+  else if (tab === "users")   Screen = currentUser?.role === 'admin'
+    ? <UsersScreen currentUser={currentUser}/>
+    : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;
   else Screen = <div>Not found</div>;
 
   return (
@@ -400,6 +426,8 @@ function App() {
         onOpenPalette={() => setPalette(true)}
         onNewBrief={() => setNewBrief(true)}
         defaultUsers={Object.assign([...data.USERS], { onPick: (u) => setUser(u) })}
+        currentUser={currentUser}
+        onLogout={onLogout}
       />
       <div style={{display:"grid", gridTemplateColumns: isMobile ? "1fr" : `${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
         {!isMobile && (
@@ -409,6 +437,7 @@ function App() {
             onToggle={() => setSidebarCollapsed(v => !v)}
             data={liveData}
             onOpenPalette={() => setPalette(true)}
+            currentUser={currentUser}
           />
         )}
         <main key={tab + t.overviewLayout} style={{
@@ -609,4 +638,11 @@ function darken(hex, amt) {
   return "#" + [f(r), f(g), f(b)].map(x => x.toString(16).padStart(2, "0")).join("");
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+// ── AppRoot — auth gate ───────────────────────────────────────────────────
+function AppRoot() {
+  const [authUser, setAuthUser] = React.useState(() => bnsGetStoredUser());
+  if (!authUser) return <LoginScreen onLogin={setAuthUser} />;
+  return <App currentUser={authUser} onLogout={bnsLogout} />;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<AppRoot />);
