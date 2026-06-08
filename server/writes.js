@@ -401,6 +401,18 @@ async function deleteBrief(id, by) {
   return { id, no: r.rows[0].no };
 }
 
+// Kalıcı silme — sadece zaten soft-deleted olan briefler için
+async function permanentDeleteBrief(id, by) {
+  const check = await pool.query(
+    'SELECT id, no FROM briefs WHERE id=$1 AND deleted_at IS NOT NULL', [id]
+  );
+  if (!check.rows[0]) throw new Error('brief bulunamadı veya önce silinenler listesine alınmamış: ' + id);
+  await pool.query('DELETE FROM brief_assignees WHERE brief_id=$1', [id]);
+  await pool.query('DELETE FROM events WHERE brief_id=$1', [id]);
+  await pool.query('DELETE FROM briefs WHERE id=$1', [id]);
+  return { id, no: check.rows[0].no };
+}
+
 // Soft delete geri al
 async function restoreBrief(id, by) {
   const r = await pool.query(
@@ -416,4 +428,4 @@ async function restoreBrief(id, by) {
   return { id, no: r.rows[0].no };
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, deleteBrief, restoreBrief, noToId, tsToId, DURUMLAR };
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };

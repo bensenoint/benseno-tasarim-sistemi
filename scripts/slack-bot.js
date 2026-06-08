@@ -985,7 +985,16 @@ async function handleFinancialsThread(event, client) {
 }
 
 app.event('message', async ({ event, client }) => {
-  // Düzenleme/silme event'lerini yoksay
+  // Slack thread silinince ilgili brief'i soft-delete yap
+  if (event.subtype === 'message_deleted') {
+    const deletedTs = event.deleted_ts;
+    if (deletedTs) {
+      log(`message_deleted: ${deletedTs}`);
+      dbWrite('DELETE', `/api/briefs/by-ts/${deletedTs}`, { by: 'slack:deleted' }).catch(() => {});
+    }
+    return;
+  }
+  // Diğer düzenleme event'lerini yoksay
   if (event.subtype && event.subtype !== 'bot_message') return;
   // Text yoksa yoksay
   if (!event.text) return;

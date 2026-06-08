@@ -22,6 +22,26 @@ function SilinenlerScreen({ data, currentUser }) {
     } catch (e) { alert('Hata: ' + e.message); }
   }
 
+  async function handlePermanentDelete(id, baslik, no) {
+    const label = baslik || ('#' + no);
+    if (!window.confirm(`"${label}" briefi kalıcı olarak silmek istediğine emin misin?\n\nBu işlem geri alınamaz.`)) return;
+    try {
+      const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
+      const tok = localStorage.getItem('bns_token');
+      const res = await fetch(`${apiBase}/api/briefs/${id}/permanent`, {
+        method: 'DELETE',
+        headers: { 'content-type': 'application/json', 'x-bns-token': tok || '', Authorization: tok ? `Bearer ${tok}` : '' },
+        body: JSON.stringify({ by: currentUser?.slack_id }),
+      });
+      if (res.ok) {
+        window.location.reload();
+      } else {
+        const j = await res.json().catch(() => ({}));
+        alert('Kalıcı silme başarısız: ' + (j.error || res.status));
+      }
+    } catch (e) { alert('Hata: ' + e.message); }
+  }
+
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -84,21 +104,34 @@ function SilinenlerScreen({ data, currentUser }) {
                   flexShrink: 0,
                 }}>{b.durum || '—'}</span>
 
-                {/* Restore butonu — sadece admin */}
+                {/* Aksiyon butonları — sadece admin */}
                 {canRestore && (
-                  <button
-                    onClick={() => handleRestore(b.id)}
-                    style={{
-                      padding: '6px 12px', borderRadius: 6, border: '1px solid var(--line-strong)',
-                      background: 'var(--surface)', color: 'var(--ink-2)',
-                      font: '500 12px/1 var(--font-sans)', cursor: 'pointer',
-                      flexShrink: 0, transition: 'background 120ms',
-                    }}
-                    onMouseEnter={e => e.target.style.background = 'var(--paper-2)'}
-                    onMouseLeave={e => e.target.style.background = 'var(--surface)'}
-                  >
-                    ↩ Geri al
-                  </button>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    <button
+                      onClick={() => handleRestore(b.id)}
+                      style={{
+                        padding: '6px 12px', borderRadius: 6, border: '1px solid var(--line-strong)',
+                        background: 'var(--surface)', color: 'var(--ink-2)',
+                        font: '500 12px/1 var(--font-sans)', cursor: 'pointer',
+                        transition: 'background 120ms',
+                      }}
+                      onMouseEnter={e => e.target.style.background = 'var(--paper-2)'}
+                      onMouseLeave={e => e.target.style.background = 'var(--surface)'}
+                    >
+                      ↩ Geri al
+                    </button>
+                    <button
+                      onClick={() => handlePermanentDelete(b.id, b.baslik, b.no)}
+                      style={{
+                        padding: '6px 12px', borderRadius: 6,
+                        border: '1px solid var(--prio-red, #e54d2e)',
+                        background: 'transparent', color: 'var(--prio-red, #e54d2e)',
+                        font: '500 12px/1 var(--font-sans)', cursor: 'pointer',
+                      }}
+                    >
+                      🗑️ Kalıcı sil
+                    </button>
+                  </div>
                 )}
               </div>
             );
