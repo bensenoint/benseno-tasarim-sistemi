@@ -921,6 +921,32 @@ app.event('message', async ({ event, client }) => {
   // Text yoksa yoksay
   if (!event.text) return;
 
+  // ── Thread'e yazılan durum emojisi (reaction'a alternatif) ──────────────────
+  // Kullanıcı uzun bir thread'de ilk mesaja kaydırmadan durum bildirmek isteyebilir.
+  // Thread yanıtına sadece 👀 / 🎨 / ✍️ / 🤖 / ✅ yazılırsa DB'deki brief durumu güncellenir.
+  // "Her iki tarafta da işleyebilmeli" — reaction veya metin emoji, sonuç aynı.
+  // NOT: thread_ts = thread'in ANA mesajının ts'i (= brief slack_ts). Çözüm gerekmez.
+  if (event.thread_ts && event.thread_ts !== event.ts && !event.bot_id) {
+    const trimmed = (event.text || '').trim();
+    // Her emoji için hem tam Unicode (variation selector dahil) hem çıplak formu yakala.
+    const EMOJI_DURUM = [
+      { emoji: '👀', durum: 'incelemede' },
+      { emoji: '🎨', durum: 'calisiliyor' },
+      { emoji: '✍️', durum: 'calisiliyor' },
+      { emoji: '✍',  durum: 'calisiliyor' },   // VS-16 olmadan yazılabilir
+      { emoji: '🤖', durum: 'calisiliyor' },
+      { emoji: '✅', durum: 'tamamlandi'  },
+    ];
+    const eMatch = EMOJI_DURUM.find(e => trimmed.startsWith(e.emoji));
+    if (eMatch) {
+      const briefTs = event.thread_ts;  // thread reply'da thread_ts = brief ana mesajı ts'i
+      log(`durum metin-emoji: ${eMatch.emoji} → ${eMatch.durum} | ${briefTs} — ${event.user}`);
+      // DB'ye yaz (best-effort). writes.setStatus → reflectChange thread'e onay düşürür.
+      dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: eMatch.durum, by: event.user, source: 'slack' });
+      return;
+    }
+  }
+
   // ── Thread'e yazılan maliyet/satış girişi (brief no otomatik çözülür) ──
   // Reply (parent değil) + insan (bot değil) + maliyet/satış anahtar kelimesi → finansal işle.
   if (event.thread_ts && event.thread_ts !== event.ts && !event.bot_id &&
