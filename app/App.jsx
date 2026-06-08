@@ -412,8 +412,11 @@ function App({ currentUser, onLogout }) {
   else if (tab === "team")     Screen = <TeamScreen     data={liveData}/>;
   else if (tab === "history")  Screen = <HistoryScreen  data={liveData}/>;
   else if (tab === "help")    Screen = <HelpScreen />;
-  else if (tab === "users")   Screen = currentUser?.role === 'admin'
+  else if (tab === "users")      Screen = currentUser?.role === 'admin'
     ? <UsersScreen currentUser={currentUser}/>
+    : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;
+  else if (tab === "silinenler") Screen = currentUser?.role === 'admin'
+    ? <SilinenlerScreen data={liveData} currentUser={currentUser}/>
     : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;
   else Screen = <div>Not found</div>;
 
