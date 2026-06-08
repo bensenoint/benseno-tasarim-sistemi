@@ -66,7 +66,7 @@ function LoginScreen({ onLogin }) {
           <img src={LOGO} alt="benseno" style={{ height: 42, display: 'block', margin: '0 auto' }} />
           <div style={{ width: 32, height: 1, background: 'var(--line-strong, #DDDBD3)', margin: '14px auto 12px' }} />
           <div style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--ink-4, #888894)' }}>
-            TASARIM SİSTEMİ
+            İŞ TAKİP SİSTEMİ
           </div>
         </div>
 
