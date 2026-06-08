@@ -483,6 +483,60 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
   }
 });
 
+// ─── /yardim — Komut rehberi (sadece yazan görür) ──────────────────────────────
+app.command('/yardim', async ({ command, ack, respond }) => {
+  await ack();
+  await respond({
+    response_type: 'ephemeral',
+    blocks: [
+      { type: 'header', text: { type: 'plain_text', text: '📖 Komut Rehberi', emoji: true } },
+
+      // Komutlar
+      { type: 'section', text: { type: 'mrkdwn', text: '*Komutlar*' } },
+      { type: 'section', text: { type: 'mrkdwn', text:
+        '`/yeni-brief` — Marka kanalında yeni brief açar\n' +
+        '`/brief-durum` — Sana atanmış aktif brifleri listeler\n' +
+        '`/kapasite` — Ekip kapasitesini gösterir _(Yönetici)_\n' +
+        '`/maliyet` — Brief maliyet/satış bilgisi girer _(Yönetici)_'
+      }},
+
+      { type: 'divider' },
+
+      // Emoji kısayolları
+      { type: 'section', text: { type: 'mrkdwn', text: '*Emoji kısayolları* — brief thread\'ine tek emoji yaz' } },
+      { type: 'section', fields: [
+        { type: 'mrkdwn', text: '🔄 → Devam Ediyor\n👀 → İncelemede\n⏸️ → Beklemede\n✅ → Tamamlandı\n✏️ → Revizyon\n🔃 → Yeniden Aç' },
+        { type: 'mrkdwn', text: '*Öncelik:*\n🔴 → Acil\n🟠 → Yüksek\n🟡 → Normal\n🟢 → Düşük' },
+      ]},
+
+      { type: 'divider' },
+
+      // Kelime kısayolları
+      { type: 'section', text: { type: 'mrkdwn', text: '*Kelime kısayolları* — brief thread\'ine tam olarak şunu yaz' } },
+      { type: 'section', fields: [
+        { type: 'mrkdwn', text:
+          '`devam et` → Devam Ediyor\n' +
+          '`iş incelemede` → İncelemede\n' +
+          '`beklemede` → Beklemede\n' +
+          '`revizyon var` · `revize et` → Revizyon\n' +
+          '`iş tamamlandı` → Tamamlandı\n' +
+          '`yeniden aç` · `geri aç` → Yeniden Açıldı\n' +
+          '`bloke et` → Blokeli'
+        },
+        { type: 'mrkdwn', text:
+          '*Öncelik:*\n' +
+          '`acil öncelik` → 🔴\n' +
+          '`yüksek öncelik` → 🟠\n' +
+          '`normal öncelik` → 🟡\n' +
+          '`düşük öncelik` → 🟢'
+        },
+      ]},
+
+      { type: 'context', elements: [{ type: 'mrkdwn', text: 'Dashboard: <https://bensenoint.github.io|bensenoint.github.io>' }] },
+    ],
+  });
+});
+
 // ─── /yeni-brief — Slack'ten deterministik brief açma (Faz 3, LLM'siz) ────────
 // Block Kit modal → POST /api/briefs → DB + markanın kanalına post. Slash command'ı
 // Slack app config'inde (api.slack.com/apps → Slash Commands) /yeni-brief olarak kayıtlı olmalı.

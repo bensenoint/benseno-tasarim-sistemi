@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #F0EDE8;
+  font-family: "Geist", -apple-system, sans-serif;
+  min-height: 100vh;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 32px 16px;
+}
+h2 { font-size: 11px; color: #666; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 14px; }
+
+.slack-shell {
+  width: 580px;
+  background: #1A1D21;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.3);
+}
+.slack-header {
+  background: #19191D;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; gap: 8px;
+}
+.slack-header .ch-name { font-size: 13px; font-weight: 700; color: #E8E8E8; }
+.slack-header .ch-type { font-size: 12px; color: #9B9FA6; }
+.slack-body { padding: 16px; }
+
+.cmd-trigger { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+.cmd-trigger .av { width: 32px; height: 32px; border-radius: 6px; background: #24479E; color: #fff; font: 700 12px/32px sans-serif; text-align: center; flex-shrink: 0; }
+.cmd-trigger .meta { font-size: 11px; color: #9B9FA6; margin-bottom: 2px; }
+.cmd-trigger .meta strong { color: #E8E8E8; }
+.cmd-trigger .text { font-size: 14px; color: #DDDFE2; }
+.cmd-trigger .text code { background: rgba(255,255,255,.1); padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 13px; color: #E8E8E8; }
+
+.bot-msg { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; }
+.bot-av { width: 32px; height: 32px; border-radius: 6px; background: #C24A2C; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+.bot-right { flex: 1; min-width: 0; }
+.bot-meta { font-size: 11px; color: #9B9FA6; margin-bottom: 4px; }
+.bot-meta strong { color: #E8E8E8; }
+.bot-meta .app-badge { background: rgba(255,255,255,.1); color: #C8C9CC; font-size: 9px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; margin-left: 5px; }
+
+.block-card {
+  background: #222529;
+  border: 1px solid rgba(255,255,255,.1);
+  border-left: 3px solid #C24A2C;
+  border-radius: 0 6px 6px 0;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #DDDFE2;
+  line-height: 1.55;
+}
+.block-card .title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.block-divider { height: 1px; background: rgba(255,255,255,.08); margin: 12px 0; }
+.section-head { font-size: 10px; font-weight: 800; letter-spacing: .10em; text-transform: uppercase; color: #9B9FA6; margin: 0 0 7px; }
+
+.cmd-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start; }
+.cmd-row code { background: rgba(255,255,255,.10); color: #AAD0FF; padding: 2px 7px; border-radius: 4px; font-size: 12px; font-family: monospace; white-space: nowrap; flex-shrink: 0; }
+.cmd-row .desc { font-size: 12px; color: #B8BBBF; }
+.manager-only { font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; background: rgba(201,154,30,.15); color: #E8C050; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+
+/* Emoji grid — 2 kolona sığdır */
+.emoji-section { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 16px; }
+.emoji-sub { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #5B6370; margin: 9px 0 5px; grid-column: 1 / -1; }
+.emoji-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #B8BBBF; padding: 3px 0; }
+.emoji-row .em { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
+.emoji-row .arrow { color: #3D4147; font-size: 10px; flex-shrink: 0; }
+.emoji-row .status { color: #DDDFE2; font-weight: 500; }
+.emoji-row .note { font-size: 10px; color: #5B6370; margin-left: 2px; }
+
+.footer-note { font-size: 11px; color: #5B5B66; margin-top: 12px; }
+.footer-note a { color: #AAD0FF; text-decoration: none; }
+</style>
+</head>
+<body>
+<div>
+  <h2>/yardim — güncellenmiş v2</h2>
+  <div class="slack-shell">
+    <div class="slack-header">
+      <span class="ch-name">#marka-bauhaus</span>
+      <span class="ch-type">· kanal</span>
+    </div>
+    <div class="slack-body">
+
+      <div class="cmd-trigger">
+        <div class="av">G</div>
+        <div>
+          <div class="meta"><strong>Görkem</strong> &nbsp;09:14</div>
+          <div class="text"><code>/yardim</code></div>
+        </div>
+      </div>
+
+      <div class="bot-msg">
+        <div class="bot-av">🐾</div>
+        <div class="bot-right">
+          <div class="bot-meta">
+            <strong>WT</strong>
+            <span class="app-badge">Uygulama</span>
+            &nbsp;09:14 &nbsp;·&nbsp;
+            <span style="color:#5B5B66;font-size:10px">Yalnızca sen görebilirsin</span>
+          </div>
+          <div class="block-card">
+            <div class="title">📖 Komut Rehberi</div>
+
+            <div class="section-head">Komutlar</div>
+            <div class="cmd-row">
+              <code>/yeni-brief</code>
+              <span class="desc">Marka kanalında yeni brief açar</span>
+            </div>
+            <div class="cmd-row">
+              <code>/brief-durum</code>
+              <span class="desc">Sana atanmış aktif brifleri listeler</span>
+            </div>
+            <div class="cmd-row">
+              <code>/kapasite</code>
+              <span class="desc">Ekip kapasitesini gösterir</span>
+              <span class="manager-only">Yönetici</span>
+            </div>
+            <div class="cmd-row">
+              <code>/maliyet</code>
+              <span class="desc">Brief maliyet/satış bilgisi girer</span>
+              <span class="manager-only">Yönetici</span>
+            </div>
+
+            <div class="block-divider"></div>
+
+            <div class="section-head">Emoji kısayolları — brief thread'ine tek emoji yaz</div>
+
+            <div class="emoji-section">
+
+              <div class="emoji-sub">📋 Durum</div>
+              <div class="emoji-row"><span class="em">🔄</span><span class="arrow">→</span><span class="status">Devam Ediyor</span></div>
+              <div class="emoji-row"><span class="em">👀</span><span class="arrow">→</span><span class="status">İncelemede</span></div>
+              <div class="emoji-row"><span class="em">⏸️</span><span class="arrow">→</span><span class="status">Beklemede</span></div>
+              <div class="emoji-row"><span class="em">✅</span><span class="arrow">→</span><span class="status">Tamamlandı</span></div>
+              <div class="emoji-row"><span class="em">✏️</span><span class="arrow">→</span><span class="status">Revizyon</span></div>
+              <div class="emoji-row"><span class="em">🔃</span><span class="arrow">→</span><span class="status">Yeniden Aç</span></div>
+
+              <div class="emoji-sub">🎯 Öncelik</div>
+              <div class="emoji-row"><span class="em">🔴</span><span class="arrow">→</span><span class="status">Acil</span></div>
+              <div class="emoji-row"><span class="em">🟠</span><span class="arrow">→</span><span class="status">Yüksek</span></div>
+              <div class="emoji-row"><span class="em">🟡</span><span class="arrow">→</span><span class="status">Normal</span></div>
+              <div class="emoji-row"><span class="em">🟢</span><span class="arrow">→</span><span class="status">Düşük</span></div>
+
+            </div>
+
+            <div class="block-divider"></div>
+
+            <div class="section-head">Kelime kısayolları — tam olarak şunu yaz</div>
+
+            <div class="emoji-section">
+
+              <div class="emoji-sub">📋 Durum</div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">devam et</span><span class="note">Devam Ediyor</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">iş incelemede</span><span class="note">İncelemede</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">beklemede</span><span class="note">Beklemede</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">revizyon var</span><span class="note">Revizyon</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">iş tamamlandı</span><span class="note">Tamamlandı</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">yeniden aç</span><span class="note">Yeniden Açıldı</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">bloke et</span><span class="note">Blokeli</span></div>
+
+              <div class="emoji-sub">🎯 Öncelik</div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">acil öncelik</span><span class="note">🔴</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">yüksek öncelik</span><span class="note">🟠</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">normal öncelik</span><span class="note">🟡</span></div>
+              <div class="emoji-row"><span class="arrow">→</span><span class="status">düşük öncelik</span><span class="note">🟢</span></div>
+
+            </div>
+
+            <div class="footer-note">Dashboard: <a>bensenoint.github.io</a></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
