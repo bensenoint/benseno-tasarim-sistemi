@@ -90,7 +90,24 @@ async function logEvent(client, { brief_id, user_id, verb, detail, source, slack
   );
 }
 
+/**
+ * Bilinmeyen Slack kullanıcı ID'lerini placeholder kayıtla oluşturur.
+ * brief_assignees.user_id REFERENCES users(id) NOT NULL — FK ihlalini önler.
+ * name placeholder = Slack ID; gerçek ad kullanıcı senkronizasyonuyla güncellenir.
+ */
+async function ensureUsers(client, ids) {
+  const unique = [...new Set(ids.filter(Boolean))];
+  if (!unique.length) return;
+  const vals = unique.map((_, i) => `($${i * 2 + 1}, $${i * 2 + 2})`).join(', ');
+  await client.query(
+    `INSERT INTO users(id, name) VALUES ${vals} ON CONFLICT (id) DO NOTHING`,
+    unique.flatMap(id => [id, id])
+  );
+}
+
 async function setAssignees(client, briefId, { worker_ids, lead_ids, gozlemci_ids }) {
+  // Bilinmeyen kullanıcılar için FK koruması (placeholder upsert, mevcut kayıtlara dokunmaz)
+  await ensureUsers(client, [...(worker_ids || []), ...(lead_ids || []), ...(gozlemci_ids || [])]);
   // her verilen rol grubunu TAM değiştir (verilmeyene dokunma)
   const apply = async (ids, role) => {
     if (!Array.isArray(ids)) return;
