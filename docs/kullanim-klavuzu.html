@@ -1144,27 +1144,6 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
 [Mesaja git](link)
       </div>
 
-      <h3>Şablonlar 27 & 28 — E3 Marka Davranış Sapması</h3>
-      <div class="callout info">
-        <span class="callout-icon">📊</span>
-        <span>Yalnızca E3 sistemi <code>active</code> modda iken çalışır — 1 Haziran 2026 ve sonrası.</span>
-      </div>
-      <div class="tmpl">
-        <div class="tmpl-header">Şablon 27 — Yetersiz Süre</div>
-📈 [Marka] için bu deadline alışılmadık agresif
-[İş özeti] — [Marka]
-Senin deadline'ın: [N] gün
-[Marka] medyan (son 90 gün): [M] gün
-Bilgilendirme amaçlı — blokaj değil.
-      </div>
-      <div class="tmpl">
-        <div class="tmpl-header">Şablon 28 — Anormal Uzun Süre</div>
-📊 [Marka] için bu deadline alışılmadık geniş
-[İş özeti] — [Marka]
-Senin deadline'ın: [N] gün
-[Marka] medyan: [M] gün
-Büyük iş ise normal — iş tipini kontrol et.
-      </div>
     </section>
 
     <!-- ─────────────────────────────────────────── -->
@@ -1294,7 +1273,7 @@ Büyük iş ise normal — iş tipini kontrol et.
         <div class="section-num">7</div>
         <div class="section-title-wrap">
           <h2 class="section-title">Yönetici İşlemleri</h2>
-          <div class="section-tag">Override · Teyit · Force-close · E3 · Sabah raporu</div>
+          <div class="section-tag">Öncelik override · Geçmiş deadline · Sabah raporu</div>
         </div>
       </div>
 
@@ -1316,7 +1295,7 @@ Büyük iş ise normal — iş tipini kontrol et.
           <div class="flow-dot" style="background:var(--prio-green)">✓</div>
           <div class="flow-content">
             <div class="flow-label">Anlık işlenir (Socket Mode)</div>
-            <div class="flow-sub">Canvas güncellenir, Geçmiş sütununa <code>🔴Yön14:23</code> notu düşer</div>
+            <div class="flow-sub">Öncelik anında güncellenir, brief geçmişine not düşer</div>
           </div>
         </div>
       </div>
@@ -1341,7 +1320,7 @@ Büyük iş ise normal — iş tipini kontrol et.
           <tbody>
             <tr><td>Çıktı 1</td><td>#benseno-grafik (tüm ekip)</td><td>Aktif brief, dün tamamlananlar, OOO listesi</td></tr>
             <tr><td>Çıktı 2</td><td>5 yöneticiye özelleştirilmiş DM</td><td>Role göre farklılaşan özet + "Bugün 3 aksiyon"</td></tr>
-            <tr><td>Çıktı 3</td><td>16 kişiye günaydın DM</td><td>Departmana göre kişiselleştirilmiş bugünkü iş listesi</td></tr>
+            <tr><td>Çıktı 3</td><td>Tüm ekibe günaydın DM</td><td>Departmana göre kişiselleştirilmiş bugünkü iş listesi</td></tr>
           </tbody>
         </table>
       </div>
@@ -1352,7 +1331,7 @@ Büyük iş ise normal — iş tipini kontrol et.
           <tbody>
             <tr><td><strong>Görkem</strong> (GM)</td><td>Tam stratejik özet, tüm departmanlar</td></tr>
             <tr><td><strong>Reyhan</strong> (GMY)</td><td>Operasyonel öncelikler, SLA durumu</td></tr>
-            <tr><td><strong>Cansu</strong> (Direktör)</td><td>3 departman, marka hız trendi (E3), kalite skoru</td></tr>
+            <tr><td><strong>Cansu</strong> (Direktör)</td><td>Tüm departmanların özeti, kritik brief'ler</td></tr>
             <tr><td><strong>İpek</strong> (Tasarım Yön.)</td><td>Tasarım ekibi detayı, kapasite, mentörlük notları</td></tr>
             <tr><td><strong>Erdem</strong> (Editör Yön.)</td><td>Editör ekibi detayı, açılan/bekleyen brief'ler</td></tr>
           </tbody>
@@ -1376,15 +1355,15 @@ Büyük iş ise normal — iş tipini kontrol et.
       <div class="schedule-grid">
         <div class="schedule-row">
           <div class="schedule-time">☀️ Her gün 07:50</div>
-          <div class="schedule-task"><strong>Sabah Raporu</strong> — #benseno-grafik + 5 yönetici DM + 16 kişi günaydın DM</div>
+          <div class="schedule-task"><strong>Sabah Raporu</strong> — #benseno-grafik + 5 yönetici DM + tüm ekibe günaydın DM</div>
         </div>
         <div class="schedule-row">
           <div class="schedule-time">📊 Cuma 17:00</div>
-          <div class="schedule-task"><strong>Haftalık Retrospektif</strong> — Haftanın özeti, yıldızlar, E3 istatistik güncellemesi, Google Drive PDF</div>
+          <div class="schedule-task"><strong>Haftalık Retrospektif</strong> — Haftanın özeti ve yıldızlar</div>
         </div>
         <div class="schedule-row">
           <div class="schedule-time">📋 Ay sonu 17:00</div>
-          <div class="schedule-task"><strong>Aylık Stratejik Özet</strong> — Aylık tamamlanan, top 3 marka/tasarımcı/editör, strateji önerileri, Google Drive PDF</div>
+          <div class="schedule-task"><strong>Aylık Stratejik Özet</strong> — Aylık tamamlanan, top 3 marka/tasarımcı/editör, strateji önerileri</div>
         </div>
         <div class="schedule-row">
           <div class="schedule-time">🔍 Her gün 17:00</div>
@@ -1586,42 +1565,28 @@ Büyük iş ise normal — iş tipini kontrol et.
       <h3>12.1 Dosya Yapısı</h3>
       <div class="tree">
 <span class="dir">~/benseno-tasarim-sistemi/</span>
-├── .claude/skills/
-│   ├── <span class="dir">benseno-orchestrator/</span>      <span class="comment"># Ana orkestratör</span>
-│   ├── <span class="dir">benseno-data-agent/</span>        <span class="comment"># Canvas okuma / parsing</span>
-│   ├── <span class="dir">benseno-notification-agent/</span> <span class="comment"># DM / calendar</span>
-│   ├── <span class="dir">benseno-dashboard-agent/</span>    <span class="comment"># GitHub push</span>
-│   ├── <span class="dir">benseno-gunluk-performans/</span>  <span class="comment"># Sabah raporu</span>
-│   ├── <span class="dir">benseno-haftalik-retrospektif/</span>
-│   ├── <span class="dir">benseno-aylik-strateji/</span>
-│   ├── <span class="dir">benseno-onboarding/</span>
-│   ├── <span class="dir">benseno-brief-tamamla/</span>
-│   └── <span class="dir">benseno-reaction-override/</span>
+├── server/                         <span class="comment"># Railway API (Express + Postgres)</span>
+│   ├── api.js                      <span class="comment"># REST uçları + auth/write guard</span>
+│   ├── queries.js                  <span class="comment"># Okuma (getState, getEmbedded)</span>
+│   ├── writes.js                   <span class="comment"># Yazma + soft-delete + finansal</span>
+│   ├── auth.js                     <span class="comment"># JWT + bcrypt</span>
+│   ├── db.js                       <span class="comment"># Postgres bağlantısı</span>
+│   └── migrations/                 <span class="comment"># Şema migration'ları</span>
 ├── dashboard/
-│   ├── index.html                  <span class="comment"># Ana HTML (EMBEDDED_DATA burada)</span>
+│   ├── index.html                  <span class="comment"># Ana HTML</span>
 │   └── app/
 │       ├── bundle.js               <span class="comment"># Derlenmiş React uygulaması</span>
-│       ├── live-data.json          <span class="comment"># Canlı veri (30sn polling)</span>
-│       ├── tokens.css              <span class="comment"># Tasarım token'ları</span>
-│       └── screens/                <span class="comment"># 14 ekran JSX dosyası</span>
-├── data/
-│   ├── canvas_cache.md             <span class="comment"># Canvas cache (30dk TTL)</span>
-│   ├── live-data.json              <span class="comment"># Canlı veri kaynağı</span>
-│   ├── notification-flags.json     <span class="comment"># Data→Notification haberleşmesi</span>
-│   ├── brief-queue.json            <span class="comment"># Slack Bot→Data Agent kuyruğu</span>
-│   ├── agent-state.json            <span class="comment"># Son run + 14 günlük geçmiş</span>
-│   ├── marka_stats.json            <span class="comment"># E3 marka istatistikleri</span>
-│   └── notifications-sent.json     <span class="comment"># İdempotent DM log</span>
+│       ├── *.jsx                   <span class="comment"># Bileşenler (BriefDrawer, vb.)</span>
+│       └── screens/                <span class="comment"># Ekran JSX dosyaları</span>
+├── app/                            <span class="comment"># GitHub Pages için dashboard/ kopyası</span>
 ├── scripts/
-│   ├── build-dashboard.sh          <span class="comment"># Bundle yeniden derle</span>
+│   ├── slack-bot.js                <span class="comment"># Socket Mode bot (her zaman açık)</span>
 │   ├── scheduler.js                <span class="comment"># node-cron rapor zamanlayıcı</span>
-│   ├── run-sabah-raporu.sh
-│   ├── run-haftalik-retro.sh
-│   ├── run-aylik-strateji.sh
-│   ├── run-gunluk-ozet.sh
-│   └── slack-bot.js                <span class="comment"># Socket Mode bot (her zaman açık)</span>
-├── server/                         <span class="comment"># Railway API (Express + Postgres)</span>
-│   ├── api.js · queries.js · writes.js · auth.js
+│   ├── build-dashboard.sh          <span class="comment"># Bundle derle + senkron</span>
+│   ├── rapor-*.js                  <span class="comment"># Rapor üreticileri</span>
+│   └── run-*.sh                    <span class="comment"># Rapor wrapper'ları</span>
+├── docs/                           <span class="comment"># Kılavuz + dokümanlar</span>
+├── Dockerfile                      <span class="comment"># Railway container (bot + scheduler)</span>
 └── logs/
     └── slack-bot.log
       </div>
