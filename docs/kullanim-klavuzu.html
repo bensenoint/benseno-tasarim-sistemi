@@ -1556,43 +1556,38 @@ Onboarding başlat: [USER_ID] [İsim] [başlangıç_tarihi]
         </div>
       </div>
 
-      <h4>Brief'i açtım ama Canvas'ta görünmüyor. Ne yapmalıyım?</h4>
-      <p>Brief sync her 30 dakikada bir çalışır — açtığınız saatten sonra gelen ilk :15 veya :45'te işlenecektir. 45 dakika geçtiyse: (1) doğru format kullanıldığını kontrol edin, (2) doğru kanalda açıldığından emin olun (editor/faq kanalları taranmaz), (3) erdem veya Görkem'e haber verin.</p>
+      <h4>Brief açtım ama dashboard'da görünmüyor. Ne yapmalıyım?</h4>
+      <p>Brief, <code>/yeni-brief</code> ile açıldığı an veritabanına kaydedilir ve markanın kanalına gönderilir; dashboard'a birkaç dakika içinde yansır. Görünmüyorsa: (1) <code>/yeni-brief</code> formunu gönderdiğinizden emin olun, (2) doğru marka kanalında açtığınızı kontrol edin, (3) dashboard sayfasını yenileyin (hard refresh), (4) sorun sürerse bir yöneticiye haber verin.</p>
 
       <hr>
 
-      <h4>Yanlış kişiye atandım. Ne yapabilirim?</h4>
-      <p>Brief thread'ine yeni atama bilgisiyle cevap yazın (editör yapabilir). Editör veya yönetici brief'i force-close (🔒) edip yenisini açabilir. Doğrudan İpek veya erdem'e DM atın.</p>
+      <h4>Yanlış kişiye atandı. Nasıl düzeltirim?</h4>
+      <p>Dashboard'da brief'e tıklayıp açılan detay panelinden <strong>İşi yapanlar / Lead / Gözlemci</strong> alanlarını düzenleyip Kaydet'e basın. Alternatif olarak bir yönetici brief'i silip (Silinenler'e taşınır) <code>/yeni-brief</code> ile yeniden açabilir.</p>
 
       <hr>
 
-      <h4>Deadline'ı geçmiş bir brief açtım ama bilerek. Uyarıyı nasıl kapatırım?</h4>
-      <p>Brief thread'ine <code>✅ ok</code> veya <code>teyit</code> yazın. Ya da brief mesajına ✅ reaction ekleyin. Sistem "teyit edilmiş geç brief" olarak işaretler ve sabah raporundan çıkarır.</p>
+      <h4>Brief'in durumunu nasıl güncellerim?</h4>
+      <p>İki yol da çalışır: brief'in <strong>ana mesajına emoji reaction</strong> ekleyin (🎨/✍️/🤖 çalışılıyor · 👀 incelemede · ⏸️ beklemede · ✏️ revizyon · ✅ tamamlandı · 🔃 yeniden aç), <strong>veya</strong> brief thread'ine o emojiyi ya da bir durum kelimesini (<code>devam et</code>, <code>iş beklemede</code>, <code>iş tamamlandı</code>…) yazın. Uzun thread'lerde thread'e yazmak pratiktir.</p>
 
       <hr>
 
-      <h4>Brief'in önceliği yanlış hesaplanmış. Nasıl düzeltirim?</h4>
-      <p>Yöneticiler (Görkem, Reyhan, Cansu, İpek, erdem) brief mesajının parent'ına doğrudan <span class="prio prio-red">🔴</span> <span class="prio prio-orange">🟠</span> <span class="prio prio-yellow">🟡</span> <span class="prio prio-green">🟢</span> reaction ekleyerek önceliği anlık değiştirebilir.</p>
+      <h4>Brief'in önceliğini nasıl değiştiririm?</h4>
+      <p>Yöneticiler (Görkem, Reyhan, Cansu, İpek, Erdem) brief'in ana mesajına <span class="prio prio-red">🔴</span> <span class="prio prio-orange">🟠</span> <span class="prio prio-yellow">🟡</span> <span class="prio prio-green">🟢</span> reaction ekleyerek önceliği anlık değiştirebilir. Thread'e <code>acil öncelik</code> / <code>yüksek öncelik</code> gibi yazmak da aynı işi yapar.</p>
 
       <hr>
 
       <h4>Dashboard güncellenmedi, eski veri gösteriyor.</h4>
-      <p>Sayfayı yenileyin (F5). Sağ üstteki "Canlı · Xsn" göstergesine bakın. 30 dakikadan uzun süredir güncellenmemişse Görkem'e haber verin.</p>
+      <p>Sayfayı yenileyin (Cmd/Ctrl+Shift+R ile hard refresh). Sağ üstteki "Canlı · Xsn" göstergesine bakın. Veri canlı API'den okunur; sorun sürerse bir yöneticiye haber verin.</p>
 
       <hr>
 
-      <h4>Reaction'ı yanlış mesaja ekledim (thread'e). Ne olur?</h4>
-      <p>Sistem 30 dakika içinde size DM ile bildirim gönderir. Reaction'ı silerek doğru (parent) mesaja eklemeniz yeterlidir.</p>
+      <h4>Dashboard'a giriş yapamıyorum.</h4>
+      <p>Dashboard kişiye özel <strong>kullanıcı adı + şifre</strong> ile korunur. Giriş bilgilerinizi bir yöneticiden alın. Brief silme, geri alma, kalıcı silme ve kullanıcı yönetimi gibi işlemler yalnızca <strong>yönetici</strong> hesaplarda görünür.</p>
 
       <hr>
 
       <h4>Brief'i yanlışlıkla sildim, geri alabilir miyim?</h4>
       <p>Evet. Silinen briefler kalıcı olarak silinmez — Dashboard → <strong>Silinenler</strong> ekranına taşınır. Bir yönetici "↩ Geri al" ile brief'i aktif listeye geri getirebilir. Yalnızca "🗑️ Kalıcı sil" işlemi geri alınamaz.</p>
-
-      <hr>
-
-      <h4>OOO (izin) durumum sisteme nasıl yansır?</h4>
-      <p>Google Calendar'a izin/tatil/raporlu/OOO etkinliği ekleyin. Sabah raporu bu etkinlikleri okuyarak OOO listesi oluşturur. WFH (evden çalışma) OOO sayılmaz.</p>
     </section>
 
     <!-- ─────────────────────────────────────────── -->
