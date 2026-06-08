@@ -47,7 +47,6 @@ async function bnsPersistBriefChange(prev, next, byId) {
       method: suffix ? "POST" : "PATCH",
       headers: {
         "content-type": "application/json",
-        "x-bns-token": window.BNS_WRITE_TOKEN || "",
         ...(tok ? { Authorization: "Bearer " + tok } : {}),
       },
       body: JSON.stringify({ ...body, by: byId || undefined, source: "dashboard" }),
