@@ -1059,19 +1059,18 @@ app.event('message', async ({ event, client }) => {
       }
       return;
     }
-  }
 
-  // ── "brief sil" / "bu brief'i sil" — soft delete ────────────────────────
-  if (event.thread_ts && event.thread_ts !== event.ts && !event.bot_id &&
-      /^(bu\s+)?(brief[''i]*|[iı][şs]i?)\s*(sil|kald[ıi]r)$/i.test(norm)) {
-    const briefTs = event.thread_ts;
-    log(`brief sil: ${briefTs} — ${event.user}`);
-    const ok = await dbWrite('DELETE', `/api/briefs/by-ts/${briefTs}`, { by: event.user });
-    await client.chat.postMessage({
-      channel: event.channel, thread_ts: briefTs,
-      text: ok ? '🗑️ Brief silindi. Dashboard → Silinenler ekranından geri alınabilir.' : '❌ Brief silinemedi (bulunamadı veya yetki yok).',
-    });
-    return;
+    // ── "brief sil" / "bu brief'i sil" — soft delete ─────────────────────
+    if (/^(bu\s+)?(brief[''i]*|[iı][şs]i?)\s*(sil|kald[ıi]r)$/i.test(norm)) {
+      const briefTs = event.thread_ts;
+      log(`brief sil: ${briefTs} — ${event.user}`);
+      const ok = await dbWrite('DELETE', `/api/briefs/by-ts/${briefTs}`, { by: event.user });
+      await client.chat.postMessage({
+        channel: event.channel, thread_ts: briefTs,
+        text: ok ? '🗑️ Brief silindi. Dashboard → Silinenler ekranından geri alınabilir.' : '❌ Brief silinemedi (bulunamadı veya yetki yok).',
+      });
+      return;
+    }
   }
 
   // ── Thread'e yazılan maliyet/satış girişi (brief no otomatik çözülür) ──
