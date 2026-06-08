@@ -395,7 +395,7 @@ async function deleteBrief(id, by) {
   if (!r.rows[0]) throw new Error('brief bulunamadı veya zaten silindi: ' + id);
   await pool.query(
     `INSERT INTO events(brief_id, user_id, verb, detail, source)
-     VALUES ($1, (SELECT id FROM users WHERE slack_id=$2 LIMIT 1), 'silindi', '{}', 'slack')`,
+     VALUES ($1, (SELECT id FROM users WHERE id=$2 LIMIT 1), 'silindi', '{}', 'slack')`,
     [id, by || null]
   );
   return { id, no: r.rows[0].no };
@@ -422,7 +422,7 @@ async function restoreBrief(id, by) {
   if (!r.rows[0]) throw new Error('brief bulunamadı veya silinmiş değil: ' + id);
   await pool.query(
     `INSERT INTO events(brief_id, user_id, verb, detail, source)
-     VALUES ($1, (SELECT id FROM users WHERE slack_id=$2 LIMIT 1), 'geri alındı', '{}', 'dashboard')`,
+     VALUES ($1, (SELECT id FROM users WHERE id=$2 LIMIT 1), 'geri alındı', '{}', 'dashboard')`,
     [id, by || null]
   );
   return { id, no: r.rows[0].no };
