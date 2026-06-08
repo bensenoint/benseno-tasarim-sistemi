@@ -44,6 +44,26 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
     else { alert("Bu brief için Slack linki bulunamadı."); }
   }
 
+  async function handleDelete() {
+    if (!window.confirm(`"${b.baslik || '#' + b.no}" briefi silmek istediğine emin misin?`)) return;
+    try {
+      const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
+      const tok = localStorage.getItem('bns_token');
+      const res = await fetch(`${apiBase}/api/briefs/${b.id}`, {
+        method: 'DELETE',
+        headers: { 'content-type': 'application/json', 'x-bns-token': tok || '', Authorization: tok ? `Bearer ${tok}` : '' },
+        body: JSON.stringify({ by: currentUser?.slack_id }),
+      });
+      if (res.ok) {
+        onClose && onClose();
+        window.location.reload();
+      } else {
+        const j = await res.json().catch(() => ({}));
+        alert('Silme başarısız: ' + (j.error || res.status));
+      }
+    } catch (e) { alert('Hata: ' + e.message); }
+  }
+
   return (
     <>
       <div onClick={onClose} style={{
@@ -171,7 +191,16 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         )}
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-          <div/>
+          <div>
+            {currentUser?.role === 'admin' && (
+              <button onClick={handleDelete} style={{
+                padding:'6px 12px', borderRadius:6,
+                border:'1px solid var(--prio-red, #e54d2e)',
+                background:'transparent', color:'var(--prio-red, #e54d2e)',
+                font:'500 12px/1 var(--font-sans)', cursor:'pointer',
+              }}>🗑️ Sil</button>
+            )}
+          </div>
           <div style={{display:"flex", gap:8}}>
             <Button kind="secondary" icon={<I.Slack size={13}/>} onClick={handleSlackOpen}>Slack'te aç</Button>
             <Button kind="primary" icon={<I.Check size={13}/>}
