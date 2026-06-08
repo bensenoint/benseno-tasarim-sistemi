@@ -190,6 +190,25 @@ app.post('/api/briefs/:id/attachments-meta', writeGuard, async (req, res) => {
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
+// Slack görsel proxy — galeri için. Slack private URL → bot token ile çek → tarayıcıya ilet.
+app.get('/api/img/:id', async (req, res) => {
+  try {
+    const r = await pool.query('SELECT image_url FROM briefs WHERE id = $1', [+req.params.id]);
+    const row = r.rows[0];
+    if (!row || !row.image_url) return res.status(404).end();
+    const slackRes = await fetch(row.image_url, {
+      headers: { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` },
+    });
+    if (!slackRes.ok) return res.status(slackRes.status).end();
+    res.set('Content-Type', slackRes.headers.get('content-type') || 'image/jpeg');
+    res.set('Cache-Control', 'public, max-age=86400');
+    slackRes.body.pipe(res);
+  } catch (e) {
+    console.error('[img-proxy] hata:', e.message);
+    res.status(500).end();
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => console.log(`[api] dinleniyor :${PORT}`));
 module.exports = { app, server };

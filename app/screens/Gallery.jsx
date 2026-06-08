@@ -24,6 +24,9 @@ function GalleryTile({ c, idx }) {
   const brandColor = c.brand?.color || c.marka_color ||
     (window.WHEEL && window.brandHash ? window.WHEEL[window.brandHash(c.marka||'')] : null) || '#888';
   const brandName = c.brand?.name || c.marka || '?';
+  // Slack private URL'lerini Railway proxy üzerinden sun
+  const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
+  const imgSrc = c.image_url ? `${apiBase}/api/img/${c.id}` : null;
   return (
     <div
       onClick={() => slackUrl !== "#" && window.open(slackUrl, "_blank")}
@@ -40,8 +43,8 @@ function GalleryTile({ c, idx }) {
         aspectRatio:"4/3", background: `linear-gradient(135deg, ${brandColor} 0%, ${shade(brandColor, -0.25)} 100%)`,
         position:"relative", overflow:"hidden"
       }}>
-        {c.image_url ? (
-          <img src={c.image_url} alt={c.baslik}
+        {imgSrc ? (
+          <img src={imgSrc} alt={c.baslik}
             style={{width:"100%", height:"100%", objectFit:"cover", position:"absolute", inset:0}}
             onError={e => { e.target.style.display = "none"; }}
           />
