@@ -517,7 +517,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
         { type: 'mrkdwn', text:
           '`devam et` → Devam Ediyor\n' +
           '`iş incelemede` → İncelemede\n' +
-          '`beklemede` → Beklemede\n' +
+          '`iş beklemede` → Beklemede\n' +
           '`revizyon var` · `revize et` → Revizyon\n' +
           '`iş tamamlandı` → Tamamlandı\n' +
           '`yeniden aç` · `geri aç` → Yeniden Açıldı\n' +
@@ -1006,7 +1006,7 @@ app.event('message', async ({ event, client }) => {
       { key: 'devam et',       type: 'durum',    value: 'calisiliyor' },
       { key: 'devam ediyor',   type: 'durum',    value: 'calisiliyor' },
       { key: 'iş incelemede',   type: 'durum',    value: 'incelemede'  },
-      { key: 'beklemede',      type: 'durum',    value: 'beklemede'   },
+      { key: 'iş beklemede',    type: 'durum',    value: 'beklemede'   },
       { key: 'bekle',          type: 'durum',    value: 'beklemede'   },
       { key: 'revizyon var',   type: 'durum',    value: 'revizyon'    },
       { key: 'revize et',      type: 'durum',    value: 'revizyon'    },
