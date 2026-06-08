@@ -497,7 +497,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
         '`/yeni-brief` — Marka kanalında yeni brief açar\n' +
         '`/brief-durum` — Sana atanmış aktif brifleri listeler\n' +
         '`/kapasite` — Ekip kapasitesini gösterir _(Yönetici)_\n' +
-        '`/maliyet` — Brief maliyet/satış bilgisi girer _(Yönetici)_'
+        '`/maliyet` — Brief maliyet/satış bilgisi girer'
       }},
 
       { type: 'divider' },
