@@ -162,7 +162,8 @@ app.patch('/api/briefs/by-no/:no', writeGuard, handleWrite(async req => writes.p
 app.post('/api/briefs/by-ts/:ts/status', writeGuard, handleWrite(async req => writes.setStatus(await writes.tsToId(req.params.ts), req.body)));
 app.post('/api/briefs/by-ts/:ts/financials', writeGuard, handleWrite(async req => writes.setFinancials(await writes.tsToId(req.params.ts), req.body)));
 // Soft delete + geri alma + kalıcı silme
-app.delete('/api/briefs/:id/permanent', writeGuard, handleWrite(req => writes.permanentDeleteBrief(+req.params.id, req.body?.by)));
+// Kalıcı silme geri alınamaz → writeGuard JWT'yi doğrular, adminGuard rol=admin şartı koyar (bot token'ı yetmez)
+app.delete('/api/briefs/:id/permanent', writeGuard, auth.adminGuard, handleWrite(req => writes.permanentDeleteBrief(+req.params.id, req.body?.by)));
 app.delete('/api/briefs/:id',          writeGuard, handleWrite(req => writes.deleteBrief(+req.params.id, req.body?.by)));
 app.delete('/api/briefs/by-ts/:ts',    writeGuard, handleWrite(async req => writes.deleteBrief(await writes.tsToId(req.params.ts), req.body?.by)));
 app.post('/api/briefs/:id/restore',    writeGuard, handleWrite(req => writes.restoreBrief(+req.params.id, req.body?.by)));

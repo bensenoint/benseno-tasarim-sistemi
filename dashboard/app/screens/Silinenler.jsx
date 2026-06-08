@@ -10,7 +10,7 @@ function SilinenlerScreen({ data, currentUser }) {
       const tok = localStorage.getItem('bns_token');
       const res = await fetch(`${apiBase}/api/briefs/${id}/restore`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-bns-token': tok || '', Authorization: tok ? `Bearer ${tok}` : '' },
+        headers: { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) },
         body: JSON.stringify({ by: currentUser?.slack_id }),
       });
       if (res.ok) {
@@ -30,7 +30,7 @@ function SilinenlerScreen({ data, currentUser }) {
       const tok = localStorage.getItem('bns_token');
       const res = await fetch(`${apiBase}/api/briefs/${id}/permanent`, {
         method: 'DELETE',
-        headers: { 'content-type': 'application/json', 'x-bns-token': tok || '', Authorization: tok ? `Bearer ${tok}` : '' },
+        headers: { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) },
         body: JSON.stringify({ by: currentUser?.slack_id }),
       });
       if (res.ok) {

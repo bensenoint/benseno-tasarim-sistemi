@@ -148,7 +148,6 @@ function APIBriefForm({ apiBase, data, onClose }) {
     const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
     const writeHeaders = {
       "content-type": "application/json",
-      "x-bns-token": window.BNS_WRITE_TOKEN || "",
       ...(tok ? { Authorization: "Bearer " + tok } : {}),
     };
     try {
