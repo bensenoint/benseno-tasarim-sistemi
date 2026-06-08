@@ -254,8 +254,12 @@ async function patchBrief(id, raw) {
     if (d.worker_ids !== undefined) {
       const dept = await deriveDept(client, d.worker_ids);
       await client.query(`UPDATE briefs SET dept=$1 WHERE id=$2`, [dept, id]);
-      // Auto-yöneticiler: yeni işi yapanlardan biriyse gözlemciye ekleme (çift listeyi önle).
-      const mgrs = (await deptManagers(client, d.worker_ids)).filter(m => !d.worker_ids.includes(m));
+      // Auto-yöneticiler: briefteki herhangi bir non-gözlemci rolündeyse gözlemciye ekleme (çift listeyi önle).
+      // setAssignees zaten çalıştı → brief_assignees güncel; lead dahil tüm çalışanları dışla.
+      const inWorkQ = await client.query(
+        `SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND role<>'gozlemci'`, [id]);
+      const inWork = new Set(inWorkQ.rows.map(r => r.user_id));
+      const mgrs = (await deptManagers(client, d.worker_ids)).filter(m => !inWork.has(m));
       for (const m of mgrs) await client.query(
         `INSERT INTO brief_assignees(brief_id,user_id,role,sira) VALUES ($1,$2,'gozlemci',NULL)
          ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [id, m]);
