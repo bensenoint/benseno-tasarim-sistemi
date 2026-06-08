@@ -478,7 +478,7 @@ function App({ currentUser, onLogout }) {
 
       {openBrief && (
         <BriefDrawer brief={openBrief} onClose={onCloseBrief}
-          onUpdate={onUpdateBrief} allUsers={data.USERS} currentUser={user}/>
+          onUpdate={onUpdateBrief} allUsers={data.USERS} currentUser={currentUser}/>
       )}
 
       <CommandPalette
