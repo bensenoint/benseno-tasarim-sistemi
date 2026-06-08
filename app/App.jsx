@@ -270,6 +270,10 @@ function App({ currentUser, onLogout }) {
           const sm = window.bnsSafeMap || ((a, f) => a.map(f));
           window.BNS_DATA.completed = sm(ed.bns_completed, window.bnsHydrateCompleted, "completed");
         }
+        // Silinenler (soft-delete) — düz alanlar, hidrasyon gerekmez
+        if (Array.isArray(ed.bns_deleted)) {
+          window.BNS_DATA.deleted = ed.bns_deleted;
+        }
         // Gerçek aktivite akışı (P3.2) — yoksa data.js mock'u korunur
         if (Array.isArray(ed.bns_activity) && ed.bns_activity.length > 0) {
           window.BNS_DATA.activity = ed.bns_activity;

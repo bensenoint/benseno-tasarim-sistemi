@@ -571,6 +571,10 @@ try {
     if (Array.isArray(ed.bns_completed) && ed.bns_completed.length > 0) {
       window.BNS_DATA.completed = bnsSafeMap(ed.bns_completed, bnsHydrateCompleted, "completed");
     }
+    // Silinenler (soft-delete) — düz alanlar, hidrasyon gerekmez
+    if (Array.isArray(ed.bns_deleted)) {
+      window.BNS_DATA.deleted = ed.bns_deleted;
+    }
     // Departman istatistikleri (canlı brief'lerden bot tarafından hesaplandı)
     if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object" && Object.keys(ed.bns_dept_stats).length > 0) {
       window.BNS_DATA.deptStats = bnsNormDeptStats(ed.bns_dept_stats);
