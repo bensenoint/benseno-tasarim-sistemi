@@ -5,6 +5,7 @@
     "dockerfilePath": "Dockerfile",
     "watchPatterns": [
       "scripts/**",
+      "server/**",
       ".claude/**",
       "Dockerfile",
       ".dockerignore",
