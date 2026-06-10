@@ -503,9 +503,11 @@ app.command('/yardim', async ({ command, ack, respond }) => {
       { type: 'divider' },
 
       // Emoji kısayolları
-      { type: 'section', text: { type: 'mrkdwn', text: '*Emoji kısayolları* — brief thread\'ine tek emoji yaz' } },
+      { type: 'section', text: { type: 'mrkdwn', text: '*Emoji kısayolları* — brief mesajına reaction ekle VEYA thread\'e tek emoji yaz' } },
       { type: 'section', fields: [
-        { type: 'mrkdwn', text: '🔄 → Devam Ediyor\n👀 → İncelemede\n⏸️ → Beklemede\n✅ → Tamamlandı\n✏️ → Revizyon\n🔃 → Yeniden Aç' },
+        { type: 'mrkdwn', text:
+          '*İş kabulü / başladım:*\n🎨 → Tasarım\n✍️ → Editör\n🤖 → AI\n🔄 → Devam Ediyor\n\n' +
+          '👀 → İncelemede\n⏸️ → Beklemede\n✏️ → Revizyon\n✅ → Tamamlandı\n🔃 → Yeniden Aç' },
         { type: 'mrkdwn', text: '*Öncelik:*\n🔴 → Acil\n🟠 → Yüksek\n🟡 → Normal\n🟢 → Düşük' },
       ]},
 
@@ -702,6 +704,7 @@ app.event('reaction_added', async ({ event, client }) => {
     double_vertical_bar: 'beklemede',
     pencil2: 'revizyon', pencil: 'revizyon',
     arrows_counterclockwise: 'calisiliyor',  // yeniden aç: tamamlandı → devam ediyor
+    arrows_clockwise: 'calisiliyor',         // 🔄 devam ediyor (/yardim'da belgeli)
   };
   if (reactionBase in DURUM_MAP) {
     const durum = DURUM_MAP[reactionBase];
@@ -924,6 +927,8 @@ app.event('message', async ({ event, client }) => {
       { emoji: ':pencil2:', durum: 'revizyon' }, { emoji: ':pencil:', durum: 'revizyon' },
       { emoji: '🔃', durum: 'calisiliyor' },   // yeniden aç: tamamlananı devam ediyora çek
       { emoji: ':arrows_counterclockwise:', durum: 'calisiliyor' },
+      { emoji: '🔄', durum: 'calisiliyor' },   // devam ediyor (/yardim'da belgeli)
+      { emoji: ':arrows_clockwise:', durum: 'calisiliyor' },
     ];
     const eMatch = EMOJI_DURUM.find(e => trimmed.startsWith(e.emoji));
     if (eMatch) {

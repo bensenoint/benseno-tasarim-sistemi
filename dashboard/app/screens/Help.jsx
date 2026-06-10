@@ -45,7 +45,7 @@ function HelpScreen() {
       </Section>
 
       <Section title="📌 Brief Durum Emojileri" note="Brief thread'ine emoji reaction olarak ekleyin VEYA thread'e o emojiyle başlayan bir mesaj yazın — ikisi de aynı sonucu verir.">
-        <EmojiRow emoji="🎨 ✍️ 🤖" label="Çalışılıyor" desc="İş başladı / devam ediyor (tasarım · editör · AI)."/>
+        <EmojiRow emoji="🎨 ✍️ 🤖" label="İş Kabulü / Çalışılıyor" desc="İşi kabul ettim, başladım (🎨 tasarım · ✍️ editör · 🤖 AI). 🔄 de devam ediyor demektir."/>
         <EmojiRow emoji="👀" label="İncelemede" desc="İş gözden geçiriliyor / revize sunuldu."/>
         <EmojiRow emoji="⏸️" label="Beklemede" desc="Müşteri / onay / materyal bekleniyor."/>
         <EmojiRow emoji="✏️" label="Revizyon" desc="Düzeltme isteği geldi."/>
