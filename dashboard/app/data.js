@@ -531,7 +531,11 @@ function bnsHydrateCompleted(raw, idx) {
     maliyet: raw.maliyet != null ? raw.maliyet : null,   // ₺ — Slack thread ile girilir
     satis:   raw.satis != null ? raw.satis : null,       // ₺
     fatura:  !!raw.fatura,   // fatura kesildi mi
-    odeme:   !!raw.odeme     // ödeme yapıldı mı
+    odeme:   !!raw.odeme,    // ödeme yapıldı mı
+    thread_ozet:    raw.thread_ozet || null,     // AI thread özeti (salt-okunur detayda görünür)
+    thread_ozet_at: raw.thread_ozet_at || null,
+    insight:        raw.insight || null,         // tamamlanma sonrası AI değerlendirmesi
+    insight_at:     raw.insight_at || null
   };
 }
 

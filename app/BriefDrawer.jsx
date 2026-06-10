@@ -178,6 +178,24 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             </>
           )}
 
+          {/* İş insight'ı — tamamlanma sonrası AI değerlendirmesi (süreç, revize, öğrenimler) */}
+          {b.insight && (
+            <>
+              <Hr/>
+              <Eyebrow>🔍 İş Insight</Eyebrow>
+              <div style={{
+                marginTop:10, padding:"12px 14px", background:"var(--paper-2)", borderRadius:8,
+                borderLeft:"3px solid var(--prio-green)",
+                font:"400 13px/1.6 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap"
+              }}>
+                {b.insight}
+              </div>
+              <div style={{marginTop:6, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
+                Tamamlanma değerlendirmesi · marka/iş analizleri için arşivlenir
+              </div>
+            </>
+          )}
+
           <Hr/>
 
           <Eyebrow>Aktivite</Eyebrow>

@@ -136,7 +136,9 @@ async function getEmbedded() {
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
-    thread_ozet: b.thread_ozet || null, insight: b.insight || null, insight_at: b.insight_at || null,
+    thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at ? ms(b.thread_ozet_at) : null,
+    insight: b.insight || null, insight_at: b.insight_at ? ms(b.insight_at) : null,
+    notes: b.musteri_notu || '',
     attachments: attByBrief[b.id] || [],
   }));
 
