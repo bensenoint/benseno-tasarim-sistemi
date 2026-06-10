@@ -2,9 +2,10 @@
 
 function DepartmentScreen({ data, role, onOpenBrief }) {
   const roleMap = {
-    tasarim: { name: "Tasarım", emoji: "🎨", stats: data.deptStats.tasarim, accent: "var(--bw-1)" },
-    editor:  { name: "Editör",  emoji: "✍️", stats: data.deptStats.editor,  accent: "var(--bw-4)" },
-    ai:      { name: "AI",      emoji: "🤖", stats: data.deptStats.ai,      accent: "var(--bw-14)" }
+    tasarim:   { name: "Tasarım",   emoji: "🎨", stats: data.deptStats.tasarim,   accent: "var(--bw-1)" },
+    editor:    { name: "Editör",    emoji: "✍️", stats: data.deptStats.editor,    accent: "var(--bw-4)" },
+    ai:        { name: "AI",        emoji: "🤖", stats: data.deptStats.ai,        accent: "var(--bw-14)" },
+    freelance: { name: "Freelance", emoji: "🤝", stats: data.deptStats.freelance, accent: "var(--bw-8)" }
   };
   const r = roleMap[role];
   // rows henüz hesaplanmadı — capPct rows.length ile override edilecek (aşağıda)

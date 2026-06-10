@@ -46,6 +46,7 @@ const NAV_SECTIONS = [
       { id: "design",  label: "Tasarım",  icon: "Pen" },
       { id: "editor",  label: "Editör",   icon: "Edit3" },
       { id: "ai",      label: "AI",        icon: "Zap" },
+      { id: "freelance", label: "Freelance", icon: "Users" },
     ]
   },
   {

@@ -89,6 +89,8 @@ async function postThread({ channel, thread_ts, text }) {
 // Tek kullanıcıya DM (channel=userID → bot DM açar; im:write gerekir).
 async function dm(userId, text) {
   if (!hasToken() || !userId) return { ok: false, skipped: true };
+  // FR... = freelancer (Slack'te yok) — DM sessizce atlanır, takip dashboard'dan yapılır.
+  if (!/^U/.test(userId)) return { ok: false, skipped: true };
   const res = await slackCall("chat.postMessage", { channel: userId, text, username: BOT_NAME, unfurl_links: false });
   return res.ok ? { ok: true } : { ok: false, error: res.error };
 }

@@ -15,7 +15,8 @@ const slack = require('./slack');
 const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'tamamlandi'];
 
 // ── Zod şemaları ─────────────────────────────────────────────
-const zUserId = z.string().regex(/^U[A-Z0-9]+$/, 'geçersiz Slack user id');
+// U... = Slack kullanıcısı, FR... = freelancer (Slack'te yok, sadece takip için sentetik id)
+const zUserId = z.string().regex(/^(U|FR)[A-Z0-9]+$/, 'geçersiz kullanıcı id');
 const zDate = z.union([z.string(), z.number()]).nullable().optional(); // ISO/ms
 
 const briefCreate = z.object({
