@@ -515,8 +515,14 @@ function bnsHydrateCompleted(raw, idx) {
     marka: raw.marka,
     brand,
     baslik: raw.baslik,
-    lead: liveUsers.find(u => u.id === raw.leadId) || (raw.leadId ? { id: raw.leadId, name: raw.leadName || raw.leadId.slice(-4), initials: "?", color: "#999", rol: "", dept: "" } : null),
-    contributors: (raw.contribIds || []).map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
+    // Canlı API leads/workers dizileri gönderir; eski mock leadId/contribIds — ikisini de destekle
+    lead: (() => {
+      const lid = raw.leadId || (Array.isArray(raw.leads) && raw.leads[0] && raw.leads[0].id) || null;
+      return liveUsers.find(u => u.id === lid) ||
+        (lid ? { id: lid, name: (raw.leads && raw.leads[0] && raw.leads[0].name) || raw.leadName || lid.slice(-4), initials: "?", color: "#999", rol: "", dept: "" } : null);
+    })(),
+    contributors: (raw.contribIds || (Array.isArray(raw.workers) ? raw.workers.map(w => w && w.id) : []) || [])
+      .map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
     deadline,
     baslangic,
     bitis,
