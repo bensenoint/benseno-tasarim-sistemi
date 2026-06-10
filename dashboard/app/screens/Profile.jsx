@@ -24,7 +24,7 @@ function TimeRangeToggle({ value, onChange }) {
   );
 }
 
-function ProfileScreen({ data, user, onOpenBrief }) {
+function ProfileScreen({ data, user, onOpenBrief, currentUser }) {
   const [selectedUser, setSelectedUser] = React.useState(user);
   const [timeRange, setTimeRange] = React.useState("30");
   const allBriefs    = data._allBriefs    || data.briefs    || [];
@@ -165,8 +165,8 @@ function ProfileScreen({ data, user, onOpenBrief }) {
           </div>
         </div>
 
-        {/* Kullanıcı değiştir */}
-        <div style={{display:"flex", flexWrap:"wrap", gap:6, maxWidth:520}}>
+        {/* Kullanıcı değiştir — sadece admin görür */}
+        {currentUser?.role === 'admin' && <div style={{display:"flex", flexWrap:"wrap", gap:6, maxWidth:520}}>
           {[...allUsers].sort((a, b) => a.name.localeCompare(b.name, 'tr')).map(usr => (
             <button key={usr.id} onClick={() => setSelectedUser(usr)}
               title={usr.name}
@@ -183,7 +183,7 @@ function ProfileScreen({ data, user, onOpenBrief }) {
               </span>
             </button>
           ))}
-        </div>
+        </div>}
       </div>
 
       <div style={{height:16}}/>
