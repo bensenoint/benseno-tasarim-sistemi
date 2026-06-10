@@ -56,7 +56,7 @@ const fmtDate = (ms) => {
 };
 
 // Brief mesajını kanala post et → {ok, ts, channel, permalink?, error}
-async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, contribNames, not }) {
+async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, contribNames, observerNames, not }) {
   const channel = channelForBrand(marka);
   if (!channel) return { ok: false, error: "kanal_yok", skipped: true };
   if (!hasToken()) return { ok: false, error: "token_yok", skipped: true };
@@ -66,9 +66,12 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
   if (!res.ok) return { ok: false, error: res.error, channel };
 
   // Detaylar (deadline, kişiler, not, dipnot) → ilk thread yanıtı olarak düşer.
+  // Kişiler <@U...> mention olarak gelir (writes.js hazırlar) — herkes thread'i Slack'te takip edebilsin.
   const detail = [
     `⏰ ${fmtDate(deadlineMs)}${dept ? `   ·   📁 ${dept}` : ""}${akis ? `   ·   ${akis === "paralel" ? "⇉ paralel" : "→ sıralı"}` : ""}`,
-    leadName ? `👤 ${leadName}${contribNames && contribNames.length ? `  ·  ${contribNames.join(", ")}` : ""}` : null,
+    contribNames && contribNames.length ? `🛠 ${contribNames.join(" · ")}` : null,
+    leadName ? `👤 Lead: ${leadName}` : null,
+    observerNames && observerNames.length ? `👁 ${observerNames.join(" · ")}` : null,
     not ? `📝 ${not}` : null,
     `_Dashboard'dan oluşturuldu · iş bu thread'de devam eder._`,
   ].filter(Boolean).join("\n");

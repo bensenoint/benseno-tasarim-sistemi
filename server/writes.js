@@ -202,17 +202,24 @@ async function createBrief(raw) {
     try {
       const leadIdsForPost = (d.lead_ids && d.lead_ids.length) ? d.lead_ids : (d.by ? [d.by] : []);
       const workerIds = (d.worker_ids || []).filter(Boolean);
-      let leadName = null, contribNames = [];
-      const allIds = [...new Set([...leadIdsForPost, ...workerIds])];
+      // Gözlemciler (manuel + otomatik dept yöneticileri) — brief'teki HERKES mention'lansın
+      const obsQ = await pool.query(
+        `SELECT user_id FROM brief_assignees WHERE brief_id=$1 AND role='gozlemci'`, [result.id]);
+      const observerIds = obsQ.rows.map(r => r.user_id);
+      let leadName = null, contribNames = [], observerNames = [];
+      const allIds = [...new Set([...leadIdsForPost, ...workerIds, ...observerIds])];
       if (allIds.length) {
         const u = await pool.query('SELECT id,name FROM users WHERE id = ANY($1)', [allIds]);
         const byId = Object.fromEntries(u.rows.map(r => [r.id, r.name]));
-        leadName = leadIdsForPost.map(i => byId[i]).filter(Boolean).join(', ') || null;
-        contribNames = workerIds.map(i => byId[i]).filter(Boolean);
+        // Slack üyeleri <@id> mention; freelancerlar (FR*) sadece isim
+        const mention = (i) => /^U/.test(i) ? `<@${i}>` : (byId[i] || i);
+        leadName = leadIdsForPost.map(mention).join(', ') || null;
+        contribNames = workerIds.map(mention);
+        observerNames = observerIds.filter(i => !leadIdsForPost.includes(i) && !workerIds.includes(i)).map(mention);
       }
       const deadlineMs = d.deadline ? (typeof d.deadline === 'number' ? d.deadline : Date.parse(d.deadline)) : null;
       const post = await slack.postBrief({ marka: d.marka, baslik: d.baslik, no: result.no,
-        deadlineMs, dept: null, akis: d.akis, leadName, contribNames, not: d.musteri_notu || null });
+        deadlineMs, dept: null, akis: d.akis, leadName, contribNames, observerNames, not: d.musteri_notu || null });
       if (post.ok) {
         await pool.query('UPDATE briefs SET slack_ts=$1, slack_channel=$2, slack_url=$3 WHERE id=$4',
           [post.ts, post.channel, post.permalink || null, result.id]);
