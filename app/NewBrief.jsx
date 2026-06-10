@@ -63,16 +63,16 @@ function PeoplePicker({ label, users, selected, onChange, grouped }) {
   const avail = users.filter(u => !selected.includes(u.id));
   const add = (id) => { if (id && !selected.includes(id)) onChange([...selected, id]); };
   const remove = (id) => onChange(selected.filter(x => x !== id));
-  const DEPT_LABEL = { tasarim: "Tasarım", editor: "Editör", ai: "AI" };
+  const DEPT_LABEL = { tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "Freelance" };
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={FIELD_LABEL}>{label}</span>
       <select value="" onChange={e => { add(e.target.value); e.target.value = ""; }} style={FIELD_BOX}>
         <option value="">+ Kişi ekle…</option>
         {grouped
-          ? ["tasarim", "editor", "ai", "_other"].map(dep => {
+          ? ["tasarim", "editor", "ai", "freelance", "_other"].map(dep => {
               const us = dep === "_other"
-                ? avail.filter(u => !["tasarim", "editor", "ai"].includes(u.dept))
+                ? avail.filter(u => !["tasarim", "editor", "ai", "freelance"].includes(u.dept))
                 : avail.filter(u => u.dept === dep);
               if (!us.length) return null;
               return (

@@ -216,8 +216,8 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
             <I.ChevronDown size={10} style={{color: "var(--ink-4)"}}/>
           </button>
           {userMenu && (() => {
-            const ROL_LABELS = { yonetici: "Yönetici", tasarim: "Tasarım", editor: "Editör", ai: "AI", diger: "Diğer" };
-            const ROL_ORDER = ["yonetici", "tasarim", "editor", "ai", "diger"];
+            const ROL_LABELS = { yonetici: "Yönetici", tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "Freelance", diger: "Diğer" };
+            const ROL_ORDER = ["yonetici", "tasarim", "editor", "ai", "freelance", "diger"];
             const grouped = {};
             for (const u of (defaultUsers || [])) {
               const rol = u.rol || "diger";
