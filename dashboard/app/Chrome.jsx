@@ -151,7 +151,7 @@ function NotificationBell() {
               display: "block", padding: "8px 10px", borderRadius: 6, textDecoration: "none",
               background: n.read_at ? "transparent" : "var(--paper-2)", marginBottom: 2,
             }}>
-              <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{n.text}</div>
+              <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</div>
               <div style={{ font: "400 10px/1 var(--font-sans)", color: "var(--ink-4)", marginTop: 3 }}>{fmtT(n.created_at)}</div>
             </a>
           ))}

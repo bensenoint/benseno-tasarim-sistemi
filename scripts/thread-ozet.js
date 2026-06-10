@@ -162,12 +162,13 @@ async function dm(tok, userId, text) {
   });
   const j = await r.json().catch(() => ({}));
   if (j.ok) {
-    // Dashboard bildirimi (best-effort)
-    const plain = text.replace(/<([^|>]+)\|([^>]+)>/g, '$2').replace(/<([^>]+)>/g, '$1');
-    const link = (text.match(/<(https:\/\/[^|>\s]+)/) || [])[1] || null;
+    // Dashboard bildirimi (best-effort) — kısa metin (ilk satır), link yoksa WT DM'ine düşer
+    const firstLine = text.split('\n').find(l => l.trim()) || '';
+    const plain = firstLine.replace(/<([^|>]+)\|([^>]+)>/g, '$2').replace(/<([^>]+)>/g, '').replace(/[*_~`]/g, '').trim();
+    const link = (text.match(/<(https:\/\/[^|>\s]+)/) || [])[1] || 'https://benseno.slack.com/app_redirect?channel=U0B5AGDEZRN';
     fetch(`${API_BASE}/api/notifications`, {
       method: 'POST', headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
-      body: JSON.stringify({ user_id: userId, text: plain.slice(0, 1000), link }),
+      body: JSON.stringify({ user_id: userId, text: plain.length > 110 ? plain.slice(0, 107) + '…' : plain, link }),
     }).catch(() => {});
   }
   return j.ok;

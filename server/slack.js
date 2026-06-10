@@ -11,7 +11,9 @@
 const CHANNELS = {
   "Bauhaus": "marka-bauhaus", "Beta": "marka-beta", "Cimporglobal": "marka-cimporglobal",
   "Cureffect": "marka-cureffect", "Egosport": "marka-egosport", "Gürsoy": "marka-gursoy",
-  "Hasvet": "marka-hasvet", "Hendex": "marka-hendex", "JnJ": "marka-jnj",
+  "Hasvet": "marka-hasvet", "JnJ": "marka-jnj",
+  // "Hendex" kanalı bilinçli olarak haritada yok (bot davet edilmedi, kullanıcı talebi) —
+  // marka dashboard'da durur, Slack çıkışı/özeti yapılmaz.
   "JnJ ACU ME": "marka-jnj-acuvue-me", "JnJ Vision TR": "marka-jnj-vision-tr",
   "Jungleous": "marka-jungleous",
   "KMR Amos": "marka-kmr-amos", "KMR Copic": "marka-kmr-copic", "KMR LAMY": "marka-kmr-lamy",
@@ -87,14 +89,22 @@ async function postThread({ channel, thread_ts, text }) {
 }
 
 // Her brief-akışı DM'i dashboard bildirimi olarak da kaydedilir (best-effort, DM'i bozmaz).
+// Bildirim KISA tutulur (ilk satır, ~110 karakter); tıklayınca thread permalink'ine,
+// permalink yoksa WT DM sohbetine gider.
+const WT_DM_LINK = 'https://benseno.slack.com/app_redirect?channel=U0B5AGDEZRN';
+function shortNotifText(text) {
+  const firstLine = String(text).split('\n').find(l => l.trim()) || '';
+  const plain = firstLine
+    .replace(/<([^|>]+)\|([^>]+)>/g, '$2').replace(/<([^>]+)>/g, '')   // linkleri at/sadeleştir
+    .replace(/[*_~`]/g, '').trim();                                     // markdown'ı soy
+  return plain.length > 110 ? plain.slice(0, 107) + '…' : plain;
+}
 async function logNotification(userId, text) {
   try {
     const { pool } = require('./db');
-    // Slack link sözdizimini sadeleştir: <url|metin> → metin, <url> → url
-    const plain = String(text).replace(/<([^|>]+)\|([^>]+)>/g, '$2').replace(/<([^>]+)>/g, '$1');
-    const link = (String(text).match(/<(https:\/\/[^|>\s]+)/) || [])[1] || null;
+    const link = (String(text).match(/<(https:\/\/[^|>\s]+)/) || [])[1] || WT_DM_LINK;
     await pool.query('INSERT INTO notifications (user_id, text, link) VALUES ($1,$2,$3)',
-      [userId, plain.slice(0, 1000), link]);
+      [userId, shortNotifText(text), link]);
   } catch (e) { console.error('[slack] notification log hata:', e.message); }
 }
 
