@@ -77,7 +77,27 @@ function HelpScreen() {
         <Row left="ödeme ok" right="Ödeme alındı olarak işaretler" sub="Geri almak için: ödeme iptal"/>
       </Section>
 
-      <Section title="🗑️ Brief Silme & Geri Alma" note="Silme kalıcı değildir — silinen briefler 'Silinenler' ekranına taşınır ve geri alınabilir.">
+      <Section title="🔔 Otomatik Takip & Uyarılar" note="Sistem işlerin sahipsiz kalmasını engellemek için otomatik kontroller yapar (hafta içi 09-19, saatte bir).">
+        <Row left="1 saat" right="Brief açıldıktan 1 saat sonra hâlâ başlama emojisi (🎨/✍️/🤖) konmadıysa atanana hatırlatma DM'i gider" sub="Thread'e yazı yazmak yeterli değil — işi planına aldığını emoji ile bildir."/>
+        <Row left="+2 saat" right="Hâlâ planına alınmadıysa: atanana 2. hatırlatma + departman yöneticisine bilgi DM'i" sub="İşi yapamayacaksan beklemeden yöneticine haber ver."/>
+        <Row left="24 iş saati" right="Hareket olmayan brief 'Hareketsiz' işaretlenir (dashboard rozeti)" sub="Cmt/Paz + TR resmî tatilleri sayılmaz; hareket gelince işaret otomatik kalkar."/>
+        <Row left="🌴 Tatil" right="Slack durumunu 🌴 / 'tatil' / 'izin' / 'OOO' yaparsan uyarılar sana gelmez" sub="Tüm atananları tatildeki brieflerde hareketsizlik süresi de işlemez."/>
+      </Section>
+
+      <Section title="💬 Thread Özeti & Raporlar">
+        <Row left="Thread Özeti" right="Her brief'in Slack yazışmaları AI ile özetlenir — brief detayında '💬 Thread Özeti' bölümü" sub="Hafta içi saatte bir güncellenir; yeni mesaj yoksa değişmez."/>
+        <Row left="07:50 hafta içi" right="Sabah raporu — #benseno-grafik + 5 yönetici DM"/>
+        <Row left="07:55 hafta içi" right="Kişisel iş özeti — aktif işi olan herkese kendi brief listesi DM olarak" sub="İşin yoksa DM gelmez."/>
+      </Section>
+
+      <Section title="👁️ Otomatik Gözlemci" note="Yeni brief açıldığında işi yapanların departman yöneticileri otomatik gözlemci olarak eklenir ve DM alır.">
+        <Row left="Tasarım" right="İpek Akdeniz"/>
+        <Row left="Editör" right="Cansu Kazgan, Erdem Akoğlu"/>
+        <Row left="AI" right="Görkem Kaya, Reyhan Nur Pınar"/>
+        <Row left="Freelance" right="İşi açan kişinin departman yöneticisi" sub="Freelancerlar Slack'te olmadığı için DM/uyarı almaz; süreci içeriden açan kişi yönetir."/>
+      </Section>
+
+      <Section title="🗑️ Brief Silme & Geri Alma" note="Silme kalıcı değildir — silinen briefler 'Silinenler' ekranına taşınır ve geri alınabilir. Silinince brief thread'ine not düşer, geri alınınca da.">
         <Row left="brief sil" right="Slack: thread'e 'brief sil' yazın → brief Silinenler'e taşınır" sub="Bot onay mesajı düşer."/>
         <Row left="Thread'i sil" right="Slack: brief ana mesajını silerseniz brief otomatik Silinenler'e taşınır"/>
         <Row left="🗑️ Sil (dashboard)" right="Brief detay panelinde sol alttaki Sil butonu" sub="Yönetici"/>
@@ -87,7 +107,8 @@ function HelpScreen() {
 
       <Section title="🔍 Dashboard İpuçları">
         <Row left="Komut paleti" right="Cmd+K (Mac) / Ctrl+K — brief adı, marka veya kişiye göre hızlı arama"/>
-        <Row left="Departman" right="Sol menüden Tasarım / Editör / AI departman görünümleri"/>
+        <Row left="Departman" right="Sol menüden Tasarım / Editör / AI / Freelance departman görünümleri"/>
+        <Row left="Görünüm" right="Açılışta görünüm otomatik olarak sana ayarlanır" sub="Başka birinin görünümüne geçmek sadece yönetici hesaplarda mümkündür."/>
         <Row left="Silinenler" right="Sol menü → Yönetim → Silinenler (yönetici)"/>
         <Row left="Yardım" right="Sol menüden bu ekrana her zaman ulaşabilirsiniz"/>
       </Section>

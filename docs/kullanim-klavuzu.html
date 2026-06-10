@@ -837,8 +837,9 @@
           <thead><tr><th>Departman</th><th>Kişiler</th></tr></thead>
           <tbody>
             <tr><td>🎨 Tasarım (6 kişi)</td><td>Aykut Arslan, Aylin Tozkoparan, Hasan Serdar Arda, İrem Özkan, Pelin Özdemir, Serhat Yıldız</td></tr>
-            <tr><td>✍️ Editör (6 kişi)</td><td>Aylin Canel, Buse Gürbüzer, Eda Ayral, Eda Tireli, Melis Can, Simge Acar</td></tr>
+            <tr><td>✍️ Editör (6 kişi)</td><td>Aylin Canel, Buse Gürbüzer, Eda Ayral, Eda Tireli, Melis Genç, Simge Acar</td></tr>
             <tr><td>🤖 AI (2 kişi)</td><td>Eren Mahzunlar, Uraş Aydınlıoğlu</td></tr>
+            <tr><td>🤝 Freelance (6 kişi)</td><td>Arda Gündoğdu (tasarım), Berke Çırakman (web/teknik), Duru Can (web/reklam/SEO), Enes Çınar (yazılım), Levent Tütüncü (matbaa/promosyon), Mehmet Filiz (yazılım) — Slack'te yoklar; brieflerini içeriden biri açar ve yönetir, sadece süreç takip edilir. DM/uyarı almazlar.</td></tr>
           </tbody>
         </table>
       </div>
@@ -846,15 +847,19 @@
       <h3>5 Yönetici</h3>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>İsim</th><th>Unvan</th></tr></thead>
+          <thead><tr><th>İsim</th><th>Unvan</th><th>Departman</th></tr></thead>
           <tbody>
-            <tr><td><strong>Görkem Kaya</strong></td><td>Genel Müdür</td></tr>
-            <tr><td><strong>Reyhan Nur Pınar</strong></td><td>Genel Müdür Yardımcısı</td></tr>
-            <tr><td><strong>Cansu Kazgan</strong></td><td>Direktör</td></tr>
-            <tr><td><strong>İpek Akdeniz</strong></td><td>Tasarım Ekibi Yöneticisi</td></tr>
-            <tr><td><strong>Erdem Akoğlu</strong></td><td>Editör Ekibi Yöneticisi</td></tr>
+            <tr><td><strong>Görkem Kaya</strong></td><td>Genel Müdür</td><td>AI</td></tr>
+            <tr><td><strong>Reyhan Nur Pınar</strong></td><td>Genel Müdür Yardımcısı</td><td>AI</td></tr>
+            <tr><td><strong>Cansu Kazgan</strong></td><td>Direktör</td><td>Editör</td></tr>
+            <tr><td><strong>İpek Akdeniz</strong></td><td>Tasarım Ekibi Yöneticisi</td><td>Tasarım</td></tr>
+            <tr><td><strong>Erdem Akoğlu</strong></td><td>Editör Ekibi Yöneticisi</td><td>Editör</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="callout info">
+        <span class="callout-icon">👁️</span>
+        <span>Yeni bir brief açıldığında, işi yapanların <strong>departman yöneticileri otomatik gözlemci</strong> olarak eklenir ve "yeni brief" DM'i alır. Freelance işlerde gözlemci, <strong>işi açan kişinin</strong> departman yöneticisidir.</span>
       </div>
 
       <h3>Sistem Mimarisi</h3>
@@ -996,8 +1001,8 @@
       <div class="reaction-grid">
         <div class="reaction-card">
           <div class="reaction-emoji">🎨 ✍️ 🤖</div>
-          <div class="reaction-name">Çalışılıyor</div>
-          <div class="reaction-desc">İş başladı / devam ediyor. Tasarım 🎨 · Editör ✍️ · AI 🤖.</div>
+          <div class="reaction-name">İş Kabulü / Çalışılıyor</div>
+          <div class="reaction-desc">İşi kabul ettim, planıma aldım, başladım. Tasarım 🎨 · Editör ✍️ · AI 🤖. 🔄 de "devam ediyor" demektir.</div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">👀</div>
@@ -1085,7 +1090,7 @@
         <div class="section-num">4</div>
         <div class="section-title-wrap">
           <h2 class="section-title">Slack — Bildirimler & DM'ler</h2>
-          <div class="section-tag">11 DM şablonu · Tüm uyarılar</div>
+          <div class="section-tag">DM şablonları · Cevapsız uyarısı · Eskalasyon · Thread özeti</div>
         </div>
       </div>
 
@@ -1144,6 +1149,31 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
 [Mesaja git](link)
       </div>
 
+      <h3>Cevapsız Brief Uyarısı (1 saat)</h3>
+      <p>Brief açıldıktan <strong>1 saat</strong> sonra durum hâlâ "yeni" ise (başlama emojisi 🎨/✍️/🤖 konmamış = iş planına alınmamış), atanan herkese DM gider. Thread'e yazışma olması yetmez — emoji şarttır. Slack durumu 🌴/tatil/izin/OOO olana uyarı gitmez.</p>
+      <div class="tmpl">
+        <div class="tmpl-header">Atanana DM — açılıştan 1 saat sonra</div>
+👋 *#[No] [Marka] — [Başlık]* sana atandı ama henüz iş planına almadın görünüyor.
+İş planına almak için thread'e emoji bırak (🎨/✍️/🤖) ya da yaz: [thread'i aç]
+      </div>
+
+      <h3>Eskalasyon (1. uyarıdan 2 saat sonra)</h3>
+      <p>İlk uyarıdan <strong>2 saat</strong> sonra durum hâlâ "yeni" ise: atanana 2. hatırlatma gider ve <strong>departman yöneticisine bilgi DM'i</strong> düşer. Amaç: kişi işi yapamayacaksa erken öğrenip zaman kaybetmeden yeniden atamak.</p>
+      <div class="tmpl">
+        <div class="tmpl-header">Atanana 2. hatırlatma + yöneticiye bilgi</div>
+⏰ *#[No] [Marka] — [Başlık]* hâlâ iş planında görünmüyor (2. hatırlatma).
+Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
+
+ℹ️ (Yöneticiye) [Kişi] işi henüz planına almadı (açılalı [N] saat,
+2 hatırlatma yapıldı). Bilgi alıp gerekirse yeniden atama yapın.
+      </div>
+
+      <h3>Thread Onay Notları</h3>
+      <p>Durum/öncelik değişiklikleri brief thread'ine kısa bir bot notu olarak düşer — Slack'ten yapılan değişikliklerde sadece thread notu (DM yok), dashboard'dan yapılanlarda thread notu + atananlara DM. Brief silindiğinde thread'e "🗑️ silindi — takip edilmiyor", geri alındığında "↩️ geri alındı" notu düşer.</p>
+
+      <h3>💬 Thread Özeti (AI)</h3>
+      <p>Hafta içi 09–19 arası her saat başı, aktif brieflerin thread yazışmaları AI ile özetlenir ve dashboard'da brief detayında <strong>"💬 Thread Özeti"</strong> bölümünde gösterilir (3-5 cümle: ne istendi, son durum, bekleyen ne). Yeni mesaj yoksa özet değişmez. İş tamamlandığında thread'den ayrıca bir <strong>değerlendirme insight'ı</strong> çıkarılır — ileride marka/iş performans analizlerinde kullanılacak.</p>
+
     </section>
 
     <!-- ─────────────────────────────────────────── -->
@@ -1185,6 +1215,7 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
       <p>Dashboard kişiye özel giriş ile korunur. Her ekip üyesinin kendi <strong>kullanıcı adı + şifresi</strong> vardır; ilk şifrenizi bir yöneticiden alırsınız. Giriş yapıldıktan sonra oturum tarayıcıda 7 gün hatırlanır. Bazı işlemler (örn. brief silme, geri alma, kalıcı silme, kullanıcı yönetimi) yalnızca <strong>yönetici</strong> yetkili kullanıcılarda görünür.</p>
 
       <h3>Görünüm Seçimi</h3>
+      <p>Giriş yaptığınızda görünüm <strong>otomatik olarak size</strong> ayarlanır — kimse seçim yapmaz. Sağ üstteki kişi listesinden başka birinin görünümüne geçmek yalnızca <strong>yönetici (admin)</strong> hesaplarda mümkündür; normal kullanıcı menüsünde sadece kendi adı ve Çıkış görünür. Profil ekranındaki kişi çipleri de aynı kurala tabidir.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Görünüm</th><th>Ne Gösterir</th><th>Kim Kullanır</th></tr></thead>
@@ -1222,7 +1253,7 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
         <div class="screen-card"><div class="screen-num">6.10</div><div class="screen-name">Multi-Atama</div><div class="screen-desc">Paralel/sıralı akış yönetim görünümü</div></div>
         <div class="screen-card"><div class="screen-num">6.11</div><div class="screen-name">Marka</div><div class="screen-desc">Markaların istatistik ve sorun skoru</div></div>
         <div class="screen-card"><div class="screen-num">6.12</div><div class="screen-name">Ekip Matrisi</div><div class="screen-desc">Kişi × marka uzmanlık haritası</div></div>
-        <div class="screen-card"><div class="screen-num">6.13</div><div class="screen-name">Tasarım/Editör/AI</div><div class="screen-desc">Departman detay ekranı — kişi bazlı istatistikler</div></div>
+        <div class="screen-card"><div class="screen-num">6.13</div><div class="screen-name">Tasarım/Editör/AI/Freelance</div><div class="screen-desc">Departman detay ekranı — kişi bazlı istatistikler</div></div>
         <div class="screen-card"><div class="screen-num">6.14</div><div class="screen-name">Profil</div><div class="screen-desc">Kişisel istatistikler, tamamlanan işler, puan geçmişi</div></div>
         <div class="screen-card"><div class="screen-num">6.15</div><div class="screen-name">Silinenler</div><div class="screen-desc">Silinmiş brief'ler — geri al / kalıcı sil (yönetici)</div></div>
         <div class="screen-card"><div class="screen-num">6.16</div><div class="screen-name">Yardım</div><div class="screen-desc">Komut, emoji ve kısayol referansı</div></div>
@@ -1237,8 +1268,8 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
             <tr><td><strong>Geciken</strong></td><td>Deadline'ı geçmiş brief'ler</td><td>↑ Kırmızı, ↓ Yeşil</td></tr>
             <tr><td><strong>Bugün Teslim</strong></td><td>Bugün teslim edilmesi gereken brief'ler</td><td>Bilgilendirici</td></tr>
             <tr><td><strong>Onay Bekleyen</strong></td><td>İncelemede (👀) durumundaki brief'ler</td><td>Bilgilendirici</td></tr>
-            <tr><td><strong>Hareketsiz</strong></td><td>3+ gün güncelleme olmayan brief'ler</td><td>↑ Kırmızı</td></tr>
-            <tr><td><strong>Kapasite</strong></td><td>Ekip ortalama kapasite doluluk oranı</td><td>↑ Yeşil (artış iyi)</td></tr>
+            <tr><td><strong>Hareketsiz</strong></td><td>24 iş saati (Cmt/Paz + TR resmî tatilleri hariç) boyunca ne durum değişikliği ne thread mesajı olan brief'ler. Hareket gelince işaret otomatik kalkar. Tüm atananlar tatildeyse (Slack 🌴/izin/OOO) süre işlemez.</td><td>↑ Kırmızı</td></tr>
+            <tr><td><strong>Kapasite</strong></td><td>Ekip doluluk oranı: aktif iş ÷ (kişi × 6 slot)</td><td>↑ Yeşil (artış iyi)</td></tr>
           </tbody>
         </table>
       </div>
@@ -1263,6 +1294,7 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
           </tbody>
         </table>
       </div>
+      <p>İşe tıklayınca açılan detay panelinde ayrıca <strong>💬 Thread Özeti</strong> bölümü vardır: Slack thread'indeki yazışmaların AI özeti (hafta içi saatte bir güncellenir), atama/zaman bilgileri, aktivite geçmişi ve not alanı.</p>
     </section>
 
     <!-- ─────────────────────────────────────────── -->
@@ -1479,14 +1511,22 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
 
       <div class="callout info">
         <span class="callout-icon">🕐</span>
-        <span>Slack botu <strong>her zaman açıktır</strong> (Socket Mode). Brief açma, durum güncelleme, finansal ve silme işlemleri <strong>anında</strong> işlenir — periyodik tarama yoktur. Yalnızca özet raporlar zamanlanmış saatlerde gönderilir.</span>
+        <span>Slack botu <strong>her zaman açıktır</strong> (Socket Mode). Brief açma, durum güncelleme, finansal ve silme işlemleri <strong>anında</strong> işlenir. Raporlar ve thread bakımı (özet/hareketsiz/uyarı kontrolleri) zamanlanmış saatlerde çalışır.</span>
       </div>
 
       <h3>Zamanlanmış Raporlar (Europe/Istanbul)</h3>
       <div class="schedule-grid">
         <div class="schedule-row">
           <div class="schedule-time">Hafta içi 07:50</div>
-          <div class="schedule-task"><strong>Sabah raporu</strong> — aktif brief, dün tamamlananlar, günün öncelikleri</div>
+          <div class="schedule-task"><strong>Sabah raporu</strong> — aktif brief, dün tamamlananlar, günün öncelikleri (#benseno-grafik + 5 yönetici DM)</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Hafta içi 07:55</div>
+          <div class="schedule-task"><strong>Kişisel iş özeti</strong> — aktif işi olan her çalışana kendi brief listesi DM olarak</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Hafta içi 09–19, saatte bir</div>
+          <div class="schedule-task"><strong>Thread bakımı</strong> — AI thread özetleri, hareketsiz işaretleme, cevapsız brief uyarısı + eskalasyon, tamamlanan iş insight'ı</div>
         </div>
         <div class="schedule-row">
           <div class="schedule-time">Hafta içi 17:05</div>
@@ -1511,7 +1551,7 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
         <div class="section-num">11</div>
         <div class="section-title-wrap">
           <h2 class="section-title">Sık Sorulan Sorular</h2>
-          <div class="section-tag">8 soru · Sorun giderme</div>
+          <div class="section-tag">10 soru · Sorun giderme</div>
         </div>
       </div>
 
@@ -1547,6 +1587,16 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
 
       <h4>Brief'i yanlışlıkla sildim, geri alabilir miyim?</h4>
       <p>Evet. Silinen briefler kalıcı olarak silinmez — Dashboard → <strong>Silinenler</strong> ekranına taşınır. Bir yönetici "↩ Geri al" ile brief'i aktif listeye geri getirebilir. Yalnızca "🗑️ Kalıcı sil" işlemi geri alınamaz.</p>
+
+      <hr>
+
+      <h4>Bana atanan işi planıma almazsam ne olur?</h4>
+      <p>Brief açıldıktan <strong>1 saat</strong> sonra hâlâ başlama emojisi (🎨/✍️/🤖) koymadıysanız size hatırlatma DM'i gelir. <strong>2 saat</strong> daha geçerse ikinci hatırlatma + departman yöneticinize bilgi gider. Thread'e yazı yazmak yeterli değildir — işi planınıza aldığınızı emoji ile bildirin. İşi yapamayacaksanız beklemeyin, hemen yöneticinize haber verin. Tatildeyseniz (Slack durumunuz 🌴/tatil/izin) uyarı gelmez.</p>
+
+      <hr>
+
+      <h4>Tatile çıkıyorum, sisteme nasıl bildiririm?</h4>
+      <p>Slack profilinizde durumunuzu 🌴 emojisi ya da "tatil" / "izin" / "OOO" içeren bir metinle ayarlayın. Bu süre boyunca cevapsız brief uyarıları size gelmez; tüm atananları tatilde olan brieflerde hareketsizlik süresi de işlemez. Hafta sonları ve TR resmî tatilleri zaten otomatik hariçtir.</p>
     </section>
 
     <!-- ─────────────────────────────────────────── -->
@@ -1617,6 +1667,8 @@ railway logs --service benseno-tasarim-sistemi
           <thead><tr><th>Cron</th><th>Tetiklenme</th><th>Komut</th></tr></thead>
           <tbody>
             <tr><td><code>50 7 * * 1-5</code></td><td>Hafta içi 07:50</td><td>run-sabah-raporu.sh</td></tr>
+            <tr><td><code>55 7 * * 1-5</code></td><td>Hafta içi 07:55</td><td>run-kisisel-rapor.sh</td></tr>
+            <tr><td><code>0 9-19 * * 1-5</code></td><td>Hafta içi 09–19 saatte bir</td><td>run-thread-ozet.sh</td></tr>
             <tr><td><code>5 17 * * 1-5</code></td><td>Hafta içi 17:05</td><td>run-gunluk-ozet.sh</td></tr>
             <tr><td><code>10 17 * * 5</code></td><td>Cuma 17:10</td><td>run-haftalik-retro.sh</td></tr>
             <tr><td><code>15 17 25-31 * *</code></td><td>Ayın 25–31'i 17:15</td><td>run-aylik-strateji.sh</td></tr>
