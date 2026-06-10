@@ -144,11 +144,11 @@ async function setStale(briefId, stale) {
   return r.ok;
 }
 
-async function markUyari(briefId) {
+async function markUyari(briefId, level) {
   const r = await fetch(`${API_BASE}/api/briefs/${briefId}/uyari`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
-    body: '{}',
+    body: JSON.stringify({ level: level || 1 }),
   });
   return r.ok;
 }
@@ -165,8 +165,9 @@ async function dm(tok, userId, text) {
 }
 
 const H = 3600000;
-const STALE_H = 24;  // iş günü saati (Cmt/Paz hariç) — hareket yoksa stale
-const UYARI_H = 1;   // brief açıldıktan sonra dokunulmamışsa atananlara DM
+const STALE_H = 24;      // iş günü saati (Cmt/Paz + TR tatil hariç) — hareket yoksa stale
+const UYARI_H = 1;       // brief açıldıktan sonra iş planına alınmadıysa atananlara DM
+const ESKALASYON_H = 2;  // 1. uyarıdan sonra hâlâ 'yeni' ise: kişiye tekrar + yöneticiye bilgi
 
 async function main() {
   const tok = token();
@@ -177,9 +178,10 @@ async function main() {
   if (!briefs.length) return;
   const { map: names, vacation } = await userNames(tok);
   if (vacation.size) console.log(`  tatilde: ${[...vacation].map(id => names[id]).join(', ')}`);
+  const usersById = Object.fromEntries((d.bns_users || []).map(u => [u.id, u]));
   const now = Date.now();
 
-  let updated = 0, skipped = 0, staleFlips = 0, warned = 0;
+  let updated = 0, skipped = 0, staleFlips = 0, warned = 0, escalated = 0;
   for (const b of briefs) {
     const msgs = await threadReplies(tok, b.slack_channel, b.slack_ts);
     if (!msgs) continue;
@@ -209,25 +211,55 @@ async function main() {
       if (await setStale(b.id, shouldStale)) { staleFlips++; console.log(`  ${shouldStale ? '🟠' : '🟢'} #${b.no} ${b.marka} stale=${shouldStale}`); }
     }
 
-    // ── 3) Cevapsız uyarısı: 1 saat geçti, durum hâlâ 'yeni', hiçbir atanan dokunmadı, daha önce uyarılmadı ──
-    // Tatildeki çalışana (Slack durumu 🌴/tatil/izin/OOO) uyarı gitmez; dönünce sonraki turda alır.
-    if (!b.uyari_at && b.durum === 'yeni' && b.created_at && (now - b.created_at) >= UYARI_H * H) {
-      const workerIds = new Set((b.workers || []).map(w => w && w.id).filter(Boolean));
-      const workerTouched = humanMsgs.some(m => workerIds.has(m.user));
-      if (!workerTouched && workerIds.size) {
+    // ── 3) Cevapsız uyarısı + eskalasyon ──
+    // Ölçüt: durum hâlâ 'yeni' = iş planına alınmamış (başlama emojisi 🎨/✍️/🤖 durumu değiştirirdi).
+    // Thread'e yazışma olması yetmez — emoji konmadıysa uyarı yine gider.
+    // Tatildeki çalışana (Slack durumu 🌴/tatil/izin/OOO) DM gitmez; dönünce sonraki turda alır.
+    if (b.durum === 'yeni' && b.created_at) {
+      const workerIds = [...new Set((b.workers || []).map(w => w && w.id).filter(Boolean))];
+
+      // 1. uyarı: açılıştan 1 saat sonra, atananın kendisine
+      if (!b.uyari_at && (now - b.created_at) >= UYARI_H * H && workerIds.length) {
         let sent = 0;
         for (const wid of workerIds) {
           if (vacation.has(wid)) continue;
           const ok = await dm(tok, wid,
-            `👋 *#${b.no} ${b.marka} — ${b.baslik}* sana atandı ama henüz başlamadın görünüyor.\n` +
+            `👋 *#${b.no} ${b.marka} — ${b.baslik}* sana atandı ama henüz iş planına almadın görünüyor.\n` +
             `İş planına almak için thread'e emoji bırak (🎨/✍️/🤖) ya da yaz: <${b.slack_url}|thread'i aç>`);
           if (ok) sent++;
         }
-        if (sent) { await markUyari(b.id); warned++; console.log(`  📣 #${b.no} ${b.marka} — ${sent} kişiye cevapsız uyarısı`); }
+        if (sent) { await markUyari(b.id, 1); warned++; console.log(`  📣 #${b.no} ${b.marka} — ${sent} kişiye cevapsız uyarısı`); }
+      }
+
+      // 2. uyarı (eskalasyon): 1. uyarıdan 2 saat sonra hâlâ 'yeni' → kişiye tekrar + departman yöneticisine bilgi
+      if (b.uyari_at && !b.uyari2_at && (now - b.uyari_at) >= ESKALASYON_H * H && workerIds.length) {
+        let sent = 0;
+        const workerNames = workerIds.map(id => names[id] || id).join(', ');
+        for (const wid of workerIds) {
+          if (vacation.has(wid)) continue;
+          const ok = await dm(tok, wid,
+            `⏰ *#${b.no} ${b.marka} — ${b.baslik}* hâlâ iş planında görünmüyor (2. hatırlatma).\n` +
+            `Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver — zaman kaybetmeyelim. <${b.slack_url}|Thread'i aç>`);
+          if (ok) sent++;
+        }
+        // Yöneticiye bilgi: atananların departman yöneticileri (kendisi atanansa hariç, tatildekiler hariç)
+        const depts = new Set(usersById ? workerIds.map(id => usersById[id]?.dept).filter(Boolean) : []);
+        const mgrIds = (d.bns_users || [])
+          .filter(u => u.yetki === 'yonetici' && depts.has(u.dept) && !workerIds.includes(u.id) && !vacation.has(u.id))
+          .map(u => u.id);
+        for (const mid of mgrIds) {
+          await dm(tok, mid,
+            `ℹ️ *#${b.no} ${b.marka} — ${b.baslik}*: ${workerNames} işi henüz planına almadı (açılalı ${Math.round((now - b.created_at) / H)} saat, 2 hatırlatma yapıldı).\n` +
+            `Bir engel olabilir — bilgi alıp gerekirse yeniden atama yapın. <${b.slack_url}|Thread'i aç>`);
+        }
+        if (sent || mgrIds.length) {
+          await markUyari(b.id, 2); escalated++;
+          console.log(`  🚨 #${b.no} ${b.marka} — eskalasyon: ${sent} çalışan + ${mgrIds.length} yönetici`);
+        }
       }
     }
   }
-  console.log(`aktifler bitti — özet:${updated} atlanan:${skipped} stale-değişimi:${staleFlips} uyarı:${warned}`);
+  console.log(`aktifler bitti — özet:${updated} atlanan:${skipped} stale-değişimi:${staleFlips} uyarı:${warned} eskalasyon:${escalated}`);
 
   // ── Tamamlananlar: insight (bir kez) ──────────────────────
   // Son 30 günde biten, insight'ı olmayan, thread'li işler. İleride marka/iş değerlendirmesi için.

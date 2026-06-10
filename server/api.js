@@ -222,7 +222,8 @@ app.patch('/api/briefs/:id/stale', writeGuard, async (req, res) => {
 });
 app.post('/api/briefs/:id/uyari', writeGuard, async (req, res) => {
   try {
-    const r = await pool.query('UPDATE briefs SET uyari_at=now() WHERE id=$1 RETURNING id', [+req.params.id]);
+    const col = req.body?.level === 2 ? 'uyari2_at' : 'uyari_at';
+    const r = await pool.query(`UPDATE briefs SET ${col}=now() WHERE id=$1 RETURNING id`, [+req.params.id]);
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true });
   } catch (e) { console.error('[api] uyari hata:', e.message); res.status(500).json({ error: e.message }); }
