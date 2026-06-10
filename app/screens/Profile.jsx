@@ -155,8 +155,9 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser }) {
           <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:17, color:"var(--ink-3)", marginTop:6}}>
             {myActive.length} aktif · {myCompleted.length} tamamlandı · {totalRev} toplam revize
           </div>
-          {/* ⭐ Kişi yıldız puanı + gün-sonu sebep açıklaması */}
+          {/* ⭐ Kişi yıldız puanı + gün-sonu sebep açıklaması — sadece yöneticiler görür */}
           {(() => {
+            if (currentUser?.role !== 'admin') return null;
             const R = window.BNS_DATA && window.BNS_DATA.ratings;
             const my = R && R.users && R.users[u.id];
             if (!my || !my.cnt) return null;
