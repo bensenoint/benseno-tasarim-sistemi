@@ -996,10 +996,13 @@ app.event('message', async ({ event, client }) => {
       const briefTs = event.thread_ts;
       log(`brief sil: ${briefTs} — ${event.user}`);
       const ok = await dbWrite('DELETE', `/api/briefs/by-ts/${briefTs}`, { by: event.user });
-      await client.chat.postMessage({
-        channel: event.channel, thread_ts: briefTs,
-        text: ok ? '🗑️ Brief silindi. Dashboard → Silinenler ekranından geri alınabilir.' : '❌ Brief silinemedi (bulunamadı veya yetki yok).',
-      });
+      // Başarı notunu writes.deleteBrief thread'e düşürür (dashboard silmesiyle aynı mesaj).
+      if (!ok) {
+        await client.chat.postMessage({
+          channel: event.channel, thread_ts: briefTs,
+          text: '❌ Brief silinemedi (bulunamadı veya zaten silinmiş).',
+        });
+      }
       return;
     }
   }

@@ -390,7 +390,8 @@ async function notifyRoleDiff(briefId, before, after, source) {
 // Soft delete — brief'i gizle (kalıcı silme yok)
 async function deleteBrief(id, by) {
   const r = await pool.query(
-    `UPDATE briefs SET deleted_at=NOW(), deleted_by=$1 WHERE id=$2 AND deleted_at IS NULL RETURNING id, no`,
+    `UPDATE briefs SET deleted_at=NOW(), deleted_by=$1 WHERE id=$2 AND deleted_at IS NULL
+     RETURNING id, no, slack_ts, slack_channel`,
     [by || null, id]
   );
   if (!r.rows[0]) throw new Error('brief bulunamadı veya zaten silindi: ' + id);
@@ -399,6 +400,14 @@ async function deleteBrief(id, by) {
      VALUES ($1, (SELECT id FROM users WHERE id=$2 LIMIT 1), 'silindi', '{}', 'slack')`,
     [id, by || null]
   );
+  // Thread'e silindi notu — thread'in kendisi silindiyse (slack:deleted) hedef mesaj yok, atla.
+  const b = r.rows[0];
+  if (by !== 'slack:deleted' && b.slack_ts && b.slack_channel) {
+    try {
+      await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts,
+        text: `🗑️ *#${b.no}* silindi — bu thread artık takip edilmiyor. Dashboard → Silinenler'den geri alınabilir.` });
+    } catch (e) { console.error('[writes] silindi notu hata:', e.message); }
+  }
   return { id, no: r.rows[0].no };
 }
 
@@ -417,7 +426,8 @@ async function permanentDeleteBrief(id, by) {
 // Soft delete geri al
 async function restoreBrief(id, by) {
   const r = await pool.query(
-    `UPDATE briefs SET deleted_at=NULL, deleted_by=NULL WHERE id=$1 AND deleted_at IS NOT NULL RETURNING id, no`,
+    `UPDATE briefs SET deleted_at=NULL, deleted_by=NULL WHERE id=$1 AND deleted_at IS NOT NULL
+     RETURNING id, no, slack_ts, slack_channel`,
     [id]
   );
   if (!r.rows[0]) throw new Error('brief bulunamadı veya silinmiş değil: ' + id);
@@ -426,6 +436,14 @@ async function restoreBrief(id, by) {
      VALUES ($1, (SELECT id FROM users WHERE id=$2 LIMIT 1), 'geri alındı', '{}', 'dashboard')`,
     [id, by || null]
   );
+  // Thread'e geri alındı notu (best-effort — thread silinmişse Slack hatası yutulur).
+  const b = r.rows[0];
+  if (b.slack_ts && b.slack_channel) {
+    try {
+      await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts,
+        text: `↩️ *#${b.no}* geri alındı — takip devam ediyor.` });
+    } catch (e) { console.error('[writes] geri alındı notu hata:', e.message); }
+  }
   return { id, no: r.rows[0].no };
 }
 
