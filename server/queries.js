@@ -149,11 +149,24 @@ async function getEmbedded() {
   const bns_dept_stats = {};
   for (const r of dept.rows) bns_dept_stats[r.dept] = r;
 
+  // Aktivite akışı (Geçmiş ekranı) — son 80 olay, brief/marka bağlamıyla
+  const ev = await pool.query(`
+    SELECT e.ts, e.user_id, e.verb, e.detail, b.no, b.baslik, br.name AS marka
+    FROM events e
+    LEFT JOIN briefs b ON b.id = e.brief_id
+    LEFT JOIN brands br ON br.id = b.marka_id
+    WHERE e.verb NOT LIKE 'slack:%'
+    ORDER BY e.ts DESC LIMIT 80`);
+  const bns_events = ev.rows.map(e => ({
+    t: ms(e.ts), who: e.user_id, verb: e.verb, detail: e.detail,
+    no: e.no, baslik: e.baslik, marka: e.marka,
+  }));
+
   return {
     now: new Date().toISOString(),
     bns_brands: brands.rows.map(b => ({ name: b.name, color: b.color, wheelIdx: b.wheel_idx })),
     bns_users: users.rows,
-    bns_briefs, bns_completed, bns_deleted, bns_dept_stats,
+    bns_briefs, bns_completed, bns_deleted, bns_dept_stats, bns_events,
     source: 'postgres', generated_at: new Date().toISOString(),
   };
 }

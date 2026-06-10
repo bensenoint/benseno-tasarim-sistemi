@@ -572,8 +572,24 @@ try {
       window.BNS_DATA.briefs = bnsSafeMap(ed.bns_briefs, bnsHydrateBrief, "brief");
       window.BNS_DATA.__source = "live_briefs";
     }
-    if (Array.isArray(ed.bns_completed) && ed.bns_completed.length > 0) {
+    // Boş liste de gerçektir: canlı payload geldiyse mock tamamlananlara DÜŞME (lansman sonrası temiz başlangıç)
+    if (Array.isArray(ed.bns_completed)) {
       window.BNS_DATA.completed = bnsSafeMap(ed.bns_completed, bnsHydrateCompleted, "completed");
+    }
+    // Aktivite (Geçmiş ekranı): canlı events — yoksa boş; mock fixture asla gösterilmez
+    {
+      const VERB_TR = { olusturuldu: "açtı", "düzenlendi": "düzenledi", silindi: "sildi", "geri alındı": "geri aldı" };
+      window.BNS_DATA.activity = (Array.isArray(ed.bns_events) ? ed.bns_events : []).map(e => {
+        const det = e.detail || {};
+        const durum = det.durum || det.yeni_durum;
+        return {
+          t: e.t, who: e.who || "system",
+          verb: durum ? "durumu değiştirdi" : (VERB_TR[e.verb] || e.verb),
+          target: e.baslik ? `#${e.no} ${e.baslik}` : (det.baslik || ""),
+          brand: e.marka && window.BNS_DATA.BR ? window.BNS_DATA.BR[e.marka] : null,
+          meta: durum || (Array.isArray(det.alanlar) ? det.alanlar.join(", ") : ""),
+        };
+      });
     }
     // Silinenler (soft-delete) — düz alanlar, hidrasyon gerekmez
     if (Array.isArray(ed.bns_deleted)) {
