@@ -272,11 +272,13 @@ function bnsCapPct(s) {
   return Math.min(100, Math.round((s.active / s.capacity) * 100));
 }
 
-// Tüm dept stats'ı capacity_pct alanı ile normalize et
+// Tüm dept stats'ı capacity_pct alanı ile normalize et.
+// Canlı API capacity göndermez → people × 6 (kişi başı slot) ile türet.
 function bnsNormDeptStats(raw) {
   const out = {};
   for (const [k, s] of Object.entries(raw || {})) {
-    out[k] = { ...s, capacity_pct: bnsCapPct(s) };
+    const capacity = s.capacity || (s.people ? s.people * 6 : 0);
+    out[k] = { ...s, capacity, capacity_pct: bnsCapPct({ ...s, capacity }) };
   }
   return out;
 }
