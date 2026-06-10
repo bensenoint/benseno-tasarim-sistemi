@@ -310,6 +310,28 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
         </div>}
       />
 
+      {/* ⭐ Firma yıldızı — tıklayınca Karşılaştırma'daki Yıldız Karnesi'ne gider */}
+      {(() => {
+        const R = window.BNS_DATA && window.BNS_DATA.ratings;
+        if (!R || !R.firma || !R.firma.cnt) return null;
+        return (
+          <div onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}
+            title="Yıldız Karnesi'ni aç"
+            style={{
+              display:"inline-flex", alignItems:"center", gap:8, marginTop:12,
+              padding:"7px 12px", background:"var(--surface)", border:"1px solid var(--line)",
+              borderRadius:999, cursor: onSwitchTab ? "pointer" : "default",
+            }}>
+            <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--ink-3)"}}>Benseno</span>
+            <span style={{display:"inline-flex", gap:1}}>
+              {[1,2,3,4,5].map(i => <I.StarFill key={i} size={12} color={i <= Math.round(R.firma.avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
+            </span>
+            <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)"}}>{R.firma.avg}</span>
+            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>({R.firma.cnt} iş)</span>
+          </div>
+        );
+      })()}
+
       {/* KPI grid */}
       <KpiGrid>
         <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>

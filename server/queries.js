@@ -173,8 +173,14 @@ async function getEmbedded() {
   try {
     const [firma, deptR, userR, sebep] = await Promise.all([
       pool.query(`SELECT round(avg(rating),1)::float avg, count(*)::int cnt FROM briefs WHERE rating IS NOT NULL`),
-      pool.query(`SELECT dept, round(avg(rating),1)::float avg, count(*)::int cnt
-                  FROM briefs WHERE rating IS NOT NULL AND dept IS NOT NULL GROUP BY dept`),
+      // Dept ortalaması katılımcıların departmanından: çok departmanlı işte (örn. tasarım+editör)
+      // puan HER İKİ departmana da işler — briefs.dept tek etiketi bunu kaçırıyordu.
+      pool.query(`SELECT u.dept, round(avg(b.rating),1)::float avg, count(DISTINCT b.id)::int cnt
+                  FROM briefs b
+                  JOIN brief_assignees a ON a.brief_id=b.id AND a.role IN ('contributor','lead')
+                  JOIN users u ON u.id=a.user_id
+                  WHERE b.rating IS NOT NULL AND u.dept IS NOT NULL AND u.dept <> 'freelance'
+                  GROUP BY u.dept`),
       pool.query(`SELECT a.user_id AS id, round(avg(b.rating),1)::float avg, count(DISTINCT b.id)::int cnt
                   FROM briefs b JOIN brief_assignees a ON a.brief_id=b.id AND a.role IN ('contributor','lead')
                   WHERE b.rating IS NOT NULL GROUP BY a.user_id`),
