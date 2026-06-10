@@ -212,6 +212,33 @@ app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
   } catch (e) { console.error('[api] insight hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
+// ── Bildirimler (dashboard zili) ────────────────────────────────────────────
+// Kendi bildirimlerim — JWT'deki slack_id ile; başkasınınki okunamaz.
+app.get('/api/notifications', auth.authGuard, async (req, res) => {
+  try {
+    const r = await pool.query(
+      `SELECT id, text, link, created_at, read_at FROM notifications
+       WHERE user_id=$1 ORDER BY created_at DESC LIMIT 30`, [req.user.slack_id]);
+    res.json({ notifications: r.rows, unread: r.rows.filter(n => !n.read_at).length });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+app.post('/api/notifications/read', auth.authGuard, async (req, res) => {
+  try {
+    await pool.query('UPDATE notifications SET read_at=now() WHERE user_id=$1 AND read_at IS NULL', [req.user.slack_id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+// Script'lerin (uyarı DM'leri) bildirim düşmesi için — writeGuard.
+app.post('/api/notifications', writeGuard, async (req, res) => {
+  try {
+    const { user_id, text, link } = req.body || {};
+    if (!user_id || !text) return res.status(400).json({ error: 'user_id ve text gerekli' });
+    await pool.query('INSERT INTO notifications (user_id, text, link) VALUES ($1,$2,$3)',
+      [user_id, String(text).slice(0, 1000), link || null]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // Marka kanal özeti (AI) — kanal-ozet.js scripti yazar. Sessiz.
 app.patch('/api/brands/by-name/:name/kanal-ozet', writeGuard, async (req, res) => {
   try {

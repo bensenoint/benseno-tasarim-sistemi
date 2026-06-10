@@ -161,6 +161,15 @@ async function dm(tok, userId, text) {
     body: JSON.stringify({ channel: userId, text, unfurl_links: false }),
   });
   const j = await r.json().catch(() => ({}));
+  if (j.ok) {
+    // Dashboard bildirimi (best-effort)
+    const plain = text.replace(/<([^|>]+)\|([^>]+)>/g, '$2').replace(/<([^>]+)>/g, '$1');
+    const link = (text.match(/<(https:\/\/[^|>\s]+)/) || [])[1] || null;
+    fetch(`${API_BASE}/api/notifications`, {
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
+      body: JSON.stringify({ user_id: userId, text: plain.slice(0, 1000), link }),
+    }).catch(() => {});
+  }
   return j.ok;
 }
 

@@ -483,6 +483,63 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
   }
 });
 
+// ─── "help" geri bildirim formu (buton → modal → adminlere DM) ─────────────────
+// Sorun/öneri bildirimleri bu kişilere DM olarak düşer.
+const FEEDBACK_ADMINS = ['U030C48PL23', 'UD96GH76E'];   // Görkem, Reyhan
+
+app.action('bns_feedback_open', async ({ ack, body, client }) => {
+  await ack();
+  try {
+    await client.views.open({
+      trigger_id: body.trigger_id,
+      view: {
+        type: 'modal', callback_id: 'bns_feedback_submit',
+        title: { type: 'plain_text', text: 'Sorun / Öneri Bildir' },
+        submit: { type: 'plain_text', text: 'Gönder' },
+        close: { type: 'plain_text', text: 'Vazgeç' },
+        blocks: [
+          { type: 'input', block_id: 'baslik_b',
+            label: { type: 'plain_text', text: 'Başlık' },
+            element: { type: 'plain_text_input', action_id: 'baslik', max_length: 120,
+              placeholder: { type: 'plain_text', text: 'Kısaca ne oldu / önerin ne?' } } },
+          { type: 'input', block_id: 'aciklama_b',
+            label: { type: 'plain_text', text: 'Açıklama' },
+            element: { type: 'plain_text_input', action_id: 'aciklama', multiline: true, max_length: 2000,
+              placeholder: { type: 'plain_text', text: 'Detaylı anlat: ne yapmaya çalışıyordun, ne bekledin, ne oldu…' } } },
+          { type: 'input', block_id: 'gorsel_b', optional: true,
+            label: { type: 'plain_text', text: 'Görsel (ekran görüntüsü vb.)' },
+            element: { type: 'file_input', action_id: 'gorsel', max_files: 3 } },
+        ],
+      },
+    });
+  } catch (e) { log(`feedback modal hata: ${e.message}`); }
+});
+
+app.view('bns_feedback_submit', async ({ ack, body, view, client }) => {
+  await ack();
+  const v = view.state.values;
+  const baslik = (v.baslik_b?.baslik?.value || '').trim();
+  const aciklama = (v.aciklama_b?.aciklama?.value || '').trim();
+  const files = v.gorsel_b?.gorsel?.files || [];
+  const by = body.user?.id || '';
+  const fileLinks = files.map(f => f.permalink || f.url_private).filter(Boolean);
+  const text = [
+    `🛟 *Uygulama geri bildirimi* — <@${by}>`,
+    `*${baslik}*`,
+    aciklama,
+    ...fileLinks.map(u => `📎 ${u}`),
+  ].filter(Boolean).join('\n');
+  let sent = 0;
+  for (const admin of FEEDBACK_ADMINS) {
+    try { await client.chat.postMessage({ channel: admin, text, username: BOT_NAME }); sent++; }
+    catch (e) { log(`feedback admin DM hata (${admin}): ${e.message}`); }
+  }
+  log(`feedback: ${by} → ${sent} admine iletildi ("${baslik.slice(0, 50)}")`);
+  // Gönderene teyit
+  try { await client.chat.postMessage({ channel: by, username: BOT_NAME,
+    text: `✅ Geri bildirimin sistem adminlerine iletildi — teşekkürler!\n*${baslik}*` }); } catch {}
+});
+
 // ─── /yardim — Komut rehberi (sadece yazan görür) ──────────────────────────────
 app.command('/yardim', async ({ command, ack, respond }) => {
   await ack();
@@ -901,6 +958,26 @@ app.event('message', async ({ event, client }) => {
   if (event.subtype && event.subtype !== 'bot_message') return;
   // Text yoksa yoksay
   if (!event.text) return;
+
+  // ── "help" → uygulama sorun/öneri bildirim formu ───────────────────────────
+  // Herhangi bir kanalda tek başına "help" yazılırsa form butonu sunulur
+  // (mesaj event'inde trigger_id olmadığı için modal ancak buton tıklamasıyla açılabilir).
+  if (!event.bot_id && /^help$/i.test(event.text.trim())) {
+    try {
+      await client.chat.postMessage({
+        channel: event.channel, thread_ts: event.thread_ts || event.ts, username: BOT_NAME,
+        text: 'Uygulamayla ilgili sorun bildirmek ya da öneri sunmak için formu aç.',
+        blocks: [
+          { type: 'section', text: { type: 'mrkdwn', text: '🛟 *Uygulama Geri Bildirimi*\nYaşadığın sorunu ya da önerini sistem adminlerine iletmek için formu doldur.' } },
+          { type: 'actions', elements: [
+            { type: 'button', action_id: 'bns_feedback_open', style: 'primary',
+              text: { type: 'plain_text', text: '📝 Formu Aç' } },
+          ] },
+        ],
+      });
+    } catch (e) { log(`help formu butonu hata: ${e.message}`); }
+    return;
+  }
 
   // ── Thread'e yazılan durum emojisi (reaction'a alternatif) ──────────────────
   // Kullanıcı uzun bir thread'de ilk mesaja kaydırmadan durum bildirmek isteyebilir.
