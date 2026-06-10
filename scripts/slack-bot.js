@@ -906,19 +906,24 @@ app.event('message', async ({ event, client }) => {
   // NOT: thread_ts = thread'in ANA mesajının ts'i (= brief slack_ts). Çözüm gerekmez.
   if (event.thread_ts && event.thread_ts !== event.ts && !event.bot_id) {
     const trimmed = (event.text || '').trim();
-    // Her emoji için hem tam Unicode (variation selector dahil) hem çıplak formu yakala.
+    // Her emoji için Unicode (VS-16 dahil/hariç) VE Slack shortcode formunu yakala —
+    // Slack, yazıyla girilen emojiyi event.text'te ':eyes:' gibi shortcode olarak iletebilir.
     const EMOJI_DURUM = [
-      { emoji: '👀', durum: 'incelemede' },
-      { emoji: '🎨', durum: 'calisiliyor' },
+      { emoji: '👀', durum: 'incelemede' }, { emoji: ':eyes:', durum: 'incelemede' },
+      { emoji: '🎨', durum: 'calisiliyor' }, { emoji: ':art:', durum: 'calisiliyor' },
       { emoji: '✍️', durum: 'calisiliyor' },
       { emoji: '✍',  durum: 'calisiliyor' },   // VS-16 olmadan yazılabilir
-      { emoji: '🤖', durum: 'calisiliyor' },
-      { emoji: '✅', durum: 'tamamlandi'  },
+      { emoji: ':writing_hand:', durum: 'calisiliyor' },
+      { emoji: '🤖', durum: 'calisiliyor' }, { emoji: ':robot_face:', durum: 'calisiliyor' },
+      { emoji: '✅', durum: 'tamamlandi'  }, { emoji: ':white_check_mark:', durum: 'tamamlandi' },
       { emoji: '⏸️', durum: 'beklemede'   },
       { emoji: '⏸',  durum: 'beklemede'   },   // VS-16 olmadan
+      { emoji: ':double_vertical_bar:', durum: 'beklemede' },
       { emoji: '✏️', durum: 'revizyon'    },
       { emoji: '✏',  durum: 'revizyon'    },   // VS-16 olmadan
+      { emoji: ':pencil2:', durum: 'revizyon' }, { emoji: ':pencil:', durum: 'revizyon' },
       { emoji: '🔃', durum: 'calisiliyor' },   // yeniden aç: tamamlananı devam ediyora çek
+      { emoji: ':arrows_counterclockwise:', durum: 'calisiliyor' },
     ];
     const eMatch = EMOJI_DURUM.find(e => trimmed.startsWith(e.emoji));
     if (eMatch) {
@@ -926,6 +931,21 @@ app.event('message', async ({ event, client }) => {
       log(`durum metin-emoji: ${eMatch.emoji} → ${eMatch.durum} | ${briefTs} — ${event.user}`);
       // DB'ye yaz (best-effort). writes.setStatus → reflectChange thread'e onay düşürür.
       dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: eMatch.durum, by: event.user, source: 'slack' });
+      return;
+    }
+
+    // ── Thread'e yazılan öncelik emojisi (reaction'a alternatif) ──────────────
+    const EMOJI_ONCELIK = [
+      { emoji: '🔴', val: '🔴' }, { emoji: ':red_circle:', val: '🔴' },
+      { emoji: '🟠', val: '🟠' }, { emoji: ':large_orange_circle:', val: '🟠' },
+      { emoji: '🟡', val: '🟡' }, { emoji: ':large_yellow_circle:', val: '🟡' },
+      { emoji: '🟢', val: '🟢' }, { emoji: ':large_green_circle:', val: '🟢' },
+    ];
+    const pMatch = EMOJI_ONCELIK.find(e => trimmed.startsWith(e.emoji));
+    if (pMatch) {
+      const briefTs = event.thread_ts;
+      log(`öncelik metin-emoji: ${pMatch.val} | ${briefTs} — ${event.user}`);
+      dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { priority: pMatch.val, by: event.user, source: 'slack' });
       return;
     }
 
@@ -937,6 +957,8 @@ app.event('message', async ({ event, client }) => {
       { key: 'devam et',       type: 'durum',    value: 'calisiliyor' },
       { key: 'devam ediyor',   type: 'durum',    value: 'calisiliyor' },
       { key: 'iş incelemede',   type: 'durum',    value: 'incelemede'  },
+      { key: 'iş inceleme',     type: 'durum',    value: 'incelemede'  }, // sık yazılan kısa varyant
+      { key: 'is incelemede',   type: 'durum',    value: 'incelemede'  }, // ASCII varyant
       { key: 'iş beklemede',    type: 'durum',    value: 'beklemede'   },
       { key: 'bekle',          type: 'durum',    value: 'beklemede'   },
       { key: 'revizyon var',   type: 'durum',    value: 'revizyon'    },
