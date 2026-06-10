@@ -101,7 +101,9 @@ function App({ currentUser, onLogout }) {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
 
   // App state
-  const [user, setUser] = React.useState(data.ME);
+  // Varsayılan görünüm = giriş yapan kişi (slack_id eşleşmesi); bulunamazsa eski ME fallback'i
+  const [user, setUser] = React.useState(
+    () => data.USERS.find(u => u.id === currentUser?.slack_id) || data.ME);
   const [tab, setTab] = React.useState("overview");
   const [jobsScope, setJobsScope] = React.useState("all"); // Overview KPI → Jobs deep-link filtresi
   const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };

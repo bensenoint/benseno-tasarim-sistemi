@@ -236,10 +236,10 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
                 borderRadius: 10, boxShadow: "var(--shadow-2)",
                 overflowY: "auto",
               }}>
-                <div style={{padding: "7px 10px 5px", font: "600 10px/1 var(--font-sans)", letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--ink-4)"}}>
+                {currentUser?.role === 'admin' && <div style={{padding: "7px 10px 5px", font: "600 10px/1 var(--font-sans)", letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--ink-4)"}}>
                   Görünümü değiştir
-                </div>
-                {ROL_ORDER.map(rol => {
+                </div>}
+                {currentUser?.role === 'admin' && ROL_ORDER.map(rol => {
                   const list = grouped[rol];
                   if (!list || list.length === 0) return null;
                   return (
