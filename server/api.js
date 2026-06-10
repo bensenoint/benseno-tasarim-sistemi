@@ -212,6 +212,22 @@ app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
   } catch (e) { console.error('[api] insight hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
+// Hareketsizlik bayrağı + cevapsız uyarı işareti — thread-ozet.js yazar. Sessiz (DM/thread notu yok).
+app.patch('/api/briefs/:id/stale', writeGuard, async (req, res) => {
+  try {
+    const r = await pool.query('UPDATE briefs SET stale=$1 WHERE id=$2 RETURNING id', [!!req.body?.stale, +req.params.id]);
+    if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
+    res.json({ ok: true });
+  } catch (e) { console.error('[api] stale hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+app.post('/api/briefs/:id/uyari', writeGuard, async (req, res) => {
+  try {
+    const r = await pool.query('UPDATE briefs SET uyari_at=now() WHERE id=$1 RETURNING id', [+req.params.id]);
+    if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
+    res.json({ ok: true });
+  } catch (e) { console.error('[api] uyari hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // Dosya ekleri (dashboard) — base64 JSON: { files:[{name,mime,b64}], by }. Slack thread'e yükler + DB.
 app.post('/api/briefs/:id/attachments', writeGuard, async (req, res) => {
   try {

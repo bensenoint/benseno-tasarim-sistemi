@@ -93,27 +93,110 @@ async function generateInsight(messages, names, brief) {
   return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim() || null;
 }
 
+// İki an arasındaki süre, Cmt/Paz günleri tamamen düşülerek (ms).
+function businessMs(t0, t1) {
+  if (!t0 || t1 <= t0) return 0;
+  let total = 0;
+  const d = new Date(t0);
+  while (d.getTime() < t1) {
+    const dayEnd = new Date(d); dayEnd.setHours(24, 0, 0, 0);
+    const chunkEnd = Math.min(dayEnd.getTime(), t1);
+    const dow = new Date(d.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' })).getDay();
+    if (dow !== 0 && dow !== 6) total += chunkEnd - d.getTime();
+    d.setTime(chunkEnd);
+  }
+  return total;
+}
+
+async function setStale(briefId, stale) {
+  const r = await fetch(`${API_BASE}/api/briefs/${briefId}/stale`, {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
+    body: JSON.stringify({ stale }),
+  });
+  return r.ok;
+}
+
+async function markUyari(briefId) {
+  const r = await fetch(`${API_BASE}/api/briefs/${briefId}/uyari`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
+    body: '{}',
+  });
+  return r.ok;
+}
+
+async function dm(tok, userId, text) {
+  if (!/^U/.test(userId)) return false; // freelancer (FR*) — Slack'te yok
+  const r = await fetch('https://slack.com/api/chat.postMessage', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${tok}` },
+    body: JSON.stringify({ channel: userId, text, unfurl_links: false }),
+  });
+  const j = await r.json().catch(() => ({}));
+  return j.ok;
+}
+
+const H = 3600000;
+const STALE_H = 24;  // iş günü saati (Cmt/Paz hariç) — hareket yoksa stale
+const UYARI_H = 1;   // brief açıldıktan sonra dokunulmamışsa atananlara DM
+
 async function main() {
   const tok = token();
   if (!tok) { console.error('SLACK token yok — çıkılıyor'); process.exit(1); }
   const d = await fetchEmbedded();
   const briefs = (d.bns_briefs || []).filter(b => b.slack_ts && b.slack_channel);
-  console.log(`Thread özeti — ${briefs.length} aktif brief (slack thread'li)`);
+  console.log(`Thread bakımı — ${briefs.length} aktif brief (özet + hareketsiz + cevapsız uyarısı)`);
   if (!briefs.length) return;
   const names = await userNames(tok);
+  const now = Date.now();
 
-  let updated = 0, skipped = 0;
+  let updated = 0, skipped = 0, staleFlips = 0, warned = 0;
   for (const b of briefs) {
     const msgs = await threadReplies(tok, b.slack_channel, b.slack_ts);
-    if (!msgs || msgs.length < 2) { skipped++; continue; }       // sadece parent → özetlenecek yazışma yok
-    const lastTs = msgs[msgs.length - 1].ts;
-    if (b.thread_ozet_ts && b.thread_ozet_ts === lastTs) { skipped++; continue; }  // yeni mesaj yok
-    const ozet = await summarize(msgs, names, b);
-    if (!ozet) continue;
-    if (await saveOzet(b.id, ozet, lastTs)) { updated++; console.log(`  ✓ #${b.no} ${b.marka} özetlendi (${msgs.length} mesaj)`); }
-    await new Promise(r => setTimeout(r, 1100)); // Slack + Anthropic rate-limit nefesi
+    if (!msgs) continue;
+
+    // İnsan mesajları (bot hariç) — son aktivite ve "çalışan dokundu mu" tespiti için
+    const humanMsgs = msgs.filter(m => !m.bot_id && m.user);
+    const lastHumanMs = humanMsgs.length ? parseFloat(humanMsgs[humanMsgs.length - 1].ts) * 1000 : 0;
+
+    // ── 1) Thread özeti (yeni mesaj varsa) ──
+    if (msgs.length >= 2) {
+      const lastTs = msgs[msgs.length - 1].ts;
+      if (b.thread_ozet_ts && b.thread_ozet_ts === lastTs) skipped++;
+      else {
+        const ozet = await summarize(msgs, names, b);
+        if (ozet && await saveOzet(b.id, ozet, lastTs)) { updated++; console.log(`  ✓ #${b.no} ${b.marka} özetlendi (${msgs.length} mesaj)`); }
+        await new Promise(r => setTimeout(r, 1100));
+      }
+    } else skipped++;
+
+    // ── 2) Hareketsizlik: 24 iş saati (Cmt/Paz hariç) ne durum/içerik değişikliği ne insan mesajı ──
+    const lastActivity = Math.max(b.created_at || 0, b.updated_at || 0, lastHumanMs);
+    const shouldStale = lastActivity > 0 && businessMs(lastActivity, now) >= STALE_H * H;
+    if (shouldStale !== !!b.stale) {
+      if (await setStale(b.id, shouldStale)) { staleFlips++; console.log(`  ${shouldStale ? '🟠' : '🟢'} #${b.no} ${b.marka} stale=${shouldStale}`); }
+    }
+
+    // ── 3) Cevapsız uyarısı: 1 saat geçti, durum hâlâ 'yeni', hiçbir atanan dokunmadı, daha önce uyarılmadı ──
+    // Sadece taze briefler (≤24sa) — ilk kurulumda eski 'yeni' brieflere toplu uyarı gitmesin.
+    if (!b.uyari_at && b.durum === 'yeni' && b.created_at &&
+        (now - b.created_at) >= UYARI_H * H && (now - b.created_at) <= 24 * H) {
+      const workerIds = new Set((b.workers || []).map(w => w && w.id).filter(Boolean));
+      const workerTouched = humanMsgs.some(m => workerIds.has(m.user));
+      if (!workerTouched && workerIds.size) {
+        let sent = 0;
+        for (const wid of workerIds) {
+          const ok = await dm(tok, wid,
+            `👋 *#${b.no} ${b.marka} — ${b.baslik}* sana atandı ama henüz başlamadın görünüyor.\n` +
+            `Başlamak için thread'e emoji bırak (🎨/✍️/🤖) ya da yaz: <${b.slack_url}|thread'i aç>`);
+          if (ok) sent++;
+        }
+        if (sent) { await markUyari(b.id); warned++; console.log(`  📣 #${b.no} ${b.marka} — ${sent} kişiye cevapsız uyarısı`); }
+      }
+    }
   }
-  console.log(`aktifler bitti — ${updated} güncellendi, ${skipped} atlandı (değişiklik yok)`);
+  console.log(`aktifler bitti — özet:${updated} atlanan:${skipped} stale-değişimi:${staleFlips} uyarı:${warned}`);
 
   // ── Tamamlananlar: insight (bir kez) ──────────────────────
   // Son 30 günde biten, insight'ı olmayan, thread'li işler. İleride marka/iş değerlendirmesi için.

@@ -11,7 +11,7 @@ async function allBriefsWithAssignees() {
            b.baslik, b.dept, b.deadline, b.saat, b.durum, b.priority, b.priority_label,
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
            b.akis, b.stale, b.created_at, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
-           b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.insight, b.insight_at,
+           b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.insight, b.insight_at, b.uyari_at,
            COALESCE(json_agg(
              json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color)
              ORDER BY a.sira NULLS LAST
@@ -124,6 +124,7 @@ async function getEmbedded() {
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at || null, thread_ozet_ts: b.thread_ozet_ts || null,
+    stale: !!b.stale, created_at: ms(b.created_at), updated_at: ms(b.updated_at), uyari_at: ms(b.uyari_at),
     attachments: attByBrief[b.id] || [],
   }));
 
