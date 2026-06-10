@@ -11,15 +11,18 @@
 const CHANNELS = {
   "Bauhaus": "marka-bauhaus", "Beta": "marka-beta", "Cimporglobal": "marka-cimporglobal",
   "Cureffect": "marka-cureffect", "Egosport": "marka-egosport", "Gürsoy": "marka-gursoy",
-  "Hasvet": "marka-hasvet", "JnJ": "marka-jnj",
+  "Hasvet": "marka-hasvet", "Hendex": "marka-hendex", "JnJ": "marka-jnj",
   "JnJ ACU ME": "marka-jnj-acuvue-me", "JnJ Vision TR": "marka-jnj-vision-tr",
-  "KMR Amos": "marka-kmr-amos", "KMR LAMY": "marka-kmr-lamy",
-  "KMR Marshmallow": "marka-kmr-marshmallow",
+  "Jungleous": "marka-jungleous",
+  "KMR Amos": "marka-kmr-amos", "KMR Copic": "marka-kmr-copic", "KMR LAMY": "marka-kmr-lamy",
+  "KMR Marshmallow": "marka-kmr-marshmallow", "KMR Max": "marka-kmr-max",
   "KMR Panfix": "marka-kmr-panfix", "KMR Serve": "marka-kmr-serve", "Kuzey Pet": "marka-kuzeypet",
+  "KZY Bark": "marka-kzy-bark",
   "KZY Ever Clean": "marka-kzy-everclean", "KZY Ferplast": "marka-kzy-ferplast",
   "KZY Flamingo": "marka-kzy-flamingo", "KZY Simple Solution": "marka-kzy-simplesolution",
   "KZY Supreme": "marka-kzy-supreme", "KZY VetsBest": "marka-kzy-vetsbest",
-  "Muffik": "marka-muffik", "Şefika Store": "marka-sefikastore",
+  "Marmara Holding": "marka-marmaraholding", "Muffik": "marka-muffik", "Polisan": "marka-polisan",
+  "Şefika Store": "marka-sefikastore",
   "Splenda": "marka-splenda", "TTA": "marka-tour2america", "VDM Petdent": "marka-vdm-petdent",
 };
 
