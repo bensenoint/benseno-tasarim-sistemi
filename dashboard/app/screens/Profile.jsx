@@ -185,25 +185,39 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser }) {
           </div>
         </div>
 
-        {/* Kullanıcı değiştir — sadece admin görür */}
-        {currentUser?.role === 'admin' && <div style={{display:"flex", flexWrap:"wrap", gap:6, maxWidth:520}}>
-          {[...allUsers].sort((a, b) => a.name.localeCompare(b.name, 'tr')).map(usr => (
-            <button key={usr.id} onClick={() => setSelectedUser(usr)}
-              title={usr.name}
-              style={{
-                display:"inline-flex", alignItems:"center", gap:6,
-                padding:"4px 10px 4px 4px",
-                border: usr.id === u.id ? "1.5px solid var(--ember)" : "1px solid var(--line)",
-                borderRadius:999, background: usr.id === u.id ? "var(--ember-tint)" : "var(--surface)",
-                cursor:"pointer", transition:"background 120ms cubic-bezier(0.2,0,0,1), border-color 120ms cubic-bezier(0.2,0,0,1), transform 120ms cubic-bezier(0.2,0,0,1)",
+        {/* Kullanıcı değiştir — sadece admin görür; departmana göre gruplu dropdown */}
+        {currentUser?.role === 'admin' && (() => {
+          const DEPT_LABEL = { tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "Freelance" };
+          const ORDER = ["tasarim", "editor", "ai", "freelance", "_other"];
+          const grouped = {};
+          for (const usr of allUsers) {
+            const d = ["tasarim","editor","ai","freelance"].includes(usr.dept) ? usr.dept : "_other";
+            (grouped[d] = grouped[d] || []).push(usr);
+          }
+          Object.values(grouped).forEach(arr => arr.sort((a, b) => a.name.localeCompare(b.name, "tr")));
+          return (
+            <div style={{display:"flex", alignItems:"center", gap:8}}>
+              <select value={u.id} onChange={e => {
+                const nu = allUsers.find(x => x.id === e.target.value);
+                if (nu) setSelectedUser(nu);
+              }} style={{
+                padding:"7px 10px", border:"1px solid var(--line)", borderRadius:8,
+                background:"var(--surface)", color:"var(--ink)",
+                font:"500 13px/1.2 var(--font-sans)", cursor:"pointer", outline:"none", minWidth:200,
               }}>
-              <Avatar user={usr} size={18}/>
-              <span style={{font:`${usr.id===u.id?600:400} 11px/1 var(--font-sans)`, color: usr.id===u.id ? "var(--ember)" : "var(--ink-3)", whiteSpace:"nowrap"}}>
-                {usr.name.split(" ")[0]}
-              </span>
-            </button>
-          ))}
-        </div>}
+                {ORDER.map(d => {
+                  const us = grouped[d];
+                  if (!us || !us.length) return null;
+                  return (
+                    <optgroup key={d} label={DEPT_LABEL[d] || "Diğer"}>
+                      {us.map(usr => <option key={usr.id} value={usr.id}>{usr.name}</option>)}
+                    </optgroup>
+                  );
+                })}
+              </select>
+            </div>
+          );
+        })()}
       </div>
 
       <div style={{height:16}}/>

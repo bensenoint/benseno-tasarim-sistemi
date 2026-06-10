@@ -275,10 +275,8 @@ function App({ currentUser, onLogout }) {
         if (Array.isArray(ed.bns_deleted)) {
           window.BNS_DATA.deleted = ed.bns_deleted;
         }
-        // Gerçek aktivite akışı (P3.2) — yoksa data.js mock'u korunur
-        if (Array.isArray(ed.bns_activity) && ed.bns_activity.length > 0) {
-          window.BNS_DATA.activity = ed.bns_activity;
-        }
+        // Aktivite + yıldız karnesi + KPI history — data.js'teki ortak yardımcı (çift mantık olmasın)
+        if (typeof window.bnsApplyExtras === "function") window.bnsApplyExtras(ed);
         // Departman + marka istatistikleri
         if (ed.bns_dept_stats && typeof ed.bns_dept_stats === "object") {
           window.BNS_DATA.deptStats = typeof bnsNormDeptStats === "function" ? bnsNormDeptStats(ed.bns_dept_stats) : ed.bns_dept_stats;

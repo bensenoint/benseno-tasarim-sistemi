@@ -546,6 +546,33 @@ function bnsHydrateCompleted(raw, idx) {
   };
 }
 
+// Aktivite akışı + yıldız karnesi + KPI history — ilk yükleme VE her poll'da çağrılır.
+// (Poll App.jsx'te ayrı bir merge yapar; bu alanlar oraya kopyalanmasın diye tek yardımcı.)
+function bnsApplyExtras(ed) {
+  if (!ed) return;
+  const VERB_TR = { olusturuldu: "açtı", "düzenlendi": "düzenledi", silindi: "sildi", "geri alındı": "geri aldı" };
+  window.BNS_DATA.activity = (Array.isArray(ed.bns_events) ? ed.bns_events : []).map(e => {
+    const det = e.detail || {};
+    const durum = det.durum || det.yeni_durum;
+    return {
+      t: e.t, who: e.who || "system",
+      verb: durum ? "durumu değiştirdi" : (VERB_TR[e.verb] || e.verb),
+      target: e.baslik ? `#${e.no} ${e.baslik}` : (det.baslik || ""),
+      brand: e.marka && window.BNS_DATA.BR ? window.BNS_DATA.BR[e.marka] : null,
+      meta: durum || (Array.isArray(det.alanlar) ? det.alanlar.join(", ") : ""),
+    };
+  });
+  // ⭐ Yıldız karnesi: canlı ortalamalar + AI sebep açıklamaları
+  window.BNS_DATA.ratings = ed.bns_ratings || null;
+  window.BNS_DATA.sebepList = Array.isArray(ed.bns_sebep) ? ed.bns_sebep : [];
+  // KPI history (Overview spark grafikleri)
+  if (Array.isArray(ed.bns_history) && ed.bns_history.length > 0) {
+    window.BNS_DATA.history = ed.bns_history;
+  }
+}
+window.bnsSebep = (type, key) => (window.BNS_DATA.sebepList || []).find(s => s.type === type && s.key === key) || null;
+window.bnsApplyExtras = bnsApplyExtras;
+
 // Polling için window'a expose et
 window.bnsHydrateBrief = bnsHydrateBrief;
 window.bnsHydrateCompleted = bnsHydrateCompleted;
@@ -587,21 +614,8 @@ try {
     if (Array.isArray(ed.bns_completed)) {
       window.BNS_DATA.completed = bnsSafeMap(ed.bns_completed, bnsHydrateCompleted, "completed");
     }
-    // Aktivite (Geçmiş ekranı): canlı events — yoksa boş; mock fixture asla gösterilmez
-    {
-      const VERB_TR = { olusturuldu: "açtı", "düzenlendi": "düzenledi", silindi: "sildi", "geri alındı": "geri aldı" };
-      window.BNS_DATA.activity = (Array.isArray(ed.bns_events) ? ed.bns_events : []).map(e => {
-        const det = e.detail || {};
-        const durum = det.durum || det.yeni_durum;
-        return {
-          t: e.t, who: e.who || "system",
-          verb: durum ? "durumu değiştirdi" : (VERB_TR[e.verb] || e.verb),
-          target: e.baslik ? `#${e.no} ${e.baslik}` : (det.baslik || ""),
-          brand: e.marka && window.BNS_DATA.BR ? window.BNS_DATA.BR[e.marka] : null,
-          meta: durum || (Array.isArray(det.alanlar) ? det.alanlar.join(", ") : ""),
-        };
-      });
-    }
+    // Aktivite + yıldız karnesi + history — hem ilk yükleme hem POLL aynı yardımcıyı kullanır
+    bnsApplyExtras(ed);
     // Silinenler (soft-delete) — düz alanlar, hidrasyon gerekmez
     if (Array.isArray(ed.bns_deleted)) {
       window.BNS_DATA.deleted = ed.bns_deleted;
@@ -613,14 +627,6 @@ try {
     // Marka istatistikleri (problemli markalar paneli için)
     if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
       window.BNS_DATA.brandStats = ed.bns_brand_stats;
-    }
-    // ⭐ Yıldız karnesi: canlı ortalamalar + AI sebep açıklamaları
-    window.BNS_DATA.ratings = ed.bns_ratings || null;
-    window.BNS_DATA.sebepList = Array.isArray(ed.bns_sebep) ? ed.bns_sebep : [];
-    window.bnsSebep = (type, key) => (window.BNS_DATA.sebepList || []).find(s => s.type === type && s.key === key) || null;
-    // 7 günlük geçmiş (agent-state.json history → live-data.json → spark chart)
-    if (Array.isArray(ed.bns_history) && ed.bns_history.length > 0) {
-      window.BNS_DATA.history = ed.bns_history; // [{ts,active,overdue,dm_sent,errors,ok}, ...]
     }
     if (typeof ed.last_sync === "string") {
       window.BNS_DATA.lastSync = ed.last_sync;
