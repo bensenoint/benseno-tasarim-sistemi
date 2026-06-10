@@ -215,7 +215,7 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
           <Card style={{ marginBottom:"var(--section-gap)" }}>
             <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
               {bm.kanal_ozet && <Box icon="📡" title="Kanal Özeti" text={bm.kanal_ozet}
-                sub={bm.kanal_ozet_at ? `AI özeti · son 24 saat · ${fmtAt(bm.kanal_ozet_at)} itibarıyla` : "AI özeti · son 24 saat"}/>}
+                sub={bm.kanal_ozet_at ? `AI özeti · ${fmtAt(bm.kanal_ozet_at)} itibarıyla` : "AI özeti"}/>}
               {bm.son_insight && <Box icon="🌙" title="Gün Sonu Insight" text={bm.son_insight}
                 sub={bm.son_insight_tarih ? `${bm.son_insight_tarih} · marka değerlendirmeleri için arşivlenir` : "marka değerlendirmeleri için arşivlenir"}/>}
             </div>

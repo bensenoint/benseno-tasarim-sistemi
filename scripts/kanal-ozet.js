@@ -17,6 +17,8 @@ const { CHANNELS } = require(path.join(__dirname, '..', 'server', 'slack.js'));
 const API_BASE = (process.env.BNS_API_BASE || 'https://benseno-api-production.up.railway.app').replace(/\/+$/, '');
 const GUNSONU = process.env.BNS_GUNSONU === '1';
 const H = 3600000;
+// Özelliğin devreye alındığı an — bu tarihten ÖNCEKİ mesajlar asla okunmaz (geçmişe gidilmez).
+const EPOCH = Date.parse('2026-06-10T14:40:00+03:00');
 
 async function slackGet(tok, method, params) {
   const qs = new URLSearchParams(params).toString();
@@ -100,24 +102,29 @@ async function main() {
   const d = await fetchEmbedded();
   const brandMeta = Object.fromEntries((d.bns_brands || []).map(b => [b.name, b]));
   const [ids, names] = await Promise.all([channelIds(tok), userNames(tok)]);
-  const since = Date.now() - 24 * H;
+  // Bugünün başlangıcı (TR) — gün sonu insight penceresi
+  const trNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
+  const todayStart = Date.now() - (trNow.getHours() * 60 + trNow.getMinutes()) * 60000 - trNow.getSeconds() * 1000;
 
   console.log(`Kanal özeti ${GUNSONU ? '+ GÜN SONU' : ''} — ${Object.keys(CHANNELS).length} marka kanalı`);
   let updated = 0, skipped = 0, insights = 0;
   for (const [brand, chName] of Object.entries(CHANNELS)) {
     const chId = ids[chName];
     if (!chId) { console.log(`  ⚠️ #${chName} bulunamadı (bot üye değil / arşivli)`); continue; }
+    // Pencere: son özetten beri (yoksa son 24sa) — ama asla EPOCH'tan (devreye alma) önce değil.
+    const meta0 = brandMeta[brand] || {};
+    const since = Math.max(GUNSONU ? todayStart : (meta0.kanal_ozet_at || Date.now() - 24 * H), EPOCH);
     const dig = await channelDigest(tok, chId, names, since);
     if (dig.error) { console.log(`  ⚠️ #${chName}: ${dig.error}`); continue; }
     if (!dig.count) { skipped++; continue; }                       // son 24 saatte mesaj yok
     const meta = brandMeta[brand] || {};
-    const text = `Marka: ${brand} (#${chName})\n\nSon 24 saatin kanal akışı (thread yanıtları ↳ ile):\n${dig.lines.join('\n')}`;
+    const text = `Marka: ${brand} (#${chName})\n\nDevreden beri kanal akışı (thread yanıtları ↳ ile):\n${dig.lines.join('\n')}`;
 
     // 1) Genel kanal özeti — yeni mesaj yoksa atla
     if (meta.kanal_ozet_at && dig.lastTs && String(meta.kanal_ozet_ts || '') === dig.lastTs) skipped++;
     else {
       const ozet = await haiku(
-        'Bir tasarım ajansının marka Slack kanalının son 24 saatlik TÜM akışını (ana mesajlar + thread yazışmaları) özetliyorsun. 4-6 cümlelik Türkçe, olgusal genel özet: hangi işler konuşuldu, neler ilerledi, açık konular/bekleyenler ne, dikkat çeken bir şey var mı. Bot durum bildirimlerini sayma, insan yazışmasına odaklan. Mesajlarda OLMAYAN hiçbir şeyi uydurma. Düz metin.',
+        'Bir tasarım ajansının marka Slack kanalının yeni TÜM akışını (ana mesajlar + thread yazışmaları) özetliyorsun. 4-6 cümlelik Türkçe, olgusal genel özet: hangi işler konuşuldu, neler ilerledi, açık konular/bekleyenler ne, dikkat çeken bir şey var mı. Bot durum bildirimlerini sayma, insan yazışmasına odaklan. Mesajlarda OLMAYAN hiçbir şeyi uydurma. Düz metin.',
         text);
       if (ozet && await apiWrite('PATCH', `/api/brands/by-name/${encodeURIComponent(brand)}/kanal-ozet`, { ozet, last_ts: dig.lastTs })) {
         updated++; console.log(`  ✓ ${brand} kanal özeti (${dig.count} satır)`);
