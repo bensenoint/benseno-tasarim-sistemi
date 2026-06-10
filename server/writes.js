@@ -75,7 +75,12 @@ const financialsBody = z.object({
 const toTs = (v) => (v == null ? null : (typeof v === 'number' ? new Date(v) : new Date(Date.parse(v))));
 
 async function brandIdByName(client, name) {
-  // varsa al, yoksa oluştur (dashboard'dan yeni marka gelebilir)
+  // Önce büyük/küçük harf + boşluk duyarsız eşle — "JNJ Acuvue ME" gibi
+  // yazım varyantları mükerrer marka yaratmasın (kanal haritası da kopar).
+  const ex = await client.query(
+    `SELECT id FROM brands WHERE lower(regexp_replace(name,'\\s+',' ','g')) = lower(regexp_replace($1,'\\s+',' ','g')) LIMIT 1`, [name]);
+  if (ex.rows[0]) return ex.rows[0].id;
+  // yoksa oluştur (dashboard'dan gerçekten yeni marka gelebilir)
   await client.query(`INSERT INTO brands(name) VALUES ($1) ON CONFLICT (name) DO NOTHING`, [name]);
   const r = await client.query(`SELECT id FROM brands WHERE name=$1`, [name]);
   return r.rows[0] && r.rows[0].id;
