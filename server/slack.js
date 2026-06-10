@@ -11,16 +11,16 @@
 const CHANNELS = {
   "Bauhaus": "marka-bauhaus", "Beta": "marka-beta", "Cimporglobal": "marka-cimporglobal",
   "Cureffect": "marka-cureffect", "Egosport": "marka-egosport", "Gürsoy": "marka-gursoy",
-  "Hasvet": "marka-hasvet", "Hendex": "marka-hendex", "JNJ": "marka-jnj",
-  "JNJ Acuvue ME": "marka-jnj-acuvue-me", "JNJ Vision TR": "marka-jnj-vision-tr",
-  "Jungleous": "marka-jungleous", "KMR Amos": "marka-kmr-amos", "KMR Copic": "marka-kmr-copic",
-  "KMR Lamy": "marka-kmr-lamy", "KMR Marshmallow": "marka-kmr-marshmallow", "KMR Max": "marka-kmr-max",
-  "KMR Panfix": "marka-kmr-panfix", "KMR Serve": "marka-kmr-serve", "Kuzeypet": "marka-kuzeypet",
-  "KZY Bark": "marka-kzy-bark", "KZY Everclean": "marka-kzy-everclean", "KZY Ferplast": "marka-kzy-ferplast",
+  "Hasvet": "marka-hasvet", "JnJ": "marka-jnj",
+  "JnJ ACU ME": "marka-jnj-acuvue-me", "JnJ Vision TR": "marka-jnj-vision-tr",
+  "KMR Amos": "marka-kmr-amos", "KMR LAMY": "marka-kmr-lamy",
+  "KMR Marshmallow": "marka-kmr-marshmallow",
+  "KMR Panfix": "marka-kmr-panfix", "KMR Serve": "marka-kmr-serve", "Kuzey Pet": "marka-kuzeypet",
+  "KZY Ever Clean": "marka-kzy-everclean", "KZY Ferplast": "marka-kzy-ferplast",
   "KZY Flamingo": "marka-kzy-flamingo", "KZY Simple Solution": "marka-kzy-simplesolution",
-  "KZY Supreme": "marka-kzy-supreme", "KZY Vet's Best": "marka-kzy-vetsbest",
-  "Marmara Holding": "marka-marmaraholding", "Muffik": "marka-muffik", "Polisan": "marka-polisan",
-  "Splenda": "marka-splenda", "Tour2America": "marka-tour2america", "VDM Petdent": "marka-vdm-petdent",
+  "KZY Supreme": "marka-kzy-supreme", "KZY VetsBest": "marka-kzy-vetsbest",
+  "Muffik": "marka-muffik", "Şefika Store": "marka-sefikastore",
+  "Splenda": "marka-splenda", "TTA": "marka-tour2america", "VDM Petdent": "marka-vdm-petdent",
 };
 
 function channelForBrand(marka) {
