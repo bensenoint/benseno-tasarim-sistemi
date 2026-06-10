@@ -686,13 +686,7 @@ app.event('reaction_added', async ({ event, client }) => {
     log(`✅ tamamlama: ${briefTs} — ${event.user}`);
     // Thread'deki son görseli onay öncesi yakala → galeri için image_url'e kaydet
     captureThreadImage(client, event.item.channel, briefTs).catch(() => {});
-    execFile('node', [`${PROJECT_DIR}/scripts/complete-brief.js`, briefTs, event.user, saat],
-      { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
-      (err, stdout, stderr) => {
-        if (err) log(`complete-brief hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
-        else log(`complete-brief: ${(stdout || '').trim().split('\n').pop()}`);
-      });
-    // DB'ye de (b3, best-effort): brief'i slack_ts ile bul → tamamlandı.
+    // DB: brief'i slack_ts ile bul → tamamlandı (reflectChange thread onayını düşürür).
     dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: 'tamamlandi', by: event.user, source: 'slack' });
     return;
   }
@@ -713,45 +707,22 @@ app.event('reaction_added', async ({ event, client }) => {
     const durum = DURUM_MAP[reactionBase];
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
     log(`durum reaction: :${reactionBase}: → ${durum} @ ${briefTs} — ${event.user}`);
-    execFile('node', [`${PROJECT_DIR}/scripts/brief-status.js`, briefTs, reactionBase, event.user, saat],
-      { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
-      (err, stdout, stderr) => {
-        if (err) log(`brief-status hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
-        else log(`brief-status: ${(stdout || '').trim().split('\n').pop()}`);
-      });
-    // DB'ye de (b3, best-effort): emoji → durum kodu.
+    // DB: emoji → durum kodu (reflectChange thread onayını düşürür).
     dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum, by: event.user, source: 'slack' });
     return;
   }
 
   // Öncelik override (🔴/🟠/🟡/🟢) — atanan + yönetici koyabilir (v7.13: artık sadece yönetici değil).
-  // Yetkiyi reaction-override.js kontrol eder (brief atananları ∪ editör ∪ yöneticiler).
+  // DB'ye yazılır; dashboard birkaç dk içinde yansıtır.
   if (!PRIORITY_REACTIONS.has(event.reaction)) return;
 
   const emoji    = REACTION_EMOJI[event.reaction];
-  const ts       = briefTs;
-  const channel  = event.item.channel;
-  const yonetici = event.user;
-  const saat     = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
-
-  log(`Reaction override: ${emoji} — ${yonetici} @ ${ts}`);
-
-  // Deterministik script (LLM değil): live-data priority'yi anında günceller, EMBEDDED_DATA'yı
-  // enjekte eder, priority-overrides.json'a yazar (kalıcı), git push. MCP/claude gerektirmez.
-  try {
-    execFile('node', [`${PROJECT_DIR}/scripts/reaction-override.js`, ts, emoji, yonetici, saat],
-      { cwd: PROJECT_DIR, timeout: 120000, env: process.env },
-      (err, stdout, stderr) => {
-        if (err) log(`reaction-override hata: ${err.message} ${(stderr || '').slice(0, 200)}`);
-        else log(`reaction-override: ${(stdout || '').trim().split('\n').pop()}`);
-      }
-    );
-  } catch (err) {
-    log(`reaction-override spawn hata: ${err.message}`);
-  }
+  log(`öncelik reaction: ${emoji} — ${event.user} @ ${briefTs}`);
+  // DB: priority emoji (reflectChange thread onayını düşürür) — kelime yolu ile aynı.
+  dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { priority: emoji, by: event.user, source: 'slack' });
 });
 
-// Brief tamamlama: ✅ reaction ile (yukarıdaki reaction_added handler → complete-brief.js).
+// Brief tamamlama: ✅ reaction ile (yukarıdaki reaction_added handler → DB status).
 // Eski brief_tamamla / brief_sure_uzat Block Kit buton handler'ları KALDIRILDI:
 // hiçbir mesaj bu butonları render etmiyordu (ölü kod) + brief_tamamla bozuk MCP claude -p
 // desenini kullanıyordu. Tamamlama artık ✅ reaction üzerinden deterministik çalışıyor.
@@ -857,77 +828,6 @@ function log(msg) {
   try {
     fs.appendFileSync(path.join(PROJECT_DIR, 'logs/slack-bot.log'), line + '\n');
   } catch (_) { process.stderr.write(line + '\n'); }
-}
-
-// ─── Öneri 5: Brief Validation (Ephemeral) ───────────────────────────────────
-//
-// Marka kanallarında Workflow brief mesajı geldiğinde anında validate eder.
-// Sadece brief açana görünen ephemeral uyarı gönderir.
-//
-// Tespit edilen sorunlar:
-//   1. Deadline geçmişte → işlenmeyecek uyarısı
-//   2. Aynı gün brief + saat yok → saat ekle uyarısı
-//   3. Tasarımcı atanmamış → bilgilendirme
-
-/**
- * Slack'te gelen brief mesajından alanları parse eder.
- * Workflow mesajları emoji başlıklı satırlardan oluşur:
- *   🔔 İş: ...
- *   ⏰ Süre: May 21st, 2026 at 10:00 AM UTC
- *   👤 Kim: @İpek, @Görkem Kaya
- *   🐷 Kimden: @Görkem Kaya
- */
-function parseBriefMesaji(text) {
-  if (!text) return null;
-
-  // Workflow brief'i tanı: en az İş + Süre alanı olmalı
-  const isMatch   = text.match(/[İI]ş\s*[:\-]\s*(.+)/i);
-  const sureMatch = text.match(/Süre\s*[:\-]\s*(.+)/i);
-  if (!isMatch || !sureMatch) return null;
-
-  const kimMatch    = text.match(/Kim\s*[:\-]\s*(.+)/i);
-  const kimdenMatch = text.match(/Kimden\s*[:\-]\s*<@(U[A-Z0-9]+)>/i);
-
-  return {
-    is:        isMatch[1].trim(),
-    sureStr:   sureMatch[1].trim(),
-    kim:       kimMatch ? kimMatch[1].trim() : '',
-    kimdenId:  kimdenMatch ? kimdenMatch[1] : null,
-  };
-}
-
-/**
- * "May 21st, 2026 at 10:00 AM UTC" gibi stringleri Date'e çevirir.
- * Saat bilgisi yoksa null döner (aynı gün uyarısı için).
- */
-function parseSure(sureStr) {
-  // "at HH:MM" veya "at H:MM AM/PM" içeriyorsa saat var
-  const saatVar = /at \d+:\d+/i.test(sureStr);
-
-  const d = new Date(sureStr);
-  if (isNaN(d.getTime())) return { date: null, saatVar: false };
-
-  return { date: d, saatVar };
-}
-
-// ─── Brief Queue ─────────────────────────────────────────────────────────────
-// Bot yeni brief mesajlarını data/brief-queue.json'a yazar.
-// Brief Sync çalışırken Slack kanallarını taramak yerine bu dosyayı okur — token tasarrufu.
-
-const BRIEF_QUEUE_PATH = path.join(PROJECT_DIR, 'data/brief-queue.json');
-
-function queueeEkle(entry) {
-  try {
-    let queue = [];
-    try { queue = JSON.parse(fs.readFileSync(BRIEF_QUEUE_PATH, 'utf8')); } catch (_) {}
-    // Aynı ts zaten varsa ekleme (duplicate önleme)
-    if (queue.some(e => e.ts === entry.ts && e.channel === entry.channel)) return;
-    queue.push(entry);
-    fs.writeFileSync(BRIEF_QUEUE_PATH, JSON.stringify(queue, null, 2), 'utf8');
-    log(`Brief queue'ya eklendi: ${entry.channel} @ ${entry.ts} — "${entry.is}"`);
-  } catch (err) {
-    log(`Brief queue yazma hatası: ${err.message}`);
-  }
 }
 
 // link "...p1779099416366989" → "1779099416.366989" (thread_ts ile eşleşir)
@@ -1090,96 +990,7 @@ app.event('message', async ({ event, client }) => {
     return;
   }
 
-  // Brief mi? (bot_id olsa da workflow brief'leri dahil)
-  const brief = parseBriefMesaji(event.text);
-  if (!brief) return; // Brief mesajı değil
-
-  // Kendi botumuzun mesajlarını yoksay (sonsuz döngü önleme)
-  if (event.bot_id && !brief.kimdenId) return;
-
-  const kimdenId = brief.kimdenId || event.user;
-  if (!kimdenId) return;
-
-  const channel = event.channel;
-
-  // ── Queue'ya ekle (Brief Sync kanal taramasını bypass eder) ──
-  queueeEkle({
-    ts:         event.ts,
-    channel,
-    text:       event.text,
-    user:       event.user || kimdenId,
-    is:         brief.is,
-    queued_at:  new Date().toISOString(),
-  });
-
-  const uyarilar = [];
-
-  // 1) Deadline parse
-  const { date: deadline, saatVar } = parseSure(brief.sureStr);
-  const simdi = new Date();
-  const trBugün = new Date(simdi.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
-
-  if (deadline) {
-    // Deadline geçmişte mi?
-    if (deadline < simdi) {
-      const gunFarki = Math.round((simdi - deadline) / (1000 * 60 * 60 * 24));
-      uyarilar.push(
-        `⚠️ *Deadline geçmişte!* Brief şu an işlenmeyecek.\n` +
-        `Deadline ${gunFarki > 0 ? gunFarki + ' gün önce geçti' : 'geçti'}. ` +
-        `Tarihi güncelleyip yeniden gönder.`
-      );
-    } else {
-      // Aynı gün ama saat girilmemiş mi?
-      const deadlineTR = new Date(deadline.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
-      const ayniGun = (
-        deadlineTR.getFullYear() === trBugün.getFullYear() &&
-        deadlineTR.getMonth()    === trBugün.getMonth() &&
-        deadlineTR.getDate()     === trBugün.getDate()
-      );
-      if (ayniGun && !saatVar) {
-        uyarilar.push(
-          `⚠️ *Bugün için brief ama saat belirtilmemiş.*\n` +
-          `Aynı günlük briflerde saat zorunlu. Brief mesajına reply olarak saat ekle (örn: "14:00").`
-        );
-      }
-    }
-  }
-
-  // 2) Tasarımcı atanmamış mı?
-  const kimStr = brief.kim;
-  const mentionVar = /<@U[A-Z0-9]+>/.test(kimStr);
-  if (!kimStr || !mentionVar) {
-    uyarilar.push(
-      `ℹ️ *Tasarımcı atanmamış.*\n` +
-      `Brief Canvas'a eklendi ama "Kim" alanı boş. ` +
-      `Canvas'taki satıra 👤 ile tasarımcı adını ekle.`
-    );
-  }
-
-  if (uyarilar.length === 0) return; // Her şey tamam, uyarı gönderme
-
-  const mesaj = uyarilar.join('\n\n');
-  log(`Brief validation uyarısı → ${kimdenId}: ${uyarilar.length} sorun`);
-
-  try {
-    await client.chat.postEphemeral({
-      channel,
-      user: kimdenId,
-      text: mesaj,
-      blocks: [
-        {
-          type: 'section',
-          text: { type: 'mrkdwn', text: `*📋 Brief Kontrolü — ${brief.is}*\n\n${mesaj}` },
-        },
-        {
-          type: 'context',
-          elements: [{ type: 'mrkdwn', text: '_Sadece sen görüyorsun · Brief Sync her :15/:45\'te çalışır_' }],
-        },
-      ],
-    });
-  } catch (err) {
-    log(`brief-validation ephemeral hata: ${err.message}`);
-  }
+  // Eski free-text/Workflow brief formatı kaldırıldı — brief açmanın tek yolu /yeni-brief.
 });
 
 // ─── Başlat ───────────────────────────────────────────────────────────────────
