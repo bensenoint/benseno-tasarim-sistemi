@@ -212,6 +212,35 @@ app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
   } catch (e) { console.error('[api] insight hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
+// Marka kanal özeti (AI) — kanal-ozet.js scripti yazar. Sessiz.
+app.patch('/api/brands/by-name/:name/kanal-ozet', writeGuard, async (req, res) => {
+  try {
+    const { ozet, last_ts } = req.body || {};
+    if (!ozet) return res.status(400).json({ error: 'ozet gerekli' });
+    const r = await pool.query(
+      'UPDATE brands SET kanal_ozet=$1, kanal_ozet_at=now(), kanal_ozet_ts=$2 WHERE name=$3 RETURNING id',
+      [String(ozet).slice(0, 4000), last_ts || null, req.params.name]);
+    if (!r.rows[0]) return res.status(404).json({ error: 'marka bulunamadı: ' + req.params.name });
+    res.json({ ok: true });
+  } catch (e) { console.error('[api] kanal-ozet hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
+// Marka gün-sonu insight'ı — günde bir, brand_daily'ye arşivlenir (ileride marka değerlendirmeleri için).
+app.post('/api/brands/by-name/:name/gun-sonu', writeGuard, async (req, res) => {
+  try {
+    const { insight, ozet } = req.body || {};
+    if (!insight) return res.status(400).json({ error: 'insight gerekli' });
+    const r = await pool.query(`
+      INSERT INTO brand_daily (brand_id, tarih, ozet, insight)
+      SELECT id, (now() AT TIME ZONE 'Europe/Istanbul')::date, $2, $3 FROM brands WHERE name=$1
+      ON CONFLICT (brand_id, tarih) DO UPDATE SET ozet=COALESCE(EXCLUDED.ozet, brand_daily.ozet), insight=EXCLUDED.insight
+      RETURNING id`,
+      [req.params.name, ozet ? String(ozet).slice(0, 4000) : null, String(insight).slice(0, 4000)]);
+    if (!r.rows[0]) return res.status(404).json({ error: 'marka bulunamadı: ' + req.params.name });
+    res.json({ ok: true });
+  } catch (e) { console.error('[api] gun-sonu hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // KPI anlık görüntüsü — saatlik thread bakımı tetikler; Overview spark grafiklerinin gerçek verisi.
 app.post('/api/kpi-snapshot', writeGuard, async (req, res) => {
   try {

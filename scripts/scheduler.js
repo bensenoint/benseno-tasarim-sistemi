@@ -70,6 +70,10 @@ cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
 cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
 // Thread özeti + tamamlanan iş insight'ı — hafta içi 09-19 arası saatte bir
 cron.schedule('0 9-19 * * 1-5', () => run('run-thread-ozet.sh'), opts);
+// Marka kanal özeti — hafta içi 09-19 arası saatte bir, yarım saat kaydırmalı (xx:30)
+cron.schedule('30 9-19 * * 1-5', () => run('run-kanal-ozet.sh'), opts);
+// Marka gün-sonu insight — hafta içi 18:45 (brand_daily arşivine yazar)
+cron.schedule('45 18 * * 1-5', () => run('run-kanal-gunsonu.sh'), opts);
 // 17:00 raporları kaydırıldı (aynı anda spawn olmasın → çift-claude/push yarışı yok):
 // Günlük sistem özeti — hafta içi 17:05, sadece Görkem'e (P2.3)
 cron.schedule('5 17 * * 1-5', () => run('run-gunluk-ozet.sh'), opts);

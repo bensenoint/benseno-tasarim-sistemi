@@ -170,9 +170,23 @@ async function getEmbedded() {
     bns_history = kh.rows.reverse().map(h => ({ ts: ms(h.ts), active: h.active, overdue: h.overdue, today: h.today, review: h.review, stale: h.stale }));
   } catch (e) { console.error('[queries] kpi_history okunamadı:', e.message); }
 
+  // Marka kanal özetleri + son gün-sonu insight'ı (Marka detay sayfası)
+  const bo = await pool.query(`
+    SELECT br.name, br.kanal_ozet, br.kanal_ozet_at, d.insight AS son_insight, d.tarih AS son_insight_tarih
+    FROM brands br
+    LEFT JOIN LATERAL (
+      SELECT insight, tarih FROM brand_daily WHERE brand_id = br.id AND insight IS NOT NULL
+      ORDER BY tarih DESC LIMIT 1) d ON TRUE`);
+  const ozetById = Object.fromEntries(bo.rows.map(r => [r.name, r]));
+
   return {
     now: new Date().toISOString(),
-    bns_brands: brands.rows.map(b => ({ name: b.name, color: b.color, wheelIdx: b.wheel_idx })),
+    bns_brands: brands.rows.map(b => {
+      const o = ozetById[b.name] || {};
+      return { name: b.name, color: b.color, wheelIdx: b.wheel_idx,
+        kanal_ozet: o.kanal_ozet || null, kanal_ozet_at: o.kanal_ozet_at ? ms(o.kanal_ozet_at) : null,
+        son_insight: o.son_insight || null, son_insight_tarih: o.son_insight_tarih || null };
+    }),
     bns_users: users.rows,
     bns_briefs, bns_completed, bns_deleted, bns_dept_stats, bns_events, bns_history,
     source: 'postgres', generated_at: new Date().toISOString(),

@@ -199,6 +199,30 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
         <Kpi label="Ort. revize" value={stats.avgRev != null ? stats.avgRev : "—"} sub={stats.rating != null ? "puan " + stats.rating : undefined}/>
       </div>
 
+      {/* Kanal özeti + gün sonu insight (AI — kanal-ozet.js besler) */}
+      {(() => {
+        const bm = (window.BNS_DATA && window.BNS_DATA.BR && window.BNS_DATA.BR[brand]) || {};
+        if (!bm.kanal_ozet && !bm.son_insight) return null;
+        const fmtAt = ms => { try { return new Date(ms).toLocaleString("tr-TR", { timeZone:"Europe/Istanbul", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }); } catch { return ""; } };
+        const Box = ({icon, title, text, sub}) => (
+          <div style={{ flex:1, minWidth:280 }}>
+            <div style={{ font:"600 11px/1 var(--font-sans)", letterSpacing:"0.07em", textTransform:"uppercase", color:"var(--ink-4)", marginBottom:8 }}>{icon} {title}</div>
+            <div style={{ font:"400 13px/1.6 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap" }}>{text}</div>
+            {sub && <div style={{ font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)", marginTop:6 }}>{sub}</div>}
+          </div>
+        );
+        return (
+          <Card style={{ marginBottom:"var(--section-gap)" }}>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
+              {bm.kanal_ozet && <Box icon="📡" title="Kanal Özeti" text={bm.kanal_ozet}
+                sub={bm.kanal_ozet_at ? `AI özeti · son 24 saat · ${fmtAt(bm.kanal_ozet_at)} itibarıyla` : "AI özeti · son 24 saat"}/>}
+              {bm.son_insight && <Box icon="🌙" title="Gün Sonu Insight" text={bm.son_insight}
+                sub={bm.son_insight_tarih ? `${bm.son_insight_tarih} · marka değerlendirmeleri için arşivlenir` : "marka değerlendirmeleri için arşivlenir"}/>}
+            </div>
+          </Card>
+        );
+      })()}
+
       {/* Filtreler */}
       <Card style={{ marginBottom:"var(--section-gap)" }}>
         <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
