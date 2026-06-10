@@ -511,6 +511,8 @@ function App({ currentUser, onLogout }) {
         onCreate={onCreateBrief}/>
 
       {toast && <Toast msg={toast}/>}
+      {/* 🤖 Sistem Asistanı — sağ alt yüzen sohbet */}
+      <ChatBot/>
 
       <ShortcutsHint/>
 

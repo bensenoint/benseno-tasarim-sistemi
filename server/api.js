@@ -231,6 +231,79 @@ app.patch('/api/briefs/:id/rating', auth.authGuard, auth.adminGuard, async (req,
   } catch (e) { console.error('[api] rating hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
+// ── Sistem Asistanı (dashboard chatbot) ─────────────────────────────────────
+// Kullanım bilgisi (chat-bilgi.md) + canlı veri bağlamıyla Haiku. JWT zorunlu;
+// kişi yıldız puanları bağlama SADECE admin ise girer (UI gizlilik kuralıyla aynı).
+const CHAT_BILGI = (() => {
+  try { return require('fs').readFileSync(require('path').join(__dirname, 'chat-bilgi.md'), 'utf8'); }
+  catch (e) { console.error('[chat] bilgi dosyası okunamadı:', e.message); return ''; }
+})();
+let _chatCtx = { at: 0, data: null };   // 60sn canlı-veri bağlam önbelleği
+async function chatContext() {
+  if (_chatCtx.data && Date.now() - _chatCtx.at < 60000) return _chatCtx.data;
+  const ed = await getEmbedded();
+  const L = [];
+  const dl = ms => ms ? new Date(ms).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+  L.push('## AKTİF BRIEFLER');
+  for (const b of ed.bns_briefs || []) {
+    const kisiler = [...(b.workers || []).map(w => w.name), ...(b.leads || []).map(x => x.name + '(lead)')].join(', ');
+    L.push(`#${b.no} [${b.marka}] ${b.baslik} · durum:${b.durum} · termin:${dl(b.deadline)} · ${kisiler}${b.stale ? ' · HAREKETSİZ' : ''}${b.notes ? ' · not:' + b.notes.slice(0, 80) : ''}`);
+    if (b.thread_ozet) L.push(`  özet: ${b.thread_ozet.slice(0, 300)}`);
+  }
+  L.push('\n## TAMAMLANANLAR (son 30 gün)');
+  for (const c of (ed.bns_completed || []).slice(-40)) {
+    L.push(`#${c.no} [${c.marka}] ${c.baslik} · bitiş:${dl(c.bitis)} · rev:${c.rev}${c.rating ? ` · puan:${c.rating}/5(${c.rating_by === 'ai' ? 'AI' : 'yönetici'})` : ''}`);
+    if (c.insight) L.push(`  insight: ${c.insight.slice(0, 300)}`);
+  }
+  L.push('\n## MARKA KANAL ÖZETLERİ');
+  for (const br of ed.bns_brands || []) {
+    if (br.kanal_ozet) L.push(`[${br.name}] ${br.kanal_ozet.slice(0, 250)}`);
+    if (br.son_insight) L.push(`[${br.name}] gün-sonu: ${br.son_insight.slice(0, 250)}`);
+  }
+  L.push('\n## YILDIZ KARNESİ');
+  if (ed.bns_ratings) {
+    L.push(`Firma: ${ed.bns_ratings.firma?.avg ?? '—'}/5 (${ed.bns_ratings.firma?.cnt || 0} iş)`);
+    for (const [k, v] of Object.entries(ed.bns_ratings.dept || {})) L.push(`Dept ${k}: ${v.avg}/5 (${v.cnt})`);
+  }
+  for (const s of ed.bns_sebep || []) if (s.type !== 'kisi') L.push(`sebep[${s.type}/${s.key}]: ${s.sebep}`);
+  // Kişi puanları AYRI tutulur — sadece admin bağlamına eklenir
+  const kisiP = [];
+  if (ed.bns_ratings && ed.bns_ratings.users) {
+    const nameOf = id => (ed.bns_users || []).find(u => u.id === id)?.name || id;
+    for (const [id, v] of Object.entries(ed.bns_ratings.users)) kisiP.push(`${nameOf(id)}: ${v.avg}/5 (${v.cnt} iş)`);
+    for (const s of ed.bns_sebep || []) if (s.type === 'kisi') kisiP.push(`sebep[${nameOf(s.key)}]: ${s.sebep}`);
+  }
+  _chatCtx = { at: Date.now(), data: { genel: L.join('\n'), kisiPuan: kisiP.join('\n') } };
+  return _chatCtx.data;
+}
+app.post('/api/chat', auth.authGuard, async (req, res) => {
+  try {
+    const msgs = Array.isArray(req.body?.messages) ? req.body.messages.slice(-12) : [];
+    if (!msgs.length) return res.status(400).json({ error: 'messages gerekli' });
+    if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'asistan yapılandırılmamış' });
+    const ctx = await chatContext();
+    const isAdmin = req.user.role === 'admin';
+    const system = [
+      `Sen Benseno Tasarım Sistemi'nin asistanısın (bot adı WT). Kullanıcı: ${req.user.name}${isAdmin ? ' (yönetici)' : ''}. Türkçe, kısa ve net cevap ver; gerektiğinde adım adım yönlendir, uygun yerde öneri sun. Verilerde OLMAYAN hiçbir şeyi uydurma — bilmiyorsan söyle. Kişi performans/puan bilgisi sadece yöneticilere verilir${isAdmin ? '' : ' — bu kullanıcı yönetici DEĞİL, kişi puanı/kıyası sorulursa "bu bilgi yöneticilere özeldir" de'}.`,
+      '\n# SİSTEM KULLANIM BİLGİSİ\n' + CHAT_BILGI,
+      '\n# CANLI VERİ (şu anki durum)\n' + ctx.genel,
+      isAdmin && ctx.kisiPuan ? '\n# KİŞİ PUANLARI (yönetici-özel)\n' + ctx.kisiPuan : '',
+    ].join('\n');
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5', max_tokens: 900, system,
+        messages: msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) })),
+      }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { console.error('[chat] AI hata:', j.error?.message || r.status); return res.status(502).json({ error: 'asistan şu an yanıt veremiyor' }); }
+    const reply = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+    res.json({ reply });
+  } catch (e) { console.error('[chat] hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // ── Bildirimler (dashboard zili) ────────────────────────────────────────────
 // Kendi bildirimlerim — JWT'deki slack_id ile; başkasınınki okunamaz.
 app.get('/api/notifications', auth.authGuard, async (req, res) => {

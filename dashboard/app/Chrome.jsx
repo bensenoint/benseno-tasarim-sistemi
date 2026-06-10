@@ -96,6 +96,108 @@ const NAV_ICONS = {
   Trash2:      () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
 };
 
+// 🤖 Sistem Asistanı — sağ altta yüzen sohbet. Kullanım soruları + canlı veri
+// (marka/iş/kişi) soruları /api/chat üzerinden yanıtlanır (JWT'li, kişiye özel).
+function ChatBot() {
+  const [open, setOpen] = React.useState(false);
+  const [msgs, setMsgs] = React.useState([]);   // {role:'user'|'assistant', content}
+  const [input, setInput] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+  const endRef = React.useRef(null);
+  const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+  const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+  React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
+
+  const send = async () => {
+    const q = input.trim();
+    if (!q || busy) return;
+    const next = [...msgs, { role: "user", content: q }];
+    setMsgs(next); setInput(""); setBusy(true);
+    try {
+      const r = await fetch(`${API}/api/chat`, {
+        method: "POST",
+        headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
+        body: JSON.stringify({ messages: next.slice(-12) }),
+      });
+      const j = await r.json().catch(() => ({}));
+      setMsgs(m => [...m, { role: "assistant", content: r.ok && j.reply ? j.reply : ("⚠️ " + (j.error || "Yanıt alınamadı, tekrar dene.")) }]);
+    } catch (e) {
+      setMsgs(m => [...m, { role: "assistant", content: "⚠️ Bağlantı hatası: " + e.message }]);
+    } finally { setBusy(false); }
+  };
+
+  return (
+    <>
+      {/* Açma balonu */}
+      {!open && (
+        <button onClick={() => setOpen(true)} title="Sistem Asistanı" style={{
+          position: "fixed", right: 20, bottom: 20, zIndex: 90,
+          width: 52, height: 52, borderRadius: "50%", border: 0, cursor: "pointer",
+          background: "var(--ember)", color: "#fff", fontSize: 24,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>🤖</button>
+      )}
+      {open && (
+        <div style={{
+          position: "fixed", right: 20, bottom: 20, zIndex: 90,
+          width: 380, maxWidth: "calc(100vw - 32px)", height: 520, maxHeight: "calc(100vh - 80px)",
+          background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14,
+          boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden",
+        }}>
+          <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 18 }}>🤖</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ font: "600 13px/1 var(--font-sans)", color: "var(--ink)" }}>Sistem Asistanı</div>
+              <div style={{ font: "400 10px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>kullanım · marka/iş/kişi soruları · öneri</div>
+            </div>
+            {msgs.length > 0 && <button onClick={() => setMsgs([])} title="Sohbeti temizle" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>temizle</button>}
+            <button onClick={() => setOpen(false)} style={{ border: 0, background: "transparent", color: "var(--ink-3)", cursor: "pointer", padding: 4, display: "inline-flex" }}><I.X size={15}/></button>
+          </div>
+          <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+            {msgs.length === 0 && (
+              <div style={{ font: "400 12px/1.6 var(--font-sans)", color: "var(--ink-4)" }}>
+                Merhaba! Bana sorabileceklerin:
+                <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+                  {["Brief'in durumunu Slack'ten nasıl güncellerim?", "Bauhaus markasında şu an neler var?", "Geciken iş var mı, ne önerirsin?"].map(s => (
+                    <button key={s} onClick={() => setInput(s)} style={{
+                      textAlign: "left", padding: "7px 10px", border: "1px solid var(--line)", borderRadius: 8,
+                      background: "var(--paper-2)", color: "var(--ink-2)", cursor: "pointer", font: "400 12px/1.4 var(--font-sans)",
+                    }}>{s}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {msgs.map((m, i) => (
+              <div key={i} style={{
+                alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%",
+                padding: "8px 11px", borderRadius: 10,
+                background: m.role === "user" ? "var(--ember)" : "var(--paper-2)",
+                color: m.role === "user" ? "#fff" : "var(--ink)",
+                font: "400 13px/1.55 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word",
+              }}>{m.content}</div>
+            ))}
+            {busy && <div style={{ alignSelf: "flex-start", padding: "8px 11px", borderRadius: 10, background: "var(--paper-2)", color: "var(--ink-4)", font: "400 13px/1 var(--font-sans)" }}>yazıyor…</div>}
+            <div ref={endRef}/>
+          </div>
+          <div style={{ padding: 10, borderTop: "1px solid var(--line)", display: "flex", gap: 8 }}>
+            <input value={input} onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") send(); }}
+              placeholder="Soru yaz…" disabled={busy}
+              style={{ flex: 1, padding: "9px 11px", border: "1px solid var(--line)", borderRadius: 8,
+                background: "var(--surface-sub)", color: "var(--ink)", font: "400 13px/1.3 var(--font-sans)", outline: "none" }}/>
+            <button onClick={send} disabled={busy || !input.trim()} style={{
+              padding: "0 14px", border: 0, borderRadius: 8, background: "var(--ember)", color: "#fff",
+              font: "600 13px/1 var(--font-sans)", cursor: busy ? "default" : "pointer", opacity: busy || !input.trim() ? 0.5 : 1,
+            }}>Gönder</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+try { window.BnsChatBot = ChatBot; } catch (e) {}
+
 // Bildirim zili — Slack brief-akışı DM'lerinin dashboard yansıması.
 // /api/notifications JWT ile kişiye özel; 60sn'de bir yoklar, açınca okundu işaretler.
 function NotificationBell() {
