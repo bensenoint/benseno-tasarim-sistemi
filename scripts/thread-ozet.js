@@ -22,12 +22,17 @@ async function threadReplies(tok, channel, ts) {
   return j.messages || [];
 }
 
+// İsim haritası + tatildeki kullanıcılar (Slack durum: 🌴 emoji ya da tatil/izin/OOO metni)
 async function userNames(tok) {
   const r = await fetch('https://slack.com/api/users.list?limit=200', { headers: { authorization: `Bearer ${tok}` } });
   const j = await r.json().catch(() => ({}));
-  const map = {};
-  for (const m of j.members || []) map[m.id] = m.profile?.display_name || m.real_name || m.name;
-  return map;
+  const map = {}; const vacation = new Set();
+  for (const m of j.members || []) {
+    map[m.id] = m.profile?.display_name || m.real_name || m.name;
+    const se = m.profile?.status_emoji || '', st = m.profile?.status_text || '';
+    if (/palm_tree|island|beach/.test(se) || /tatil|izin|vacation|ooo|out of office/i.test(st)) vacation.add(m.id);
+  }
+  return { map, vacation };
 }
 
 async function summarize(messages, names, brief) {
@@ -93,7 +98,29 @@ async function generateInsight(messages, names, brief) {
   return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim() || null;
 }
 
-// İki an arasındaki süre, Cmt/Paz günleri tamamen düşülerek (ms).
+// TR resmî tatilleri (tam gün) — yıl dönümünde güncelle. Dini bayramlar takvime göre kayar.
+const TR_HOLIDAYS = new Set([
+  // 2026
+  '2026-01-01',                                          // Yılbaşı
+  '2026-03-20', '2026-03-21', '2026-03-22',              // Ramazan Bayramı
+  '2026-04-23',                                          // Ulusal Egemenlik ve Çocuk Bayramı
+  '2026-05-01',                                          // Emek ve Dayanışma Günü
+  '2026-05-19',                                          // Atatürk'ü Anma, Gençlik ve Spor Bayramı
+  '2026-05-27', '2026-05-28', '2026-05-29', '2026-05-30',// Kurban Bayramı
+  '2026-07-15',                                          // Demokrasi ve Millî Birlik Günü
+  '2026-08-30',                                          // Zafer Bayramı
+  '2026-10-29',                                          // Cumhuriyet Bayramı
+  // 2027
+  '2027-01-01',
+  '2027-03-09', '2027-03-10', '2027-03-11',              // Ramazan Bayramı
+  '2027-04-23', '2027-05-01', '2027-05-19',
+  '2027-05-16', '2027-05-17', '2027-05-18', '2027-05-19',// Kurban Bayramı
+  '2027-07-15', '2027-08-30', '2027-10-29',
+]);
+
+const trYmd = (ms) => new Date(ms).toLocaleDateString('sv-SE', { timeZone: 'Europe/Istanbul' }); // YYYY-MM-DD
+
+// İki an arasındaki süre; Cmt/Paz + TR resmî tatil günleri tamamen düşülerek (ms).
 function businessMs(t0, t1) {
   if (!t0 || t1 <= t0) return 0;
   let total = 0;
@@ -102,7 +129,7 @@ function businessMs(t0, t1) {
     const dayEnd = new Date(d); dayEnd.setHours(24, 0, 0, 0);
     const chunkEnd = Math.min(dayEnd.getTime(), t1);
     const dow = new Date(d.toLocaleString('en-US', { timeZone: 'Europe/Istanbul' })).getDay();
-    if (dow !== 0 && dow !== 6) total += chunkEnd - d.getTime();
+    if (dow !== 0 && dow !== 6 && !TR_HOLIDAYS.has(trYmd(d.getTime()))) total += chunkEnd - d.getTime();
     d.setTime(chunkEnd);
   }
   return total;
@@ -148,7 +175,8 @@ async function main() {
   const briefs = (d.bns_briefs || []).filter(b => b.slack_ts && b.slack_channel);
   console.log(`Thread bakımı — ${briefs.length} aktif brief (özet + hareketsiz + cevapsız uyarısı)`);
   if (!briefs.length) return;
-  const names = await userNames(tok);
+  const { map: names, vacation } = await userNames(tok);
+  if (vacation.size) console.log(`  tatilde: ${[...vacation].map(id => names[id]).join(', ')}`);
   const now = Date.now();
 
   let updated = 0, skipped = 0, staleFlips = 0, warned = 0;
@@ -172,24 +200,27 @@ async function main() {
     } else skipped++;
 
     // ── 2) Hareketsizlik: 24 iş saati (Cmt/Paz hariç) ne durum/içerik değişikliği ne insan mesajı ──
+    // Atananların TAMAMI tatildeyse (Slack 🌴/tatil/izin/OOO) süre işlemez — resmî tatil gibi.
+    const wIds = (b.workers || []).map(w => w && w.id).filter(Boolean);
+    const allOnVacation = wIds.length > 0 && wIds.every(id => vacation.has(id));
     const lastActivity = Math.max(b.created_at || 0, b.updated_at || 0, lastHumanMs);
-    const shouldStale = lastActivity > 0 && businessMs(lastActivity, now) >= STALE_H * H;
+    const shouldStale = !allOnVacation && lastActivity > 0 && businessMs(lastActivity, now) >= STALE_H * H;
     if (shouldStale !== !!b.stale) {
       if (await setStale(b.id, shouldStale)) { staleFlips++; console.log(`  ${shouldStale ? '🟠' : '🟢'} #${b.no} ${b.marka} stale=${shouldStale}`); }
     }
 
     // ── 3) Cevapsız uyarısı: 1 saat geçti, durum hâlâ 'yeni', hiçbir atanan dokunmadı, daha önce uyarılmadı ──
-    // Sadece taze briefler (≤24sa) — ilk kurulumda eski 'yeni' brieflere toplu uyarı gitmesin.
-    if (!b.uyari_at && b.durum === 'yeni' && b.created_at &&
-        (now - b.created_at) >= UYARI_H * H && (now - b.created_at) <= 24 * H) {
+    // Tatildeki çalışana (Slack durumu 🌴/tatil/izin/OOO) uyarı gitmez; dönünce sonraki turda alır.
+    if (!b.uyari_at && b.durum === 'yeni' && b.created_at && (now - b.created_at) >= UYARI_H * H) {
       const workerIds = new Set((b.workers || []).map(w => w && w.id).filter(Boolean));
       const workerTouched = humanMsgs.some(m => workerIds.has(m.user));
       if (!workerTouched && workerIds.size) {
         let sent = 0;
         for (const wid of workerIds) {
+          if (vacation.has(wid)) continue;
           const ok = await dm(tok, wid,
             `👋 *#${b.no} ${b.marka} — ${b.baslik}* sana atandı ama henüz başlamadın görünüyor.\n` +
-            `Başlamak için thread'e emoji bırak (🎨/✍️/🤖) ya da yaz: <${b.slack_url}|thread'i aç>`);
+            `İş planına almak için thread'e emoji bırak (🎨/✍️/🤖) ya da yaz: <${b.slack_url}|thread'i aç>`);
           if (ok) sent++;
         }
         if (sent) { await markUyari(b.id); warned++; console.log(`  📣 #${b.no} ${b.marka} — ${sent} kişiye cevapsız uyarısı`); }
