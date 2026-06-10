@@ -162,11 +162,19 @@ async function getEmbedded() {
     no: e.no, baslik: e.baslik, marka: e.marka,
   }));
 
+  // KPI geçmişi (Overview spark grafikleri) — son 48 anlık görüntü, eskiden yeniye
+  let bns_history = [];
+  try {
+    const kh = await pool.query(
+      `SELECT ts, active, overdue, today, review, stale FROM kpi_history ORDER BY ts DESC LIMIT 48`);
+    bns_history = kh.rows.reverse().map(h => ({ ts: ms(h.ts), active: h.active, overdue: h.overdue, today: h.today, review: h.review, stale: h.stale }));
+  } catch (e) { console.error('[queries] kpi_history okunamadı:', e.message); }
+
   return {
     now: new Date().toISOString(),
     bns_brands: brands.rows.map(b => ({ name: b.name, color: b.color, wheelIdx: b.wheel_idx })),
     bns_users: users.rows,
-    bns_briefs, bns_completed, bns_deleted, bns_dept_stats, bns_events,
+    bns_briefs, bns_completed, bns_deleted, bns_dept_stats, bns_events, bns_history,
     source: 'postgres', generated_at: new Date().toISOString(),
   };
 }

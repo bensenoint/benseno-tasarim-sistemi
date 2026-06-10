@@ -176,6 +176,14 @@ async function main() {
   const briefs = (d.bns_briefs || []).filter(b => b.slack_ts && b.slack_channel);
   console.log(`Thread bakımı — ${briefs.length} aktif brief (özet + hareketsiz + cevapsız uyarısı)`);
   if (!briefs.length) return;
+  // KPI anlık görüntüsü — Overview spark grafiklerinin tarihsel verisi (saatlik birikir)
+  try {
+    const ks = await fetch(`${API_BASE}/api/kpi-snapshot`, {
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' }, body: '{}',
+    });
+    console.log(`  kpi-snapshot: ${ks.ok ? 'OK' : 'HATA ' + ks.status}`);
+  } catch (e) { console.log(`  kpi-snapshot hata: ${e.message}`); }
+
   const { map: names, vacation } = await userNames(tok);
   if (vacation.size) console.log(`  tatilde: ${[...vacation].map(id => names[id]).join(', ')}`);
   const usersById = Object.fromEntries((d.bns_users || []).map(u => [u.id, u]));

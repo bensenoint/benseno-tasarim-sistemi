@@ -282,13 +282,18 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
   const avgCapPct = calcAvgCapPct(data);
   const hist = data.history || [];
 
-  // Gerçek history'den spark dizileri
+  // Gerçek history'den spark dizileri (kpi_history dolana kadar mock fallback)
   const sparkActive  = histSpark(hist, "active",  active.length)  || [42,45,49,52,55,58,active.length];
   const sparkOverdue = histSpark(hist, "overdue", overdue.length) || [3,4,5,4,6,7,overdue.length];
+  const sparkToday   = histSpark(hist, "today",   today.length)   || [8,7,9,10,11,11,today.length];
+  const sparkReview  = histSpark(hist, "review",  review.length)  || [6,7,7,9,10,11,review.length];
+  const sparkStale   = histSpark(hist, "stale",   stale.length)   || [1,2,2,3,3,4,stale.length];
 
   // Trend: son kayıtla karşılaştır
   const trendActive  = histTrend(hist, "active",  active.length)  || { dir:"up",   value:"+8",  bad:true };
   const trendOverdue = histTrend(hist, "overdue", overdue.length) || { dir:"up",   value:"+2",  bad:true };
+  const trendToday   = histTrend(hist, "today",   today.length)   || { dir:"flat", value:"=" };
+  const trendReview  = histTrend(hist, "review",  review.length)  || { dir:"up",   value:"+3" };
 
   return (
     <div className="bn-tab-in">
@@ -309,9 +314,9 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
       <KpiGrid>
         <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"} onClick={onJumpJobs ? () => onJumpJobs("overdue") : undefined}/>
-        <Kpi label="Bugün teslim"  value={today.length}   variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}} sub="stabil" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
-        <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]} trend={{dir:"up", value:"+3"}} sub="dün 09:00'dan beri" onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>
-        <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={[1,2,2,3,3,4,stale.length]} sub="3+ gün güncelleme yok" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Bugün teslim"  value={today.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={sparkReview} trend={trendReview} sub={hist.length > 1 ? "son sync'e göre" : "dün 09:00'dan beri"} onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>
+        <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={sparkStale} sub="24 iş saati hareket yok" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması" onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}/>
       </KpiGrid>
 

@@ -212,6 +212,23 @@ app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
   } catch (e) { console.error('[api] insight hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
+// KPI anlık görüntüsü — saatlik thread bakımı tetikler; Overview spark grafiklerinin gerçek verisi.
+app.post('/api/kpi-snapshot', writeGuard, async (req, res) => {
+  try {
+    const r = await pool.query(`
+      INSERT INTO kpi_history (active, overdue, today, review, stale)
+      SELECT
+        count(*) FILTER (WHERE TRUE)::int,
+        count(*) FILTER (WHERE deadline < now())::int,
+        count(*) FILTER (WHERE (deadline AT TIME ZONE 'Europe/Istanbul')::date = (now() AT TIME ZONE 'Europe/Istanbul')::date)::int,
+        count(*) FILTER (WHERE durum = 'incelemede')::int,
+        count(*) FILTER (WHERE stale)::int
+      FROM briefs WHERE completed_at IS NULL AND deleted_at IS NULL
+      RETURNING id, ts, active, overdue`);
+    res.json({ ok: true, snapshot: r.rows[0] });
+  } catch (e) { console.error('[api] kpi-snapshot hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // Hareketsizlik bayrağı + cevapsız uyarı işareti — thread-ozet.js yazar. Sessiz (DM/thread notu yok).
 app.patch('/api/briefs/:id/stale', writeGuard, async (req, res) => {
   try {
