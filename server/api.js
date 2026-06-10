@@ -198,6 +198,20 @@ app.patch('/api/briefs/:id/thread-ozet', writeGuard, async (req, res) => {
   } catch (e) { console.error('[api] thread-ozet hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
+// İş insight'ı (AI) — tamamlanan işler için; ileride marka/iş değerlendirmelerinde kullanılacak. Sessiz.
+app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
+  try {
+    const { insight } = req.body || {};
+    if (!insight) return res.status(400).json({ error: 'insight gerekli' });
+    const r = await pool.query(
+      'UPDATE briefs SET insight=$1, insight_at=now() WHERE id=$2 RETURNING id',
+      [String(insight).slice(0, 4000), +req.params.id]
+    );
+    if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
+    res.json({ ok: true, id: r.rows[0].id });
+  } catch (e) { console.error('[api] insight hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // Dosya ekleri (dashboard) — base64 JSON: { files:[{name,mime,b64}], by }. Slack thread'e yükler + DB.
 app.post('/api/briefs/:id/attachments', writeGuard, async (req, res) => {
   try {

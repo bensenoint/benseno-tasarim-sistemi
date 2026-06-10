@@ -62,6 +62,37 @@ async function saveOzet(briefId, ozet, lastTs) {
   return true;
 }
 
+async function saveInsight(briefId, insight) {
+  const r = await fetch(`${API_BASE}/api/briefs/${briefId}/insight`, {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
+    body: JSON.stringify({ insight }),
+  });
+  if (!r.ok) { const j = await r.json().catch(() => ({})); console.log(`  insight kayıt hata ${r.status}: ${j.error || ''}`); return false; }
+  return true;
+}
+
+// Tamamlanan iş için değerlendirme insight'ı — ileride marka/iş analizlerinde kullanılacak.
+async function generateInsight(messages, names, brief) {
+  const key = process.env.ANTHROPIC_API_KEY;
+  const lines = messages.map(m => {
+    const who = m.bot_id ? 'WT(bot)' : (names[m.user] || m.user || '?');
+    return `${who}: ${(m.text || '').slice(0, 500)}`;
+  }).join('\n');
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5', max_tokens: 400,
+      system: 'Bir tasarım ajansında TAMAMLANMIŞ bir işin thread\'inden değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka ve iş performans analizlerinde kullanılacak — şu açılardan kısa, olgusal değerlendir: süreç nasıl aktı (pürüzsüz mü, revize/sürtünme oldu mu), müşteri/marka tarafı geri bildirimi neydi, gecikme yaşandıysa nedeni, bu marka/iş tipi için kayda değer öğrenim ne. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Yeterli yazışma yoksa "Değerlendirme için yeterli yazışma yok." de. Düz metin, en fazla 5 cümle.',
+      messages: [{ role: 'user', content: `İş: #${brief.no} ${brief.marka} — ${brief.baslik} (rev: ${brief.rev || 0})\n\nThread:\n${lines.slice(0, 12000)}` }],
+    }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { console.log(`  insight hata: ${j.error?.message || r.status}`); return null; }
+  return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim() || null;
+}
+
 async function main() {
   const tok = token();
   if (!tok) { console.error('SLACK token yok — çıkılıyor'); process.exit(1); }
@@ -82,7 +113,24 @@ async function main() {
     if (await saveOzet(b.id, ozet, lastTs)) { updated++; console.log(`  ✓ #${b.no} ${b.marka} özetlendi (${msgs.length} mesaj)`); }
     await new Promise(r => setTimeout(r, 1100)); // Slack + Anthropic rate-limit nefesi
   }
-  console.log(`bitti — ${updated} güncellendi, ${skipped} atlandı (değişiklik yok)`);
+  console.log(`aktifler bitti — ${updated} güncellendi, ${skipped} atlandı (değişiklik yok)`);
+
+  // ── Tamamlananlar: insight (bir kez) ──────────────────────
+  // Son 30 günde biten, insight'ı olmayan, thread'li işler. İleride marka/iş değerlendirmesi için.
+  const cutoff = Date.now() - 30 * 86400000;
+  const done = (d.bns_completed || []).filter(b =>
+    b.slack_ts && b.slack_channel && !b.insight && b.bitis && b.bitis >= cutoff);
+  console.log(`Insight — ${done.length} tamamlanan iş bekliyor`);
+  let insighted = 0;
+  for (const b of done) {
+    const msgs = await threadReplies(tok, b.slack_channel, b.slack_ts);
+    if (!msgs) continue;
+    const ins = await generateInsight(msgs, names, b);
+    if (!ins) continue;
+    if (await saveInsight(b.id, ins)) { insighted++; console.log(`  ✓ #${b.no} ${b.marka} insight kaydedildi`); }
+    await new Promise(r => setTimeout(r, 1100));
+  }
+  console.log(`bitti — ${insighted} insight üretildi`);
 }
 
 main().catch(e => { console.error('thread-ozet hata:', e.message); process.exit(1); });

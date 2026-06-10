@@ -11,7 +11,7 @@ async function allBriefsWithAssignees() {
            b.baslik, b.dept, b.deadline, b.saat, b.durum, b.priority, b.priority_label,
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
            b.akis, b.stale, b.created_at, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
-           b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts,
+           b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.insight, b.insight_at,
            COALESCE(json_agg(
              json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color)
              ORDER BY a.sira NULLS LAST
@@ -122,6 +122,8 @@ async function getEmbedded() {
     deadline: ms(b.deadline), durum: b.durum, rev: b.rev || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || '#',
+    slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
+    thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at || null, thread_ozet_ts: b.thread_ozet_ts || null,
     attachments: attByBrief[b.id] || [],
   }));
 
@@ -132,6 +134,8 @@ async function getEmbedded() {
     deadline: ms(b.deadline), bitis: ms(b.completed_at), rev: b.rev || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || '#',
+    slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
+    thread_ozet: b.thread_ozet || null, insight: b.insight || null, insight_at: b.insight_at || null,
     attachments: attByBrief[b.id] || [],
   }));
 
