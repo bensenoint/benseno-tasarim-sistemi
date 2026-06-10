@@ -44,7 +44,7 @@ const USERS = [
   // Editör (6)
   { id: "U09BZHR25NG", name: "Eda Tireli",        mono: "ET", rol: "editor" },
   { id: "U07PV0RA9L2", name: "Eda Ayral",         mono: "EY", rol: "editor" },
-  { id: "U08NQJ27G5S", name: "Melis Can",         mono: "MC", rol: "editor" },
+  { id: "U08NQJ27G5S", name: "Melis Genç",        mono: "MG", rol: "editor" },
   { id: "U05PP70GQTX", name: "Aylin Canel",       mono: "AC", rol: "editor" },
   { id: "U063T8M5HL4", name: "Buse Gürbüzer",     mono: "BG", rol: "editor" },
   { id: "U0AAC3YK20G", name: "Simge Acar",        mono: "SA", rol: "editor" },
