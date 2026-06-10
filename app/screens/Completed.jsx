@@ -1,6 +1,6 @@
 // app/screens/Completed.jsx — Tamamlananlar (12-col table).
 
-function CompletedScreen({ data, onOpenBrief }) {
+function CompletedScreen({ data, onOpenBrief, currentUser }) {
   const [range, setRange] = React.useState("30");
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
   const allCompleted = data._allCompleted || data.completed || [];
@@ -103,7 +103,10 @@ function CompletedScreen({ data, onOpenBrief }) {
                 <td style={{...cs(true, "right"), color: c.gecikmeH > 0 ? "var(--prio-red)" : "var(--ink-4)"}}>
                   {c.gecikmeH > 0 ? c.gecikmeH.toFixed(1) + " sa" : "—"}
                 </td>
-                <td style={cs()}><Stars n={c.rating}/></td>
+                <td style={cs()} onClick={e => e.stopPropagation()}>
+                  <Stars n={c.rating} ai={c.rating_by === 'ai'}
+                    onRate={currentUser?.role === 'admin' ? (n) => rateBrief(c.id, n) : null}/>
+                </td>
                 <td className="bns-col-mobile-hide" style={cs()}>
                   <a href={c.slack_url && c.slack_url !== "#" ? c.slack_url : undefined}
                      target="_blank" rel="noopener noreferrer"
@@ -121,12 +124,28 @@ function CompletedScreen({ data, onOpenBrief }) {
   );
 }
 
-function Stars({ n }) {
+// Yönetici puanı değiştirmek için yıldıza tıklar (PATCH /api/briefs/:id/rating).
+function rateBrief(id, n) {
+  const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+  const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+  fetch(`${API}/api/briefs/${id}/rating`, {
+    method: "PATCH",
+    headers: { "content-type": "application/json", Authorization: "Bearer " + tok },
+    body: JSON.stringify({ rating: n }),
+  }).then(r => { if (r.ok && window.bnsRefresh) window.bnsRefresh(); })
+    .catch(() => {});
+}
+
+function Stars({ n, onRate, ai }) {
   return (
-    <span style={{display:"inline-flex", gap: 1}}>
+    <span style={{display:"inline-flex", gap: 1, alignItems:"center"}} title={onRate ? "Puanı değiştirmek için yıldıza tıkla" : undefined}>
       {[1,2,3,4,5].map(i => (
-        <I.StarFill key={i} size={11} color={i <= n ? "var(--prio-yellow)" : "var(--line-strong)"}/>
+        <span key={i} onClick={onRate ? () => onRate(i) : undefined}
+          style={{display:"inline-flex", cursor: onRate ? "pointer" : "default", padding: onRate ? 1 : 0}}>
+          <I.StarFill size={11} color={i <= n ? "var(--prio-yellow)" : "var(--line-strong)"}/>
+        </span>
       ))}
+      {ai && n > 0 && <span style={{font:"600 8px/1 var(--font-sans)", color:"var(--ink-4)", marginLeft:3, letterSpacing:"0.05em"}}>AI</span>}
     </span>
   );
 }

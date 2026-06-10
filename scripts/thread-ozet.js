@@ -67,11 +67,11 @@ async function saveOzet(briefId, ozet, lastTs) {
   return true;
 }
 
-async function saveInsight(briefId, insight) {
+async function saveInsight(briefId, insight, puan) {
   const r = await fetch(`${API_BASE}/api/briefs/${briefId}/insight`, {
     method: 'PATCH',
     headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
-    body: JSON.stringify({ insight }),
+    body: JSON.stringify({ insight, puan: puan || undefined }),
   });
   if (!r.ok) { const j = await r.json().catch(() => ({})); console.log(`  insight kayıt hata ${r.status}: ${j.error || ''}`); return false; }
   return true;
@@ -88,14 +88,17 @@ async function generateInsight(messages, names, brief) {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5', max_tokens: 400,
-      system: 'Bir tasarım ajansında TAMAMLANMIŞ bir işin thread\'inden değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka ve iş performans analizlerinde kullanılacak — şu açılardan kısa, olgusal değerlendir: süreç nasıl aktı (pürüzsüz mü, revize/sürtünme oldu mu), müşteri/marka tarafı geri bildirimi neydi, gecikme yaşandıysa nedeni, bu marka/iş tipi için kayda değer öğrenim ne. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Yeterli yazışma yoksa "Değerlendirme için yeterli yazışma yok." de. Düz metin, en fazla 5 cümle.',
+      model: 'claude-haiku-4-5', max_tokens: 450,
+      system: 'Bir tasarım ajansında TAMAMLANMIŞ bir işin thread\'inden değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka ve iş performans analizlerinde kullanılacak — şu açılardan kısa, olgusal değerlendir: süreç nasıl aktı (pürüzsüz mü, revize/sürtünme oldu mu), müşteri/marka tarafı geri bildirimi neydi, gecikme yaşandıysa nedeni, bu marka/iş tipi için kayda değer öğrenim ne. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Yeterli yazışma yoksa "Değerlendirme için yeterli yazışma yok." de. Düz metin, en fazla 5 cümle. SON SATIRA tek başına "PUAN: n" yaz (n = 1-5 iş kalite puanı: 5 = pürüzsüz/zamanında/revizesiz, 3 = normal sürtünme, 1 = ciddi sorun/gecikme/çok revize; yazışma yetersizse PUAN: 3).',
       messages: [{ role: 'user', content: `İş: #${brief.no} ${brief.marka} — ${brief.baslik} (rev: ${brief.rev || 0})\n\nThread:\n${lines.slice(0, 12000)}` }],
     }),
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) { console.log(`  insight hata: ${j.error?.message || r.status}`); return null; }
-  return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim() || null;
+  const raw = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+  if (!raw) return null;
+  const m = raw.match(/PUAN:\s*([1-5])\s*$/i);
+  return { text: raw.replace(/\n?PUAN:\s*[1-5]\s*$/i, '').trim(), puan: m ? +m[1] : null };
 }
 
 // TR resmî tatilleri (tam gün) — yıl dönümünde güncelle. Dini bayramlar takvime göre kayar.
@@ -282,16 +285,19 @@ async function main() {
   // ── Tamamlananlar: insight (bir kez) ──────────────────────
   // Son 30 günde biten, insight'ı olmayan, thread'li işler. İleride marka/iş değerlendirmesi için.
   const cutoff = Date.now() - 30 * 86400000;
+  // insight'sız VEYA (insight var ama puanlanmamış) tamamlananlar — puan AI'dan gelir, yönetici override edebilir
   const done = (d.bns_completed || []).filter(b =>
-    b.slack_ts && b.slack_channel && !b.insight && b.bitis && b.bitis >= cutoff);
+    b.slack_ts && b.slack_channel && b.bitis && b.bitis >= cutoff && (!b.insight || !b.rating));
   console.log(`Insight — ${done.length} tamamlanan iş bekliyor`);
   let insighted = 0;
   for (const b of done) {
     const msgs = await threadReplies(tok, b.slack_channel, b.slack_ts);
     if (!msgs) continue;
     const ins = await generateInsight(msgs, names, b);
-    if (!ins) continue;
-    if (await saveInsight(b.id, ins)) { insighted++; console.log(`  ✓ #${b.no} ${b.marka} insight kaydedildi`); }
+    if (!ins || !ins.text) continue;
+    if (await saveInsight(b.id, ins.text, ins.puan)) {
+      insighted++; console.log(`  ✓ #${b.no} ${b.marka} insight kaydedildi${ins.puan ? ` (puan: ${ins.puan}/5)` : ''}`);
+    }
     await new Promise(r => setTimeout(r, 1100));
   }
   console.log(`bitti — ${insighted} insight üretildi`);

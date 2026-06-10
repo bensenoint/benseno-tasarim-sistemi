@@ -525,6 +525,7 @@ function bnsHydrateCompleted(raw, idx) {
     gecikme,
     gecikmeH,
     rating: raw.rating != null ? raw.rating : null,
+    rating_by: raw.rating_by || null,   // 'ai' = AI puanı, U... = yönetici override
     slack_url:  raw.slack_url || "#",
     image_url:  raw.image_url || null,  // Slack thread'indeki ilk görsel (Brief Sync tarafından doldurulur)
     notes: raw.notes || "",
