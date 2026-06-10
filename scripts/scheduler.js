@@ -68,6 +68,8 @@ function run(script) {
 cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
 // Kişisel iş özeti — hafta içi 07:55, aktif işi olan her çalışana DM
 cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
+// Thread özeti — hafta içi 09-19 arası 2 saatte bir; aktif brief thread'lerini AI ile özetler
+cron.schedule('0 9-19/2 * * 1-5', () => run('run-thread-ozet.sh'), opts);
 // 17:00 raporları kaydırıldı (aynı anda spawn olmasın → çift-claude/push yarışı yok):
 // Günlük sistem özeti — hafta içi 17:05, sadece Görkem'e (P2.3)
 cron.schedule('5 17 * * 1-5', () => run('run-gunluk-ozet.sh'), opts);

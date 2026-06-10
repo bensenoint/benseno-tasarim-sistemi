@@ -150,6 +150,24 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             <span style={{marginLeft:"auto", color:"var(--ink-4)"}}>↗</span>
           </div>
 
+          {b.thread_ozet && (
+            <>
+              <Hr/>
+              <Eyebrow>💬 Thread Özeti</Eyebrow>
+              <div style={{
+                marginTop:10, padding:"12px 14px", background:"var(--paper-2)", borderRadius:8,
+                font:"400 13px/1.6 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap"
+              }}>
+                {b.thread_ozet}
+              </div>
+              {b.thread_ozet_at && (
+                <div style={{marginTop:6, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
+                  AI özeti · {new Date(b.thread_ozet_at).toLocaleString("tr-TR", {timeZone:"Europe/Istanbul", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"})} itibarıyla
+                </div>
+              )}
+            </>
+          )}
+
           <Hr/>
 
           <Eyebrow>Aktivite</Eyebrow>

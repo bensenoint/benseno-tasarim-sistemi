@@ -491,6 +491,8 @@ function bnsHydrateBrief(raw, idx) {
     satis:        raw.satis != null ? raw.satis : null,       // ₺
     fatura:       !!raw.fatura,   // fatura kesildi mi
     odeme:        !!raw.odeme,    // ödeme yapıldı mı
+    thread_ozet:    raw.thread_ozet || null,     // AI thread özeti (thread-ozet.js yazar)
+    thread_ozet_at: raw.thread_ozet_at || null,
     _kimden_id:   raw._kimden_id || null
   };
 }

@@ -11,6 +11,7 @@ async function allBriefsWithAssignees() {
            b.baslik, b.dept, b.deadline, b.saat, b.durum, b.priority, b.priority_label,
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
            b.akis, b.stale, b.created_at, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
+           b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts,
            COALESCE(json_agg(
              json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color)
              ORDER BY a.sira NULLS LAST

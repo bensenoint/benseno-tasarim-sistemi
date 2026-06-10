@@ -184,6 +184,20 @@ app.patch('/api/briefs/by-ts/:ts/set-image', writeGuard, async (req, res) => {
 });
 app.patch('/api/briefs/by-ts/:ts', writeGuard, handleWrite(async req => writes.patchBrief(await writes.tsToId(req.params.ts), req.body)));
 
+// Thread özeti (AI) — thread-ozet.js scripti yazar. Bilinçli olarak sessiz: DM/thread notu YOK.
+app.patch('/api/briefs/:id/thread-ozet', writeGuard, async (req, res) => {
+  try {
+    const { ozet, last_ts } = req.body || {};
+    if (!ozet) return res.status(400).json({ error: 'ozet gerekli' });
+    const r = await pool.query(
+      'UPDATE briefs SET thread_ozet=$1, thread_ozet_at=now(), thread_ozet_ts=$2 WHERE id=$3 RETURNING id',
+      [String(ozet).slice(0, 4000), last_ts || null, +req.params.id]
+    );
+    if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
+    res.json({ ok: true, id: r.rows[0].id });
+  } catch (e) { console.error('[api] thread-ozet hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // Dosya ekleri (dashboard) — base64 JSON: { files:[{name,mime,b64}], by }. Slack thread'e yükler + DB.
 app.post('/api/briefs/:id/attachments', writeGuard, async (req, res) => {
   try {
