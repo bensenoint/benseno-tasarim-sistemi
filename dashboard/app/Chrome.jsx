@@ -222,6 +222,8 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
             for (const u of (defaultUsers || [])) {
               const rol = u.rol || "diger";
               (grouped[rol] = grouped[rol] || []).push(u);
+              // Departman yöneticisi kendi departman grubunda da görünsün (Yönetici grubuna ek olarak)
+              if (rol === "yonetici" && u.dept) (grouped[u.dept] = grouped[u.dept] || []).push(u);
             }
             // Her grubu alfabetik sırala
             Object.keys(grouped).forEach(k => {

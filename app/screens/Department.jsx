@@ -10,13 +10,14 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
   const r = roleMap[role];
   // rows henüz hesaplanmadı — capPct rows.length ile override edilecek (aşağıda)
   const _capPctFromStats = r.stats ? (r.stats.capacity_pct != null ? r.stats.capacity_pct : bnsCapPct(r.stats)) : 0;
-  const people = data.USERS.filter(u => (u.rol || u.dept) === role);
+  // dept öncelikli eşleşme: departman yöneticileri (rol='yonetici', dept=ilgili) de ekibin içinde sayılır
+  const people = data.USERS.filter(u => (u.dept || u.rol) === role);
   // Department her zaman bu rolün tüm briefler'ini gösterir — viewMode (mine/dept/all) etkilemez.
   const allBriefs = data._allBriefs || data.briefs;
   const rows = allBriefs.filter(b =>
-    (b.lead && (b.lead.rol || b.lead.dept) === role) ||
+    (b.lead && (b.lead.dept || b.lead.rol) === role) ||
     (b.dept === role) ||
-    (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.rol || c.dept) === role))
+    (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.dept || c.rol) === role))
   );
   const overdueCount = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length;
   // Kapasite: rows.length / (people × 6 slot) — deptStats.active yerine gerçek satır sayısı
