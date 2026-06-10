@@ -40,7 +40,7 @@ const USERS = [
   { id: "U09BFPBKQG7", name: "Hasan Serdar Arda", mono: "HA", rol: "tasarim" },
   { id: "U0B3K2WE7SB", name: "Pelin Özdemir",     mono: "PÖ", rol: "tasarim", isNew: true },
   { id: "U0AK8U7L57F", name: "İrem Özkan",        mono: "İÖ", rol: "tasarim" },
-  { id: "U08HLMHTGEL", name: "Serhat Yıldız",     mono: "SY", rol: "tasarim" },
+  { id: "U08HLMHTGEL", name: "Serhat Tokmak",     mono: "ST", rol: "tasarim" },
   // Editör (6)
   { id: "U09BZHR25NG", name: "Eda Tireli",        mono: "ET", rol: "editor" },
   { id: "U07PV0RA9L2", name: "Eda Ayral",         mono: "EY", rol: "editor" },
