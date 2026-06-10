@@ -42,7 +42,11 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
       <PageHead
         eyebrow={`Departman · ${r.stats.people} kişi`}
         title={`${r.name} departmanı`}
-        subtitle={`${rows.length} aktif iş · %${capPct} kapasite · ${overdueCount} geciken`}
+        subtitle={(() => {
+          const dr = window.BNS_DATA?.ratings?.dept?.[role];
+          const star = dr && dr.cnt ? ` · ⭐ ${dr.avg}/5 (${dr.cnt} iş)` : "";
+          return `${rows.length} aktif iş · %${capPct} kapasite · ${overdueCount} geciken${star}`;
+        })()}
         actions={null}
       />
 

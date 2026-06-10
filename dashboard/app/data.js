@@ -608,6 +608,10 @@ try {
     if (Array.isArray(ed.bns_brand_stats) && ed.bns_brand_stats.length > 0) {
       window.BNS_DATA.brandStats = ed.bns_brand_stats;
     }
+    // ⭐ Yıldız karnesi: canlı ortalamalar + AI sebep açıklamaları
+    window.BNS_DATA.ratings = ed.bns_ratings || null;
+    window.BNS_DATA.sebepList = Array.isArray(ed.bns_sebep) ? ed.bns_sebep : [];
+    window.bnsSebep = (type, key) => (window.BNS_DATA.sebepList || []).find(s => s.type === type && s.key === key) || null;
     // 7 günlük geçmiş (agent-state.json history → live-data.json → spark chart)
     if (Array.isArray(ed.bns_history) && ed.bns_history.length > 0) {
       window.BNS_DATA.history = ed.bns_history; // [{ts,active,overdue,dm_sent,errors,ok}, ...]

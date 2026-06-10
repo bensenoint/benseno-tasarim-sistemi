@@ -155,6 +155,25 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser }) {
           <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:17, color:"var(--ink-3)", marginTop:6}}>
             {myActive.length} aktif · {myCompleted.length} tamamlandı · {totalRev} toplam revize
           </div>
+          {/* ⭐ Kişi yıldız puanı + gün-sonu sebep açıklaması */}
+          {(() => {
+            const R = window.BNS_DATA && window.BNS_DATA.ratings;
+            const my = R && R.users && R.users[u.id];
+            if (!my || !my.cnt) return null;
+            const why = typeof window.bnsSebep === "function" ? window.bnsSebep("kisi", u.id) : null;
+            return (
+              <div style={{marginTop:8}}>
+                <div style={{display:"flex", alignItems:"center", gap:8}}>
+                  <span style={{display:"inline-flex", gap:1}}>
+                    {[1,2,3,4,5].map(i => <I.StarFill key={i} size={13} color={i <= Math.round(my.avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
+                  </span>
+                  <span style={{font:"600 14px/1 var(--font-mono)", color:"var(--ink)"}}>{my.avg}</span>
+                  <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>({my.cnt} puanlı iş)</span>
+                </div>
+                {why && <div style={{marginTop:5, font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", maxWidth:520}}>{why.sebep}</div>}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Zaman filtresi */}

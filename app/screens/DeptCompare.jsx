@@ -69,6 +69,39 @@ function DeptCompareScreen({ data }) {
         title="Departmanlar · karşılaştırma"
         subtitle="tasarım · editör · AI · son 30 gün performansı"/>
 
+      {/* ⭐ Yıldız Karnesi — AI puanlarından firma + departman ortalamaları, gün sonu sebep açıklamalarıyla */}
+      {(() => {
+        const R = window.BNS_DATA && window.BNS_DATA.ratings;
+        if (!R || !R.firma || !R.firma.cnt) return null;
+        const sebep = (t, k) => (typeof window.bnsSebep === "function" && window.bnsSebep(t, k)) || null;
+        const DEPT_TR = { tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "Freelance" };
+        const Row = ({ label, avg, cnt, why, big }) => (
+          <div style={{display:"flex", alignItems:"flex-start", gap:12, padding:"9px 0", borderBottom:"1px solid var(--line-soft)"}}>
+            <span style={{font:`${big?600:500} 13px/1.3 var(--font-sans)`, color:"var(--ink)", minWidth:150, flexShrink:0}}>{label}</span>
+            <span style={{display:"inline-flex", gap:1, flexShrink:0, paddingTop:1}}>
+              {[1,2,3,4,5].map(i => <I.StarFill key={i} size={12} color={i <= Math.round(avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
+            </span>
+            <span style={{font:"600 13px/1.3 var(--font-mono)", color:"var(--ink)", flexShrink:0}}>{avg}</span>
+            <span style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)", flexShrink:0}}>({cnt} iş)</span>
+            {why && <span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}>{why.sebep}</span>}
+          </div>
+        );
+        return (
+          <Card style={{marginBottom:"var(--section-gap)"}}>
+            <Eyebrow>⭐ Yıldız Karnesi</Eyebrow>
+            <div style={{marginTop:6}}>
+              <Row label="Benseno (tüm firma)" avg={R.firma.avg} cnt={R.firma.cnt} why={sebep("firma","benseno")} big/>
+              {Object.entries(R.dept || {}).sort().map(([k, v]) => (
+                <Row key={k} label={DEPT_TR[k] || k} avg={v.avg} cnt={v.cnt} why={sebep("dept", k)}/>
+              ))}
+            </div>
+            <div style={{marginTop:8, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
+              Puanlar AI iş değerlendirmelerinden (yönetici override edebilir) · sebep açıklamaları her gün 18:45'te güncellenir
+            </div>
+          </Card>
+        );
+      })()}
+
       <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap: 12, marginBottom: "var(--section-gap)"}}>
         {["tasarim", "editor", "ai"].map(k => {
           const s = d[k];

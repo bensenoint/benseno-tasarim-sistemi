@@ -199,6 +199,22 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
         <Kpi label="Ort. revize" value={stats.avgRev != null ? stats.avgRev : "—"} sub={stats.rating != null ? "puan " + stats.rating : undefined}/>
       </div>
 
+      {/* ⭐ Marka yıldız puanı + sebep açıklaması */}
+      {(() => {
+        const why = typeof window.bnsSebep === "function" ? window.bnsSebep("marka", brand) : null;
+        if (!stats.rating && !why) return null;
+        return (
+          <div style={{display:"flex", alignItems:"flex-start", gap:10, marginBottom:"var(--section-gap)", padding:"10px 14px", background:"var(--surface)", border:"1px solid var(--line)", borderRadius:10}}>
+            <span style={{display:"inline-flex", gap:1, paddingTop:2}}>
+              {[1,2,3,4,5].map(i => <I.StarFill key={i} size={13} color={i <= Math.round(why?.rating_avg || stats.rating || 0) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
+            </span>
+            <span style={{font:"600 14px/1.4 var(--font-mono)", color:"var(--ink)"}}>{why?.rating_avg || stats.rating}</span>
+            {why?.rating_count != null && <span style={{font:"400 11px/1.5 var(--font-sans)", color:"var(--ink-4)"}}>({why.rating_count} iş)</span>}
+            {why && <span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}>{why.sebep}</span>}
+          </div>
+        );
+      })()}
+
       {/* Kanal özeti + gün sonu insight (AI — kanal-ozet.js besler) */}
       {(() => {
         const bm = (window.BNS_DATA && window.BNS_DATA.BR && window.BNS_DATA.BR[brand]) || {};

@@ -143,7 +143,49 @@ async function main() {
       await new Promise(r => setTimeout(r, 1100));
     }
   }
-  console.log(`bitti — özet:${updated} atlanan:${skipped}${GUNSONU ? ` insight:${insights}` : ''}`);
+  console.log(`kanallar bitti — özet:${updated} atlanan:${skipped}${GUNSONU ? ` insight:${insights}` : ''}`);
+
+  // ── Gün sonu: yıldız karnesi sebep açıklamaları (kişi/dept/marka/firma) ──
+  // Puanlı işlerin insight'larından entity başına 1-2 cümlelik "neden bu puan" açıklaması.
+  // Sadece puan sayısı değişen entity'ler için AI çağrısı yapılır (maliyet kontrolü).
+  if (GUNSONU) {
+    const rated = (d.bns_completed || []).filter(b => b.rating && b.insight);
+    const sebepStored = Object.fromEntries((d.bns_sebep || []).map(s => [`${s.type}:${s.key}`, s]));
+    const groups = {};  // "type:key" → { type, key, label, items:[{rating, insight, baslik}] }
+    const push = (type, key, label, b) => {
+      const k = `${type}:${key}`;
+      (groups[k] = groups[k] || { type, key, label, items: [] }).items.push(
+        { rating: b.rating, insight: b.insight, baslik: `#${b.no} ${b.baslik}` });
+    };
+    const userName = id => (d.bns_users || []).find(u => u.id === id)?.name || id;
+    const userDept = id => (d.bns_users || []).find(u => u.id === id)?.dept || null;
+    for (const b of rated) {
+      push('firma', 'benseno', 'Benseno (tüm firma)', b);
+      push('marka', b.marka, b.marka, b);
+      const ids = [...new Set([...(b.workers || []), ...(b.leads || [])].map(x => x && x.id).filter(Boolean))];
+      for (const id of ids) {
+        push('kisi', id, userName(id), b);
+        const dept = userDept(id);
+        if (dept && dept !== 'freelance') push('dept', dept, dept, b);
+      }
+    }
+    let sebepCount = 0;
+    for (const g of Object.values(groups)) {
+      const stored = sebepStored[`${g.type}:${g.key}`];
+      if (stored && stored.rating_count === g.items.length) continue;   // yeni puan yok → AI'a gitme
+      const avg = +(g.items.reduce((a, x) => a + x.rating, 0) / g.items.length).toFixed(1);
+      const facts = g.items.map(x => `[${x.rating}/5] ${x.baslik}: ${x.insight}`).join('\n');
+      const sebep = await haiku(
+        `Bir tasarım ajansının yıldız karnesini açıklıyorsun. Aşağıda "${g.label}" için puanlanmış işlerin değerlendirmeleri var (ortalama ${avg}/5). Bu ortalamanın NEDEN yüksek/düşük olduğunu 1-2 cümleyle, olgusal ve insight'lara dayanarak açıkla — güçlü yanı ve (varsa) tekrarlayan sorunu söyle. UYDURMA, sadece verilen değerlendirmelere dayan. Düz metin.`,
+        facts.slice(0, 10000));
+      if (sebep && await apiWrite('POST', '/api/rating-sebep',
+        { type: g.type, key: g.key, sebep, rating_avg: avg, rating_count: g.items.length })) {
+        sebepCount++; console.log(`  ⭐ ${g.type}/${g.label}: ${avg}/5 sebep güncellendi`);
+      }
+      await new Promise(r => setTimeout(r, 1100));
+    }
+    console.log(`yıldız karnesi — ${sebepCount} sebep güncellendi`);
+  }
 }
 
 main().catch(e => { console.error('kanal-ozet hata:', e.message); process.exit(1); });

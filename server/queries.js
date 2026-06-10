@@ -62,7 +62,9 @@ async function getState() {
         count(b.id) FILTER (WHERE b.completed_at IS NULL)::int active,
         count(b.id) FILTER (WHERE b.completed_at >= now() - interval '30 days')::int done30,
         count(b.id) FILTER (WHERE b.completed_at IS NULL AND b.deadline < now())::int overdue,
-        round(avg(b.rev) FILTER (WHERE b.completed_at IS NOT NULL), 1) avg_rev
+        round(avg(b.rev) FILTER (WHERE b.completed_at IS NOT NULL), 1) avg_rev,
+        round(avg(b.rating) FILTER (WHERE b.rating IS NOT NULL), 1)::float rating,
+        count(b.id) FILTER (WHERE b.rating IS NOT NULL)::int rating_count
       FROM brands br LEFT JOIN briefs b ON b.marka_id = br.id
       GROUP BY br.name, br.color ORDER BY active DESC, br.name`),
     pool.query(`SELECT e.id, e.brief_id, e.user_id, u.name AS user_name, e.verb, e.detail, e.source, e.ts
@@ -166,6 +168,26 @@ async function getEmbedded() {
     no: e.no, baslik: e.baslik, marka: e.marka,
   }));
 
+  // ⭐ Yıldız karnesi — puanlı tamamlanan işlerden canlı ortalamalar (firma/dept/kişi/marka)
+  let bns_ratings = null, bns_sebep = [];
+  try {
+    const [firma, deptR, userR, sebep] = await Promise.all([
+      pool.query(`SELECT round(avg(rating),1)::float avg, count(*)::int cnt FROM briefs WHERE rating IS NOT NULL`),
+      pool.query(`SELECT dept, round(avg(rating),1)::float avg, count(*)::int cnt
+                  FROM briefs WHERE rating IS NOT NULL AND dept IS NOT NULL GROUP BY dept`),
+      pool.query(`SELECT a.user_id AS id, round(avg(b.rating),1)::float avg, count(DISTINCT b.id)::int cnt
+                  FROM briefs b JOIN brief_assignees a ON a.brief_id=b.id AND a.role IN ('contributor','lead')
+                  WHERE b.rating IS NOT NULL GROUP BY a.user_id`),
+      pool.query(`SELECT type, key, sebep, rating_avg::float, rating_count, updated_at FROM entity_sebep`),
+    ]);
+    bns_ratings = {
+      firma: firma.rows[0] || { avg: null, cnt: 0 },
+      dept: Object.fromEntries(deptR.rows.map(r => [r.dept, { avg: r.avg, cnt: r.cnt }])),
+      users: Object.fromEntries(userR.rows.map(r => [r.id, { avg: r.avg, cnt: r.cnt }])),
+    };
+    bns_sebep = sebep.rows;
+  } catch (e) { console.error('[queries] ratings okunamadı:', e.message); }
+
   // KPI geçmişi (Overview spark grafikleri) — son 48 anlık görüntü, eskiden yeniye
   let bns_history = [];
   try {
@@ -193,6 +215,7 @@ async function getEmbedded() {
     }),
     bns_users: users.rows,
     bns_briefs, bns_completed, bns_deleted, bns_dept_stats, bns_events, bns_history,
+    bns_ratings, bns_sebep,
     source: 'postgres', generated_at: new Date().toISOString(),
   };
 }

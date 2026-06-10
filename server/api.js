@@ -258,6 +258,20 @@ app.post('/api/notifications', writeGuard, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Yıldız karnesi sebep açıklaması (AI) — gün-sonu turu yazar. Sessiz upsert.
+app.post('/api/rating-sebep', writeGuard, async (req, res) => {
+  try {
+    const { type, key, sebep, rating_avg, rating_count } = req.body || {};
+    if (!type || !key || !sebep) return res.status(400).json({ error: 'type, key, sebep gerekli' });
+    await pool.query(`
+      INSERT INTO entity_sebep (type, key, sebep, rating_avg, rating_count, updated_at)
+      VALUES ($1,$2,$3,$4,$5,now())
+      ON CONFLICT (type, key) DO UPDATE SET sebep=$3, rating_avg=$4, rating_count=$5, updated_at=now()`,
+      [type, key, String(sebep).slice(0, 1000), rating_avg ?? null, rating_count ?? null]);
+    res.json({ ok: true });
+  } catch (e) { console.error('[api] rating-sebep hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // Marka kanal özeti (AI) — kanal-ozet.js scripti yazar. Sessiz.
 app.patch('/api/brands/by-name/:name/kanal-ozet', writeGuard, async (req, res) => {
   try {
