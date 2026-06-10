@@ -7,8 +7,9 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
   const [inlineToast, setInlineToast] = React.useState(null); // ← hook'lar erken return'dan önce
   React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); setInlineToast(null); }, [brief]);
   if (!b) return null;
+  const ro = !!b._readOnly;   // tamamlanan iş: akış görünür, güncelleme kapalı
 
-  function set(patch) { const next = { ...b, ...patch }; setB(next); setSaved(false); }
+  function set(patch) { if (ro) return; const next = { ...b, ...patch }; setB(next); setSaved(false); }
   function changeStatus(s) { set({ durum: s }); }
 
   function showToast(msg, duration) {
@@ -96,12 +97,16 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         </div>
 
         <div style={{padding:"18px 20px", overflowY:"auto", flex: 1}}>
-          {/* Title (editable) */}
-          <EditableTitle value={b.baslik} onChange={(v) => set({ baslik: v })}/>
+          {/* Title (editable — tamamlananlarda salt-okunur) */}
+          {ro
+            ? <h2 style={{font:"600 20px/1.25 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.005em", padding:"4px 0"}}>{b.baslik}</h2>
+            : <EditableTitle value={b.baslik} onChange={(v) => set({ baslik: v })}/>}
 
           <div style={{marginTop: 12, display:"flex", alignItems:"center", gap:8, flexWrap:"wrap"}}>
-            <PriorityBadge p={b.priority} deltaH={b.deltaH}/>
-            <StatusEditor current={b.durum} onPick={changeStatus}/>
+            {!ro && <PriorityBadge p={b.priority} deltaH={b.deltaH}/>}
+            {ro
+              ? <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--prio-green)", background:"var(--prio-green-bg, var(--paper-2))", padding:"5px 9px", borderRadius:999}}>✅ Tamamlandı</span>
+              : <StatusEditor current={b.durum} onPick={changeStatus}/>}
             <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
               rev {String(b.revision).padStart(2,"0")}
             </span>
@@ -112,11 +117,11 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           <Eyebrow>Atama</Eyebrow>
           <div style={{display:"flex", flexDirection:"column", gap:8, marginTop:10}}>
             <RoleGroup tag="İŞİ YAPAN" list={b.workers} allUsers={allUsers}
-              onChange={(arr) => set({ workers: arr })} showDept/>
+              onChange={ro ? null : (arr) => set({ workers: arr })} showDept/>
             <RoleGroup tag="LEAD" list={b.leads} allUsers={allUsers}
-              onChange={(arr) => set({ leads: arr })}/>
+              onChange={ro ? null : (arr) => set({ leads: arr })}/>
             <RoleGroup tag="GÖZLEMCİ" list={b.observers} allUsers={allUsers}
-              onChange={(arr) => set({ observers: arr })}/>
+              onChange={ro ? null : (arr) => set({ observers: arr })}/>
           </div>
 
           <Hr/>
@@ -128,10 +133,15 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           }}>
             <span style={{color:"var(--ink-3)"}}>Açıldı</span><span>{formatFull(b.acilma)}</span>
             <span style={{color:"var(--ink-3)"}}>Deadline</span><span>{formatFull(b.deadline)}</span>
-            <span style={{color:"var(--ink-3)"}}>Kalan</span>
-            <span style={{color: b.deltaH <= 0 ? "var(--prio-red)" : b.deltaH <= 8 ? "var(--prio-red)" : "var(--ink)"}}>
-              {formatDelta(b.deltaH)}
-            </span>
+            {ro ? <>
+              <span style={{color:"var(--ink-3)"}}>Bitiş</span>
+              <span style={{color:"var(--prio-green)"}}>{formatFull(b.bitis)}</span>
+            </> : <>
+              <span style={{color:"var(--ink-3)"}}>Kalan</span>
+              <span style={{color: b.deltaH <= 0 ? "var(--prio-red)" : b.deltaH <= 8 ? "var(--prio-red)" : "var(--ink)"}}>
+                {formatDelta(b.deltaH)}
+              </span>
+            </>}
             <span style={{color:"var(--ink-3)"}}>Timezone</span>
             <span style={{fontFamily:"var(--font-mono)"}}>Europe/Istanbul (UTC+3)</span>
           </div>
@@ -182,8 +192,9 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           <Eyebrow>Not</Eyebrow>
           <textarea
             value={b.notes || ""}
+            readOnly={ro}
             onChange={(e) => set({ notes: e.target.value })}
-            placeholder="Brief'le ilgili kısa bir not bırak…"
+            placeholder={ro ? "—" : "Brief'le ilgili kısa bir not bırak…"}
             style={{
               marginTop: 8, width:"100%", minHeight: 64, resize:"vertical",
               padding: 10, borderRadius: 8, border:"1px solid var(--line)",
@@ -210,7 +221,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <div>
-            {currentUser?.role === 'admin' && (
+            {!ro && currentUser?.role === 'admin' && (
               <button onClick={handleDelete} style={{
                 padding:'6px 12px', borderRadius:6,
                 border:'1px solid var(--prio-red, #e54d2e)',
@@ -221,14 +232,14 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           </div>
           <div style={{display:"flex", gap:8}}>
             <Button kind="secondary" icon={<I.Slack size={13}/>} onClick={handleSlackOpen}>Slack'te aç</Button>
-            <Button kind="primary" icon={<I.Check size={13}/>}
+            {!ro && <Button kind="primary" icon={<I.Check size={13}/>}
               onClick={handleSave}
               style={{
                 ...(saved ? {background:"var(--prio-green)", borderColor:"var(--prio-green)"} : {}),
                 ...(assignedMe && !saved ? {boxShadow:"0 0 0 2px var(--ember)", animation:"bn-pulse 1s ease infinite"} : {})
               }}>
               {saved ? "Kaydedildi ✓" : "Kaydet"}
-            </Button>
+            </Button>}
           </div>
         </footer>
       </aside>
@@ -298,6 +309,21 @@ function StatusEditor({ current, onPick }) {
 function RoleGroup({ tag, list, allUsers, onChange }) {
   const [adding, setAdding] = React.useState(false);
   const arr = (list || []).filter(Boolean);
+  // Salt-okunur (tamamlanan iş): statik çipler, ekle/değiştir/kaldır yok
+  if (!onChange) return (
+    <div style={{display:"flex", flexDirection:"column", gap:6}}>
+      {arr.length === 0 && <div style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-4)", padding:"2px 0"}}>{tag}: —</div>}
+      {arr.map((u, i) => (
+        <div key={u.id || i} style={{display:"flex", alignItems:"center", gap:10, padding:"4px 0"}}>
+          <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", color:"var(--ink-3)", padding:"3px 6px", borderRadius:4, background:"var(--paper-2)", minWidth:64, textAlign:"center"}}>{tag}</span>
+          <span style={{display:"inline-flex", alignItems:"center", gap:8, padding:"3px 8px 3px 3px", borderRadius:999, border:"1px solid var(--line)"}}>
+            <Avatar user={u} size={22}/>
+            <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)"}}>{u.name || "—"}</span>
+          </span>
+        </div>
+      ))}
+    </div>
+  );
   return (
     <div style={{display:"flex", flexDirection:"column", gap:6}}>
       {arr.length === 0 && (

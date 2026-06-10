@@ -1,6 +1,6 @@
 // app/screens/Completed.jsx — Tamamlananlar (12-col table).
 
-function CompletedScreen({ data }) {
+function CompletedScreen({ data, onOpenBrief }) {
   const [range, setRange] = React.useState("30");
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
   const allCompleted = data._allCompleted || data.completed || [];
@@ -89,7 +89,8 @@ function CompletedScreen({ data }) {
               </td></tr>
             )}
             {rows.map((c, idx) => (
-              <tr key={c.id} style={{background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)"}}>
+              <tr key={c.id} onClick={() => onOpenBrief && onOpenBrief(c)} title="İşin akışını görüntüle"
+                style={{background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)", cursor: onOpenBrief ? "pointer" : "default"}}>
                 <td style={cs(true, "right")}>{c.no}</td>
                 <td style={cs()}><BrandChip brand={c.brand} size="sm"/></td>
                 <td style={{...cs(), maxWidth: 240, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{c.baslik}</td>

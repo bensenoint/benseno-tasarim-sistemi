@@ -378,6 +378,12 @@ function App({ currentUser, onLogout }) {
     setOpenBrief(live);
   };
   const onCloseBrief = () => setOpenBrief(null);
+  // Tamamlanan iş → drawer'ı salt-okunur aç (akış görünür, güncelleme kapalı)
+  const onOpenCompleted = (c) => setOpenBrief({
+    ...c, _readOnly: true, durum: "tamamlandi",
+    workers: c.contributors || [], leads: c.lead ? [c.lead] : [], observers: [],
+    priority: null, deltaH: null, acilma: c.baslangic || null,
+  });
   const onUpdateBrief = (next) => {
     const prev = briefs.find(b => b.id === next.id) || next;
     setBriefs(arr => arr.map(b => b.id === next.id ? next : b));   // optimistic
@@ -411,7 +417,7 @@ function App({ currentUser, onLogout }) {
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} currentUser={currentUser}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
-  else if (tab === "completed")Screen = <CompletedScreen data={liveData}/>;
+  else if (tab === "completed")Screen = <CompletedScreen data={liveData} onOpenBrief={onOpenCompleted}/>;
   else if (tab === "dept-comp")Screen = <DeptCompareScreen data={liveData}/>;
   else if (tab === "design")   Screen = <DepartmentScreen data={liveData} role="tasarim" onOpenBrief={onOpenBrief}/>;
   else if (tab === "editor")   Screen = <DepartmentScreen data={liveData} role="editor"  onOpenBrief={onOpenBrief}/>;
