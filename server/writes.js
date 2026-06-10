@@ -422,8 +422,13 @@ async function deleteBrief(id, by) {
   const b = r.rows[0];
   if (by !== 'slack:deleted' && b.slack_ts && b.slack_channel) {
     try {
+      let who = '';
+      if (by) {
+        const u = await pool.query('SELECT name FROM users WHERE id=$1', [by]);
+        who = u.rows[0] ? ` (${u.rows[0].name} tarafından)` : '';
+      }
       await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts,
-        text: `🗑️ *#${b.no}* silindi — bu thread artık takip edilmiyor. Dashboard → Silinenler'den geri alınabilir.` });
+        text: `🗑️ *#${b.no}* silindi${who} — bu thread artık takip edilmiyor. Dashboard → Silinenler'den geri alınabilir.` });
     } catch (e) { console.error('[writes] silindi notu hata:', e.message); }
   }
   return { id, no: r.rows[0].no };

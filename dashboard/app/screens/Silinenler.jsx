@@ -92,7 +92,12 @@ function SilinenlerScreen({ data, currentUser }) {
                   }}>{b.baslik || '(başlıksız)'}</div>
                   <div style={{ font: '400 11px/1.4 var(--font-sans)', color: 'var(--ink-4)', marginTop: 2 }}>
                     {b.marka || '—'}
-                    {b.deleted_by ? ` · ${b.deleted_by} tarafından silindi` : ''}
+                    {(() => {
+                      if (!b.deleted_by) return '';
+                      if (b.deleted_by === 'slack:deleted') return " · Slack'te thread silindi";
+                      const u = (data.USERS || []).find(x => x.id === b.deleted_by);
+                      return ` · ${u ? u.name : b.deleted_by} tarafından silindi`;
+                    })()}
                     {' · '}{deletedDate}
                   </div>
                 </div>
