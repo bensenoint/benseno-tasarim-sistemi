@@ -317,7 +317,8 @@ async function setFinancials(id, raw) {
     return { id };
   });
   const fin = ['maliyet', 'satis', 'fatura', 'odeme'].filter(k => d[k] !== undefined).join(', ');
-  await reflectChange(id, `💰 finans güncellendi (${fin})`, d.source);
+  // Thread'den girilen finansalda bot zaten detaylı onay yanıtı atıyor → notu atla (çift mesaj olmasın).
+  await reflectChange(id, `💰 finans güncellendi (${fin})`, d.source, { thread: d.source !== 'slack' });
   return res;
 }
 
@@ -334,10 +335,14 @@ async function tsToId(ts) {
 }
 
 // b2 — değişikliği Slack thread'ine yansıt + (opts.dm!==false ise) ilgili kişilere DM.
-// Best-effort, echo-korumalı. Rol-only değişimlerde DM'i notifyRoleDiff yapar → opts.dm=false ile çift DM önlenir.
+// Best-effort, echo-korumalı: Slack-kökenli değişiklikte DM atılmaz (yapan zaten orada)
+// ama thread notu DÜŞER — emoji/kelime koyanın işlemin alındığını görmesi için.
+// Rol-only değişimlerde DM'i notifyRoleDiff yapar → opts.dm=false ile çift DM önlenir.
+// opts.thread=false → hiçbir şey yapma (ör. thread finansalında bot kendi onayını atıyor).
 async function reflectChange(briefId, summary, source, opts) {
-  if (source === 'slack' || !slack.hasToken()) return;
-  const dmAll = !opts || opts.dm !== false;
+  if (!slack.hasToken()) return;
+  if (opts && opts.thread === false) return;
+  const dmAll = source !== 'slack' && (!opts || opts.dm !== false);
   try {
     const r = await pool.query(
       `SELECT b.slack_ts, b.slack_channel, b.no, br.name AS marka

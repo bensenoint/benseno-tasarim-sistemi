@@ -85,4 +85,4 @@ async function runReport(name, build, sysPrompt) {
   for (const ch of tgs) await post(tok, ch, text);
 }
 
-module.exports = { DASHBOARD_URL, H, DAY, trDate, ymd, isToday, deltaLabel, money, runReport };
+module.exports = { DASHBOARD_URL, H, DAY, trDate, ymd, isToday, deltaLabel, money, runReport, token, post, fetchEmbedded, GORKEM };

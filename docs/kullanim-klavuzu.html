@@ -1311,16 +1311,15 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
         </table>
       </div>
 
-      <h3>7.3 Sabah Raporunu Yorumlama</h3>
-      <p>Her hafta içi sabah <strong>07:50'de</strong> 3 çıktı üretilir:</p>
+      <h3>7.3 Sabah Raporları</h3>
+      <p>Her hafta içi sabah iki rapor gönderilir:</p>
 
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Çıktı</th><th>Hedef</th><th>İçerik</th></tr></thead>
+          <thead><tr><th>Saat</th><th>Hedef</th><th>İçerik</th></tr></thead>
           <tbody>
-            <tr><td>Çıktı 1</td><td>#benseno-grafik (tüm ekip)</td><td>Aktif brief, dün tamamlananlar, OOO listesi</td></tr>
-            <tr><td>Çıktı 2</td><td>5 yöneticiye özelleştirilmiş DM</td><td>Role göre farklılaşan özet + "Bugün 3 aksiyon"</td></tr>
-            <tr><td>Çıktı 3</td><td>Tüm ekibe günaydın DM</td><td>Departmana göre kişiselleştirilmiş bugünkü iş listesi</td></tr>
+            <tr><td>07:50</td><td>#benseno-grafik + 5 yönetici DM</td><td>Sabah raporu: aktif brief'ler, dün tamamlananlar, günün öncelikleri (tek metin)</td></tr>
+            <tr><td>07:55</td><td>Aktif işi olan her çalışana DM</td><td>Kişisel özet: kendi brief'leri, geciken/bugün teslim olanlar, dashboard linki. Aktif işi olmayana DM gitmez.</td></tr>
           </tbody>
         </table>
       </div>
@@ -1355,7 +1354,7 @@ Brief thread'ine HH:MM formatında saat yaz, veya yeni brief aç.
       <div class="schedule-grid">
         <div class="schedule-row">
           <div class="schedule-time">☀️ Her gün 07:50</div>
-          <div class="schedule-task"><strong>Sabah Raporu</strong> — #benseno-grafik + 5 yönetici DM + tüm ekibe günaydın DM</div>
+          <div class="schedule-task"><strong>Sabah Raporu</strong> — #benseno-grafik + 5 yönetici DM · <strong>07:55</strong>'te aktif işi olan her çalışana kişisel özet DM</div>
         </div>
         <div class="schedule-row">
           <div class="schedule-time">📊 Cuma 17:00</div>

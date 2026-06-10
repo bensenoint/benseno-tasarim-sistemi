@@ -66,6 +66,8 @@ function run(script) {
 // raporlar /api/embedded (DB) okuyor, briefler /yeni-brief ile DB'ye düşüyor.
 // Sabah raporu — hafta içi 07:50
 cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
+// Kişisel iş özeti — hafta içi 07:55, aktif işi olan her çalışana DM
+cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
 // 17:00 raporları kaydırıldı (aynı anda spawn olmasın → çift-claude/push yarışı yok):
 // Günlük sistem özeti — hafta içi 17:05, sadece Görkem'e (P2.3)
 cron.schedule('5 17 * * 1-5', () => run('run-gunluk-ozet.sh'), opts);
