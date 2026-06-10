@@ -372,10 +372,13 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
           <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
           <ProblemBrands data={data}/>
         </Card>
+        {/* Bu hafta parlayan — kişi performansı: sadece yöneticiler görür */}
+        {(typeof bnsGetStoredUser === "function" && bnsGetStoredUser()?.role === "admin") && (
         <Card>
           <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
           <StarOfTheWeek data={data}/>
         </Card>
+        )}
       </div>
 
       <ManagerSection data={data} user={user} overdue={overdue} review={review} onOpenBrief={onOpenBrief} onSwitchTab={onSwitchTab} onStatusChange={onStatusChange}/>
