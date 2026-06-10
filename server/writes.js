@@ -136,11 +136,19 @@ async function deriveDept(client, worker_ids) {
 const DEPT_MANAGER_FALLBACK = { ai: 'U030C48PL23' };
 
 // İlgili departman(lar)ın yöneticileri (yetki='yonetici' + fallback) — gözlemciye otomatik eklenir.
-async function deptManagers(client, worker_ids) {
+// Freelance işlerin kendi yöneticisi yok → işi açan kişinin (creatorId) departman yöneticisi sayılır.
+async function deptManagers(client, worker_ids, creatorId) {
   if (!Array.isArray(worker_ids) || !worker_ids.length) return [];
   const dr = await client.query(
     `SELECT DISTINCT dept FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> ''`, [worker_ids]);
-  const depts = dr.rows.map(x => x.dept);
+  let depts = dr.rows.map(x => x.dept);
+  if (depts.includes('freelance') && creatorId) {
+    const cr = await client.query(
+      `SELECT dept FROM users WHERE id=$1 AND dept IS NOT NULL AND dept <> ''`, [creatorId]);
+    depts = [...new Set([...depts.filter(x => x !== 'freelance'), ...cr.rows.map(x => x.dept)])];
+  } else {
+    depts = depts.filter(x => x !== 'freelance');
+  }
   if (!depts.length) return [];
   const r = await client.query(
     `SELECT id FROM users WHERE active AND yetki='yonetici' AND dept = ANY($1)`, [depts]);
@@ -173,7 +181,7 @@ async function createBrief(raw) {
     // gözlemci = manuel seçilenler ∪ ilgili dept yöneticileri (her zaman)
     // Auto-yöneticiler: zaten işi yapan/lead olanları gözlemciye ekleme (tek kişi iki listede görünmesin).
     const inWork = new Set([...d.worker_ids, ...leadIds]);
-    const mgrs = (await deptManagers(client, d.worker_ids)).filter(m => !inWork.has(m));
+    const mgrs = (await deptManagers(client, d.worker_ids, d.by)).filter(m => !inWork.has(m));
     const observerIds = [...new Set([...(d.gozlemci_ids || []), ...mgrs])];
     await setAssignees(client, id, { worker_ids: d.worker_ids, lead_ids: leadIds, gozlemci_ids: observerIds });
     if (Array.isArray(d.tags)) for (const t of d.tags)
@@ -260,7 +268,7 @@ async function patchBrief(id, raw) {
       const inWorkQ = await client.query(
         `SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND role<>'gozlemci'`, [id]);
       const inWork = new Set(inWorkQ.rows.map(r => r.user_id));
-      const mgrs = (await deptManagers(client, d.worker_ids)).filter(m => !inWork.has(m));
+      const mgrs = (await deptManagers(client, d.worker_ids, d.by)).filter(m => !inWork.has(m));
       for (const m of mgrs) await client.query(
         `INSERT INTO brief_assignees(brief_id,user_id,role,sira) VALUES ($1,$2,'gozlemci',NULL)
          ON CONFLICT (brief_id,user_id,role) DO NOTHING`, [id, m]);
