@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --paper: #FBFAF7; --paper-2: #F4F2EC;
+  --ember: #C24A2C; --ember-dim: rgba(194,74,44,.10);
+  --navy: #24479E; --navy-dim: rgba(36,71,158,.10);
+  --ink: #16161A; --ink-2: #2E2E36; --ink-3: #5B5B66; --ink-4: #8A8A94;
+  --line: #ECEAE3; --line-strong: #DFDCD3;
+  --surface: #fff;
+  --red-dim: rgba(215,38,61,.09); --red: #D7263D;
+  --font-sans: "Geist", sans-serif;
+  --font-mono: "Geist Mono", monospace;
+  --r-2: 8px; --r-3: 12px;
+}
+body { background: var(--paper-2); font-family: var(--font-sans); min-height: 100vh; }
+
+/* ─── HEADER ─── */
+.hdr {
+  height: 52px; background: var(--surface); border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; padding: 0 20px; gap: 14px;
+  position: sticky; top: 0; z-index: 10;
+}
+.hdr-logo { height: 22px; opacity: .9; }
+.hdr-logo-text { font-size: 15px; font-weight: 700; color: var(--navy); letter-spacing: -.01em; }
+.hdr-sep { flex: 1; }
+.hdr-user { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.hdr-av { width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: #fff; font: 700 11px/28px var(--font-sans); text-align: center; }
+.hdr-name { font-size: 13px; font-weight: 500; color: var(--ink-2); }
+
+/* ─── NAV TABS ─── */
+.nav {
+  display: flex; gap: 2px; padding: 12px 20px 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.nav-tab {
+  padding: 8px 14px; font-size: 13px; font-weight: 500;
+  color: var(--ink-3); border-bottom: 2px solid transparent;
+  cursor: pointer; transition: color .12s;
+  display: flex; align-items: center; gap: 5px;
+}
+.nav-tab:hover { color: var(--ink-2); }
+.nav-tab.active { color: var(--ink); border-bottom-color: var(--navy); font-weight: 600; }
+.nav-tab .count {
+  font-size: 10px; font-weight: 700; background: var(--line);
+  color: var(--ink-3); padding: 1px 5px; border-radius: 20px;
+}
+.nav-tab.active .count { background: var(--navy-dim); color: var(--navy); }
+.nav-tab.danger-tab.active { border-bottom-color: var(--red); color: var(--red); }
+.nav-tab.danger-tab.active .count { background: var(--red-dim); color: var(--red); }
+
+/* ─── PAGE BODY ─── */
+.body { padding: 24px 20px; max-width: 1100px; }
+
+.page-head { margin-bottom: 20px; }
+.page-head h1 { font-size: 20px; font-weight: 700; color: var(--ink); }
+.page-head p { font-size: 13px; color: var(--ink-3); margin-top: 3px; }
+
+/* ─── DELETED BRIEF CARD ─── */
+.del-list { display: flex; flex-direction: column; gap: 8px; }
+.del-card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-3); padding: 14px 16px;
+  display: flex; align-items: center; gap: 14px;
+  opacity: .85; position: relative;
+}
+.del-card:hover { opacity: 1; }
+.del-no {
+  font: 600 11px var(--font-mono); color: var(--ink-4);
+  background: var(--paper-2); padding: 3px 7px; border-radius: 4px;
+  flex-shrink: 0;
+}
+.del-brand-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.del-info { flex: 1; min-width: 0; }
+.del-title { font-size: 14px; font-weight: 600; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.del-meta { font-size: 11px; color: var(--ink-4); margin-top: 2px; }
+.del-meta span { margin-right: 10px; }
+
+/* deleted date pill */
+.del-when {
+  font-size: 11px; color: var(--red); background: var(--red-dim);
+  padding: 2px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0;
+}
+
+/* actions */
+.del-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-restore {
+  font: 600 12px var(--font-sans); color: var(--navy); background: var(--navy-dim);
+  border: 1px solid rgba(36,71,158,.18); border-radius: var(--r-2);
+  padding: 6px 12px; cursor: pointer; white-space: nowrap;
+  transition: background .12s;
+}
+.btn-restore:hover { background: rgba(36,71,158,.18); }
+.btn-perm-del {
+  font: 600 12px var(--font-sans); color: var(--red); background: var(--red-dim);
+  border: 1px solid rgba(215,38,61,.2); border-radius: var(--r-2);
+  padding: 6px 10px; cursor: pointer;
+  transition: background .12s;
+}
+.btn-perm-del:hover { background: rgba(215,38,61,.18); }
+
+/* ─── ACTIVE BRIEF CARD (for trash icon demo) ─── */
+.active-section { margin-top: 36px; }
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-4); margin-bottom: 12px; }
+.brief-card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-3); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  position: relative;
+}
+.brief-card:hover .trash-btn { opacity: 1; }
+.brief-no { font: 600 11px var(--font-mono); color: var(--ink-4);
+  background: var(--paper-2); padding: 3px 7px; border-radius: 4px; }
+.brief-dot { width: 10px; height: 10px; border-radius: 50%; }
+.brief-info { flex: 1; }
+.brief-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+.brief-meta { font-size: 11px; color: var(--ink-4); margin-top: 2px; }
+.status-pill {
+  font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 20px;
+  background: rgba(36,71,158,.10); color: var(--navy);
+}
+.trash-btn {
+  opacity: 0; transition: opacity .15s;
+  background: none; border: 1px solid var(--line-strong);
+  border-radius: var(--r-2); padding: 5px 8px; cursor: pointer;
+  color: var(--ink-4); font-size: 13px;
+}
+.trash-btn:hover { background: var(--red-dim); color: var(--red); border-color: rgba(215,38,61,.25); }
+
+/* annotation bubbles */
+.ann {
+  position: absolute;
+  background: var(--ink); color: #fff;
+  font-size: 11px; font-weight: 500; padding: 5px 10px;
+  border-radius: 6px; white-space: nowrap;
+  pointer-events: none;
+}
+.ann::after {
+  content: ""; position: absolute;
+  border: 5px solid transparent;
+}
+.ann-right { right: -8px; top: 50%; transform: translate(100%,-50%); }
+.ann-right::after { border-right-color: var(--ink); left: -10px; top: 50%; transform: translateY(-50%); }
+
+/* ─── EMPTY STATE ─── */
+.empty { padding: 60px 0; text-align: center; color: var(--ink-4); }
+.empty-icon { font-size: 32px; margin-bottom: 12px; }
+.empty p { font-size: 14px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <span class="hdr-logo-text">benseno</span>
+  <span class="hdr-sep"></span>
+  <div class="hdr-user">
+    <div class="hdr-av">G</div>
+    <span class="hdr-name">Görkem</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-tab">Kanban</div>
+  <div class="nav-tab">Liste</div>
+  <div class="nav-tab">Tamamlanan</div>
+  <div class="nav-tab">Galeri</div>
+  <div class="nav-tab danger-tab active">Silinenler <span class="count">3</span></div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="body">
+  <div class="page-head">
+    <h1>🗑️ Silinenler</h1>
+    <p>Slack'ten veya dashboard'dan silinen brief'ler. Geri yüklenebilir ya da kalıcı olarak silinebilir.</p>
+  </div>
+
+  <div class="del-list">
+
+    <div class="del-card">
+      <div class="del-no">#031</div>
+      <div class="del-brand-dot" style="background:#2B6CB0"></div>
+      <div class="del-info">
+        <div class="del-title">Bauhaus — Haziran kampanya banner paketi</div>
+        <div class="del-meta">
+          <span>📅 Silindi: Görkem · slack thread silindi</span>
+        </div>
+      </div>
+      <div class="del-when">2 saat önce</div>
+      <div class="del-actions">
+        <button class="btn-restore">↩ Geri Yükle</button>
+        <button class="btn-perm-del">🗑️</button>
+      </div>
+    </div>
+
+    <div class="del-card">
+      <div class="del-no">#027</div>
+      <div class="del-brand-dot" style="background:#D4A017"></div>
+      <div class="del-info">
+        <div class="del-title">Egosport — Ürün kataloğu kapak</div>
+        <div class="del-meta">
+          <span>📅 Silindi: Görkem · dashboard'dan silindi</span>
+        </div>
+      </div>
+      <div class="del-when">Dün</div>
+      <div class="del-actions">
+        <button class="btn-restore">↩ Geri Yükle</button>
+        <button class="btn-perm-del">🗑️</button>
+      </div>
+    </div>
+
+    <div class="del-card">
+      <div class="del-no">#019</div>
+      <div class="del-brand-dot" style="background:#6B7280"></div>
+      <div class="del-info">
+        <div class="del-title">Pineapple — Sosyal medya şablonu</div>
+        <div class="del-meta">
+          <span>📅 Silindi: dashboard'dan silindi</span>
+        </div>
+      </div>
+      <div class="del-when">5 gün önce</div>
+      <div class="del-actions">
+        <button class="btn-restore">↩ Geri Yükle</button>
+        <button class="btn-perm-del">🗑️</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ACTIVE CARD DEMO — trash icon on hover -->
+  <div class="active-section">
+    <div class="section-label">↑ Silinen listesi · · · ↓ Aktif brief'te nasıl görünür (hover)</div>
+    <div class="brief-card">
+      <div class="brief-no">#034</div>
+      <div class="brief-dot" style="background:#2B6CB0"></div>
+      <div class="brief-info">
+        <div class="brief-title">Bauhaus — Temmuz sosyal medya paketi</div>
+        <div class="brief-meta">Atanan: Selin · Başlangıç: 10 Haz</div>
+      </div>
+      <div class="status-pill">Devam Ediyor</div>
+      <button class="trash-btn">🗑️</button>
+      <!-- annotation -->
+      <div class="ann ann-right" style="right: -120px; top: 50%; transform: translate(0,-50%);">
+        hover'da görünür
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# metric_direction: higher_is_better
+iteration	timestamp	hypothesis	status	technique	evidence	file_line
+1	09:30	reflectChange kullanıcıya ham alan adları (worker_ids vb.) gösteriyor	confirmed	trace	patchBrief fields=Object.keys(d) raw → DM/thread	server/writes.js:248-249
+2	09:30	Rol-only patch'te reflectChange tüm atananlara gereksiz 'düzenlendi' DM + notifyRoleDiff = çift bildirim	confirmed	trace	reflectChange DMs all + notifyRoleDiff	server/writes.js:249-251
+3	09:30	Dept yöneticisi aynı zamanda işi yapansa hem worker hem gözlemci listesinde (canlı #4 İpek)	confirmed	differential	deptManagers worker/lead'i dışlamıyor	server/writes.js:156-158,238-241
+4	09:30	API/embedded/state 200, tüm JS syntax OK, roller/dept/not/ekler doğru	disproven	pattern	baseline temiz	server/api.js
+5	09:30	dashboard persist diff (workers/leads/observers→ids) doğru	disproven	trace	idsOf diff	dashboard/app/App.jsx:62-69
+6	09:34	/brief-durum + /kapasite + AppHome bayat live-data.json okuyor (28 eski brief, orchestrator kaldırıldı, is/atanan_ids mapping bozuk)	confirmed	differential	live-data.json frozen Jun4; DB 11 aktif	scripts/slack-bot.js:286-305
+7	09:34	queueeEkle + message handler eski Slack-Workflow formatı kalıntısı (ölü ama zararsız: parse null→erken çıkış)	inconclusive	trace	recalc.js okur ama zamanlanmıyor	scripts/slack-bot.js:835,918
+8	09:34	rapor-* scriptleri /api/embedded'dan okuyor (DB truth)	disproven	pattern	rapor-lib.js:28 fetch embedded	scripts/rapor-lib.js:28
+9	09:34	reaction_added handler by-ts + resolveBriefTs (thread reply parent) doğru	disproven	trace	by-ts/.../status source=slack	scripts/slack-bot.js:599-638
+10	09:34	datetimepicker deadline ISO akışı (selected_date_time→ISO→toTs) doğru	disproven	trace	createBrief toTs(Date.parse)	scripts/slack-bot.js:540

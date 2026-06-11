@@ -1,0 +1,26 @@
+<h2>Dashboard'a kimler giriş yapabilecek?</h2>
+<p class="subtitle">Bu karar veritabanı yapısını ve yönetici panelinin kapsamını belirliyor.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Slack'teki herkes</h3>
+      <p>Sistemde kayıtlı tüm çalışanlar dashboard'a erişebilir. Şifreleri admin panelinden belirlenir. Mevcut <code>users</code> tablosuna <code>username</code> + <code>password_hash</code> eklenir.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Sadece yöneticiler / belirli kişiler</h3>
+      <p>Tüm Slack kullanıcılarını değil, yalnızca seçilen kişileri dashboard'a alırsın. Ayrı bir <code>dashboard_users</code> tablosu. Admin panelinden yeni kullanıcı eklenir / çıkarılır.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Şimdilik sadece sen (tek admin)</h3>
+      <p>Şimdilik tek kullanıcı, ileride genişler. En hızlı başlangıç — admin paneli gelecekte eklenir, şimdi CLI ile ilk şifre oluşturulur.</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+# metric_direction: higher_is_better
+iteration	timestamp	hypothesis	status	technique	evidence	file_line
+1	17:48	Deployed API == son commit (tüm endpointler canlı)	confirmed	differential	permanent 403, set-image, embedded bns_deleted çalışıyor	server/api.js
+2	17:48	Bot son slack-bot.js çalıştırıyor	confirmed	trace	3346a70 sonrası slack-bot.js değişmemiş	scripts/slack-bot.js
+3	17:48	DB şema kod beklentileriyle uyumlu	confirmed	pattern	deleted_at/deleted_by/image_url/slack_ts/completed_at mevcut	briefs
+4	17:48	CORS dashboard yazımları için yeterli	confirmed	differential	GET POST PATCH DELETE OPTIONS + Authorization header	server/api.js:54
+5	17:48	fetchCanvas ölü kod (çağrılmıyor)	confirmed	working_backwards	tanım var (166) çağrı yok	scripts/slack-bot.js:166
+6	17:48	escalation/create-slack-list/recalc çağrılmıyor (ölü script)	confirmed	trace	scheduler+run-*.sh+slack-bot hiçbiri çağırmıyor	scripts/
+7	17:48	Dashboard auth tüm yazımlarda JWT (eski write-token kalıntısı yok)	confirmed	pattern	BNS_WRITE_TOKEN aktif kodda 0	dashboard/app
+8	17:50	Ölü scriptler silindi, bot sağlıklı redeploy	confirmed	differential	node --check geçti, import yok	scripts/

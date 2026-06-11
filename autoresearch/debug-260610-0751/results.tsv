@@ -1,0 +1,11 @@
+# metric_direction: higher_is_better
+iteration	timestamp	hypothesis	status	technique	evidence	file_line
+1	07:53	Ekip reactionları DB-dışı eski mesajlara gitti, veri bozulması yok	confirmed	trace	DB 0 brief/0 event; status-overrides 22 pending hayalet	data/status-overrides.json
+2	07:53	Legacy brief-status.js her reactionda git commit+push atıyor (çöp)	confirmed	trace	9 commit dün, 12 toplam; brief sync yok artık	scripts/brief-status.js
+3	07:56	API tüm rotalar canlı + CORS DELETE + guard JSON yanıt	confirmed	differential	health 200, 6 yazma rotası JSON guard, CORS tam	server/api.js
+4	07:56	Auth yolları dünkü canlı testten beri değişmedi	confirmed	binary_search	c412d5f..HEAD server/ boş; dün ok:true + admin 403 kanıtlı	server/auth.js
+5	07:59	Canlı bundle == lokal (SHA eşit), login UI bundle içinde	confirmed	differential	sha 1435d28bf99e eşit; 12 login referansı	app/bundle.js
+6	07:59	ID sequenceler sıfır — ilk brief no=1	confirmed	pattern	briefs_id_seq last_value boş	DB
+7	07:59	Free-text brief yolu canlı: İş:+Süre: mesajı → kuyruk+uyarı ama DB brief YOK (hayalet)	confirmed	trace	parseBriefMesaji 1094, queueeEkle, Brief Sync yok	scripts/slack-bot.js:1094
+8	07:59	Bu sabahki 07:50 raporu Slack public aramada yok	inconclusive	differential	kanal private, arama erişemiyor — kullanıcı teyidi gerek	scripts/scheduler.js
+9	07:59	reflectChange tüm görünür onayları atıyor — legacy 3 execFile gereksiz	confirmed	trace	writes.js:278,297,319 thread onayı; execFile 689/716/742 paralel-eski	server/writes.js:337

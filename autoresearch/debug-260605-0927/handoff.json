@@ -1,0 +1,12 @@
+{
+  "version": "2.1.0", "source": "debug", "status": "COMPLETE",
+  "results_tsv": "results.tsv",
+  "config": { "scope": "tüm sistem (server + scripts + dashboard)", "symptom": "tüm alanları debug, bug avı" },
+  "findings": [
+    {"severity":"high","desc":"/brief-durum + /kapasite + App Home bayat live-data.json okuyordu (28 eski brief). loadBriefs() artık /api/embedded (DB)","file":"scripts/slack-bot.js:286","fixed":true},
+    {"severity":"medium","desc":"reflectChange kullanıcıya ham alan adları (worker_ids) sızdırıyordu → TR etiket","file":"server/writes.js:307","fixed":true},
+    {"severity":"medium","desc":"rol-only patch'te tüm atananlara gereksiz çift DM → contentChanged ise DM","file":"server/writes.js:248","fixed":true},
+    {"severity":"low","desc":"dept yöneticisi aynı zamanda işi yapansa hem worker hem gözlemci → dışlandı","file":"server/writes.js:156","fixed":true},
+    {"severity":"low","desc":"queueeEkle + message handler eski Slack-Workflow kalıntısı (zararsız ölü kod)","file":"scripts/slack-bot.js:835","fixed":false}
+  ]
+}

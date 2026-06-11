@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #F0EDE8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 40px 20px;
+    flex-wrap: wrap;
+  }
+
+  .label-tag {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 12px;
+  }
+
+  /* ── MEVCUT (Eski) ── */
+  .old-card {
+    background: #FBFAF7;
+    border-radius: 16px;
+    padding: 40px 32px;
+    width: 320px;
+    box-shadow: 0 2px 24px rgba(0,0,0,.08);
+    opacity: .7;
+    position: relative;
+  }
+  .old-card::after {
+    content: "Eski";
+    position: absolute;
+    top: 12px; right: 14px;
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: #bbb;
+  }
+
+  /* ── YENİ ── */
+  .new-card {
+    background: #FBFAF7;
+    border-radius: 16px;
+    padding: 40px 32px;
+    width: 320px;
+    box-shadow: 0 4px 32px rgba(0,0,0,.12);
+    position: relative;
+  }
+  .new-card::after {
+    content: "Yeni ✦";
+    position: absolute;
+    top: 12px; right: 14px;
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: #C24A2C;
+  }
+
+  .logo-area {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .logo-box {
+    display: inline-block;
+    background: #C24A2C;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    padding: 8px 18px;
+    border-radius: 8px;
+  }
+  .sub {
+    font-size: 13px;
+    color: #6b6b70;
+    margin-top: 10px;
+    line-height: 1.4;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .field input {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid #e3e0d8;
+    border-radius: 10px;
+    font-size: 15px;
+    background: #fff;
+    color: #1a1a1a;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field input:focus { border-color: #C24A2C; }
+
+  .btn {
+    width: 100%;
+    padding: 12px;
+    border: 0;
+    border-radius: 10px;
+    background: #C24A2C;
+    color: #fff;
+    font: 600 15px/1 sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+    letter-spacing: .01em;
+  }
+
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #F5F2EE;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #444;
+  }
+  .user-badge .avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #C24A2C;
+    color: #fff;
+    font: 700 12px/28px sans-serif;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .user-badge .name { font-weight: 600; }
+  .user-badge .hint { font-size: 11px; color: #999; }
+
+  .forgot {
+    text-align: right;
+    font-size: 12px;
+    color: #C24A2C;
+    margin-top: 8px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px;
+    margin: 32px 0 24px;
+    color: #bbb; font-size: 12px;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: #e3e0d8;
+  }
+
+  .note {
+    background: #FFF8F6;
+    border: 1px solid #f2d4cc;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #7a3020;
+    line-height: 1.5;
+    margin-top: 20px;
+  }
+  .note strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ESKİ -->
+<div>
+  <div class="label-tag">Mevcut giriş ekranı</div>
+  <div class="old-card">
+    <div class="logo-area">
+      <div class="logo-box">B</div>
+      <div class="sub">Tasarım Panosu · giriş</div>
+    </div>
+    <div class="field">
+      <input type="password" placeholder="Şifre">
+    </div>
+    <div style="height:18px;font-size:12px;color:#C24A2C;margin:6px 0"> </div>
+    <button class="btn">Giriş</button>
+    <div class="note" style="margin-top:16px">
+      <strong>Kısıt:</strong> tek ortak şifre, kim girdi belli değil, şifre değişince deploy gerekiyor.
+    </div>
+  </div>
+</div>
+
+<!-- YENİ -->
+<div>
+  <div class="label-tag">Yeni giriş ekranı</div>
+  <div class="new-card">
+    <div class="logo-area">
+      <div class="logo-box">B</div>
+      <div class="sub">Tasarım Panosu · giriş</div>
+    </div>
+    <div class="field">
+      <label>Kullanıcı adı</label>
+      <input type="text" value="gorkem" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Şifre</label>
+      <input type="password" value="••••••••">
+    </div>
+    <div class="forgot">Şifremi unuttum →</div>
+    <button class="btn" style="margin-top:16px">Giriş Yap</button>
+
+    <div class="divider">giriş sonrası</div>
+
+    <div class="user-badge">
+      <div class="avatar">G</div>
+      <div>
+        <div class="name">Görkem Kaya</div>
+        <div class="hint">Admin · oturum 30 gün geçerli</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Yeni:</strong> kişiye özel oturum, kim ne zaman girdi izlenebilir, şifre değişince deploy yok.
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

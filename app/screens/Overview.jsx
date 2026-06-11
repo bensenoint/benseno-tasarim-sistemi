@@ -24,7 +24,7 @@ function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwit
   const blocked = filtered.filter(b => b.durum === "blokeli");
 
   const filterActive = deptFilter !== "all" || prioFilter !== "all";
-  const shared = {data,user,viewMode,setViewMode,active:filtered,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,onJumpJobs,onRefresh,onStatusChange,filterOpen,setFilterOpen,deptFilter,setDeptFilter,prioFilter,setPrioFilter,filterActive,kpiVariant};
+  const shared = {data,user,viewMode,setViewMode,active:filtered,musteride,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,onJumpJobs,onRefresh,onStatusChange,filterOpen,setFilterOpen,deptFilter,setDeptFilter,prioFilter,setPrioFilter,filterActive,kpiVariant};
 
   if (layout === "dense") return <DenseLayout {...shared}/>;
   if (layout === "story") return <StoryLayout {...shared}/>;
@@ -277,7 +277,7 @@ function Rule({ name, status, hits, last }) {
   );
 }
 
-function EditorialLayout({ data, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+function EditorialLayout({ data, musteride, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   const avgCapPct = calcAvgCapPct(data);
@@ -389,7 +389,7 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
 }
 
 // ─── DENSE ──────────────────────────────────────────────────────────────────
-function DenseLayout({ data, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+function DenseLayout({ data, musteride, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const avgCapPct = calcAvgCapPct(data);
   // Bu hafta özet — canlı veriden
   const nowTs2 = data.NOW || Date.now();
@@ -465,7 +465,7 @@ function DenseLayout({ data, active, overdue, today, week, stale, review, blocke
 }
 
 // ─── STORY (vertical narrative) ─────────────────────────────────────────────
-function StoryLayout({ data, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, kpiVariant }) {
+function StoryLayout({ data, musteride, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, kpiVariant }) {
   const avgCapPct = calcAvgCapPct(data);
   return (
     <div className="bn-tab-in">

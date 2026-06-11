@@ -1,0 +1,33 @@
+{
+ "version": "2.1.0",
+ "source": "debug",
+ "timestamp": "2026-06-10T07:59:25.600005",
+ "status": "COMPLETE",
+ "results_tsv": "autoresearch/debug-260610-0751/results.tsv",
+ "findings": [
+  {
+   "severity": "high",
+   "title": "Legacy reaction scripts git'e çöp commit atıyor (her durum reactionında)",
+   "file_line": "scripts/slack-bot.js:689,716,742"
+  },
+  {
+   "severity": "medium",
+   "title": "Free-text 'İş:+Süre:' mesajı hayalet brief davranışı (kuyruk+uyarı, DB yok)",
+   "file_line": "scripts/slack-bot.js:1094"
+  },
+  {
+   "severity": "low",
+   "title": "status-overrides.json'da 22 hayalet pending girişi",
+   "file_line": "data/status-overrides.json"
+  },
+  {
+   "severity": "info",
+   "title": "Sabah raporu (bugün 07:50) doğrulanamadı — kanal private",
+   "file_line": "scripts/scheduler.js:68"
+  }
+ ],
+ "config": {
+  "scope": "server/** scripts/** dashboard/** DB Slack",
+  "symptom": "pre-launch full sweep"
+ }
+}

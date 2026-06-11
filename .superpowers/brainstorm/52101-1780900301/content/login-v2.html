@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login v2 Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --paper:       #FBFAF7;
+    --paper-2:     #F4F2EC;
+    --ember:       #C24A2C;
+    --ember-hover: #A93D22;
+    --ink:         #16161A;
+    --ink-2:       #2E2E36;
+    --ink-3:       #5B5B66;
+    --ink-4:       #8A8A94;
+    --line:        #ECEAE3;
+    --line-strong: #DFDCD3;
+    --font-sans:   "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
+    --r-2: 8px;
+    --r-3: 12px;
+    --r-4: 16px;
+    --shadow-2:
+      0 2px 8px rgba(22, 22, 26, 0.07),
+      0 16px 40px rgba(22, 22, 26, 0.12);
+  }
+
+  body {
+    background: var(--paper-2);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    /* Subtle noise texture */
+    background-image: radial-gradient(ellipse at 60% 10%, rgba(194,74,44,.06) 0%, transparent 55%),
+                      radial-gradient(ellipse at 20% 90%, rgba(194,74,44,.04) 0%, transparent 45%);
+  }
+
+  .card {
+    background: var(--paper);
+    border-radius: 20px;
+    padding: 44px 40px 40px;
+    width: 360px;
+    max-width: 92vw;
+    box-shadow: var(--shadow-2);
+    border: 1px solid var(--line);
+  }
+
+  /* Logo area */
+  .logo-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+    gap: 14px;
+  }
+  .logo-img {
+    height: 42px;
+    width: auto;
+    object-fit: contain;
+  }
+  .logo-divider {
+    width: 32px;
+    height: 1px;
+    background: var(--line-strong);
+  }
+  .logo-sub {
+    font-size: 12px;
+    color: var(--ink-4);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* Fields */
+  .fields { display: flex; flex-direction: column; gap: 12px; }
+
+  .field-wrap { display: flex; flex-direction: column; gap: 5px; }
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-3);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+  .field-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--r-2);
+    font: 15px var(--font-sans);
+    background: #fff;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field-input:focus {
+    border-color: var(--ember);
+    box-shadow: 0 0 0 3px rgba(194,74,44,.10);
+  }
+  .field-input.filled { border-color: var(--line-strong); }
+
+  /* Forgot */
+  .forgot-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -4px;
+  }
+  .forgot-link {
+    font-size: 12px;
+    color: var(--ember);
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .forgot-link:hover { text-decoration: underline; }
+
+  /* Submit */
+  .btn-login {
+    width: 100%;
+    padding: 13px;
+    border: 0;
+    border-radius: var(--r-2);
+    background: var(--ember);
+    color: #fff;
+    font: 600 15px var(--font-sans);
+    cursor: pointer;
+    margin-top: 20px;
+    letter-spacing: .01em;
+    transition: background .12s, transform .12s;
+  }
+  .btn-login:hover { background: var(--ember-hover); }
+  .btn-login:active { transform: scale(0.98); }
+
+  /* After login: session info badge */
+  .session-divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 28px 0 20px;
+    color: var(--ink-4); font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+    font-weight: 500;
+  }
+  .session-divider::before, .session-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--line);
+  }
+
+  .session-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-3);
+    padding: 12px 14px;
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ember);
+    color: #fff;
+    font: 700 14px/36px var(--font-sans);
+    text-align: center;
+    flex-shrink: 0;
+    letter-spacing: 0;
+  }
+  .session-info .name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .session-info .meta {
+    font-size: 11px;
+    color: var(--ink-4);
+    margin-top: 1px;
+  }
+  .session-info .admin-badge {
+    display: inline-block;
+    background: rgba(194,74,44,.12);
+    color: var(--ember);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+  }
+
+  /* Error state example */
+  .err-msg {
+    height: 16px;
+    font-size: 12px;
+    color: #D7263D;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+
+    <div class="logo-area">
+      <img class="logo-img" src="logo.png" alt="Benseno">
+      <div class="logo-divider"></div>
+      <div class="logo-sub">Tasarım Panosu</div>
+    </div>
+
+    <div class="fields">
+
+      <div class="field-wrap">
+        <label class="field-label">Kullanıcı adı</label>
+        <input class="field-input filled" type="text" value="gorkem" autocomplete="username" readonly>
+      </div>
+
+      <div class="field-wrap">
+        <label class="field-label">Şifre</label>
+        <input class="field-input" type="password" value="••••••••" readonly>
+        <div class="err-msg"></div>
+      </div>
+
+    </div>
+
+    <div class="forgot-row">
+      <a class="forgot-link">Şifremi unuttum</a>
+    </div>
+
+    <button class="btn-login">Giriş Yap</button>
+
+    <div class="session-divider">giriş sonrası</div>
+
+    <div class="session-badge">
+      <div class="avatar">G</div>
+      <div class="session-info">
+        <div class="name">Görkem Kaya <span class="admin-badge">Admin</span></div>
+        <div class="meta">Oturum 30 gün geçerli · son giriş şimdi</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
