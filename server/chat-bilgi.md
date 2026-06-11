@@ -33,7 +33,7 @@ Thread'e "brief sil" yaz, ya da brief ana mesajını Slack'te sil, ya da dashboa
 - Thread Özeti: her aktif brief'in Slack yazışması saatte bir AI ile özetlenir → brief detayında "💬 Thread Özeti".
 - İş Insight: iş tamamlanınca thread'den değerlendirme üretilir (süreç, revize, öğrenimler) → tamamlanan işin detayında "🔍 İş Insight".
 - Marka Günlük Takibi: marka kanalının tüm akışı saatte bir özetlenir; her gün 18:45'te günün özeti + gün-sonu insight'ı tarihli arşive yazılır → Marka detayında tabloların altında "Günlük Kanal Takibi" paneli, tarih seçiciyle geçmiş günlere dönülür. Günlük kayıtlar bir önceki günle ilişkilendirilir (dünden sarkan konuların durumu belirtilir).
-- Yıldız puanı: AI her tamamlanan işe 1-5 puan verir (5=pürüzsüz/zamanında, 1=ciddi sorun). Yönetici Tamamlananlar'daki yıldızlara tıklayıp override edebilir; override sonrası AI dokunamaz. Karne: firma+departman (Karşılaştırma ekranı, herkese açık), marka (Marka detayı), kişi (Profil, SADECE yönetici görür). Sebep açıklamaları her gün 18:45'te güncellenir.
+- Yıldız puanı: AI her tamamlanan işe 1-5 puan verir (5=pürüzsüz/zamanında, 1=ciddi sorun). Yönetici Tamamlananlar'daki yıldızlara tıklayıp override edebilir; override sonrası AI dokunamaz. Tabloda yıldızın üzerine gelince puanın tek cümlelik gerekçesi (tooltip) görünür. Karne: firma+departman (Karşılaştırma ekranı, herkese açık), marka (Marka detayı), kişi (Profil, SADECE yönetici görür). Sebep açıklamaları her gün 18:45'te güncellenir.
 
 ## Raporlar (hafta içi)
 - 07:50 Sabah raporu → #benseno-grafik + 5 yönetici DM.
@@ -41,7 +41,7 @@ Thread'e "brief sil" yaz, ya da brief ana mesajını Slack'te sil, ya da dashboa
 - 17:05 Günlük özet, Cuma 17:10 haftalık retro, ay sonu strateji.
 
 ## Dashboard ekranları
-Genel Bakış (KPI + bugün/yarın + firma yıldızı; "Bu hafta parlayan" kartı sadece yönetici), Aktif İşler (tablo + detay paneli), Plan/Gantt, Kanban, Tamamlananlar (satıra tıkla → salt-okunur detay: thread özeti, insight, not; yıldız puanlama yönetici), Karşılaştırma (Yıldız Karnesi + departman kıyası), Geçmiş (gerçek olay akışı; satıra tıkla → işin detayı), Galeri, Multi-atama, Marka (liste + detay: yıldız, günlük kanal takibi arşivi), Ekip Matrisi, Profil (kişisel istatistik; admin departman gruplu dropdown'la kişi seçebilir), Yardım, Kullanıcılar & Silinenler (yönetici; silen kişinin adı görünür).
+Genel Bakış (KPI + bugün/yarın + firma yıldızı; "Bu hafta parlayan" kartı sadece yönetici), Aktif İşler (tablo + detay paneli), Plan/Gantt, Kanban, Tamamlananlar (satıra tıkla → salt-okunur detay: thread özeti, insight, not; yıldız puanlama yönetici), Karşılaştırma (Yıldız Karnesi + departman kıyası), Geçmiş (gerçek olay akışı; satıra tıkla → işin detayı), Müşteri Onayı (✈️ müşteri dönüşü bekleyen işler: bekleme süresi, gönderim sayısı, iç/müşteri revize), Galeri, Multi-atama, Marka (liste + detay: yıldız, günlük kanal takibi arşivi), Ekip Matrisi, Profil (kişisel istatistik; admin departman gruplu dropdown'la kişi seçebilir), Yardım, Kullanıcılar & Silinenler (yönetici; silen kişinin adı görünür).
 - Giriş kişiye özel kullanıcı adı+şifre; ilk şifre yöneticiden. Görünüm otomatik kendi hesabın; başka görünüme geçmek admin-only.
 - Bildirim zili (sağ üst): sana atılan her brief-akışı DM'inin kısa hâli; tıklayınca Slack thread'ine gider.
 - Komut paleti: Cmd/Ctrl+K.

@@ -1185,7 +1185,7 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
       <p><strong>Revizyon ayrımı kuralı:</strong> ✈️'dan sonraki <strong>İLK ✏️ müşteri revizyonudur</strong>; diğer tüm ✏️'ler iç revizyondur. Müşteri revizyonu gelince iş otomatik "çalışılıyor"a döner ve aktif listelere geri gelir; tekrar hazır olunca yine ✈️ atılır — her döngüde aynı kural işler. Tablolarda revizyon "iç/müşteri" olarak ayrı gösterilir; bekleme süreleri marka değerlendirmelerine veri sağlar.</p>
 
       <h3>⭐ Yıldız Puanlama & Karne</h3>
-      <p>Her tamamlanan işe AI, thread değerlendirmesinden <strong>1-5 kalite puanı</strong> verir (5 = pürüzsüz/zamanında, 3 = normal sürtünme, 1 = ciddi sorun). Yönetici, Tamamlananlar'daki yıldızlara tıklayarak puanı değiştirebilir — override sonrası AI o işe dokunamaz (AI puanları küçük "AI" rozetiyle ayırt edilir).</p>
+      <p>Her tamamlanan işe AI, thread değerlendirmesinden <strong>1-5 kalite puanı</strong> verir (5 = pürüzsüz/zamanında, 3 = normal sürtünme, 1 = ciddi sorun). Yönetici, Tamamlananlar'daki yıldızlara tıklayarak puanı değiştirebilir — override sonrası AI o işe dokunamaz (AI puanları küçük "AI" rozetiyle ayırt edilir). Yıldızların üzerine gelince işin <strong>neden o puanı aldığını anlatan tek cümlelik gerekçe</strong> görünür.</p>
       <p>Puanlar dört seviyede karneye dönüşür: <strong>Firma + Departman</strong> → Karşılaştırma ekranındaki "⭐ Yıldız Karnesi" kartı (Genel Bakış'taki BENSENO ⭐ rozeti de oraya götürür) · <strong>Marka</strong> → Marka detayındaki yıldız şeridi · <strong>Kişi</strong> → Profil'de, <em>sadece yöneticiler görür</em>. Çok departmanlı işin puanı ilgili tüm departmanlara işler. "Neden bu ortalama" sebep açıklamaları her gün 18:45'te iş insight'larından üretilir.</p>
 
       <h3>📡 Marka Günlük Takibi</h3>
@@ -1277,6 +1277,7 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         <div class="screen-card"><div class="screen-num">6.14</div><div class="screen-name">Profil</div><div class="screen-desc">Kişisel istatistikler, tamamlanan işler, puan geçmişi</div></div>
         <div class="screen-card"><div class="screen-num">6.15</div><div class="screen-name">Silinenler</div><div class="screen-desc">Silinmiş brief'ler — geri al / kalıcı sil (yönetici)</div></div>
         <div class="screen-card"><div class="screen-num">6.16</div><div class="screen-name">Yardım</div><div class="screen-desc">Komut, emoji ve kısayol referansı</div></div>
+        <div class="screen-card"><div class="screen-num">6.17</div><div class="screen-name">✈️ Müşteri Onayı</div><div class="screen-desc">Müşteri dönüşü bekleyen işler — bekleme süresi, gönderim sayısı, iç/müşteri revize; en uzun bekleyen üstte</div></div>
       </div>
 
       <h3>6.1 Genel Bakış — KPI Kartları</h3>
@@ -1616,7 +1617,7 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
       <hr>
 
       <h4>İş puanları nasıl veriliyor, değiştirebilir miyim?</h4>
-      <p>Puanı (1-5 yıldız) iş tamamlandığında <strong>AI</strong>, thread değerlendirmesinden otomatik verir. Yöneticiler Tamamlananlar ekranındaki yıldızlara tıklayarak puanı değiştirebilir; yönetici puan verdikten sonra AI o işe bir daha dokunmaz. Kendi puanınızı göremezsiniz — kişi puanları yöneticilere özeldir; firma/departman/marka karneleri herkese açıktır.</p>
+      <p>Puanı (1-5 yıldız) iş tamamlandığında <strong>AI</strong>, thread değerlendirmesinden otomatik verir. Yöneticiler Tamamlananlar ekranındaki yıldızlara tıklayarak puanı değiştirebilir; yönetici puan verdikten sonra AI o işe bir daha dokunmaz. Yıldızın üzerine gelince puanın tek cümlelik gerekçesi görünür. Kendi puanınızı göremezsiniz — kişi puanları yöneticilere özeldir; firma/departman/marka karneleri herkese açıktır.</p>
 
       <hr>
 

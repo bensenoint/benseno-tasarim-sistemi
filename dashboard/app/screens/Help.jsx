@@ -90,6 +90,7 @@ function HelpScreen() {
         <Row left="AI puanı" right="İş tamamlanınca otomatik verilir — Tamamlananlar'da yıldızların yanında 'AI' rozeti görünür"/>
         <Row left="Yönetici override" right="Tamamlananlar'daki yıldızlara tıklayarak puanı değiştir (yönetici)" sub="Override sonrası AI o işe bir daha dokunmaz."/>
         <Row left="Karne" right="Karşılaştırma ekranı → '⭐ Yıldız Karnesi': firma + departman ortalamaları ve sebep açıklamaları" sub="Genel Bakış'taki 'BENSENO ⭐' rozeti de oraya götürür. Marka puanı Marka detayında; kişi puanı sadece yöneticiye, Profil'de."/>
+        <Row left="Puan gerekçesi" right="Tamamlananlar'da yıldızların üzerine gelince işin neden o puanı aldığını anlatan tek cümlelik açıklama görünür" sub="Gerekçe, iş tamamlandığında AI değerlendirmesiyle birlikte üretilir."/>
         <Row left="Sebep" right="'Neden bu ortalama' açıklamaları her gün 18:45'te insight'lardan üretilir"/>
       </Section>
 
