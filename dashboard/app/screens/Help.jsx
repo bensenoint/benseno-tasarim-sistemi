@@ -68,6 +68,7 @@ function HelpScreen() {
         <Row left="revizyon var · revize et" right="Revizyon"/>
         <Row left="müşteriye yollandı" right="✈️ Müşteri Onayında"/>
         <Row left="revize: @kişi" right="⛓️ Sıralı işte zinciri o halkaya geri sarar"/>
+        <Row left="termin 15.06 17:00" right="Termini değiştirir — 'termin yarın 14:30' da olur; saat yoksa 18:00" sub="Dashboard'da brief detayında Deadline'a tıklayarak da değiştirilir."/>
         <Row left="iş tamamlandı" right="Tamamlandı"/>
         <Row left="yeniden aç · geri aç" right="Yeniden açıldı (çalışılıyor)"/>
         <Row left="bloke et" right="Blokeli"/>

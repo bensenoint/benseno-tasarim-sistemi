@@ -580,6 +580,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
           '`iş beklemede` → Beklemede\n' +
           '`revizyon var` · `revize et` → Revizyon\n' +
           '`revize: @kişi` → Zinciri o halkaya geri sarar (sıralı iş)\n' +
+          '`termin 15.06 17:00` → Termini değiştirir (saat yoksa 18:00)\n' +
           '`müşteriye yollandı` → ✈️ Müşteri Onayında\n' +
           '`iş tamamlandı` → Tamamlandı\n' +
           '`yeniden aç` · `geri aç` → Yeniden Açıldı\n' +
@@ -724,6 +725,28 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
 
 // Reaction bir thread YANITINA konmuşsa parent (brief) ts'ini döndür — aksi halde
 // by-ts araması yanıtın ts'iyle yapılır ve brief bulunamaz (Bug 1). Standalone mesajda ts'i aynen döner.
+// "15.06 17:00" / "15.06.2026" / "bugün 14:30" / "yarın" → TR saatiyle ISO (+03:00).
+// Saat verilmezse 18:00. Yıl verilmemiş ve tarih geçmişse bir sonraki yıl alınır.
+function parseTerminTR(raw) {
+  const s = raw.trim().toLowerCase();
+  const p = (n) => String(n).padStart(2, '0');
+  const bugunTR = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Istanbul' }); // YYYY-MM-DD
+  let m = s.match(/^(bug[uü]n|yar[ıi]n)(?:\s+(\d{1,2})[:.](\d{2}))?$/);
+  if (m) {
+    let [y, mo, d] = bugunTR().split('-').map(Number);
+    if (m[1].startsWith('yar')) { const t = new Date(Date.UTC(y, mo - 1, d + 1)); y = t.getUTCFullYear(); mo = t.getUTCMonth() + 1; d = t.getUTCDate(); }
+    return `${y}-${p(mo)}-${p(d)}T${p(m[2] ? +m[2] : 18)}:${m[3] || '00'}:00+03:00`;
+  }
+  m = s.match(/^(\d{1,2})[./](\d{1,2})(?:[./](\d{2,4}))?(?:\s+(\d{1,2})[:.](\d{2}))?$/);
+  if (!m) return null;
+  const gun = +m[1], ay = +m[2];
+  if (gun < 1 || gun > 31 || ay < 1 || ay > 12) return null;
+  let yil = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : +bugunTR().slice(0, 4);
+  const iso = () => `${yil}-${p(ay)}-${p(gun)}T${p(m[4] ? +m[4] : 18)}:${m[5] || '00'}:00+03:00`;
+  if (!m[3] && Date.parse(iso()) < Date.now()) yil++;   // yılsız geçmiş tarih → gelecek yıl
+  return iso();
+}
+
 async function resolveBriefTs(client, channel, ts) {
   try {
     const r = await client.conversations.replies({ channel, ts, limit: 1 });
@@ -1096,6 +1119,21 @@ app.event('message', async ({ event, client }) => {
       const briefTs = event.thread_ts;
       log(`hedefli revizyon: @${revHedef[1]} | ${briefTs} — ${event.user}`);
       dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: 'revizyon', hedef: revHedef[1], by: event.user, source: 'slack' });
+      return;
+    }
+
+    // "termin 15.06 17:00" / "deadline yarın 14:30" — termini günceller (saat yoksa 18:00)
+    const tMatch = trimmed.match(/^(?:termin|deadline)\s*:?\s+(.+)$/i);
+    if (tMatch) {
+      const iso = parseTerminTR(tMatch[1]);
+      const briefTs = event.thread_ts;
+      if (iso) {
+        log(`termin keyword: ${tMatch[1]} → ${iso} | ${briefTs} — ${event.user}`);
+        dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { deadline: iso, by: event.user, source: 'slack' });
+      } else {
+        try { await client.chat.postMessage({ channel: event.channel, thread_ts: briefTs,
+          text: '⚠️ Termin formatını anlayamadım. Örnek: `termin 15.06 17:00` · `termin 15.06.2026` · `termin yarın 14:30` (saat yoksa 18:00 alınır).', username: BOT_NAME }); } catch {}
+      }
       return;
     }
 

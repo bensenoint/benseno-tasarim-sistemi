@@ -160,7 +160,9 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             marginTop:10, font:"400 13px/1.4 var(--font-sans)", color:"var(--ink-2)"
           }}>
             <span style={{color:"var(--ink-3)"}}>Açıldı</span><span>{formatFull(b.acilma)}</span>
-            <span style={{color:"var(--ink-3)"}}>Deadline</span><span>{formatFull(b.deadline)}</span>
+            <span style={{color:"var(--ink-3)"}}>Deadline</span>
+            {ro ? <span>{formatFull(b.deadline)}</span>
+                : <DeadlineField value={b.deadline} onChange={(ms) => set({ deadline: ms })}/>}
             {ro ? <>
               <span style={{color:"var(--ink-3)"}}>Bitiş</span>
               <span style={{color:"var(--prio-green)"}}>{formatFull(b.bitis)}</span>
@@ -695,3 +697,28 @@ function buildActivity(b) {
 }
 
 window.BriefDrawer = BriefDrawer;
+
+
+// Termin: tıkla-düzenle — görünümde formatlı tarih, tıklayınca datetime-local; değişiklik
+// Kaydet ile PATCH'e gider (App.jsx persist diff'i deadline'ı ISO'ya çevirir).
+function DeadlineField({ value, onChange }) {
+  const [editing, setEditing] = React.useState(false);
+  const toLocal = (ms) => {
+    if (!ms) return "";
+    const d = new Date(ms), p = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+  if (!editing) return (
+    <span onClick={() => setEditing(true)} title="Değiştirmek için tıkla"
+      style={{cursor:"pointer", borderBottom:"1px dashed var(--line-strong)"}}>
+      {formatFull(value)} ✎
+    </span>
+  );
+  return (
+    <input type="datetime-local" autoFocus defaultValue={toLocal(value)}
+      onBlur={(e) => { setEditing(false); const v = e.target.value; if (v) { const ms = new Date(v).getTime(); if (ms && ms !== value) onChange(ms); } }}
+      onKeyDown={(e) => { if (e.key === "Enter") e.target.blur(); if (e.key === "Escape") setEditing(false); }}
+      style={{font:"400 13px/1.4 var(--font-sans)", color:"var(--ink)", background:"var(--surface)",
+        border:"1px solid var(--line-strong)", borderRadius: 6, padding:"2px 6px", colorScheme:"light dark"}}/>
+  );
+}

@@ -63,6 +63,8 @@ async function bnsPersistBriefChange(prev, next, byId) {
   const patch = {};
   if (next.baslik !== prev.baslik) patch.baslik = next.baslik;
   if ((next.notes || "") !== (prev.notes || "")) patch.musteri_notu = next.notes || "";
+  if ((next.deadline || null) !== (prev.deadline || null))
+    patch.deadline = next.deadline ? new Date(next.deadline).toISOString() : null;
   const idsOf = (arr) => (arr || []).map(x => x && x.id).filter(Boolean);
   const w0 = idsOf(prev.workers), w1 = idsOf(next.workers);
   if (w0.join(",") !== w1.join(",")) patch.worker_ids = w1;

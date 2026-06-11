@@ -21,7 +21,7 @@ Slack botu (WT) + Railway API/Postgres + GitHub Pages dashboard. Briefler (işle
 Brief açarken (Slack formu veya dashboard) "Sıralı" seçilirse işi yapanlar SEÇİM SIRASINA göre zincir olur (ör. Melis → İpek → Levent). ✅ yalnızca sıradaki halkayı onaylar; iş otomatik sonraki kişiye geçer (DM gider) ve HERKES onaylamadan tamamlanmaz. ✏️ zinciri bir önceki onaylı halkaya geri sarar; "revize: @kişi" yazılırsa o halkaya döner (o halka ve sonrasının onayı düşer). Freelance halkası yerine brief'teki herhangi biri onay verebilir (vekâleten not düşülür). Sıralı işte cevapsız uyarısı ve kapasite yükü yalnız sırası gelen halkaya işler. Seçim yapılmaz veya "Paralel" seçilirse her şey bugünkü gibi çalışır. Bu akış yalnızca yeni açılan brieflerde geçerlidir. Brief detayında ⛓️ zincir şeridi halkaların durumunu gösterir (✓ onaylı, ▶ sırada).
 
 ## Finansal (Slack thread'ine yaz)
-"maliyet 1500 satış 4000" · "fatura ok"/"fatura iptal" · "ödeme ok"/"ödeme iptal". Dashboard'a dakikalar içinde yansır. `/maliyet` komutu da var.
+"maliyet 1500 satış 4000" · "fatura ok"/"fatura iptal" · "ödeme ok"/"ödeme iptal". Termin değiştirme: thread'e "termin 15.06 17:00" (veya "termin yarın 14:30"; saat yoksa 18:00) — dashboard'da da brief detayında Deadline'a tıklayıp değiştirilebilir. Dashboard'a dakikalar içinde yansır. `/maliyet` komutu da var.
 
 ## Silme & geri alma
 Thread'e "brief sil" yaz, ya da brief ana mesajını Slack'te sil, ya da dashboard detayında 🗑️ Sil (yönetici). Silinen iş Silinenler ekranına gider, geri alınabilir; thread'e silen kişinin adıyla not düşer. "Kalıcı sil" geri alınamaz (yönetici).
