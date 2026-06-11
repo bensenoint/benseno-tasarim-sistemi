@@ -202,13 +202,10 @@ async function createBrief(raw) {
     try {
       const leadIdsForPost = (d.lead_ids && d.lead_ids.length) ? d.lead_ids : (d.by ? [d.by] : []);
       const workerIds = (d.worker_ids || []).filter(Boolean);
-      // Gözlemciler: işi yapanlar/lead/ELLE seçilen gözlemciler mention'lanır; OTOMATİK
-      // eklenen dept yöneticileri düz isimle yazılır — her briefte mention almasınlar
-      // (Slack Activity'leri dolmasın; bilgilendirme zaten 'yeni brief' DM'iyle gidiyor).
+      // Gözlemciler (manuel + otomatik dept yöneticileri) — brief'teki HERKES mention'lansın
       const obsQ = await pool.query(
         `SELECT user_id FROM brief_assignees WHERE brief_id=$1 AND role='gozlemci'`, [result.id]);
       const observerIds = obsQ.rows.map(r => r.user_id);
-      const manualObs = new Set(d.gozlemci_ids || []);   // kullanıcının formda seçtikleri
       let leadName = null, contribNames = [], observerNames = [];
       const allIds = [...new Set([...leadIdsForPost, ...workerIds, ...observerIds])];
       if (allIds.length) {
@@ -218,9 +215,7 @@ async function createBrief(raw) {
         const mention = (i) => /^U/.test(i) ? `<@${i}>` : (byId[i] || i);
         leadName = leadIdsForPost.map(mention).join(', ') || null;
         contribNames = workerIds.map(mention);
-        observerNames = observerIds
-          .filter(i => !leadIdsForPost.includes(i) && !workerIds.includes(i))
-          .map(i => manualObs.has(i) ? mention(i) : (byId[i] || i));
+        observerNames = observerIds.filter(i => !leadIdsForPost.includes(i) && !workerIds.includes(i)).map(mention);
       }
       const deadlineMs = d.deadline ? (typeof d.deadline === 'number' ? d.deadline : Date.parse(d.deadline)) : null;
       const post = await slack.postBrief({ marka: d.marka, baslik: d.baslik, no: result.no,
