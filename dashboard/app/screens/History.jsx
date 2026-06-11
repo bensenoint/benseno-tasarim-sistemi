@@ -1,6 +1,6 @@
 // app/screens/History.jsx — sistem aktivite log'u.
 
-function HistoryScreen({ data }) {
+function HistoryScreen({ data, onOpenByNo }) {
   const [filter, setFilter] = React.useState("all");
   // viewMode'dan bağımsız: her zaman TÜM brief ve tamamlananları kullan
   const allBriefs    = data._allBriefs    || data.briefs    || [];
@@ -12,7 +12,7 @@ function HistoryScreen({ data }) {
     const acan = b.lead;
     if (!acan) return;
     extras.push({
-      t: b.acilma,
+      t: b.acilma, no: b.no,
       who: acan.id, verb: "açtı", target: b.baslik,
       brand: b.brand, _type: "open"
     });
@@ -22,7 +22,7 @@ function HistoryScreen({ data }) {
     const tamamlayan = (c.contributors && c.contributors[0]) || c.lead;
     if (!tamamlayan) return;
     extras.push({
-      t: c.bitis,
+      t: c.bitis, no: c.no,
       who: tamamlayan.id, verb: "tamamladı", target: c.baslik,
       brand: c.brand, meta: c.sureH != null && c.sureH > 0 ? c.sureH.toFixed(1) + " sa" : "",
       _type: "done"
@@ -85,9 +85,16 @@ function HistoryScreen({ data }) {
               const u = data.USERS.find(x => x.id === a.who) || { id: a.who, name: "Bilinmiyor", initials: "?", color: "#999" };
               const d = new Date(a.t);
               const time = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+              const clickable = !!(a.no && onOpenByNo);
               return (
-                <div key={i} style={{
+                <div key={i}
+                  onClick={clickable ? () => onOpenByNo(a.no) : undefined}
+                  title={clickable ? `#${a.no} detayını aç` : undefined}
+                  onMouseEnter={clickable ? (e => e.currentTarget.style.background = "var(--paper-2)") : undefined}
+                  onMouseLeave={clickable ? (e => e.currentTarget.style.background = "transparent") : undefined}
+                  style={{
                   display:"flex", alignItems:"center", gap: 12, padding:"10px 16px",
+                  cursor: clickable ? "pointer" : "default",
                   borderBottom: i === g.items.length - 1 ? 0 : "1px solid var(--line-soft)"
                 }}>
                   <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", minWidth: 44}}>{time}</span>

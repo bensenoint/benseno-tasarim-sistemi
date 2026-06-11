@@ -425,7 +425,14 @@ function App({ currentUser, onLogout }) {
   else if (tab === "multi")    Screen = <MultiScreen    data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "brand")    Screen = <BrandScreen    data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "team")     Screen = <TeamScreen     data={liveData}/>;
-  else if (tab === "history")  Screen = <HistoryScreen  data={liveData}/>;
+  else if (tab === "history")  Screen = <HistoryScreen  data={liveData} onOpenByNo={(no) => {
+    // Geçmiş satırı → iş detayı: aktifse normal panel, tamamlanmışsa salt-okunur
+    const b = (liveData._allBriefs || liveData.briefs || []).find(x => x.no === no);
+    if (b) return onOpenBrief(b);
+    const c = (liveData._allCompleted || liveData.completed || []).find(x => x.no === no);
+    if (c) return onOpenCompleted(c);
+    setToast(`#${no} bulunamadı — silinmiş olabilir`);
+  }}/>;
   else if (tab === "help")    Screen = <HelpScreen />;
   else if (tab === "users")      Screen = currentUser?.role === 'admin'
     ? <UsersScreen currentUser={currentUser}/>

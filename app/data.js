@@ -556,6 +556,7 @@ function bnsApplyExtras(ed) {
     const durum = det.durum || det.yeni_durum;
     return {
       t: e.t, who: e.who || "system",
+      no: e.no || null,   // tıklayınca iş detayını açmak için
       verb: durum ? "durumu değiştirdi" : (VERB_TR[e.verb] || e.verb),
       target: e.baslik ? `#${e.no} ${e.baslik}` : (det.baslik || ""),
       brand: e.marka && window.BNS_DATA.BR ? window.BNS_DATA.BR[e.marka] : null,
