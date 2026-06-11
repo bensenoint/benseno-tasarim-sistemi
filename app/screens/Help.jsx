@@ -84,6 +84,25 @@ function HelpScreen() {
         <Row left="🌴 Tatil" right="Slack durumunu 🌴 / 'tatil' / 'izin' / 'OOO' yaparsan uyarılar sana gelmez" sub="Tüm atananları tatildeki brieflerde hareketsizlik süresi de işlemez."/>
       </Section>
 
+      <Section title="⭐ Yıldız Puanlama & Karne" note="Her tamamlanan işe AI, thread'inden 1-5 kalite puanı verir (5=pürüzsüz/zamanında, 1=ciddi sorun).">
+        <Row left="AI puanı" right="İş tamamlanınca otomatik verilir — Tamamlananlar'da yıldızların yanında 'AI' rozeti görünür"/>
+        <Row left="Yönetici override" right="Tamamlananlar'daki yıldızlara tıklayarak puanı değiştir (yönetici)" sub="Override sonrası AI o işe bir daha dokunmaz."/>
+        <Row left="Karne" right="Karşılaştırma ekranı → '⭐ Yıldız Karnesi': firma + departman ortalamaları ve sebep açıklamaları" sub="Genel Bakış'taki 'BENSENO ⭐' rozeti de oraya götürür. Marka puanı Marka detayında; kişi puanı sadece yöneticiye, Profil'de."/>
+        <Row left="Sebep" right="'Neden bu ortalama' açıklamaları her gün 18:45'te insight'lardan üretilir"/>
+      </Section>
+
+      <Section title="📡 Marka Günlük Takibi" note="Marka detay sayfasında, tabloların altında.">
+        <Row left="Kanal Özeti" right="Marka kanalının tüm akışının (thread'ler dahil) AI özeti — saatte bir güncellenir"/>
+        <Row left="Gün Sonu Insight" right="Her gün 18:45'te günün değerlendirmesi (tempo, sürtünme, müşteri sinyalleri) arşive yazılır"/>
+        <Row left="Tarih filtresi" right="'Şu an (canlı)' veya geçmiş bir günü seç → o günün özeti + insight'ı" sub="Günlük kayıtlar bir önceki günle ilişkilendirilir — dünden sarkan konuların bugünkü durumu belirtilir."/>
+      </Section>
+
+      <Section title="🤖 Sistem Asistanı & Geri Bildirim">
+        <Row left="🤖 Asistan" right="Sağ alttaki balon — kullanım soruları + marka/iş/kişi bazlı canlı veri soruları + öneri" sub="Kişi puanlarını sadece yöneticilere söyler."/>
+        <Row left="help (Slack)" right="Herhangi bir kanala 'help' yaz → sorun/öneri formu (başlık + açıklama + görsel) → sistem adminlerine DM"/>
+        <Row left="🔔 Bildirim zili" right="Sana atılan her brief-akışı DM'inin kısa hâli — tıklayınca ilgili Slack thread'i açılır"/>
+      </Section>
+
       <Section title="💬 Thread Özeti & Raporlar">
         <Row left="Thread Özeti" right="Her brief'in Slack yazışmaları AI ile özetlenir — brief detayında '💬 Thread Özeti' bölümü" sub="Hafta içi saatte bir güncellenir; yeni mesaj yoksa değişmez."/>
         <Row left="07:50 hafta içi" right="Sabah raporu — #benseno-grafik + 5 yönetici DM"/>
@@ -107,6 +126,8 @@ function HelpScreen() {
 
       <Section title="🔍 Dashboard İpuçları">
         <Row left="Komut paleti" right="Cmd+K (Mac) / Ctrl+K — brief adı, marka veya kişiye göre hızlı arama"/>
+        <Row left="Tamamlananlar" right="Satıra tıkla → işin salt-okunur detayı (thread özeti, iş insight'ı, not)" sub="Hiçbir alan değiştirilemez; sadece yıldız puanı yönetici tarafından güncellenebilir."/>
+        <Row left="Geçmiş" right="Olay satırına tıkla → ilgili işin detayı açılır (aktifse normal, tamamlanmışsa salt-okunur)"/>
         <Row left="Departman" right="Sol menüden Tasarım / Editör / AI / Freelance departman görünümleri"/>
         <Row left="Görünüm" right="Açılışta görünüm otomatik olarak sana ayarlanır" sub="Başka birinin görünümüne geçmek sadece yönetici hesaplarda mümkündür."/>
         <Row left="Silinenler" right="Sol menü → Yönetim → Silinenler (yönetici)"/>

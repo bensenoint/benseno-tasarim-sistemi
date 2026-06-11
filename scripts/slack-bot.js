@@ -591,6 +591,17 @@ app.command('/yardim', async ({ command, ack, respond }) => {
         },
       ]},
 
+      { type: 'divider' },
+
+      // Diğer
+      { type: 'section', text: { type: 'mrkdwn', text: '*Diğer*' } },
+      { type: 'section', text: { type: 'mrkdwn', text:
+        '`help` — herhangi bir kanala yaz → sorun/öneri bildirim formu (adminlere gider)\n' +
+        '🌴 — Slack durumunu 🌴/tatil/izin yap → uyarı DM\'leri sana gelmez\n' +
+        '🤖 — Dashboard sağ alttaki asistana kullanım ve iş/marka/kişi soruları sorabilirsin\n' +
+        '⏰ — İşi 1 saat içinde planına al (🎨/✍️/🤖), yoksa hatırlatma; 2 saat sonra yöneticine bilgi gider'
+      }},
+
       { type: 'context', elements: [{ type: 'mrkdwn', text: 'Dashboard: <https://bensenoint.github.io|bensenoint.github.io>' }] },
     ],
   });

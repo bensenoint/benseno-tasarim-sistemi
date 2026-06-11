@@ -859,7 +859,7 @@
       </div>
       <div class="callout info">
         <span class="callout-icon">👁️</span>
-        <span>Yeni bir brief açıldığında, işi yapanların <strong>departman yöneticileri otomatik gözlemci</strong> olarak eklenir ve "yeni brief" DM'i alır. Freelance işlerde gözlemci, <strong>işi açan kişinin</strong> departman yöneticisidir. Yöneticiler dashboard'daki departman ekranlarında ve kişi listelerinde <strong>ekibin içinde</strong> görünür.</span>
+        <span>Yeni bir brief açıldığında, işi yapanların <strong>departman yöneticileri otomatik gözlemci</strong> olarak eklenir ve "yeni brief" DM'i alır. Freelance işlerde gözlemci, <strong>işi açan kişinin</strong> departman yöneticisidir. Brief'in Slack thread'indeki ilk detay mesajında <strong>herkes @mention'lıdır</strong> (🛠 işi yapanlar · 👤 lead · 👁 gözlemciler) — herkes thread'e otomatik bağlanır. Yöneticiler dashboard'daki departman ekranlarında ve kişi listelerinde <strong>ekibin içinde</strong> görünür.</span>
       </div>
 
       <h3>Sistem Mimarisi</h3>
@@ -1172,7 +1172,17 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
       <p>Durum/öncelik değişiklikleri brief thread'ine kısa bir bot notu olarak düşer — Slack'ten yapılan değişikliklerde sadece thread notu (DM yok), dashboard'dan yapılanlarda thread notu + atananlara DM. Brief silindiğinde thread'e "🗑️ silindi — takip edilmiyor", geri alındığında "↩️ geri alındı" notu düşer.</p>
 
       <h3>💬 Thread Özeti (AI)</h3>
-      <p>Hafta içi 09–19 arası her saat başı, aktif brieflerin thread yazışmaları AI ile özetlenir ve dashboard'da brief detayında <strong>"💬 Thread Özeti"</strong> bölümünde gösterilir (3-5 cümle: ne istendi, son durum, bekleyen ne). Yeni mesaj yoksa özet değişmez. İş tamamlandığında thread'den ayrıca bir <strong>değerlendirme insight'ı</strong> çıkarılır — ileride marka/iş performans analizlerinde kullanılacak.</p>
+      <p>Hafta içi 09–19 arası her saat başı, aktif brieflerin thread yazışmaları AI ile özetlenir ve dashboard'da brief detayında <strong>"💬 Thread Özeti"</strong> bölümünde gösterilir (3-5 cümle: ne istendi, son durum, bekleyen ne). Yeni mesaj yoksa özet değişmez. İş tamamlandığında thread'den ayrıca bir <strong>"🔍 İş Insight"</strong> değerlendirmesi çıkarılır (süreç, revize, öğrenimler) — tamamlanan işin detayında görünür ve marka/iş analizlerinde kullanılır.</p>
+
+      <h3>⭐ Yıldız Puanlama & Karne</h3>
+      <p>Her tamamlanan işe AI, thread değerlendirmesinden <strong>1-5 kalite puanı</strong> verir (5 = pürüzsüz/zamanında, 3 = normal sürtünme, 1 = ciddi sorun). Yönetici, Tamamlananlar'daki yıldızlara tıklayarak puanı değiştirebilir — override sonrası AI o işe dokunamaz (AI puanları küçük "AI" rozetiyle ayırt edilir).</p>
+      <p>Puanlar dört seviyede karneye dönüşür: <strong>Firma + Departman</strong> → Karşılaştırma ekranındaki "⭐ Yıldız Karnesi" kartı (Genel Bakış'taki BENSENO ⭐ rozeti de oraya götürür) · <strong>Marka</strong> → Marka detayındaki yıldız şeridi · <strong>Kişi</strong> → Profil'de, <em>sadece yöneticiler görür</em>. Çok departmanlı işin puanı ilgili tüm departmanlara işler. "Neden bu ortalama" sebep açıklamaları her gün 18:45'te iş insight'larından üretilir.</p>
+
+      <h3>📡 Marka Günlük Takibi</h3>
+      <p>Marka detay sayfasında, iş tablolarının altında <strong>"Günlük Kanal Takibi"</strong> paneli: marka kanalının tüm akışının (thread'ler dahil) AI özeti saatte bir güncellenir; her gün 18:45'te günün <strong>kanal özeti + gün-sonu insight'ı</strong> tarihli arşive yazılır. Paneldeki tarih seçiciyle geçmiş bir günün kaydına dönülebilir. Günlük kayıtlar bir önceki günle ilişkilendirilir — dünden sarkan konuların bugünkü durumu (çözüldü/sürüyor) belirtilir.</p>
+
+      <h3>🤖 Sistem Asistanı (dashboard chatbot)</h3>
+      <p>Dashboard'da sağ alttaki 🤖 balonu: sistemin nasıl kullanılacağına dair her soru + canlı veriden marka/iş/kişi soruları ("Bauhaus'ta neler var?", "geciken iş var mı?") + öneri/yönlendirme. Kişiye özeldir (girişle korunur); kişi puanlarını yalnızca yöneticilere söyler.</p>
 
     </section>
 
@@ -1246,12 +1256,12 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         <div class="screen-card"><div class="screen-num">6.3</div><div class="screen-name">Aktif İşler</div><div class="screen-desc">Tüm brief'ler tablo formatında, detay çekmecesi</div></div>
         <div class="screen-card"><div class="screen-num">6.4</div><div class="screen-name">Plan / Gantt</div><div class="screen-desc">Brief'lerin zaman ekseninde görünümü</div></div>
         <div class="screen-card"><div class="screen-num">6.5</div><div class="screen-name">Kanban</div><div class="screen-desc">Durum sütunlarına göre gruplandırılmış</div></div>
-        <div class="screen-card"><div class="screen-num">6.6</div><div class="screen-name">Tamamlananlar</div><div class="screen-desc">Geçmiş tüm işler, tarih/marka/kişi filtresi</div></div>
-        <div class="screen-card"><div class="screen-num">6.7</div><div class="screen-name">Karşılaştırma</div><div class="screen-desc">Departmanlar arası performans analizi</div></div>
-        <div class="screen-card"><div class="screen-num">6.8</div><div class="screen-name">Geçmiş</div><div class="screen-desc">Son 14 günlük trend grafikleri</div></div>
+        <div class="screen-card"><div class="screen-num">6.6</div><div class="screen-name">Tamamlananlar</div><div class="screen-desc">Satıra tıkla → salt-okunur detay (thread özeti, insight); yıldız puanlama (yönetici)</div></div>
+        <div class="screen-card"><div class="screen-num">6.7</div><div class="screen-name">Karşılaştırma</div><div class="screen-desc">⭐ Yıldız Karnesi (firma+departman) + departman kıyası</div></div>
+        <div class="screen-card"><div class="screen-num">6.8</div><div class="screen-name">Geçmiş</div><div class="screen-desc">Gerçek olay akışı — satıra tıkla → işin detayı</div></div>
         <div class="screen-card"><div class="screen-num">6.9</div><div class="screen-name">Galeri</div><div class="screen-desc">Tamamlanan işlerin marka bazlı galerisi</div></div>
         <div class="screen-card"><div class="screen-num">6.10</div><div class="screen-name">Multi-Atama</div><div class="screen-desc">Paralel/sıralı akış yönetim görünümü</div></div>
-        <div class="screen-card"><div class="screen-num">6.11</div><div class="screen-name">Marka</div><div class="screen-desc">Markaların istatistik ve sorun skoru</div></div>
+        <div class="screen-card"><div class="screen-num">6.11</div><div class="screen-name">Marka</div><div class="screen-desc">İstatistik + yıldız + günlük kanal takibi (özet/insight arşivi, tarih filtreli)</div></div>
         <div class="screen-card"><div class="screen-num">6.12</div><div class="screen-name">Ekip Matrisi</div><div class="screen-desc">Kişi × marka uzmanlık haritası</div></div>
         <div class="screen-card"><div class="screen-num">6.13</div><div class="screen-name">Tasarım/Editör/AI/Freelance</div><div class="screen-desc">Departman detay ekranı — kişi bazlı istatistikler</div></div>
         <div class="screen-card"><div class="screen-num">6.14</div><div class="screen-name">Profil</div><div class="screen-desc">Kişisel istatistikler, tamamlanan işler, puan geçmişi</div></div>
@@ -1551,7 +1561,7 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         <div class="section-num">11</div>
         <div class="section-title-wrap">
           <h2 class="section-title">Sık Sorulan Sorular</h2>
-          <div class="section-tag">10 soru · Sorun giderme</div>
+          <div class="section-tag">12 soru · Sorun giderme</div>
         </div>
       </div>
 
@@ -1592,6 +1602,16 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
 
       <h4>Bana atanan işi planıma almazsam ne olur?</h4>
       <p>Brief açıldıktan <strong>1 saat</strong> sonra hâlâ başlama emojisi (🎨/✍️/🤖) koymadıysanız size hatırlatma DM'i gelir. <strong>2 saat</strong> daha geçerse ikinci hatırlatma + departman yöneticinize bilgi gider. Thread'e yazı yazmak yeterli değildir — işi planınıza aldığınızı emoji ile bildirin. İşi yapamayacaksanız beklemeyin, hemen yöneticinize haber verin. Tatildeyseniz (Slack durumunuz 🌴/tatil/izin) uyarı gelmez.</p>
+
+      <hr>
+
+      <h4>İş puanları nasıl veriliyor, değiştirebilir miyim?</h4>
+      <p>Puanı (1-5 yıldız) iş tamamlandığında <strong>AI</strong>, thread değerlendirmesinden otomatik verir. Yöneticiler Tamamlananlar ekranındaki yıldızlara tıklayarak puanı değiştirebilir; yönetici puan verdikten sonra AI o işe bir daha dokunmaz. Kendi puanınızı göremezsiniz — kişi puanları yöneticilere özeldir; firma/departman/marka karneleri herkese açıktır.</p>
+
+      <hr>
+
+      <h4>Uygulamayla ilgili sorun/önerimi nereye bildiririm?</h4>
+      <p>Herhangi bir Slack kanalına <code>help</code> yazın → bot "📝 Formu Aç" butonu sunar → başlık + açıklama + (isterseniz) ekran görüntüsü ile gönderin; sistem adminlerine DM olarak düşer ve size teyit gelir. Kullanım sorularınız için dashboard'daki <strong>🤖 Sistem Asistanı</strong>'na da sorabilirsiniz.</p>
 
       <hr>
 
