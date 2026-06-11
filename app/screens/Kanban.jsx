@@ -14,7 +14,16 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   ];
 
   // for the Tamamlandı column we use completed[]; map to active brief shape (lightly)
-  const allCompleted = data._allCompleted || data.completed || [];
+  // Arama filtresi tamamlananlara da uygulanır — slice'tan ÖNCE (yoksa filtre yalnız ilk 12'de arar)
+  let allCompleted = data._allCompleted || data.completed || [];
+  if (search.trim()) {
+    const cq = search.toLowerCase().trim();
+    allCompleted = allCompleted.filter(c =>
+      (c.baslik||"").toLowerCase().includes(cq) ||
+      (c.marka||"").toLowerCase().includes(cq) ||
+      (c.lead?.name||"").toLowerCase().includes(cq)
+    );
+  }
   const completedAsBriefs = allCompleted.slice(0, 12).map(c => {
     // Gerçek gecikmeyi veya "zamanında" badge'ini göster
     const gh = c.gecikmeH || 0;
