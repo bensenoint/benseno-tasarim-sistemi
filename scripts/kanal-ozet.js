@@ -87,6 +87,22 @@ async function haiku(system, content) {
   return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim() || null;
 }
 
+// Markanın dünkü arşiv kaydı (özet+insight) — bugünkü üretime süreklilik bağlamı olarak verilir.
+async function dunkuKayit(brand) {
+  try {
+    const r = await fetch(`${API_BASE}/api/brands/by-name/${encodeURIComponent(brand)}/daily`);
+    if (!r.ok) return null;
+    const j = await r.json();
+    const bugun = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Istanbul' });
+    return (j.daily || []).find(d => String(d.tarih).slice(0, 10) < bugun) || null;
+  } catch { return null; }
+}
+
+function dunBaglam(dun) {
+  if (!dun) return '';
+  return `\n\n# DÜNKÜ KAYIT (süreklilik bağlamı)\nDünkü özet: ${dun.ozet || '—'}\nDünkü insight: ${dun.insight || '—'}`;
+}
+
 async function apiWrite(method, urlPath, body) {
   const r = await fetch(`${API_BASE}${urlPath}`, {
     method, headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
@@ -122,11 +138,14 @@ async function main() {
 
     // 1) Genel kanal özeti — yeni mesaj yoksa atla
     let sonOzet = meta.kanal_ozet || null;   // gün-sonu arşivine yazılacak en güncel özet
-    if (meta.kanal_ozet_at && dig.lastTs && String(meta.kanal_ozet_ts || '') === dig.lastTs) skipped++;
+    const yenidenUretim = !(meta.kanal_ozet_at && dig.lastTs && String(meta.kanal_ozet_ts || '') === dig.lastTs);
+    // Dünkü kayıt — özet ve insight'a süreklilik bağlamı (sadece üretim olacaksa çek)
+    const dun = (yenidenUretim || GUNSONU) ? await dunkuKayit(brand) : null;
+    if (!yenidenUretim) skipped++;
     else {
       const ozet = await haiku(
-        'Bir tasarım ajansının marka Slack kanalının yeni TÜM akışını (ana mesajlar + thread yazışmaları) özetliyorsun. 4-6 cümlelik Türkçe, olgusal genel özet: hangi işler konuşuldu, neler ilerledi, açık konular/bekleyenler ne, dikkat çeken bir şey var mı. Bot durum bildirimlerini sayma, insan yazışmasına odaklan. Mesajlarda OLMAYAN hiçbir şeyi uydurma. Düz metin.',
-        text);
+        'Bir tasarım ajansının marka Slack kanalının yeni TÜM akışını (ana mesajlar + thread yazışmaları) özetliyorsun. 4-6 cümlelik Türkçe, olgusal genel özet: hangi işler konuşuldu, neler ilerledi, açık konular/bekleyenler ne, dikkat çeken bir şey var mı. DÜNKÜ KAYIT verilmişse süreklilik kur: dünden bekleyen/sarkan konuların bugünkü durumuna kısaca değin (çözüldü mü, sürüyor mu). Bot durum bildirimlerini sayma, insan yazışmasına odaklan. Mesajlarda OLMAYAN hiçbir şeyi uydurma. Düz metin.',
+        text + dunBaglam(dun));
       if (ozet && await apiWrite('PATCH', `/api/brands/by-name/${encodeURIComponent(brand)}/kanal-ozet`, { ozet, last_ts: dig.lastTs })) {
         updated++; sonOzet = ozet; console.log(`  ✓ ${brand} kanal özeti (${dig.count} satır)`);
       }
@@ -136,8 +155,8 @@ async function main() {
     // 2) Gün sonu insight — sadece BNS_GUNSONU=1 turunda
     if (GUNSONU) {
       const ins = await haiku(
-        'Bir tasarım ajansının marka Slack kanalının BUGÜNKÜ akışından gün-sonu değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka performans değerlendirmelerinde ve raporlarda kullanılacak — şu açılardan kısa ve olgusal değerlendir: bugün bu markada iş yoğunluğu/tempo nasıldı, süreçte pürüz/sürtünme var mıydı, müşteri-marka tarafından gelen sinyaller (memnuniyet, aciliyet, revize baskısı), yarına sarkan/bekleyen konular. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Düz metin, en fazla 5 cümle.',
-        text);
+        'Bir tasarım ajansının marka Slack kanalının BUGÜNKÜ akışından gün-sonu değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka performans değerlendirmelerinde ve raporlarda kullanılacak — şu açılardan kısa ve olgusal değerlendir: bugün bu markada iş yoğunluğu/tempo nasıldı, süreçte pürüz/sürtünme var mıydı, müşteri-marka tarafından gelen sinyaller (memnuniyet, aciliyet, revize baskısı), yarına sarkan/bekleyen konular. DÜNKÜ KAYIT verilmişse süreklilik kur: dünkü değerlendirmedeki bekleyen/sorunlu konuların bugün ne olduğunu belirt (çözüldü, sürüyor, kötüleşti). Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Düz metin, en fazla 6 cümle.',
+        text + dunBaglam(dun));
       if (ins && await apiWrite('POST', `/api/brands/by-name/${encodeURIComponent(brand)}/gun-sonu`, { insight: ins, ozet: sonOzet })) {
         insights++; console.log(`  🌙 ${brand} gün-sonu insight`);
       }
