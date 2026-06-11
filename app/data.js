@@ -469,6 +469,9 @@ function bnsHydrateBrief(raw, idx) {
     brand,
     baslik:       raw.baslik || raw.is || "",
     workers, leads, observers,
+    akis: raw.akis || 'paralel',
+    zincir: Array.isArray(raw.workers) ? raw.workers.map(w => w && w.id ? { id: w.id, name: w.name, sira: w.sira ?? null, onay: !!w.onay } : null).filter(Boolean) : [],
+    aktif_halka: raw.aktif_halka || null,
     attachments:  Array.isArray(raw.attachments) ? raw.attachments : [],
     // geriye uyum (mevcut görüntüleme kodu): lead=ilk lead, contributors=işi yapanlar
     lead:         leads[0] || null,

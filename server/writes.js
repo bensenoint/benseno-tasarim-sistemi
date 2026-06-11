@@ -56,6 +56,7 @@ const briefPatch = z.object({
 const statusBody = z.object({
   durum: z.enum(DURUMLAR),
   by: zUserId.optional(),
+  hedef: zUserId.optional(),   // sıralı zincirde revizyonun döneceği halka (revize: @kişi)
   source: z.enum(['dashboard', 'slack', 'system']).default('dashboard'),
   slack_ts: z.string().optional(),
 }).strict();
@@ -180,7 +181,7 @@ async function createBrief(raw) {
       `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
       [no, markaId, d.baslik, dept, toTs(d.deadline), d.priority || null,
-       d.akis || 'sirali', d.maliyet ?? null, d.satis ?? null, d.musteri_notu || null,
+       d.akis || 'paralel', d.maliyet ?? null, d.satis ?? null, d.musteri_notu || null,
        d.slack_ts || null, null]);
     const id = r.rows[0].id;
     // gözlemci = manuel seçilenler ∪ ilgili dept yöneticileri (her zaman)
@@ -302,10 +303,90 @@ async function patchBrief(id, raw) {
   return res;
 }
 
+// Sıralı onay zinciri yalnızca bu tarihten SONRA açılan brieflerde işler —
+// devam eden işlerin davranışı geriye dönük değişmesin (kanal-özet EPOCH deseniyle aynı).
+const ZINCIR_EPOCH = Date.parse('2026-06-11T16:00:00+03:00');
+
+// Brief'in zincir bağlamı: akış tipi + sıralı halkalar (contributor'lar, sira sıralı, onay durumlu).
+async function zincirCtx(client, id) {
+  const r = await client.query(
+    `SELECT b.akis, b.created_at, b.completed_at,
+       COALESCE((SELECT json_agg(json_build_object(
+           'user_id', a.user_id, 'sira', a.sira, 'onay_at', a.onay_at, 'name', u.name, 'dept', u.dept)
+           ORDER BY a.sira NULLS LAST)
+         FROM brief_assignees a JOIN users u ON u.id = a.user_id
+         WHERE a.brief_id = b.id AND a.role = 'contributor'), '[]'::json) AS halkalar
+     FROM briefs b WHERE b.id = $1`, [id]);
+  const b = r.rows[0];
+  if (!b) return null;
+  const halkalar = b.halkalar || [];
+  const zincirli = b.akis === 'sirali' && halkalar.length > 1
+    && new Date(b.created_at).getTime() >= ZINCIR_EPOCH;
+  return { ...b, halkalar, zincirli };
+}
+
 async function setStatus(id, raw) {
   const d = statusBody.parse(raw);
+  let zincirNote = null, dmNext = null;
   const res = await tx(async (client) => {
-    const completed = d.durum === 'tamamlandi';
+    const ctx = await zincirCtx(client, id);
+    if (!ctx) throw new Error('brief bulunamadı: ' + id);
+    let durum = d.durum;
+
+    // ── Sıralı onay zinciri (akis='sirali', 2+ işi yapan) ──
+    // ✅ aktif halkayı onaylar; halkalar bitmeden iş tamamlanmaz. Son halka işi kapatır.
+    if (ctx.zincirli && durum === 'tamamlandi') {
+      const aktif = ctx.halkalar.find(h => !h.onay_at);
+      if (aktif) {
+        await client.query(
+          `UPDATE brief_assignees SET onay_at = now(), onay_by = $1
+           WHERE brief_id = $2 AND user_id = $3 AND role = 'contributor'`,
+          [d.by || null, id, aktif.user_id]);
+        const kalan = ctx.halkalar.filter(h => !h.onay_at && h.user_id !== aktif.user_id);
+        const onayli = ctx.halkalar.length - kalan.length;
+        const vekil = d.by && d.by !== aktif.user_id ? ' _(vekâleten)_' : '';
+        if (kalan.length) {
+          // ara halka: iş kapanmaz, sıradaki halkaya geçer; cevapsız uyarısı yeni halka için yeniden işler
+          durum = 'yeni';
+          const next = kalan[0];
+          dmNext = next.user_id;
+          zincirNote = `⛓️ *${aktif.name}* halkası onaylandı${vekil} (${onayli}/${ctx.halkalar.length}) — sıradaki: *${next.name}*`;
+          await client.query(`UPDATE briefs SET uyari_at = NULL, uyari2_at = NULL WHERE id = $1`, [id]);
+        } else {
+          zincirNote = `⛓️ son halka *${aktif.name}* onaylandı${vekil} — zincir tamamlandı, iş müşteriye teslim edildi. 📦`;
+        }
+      }
+    }
+
+    // ✏️ zincirde geri sarar: hedef verilmişse (revize: @kişi) o halkaya, yoksa son onaylı halkaya.
+    // Hedef ve sonrasındaki tüm onaylar düşer — iş o halkadan yeniden akar.
+    if (ctx.zincirli && durum === 'revizyon') {
+      const onaylilar = ctx.halkalar.filter(h => h.onay_at);
+      let hedef = d.hedef ? ctx.halkalar.find(h => h.user_id === d.hedef) || null : null;
+      if (!hedef && onaylilar.length) hedef = onaylilar[onaylilar.length - 1];
+      if (hedef) {
+        await client.query(
+          `UPDATE brief_assignees SET onay_at = NULL, onay_by = NULL
+           WHERE brief_id = $1 AND role = 'contributor'
+             AND COALESCE(sira, 999999) >= COALESCE($2::int, 999999)`,
+          [id, hedef.sira]);
+        zincirNote = `↩️ zincir *${hedef.name}* halkasına geri sarıldı — o halka ve sonrası yeniden onay bekliyor.`;
+      }
+    }
+
+    // 🔃 tamamlanmış zincirli iş yeniden açılırsa son halkanın onayı düşer (oradan devam eder)
+    if (ctx.zincirli && durum === 'calisiliyor' && ctx.completed_at) {
+      const onaylilar = ctx.halkalar.filter(h => h.onay_at);
+      const son = onaylilar[onaylilar.length - 1];
+      if (son) {
+        await client.query(
+          `UPDATE brief_assignees SET onay_at = NULL, onay_by = NULL
+           WHERE brief_id = $1 AND user_id = $2 AND role = 'contributor'`, [id, son.user_id]);
+        zincirNote = `🔃 yeniden açıldı — zincir *${son.name}* halkasından devam eder.`;
+      }
+    }
+
+    const completed = durum === 'tamamlandi';
     // Müşteri onayı akışı (✈️):
     //  - musteride → gönderim sayacı +1, son_gonderim_at, "müşteri dönüşü bekleniyor" bayrağı AÇIK
     //  - revizyon  → bayrak AÇIKSA müşteri revizyonu, KAPALIYSA iç revizyon; bayrak kapanır
@@ -322,10 +403,10 @@ async function setStatus(id, raw) {
                                  WHEN $1='revizyon'  THEN false
                                  ELSE musteri_bekliyor END
        WHERE id=$3 RETURNING id, durum, rev_ic, rev_musteri, gonderim_sayisi, musteri_bekliyor`,
-      [d.durum, completed, id]);
+      [durum, completed, id]);
     if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
-    await logEvent(client, { brief_id: id, user_id: d.by, verb: 'durum:' + d.durum,
-      detail: { durum: d.durum }, source: d.source, slack_ts: d.slack_ts });
+    await logEvent(client, { brief_id: id, user_id: d.by, verb: 'durum:' + durum,
+      detail: { durum, istenen: d.durum, hedef: d.hedef }, source: d.source, slack_ts: d.slack_ts });
     return r.rows[0];
   });
   // Thread notu — müşteri akışına özel, anlaşılır metinler
@@ -334,10 +415,25 @@ async function setStatus(id, raw) {
     note = `✈️ *müşteriye yollandı* — müşteri dönüşü bekleniyor (${res.gonderim_sayisi}. gönderim). Dönüşteki ilk ✏️ müşteri revizyonu sayılır.`;
   } else if (d.durum === 'revizyon') {
     note = `✏️ revizyon kaydedildi — iç: *${res.rev_ic}* · müşteri: *${res.rev_musteri}*`;
+    if (zincirNote) note += `\n${zincirNote}`;
+  } else if (zincirNote) {
+    note = zincirNote;
   } else {
     note = `🔄 durum güncellendi: *${d.durum}*`;
   }
   await reflectChange(id, note, d.source);
+  // Zincir el değişimi: sıradaki halkaya DM (best-effort)
+  if (dmNext && slack.hasToken()) {
+    try {
+      const r = await pool.query(
+        `SELECT b.no, b.baslik, b.slack_url, br.name AS marka
+         FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id WHERE b.id=$1`, [id]);
+      const b = r.rows[0];
+      if (b) await slack.dm(dmNext,
+        `⏭️ *#${b.no} ${b.marka || ''} — ${b.baslik}* zincirinde sıra sende: önceki halka onaylandı.\n` +
+        `İşi planına almak için thread'e emoji bırak (🎨/✍️/🤖)${b.slack_url && b.slack_url !== '#' ? ` — <${b.slack_url}|thread'i aç>` : ''}.`);
+    } catch (e) { console.error('[writes] zincir DM hata:', e.message); }
+  }
   return res;
 }
 

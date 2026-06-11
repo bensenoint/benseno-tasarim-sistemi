@@ -15,7 +15,7 @@ async function allBriefsWithAssignees() {
            b.rating, b.rating_by, b.rating_sebep,
            b.rev_ic, b.rev_musteri, b.gonderim_sayisi, b.son_gonderim_at, b.musteri_bekliyor,
            COALESCE(json_agg(
-             json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color)
+             json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color,'sira',a.sira,'onay_at',a.onay_at,'onay_by',a.onay_by)
              ORDER BY a.sira NULLS LAST
            ) FILTER (WHERE u.id IS NOT NULL), '[]') AS assignees
     FROM briefs b
@@ -57,6 +57,11 @@ async function getState() {
       FROM users u
       LEFT JOIN brief_assignees a ON a.user_id = u.id
       LEFT JOIN briefs b ON b.id = a.brief_id
+        AND NOT (b.completed_at IS NULL AND b.akis = 'sirali' AND a.role = 'contributor'
+          AND (a.onay_at IS NOT NULL OR EXISTS (
+            SELECT 1 FROM brief_assignees a2
+            WHERE a2.brief_id = b.id AND a2.role = 'contributor' AND a2.onay_at IS NULL
+              AND COALESCE(a2.sira, 999999) < COALESCE(a.sira, 999999))))
       WHERE u.dept IS NOT NULL GROUP BY u.dept`),
     // marka istatistik
     pool.query(`
@@ -106,6 +111,11 @@ async function getEmbedded() {
       FROM users u
       LEFT JOIN brief_assignees a ON a.user_id = u.id
       LEFT JOIN briefs b ON b.id = a.brief_id
+        AND NOT (b.completed_at IS NULL AND b.akis = 'sirali' AND a.role = 'contributor'
+          AND (a.onay_at IS NOT NULL OR EXISTS (
+            SELECT 1 FROM brief_assignees a2
+            WHERE a2.brief_id = b.id AND a2.role = 'contributor' AND a2.onay_at IS NULL
+              AND COALESCE(a2.sira, 999999) < COALESCE(a.sira, 999999))))
       WHERE u.dept IS NOT NULL GROUP BY u.dept`),
   ]);
   const ms = (d) => (d ? new Date(d).getTime() : 0);
@@ -121,7 +131,10 @@ async function getEmbedded() {
 
   const bns_briefs = all.filter(b => !b.completed_at && !b.deleted_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, dept: b.dept || '',
-    workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '' })),
+    workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '', sira: w.sira ?? null, onay: !!w.onay_at, onay_by: w.onay_by || null })),
+    akis: b.akis || 'paralel',
+    // sıralı zincirde sırası gelen halka (ilk onaysız contributor) — uyarılar ve UI bunun üstünden çalışır
+    aktif_halka: (b.akis === 'sirali' && b.workers.length > 1) ? ((b.workers.find(w => !w.onay_at) || {}).id || null) : null,
     leads:     b.leads.map(l => ({ id: l.id, name: l.name })),
     observers: b.observers.map(o => ({ id: o.id, name: o.name })),
     notes: b.musteri_notu || '',
@@ -139,7 +152,8 @@ async function getEmbedded() {
   const bns_completed = all.filter(b => b.completed_at && !b.deleted_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik,
     leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
-    workers: b.workers.map(w => ({ id: w.id, name: w.name })),
+    workers: b.workers.map(w => ({ id: w.id, name: w.name, sira: w.sira ?? null, onay: !!w.onay_at })),
+    akis: b.akis || 'paralel',
     deadline: ms(b.deadline), bitis: ms(b.completed_at), rev: b.rev || 0,
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,

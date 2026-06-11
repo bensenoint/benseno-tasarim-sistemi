@@ -240,7 +240,11 @@ async function main() {
     // Thread'e yazışma olması yetmez — emoji konmadıysa uyarı yine gider.
     // Tatildeki çalışana (Slack durumu 🌴/tatil/izin/OOO) DM gitmez; dönünce sonraki turda alır.
     if (b.durum === 'yeni' && b.created_at) {
-      const workerIds = [...new Set((b.workers || []).map(w => w && w.id).filter(Boolean))];
+      // Sıralı zincirde cevapsız uyarısı yalnız sırası gelen halkaya gider — sırası gelmemiş kişi rahatsız edilmez.
+      const hedefW = (b.akis === 'sirali' && b.aktif_halka)
+        ? (b.workers || []).filter(w => w && w.id === b.aktif_halka)
+        : (b.workers || []);
+      const workerIds = [...new Set(hedefW.map(w => w && w.id).filter(Boolean))];
 
       // 1. uyarı: açılıştan 1 saat sonra, atananın kendisine
       if (!b.uyari_at && (now - b.created_at) >= UYARI_H * H && workerIds.length) {

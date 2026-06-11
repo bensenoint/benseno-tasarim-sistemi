@@ -120,6 +120,26 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             )}
           </div>
 
+          {/* Sıralı onay zinciri — her halka ✅ ile kapanır, son halka işi tamamlar */}
+          {b.akis === "sirali" && (b.zincir || []).length > 1 && (
+            <div style={{marginTop: 10, display:"flex", alignItems:"center", gap: 6, flexWrap:"wrap"}}
+              title="Sıralı iş: ✅ yalnızca sıradaki halkayı onaylar; herkes onaylamadan iş kapanmaz. ✏️ zinciri geri sarar.">
+              <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--ink-4)"}}>⛓️ zincir</span>
+              {(b.zincir || []).map((h, i) => {
+                const aktif = !h.onay && h.id === b.aktif_halka;
+                return (
+                  <span key={h.id || i} style={{display:"inline-flex", alignItems:"center", gap: 4,
+                    font:"500 11px/1 var(--font-sans)", padding:"4px 8px", borderRadius: 999,
+                    color: h.onay ? "var(--prio-green)" : aktif ? "var(--ink)" : "var(--ink-4)",
+                    background: aktif ? "var(--paper-2)" : "transparent",
+                    border: "1px solid " + (aktif ? "var(--line-strong)" : "var(--line)")}}>
+                    {h.onay ? "✓" : aktif ? "▶" : (i + 1) + "."} {h.name}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
           <Hr/>
 
           <Eyebrow>Atama</Eyebrow>

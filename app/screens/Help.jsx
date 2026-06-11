@@ -67,6 +67,7 @@ function HelpScreen() {
         <Row left="iş beklemede · bekle" right="Beklemede"/>
         <Row left="revizyon var · revize et" right="Revizyon"/>
         <Row left="müşteriye yollandı" right="✈️ Müşteri Onayında"/>
+        <Row left="revize: @kişi" right="⛓️ Sıralı işte zinciri o halkaya geri sarar"/>
         <Row left="iş tamamlandı" right="Tamamlandı"/>
         <Row left="yeniden aç · geri aç" right="Yeniden açıldı (çalışılıyor)"/>
         <Row left="bloke et" right="Blokeli"/>
@@ -90,6 +91,7 @@ function HelpScreen() {
         <Row left="AI puanı" right="İş tamamlanınca otomatik verilir — Tamamlananlar'da yıldızların yanında 'AI' rozeti görünür"/>
         <Row left="Yönetici override" right="Tamamlananlar'daki yıldızlara tıklayarak puanı değiştir (yönetici)" sub="Override sonrası AI o işe bir daha dokunmaz."/>
         <Row left="Karne" right="Karşılaştırma ekranı → '⭐ Yıldız Karnesi': firma + departman ortalamaları ve sebep açıklamaları" sub="Genel Bakış'taki 'BENSENO ⭐' rozeti de oraya götürür. Marka puanı Marka detayında; kişi puanı sadece yöneticiye, Profil'de."/>
+        <Row left="⛓️ Sıralı iş" right="Brief 'Sıralı' açılırsa işi yapanlar seçim sırasına göre zincir olur: ✅ yalnız sıradaki halkayı onaylar, herkes onaylamadan iş kapanmaz" sub="✏️ zinciri geri sarar; 'revize: @kişi' belirli halkaya döndürür. Uyarılar ve yük yalnız sırası gelen kişiye işler. Detay panelinde ⛓️ şerit halkaları gösterir."/>
         <Row left="Puan gerekçesi" right="Tamamlananlar'da yıldızların üzerine gelince işin neden o puanı aldığını anlatan tek cümlelik açıklama görünür" sub="Gerekçe, iş tamamlandığında AI değerlendirmesiyle birlikte üretilir."/>
         <Row left="Sebep" right="'Neden bu ortalama' açıklamaları her gün 18:45'te insight'lardan üretilir"/>
       </Section>

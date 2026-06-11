@@ -567,6 +567,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
           '👀 → İncelemede\n⏸️ → Beklemede\n✏️ → Revizyon\n✈️ → Müşteriye Yollandı\n✅ → Tamamlandı\n🔃 → Yeniden Aç' },
         { type: 'mrkdwn', text: '*Öncelik:*\n🔴 → Acil\n🟠 → Yüksek\n🟡 → Normal\n🟢 → Düşük' },
       ]},
+      { type: 'context', elements: [{ type: 'mrkdwn', text: '⛓️ *Sıralı iş:* brief "Sıralı" açıldıysa ✅ yalnızca SENİN halkanı onaylar; iş sıradaki kişiye geçer ve herkes onaylamadan kapanmaz. Sonraki halka ✏️ koyarsa iş bir önceki halkaya (veya `revize: @kişi` ile seçilen halkaya) geri döner.' }] },
 
       { type: 'divider' },
 
@@ -578,6 +579,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
           '`iş incelemede` → İncelemede\n' +
           '`iş beklemede` → Beklemede\n' +
           '`revizyon var` · `revize et` → Revizyon\n' +
+          '`revize: @kişi` → Zinciri o halkaya geri sarar (sıralı iş)\n' +
           '`müşteriye yollandı` → ✈️ Müşteri Onayında\n' +
           '`iş tamamlandı` → Tamamlandı\n' +
           '`yeniden aç` · `geri aç` → Yeniden Açıldı\n' +
@@ -636,7 +638,14 @@ app.command('/yeni-brief', async ({ command, ack, client, respond }) => {
           { type: 'input', block_id: 'deadline_b', optional: true, label: { type: 'plain_text', text: 'Deadline (tarih + saat)' },
             element: { type: 'datetimepicker', action_id: 'deadline' } },
           { type: 'input', block_id: 'workers_b', label: { type: 'plain_text', text: 'İşi yapan(lar)' },
-            element: { type: 'multi_users_select', action_id: 'workers', placeholder: { type: 'plain_text', text: 'Kişi(ler) — departman buradan belirlenir' } } },
+            element: { type: 'multi_users_select', action_id: 'workers', placeholder: { type: 'plain_text', text: 'Kişi(ler) — sıralı akışta seçim sırası = zincir sırası' } } },
+          { type: 'input', block_id: 'akis_b', optional: true, label: { type: 'plain_text', text: 'Çalışma şekli (birden çok kişi varsa)' },
+            element: { type: 'radio_buttons', action_id: 'akis',
+              initial_option: { text: { type: 'plain_text', text: '🔀 Paralel — herkes aynı anda çalışır' }, value: 'paralel' },
+              options: [
+                { text: { type: 'plain_text', text: '🔀 Paralel — herkes aynı anda çalışır' }, value: 'paralel' },
+                { text: { type: 'plain_text', text: '⛓️ Sıralı — seçim sırasına göre el değiştirir, herkes ✅ vermeden iş kapanmaz' }, value: 'sirali' },
+              ] } },
           { type: 'input', block_id: 'leads_b', optional: true, label: { type: 'plain_text', text: 'Lead(ler) — son kontrol (boş = briefi açan)' },
             element: { type: 'multi_users_select', action_id: 'leads', placeholder: { type: 'plain_text', text: 'Kişi(ler) (ops.)' } } },
           { type: 'input', block_id: 'gozlemci_b', optional: true, label: { type: 'plain_text', text: 'Gözlemciler (dept yöneticisi otomatik)' },
@@ -666,12 +675,14 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
   const dtSec   = v.deadline_b?.deadline?.selected_date_time || null;  // Unix saniye (tarih+saat)
   const leads   = v.leads_b?.leads?.selected_users || [];
   const gozlemci = v.gozlemci_b?.gozlemci?.selected_users || [];
+  const akis = v.akis_b?.akis?.selected_option?.value || 'paralel';
   const fileIds = (v.dosya_b?.dosya?.files || []).map(f => f.id);
   const aciklama = (v.not_b?.aciklama?.value || '').trim();
   const payload = {
     marka, baslik,
     deadline: dtSec ? new Date(dtSec * 1000).toISOString() : null,
     worker_ids: workers,
+    akis,
     lead_ids: leads.length ? leads : undefined,
     gozlemci_ids: gozlemci.length ? gozlemci : undefined,
     musteri_notu: aciklama || undefined,
@@ -1079,6 +1090,15 @@ app.event('message', async ({ event, client }) => {
       { key: 'düşük öncelik',  type: 'priority', value: '🟢' },
       { key: 'dusuk oncelik',  type: 'priority', value: '🟢' },
     ];
+    // "revize: @kişi" / "revizyon @kişi" — sıralı zincirde belirli halkaya geri sarar
+    const revHedef = trimmed.match(/^reviz(?:e|yon)\s*:?\s*<@([A-Z0-9]+)(?:\|[^>]*)?>/i);
+    if (revHedef) {
+      const briefTs = event.thread_ts;
+      log(`hedefli revizyon: @${revHedef[1]} | ${briefTs} — ${event.user}`);
+      dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: 'revizyon', hedef: revHedef[1], by: event.user, source: 'slack' });
+      return;
+    }
+
     const kMatch = KEYWORD_MAP.find(({ key }) => norm === key);
     if (kMatch) {
       const briefTs = event.thread_ts;

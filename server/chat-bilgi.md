@@ -17,6 +17,9 @@ Slack botu (WT) + Railway API/Postgres + GitHub Pages dashboard. Briefler (işle
 - Kelimeler (tam eşleşme): "devam et", "iş incelemede", "iş beklemede", "bekle", "revizyon var", "revize et", "müşteriye yollandı", "iş tamamlandı", "yeniden aç", "geri aç", "bloke et".
 - Öncelik: 🔴 acil · 🟠 yüksek · 🟡 normal · 🟢 düşük (reaction veya "acil öncelik" gibi yazı; atanan veya yönetici).
 
+## Sıralı onay zinciri (⛓️)
+Brief açarken (Slack formu veya dashboard) "Sıralı" seçilirse işi yapanlar SEÇİM SIRASINA göre zincir olur (ör. Melis → İpek → Levent). ✅ yalnızca sıradaki halkayı onaylar; iş otomatik sonraki kişiye geçer (DM gider) ve HERKES onaylamadan tamamlanmaz. ✏️ zinciri bir önceki onaylı halkaya geri sarar; "revize: @kişi" yazılırsa o halkaya döner (o halka ve sonrasının onayı düşer). Freelance halkası yerine brief'teki herhangi biri onay verebilir (vekâleten not düşülür). Sıralı işte cevapsız uyarısı ve kapasite yükü yalnız sırası gelen halkaya işler. Seçim yapılmaz veya "Paralel" seçilirse her şey bugünkü gibi çalışır. Bu akış yalnızca yeni açılan brieflerde geçerlidir. Brief detayında ⛓️ zincir şeridi halkaların durumunu gösterir (✓ onaylı, ▶ sırada).
+
 ## Finansal (Slack thread'ine yaz)
 "maliyet 1500 satış 4000" · "fatura ok"/"fatura iptal" · "ödeme ok"/"ödeme iptal". Dashboard'a dakikalar içinde yansır. `/maliyet` komutu da var.
 
