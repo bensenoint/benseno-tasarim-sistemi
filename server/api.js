@@ -202,16 +202,17 @@ app.patch('/api/briefs/:id/thread-ozet', writeGuard, async (req, res) => {
 // puan (1-5) AI değerlendirmesinden gelir; yönetici elle verdiyse (rating_by≠'ai') AI üzerine yazamaz.
 app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
   try {
-    const { insight, puan } = req.body || {};
+    const { insight, puan, puan_sebep } = req.body || {};
     if (!insight) return res.status(400).json({ error: 'insight gerekli' });
     const p = Number.isInteger(puan) && puan >= 1 && puan <= 5 ? puan : null;
     const r = await pool.query(
       `UPDATE briefs SET insight=$1, insight_at=now(),
          rating    = CASE WHEN $3::int IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN $3 ELSE rating END,
          rating_by = CASE WHEN $3::int IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN 'ai' ELSE rating_by END,
-         rating_at = CASE WHEN $3::int IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN now() ELSE rating_at END
+         rating_at = CASE WHEN $3::int IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN now() ELSE rating_at END,
+         rating_sebep = CASE WHEN $4::text IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN $4 ELSE rating_sebep END
        WHERE id=$2 RETURNING id`,
-      [String(insight).slice(0, 4000), +req.params.id, p]
+      [String(insight).slice(0, 4000), +req.params.id, p, puan_sebep ? String(puan_sebep).slice(0, 500) : null]
     );
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true, id: r.rows[0].id });

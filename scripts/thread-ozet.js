@@ -67,11 +67,11 @@ async function saveOzet(briefId, ozet, lastTs) {
   return true;
 }
 
-async function saveInsight(briefId, insight, puan) {
+async function saveInsight(briefId, insight, puan, sebep) {
   const r = await fetch(`${API_BASE}/api/briefs/${briefId}/insight`, {
     method: 'PATCH',
     headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
-    body: JSON.stringify({ insight, puan: puan || undefined }),
+    body: JSON.stringify({ insight, puan: puan || undefined, puan_sebep: sebep || undefined }),
   });
   if (!r.ok) { const j = await r.json().catch(() => ({})); console.log(`  insight kayıt hata ${r.status}: ${j.error || ''}`); return false; }
   return true;
@@ -89,7 +89,7 @@ async function generateInsight(messages, names, brief) {
     headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: 'claude-haiku-4-5', max_tokens: 450,
-      system: 'Bir tasarım ajansında TAMAMLANMIŞ bir işin thread\'inden değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka ve iş performans analizlerinde kullanılacak — şu açılardan kısa, olgusal değerlendir: süreç nasıl aktı (pürüzsüz mü, revize/sürtünme oldu mu), müşteri/marka tarafı geri bildirimi neydi, gecikme yaşandıysa nedeni, bu marka/iş tipi için kayda değer öğrenim ne. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Yeterli yazışma yoksa "Değerlendirme için yeterli yazışma yok." de. Düz metin, en fazla 5 cümle. SON SATIRA tek başına "PUAN: n" yaz (n = 1-5 iş kalite puanı: 5 = pürüzsüz/zamanında/revizesiz, 3 = normal sürtünme, 1 = ciddi sorun/gecikme/çok revize; yazışma yetersizse PUAN: 3).',
+      system: 'Bir tasarım ajansında TAMAMLANMIŞ bir işin thread\'inden değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka ve iş performans analizlerinde kullanılacak — şu açılardan kısa, olgusal değerlendir: süreç nasıl aktı (pürüzsüz mü, revize/sürtünme oldu mu), müşteri/marka tarafı geri bildirimi neydi, gecikme yaşandıysa nedeni, bu marka/iş tipi için kayda değer öğrenim ne. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Yeterli yazışma yoksa "Değerlendirme için yeterli yazışma yok." de. Düz metin, en fazla 5 cümle. SONDAN İKİNCİ SATIRA "SEBEP: ..." yaz (puanın tek cümlelik gerekçesi, en fazla 120 karakter, ör. "2 revize ve 1 gün gecikme yaşandı" ya da "Pürüzsüz ilerledi, zamanında teslim edildi"). SON SATIRA tek başına "PUAN: n" yaz (n = 1-5 iş kalite puanı: 5 = pürüzsüz/zamanında/revizesiz, 3 = normal sürtünme, 1 = ciddi sorun/gecikme/çok revize; yazışma yetersizse PUAN: 3 ve SEBEP: "Yazışma değerlendirme için yetersiz").',
       messages: [{ role: 'user', content: `İş: #${brief.no} ${brief.marka} — ${brief.baslik} (rev: ${brief.rev || 0})\n\nThread:\n${lines.slice(0, 12000)}` }],
     }),
   });
@@ -98,7 +98,9 @@ async function generateInsight(messages, names, brief) {
   const raw = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
   if (!raw) return null;
   const m = raw.match(/PUAN:\s*([1-5])\s*$/i);
-  return { text: raw.replace(/\n?PUAN:\s*[1-5]\s*$/i, '').trim(), puan: m ? +m[1] : null };
+  const sm = raw.match(/SEBEP:\s*(.+)$/im);
+  const text = raw.replace(/\n?PUAN:\s*[1-5]\s*$/i, '').replace(/\n?SEBEP:\s*.+$/im, '').trim();
+  return { text, puan: m ? +m[1] : null, sebep: sm ? sm[1].trim().slice(0, 300) : null };
 }
 
 // TR resmî tatilleri (tam gün) — yıl dönümünde güncelle. Dini bayramlar takvime göre kayar.
@@ -296,7 +298,7 @@ async function main() {
     if (!msgs) continue;
     const ins = await generateInsight(msgs, names, b);
     if (!ins || !ins.text) continue;
-    if (await saveInsight(b.id, ins.text, ins.puan)) {
+    if (await saveInsight(b.id, ins.text, ins.puan, ins.sebep)) {
       insighted++; console.log(`  ✓ #${b.no} ${b.marka} insight kaydedildi${ins.puan ? ` (puan: ${ins.puan}/5)` : ''}`);
     }
     await new Promise(r => setTimeout(r, 1100));

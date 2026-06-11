@@ -105,6 +105,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
                 </td>
                 <td style={cs()} onClick={e => e.stopPropagation()}>
                   <Stars n={c.rating} ai={c.rating_by === 'ai'}
+                    sebep={c.rating_sebep || (c.insight ? c.insight.split(/(?<=[.!?])\s/).slice(0, 2).join(' ').slice(0, 200) : null)}
                     onRate={currentUser?.role === 'admin' ? (n) => rateBrief(c.id, n) : null}/>
                 </td>
                 <td className="bns-col-mobile-hide" style={cs()}>
@@ -136,9 +137,10 @@ function rateBrief(id, n) {
     .catch(() => {});
 }
 
-function Stars({ n, onRate, ai }) {
+function Stars({ n, onRate, ai, sebep }) {
+  const tip = [n > 0 && sebep ? sebep : null, onRate ? "Puanı değiştirmek için yıldıza tıkla" : null].filter(Boolean).join("\n");
   return (
-    <span style={{display:"inline-flex", gap: 1, alignItems:"center"}} title={onRate ? "Puanı değiştirmek için yıldıza tıkla" : undefined}>
+    <span style={{display:"inline-flex", gap: 1, alignItems:"center"}} title={tip || undefined}>
       {[1,2,3,4,5].map(i => (
         <span key={i} onClick={onRate ? () => onRate(i) : undefined}
           style={{display:"inline-flex", cursor: onRate ? "pointer" : "default", padding: onRate ? 1 : 0}}>
