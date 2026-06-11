@@ -297,10 +297,36 @@ async function patchBrief(id, raw) {
   const friendly = fields.map(k => FIELD_TR[k] || k).join(', ');
   // Rol değişimi varsa bulk DM'i kapat — notifyRoleDiff hedefli atar; thread notu her zaman düşer.
   // Mixed (içerik+rol) patch'te de aynı: çift DM'i önler, mevcut atananlar thread'den görür.
-  await reflectChange(id, `✏️ güncellendi: ${friendly}`, d.source, { dm: contentChanged && !roleChange });
+  let summary = `✏️ güncellendi: ${friendly}`;
+  let after = null;
+  if (roleChange) {
+    // Thread notuna mention'lı ekleme/çıkarma satırı — dashboard'dan eklenen kişi
+    // Slack thread'inde @mention ile görünür ve mention sayesinde bildirim alır.
+    after = await assigneeMap(id);
+    const diff = roleDiffNote(before, after);
+    if (diff) summary += `\n${diff}`;
+  }
+  await reflectChange(id, summary, d.source, { dm: contentChanged && !roleChange });
   // Rol eklenen/çıkarılan/değişen kişilere hedefli DM (çıkarılanlar dahil).
-  if (roleChange) { const after = await assigneeMap(id); await notifyRoleDiff(id, before, after, d.source); }
+  if (roleChange && after) await notifyRoleDiff(id, before, after, d.source);
   return res;
+}
+
+// before/after assigneeMap'ten thread'e yazılacak mention'lı diff satırı üretir.
+// Ör: "➕ gözlemci: <@U123> · ➕ işi yapan: <@U456> · ➖ <@U789>"
+function roleDiffNote(before, after) {
+  if (!before || !after) return '';
+  const rolesStr = (set) => [...set].map(x => ROLE_TR[x] || x).join(' + ');
+  const parts = [];
+  const users = new Set([...before.keys(), ...after.keys()]);
+  for (const uid of users) {
+    const was = before.get(uid), now = after.get(uid);
+    if (!was && now)        parts.push(`➕ ${rolesStr(now)}: <@${uid}>`);
+    else if (was && !now)   parts.push(`➖ <@${uid}>`);
+    else if (was && now && [...was].sort().join() !== [...now].sort().join())
+                            parts.push(`🔄 <@${uid}> → ${rolesStr(now)}`);
+  }
+  return parts.join(' · ');
 }
 
 // Sıralı onay zinciri yalnızca bu tarihten SONRA açılan brieflerde işler —
