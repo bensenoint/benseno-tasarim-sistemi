@@ -415,6 +415,7 @@ function App({ currentUser, onLogout }) {
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} currentUser={currentUser}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
+  else if (tab === "musteride")Screen = <MusterideScreen data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "completed")Screen = <CompletedScreen data={liveData} onOpenBrief={onOpenCompleted} currentUser={currentUser}/>;
   else if (tab === "dept-comp")Screen = <DeptCompareScreen data={liveData}/>;
   else if (tab === "design")   Screen = <DepartmentScreen data={liveData} role="tasarim" onOpenBrief={onOpenBrief}/>;
@@ -653,7 +654,7 @@ function Short({ k, l }) {
 }
 
 function labelForStatus(s) {
-  return {yeni:"Yeni", calisiliyor:"Çalışılıyor", incelemede:"İncelemede", blokeli:"Blokeli", tamamlandi:"Tamamlandı"}[s] || s;
+  return {yeni:"Yeni", calisiliyor:"Çalışılıyor", incelemede:"İncelemede", beklemede:"Beklemede", revizyon:"Revizyon", musteride:"✈️ Müşteri Onayında", blokeli:"Blokeli", tamamlandi:"Tamamlandı"}[s] || s;
 }
 
 function darken(hex, amt) {

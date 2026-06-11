@@ -12,7 +12,7 @@ const { z } = require('zod');
 const { pool, tx } = require('./db');
 const slack = require('./slack');
 
-const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'tamamlandi'];
+const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'musteride', 'tamamlandi'];
 
 // ── Zod şemaları ─────────────────────────────────────────────
 // U... = Slack kullanıcısı, FR... = freelancer (Slack'te yok, sadece takip için sentetik id)
@@ -306,16 +306,38 @@ async function setStatus(id, raw) {
   const d = statusBody.parse(raw);
   const res = await tx(async (client) => {
     const completed = d.durum === 'tamamlandi';
+    // Müşteri onayı akışı (✈️):
+    //  - musteride → gönderim sayacı +1, son_gonderim_at, "müşteri dönüşü bekleniyor" bayrağı AÇIK
+    //  - revizyon  → bayrak AÇIKSA müşteri revizyonu, KAPALIYSA iç revizyon; bayrak kapanır
+    //  Kural: "✈️'dan sonraki İLK ✏️ müşteri revizyonudur; gerisi içtir."
     const r = await client.query(
       `UPDATE briefs SET durum=$1,
-         completed_at = CASE WHEN $2 THEN COALESCE(completed_at, now()) ELSE NULL END
-       WHERE id=$3 RETURNING id, durum`, [d.durum, completed, id]);
+         completed_at = CASE WHEN $2 THEN COALESCE(completed_at, now()) ELSE NULL END,
+         gonderim_sayisi = gonderim_sayisi + CASE WHEN $1='musteride' THEN 1 ELSE 0 END,
+         son_gonderim_at = CASE WHEN $1='musteride' THEN now() ELSE son_gonderim_at END,
+         rev_musteri = rev_musteri + CASE WHEN $1='revizyon' AND musteri_bekliyor     THEN 1 ELSE 0 END,
+         rev_ic      = rev_ic      + CASE WHEN $1='revizyon' AND NOT musteri_bekliyor THEN 1 ELSE 0 END,
+         rev         = COALESCE(rev,0) + CASE WHEN $1='revizyon' THEN 1 ELSE 0 END,
+         musteri_bekliyor = CASE WHEN $1='musteride' THEN true
+                                 WHEN $1='revizyon'  THEN false
+                                 ELSE musteri_bekliyor END
+       WHERE id=$3 RETURNING id, durum, rev_ic, rev_musteri, gonderim_sayisi, musteri_bekliyor`,
+      [d.durum, completed, id]);
     if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'durum:' + d.durum,
       detail: { durum: d.durum }, source: d.source, slack_ts: d.slack_ts });
     return r.rows[0];
   });
-  await reflectChange(id, `🔄 durum güncellendi: *${d.durum}*`, d.source);
+  // Thread notu — müşteri akışına özel, anlaşılır metinler
+  let note;
+  if (d.durum === 'musteride') {
+    note = `✈️ *müşteriye yollandı* — müşteri dönüşü bekleniyor (${res.gonderim_sayisi}. gönderim). Dönüşteki ilk ✏️ müşteri revizyonu sayılır.`;
+  } else if (d.durum === 'revizyon') {
+    note = `✏️ revizyon kaydedildi — iç: *${res.rev_ic}* · müşteri: *${res.rev_musteri}*`;
+  } else {
+    note = `🔄 durum güncellendi: *${d.durum}*`;
+  }
+  await reflectChange(id, note, d.source);
   return res;
 }
 

@@ -107,9 +107,17 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             {ro
               ? <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--prio-green)", background:"var(--prio-green-bg, var(--paper-2))", padding:"5px 9px", borderRadius:999}}>✅ Tamamlandı</span>
               : <StatusEditor current={b.durum} onPick={changeStatus}/>}
-            <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
+            <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}
+              title="İç revizyon: ✈️ öncesi düzeltmeler · Müşteri revizyonu: ✈️ sonrası ilk ✏️">
               rev {String(b.revision).padStart(2,"0")}
+              {(b.rev_ic > 0 || b.rev_musteri > 0) && ` · ${b.rev_ic||0} iç / ${b.rev_musteri||0} müşteri`}
             </span>
+            {b.musteri_bekliyor && !ro && (
+              <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase",
+                color:"#7c5cff", background:"rgba(124,92,255,0.1)", padding:"4px 8px", borderRadius:999}}>
+                ✈️ müşteri dönüşü bekleniyor
+              </span>
+            )}
           </div>
 
           <Hr/>
@@ -141,6 +149,10 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
               <span style={{color: b.deltaH <= 0 ? "var(--prio-red)" : b.deltaH <= 8 ? "var(--prio-red)" : "var(--ink)"}}>
                 {formatDelta(b.deltaH)}
               </span>
+            </>}
+            {b.gonderim_sayisi > 0 && <>
+              <span style={{color:"var(--ink-3)"}}>Müşteriye</span>
+              <span>✈️ {b.gonderim_sayisi} kez gönderildi{b.son_gonderim_at ? ` · son: ${formatFull(b.son_gonderim_at)}` : ""}</span>
             </>}
             <span style={{color:"var(--ink-3)"}}>Timezone</span>
             <span style={{fontFamily:"var(--font-mono)"}}>Europe/Istanbul (UTC+3)</span>
@@ -308,7 +320,8 @@ function StatusEditor({ current, onPick }) {
   const [open, setOpen] = React.useState(false);
   const opts = [
     ["yeni","Yeni"],["calisiliyor","Çalışılıyor"],
-    ["incelemede","İncelemede"],["blokeli","Blokeli"],["tamamlandi","Tamamlandı"]
+    ["incelemede","İncelemede"],["beklemede","Beklemede"],["revizyon","Revizyon"],
+    ["musteride","✈️ Müşteri Onayında"],["blokeli","Blokeli"],["tamamlandi","Tamamlandı"]
   ];
   return (
     <span style={{position:"relative"}}>

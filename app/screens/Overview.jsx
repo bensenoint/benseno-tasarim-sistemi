@@ -3,7 +3,8 @@
 
 function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, layout = "editorial", kpiVariant = "plain" }) {
   // viewMode filtresi App.jsx'te merkezi olarak uygulanıyor — data.briefs zaten filtered.
-  const active = data.briefs;
+  const musteride = data.briefs.filter(b => b.durum === "musteride");   // müşteri onayında bekleyenler
+  const active = data.briefs.filter(b => b.durum !== "musteride");      // aktif yük = müşteridekiler hariç
   const [filterOpen, setFilterOpen] = React.useState(false);
   const [deptFilter, setDeptFilter] = React.useState("all");
   const [prioFilter, setPrioFilter] = React.useState("all");
@@ -333,12 +334,13 @@ function EditorialLayout({ data, user, active, overdue, today, week, stale, revi
       })()}
 
       {/* KPI grid */}
-      <KpiGrid>
+      <KpiGrid cols={7}>
         <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"} onClick={onJumpJobs ? () => onJumpJobs("overdue") : undefined}/>
         <Kpi label="Bugün teslim"  value={today.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={sparkReview} trend={trendReview} sub={hist.length > 1 ? "son sync'e göre" : "dün 09:00'dan beri"} onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>
         <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={sparkStale} sub="24 iş saati hareket yok" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Müşteride"     value={musteride.length} color="#7c5cff" variant={kpiVariant} sub="✈️ dönüş bekleniyor" onClick={onSwitchTab ? () => onSwitchTab("musteride") : undefined}/>
         <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması" onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}/>
       </KpiGrid>
 

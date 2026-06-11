@@ -389,13 +389,14 @@ app.post('/api/brands/by-name/:name/gun-sonu', writeGuard, async (req, res) => {
 app.post('/api/kpi-snapshot', writeGuard, async (req, res) => {
   try {
     const r = await pool.query(`
-      INSERT INTO kpi_history (active, overdue, today, review, stale)
+      INSERT INTO kpi_history (active, overdue, today, review, stale, musteride)
       SELECT
-        count(*) FILTER (WHERE TRUE)::int,
-        count(*) FILTER (WHERE deadline < now())::int,
+        count(*) FILTER (WHERE durum <> 'musteride')::int,
+        count(*) FILTER (WHERE durum <> 'musteride' AND deadline < now())::int,
         count(*) FILTER (WHERE (deadline AT TIME ZONE 'Europe/Istanbul')::date = (now() AT TIME ZONE 'Europe/Istanbul')::date)::int,
         count(*) FILTER (WHERE durum = 'incelemede')::int,
-        count(*) FILTER (WHERE stale)::int
+        count(*) FILTER (WHERE stale)::int,
+        count(*) FILTER (WHERE durum = 'musteride')::int
       FROM briefs WHERE completed_at IS NULL AND deleted_at IS NULL
       RETURNING id, ts, active, overdue`);
     res.json({ ok: true, snapshot: r.rows[0] });

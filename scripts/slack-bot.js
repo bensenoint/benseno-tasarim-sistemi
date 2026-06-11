@@ -564,7 +564,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
       { type: 'section', fields: [
         { type: 'mrkdwn', text:
           '*İş kabulü / başladım:*\n🎨 → Tasarım\n✍️ → Editör\n🤖 → AI\n🔄 → Devam Ediyor\n\n' +
-          '👀 → İncelemede\n⏸️ → Beklemede\n✏️ → Revizyon\n✅ → Tamamlandı\n🔃 → Yeniden Aç' },
+          '👀 → İncelemede\n⏸️ → Beklemede\n✏️ → Revizyon\n✈️ → Müşteriye Yollandı\n✅ → Tamamlandı\n🔃 → Yeniden Aç' },
         { type: 'mrkdwn', text: '*Öncelik:*\n🔴 → Acil\n🟠 → Yüksek\n🟡 → Normal\n🟢 → Düşük' },
       ]},
 
@@ -578,6 +578,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
           '`iş incelemede` → İncelemede\n' +
           '`iş beklemede` → Beklemede\n' +
           '`revizyon var` · `revize et` → Revizyon\n' +
+          '`müşteriye yollandı` → ✈️ Müşteri Onayında\n' +
           '`iş tamamlandı` → Tamamlandı\n' +
           '`yeniden aç` · `geri aç` → Yeniden Açıldı\n' +
           '`bloke et` → Blokeli'
@@ -773,6 +774,7 @@ app.event('reaction_added', async ({ event, client }) => {
     pencil2: 'revizyon', pencil: 'revizyon',
     arrows_counterclockwise: 'calisiliyor',  // yeniden aç: tamamlandı → devam ediyor
     arrows_clockwise: 'calisiliyor',         // 🔄 devam ediyor (/yardim'da belgeli)
+    airplane: 'musteride', small_airplane: 'musteride',  // ✈️ müşteriye yollandı (müşteri onayında)
   };
   if (reactionBase in DURUM_MAP) {
     const durum = DURUM_MAP[reactionBase];
@@ -1017,6 +1019,9 @@ app.event('message', async ({ event, client }) => {
       { emoji: ':arrows_counterclockwise:', durum: 'calisiliyor' },
       { emoji: '🔄', durum: 'calisiliyor' },   // devam ediyor (/yardim'da belgeli)
       { emoji: ':arrows_clockwise:', durum: 'calisiliyor' },
+      { emoji: '✈️', durum: 'musteride' },     // müşteriye yollandı (müşteri onayında)
+      { emoji: '✈',  durum: 'musteride' },     // VS-16 olmadan
+      { emoji: ':airplane:', durum: 'musteride' }, { emoji: ':small_airplane:', durum: 'musteride' },
     ];
     const eMatch = EMOJI_DURUM.find(e => trimmed.startsWith(e.emoji));
     if (eMatch) {
@@ -1061,6 +1066,9 @@ app.event('message', async ({ event, client }) => {
       { key: 'yeniden aç',     type: 'durum',    value: 'calisiliyor' },
       { key: 'geri aç',        type: 'durum',    value: 'calisiliyor' },
       { key: 'bloke et',       type: 'durum',    value: 'blokeli'     },
+      { key: 'müşteriye yollandı',  type: 'durum', value: 'musteride' },
+      { key: 'müşteriye gönderildi', type: 'durum', value: 'musteride' },
+      { key: 'musteriye yollandi',  type: 'durum', value: 'musteride' }, // ASCII varyant
       // Öncelik
       { key: 'acil öncelik',   type: 'priority', value: '🔴' },
       { key: 'acil oncelik',   type: 'priority', value: '🔴' }, // ASCII varyant

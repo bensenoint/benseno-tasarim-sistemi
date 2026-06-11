@@ -13,7 +13,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
   // dept öncelikli eşleşme: departman yöneticileri (rol='yonetici', dept=ilgili) de ekibin içinde sayılır
   const people = data.USERS.filter(u => (u.dept || u.rol) === role);
   // Department her zaman bu rolün tüm briefler'ini gösterir — viewMode (mine/dept/all) etkilemez.
-  const allBriefs = data._allBriefs || data.briefs;
+  const allBriefs = (data._allBriefs || data.briefs).filter(b => b.durum !== "musteride"); // müşteridekiler yük sayılmaz
   const rows = allBriefs.filter(b =>
     (b.lead && (b.lead.dept || b.lead.rol) === role) ||
     (b.dept === role) ||

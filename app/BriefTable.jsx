@@ -165,7 +165,9 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
             onClose={() => setMenu(false)}/>
         )}
       </td>
-      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{brief.revision > 0 ? brief.revision : <span style={{color:"var(--ink-5)"}}>—</span>}</td>
+      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{(brief.rev_ic > 0 || brief.rev_musteri > 0)
+        ? <span title={`${brief.rev_ic||0} iç · ${brief.rev_musteri||0} müşteri revizyonu`}>{brief.rev_ic||0}<span style={{color:"var(--ink-5)"}}>/</span><span style={{color:"#7c5cff"}}>{brief.rev_musteri||0}</span></span>
+        : brief.revision > 0 ? brief.revision : <span style={{color:"var(--ink-5)"}}>—</span>}</td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title={brief.acilma ? new Date(brief.acilma).toLocaleDateString("tr-TR") + " açıldı" : ""}>{relTime(brief.acilma)}</td>
       <td style={cellStyle()}>
         <a href={brief.slack_url && brief.slack_url !== "#" ? brief.slack_url : undefined}

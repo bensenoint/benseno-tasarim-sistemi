@@ -22,6 +22,7 @@ cat \
   "$APP/screens/Jobs.jsx" \
   "$APP/screens/Plan.jsx" \
   "$APP/screens/Kanban.jsx" \
+  "$APP/screens/Musteride.jsx" \
   "$APP/screens/Completed.jsx" \
   "$APP/screens/DeptCompare.jsx" \
   "$APP/screens/Department.jsx" \

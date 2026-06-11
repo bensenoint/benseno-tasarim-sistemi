@@ -1020,6 +1020,11 @@
           <div class="reaction-desc">Düzeltme isteği geldi.</div>
         </div>
         <div class="reaction-card">
+          <div class="reaction-emoji">✈️</div>
+          <div class="reaction-name">Müşteriye Yollandı</div>
+          <div class="reaction-desc">İş müşteri onayına gönderildi — dashboard'da "Müşteri Onayı" sayfasına taşınır, aktif yükten düşer. ✈️ sonrası İLK ✏️ müşteri revizyonu sayılır.</div>
+        </div>
+        <div class="reaction-card">
           <div class="reaction-emoji">✅</div>
           <div class="reaction-name">Tamamlandı</div>
           <div class="reaction-desc">İş bitti. Thread'deki son görsel otomatik galeriye kaydedilir.</div>
@@ -1045,6 +1050,7 @@
             <tr><td><code>iş incelemede</code></td><td>İncelemede</td></tr>
             <tr><td><code>iş beklemede</code> · <code>bekle</code></td><td>Beklemede</td></tr>
             <tr><td><code>revizyon var</code> · <code>revize et</code></td><td>Revizyon</td></tr>
+            <tr><td><code>müşteriye yollandı</code> · <code>müşteriye gönderildi</code></td><td>✈️ Müşteri Onayında</td></tr>
             <tr><td><code>iş tamamlandı</code></td><td>Tamamlandı</td></tr>
             <tr><td><code>yeniden aç</code> · <code>geri aç</code></td><td>Yeniden açıldı (çalışılıyor)</td></tr>
             <tr><td><code>bloke et</code></td><td>Blokeli</td></tr>
@@ -1173,6 +1179,10 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
 
       <h3>💬 Thread Özeti (AI)</h3>
       <p>Hafta içi 09–19 arası her saat başı, aktif brieflerin thread yazışmaları AI ile özetlenir ve dashboard'da brief detayında <strong>"💬 Thread Özeti"</strong> bölümünde gösterilir (3-5 cümle: ne istendi, son durum, bekleyen ne). Yeni mesaj yoksa özet değişmez. İş tamamlandığında thread'den ayrıca bir <strong>"🔍 İş Insight"</strong> değerlendirmesi çıkarılır (süreç, revize, öğrenimler) — tamamlanan işin detayında görünür ve marka/iş analizlerinde kullanılır.</p>
+
+      <h3>✈️ Müşteri Onayı Akışı & İç/Müşteri Revizyon Ayrımı</h3>
+      <p>İş müşteriye gönderilmeye hazır olduğunda thread'e <strong>✈️</strong> konur (veya "müşteriye yollandı" yazılır). İş dashboard'da <strong>"Müşteri Onayı"</strong> sayfasına taşınır (Planlama menüsünde); aktif iş listesi, departman yükü, kapasite ve hareketsizlik hesaplarından çıkar — ekip o iş için gerçekten müsait görünür. Kanban'da kendi kolonu vardır.</p>
+      <p><strong>Revizyon ayrımı kuralı:</strong> ✈️'dan sonraki <strong>İLK ✏️ müşteri revizyonudur</strong>; diğer tüm ✏️'ler iç revizyondur. Müşteri revizyonu gelince iş otomatik "çalışılıyor"a döner ve aktif listelere geri gelir; tekrar hazır olunca yine ✈️ atılır — her döngüde aynı kural işler. Tablolarda revizyon "iç/müşteri" olarak ayrı gösterilir; bekleme süreleri marka değerlendirmelerine veri sağlar.</p>
 
       <h3>⭐ Yıldız Puanlama & Karne</h3>
       <p>Her tamamlanan işe AI, thread değerlendirmesinden <strong>1-5 kalite puanı</strong> verir (5 = pürüzsüz/zamanında, 3 = normal sürtünme, 1 = ciddi sorun). Yönetici, Tamamlananlar'daki yıldızlara tıklayarak puanı değiştirebilir — override sonrası AI o işe dokunamaz (AI puanları küçük "AI" rozetiyle ayırt edilir).</p>

@@ -13,6 +13,7 @@ async function allBriefsWithAssignees() {
            b.akis, b.stale, b.created_at, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
            b.rating, b.rating_by,
+           b.rev_ic, b.rev_musteri, b.gonderim_sayisi, b.son_gonderim_at, b.musteri_bekliyor,
            COALESCE(json_agg(
              json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color)
              ORDER BY a.sira NULLS LAST
@@ -49,8 +50,9 @@ async function getState() {
     pool.query(`
       SELECT u.dept,
         count(DISTINCT u.id)::int people,
-        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL)::int active,
-        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.deadline < now())::int overdue,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride')::int active,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND b.deadline < now())::int overdue,
+        count(DISTINCT b.id) FILTER (WHERE b.durum = 'musteride')::int musteride,
         count(DISTINCT b.id) FILTER (WHERE b.completed_at >= now() - interval '30 days')::int completed30
       FROM users u
       LEFT JOIN brief_assignees a ON a.user_id = u.id
@@ -97,8 +99,9 @@ async function getEmbedded() {
     pool.query(`
       SELECT u.dept,
         count(DISTINCT u.id)::int people,
-        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL)::int active,
-        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.deadline < now())::int overdue,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride')::int active,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND b.deadline < now())::int overdue,
+        count(DISTINCT b.id) FILTER (WHERE b.durum = 'musteride')::int musteride,
         count(DISTINCT b.id) FILTER (WHERE b.completed_at >= now() - interval '30 days')::int completed30
       FROM users u
       LEFT JOIN brief_assignees a ON a.user_id = u.id
@@ -123,6 +126,8 @@ async function getEmbedded() {
     observers: b.observers.map(o => ({ id: o.id, name: o.name })),
     notes: b.musteri_notu || '',
     deadline: ms(b.deadline), durum: b.durum, rev: b.rev || 0,
+    rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
+    gonderim_sayisi: b.gonderim_sayisi || 0, son_gonderim_at: ms(b.son_gonderim_at), musteri_bekliyor: !!b.musteri_bekliyor,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
@@ -136,6 +141,7 @@ async function getEmbedded() {
     leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
     workers: b.workers.map(w => ({ id: w.id, name: w.name })),
     deadline: ms(b.deadline), bitis: ms(b.completed_at), rev: b.rev || 0,
+    rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
@@ -198,8 +204,8 @@ async function getEmbedded() {
   let bns_history = [];
   try {
     const kh = await pool.query(
-      `SELECT ts, active, overdue, today, review, stale FROM kpi_history ORDER BY ts DESC LIMIT 48`);
-    bns_history = kh.rows.reverse().map(h => ({ ts: ms(h.ts), active: h.active, overdue: h.overdue, today: h.today, review: h.review, stale: h.stale }));
+      `SELECT ts, active, overdue, today, review, stale, musteride FROM kpi_history ORDER BY ts DESC LIMIT 48`);
+    bns_history = kh.rows.reverse().map(h => ({ ts: ms(h.ts), active: h.active, overdue: h.overdue, today: h.today, review: h.review, stale: h.stale, musteride: h.musteride || 0 }));
   } catch (e) { console.error('[queries] kpi_history okunamadı:', e.message); }
 
   // Marka kanal özetleri + son gün-sonu insight'ı (Marka detay sayfası)

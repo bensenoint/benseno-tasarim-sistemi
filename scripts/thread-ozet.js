@@ -227,7 +227,8 @@ async function main() {
     const wIds = (b.workers || []).map(w => w && w.id).filter(Boolean);
     const allOnVacation = wIds.length > 0 && wIds.every(id => vacation.has(id));
     const lastActivity = Math.max(b.created_at || 0, b.updated_at || 0, lastHumanMs);
-    const shouldStale = !allOnVacation && lastActivity > 0 && businessMs(lastActivity, now) >= STALE_H * H;
+    // Müşteri onayında bekleyen iş hareketsiz sayılmaz — bekleme bizden kaynaklanmıyor
+    const shouldStale = b.durum !== 'musteride' && !allOnVacation && lastActivity > 0 && businessMs(lastActivity, now) >= STALE_H * H;
     if (shouldStale !== !!b.stale) {
       if (await setStale(b.id, shouldStale)) { staleFlips++; console.log(`  ${shouldStale ? '🟠' : '🟢'} #${b.no} ${b.marka} stale=${shouldStale}`); }
     }

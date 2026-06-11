@@ -48,7 +48,8 @@ function HelpScreen() {
         <EmojiRow emoji="🎨 ✍️ 🤖" label="İş Kabulü / Çalışılıyor" desc="İşi kabul ettim, başladım (🎨 tasarım · ✍️ editör · 🤖 AI). 🔄 de devam ediyor demektir."/>
         <EmojiRow emoji="👀" label="İncelemede" desc="İş gözden geçiriliyor / revize sunuldu."/>
         <EmojiRow emoji="⏸️" label="Beklemede" desc="Müşteri / onay / materyal bekleniyor."/>
-        <EmojiRow emoji="✏️" label="Revizyon" desc="Düzeltme isteği geldi."/>
+        <EmojiRow emoji="✏️" label="Revizyon" desc="Düzeltme isteği geldi. ✈️'dan sonraki İLK ✏️ müşteri revizyonu, diğerleri iç revizyon sayılır."/>
+        <EmojiRow emoji="✈️" label="Müşteriye Yollandı" desc="İş müşteri onayına gönderildi. İş 'Müşteri Onayı' sayfasına taşınır; aktif yük/kapasite ve hareketsizlik hesabından çıkar. Müşteri revizyonla dönünce otomatik aktif listeye geri gelir."/>
         <EmojiRow emoji="✅" label="Tamamlandı" desc="İş bitti. Thread'deki son görsel otomatik olarak galeriye kaydedilir."/>
         <EmojiRow emoji="🔃" label="Yeniden açıldı" desc="Tamamlanmış brief'i tekrar çalışılıyor durumuna çeker."/>
       </Section>
@@ -65,6 +66,7 @@ function HelpScreen() {
         <Row left="iş incelemede" right="İncelemede"/>
         <Row left="iş beklemede · bekle" right="Beklemede"/>
         <Row left="revizyon var · revize et" right="Revizyon"/>
+        <Row left="müşteriye yollandı" right="✈️ Müşteri Onayında"/>
         <Row left="iş tamamlandı" right="Tamamlandı"/>
         <Row left="yeniden aç · geri aç" right="Yeniden açıldı (çalışılıyor)"/>
         <Row left="bloke et" right="Blokeli"/>

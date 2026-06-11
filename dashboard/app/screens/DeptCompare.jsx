@@ -14,7 +14,7 @@ function DeptCompareScreen({ data }) {
   const cutoff30 = Date.now() - 30 * 24 * 3600000;
 
   function deptRows(role) {
-    return allBriefs.filter(b =>
+    return allBriefs.filter(b => b.durum !== "musteride").filter(b =>
       (b.lead && (b.lead.rol || b.lead.dept) === role) ||
       b.dept === role ||
       (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.rol || c.dept) === role))

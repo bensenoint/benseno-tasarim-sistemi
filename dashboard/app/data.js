@@ -364,7 +364,7 @@ window.BNS_DATA = {
 // Uzun durum açıklamalarını ("⏳ Yeni açıldı (Eda T...") kısa koda normalize eder
 function bnsNormalizeDurum(durum, status) {
   // Zaten kısa kod mu?
-  const SHORT = ["yeni","calisiliyor","incelemede","blokeli","tamamlandi","tamamlandı"];
+  const SHORT = ["yeni","calisiliyor","incelemede","beklemede","revizyon","musteride","blokeli","tamamlandi","tamamlandı"];
   const raw = (durum || status || "").trim();
   const d = raw.toLowerCase();
   if (SHORT.includes(d)) return d === "tamamlandı" ? "tamamlandi" : d;
@@ -493,6 +493,11 @@ function bnsHydrateBrief(raw, idx) {
     odeme:        !!raw.odeme,    // ödeme yapıldı mı
     thread_ozet:    raw.thread_ozet || null,     // AI thread özeti (thread-ozet.js yazar)
     thread_ozet_at: raw.thread_ozet_at || null,
+    rev_ic:          raw.rev_ic || 0,            // iç revizyon (✈️ öncesi / sonrası 2.+)
+    rev_musteri:     raw.rev_musteri || 0,       // müşteri revizyonu (✈️ sonrası ilk ✏️)
+    gonderim_sayisi: raw.gonderim_sayisi || 0,
+    son_gonderim_at: raw.son_gonderim_at || null,
+    musteri_bekliyor: !!raw.musteri_bekliyor,
     _kimden_id:   raw._kimden_id || null
   };
 }
@@ -528,6 +533,7 @@ function bnsHydrateCompleted(raw, idx) {
     bitis,
     sureH,
     revision: raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
+    rev_ic: raw.rev_ic || 0, rev_musteri: raw.rev_musteri || 0,
     gecikme,
     gecikmeH,
     rating: raw.rating != null ? raw.rating : null,

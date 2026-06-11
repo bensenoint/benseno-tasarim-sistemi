@@ -8,7 +8,8 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
   const [prioFilter, setPrioFilter] = React.useState("all");
 
   // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
-  let rows = data.briefs;
+  // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
+  let rows = data.briefs.filter(b => b.durum !== "musteride");
   if (scope === "overdue") rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
   if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor");
   if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");
