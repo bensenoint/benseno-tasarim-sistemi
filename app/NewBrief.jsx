@@ -111,11 +111,14 @@ function PeoplePicker({ label, users, selected, onChange, grouped }) {
 function APIBriefForm({ apiBase, data, onClose }) {
   const users = (data.USERS || []).filter(u => u.active !== false);
   const brands = data.BRANDS || [];
-  const me = data.ME || {};
+  // Açan kişi = GİRİŞ YAPAN kullanıcı (login). data.ME varsayılanı Görkem'e sabitti —
+  // kim açarsa açsın "Görkem açtı" kaydediliyordu; bns_user (login) esas alınır.
+  const logged = (() => { try { return JSON.parse(localStorage.getItem("bns_user") || "null"); } catch { return null; } })();
+  const me = (logged && users.find(u => u.id === logged.slack_id)) || data.ME || {};
   const [f, setF] = React.useState({
     marka: "", baslik: "", deadlineDate: "", deadlineTime: "17:00",
     workerIds: [], leadIds: [], gozlemciIds: [],   // lead boş → server işi vereni lead yapar
-    musteri_notu: "", akis: "sirali", maliyet: "", satis: "",
+    musteri_notu: "", akis: "paralel", maliyet: "", satis: "",
   });
   const [files, setFiles] = React.useState([]);
   const [busy, setBusy] = React.useState(false);
