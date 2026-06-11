@@ -208,34 +208,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           <Hr/>
 
           <Eyebrow>Not</Eyebrow>
-          {ro ? (
-            <div style={{
-              marginTop: 8, padding: 10, borderRadius: 8, border:"1px solid var(--line)",
-              background:"var(--surface-sub)", color:"var(--ink)", minHeight: 40,
-              font:"400 13px/1.5 var(--font-sans)", whiteSpace:"pre-wrap", wordBreak:"break-word"
-            }}>{b.notes ? <Linkify text={b.notes}/> : <span style={{color:"var(--ink-4)"}}>—</span>}</div>
-          ) : (
-            <>
-              <textarea
-                value={b.notes || ""}
-                onChange={(e) => set({ notes: e.target.value })}
-                placeholder="Brief'le ilgili kısa bir not bırak…"
-                style={{
-                  marginTop: 8, width:"100%", minHeight: 64, resize:"vertical",
-                  padding: 10, borderRadius: 8, border:"1px solid var(--line)",
-                  background:"var(--surface-sub)", color:"var(--ink)",
-                  font:"400 13px/1.5 var(--font-sans)", outline:"none"
-                }}/>
-              {/* Nottaki linkler tıklanabilir olarak ayrıca listelenir (textarea link açamaz) */}
-              {/https?:\/\//.test(b.notes || "") && (
-                <div style={{marginTop: 6, font:"400 12px/1.6 var(--font-sans)", color:"var(--ink-3)", display:"flex", flexDirection:"column", gap:2}}>
-                  {(b.notes.match(/https?:\/\/[^\s<>"')\]]+/g) || []).map((u, i) => (
-                    <a key={i} href={u} target="_blank" rel="noreferrer" style={{color:"var(--ember)", wordBreak:"break-all"}}>🔗 {u}</a>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
+          <NotesField value={b.notes || ""} readOnly={ro} onChange={(v) => set({ notes: v })}/>
         </div>
 
         {inlineToast && (
@@ -283,6 +256,34 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
 }
 
 function Hr() { return <div style={{height: 1, background:"var(--line)", margin:"18px 0"}}/>; }
+
+// Not alanı: görünümde linkler METNİN İÇİNDE tıklanabilir; metne tıklayınca düzenleme
+// moduna (textarea) geçer, odak çıkınca görünüme döner. (textarea link render edemez —
+// bu yüzden EditableTitle ile aynı tıkla-düzenle deseni kullanılır.)
+function NotesField({ value, readOnly, onChange }) {
+  const [edit, setEdit] = React.useState(false);
+  const boxStyle = {
+    marginTop: 8, width:"100%", minHeight: 64, padding: 10, borderRadius: 8,
+    border:"1px solid var(--line)", background:"var(--surface-sub)", color:"var(--ink)",
+    font:"400 13px/1.5 var(--font-sans)", boxSizing:"border-box",
+  };
+  if (!readOnly && edit) return (
+    <textarea autoFocus value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onBlur={() => setEdit(false)}
+      placeholder="Brief'le ilgili kısa bir not bırak…"
+      style={{ ...boxStyle, resize:"vertical", outline:"none" }}/>
+  );
+  return (
+    <div onClick={readOnly ? undefined : () => setEdit(true)}
+      title={readOnly ? undefined : "Düzenlemek için tıkla"}
+      style={{ ...boxStyle, cursor: readOnly ? "default" : "text", whiteSpace:"pre-wrap", wordBreak:"break-word" }}>
+      {value
+        ? <Linkify text={value}/>
+        : <span style={{color:"var(--ink-4)"}}>{readOnly ? "—" : "Brief'le ilgili kısa bir not bırak…"}</span>}
+    </div>
+  );
+}
 
 function EditableTitle({ value, onChange }) {
   const [edit, setEdit] = React.useState(false);
