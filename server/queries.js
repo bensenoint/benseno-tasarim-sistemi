@@ -57,6 +57,8 @@ async function getState() {
       FROM users u
       LEFT JOIN brief_assignees a ON a.user_id = u.id
       LEFT JOIN briefs b ON b.id = a.brief_id
+        -- Gözlemciler yük sayılmaz: aktif/geciken sayaçlarına yalnız işi yapan + lead girer
+        AND NOT (b.completed_at IS NULL AND a.role = 'gozlemci')
         AND NOT (b.completed_at IS NULL AND b.akis = 'sirali' AND a.role = 'contributor'
           AND (a.onay_at IS NOT NULL OR EXISTS (
             SELECT 1 FROM brief_assignees a2
@@ -111,6 +113,8 @@ async function getEmbedded() {
       FROM users u
       LEFT JOIN brief_assignees a ON a.user_id = u.id
       LEFT JOIN briefs b ON b.id = a.brief_id
+        -- Gözlemciler yük sayılmaz: aktif/geciken sayaçlarına yalnız işi yapan + lead girer
+        AND NOT (b.completed_at IS NULL AND a.role = 'gozlemci')
         AND NOT (b.completed_at IS NULL AND b.akis = 'sirali' AND a.role = 'contributor'
           AND (a.onay_at IS NOT NULL OR EXISTS (
             SELECT 1 FROM brief_assignees a2
