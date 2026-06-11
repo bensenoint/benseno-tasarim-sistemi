@@ -46,7 +46,8 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
     { id: "deadline",label: "Teslim",   sort: true,  align: "right" },
     { id: "durum",   label: "Durum",    sort: true,  mobileHide: true },
     { id: "rev",     label: "Rev#",     sort: false, align: "right", mobileHide: true },
-    { id: "acilma",  label: "Gecikme",  sort: true,  align: "right", mobileHide: true },
+    { id: "acilma",  label: "Açıldı",   sort: true,  align: "right", mobileHide: true },
+    { id: "gecikme", label: "Gecikme",  sort: false, align: "right", mobileHide: true },
     { id: "link",    label: "🔗",       sort: false }
   ];
   if (financeCols) {
@@ -168,7 +169,10 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{(brief.rev_ic > 0 || brief.rev_musteri > 0)
         ? <span title={`${brief.rev_ic||0} iç · ${brief.rev_musteri||0} müşteri revizyonu`}>{brief.rev_ic||0}<span style={{color:"var(--ink-5)"}}>/</span><span style={{color:"#7c5cff"}}>{brief.rev_musteri||0}</span></span>
         : brief.revision > 0 ? brief.revision : <span style={{color:"var(--ink-5)"}}>—</span>}</td>
-      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title={brief.acilma ? new Date(brief.acilma).toLocaleDateString("tr-TR") + " açıldı" : ""}>{relTime(brief.acilma)}</td>
+      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title="İşin açıldığı tarih ve saat">
+        {brief.acilma ? new Date(brief.acilma).toLocaleString("tr-TR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "—"}
+      </td>
+      <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title={brief.acilma ? "açılışından beri geçen süre" : ""}>{relTime(brief.acilma)}</td>
       <td style={cellStyle()}>
         <a href={brief.slack_url && brief.slack_url !== "#" ? brief.slack_url : undefined}
            target="_blank" rel="noopener noreferrer"

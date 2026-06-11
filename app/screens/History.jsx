@@ -6,32 +6,11 @@ function HistoryScreen({ data, onOpenByNo }) {
   const allBriefs    = data._allBriefs    || data.briefs    || [];
   const allCompleted = data._allCompleted || data.completed || [];
 
-  const extras = [];
-  allBriefs.slice(0, 30).forEach((b) => {
-    if (!b.acilma) return;
-    const acan = b.lead;
-    if (!acan) return;
-    extras.push({
-      t: b.acilma, no: b.no,
-      who: acan.id, verb: "açtı", target: b.baslik,
-      brand: b.brand, _type: "open"
-    });
-  });
-  allCompleted.slice(0, 20).forEach((c) => {
-    if (!c.bitis) return;
-    const tamamlayan = (c.contributors && c.contributors[0]) || c.lead;
-    if (!tamamlayan) return;
-    extras.push({
-      t: c.bitis, no: c.no,
-      who: tamamlayan.id, verb: "tamamladı", target: c.baslik,
-      brand: c.brand, meta: c.sureH != null && c.sureH > 0 ? c.sureH.toFixed(1) + " sa" : "",
-      _type: "done"
-    });
-  });
-  let all = [
-    ...data.activity.map(a => ({ ...a, _type: typeFromVerb(a.verb) })),
-    ...extras
-  ].sort((a, b) => b.t - a.t).slice(0, 80);
+  // Yalnız gerçek olay akışı (events tablosu). Brieflerden sentetik "açtı" satırı
+  // ÜRETİLMEZ — eski sürüm lead'i açan sayıyordu (yanlış kişi) ve mükerrer satır yaratıyordu.
+  let all = data.activity
+    .map(a => ({ ...a, _type: typeFromVerb(a.verb) }))
+    .sort((a, b) => b.t - a.t).slice(0, 80);
 
   if (filter !== "all") all = all.filter(a => a._type === filter);
 

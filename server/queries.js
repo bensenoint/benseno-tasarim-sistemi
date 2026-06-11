@@ -50,15 +50,16 @@ async function getState() {
     pool.query(`
       SELECT u.dept,
         count(DISTINCT u.id)::int people,
-        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride')::int active,
-        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND b.deadline < now())::int overdue,
-        count(DISTINCT b.id) FILTER (WHERE b.durum = 'musteride')::int musteride,
+        round((count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND a.role <> 'gozlemci')
+          + 0.25 * count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND a.role = 'gozlemci'
+              AND NOT EXISTS (SELECT 1 FROM brief_assignees a3 JOIN users u3 ON u3.id = a3.user_id
+                              WHERE a3.brief_id = b.id AND a3.role <> 'gozlemci' AND u3.dept = u.dept)))::numeric, 2)::float active,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND b.deadline < now() AND a.role <> 'gozlemci')::int overdue,
+        count(DISTINCT b.id) FILTER (WHERE b.durum = 'musteride' AND a.role <> 'gozlemci')::int musteride,
         count(DISTINCT b.id) FILTER (WHERE b.completed_at >= now() - interval '30 days')::int completed30
       FROM users u
       LEFT JOIN brief_assignees a ON a.user_id = u.id
       LEFT JOIN briefs b ON b.id = a.brief_id
-        -- Gözlemciler yük sayılmaz: aktif/geciken sayaçlarına yalnız işi yapan + lead girer
-        AND NOT (b.completed_at IS NULL AND a.role = 'gozlemci')
         AND NOT (b.completed_at IS NULL AND b.akis = 'sirali' AND a.role = 'contributor'
           AND (a.onay_at IS NOT NULL OR EXISTS (
             SELECT 1 FROM brief_assignees a2
@@ -106,15 +107,16 @@ async function getEmbedded() {
     pool.query(`
       SELECT u.dept,
         count(DISTINCT u.id)::int people,
-        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride')::int active,
-        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND b.deadline < now())::int overdue,
-        count(DISTINCT b.id) FILTER (WHERE b.durum = 'musteride')::int musteride,
+        round((count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND a.role <> 'gozlemci')
+          + 0.25 * count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND a.role = 'gozlemci'
+              AND NOT EXISTS (SELECT 1 FROM brief_assignees a3 JOIN users u3 ON u3.id = a3.user_id
+                              WHERE a3.brief_id = b.id AND a3.role <> 'gozlemci' AND u3.dept = u.dept)))::numeric, 2)::float active,
+        count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND b.deadline < now() AND a.role <> 'gozlemci')::int overdue,
+        count(DISTINCT b.id) FILTER (WHERE b.durum = 'musteride' AND a.role <> 'gozlemci')::int musteride,
         count(DISTINCT b.id) FILTER (WHERE b.completed_at >= now() - interval '30 days')::int completed30
       FROM users u
       LEFT JOIN brief_assignees a ON a.user_id = u.id
       LEFT JOIN briefs b ON b.id = a.brief_id
-        -- Gözlemciler yük sayılmaz: aktif/geciken sayaçlarına yalnız işi yapan + lead girer
-        AND NOT (b.completed_at IS NULL AND a.role = 'gozlemci')
         AND NOT (b.completed_at IS NULL AND b.akis = 'sirali' AND a.role = 'contributor'
           AND (a.onay_at IS NOT NULL OR EXISTS (
             SELECT 1 FROM brief_assignees a2
