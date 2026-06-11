@@ -121,13 +121,14 @@ async function main() {
     const text = `Marka: ${brand} (#${chName})\n\nDevreden beri kanal akışı (thread yanıtları ↳ ile):\n${dig.lines.join('\n')}`;
 
     // 1) Genel kanal özeti — yeni mesaj yoksa atla
+    let sonOzet = meta.kanal_ozet || null;   // gün-sonu arşivine yazılacak en güncel özet
     if (meta.kanal_ozet_at && dig.lastTs && String(meta.kanal_ozet_ts || '') === dig.lastTs) skipped++;
     else {
       const ozet = await haiku(
         'Bir tasarım ajansının marka Slack kanalının yeni TÜM akışını (ana mesajlar + thread yazışmaları) özetliyorsun. 4-6 cümlelik Türkçe, olgusal genel özet: hangi işler konuşuldu, neler ilerledi, açık konular/bekleyenler ne, dikkat çeken bir şey var mı. Bot durum bildirimlerini sayma, insan yazışmasına odaklan. Mesajlarda OLMAYAN hiçbir şeyi uydurma. Düz metin.',
         text);
       if (ozet && await apiWrite('PATCH', `/api/brands/by-name/${encodeURIComponent(brand)}/kanal-ozet`, { ozet, last_ts: dig.lastTs })) {
-        updated++; console.log(`  ✓ ${brand} kanal özeti (${dig.count} satır)`);
+        updated++; sonOzet = ozet; console.log(`  ✓ ${brand} kanal özeti (${dig.count} satır)`);
       }
       await new Promise(r => setTimeout(r, 1100));
     }
@@ -137,7 +138,7 @@ async function main() {
       const ins = await haiku(
         'Bir tasarım ajansının marka Slack kanalının BUGÜNKÜ akışından gün-sonu değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka performans değerlendirmelerinde ve raporlarda kullanılacak — şu açılardan kısa ve olgusal değerlendir: bugün bu markada iş yoğunluğu/tempo nasıldı, süreçte pürüz/sürtünme var mıydı, müşteri-marka tarafından gelen sinyaller (memnuniyet, aciliyet, revize baskısı), yarına sarkan/bekleyen konular. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Düz metin, en fazla 5 cümle.',
         text);
-      if (ins && await apiWrite('POST', `/api/brands/by-name/${encodeURIComponent(brand)}/gun-sonu`, { insight: ins })) {
+      if (ins && await apiWrite('POST', `/api/brands/by-name/${encodeURIComponent(brand)}/gun-sonu`, { insight: ins, ozet: sonOzet })) {
         insights++; console.log(`  🌙 ${brand} gün-sonu insight`);
       }
       await new Promise(r => setTimeout(r, 1100));

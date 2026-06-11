@@ -215,30 +215,6 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
         );
       })()}
 
-      {/* Kanal özeti + gün sonu insight (AI — kanal-ozet.js besler) */}
-      {(() => {
-        const bm = (window.BNS_DATA && window.BNS_DATA.BR && window.BNS_DATA.BR[brand]) || {};
-        if (!bm.kanal_ozet && !bm.son_insight) return null;
-        const fmtAt = ms => { try { return new Date(ms).toLocaleString("tr-TR", { timeZone:"Europe/Istanbul", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }); } catch { return ""; } };
-        const Box = ({icon, title, text, sub}) => (
-          <div style={{ flex:1, minWidth:280 }}>
-            <div style={{ font:"600 11px/1 var(--font-sans)", letterSpacing:"0.07em", textTransform:"uppercase", color:"var(--ink-4)", marginBottom:8 }}>{icon} {title}</div>
-            <div style={{ font:"400 13px/1.6 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap" }}>{text}</div>
-            {sub && <div style={{ font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)", marginTop:6 }}>{sub}</div>}
-          </div>
-        );
-        return (
-          <Card style={{ marginBottom:"var(--section-gap)" }}>
-            <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
-              {bm.kanal_ozet && <Box icon="📡" title="Kanal Özeti" text={bm.kanal_ozet}
-                sub={bm.kanal_ozet_at ? `AI özeti · ${fmtAt(bm.kanal_ozet_at)} itibarıyla` : "AI özeti"}/>}
-              {bm.son_insight && <Box icon="🌙" title="Gün Sonu Insight" text={bm.son_insight}
-                sub={bm.son_insight_tarih ? `${bm.son_insight_tarih} · marka değerlendirmeleri için arşivlenir` : "marka değerlendirmeleri için arşivlenir"}/>}
-            </div>
-          </Card>
-        );
-      })()}
-
       {/* Filtreler */}
       <Card style={{ marginBottom:"var(--section-gap)" }}>
         <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
@@ -323,6 +299,81 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
           </div>
         </Card>
       )}
+
+      {/* 📡 Kanal Özeti & 🌙 Gün Sonu Insight — günlük arşiv + tarih filtresi */}
+      <BrandDailyPanel brand={brand}/>
+    </div>
+  );
+}
+
+// ── Marka günlük arşivi: kanal özeti + gün-sonu insight, tarih seçimiyle ──────
+// "Şu an (canlı)" = saatlik güncellenen güncel özet; geçmiş günler brand_daily arşivinden.
+function BrandDailyPanel({ brand }) {
+  const [daily, setDaily] = React.useState([]);     // [{tarih, ozet, insight}] yeni→eski
+  const [sel, setSel] = React.useState("live");
+  const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+  React.useEffect(() => {
+    let dead = false;
+    setDaily([]); setSel("live");
+    fetch(`${API}/api/brands/by-name/${encodeURIComponent(brand)}/daily`)
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (!dead && j) setDaily(j.daily || []); })
+      .catch(() => {});
+    return () => { dead = true; };
+  }, [brand]);
+
+  const bm = (window.BNS_DATA && window.BNS_DATA.BR && window.BNS_DATA.BR[brand]) || {};
+  const fmtTarih = (t) => { try { return new Date(t).toLocaleDateString("tr-TR", { timeZone:"Europe/Istanbul", day:"numeric", month:"long", year:"numeric", weekday:"short" }); } catch { return String(t).slice(0, 10); } };
+  const fmtAt = ms => { try { return new Date(ms).toLocaleString("tr-TR", { timeZone:"Europe/Istanbul", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }); } catch { return ""; } };
+
+  const selDay = sel === "live" ? null : daily.find(d => String(d.tarih).slice(0, 10) === sel);
+  const ozet    = sel === "live" ? bm.kanal_ozet : (selDay && selDay.ozet);
+  const insight = sel === "live" ? bm.son_insight : (selDay && selDay.insight);
+  const ozetSub = sel === "live"
+    ? (bm.kanal_ozet_at ? `canlı · ${fmtAt(bm.kanal_ozet_at)} itibarıyla · saatte bir güncellenir` : "saatte bir güncellenir")
+    : `${fmtTarih(selDay && selDay.tarih)} arşivi`;
+  const insSub = sel === "live"
+    ? (bm.son_insight_tarih ? `en son: ${fmtTarih(bm.son_insight_tarih)} · her gün 18:45'te üretilir` : "her gün 18:45'te üretilir")
+    : `${fmtTarih(selDay && selDay.tarih)} arşivi`;
+
+  if (!bm.kanal_ozet && !bm.son_insight && daily.length === 0) return null;
+
+  const Kart = ({ icon, title, text, sub, accent }) => (
+    <Card style={{ flex:1, minWidth:300, borderTop:`3px solid ${accent}` }}>
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+        <span style={{ fontSize:16 }}>{icon}</span>
+        <span style={{ font:"600 12px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)" }}>{title}</span>
+      </div>
+      {text
+        ? <div style={{ font:"400 13px/1.65 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap" }}>{text}</div>
+        : <div style={{ font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-4)" }}>Bu gün için kayıt yok.</div>}
+      <div style={{ marginTop:10, paddingTop:8, borderTop:"1px solid var(--line-soft)", font:"400 10px/1.4 var(--font-sans)", color:"var(--ink-4)" }}>{sub}</div>
+    </Card>
+  );
+
+  return (
+    <div style={{ marginTop:"var(--section-gap)" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+        <span style={{ font:"600 13px/1 var(--font-sans)", color:"var(--ink)" }}>Günlük Kanal Takibi</span>
+        <select value={sel} onChange={e => setSel(e.target.value)} style={{
+          padding:"6px 10px", border:"1px solid var(--line)", borderRadius:8,
+          background:"var(--surface)", color:"var(--ink)", font:"500 12px/1.2 var(--font-sans)",
+          cursor:"pointer", outline:"none",
+        }}>
+          <option value="live">Şu an (canlı)</option>
+          {daily.map(d => {
+            const key = String(d.tarih).slice(0, 10);
+            return <option key={key} value={key}>{fmtTarih(d.tarih)}</option>;
+          })}
+        </select>
+        <span style={{ font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)" }}>
+          {daily.length > 0 ? `${daily.length} günlük arşiv` : "arşiv her gün 18:45'te birikir"}
+        </span>
+      </div>
+      <div style={{ display:"flex", flexWrap:"wrap", gap:"var(--grid-gap)" }}>
+        <Kart icon="📡" title="Kanal Özeti" text={ozet} sub={ozetSub} accent="var(--info, #4a7dbd)"/>
+        <Kart icon="🌙" title="Gün Sonu Insight" text={insight} sub={insSub} accent="var(--prio-yellow)"/>
+      </div>
     </div>
   );
 }

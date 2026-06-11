@@ -345,6 +345,17 @@ app.post('/api/rating-sebep', writeGuard, async (req, res) => {
   } catch (e) { console.error('[api] rating-sebep hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
+// Marka günlük arşivi — tarih filtresiyle geçmiş kanal özetleri + gün-sonu insight'ları
+app.get('/api/brands/by-name/:name/daily', async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT d.tarih, d.ozet, d.insight
+      FROM brand_daily d JOIN brands b ON b.id = d.brand_id
+      WHERE b.name = $1 ORDER BY d.tarih DESC LIMIT 90`, [req.params.name]);
+    res.json({ daily: r.rows });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // Marka kanal özeti (AI) — kanal-ozet.js scripti yazar. Sessiz.
 app.patch('/api/brands/by-name/:name/kanal-ozet', writeGuard, async (req, res) => {
   try {
