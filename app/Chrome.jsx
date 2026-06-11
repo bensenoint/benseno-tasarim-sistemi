@@ -96,6 +96,19 @@ const NAV_ICONS = {
   Trash2:      () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>,
 };
 
+// Metin içindeki http(s) linklerini tıklanabilir yapar — özet/insight/not/sohbet gibi
+// tüm serbest-metin alanlarında kullanılır. (Fonksiyon bildirimi: bundle genelinde erişilebilir.)
+function Linkify({ text }) {
+  if (text == null) return null;
+  const parts = String(text).split(/(https?:\/\/[^\s<>"')\]]+)/g);
+  return parts.map((p, i) => /^https?:\/\//.test(p)
+    ? <a key={i} href={p} target="_blank" rel="noreferrer"
+        onClick={e => e.stopPropagation()}
+        style={{ color: "var(--ember)", textDecoration: "underline", wordBreak: "break-all" }}>{p}</a>
+    : p);
+}
+try { window.BnsLinkify = Linkify; } catch (e) {}
+
 // 🤖 Sistem Asistanı — sağ altta yüzen sohbet. Kullanım soruları + canlı veri
 // (marka/iş/kişi) soruları /api/chat üzerinden yanıtlanır (JWT'li, kişiye özel).
 function ChatBot() {
@@ -175,7 +188,7 @@ function ChatBot() {
                 background: m.role === "user" ? "var(--ember)" : "var(--paper-2)",
                 color: m.role === "user" ? "#fff" : "var(--ink)",
                 font: "400 13px/1.55 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word",
-              }}>{m.content}</div>
+              }}>{m.role === "assistant" ? <Linkify text={m.content}/> : m.content}</div>
             ))}
             {busy && <div style={{ alignSelf: "flex-start", padding: "8px 11px", borderRadius: 10, background: "var(--paper-2)", color: "var(--ink-4)", font: "400 13px/1 var(--font-sans)" }}>yazıyor…</div>}
             <div ref={endRef}/>

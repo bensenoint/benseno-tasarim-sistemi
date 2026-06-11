@@ -168,7 +168,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
                 marginTop:10, padding:"12px 14px", background:"var(--paper-2)", borderRadius:8,
                 font:"400 13px/1.6 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap"
               }}>
-                {b.thread_ozet}
+                <Linkify text={b.thread_ozet}/>
               </div>
               {b.thread_ozet_at && (
                 <div style={{marginTop:6, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
@@ -188,7 +188,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
                 borderLeft:"3px solid var(--prio-green)",
                 font:"400 13px/1.6 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap"
               }}>
-                {b.insight}
+                <Linkify text={b.insight}/>
               </div>
               <div style={{marginTop:6, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
                 Tamamlanma değerlendirmesi · marka/iş analizleri için arşivlenir
@@ -208,17 +208,34 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           <Hr/>
 
           <Eyebrow>Not</Eyebrow>
-          <textarea
-            value={b.notes || ""}
-            readOnly={ro}
-            onChange={(e) => set({ notes: e.target.value })}
-            placeholder={ro ? "—" : "Brief'le ilgili kısa bir not bırak…"}
-            style={{
-              marginTop: 8, width:"100%", minHeight: 64, resize:"vertical",
-              padding: 10, borderRadius: 8, border:"1px solid var(--line)",
-              background:"var(--surface-sub)", color:"var(--ink)",
-              font:"400 13px/1.5 var(--font-sans)", outline:"none"
-            }}/>
+          {ro ? (
+            <div style={{
+              marginTop: 8, padding: 10, borderRadius: 8, border:"1px solid var(--line)",
+              background:"var(--surface-sub)", color:"var(--ink)", minHeight: 40,
+              font:"400 13px/1.5 var(--font-sans)", whiteSpace:"pre-wrap", wordBreak:"break-word"
+            }}>{b.notes ? <Linkify text={b.notes}/> : <span style={{color:"var(--ink-4)"}}>—</span>}</div>
+          ) : (
+            <>
+              <textarea
+                value={b.notes || ""}
+                onChange={(e) => set({ notes: e.target.value })}
+                placeholder="Brief'le ilgili kısa bir not bırak…"
+                style={{
+                  marginTop: 8, width:"100%", minHeight: 64, resize:"vertical",
+                  padding: 10, borderRadius: 8, border:"1px solid var(--line)",
+                  background:"var(--surface-sub)", color:"var(--ink)",
+                  font:"400 13px/1.5 var(--font-sans)", outline:"none"
+                }}/>
+              {/* Nottaki linkler tıklanabilir olarak ayrıca listelenir (textarea link açamaz) */}
+              {/https?:\/\//.test(b.notes || "") && (
+                <div style={{marginTop: 6, font:"400 12px/1.6 var(--font-sans)", color:"var(--ink-3)", display:"flex", flexDirection:"column", gap:2}}>
+                  {(b.notes.match(/https?:\/\/[^\s<>"')\]]+/g) || []).map((u, i) => (
+                    <a key={i} href={u} target="_blank" rel="noreferrer" style={{color:"var(--ember)", wordBreak:"break-all"}}>🔗 {u}</a>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {inlineToast && (
