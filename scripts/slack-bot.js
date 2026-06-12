@@ -747,6 +747,21 @@ function parseTerminTR(raw) {
   return iso();
 }
 
+// Açılışta Slack profil fotoğraflarını DB'ye senkronla (best-effort, bloklamaz).
+// Avatar dashboard'da kişi rozetlerinde kullanılır; foto yoksa renkli baş harf kalır.
+async function syncAvatars(client) {
+  try {
+    const r = await client.users.list({ limit: 500 });
+    let n = 0;
+    for (const m of r.members || []) {
+      const img = m.profile && (m.profile.image_192 || m.profile.image_72);
+      if (!img || m.deleted || m.is_bot) continue;
+      if (await dbWrite('PATCH', `/api/users-avatar/${m.id}`, { avatar_url: img })) n++;
+    }
+    log(`avatar senkron: ${n} kullanıcı güncellendi`);
+  } catch (e) { log(`avatar senkron hata: ${e.message}`); }
+}
+
 async function resolveBriefTs(client, channel, ts) {
   try {
     const r = await client.conversations.replies({ channel, ts, limit: 1 });
@@ -1185,4 +1200,5 @@ app.event('message', async ({ event, client }) => {
 
   await app.start();
   log('Benseno Slack Bot başlatıldı (Socket Mode)');
+  syncAvatars(app.client);   // best-effort, açılışı bloklamaz
 })();

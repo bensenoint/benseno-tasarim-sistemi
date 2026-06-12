@@ -44,7 +44,7 @@ async function allBriefsWithAssignees() {
 
 async function getState() {
   const [users, brands, all, dept, brand, events] = await Promise.all([
-    pool.query(`SELECT id,name,rol,dept,yetki,initials,color,title,active FROM users WHERE active ORDER BY rol,name`),
+    pool.query(`SELECT id,name,rol,dept,yetki,initials,color,title,active,avatar_url FROM users WHERE active ORDER BY rol,name`),
     pool.query(`SELECT id,name,color,wheel_idx,slack_channel FROM brands ORDER BY name`),
     allBriefsWithAssignees(),
     // departman yükü (aktif + gecikmiş), kişi sayısı
@@ -101,7 +101,7 @@ async function getEmbedded() {
   const [all, brands, users, dept] = await Promise.all([
     allBriefsWithAssignees(),
     pool.query(`SELECT name, color, wheel_idx FROM brands ORDER BY name`),
-    pool.query(`SELECT id,name,rol,dept,yetki,initials,color FROM users WHERE active ORDER BY rol,name`),
+    pool.query(`SELECT id,name,rol,dept,yetki,initials,color,avatar_url FROM users WHERE active ORDER BY rol,name`),
     pool.query(`
       SELECT u.dept,
         count(DISTINCT u.id)::int people,

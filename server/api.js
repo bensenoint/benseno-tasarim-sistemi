@@ -232,6 +232,16 @@ app.patch('/api/briefs/:id/rating', auth.authGuard, auth.adminGuard, async (req,
   } catch (e) { console.error('[api] rating hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
+// Avatar senkronu — bot açılışta Slack profil fotoğraflarını buraya yazar.
+app.patch('/api/users-avatar/:id', writeGuard, async (req, res) => {
+  try {
+    const { avatar_url } = req.body || {};
+    if (!avatar_url) return res.status(400).json({ error: 'avatar_url gerekli' });
+    const r = await pool.query('UPDATE users SET avatar_url=$1 WHERE id=$2 RETURNING id', [String(avatar_url).slice(0, 600), req.params.id]);
+    res.json({ ok: true, updated: !!r.rows[0] });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── Sistem Asistanı (dashboard chatbot) ─────────────────────────────────────
 // Kullanım bilgisi (chat-bilgi.md) + canlı veri bağlamıyla Haiku. JWT zorunlu;
 // kişi yıldız puanları bağlama SADECE admin ise girer (UI gizlilik kuralıyla aynı).

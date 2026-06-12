@@ -80,8 +80,16 @@ function Avatar({ user, size = 22, borderColor }) {
       fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: Math.round(size * 0.42),
       color: "#fff", background: c,
       border: borderColor ? `2px solid ${borderColor}` : "none",
-      flexShrink: 0
-    }}>{user.mono}</span>
+      flexShrink: 0, position: "relative", overflow: "hidden"
+    }}>
+      {user.mono}
+      {/* Slack profil fotoğrafı — yüklenemezse gizlenir, alttaki renkli baş harf görünür kalır */}
+      {user.avatar_url && (
+        <img src={user.avatar_url} alt="" loading="lazy"
+          onError={(e) => { e.target.style.display = "none"; }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", borderRadius: 999 }}/>
+      )}
+    </span>
   );
 }
 
