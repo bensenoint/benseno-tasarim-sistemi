@@ -157,4 +157,4 @@ async function uploadFile({ channel, thread_ts, filename, buf, title }) {
   return { ok: true, file_id: g.file_id, permalink: f.permalink || null, name: filename };
 }
 
-module.exports = { postBrief, postThread, dm, uploadFile, channelForBrand, hasToken, CHANNELS };
+module.exports = { postBrief, postThread, dm, logNotification, uploadFile, channelForBrand, hasToken, CHANNELS };

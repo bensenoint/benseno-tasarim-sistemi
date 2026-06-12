@@ -519,8 +519,10 @@ async function reflectChange(briefId, summary, source, opts) {
     const threadLink = (b.slack_ts && b.slack_channel)
       ? `https://${ws}.slack.com/archives/${b.slack_channel}/p${String(msgTs).replace('.', '')}?thread_ts=${b.slack_ts}&cid=${b.slack_channel}`
       : null;
+    // DM YOK: thread notu zaten takipçilere Slack bildirimi üretiyor (çift bildirim önlenir).
+    // Dashboard çanı beslenmeye devam etsin diye yalnız notifications tablosuna yazılır.
     const u = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1`, [briefId]);
-    for (const row of u.rows) await slack.dm(row.user_id, text, threadLink);
+    for (const row of u.rows) if (/^U/.test(row.user_id || '')) await slack.logNotification(row.user_id, text, threadLink);
   } catch (e) { console.error('[writes] reflect hata:', e.message); }
 }
 
