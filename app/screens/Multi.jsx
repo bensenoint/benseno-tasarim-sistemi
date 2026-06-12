@@ -46,8 +46,13 @@ function MultiScreen({ data, onOpenBrief }) {
     (b.contributors && b.contributors.length > 0) || b.reviewer
   );
 
-  const paralel = allMulti.filter(b => getAssignType(b.durum_raw || b.durum) === "paralel");
-  const sirali  = allMulti.filter(b => getAssignType(b.durum_raw || b.durum) === "sirali");
+  // Gerçek akış DB'deki akis alanından gelir (form seçimi); eski metin-ayrıştırma yalnız
+  // akis'i olmayan eski kayıtlara yedektir. Varsayılan paralel (sistem kararıyla uyumlu).
+  const tipOf = (b) => b.akis === "sirali" || b.akis === "paralel"
+    ? b.akis
+    : (getAssignType(b.durum_raw || b.durum) === "paralel" ? "paralel" : "paralel");
+  const paralel = allMulti.filter(b => tipOf(b) === "paralel");
+  const sirali  = allMulti.filter(b => tipOf(b) === "sirali");
 
   const shown = tab === "paralel" ? paralel : tab === "sirali" ? sirali : allMulti;
 
