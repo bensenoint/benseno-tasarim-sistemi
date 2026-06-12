@@ -23,7 +23,7 @@ function BrandScreen({ data, onOpenBrief, initialSel }) {
   // Tek marka seçiliyse detay sayfasını göster
   if (sel) {
     const stats = (data.brandStats || []).find(b => b.name === sel) || { name: sel };
-    return <BrandDetail brand={sel} stats={stats} data={data} onBack={() => setSel(null)} onOpenBrief={onOpenBrief} />;
+    return <BrandDetail brand={sel} stats={stats} data={data} onBack={() => setSel(null)} onSwitch={setSel} onOpenBrief={onOpenBrief} />;
   }
 
   let rows = data.brandStats;
@@ -102,7 +102,7 @@ function BrandScreen({ data, onOpenBrief, initialSel }) {
 }
 
 // ── Tek marka detay sayfası ─────────────────────────────────────────────────
-function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
+function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief }) {
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
 
   // Marka brief'lerini birleşik satır modeline çevir (aktif + tamamlanan)
@@ -192,6 +192,15 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
         title={brand}
         subtitle={`${active.length} aktif · ${done.length} tamamlanan · ${overdue} gecikmiş${stats.medianH != null ? " · medyan " + stats.medianH + " sa" : ""}`}
         actions={<>
+          {/* Hızlı marka geçişi — listeye dönmeden başka markanın detayına atla */}
+          {onSwitch && (
+            <select value={brand} onChange={(e) => onSwitch(e.target.value)} title="Başka markaya geç"
+              style={{ ...fldStyle, cursor:"pointer", maxWidth:180 }}>
+              {[...(data.brandStats || [])].sort((a, b) => a.name.localeCompare(b.name, "tr")).map(b => (
+                <option key={b.name} value={b.name}>{b.name}{b.active ? ` (${b.active})` : ""}</option>
+              ))}
+            </select>
+          )}
           <button onClick={onBack} style={{ ...fldStyle, cursor:"pointer", display:"inline-flex", alignItems:"center", gap:5 }}>
             <span style={{ font:"600 13px/1 var(--font-sans)" }}>←</span> Markalar
           </button>
