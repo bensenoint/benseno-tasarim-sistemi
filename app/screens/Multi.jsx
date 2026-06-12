@@ -43,7 +43,11 @@ function MultiScreen({ data, onOpenBrief }) {
   // Yalnız SIRALI (onay zinciri) işler gösterilir — paralel işler zaten diğer
   // tablolarda izleniyor; bu ekran el-değiştirme akışını takip etmek için.
   const sirali = (data._allBriefs || data.briefs).filter(b => b.akis === "sirali");
-  const shown = sirali;
+  const [filtre, setFiltre] = React.useState("all");   // KPI kartları tıklanabilir filtre
+  const gecikmis  = sirali.filter(b => b.deltaH <= 0);
+  const musteride = sirali.filter(b => b.durum === "musteride");
+  const shown = filtre === "gecikmis" ? gecikmis : filtre === "musteride" ? musteride : sirali;
+  const tgl = (k) => setFiltre(f => f === k ? "all" : k);   // aynı karta tekrar tıkla → filtreyi kaldır
 
   return (
     <div className="bn-tab-in">
@@ -54,9 +58,9 @@ function MultiScreen({ data, onOpenBrief }) {
 
       {/* KPI */}
       <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
-        <Kpi label="Sıralı iş" value={sirali.length} sub="aktif onay zinciri"/>
-        <Kpi label="Gecikmiş" value={sirali.filter(b => b.deltaH <= 0).length} color={sirali.some(b => b.deltaH <= 0) ? "var(--prio-red)" : undefined}/>
-        <Kpi label="Müşteride" value={sirali.filter(b => b.durum === "musteride").length} color="#7c5cff" sub="✈️ dönüş bekleniyor"/>
+        <Kpi label="Sıralı iş" value={sirali.length} sub="aktif onay zinciri" onClick={() => setFiltre("all")} active={filtre === "all"}/>
+        <Kpi label="Gecikmiş" value={gecikmis.length} color={gecikmis.length ? "var(--prio-red)" : undefined} sub="termin geçti" onClick={() => tgl("gecikmis")} active={filtre === "gecikmis"}/>
+        <Kpi label="Müşteride" value={musteride.length} color="#7c5cff" sub="✈️ dönüş bekleniyor" onClick={() => tgl("musteride")} active={filtre === "musteride"}/>
       </div>
 
       {/* List */}
