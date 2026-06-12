@@ -145,7 +145,7 @@ function ChatBot() {
       {/* Açma balonu */}
       {!open && (
         <button onClick={() => setOpen(true)} title="Ody — sistem asistanı" style={{
-          position: "fixed", right: 20, bottom: 20, zIndex: 90,
+          position: "fixed", left: 20, bottom: 20, zIndex: 90,   // sol alt: sağdaki iş detay çekmecesinin Kaydet butonuyla çakışmasın
           width: 52, height: 52, borderRadius: "50%", border: 0, cursor: "pointer",
           background: "var(--ember)", color: "#fff", fontSize: 24,
           boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
@@ -154,7 +154,7 @@ function ChatBot() {
       )}
       {open && (
         <div style={{
-          position: "fixed", right: 20, bottom: 20, zIndex: 90,
+          position: "fixed", left: 20, bottom: 20, zIndex: 90,   // sol alt: sağdaki iş detay çekmecesinin Kaydet butonuyla çakışmasın
           width: 380, maxWidth: "calc(100vw - 32px)", height: 520, maxHeight: "calc(100vh - 80px)",
           background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14,
           boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden",
