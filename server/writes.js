@@ -420,6 +420,7 @@ async function setStatus(id, raw) {
     const r = await client.query(
       `UPDATE briefs SET durum=$1,
          completed_at = CASE WHEN $2 THEN COALESCE(completed_at, now()) ELSE NULL END,
+         started_at   = CASE WHEN $1='calisiliyor' THEN COALESCE(started_at, now()) ELSE started_at END,
          gonderim_sayisi = gonderim_sayisi + CASE WHEN $1='musteride' THEN 1 ELSE 0 END,
          son_gonderim_at = CASE WHEN $1='musteride' THEN now() ELSE son_gonderim_at END,
          rev_musteri = rev_musteri + CASE WHEN $1='revizyon' AND musteri_bekliyor     THEN 1 ELSE 0 END,

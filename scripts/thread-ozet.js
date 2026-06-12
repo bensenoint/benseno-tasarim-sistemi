@@ -77,6 +77,14 @@ async function saveInsight(briefId, insight, puan, sebep) {
   return true;
 }
 
+// Termin/teslim kıyası — AI puanlamasının gecikmeyi bilmesi için (saat cinsinden).
+function gecikmeSatiri(b) {
+  if (!b.deadline || !b.bitis) return 'Termin bilgisi: yok.';
+  const dH = Math.round((b.bitis - b.deadline) / 3600000 * 10) / 10;
+  if (dH > 0)  return `Termin: GEÇİLDİ — iş terminden ${dH} saat GEÇ teslim edildi (puana yansıt).`;
+  return `Termin: zamanında/erken teslim (${Math.abs(dH)} saat önce).`;
+}
+
 // Tamamlanan iş için değerlendirme insight'ı — ileride marka/iş analizlerinde kullanılacak.
 async function generateInsight(messages, names, brief) {
   const key = process.env.ANTHROPIC_API_KEY;
@@ -89,8 +97,8 @@ async function generateInsight(messages, names, brief) {
     headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: 'claude-haiku-4-5', max_tokens: 450,
-      system: 'Bir tasarım ajansında TAMAMLANMIŞ bir işin thread\'inden değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka ve iş performans analizlerinde kullanılacak — şu açılardan kısa, olgusal değerlendir: süreç nasıl aktı (pürüzsüz mü, revize/sürtünme oldu mu), müşteri/marka tarafı geri bildirimi neydi, gecikme yaşandıysa nedeni, bu marka/iş tipi için kayda değer öğrenim ne. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Yeterli yazışma yoksa "Değerlendirme için yeterli yazışma yok." de. Düz metin, en fazla 5 cümle. SONDAN İKİNCİ SATIRA "SEBEP: ..." yaz (puanın tek cümlelik gerekçesi, en fazla 120 karakter, ör. "2 revize ve 1 gün gecikme yaşandı" ya da "Pürüzsüz ilerledi, zamanında teslim edildi"). SON SATIRA tek başına "PUAN: n" yaz (n = 1-5 iş kalite puanı: 5 = pürüzsüz/zamanında/revizesiz, 3 = normal sürtünme, 1 = ciddi sorun/gecikme/çok revize; yazışma yetersizse PUAN: 3 ve SEBEP: "Yazışma değerlendirme için yetersiz").',
-      messages: [{ role: 'user', content: `İş: #${brief.no} ${brief.marka} — ${brief.baslik} (rev: ${brief.rev || 0})\n\nThread:\n${lines.slice(0, 12000)}` }],
+      system: 'Bir tasarım ajansında TAMAMLANMIŞ bir işin thread\'inden değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka ve iş performans analizlerinde kullanılacak — şu açılardan kısa, olgusal değerlendir: süreç nasıl aktı (pürüzsüz mü, revize/sürtünme oldu mu), müşteri/marka tarafı geri bildirimi neydi, gecikme yaşandıysa nedeni, bu marka/iş tipi için kayda değer öğrenim ne. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Yeterli yazışma yoksa "Değerlendirme için yeterli yazışma yok." de. Düz metin, en fazla 5 cümle. SONDAN İKİNCİ SATIRA "SEBEP: ..." yaz (puanın tek cümlelik gerekçesi, en fazla 120 karakter, ör. "2 revize ve 1 gün gecikme yaşandı" ya da "Pürüzsüz ilerledi, zamanında teslim edildi"). SON SATIRA tek başına "PUAN: n" yaz (n = 1-5 iş kalite puanı: 5 = pürüzsüz/zamanında/revizesiz, 3 = normal sürtünme, 1 = ciddi sorun/gecikme/çok revize; yazışma yetersizse PUAN: 3 ve SEBEP: "Yazışma değerlendirme için yetersiz"). GECİKME KURALI (kesin): iş bilgilerinde verilen termin gecikmesini puana MUTLAKA yansıt — 24 saatten fazla geciken iş EN FAZLA 3, 48 saatten fazla geciken iş EN FAZLA 2 alabilir; zamanında/erken teslim puanı yükseltir. Gecikme varsa SEBEP satırında belirt.',
+      messages: [{ role: 'user', content: `İş: #${brief.no} ${brief.marka} — ${brief.baslik} (rev: ${brief.rev || 0})\n${gecikmeSatiri(brief)}\nThread:\n${lines.slice(0, 12000)}` }],
     }),
   });
   const j = await r.json().catch(() => ({}));

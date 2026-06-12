@@ -17,7 +17,9 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
   const withGecikme = rows.filter(c => c.gecikmeH > 0);
   const withRating  = rows.filter(c => c.rating > 0);
   const avgSure    = withSure.length   ? withSure.reduce((s,c) => s + c.sureH, 0) / withSure.length : 0;
-  const avgGecikme = withGecikme.length ? withGecikme.reduce((s,c) => s + c.gecikmeH, 0) / withGecikme.length : 0;
+  // Ortalama gecikme = toplam gecikme / TÜM işler (zamanında bitenler 0 katkı yapar) —
+  // yalnız gecikenlere bölmek tek geç işte ortalamayı şişiriyordu.
+  const avgGecikme = rows.length ? withGecikme.reduce((s,c) => s + c.gecikmeH, 0) / rows.length : 0;
   const avgRev     = rows.length ? rows.reduce((s,c) => s + (c.revision || 0), 0) / rows.length : 0;
   const avgRating  = withRating.length  ? withRating.reduce((s,c) => s + c.rating, 0) / withRating.length : 0;
 
