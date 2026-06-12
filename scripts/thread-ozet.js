@@ -80,9 +80,12 @@ async function saveInsight(briefId, insight, puan, sebep) {
 // Termin/teslim kıyası — AI puanlamasının gecikmeyi bilmesi için (saat cinsinden).
 function gecikmeSatiri(b) {
   if (!b.deadline || !b.bitis) return 'Termin bilgisi: yok.';
-  const dH = Math.round((b.bitis - b.deadline) / 3600000 * 10) / 10;
-  if (dH > 0)  return `Termin: GEÇİLDİ — iş terminden ${dH} saat GEÇ teslim edildi (puana yansıt).`;
-  return `Termin: zamanında/erken teslim (${Math.abs(dH)} saat önce).`;
+  // Beklemede geçen süre muaf — net gecikme üzerinden değerlendirilir.
+  const bekleme = b.bekleme_ms || 0;
+  const dH = Math.round((b.bitis - bekleme - b.deadline) / 3600000 * 10) / 10;
+  const not = bekleme > 0 ? ` (${Math.round(bekleme / 3600000 * 10) / 10} saat beklemede geçti, muaf tutuldu)` : '';
+  if (dH > 0)  return `Termin: GEÇİLDİ — iş terminden net ${dH} saat GEÇ teslim edildi${not} (puana yansıt).`;
+  return `Termin: zamanında/erken teslim (net ${Math.abs(dH)} saat önce)${not}.`;
 }
 
 // Tamamlanan iş için değerlendirme insight'ı — ileride marka/iş analizlerinde kullanılacak.

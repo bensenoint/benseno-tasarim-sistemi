@@ -126,6 +126,18 @@ async function getEmbedded() {
   const attByBrief = {};
   for (const a of att.rows) (attByBrief[a.brief_id] ||= []).push({ name: a.name, permalink: a.permalink });
 
+  // Bekleme süreleri: 'beklemede' durumuna girişten bir sonraki durum değişimine kadar geçen
+  // toplam süre (ms). Süre/gecikme hesapları bu süreyi MUAF tutar (saat durur).
+  // Hâlâ beklemedeyse completed_at, o da yoksa now() kapatır.
+  const pse = await pool.query(`
+    SELECT x.brief_id, EXTRACT(EPOCH FROM sum(COALESCE(x.next_ts, b.completed_at, now()) - x.ts)) * 1000 AS ms
+    FROM (SELECT brief_id, verb, ts, lead(ts) OVER (PARTITION BY brief_id ORDER BY ts) AS next_ts
+          FROM events WHERE verb LIKE 'durum:%') x
+    JOIN briefs b ON b.id = x.brief_id
+    WHERE x.verb = 'durum:beklemede' GROUP BY x.brief_id`);
+  const pauseByBrief = {};
+  for (const r of pse.rows) pauseByBrief[r.brief_id] = Math.max(0, Math.round(+r.ms));
+
   // Marka → renk (silinenler ekranı marka_color bekliyor)
   const brandColor = {};
   for (const br of brands.rows) brandColor[br.name] = br.color;
@@ -155,7 +167,9 @@ async function getEmbedded() {
     leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
     workers: b.workers.map(w => ({ id: w.id, name: w.name, sira: w.sira ?? null, onay: !!w.onay_at })),
     akis: b.akis || 'paralel',
-    deadline: ms(b.deadline), baslangic: ms(b.started_at), bitis: ms(b.completed_at), rev: b.rev || 0,
+    deadline: ms(b.deadline), baslangic: ms(b.started_at), bitis: ms(b.completed_at),
+    bekleme_ms: pauseByBrief[b.id] || 0,   // süre/gecikme hesabından düşülür
+    rev: b.rev || 0,
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
     slack_url: b.slack_url || '#',

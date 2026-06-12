@@ -511,8 +511,10 @@ function bnsHydrateCompleted(raw, idx) {
   const _baslangicRaw = raw.baslangic ?? raw.basla;
   const baslangic = typeof _baslangicRaw === "string" ? Date.parse(_baslangicRaw) : _baslangicRaw;
   const bitis = typeof raw.bitis === "string" ? Date.parse(raw.bitis) : raw.bitis;
-  const sureH = raw.sureH != null ? raw.sureH : raw.sure != null ? raw.sure : (bitis && baslangic && !isNaN(bitis) && !isNaN(baslangic) ? (bitis - baslangic) / H : null);
-  const gecikmeH = (bitis && deadline && bitis > deadline) ? Math.round((bitis - deadline) / H * 10) / 10 : 0;
+  // Beklemede geçirilen süre muaftır: hem çalışma süresinden hem gecikmeden düşülür (saat durur).
+  const beklemeMs = raw.bekleme_ms || 0;
+  const sureH = raw.sureH != null ? raw.sureH : raw.sure != null ? raw.sure : (bitis && baslangic && !isNaN(bitis) && !isNaN(baslangic) ? Math.max(0, bitis - baslangic - beklemeMs) / H : null);
+  const gecikmeH = (bitis && deadline && (bitis - beklemeMs) > deadline) ? Math.round((bitis - beklemeMs - deadline) / H * 10) / 10 : 0;
   const gecikme  = gecikmeH > 0 ? gecikmeH.toFixed(1) + "h" : "—";
   const brand = BR[raw.marka] || {
     name: raw.marka, color: WHEEL[brandHash(raw.marka)], wheelIdx: brandHash(raw.marka)
