@@ -128,24 +128,28 @@ async function setAssignees(client, briefId, { worker_ids, lead_ids, gozlemci_id
   if (gozlemci_ids !== undefined) await apply(gozlemci_ids, 'gozlemci');     // gözlemciler
 }
 
+// Üst yönetim: bu kişiler bir işe atanırsa iş KENDİ departmanlarına değil, açanın departmanına yazılır.
+// (Erdem/İpek gibi departman liderleri kapsam DIŞI — onlar kendi departmanlarında çalışır.)
+const MGMT_IDS = new Set(['U030C48PL23' /* Görkem */, 'UD96GH76E' /* Reyhan */, 'U4XCE3532' /* Cansu */]);
+
 // İşi yapanların dept'lerinden brief dept'i türet (distinct, virgül-join).
-// Yönetici kuralı: yönetici (yetki='yonetici') bir işe ATANIRSA işi kendi departmanına değil,
-// işi AÇANIN departmanına yazılır. (Yönetici iş açarsa zaten atananların dept'i türetilir.)
-// Hem açan hem atanan yöneticiyse: yönetici-olmayan atananların dept'i; o da yoksa kendi dept'leri.
+// Üst yönetim kuralı: MGMT_IDS'ten biri ATANIRSA dept katkısı kendi departmanı değil,
+// işi AÇANIN departmanı olur. (Üst yönetim iş açarsa zaten atananların dept'i türetilir.)
+// Hem açan hem atanan üst yönetimse: diğer atananların dept'i; o da yoksa kendi dept'leri.
 async function deriveDept(client, worker_ids, creatorId) {
   if (!Array.isArray(worker_ids) || !worker_ids.length) return null;
   const r = await client.query(
-    `SELECT dept, yetki FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> ''`, [worker_ids]);
-  const normal = r.rows.filter(x => x.yetki !== 'yonetici').map(x => x.dept);
-  const mgr    = r.rows.filter(x => x.yetki === 'yonetici').map(x => x.dept);
-  let mgrSub = [];   // yönetici atananların yerine geçecek dept
+    `SELECT id, dept FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> ''`, [worker_ids]);
+  const normal = r.rows.filter(x => !MGMT_IDS.has(x.id)).map(x => x.dept);
+  const mgr    = r.rows.filter(x => MGMT_IDS.has(x.id)).map(x => x.dept);
+  let mgrSub = [];   // üst yönetim atananların yerine geçecek dept
   if (mgr.length) {
     const cr = creatorId ? await client.query(
-      `SELECT dept, yetki FROM users WHERE id=$1 AND dept IS NOT NULL AND dept <> ''`, [creatorId]) : { rows: [] };
+      `SELECT id, dept FROM users WHERE id=$1 AND dept IS NOT NULL AND dept <> ''`, [creatorId]) : { rows: [] };
     const c = cr.rows[0];
-    if (c && c.yetki !== 'yonetici') mgrSub = [c.dept];          // açan normal → onun dept'i
-    else if (normal.length)          mgrSub = [];                 // açan da yönetici → normal atananlar belirler
-    else                             mgrSub = mgr;                // herkes yönetici → kendi dept'leri (son çare)
+    if (c && !MGMT_IDS.has(c.id)) mgrSub = [c.dept];   // açan normal → onun dept'i
+    else if (normal.length)       mgrSub = [];          // açan da üst yönetim → diğer atananlar belirler
+    else                          mgrSub = mgr;         // herkes üst yönetim → kendi dept'leri (son çare)
   }
   const depts = [...new Set([...normal, ...mgrSub])].sort();
   return depts.length ? depts.join(',') : null;
