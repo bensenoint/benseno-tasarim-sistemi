@@ -120,7 +120,7 @@ function TeamScreen({ data }) {
                   display:"flex", alignItems:"center", gap:8, minWidth: 200
                 }}>
                   <Avatar user={u} size={20}/>
-                  <span style={{whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{u.name}</span>
+                  <span onClick={() => window.bnsOpenUser && window.bnsOpenUser(u.id)} title={`${u.name} · profili aç`} style={{whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", cursor:"pointer"}}>{u.name}</span>
                   <span style={{marginLeft:"auto", font:"500 10px/1 var(--font-mono)", color:"var(--ink-4)"}}>{u.rol}</span>
                 </td>
                 {brands.map(b => {
