@@ -154,7 +154,8 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
     return true;
   });
 
-  const overdue = active.filter(b => { const m = dlMs(b); return m != null && m < now * 1000; }).length;
+  // now zaten ms — eski "*1000" çarpanı eşiği ~58000 yılına taşıyıp HER işi gecikmiş sayıyordu
+  const overdue = active.filter(b => { const m = dlMs(b); return m != null && m < now; }).length;
   const shown = view === "active" ? filteredActive.length : view === "musteride" ? filteredMusteride.length : filteredDone.length;
   // Tamamlanan finans toplamı (görüntülenen satırlar): faturalanan/tahsil = Σ satış · ilgili bayrak
   const sumDone = filteredDone.reduce((a, c) => {
