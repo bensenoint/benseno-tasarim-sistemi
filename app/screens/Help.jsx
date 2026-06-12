@@ -115,7 +115,7 @@ function HelpScreen() {
         <Row left="07:55 hafta içi" right="Kişisel iş özeti — aktif işi olan herkese kendi brief listesi DM olarak" sub="İşin yoksa DM gelmez."/>
       </Section>
 
-      <Section title="👁️ Otomatik Gözlemci" note="Yeni brief açıldığında işi yapanların departman yöneticileri otomatik gözlemci olarak eklenir ve DM alır.">
+      <Section title="👁️ Otomatik Gözlemci" note="Yeni brief açıldığında işi yapanların departman yöneticileri otomatik gözlemci olarak eklenir; bildirim ilk thread yanıtındaki mention ile gelir (ayrıca DM gitmez).">
         <Row left="Tasarım" right="İpek Akdeniz"/>
         <Row left="Editör" right="Cansu Kazgan, Erdem Akoğlu"/>
         <Row left="AI" right="Görkem Kaya, Reyhan Nur Pınar"/>
