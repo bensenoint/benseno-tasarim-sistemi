@@ -366,9 +366,10 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, week, 
       <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
         <Card>
           <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
-          <DeptRow s={data.deptStats.tasarim} color="var(--bw-1)"/>
-          <DeptRow s={data.deptStats.editor}  color="var(--bw-4)"/>
-          <DeptRow s={data.deptStats.ai}      color="var(--bw-14)" last/>
+          <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
+          <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"/>
+          <DeptRow s={data.deptStats.ai}        color="var(--bw-14)"/>
+          <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" last/>
         </Card>
         <Card>
           <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
@@ -439,9 +440,10 @@ function DenseLayout({ data, musteride, active, overdue, today, week, stale, rev
         <div style={{display:"flex", flexDirection:"column", gap: 12}}>
           <Card>
             <CardHead title="Departmanlar"/>
-            <DeptRow s={data.deptStats.tasarim} color="var(--bw-1)" compact/>
-            <DeptRow s={data.deptStats.editor}  color="var(--bw-4)" compact/>
-            <DeptRow s={data.deptStats.ai}      color="var(--bw-14)" compact last/>
+            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)" compact/>
+            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)" compact/>
+            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)" compact/>
+            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" compact last/>
           </Card>
           <Card>
             <CardHead title="Onay bekleyen" sub={`${review.length} brief`}/>
@@ -530,9 +532,10 @@ function StoryLayout({ data, musteride, active, overdue, today, week, stale, rev
         <div style={{display:"flex", flexDirection:"column", gap: "var(--grid-gap)"}}>
           <Card>
             <CardHead title="Departman"/>
-            <DeptRow s={data.deptStats.tasarim} color="var(--bw-1)"/>
-            <DeptRow s={data.deptStats.editor}  color="var(--bw-4)"/>
-            <DeptRow s={data.deptStats.ai}      color="var(--bw-14)" last/>
+            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
+            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"/>
+            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)"/>
+            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" last/>
           </Card>
           <Card>
             <CardHead title="Onay bekleyenler" sub="manager review · 12"/>
