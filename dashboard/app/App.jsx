@@ -111,6 +111,12 @@ function App({ currentUser, onLogout }) {
   const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
   // Normal navigasyon (sidebar/alt-nav/buton): Jobs'a giderken KPI deep-link filtresini sıfırla
   const navTo = (id) => { if (id === "jobs") setJobsScope("all"); setTab(id); };
+  // Marka chip'lerinden detay sayfasına gidiş (BrandChip → window.bnsOpenBrand)
+  const [brandSel, setBrandSel] = React.useState(null);
+  React.useEffect(() => {
+    window.bnsOpenBrand = (name) => { setBrandSel({ name, t: Date.now() }); setTab("brand"); };
+    return () => { delete window.bnsOpenBrand; };
+  }, []);
   const isMobile = window.useIsMobile ? window.useIsMobile() : false;
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [viewMode, setViewMode] = React.useState(t.defaultView);
@@ -426,7 +432,7 @@ function App({ currentUser, onLogout }) {
   else if (tab === "freelance") Screen = <DepartmentScreen data={liveData} role="freelance" onOpenBrief={onOpenBrief}/>;
   else if (tab === "gallery")  Screen = <GalleryScreen  data={liveData}/>;
   else if (tab === "multi")    Screen = <MultiScreen    data={liveData} onOpenBrief={onOpenBrief}/>;
-  else if (tab === "brand")    Screen = <BrandScreen    data={liveData} onOpenBrief={onOpenBrief}/>;
+  else if (tab === "brand")    Screen = <BrandScreen    data={liveData} onOpenBrief={onOpenBrief} initialSel={brandSel}/>;
   else if (tab === "team")     Screen = <TeamScreen     data={liveData}/>;
   else if (tab === "history")  Screen = <HistoryScreen  data={liveData} onOpenByNo={(no) => {
     // Geçmiş satırı → iş detayı: aktifse normal panel, tamamlanmışsa salt-okunur

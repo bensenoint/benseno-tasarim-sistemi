@@ -47,8 +47,11 @@ function PriorityBadge({ p, deltaH, compact }) {
 function BrandChip({ brand, size = "md" }) {
   if (!brand) return null;
   const small = size === "sm";
+  // Her yerde tıklanabilir: marka detay sayfasına götürür (App.jsx bnsOpenBrand'i tanımlar).
+  const go = (e) => { if (window.bnsOpenBrand) { e.stopPropagation(); window.bnsOpenBrand(brand.name); } };
   return (
-    <span style={{
+    <span onClick={go} title={`${brand.name} marka detayını aç`} style={{
+      cursor: "pointer",
       display: "inline-flex", alignItems: "center", gap: 6,
       padding: small ? "2px 7px 2px 4px" : "3px 9px 3px 5px",
       borderRadius: 999, background: "var(--surface)",

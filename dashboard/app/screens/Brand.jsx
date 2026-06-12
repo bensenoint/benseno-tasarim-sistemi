@@ -14,8 +14,9 @@ function fmtDate(d) {
 }
 function csvCell(s) { s = String(s == null ? "" : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 
-function BrandScreen({ data, onOpenBrief }) {
-  const [sel, setSel] = React.useState(null);
+function BrandScreen({ data, onOpenBrief, initialSel }) {
+  const [sel, setSel] = React.useState(initialSel ? initialSel.name : null);
+  React.useEffect(() => { if (initialSel) setSel(initialSel.name); }, [initialSel]);
   const [sort, setSort] = React.useState("active");
   const [search, setSearch] = React.useState("");
 
