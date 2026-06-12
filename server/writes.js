@@ -507,14 +507,17 @@ async function reflectChange(briefId, summary, source, opts) {
        FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id WHERE b.id=$1`, [briefId]);
     const b = r.rows[0]; if (!b) return;
     const text = `*#${b.no} ${b.marka || ''}* — ${summary}`;
+    let replyTs = null;   // thread'e düşen notun ts'i — bildirim tam o mesaja gitsin
     if (b.slack_ts && b.slack_channel) {
-      await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text });
+      const tr = await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text });
+      if (tr && tr.ok) replyTs = tr.ts;
     }
     if (!dmAll) return;
-    // Bildirim linki: işin Slack thread'i (thread görünümü formatında).
+    // Bildirim linki: thread içindeki İLGİLİ mesaj (p{replyTs}); not atılamadıysa thread kökü.
     const ws = process.env.BNS_SLACK_WORKSPACE || 'benseno';
+    const msgTs = replyTs || b.slack_ts;
     const threadLink = (b.slack_ts && b.slack_channel)
-      ? `https://${ws}.slack.com/archives/${b.slack_channel}/p${String(b.slack_ts).replace('.', '')}?thread_ts=${b.slack_ts}&cid=${b.slack_channel}`
+      ? `https://${ws}.slack.com/archives/${b.slack_channel}/p${String(msgTs).replace('.', '')}?thread_ts=${b.slack_ts}&cid=${b.slack_channel}`
       : null;
     const u = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1`, [briefId]);
     for (const row of u.rows) await slack.dm(row.user_id, text, threadLink);
