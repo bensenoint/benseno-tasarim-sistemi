@@ -228,16 +228,8 @@ async function createBrief(raw) {
         await pool.query(`INSERT INTO events(brief_id,verb,detail,source) VALUES ($1,'slack:gönderildi',$2,'system')`,
           [result.id, JSON.stringify({ channel: post.channel, ts: post.ts })]);
         result.slack = { ts: post.ts, channel: post.channel, permalink: post.permalink };
-        // Brief'teki herkese (işi yapan + lead + gözlemci) DM — yeni brief bildirimi. Best-effort.
-        try {
-          const dmText = [
-            `🆕 Yeni brief *#${result.no}* — ${d.marka}: ${d.baslik}`,
-            d.musteri_notu ? `📝 ${d.musteri_notu}` : null,
-            post.permalink || null,
-          ].filter(Boolean).join('\n');
-          const au = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND user_id IS NOT NULL`, [result.id]);
-          for (const row of au.rows) await slack.dm(row.user_id, dmText);
-        } catch (e) { console.error('[writes] yeni brief DM hata:', e.message); }
+        // "Yeni brief" DM'i bilinçli olarak YOK: ilk thread yanıtındaki mention'lar
+        // brief'teki herkese zaten bildirim üretir — DM aynı haberin ikinci kopyasıydı.
       } else if (!post.skipped) {
         await pool.query(`INSERT INTO events(brief_id,verb,detail,source) VALUES ($1,'slack:hata',$2,'system')`,
           [result.id, JSON.stringify({ error: post.error })]);
