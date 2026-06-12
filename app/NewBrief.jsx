@@ -1,7 +1,7 @@
 // app/NewBrief.jsx — API modunda tam intake formu (POST /api/briefs); değilse marka→Slack kanalı yönlendirme.
 
 const MARKA_KANAL = {
-  "Benseno":             "benseno-grafik",   // markasız / müşteri adayı işleri
+  "Benseno":             "benseno",   // markasız / müşteri adayı işleri
   "Bauhaus":             "marka-bauhaus",
   "Beta":                "marka-beta",
   "Cimporglobal":        "marka-cimporglobal",

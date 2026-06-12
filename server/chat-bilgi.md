@@ -4,7 +4,7 @@
 Slack botu (WT) + Railway API/Postgres + GitHub Pages dashboard. Briefler (işler) Slack'ten veya dashboard'dan açılır, tüm takip iki taraftan senkron yürür. Tek doğru kaynak veritabanıdır.
 
 ## Brief açma
-- Slack: marka kanalında `/yeni-brief` → form. "Benseno" markası özeldir: #benseno-grafik kanalına bağlıdır ve henüz anlaşılmamış müşteri adayları / örnek çalışmalar için kullanılır — markadan bağımsız işler oradan açılır. (başlık, termin, işi yapanlar, lead, gözlemci, not, dosya). Marka kanaldan otomatik algılanır.
+- Slack: marka kanalında `/yeni-brief` → form. "Benseno" markası özeldir: #benseno kanalına bağlıdır ve henüz anlaşılmamış müşteri adayları / örnek çalışmalar için kullanılır — markadan bağımsız işler oradan açılır. (başlık, termin, işi yapanlar, lead, gözlemci, not, dosya). Marka kanaldan otomatik algılanır.
 - Dashboard: sağ üst "+ Yeni brief". Üç kişi seçici de departmana göre gruplu (Tasarım/Editör/AI/Freelance).
 - Yeni briefte işi yapanların departman yöneticileri OTOMATİK gözlemci olur ve DM alır. Freelance işlerde gözlemci = işi açanın departman yöneticisi.
 - Brief açılınca markanın kanalına mesaj düşer; ilk thread yanıtında herkes @mention'lıdır — iş o thread'de yürür.
