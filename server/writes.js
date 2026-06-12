@@ -317,7 +317,7 @@ async function patchBrief(id, raw) {
     const diff = roleDiffNote(before, after);
     if (diff) summary += `\n${diff}`;
   }
-  await reflectChange(id, summary, d.source, { dm: contentChanged && !roleChange });
+  await reflectChange(id, summary, d.source, { dm: contentChanged && !roleChange, by: d.by });
   // Rol eklenen/çıkarılan/değişen kişilere hedefli DM (çıkarılanlar dahil).
   if (roleChange && after) await notifyRoleDiff(id, before, after, d.source);
   return res;
@@ -459,7 +459,7 @@ async function setStatus(id, raw) {
   } else {
     note = `🔄 durum güncellendi: *${d.durum}*`;
   }
-  await reflectChange(id, note, d.source);
+  await reflectChange(id, note, d.source, { by: d.by });
   // Zincir el değişimi: sıradaki halkaya DM (best-effort)
   if (dmNext && slack.hasToken()) {
     try {
@@ -494,7 +494,7 @@ async function setFinancials(id, raw) {
   });
   const fin = ['maliyet', 'satis', 'fatura', 'odeme'].filter(k => d[k] !== undefined).join(', ');
   // Thread'den girilen finansalda bot zaten detaylı onay yanıtı atıyor → notu atla (çift mesaj olmasın).
-  await reflectChange(id, `💰 finans güncellendi (${fin})`, d.source, { thread: d.source !== 'slack' });
+  await reflectChange(id, `💰 finans güncellendi (${fin})`, d.source, { thread: d.source !== 'slack', by: d.by });
   return res;
 }
 
@@ -524,7 +524,19 @@ async function reflectChange(briefId, summary, source, opts) {
       `SELECT b.slack_ts, b.slack_channel, b.no, br.name AS marka
        FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id WHERE b.id=$1`, [briefId]);
     const b = r.rows[0]; if (!b) return;
-    const text = `*#${b.no} ${b.marka || ''}* — ${summary}`;
+    // Güncellemeyi yapan kişi (dashboard veya Slack farketmez) — notun sonuna eklenir.
+    let byName = '';
+    const byId = opts && opts.by;
+    if (byId) {
+      try {
+        const ur = await pool.query(`SELECT name FROM users WHERE id=$1`, [byId]);
+        const nm = ur.rows[0] && ur.rows[0].name;
+        if (nm && nm !== byId) byName = `  ·  👤 ${nm}`;
+      } catch (e) {}
+    }
+    // Çok satırlı özetlerde isim İLK satırın sonuna gelir (rol satırları altta kalır).
+    const [ozet1, ...ozetRest] = String(summary).split('\n');
+    const text = `*#${b.no} ${b.marka || ''}* — ${ozet1}${byName}${ozetRest.length ? '\n' + ozetRest.join('\n') : ''}`;
     let replyTs = null;   // thread'e düşen notun ts'i — bildirim tam o mesaja gitsin
     if (b.slack_ts && b.slack_channel) {
       const tr = await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text });
