@@ -55,7 +55,7 @@ const NAV_SECTIONS = [
     label: "Diğer",
     items: [
       { id: "gallery", label: "Galeri",       icon: "Image" },
-      { id: "multi",   label: "Multi-atama",  icon: "Users" },
+      { id: "multi",   label: "Sıralı İşler", icon: "Users" },
       { id: "brand",   label: "Marka",         icon: "Tag" },
       { id: "team",    label: "Ekip matrisi",  icon: "Grid" },
       { id: "profile", label: "Profil",        icon: "User" },
