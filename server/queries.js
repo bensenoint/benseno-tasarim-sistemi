@@ -13,6 +13,7 @@ async function allBriefsWithAssignees() {
            b.akis, b.stale, b.created_at, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
            b.rating, b.rating_by, b.rating_sebep,
+           b.image_url,
            b.rev_ic, b.rev_musteri, b.gonderim_sayisi, b.son_gonderim_at, b.musteri_bekliyor,
            COALESCE(json_agg(
              json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color,'sira',a.sira,'onay_at',a.onay_at,'onay_by',a.onay_by)
@@ -162,6 +163,7 @@ async function getEmbedded() {
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at ? ms(b.thread_ozet_at) : null,
     insight: b.insight || null, insight_at: b.insight_at ? ms(b.insight_at) : null,
     rating: b.rating || null, rating_by: b.rating_by || null, rating_sebep: b.rating_sebep || null,
+    image_url: b.image_url || null,
     notes: b.musteri_notu || '',
     attachments: attByBrief[b.id] || [],
   }));
