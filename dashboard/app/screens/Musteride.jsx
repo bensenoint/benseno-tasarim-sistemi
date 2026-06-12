@@ -42,11 +42,11 @@ function MusterideScreen({ data, onOpenBrief }) {
       ) : (
         <Card padding={0}>
           <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
-            <table style={{ width:"100%", minWidth:640, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
+            <table style={{ width:"100%", minWidth:720, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
               <thead>
                 <tr style={{ background:"var(--surface-sub)" }}>
-                  {["#","Marka","İş","Atanan","Gönderim","Bekliyor","Rev (iç/müşt)","Termin"].map((h, i) => (
-                    <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: i === 0 || i >= 4 ? "right" : "left", whiteSpace:"nowrap" }}>{h}</th>
+                  {["#","Marka","İş","Öncelik","Atanan","Gönderim","Bekliyor","Rev (iç/müşt)","Termin"].map((h, i) => (
+                    <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: i === 0 || i >= 5 ? "right" : "left", whiteSpace:"nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -59,6 +59,7 @@ function MusterideScreen({ data, onOpenBrief }) {
                       <td style={mCs(true, "right")}>{b.no}</td>
                       <td style={mCs()}><BrandChip brand={b.brand} size="sm"/></td>
                       <td style={{ ...mCs(), maxWidth: 260, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{b.baslik}</td>
+                      <td style={mCs()}><PriorityBadge p={b.oncelik || { code: "ylw", label: "NORMAL" }}/></td>
                       <td style={mCs()}>
                         <span style={{ display:"inline-flex", alignItems:"center", gap: 4 }}>
                           {b.lead && <Avatar user={b.lead} size={20}/>}

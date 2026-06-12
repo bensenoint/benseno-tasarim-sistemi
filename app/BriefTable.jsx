@@ -25,6 +25,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
       if (col === "atanan") av = a.lead?.name ?? "", bv = b.lead?.name ?? "";
       if (col === "no")     av = a.no, bv = b.no;
       if (col === "durum")  av = a.durum, bv = b.durum;
+      if (col === "oncelik") { const O = { red: 0, org: 1, ylw: 2, grn: 3 }; av = O[a.oncelik?.code] ?? 2; bv = O[b.oncelik?.code] ?? 2; }
       if (typeof av === "string") av = av.toLowerCase();
       if (typeof bv === "string") bv = bv.toLowerCase();
       if (av === bv) return 0;
@@ -39,7 +40,8 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
 
   const cols = [
     { id: "no",      label: "#",        sort: true,  align: "right" },
-    { id: "deltaH",  label: "Öncelik",  sort: true },
+    { id: "oncelik", label: "Öncelik",  sort: true },
+    { id: "deltaH",  label: "Kalan",    sort: true },
     { id: "marka",   label: "Marka",    sort: true },
     { id: "baslik",  label: "İş",       sort: true },
     { id: "atanan",  label: "Atanan",   sort: false, mobileHide: true },
@@ -143,6 +145,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
+      <td style={cellStyle()}><PriorityBadge p={brief.oncelik || { code: "ylw", label: "NORMAL" }}/></td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
       <td style={{...cellStyle(), maxWidth: 160, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>

@@ -25,7 +25,9 @@ function formatDelta(h) {
 }
 
 function PriorityBadge({ p, deltaH, compact }) {
-  const label = deltaH === null
+  const label = deltaH === undefined
+    ? p.label   // manuel öncelik pili: yalnız etiket (ACİL/YÜKSEK/NORMAL/DÜŞÜK)
+    : deltaH === null
     ? (compact ? "zamanında" : `${p.label}`)
     : (compact ? formatDelta(deltaH) : `${p.label} · ${formatDelta(deltaH)}`);
   return (

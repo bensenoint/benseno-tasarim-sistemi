@@ -483,6 +483,9 @@ function bnsHydrateBrief(raw, idx) {
     durum:        bnsNormalizeDurum(raw.durum, raw.status),
     durum_raw:    raw.durum || raw.status || "",  // Paralel/Sıralı/🎨 bilgisi için ham durum
     prio:         prio(deltaH),   // prio objesi: {code, label, color}
+    // Manuel öncelik (Slack 🔴🟠🟡🟢 / dashboard) — termin aciliyetinden BAĞIMSIZ; boşsa NORMAL
+    oncelik:      ({ "🔴": { code: "red", label: "ACİL" }, "🟠": { code: "org", label: "YÜKSEK" },
+                     "🟡": { code: "ylw", label: "NORMAL" }, "🟢": { code: "grn", label: "DÜŞÜK" } })[raw.oncelik] || { code: "ylw", label: "NORMAL" },
     priority:     prio(deltaH),   // backwards compat
     deltaH,
     revision:     raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
