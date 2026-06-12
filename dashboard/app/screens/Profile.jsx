@@ -43,7 +43,10 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser }) {
     (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === uid)) ||
     (b.reviewer && b.reviewer.id === uid);
 
-  const myActive     = allBriefs.filter(b => isRelated(b, u.id));
+  // Müşteri onayındaki işler aktif yük/kapasite SAYILMAZ — ayrı KPI kartında gösterilir
+  const myAll        = allBriefs.filter(b => isRelated(b, u.id));
+  const myMusteride  = myAll.filter(b => b.durum === "musteride");
+  const myActive     = myAll.filter(b => b.durum !== "musteride");
   const asLead       = allBriefs.filter(b => b.lead && b.lead.id === u.id);
   const asContrib    = allBriefs.filter(b => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id));
   const asReviewer   = allBriefs.filter(b => b.reviewer && b.reviewer.id === u.id);
@@ -153,7 +156,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser }) {
           <Eyebrow>{roleLabel}</Eyebrow>
           <h1 style={{font:"600 26px/1.1 var(--font-sans)", color:"var(--ink)", margin:"5px 0 0", letterSpacing:"-0.01em"}}>{u.name}</h1>
           <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:17, color:"var(--ink-3)", marginTop:6}}>
-            {myActive.length} aktif · {myCompleted.length} tamamlandı · {totalRev} toplam revize
+            {myActive.length} aktif{myMusteride.length > 0 ? ` · ${myMusteride.length} müşteride` : ""} · {myCompleted.length} tamamlandı · {totalRev} toplam revize
           </div>
           {/* ⭐ Kişi yıldız puanı + gün-sonu sebep açıklaması — sadece yöneticiler görür */}
           {(() => {
@@ -223,8 +226,9 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser }) {
       <div style={{height:16}}/>
 
       {/* ─── KPI şeridi ──────────────────────────────────────── */}
-      <div className="bns-kpi-8" style={{display:"grid", gridTemplateColumns:"repeat(8,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
+      <div className="bns-kpi-8" style={{display:"grid", gridTemplateColumns:"repeat(9,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Aktif iş"      value={myActive.length} color={myActive.length > CAP_LIMIT ? "var(--prio-red)" : undefined}/>
+        <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "#7c5cff" : undefined} sub="✈️ dönüş bekleniyor"/>
         <Kpi label="Tamamlanan"    value={myCompleted.length} sub="kayıtlı"/>
         <Kpi label="Toplam revize" value={totalRev} sub={`ort. ${avgRev}/iş`}/>
         <Kpi label="Toplam saat"   value={totalHours > 0 ? totalHours.toFixed(0)+"sa" : "—"} sub={`ort. ${avgHours}sa/iş`}/>
