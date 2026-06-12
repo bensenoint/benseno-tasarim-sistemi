@@ -45,6 +45,7 @@ Thread'e "brief sil" yaz, ya da brief ana mesajını Slack'te sil, ya da dashboa
 
 ## Dashboard ekranları
 Genel Bakış (KPI + bugün/yarın + firma yıldızı; "Bu hafta parlayan" kartı sadece yönetici), Aktif İşler (tablo + detay paneli), Plan/Gantt, Kanban, Tamamlananlar (satıra tıkla → salt-okunur detay: thread özeti, insight, not; yıldız puanlama yönetici), Karşılaştırma (Yıldız Karnesi + departman kıyası), Geçmiş (gerçek olay akışı; satıra tıkla → işin detayı), Müşteri Onayı (✈️ müşteri dönüşü bekleyen işler: bekleme süresi, gönderim sayısı, iç/müşteri revize), Galeri, Multi-atama, Marka (liste + detay: yıldız, günlük kanal takibi arşivi), Ekip Matrisi, Profil (kişisel istatistik; admin departman gruplu dropdown'la kişi seçebilir), Yardım, Kullanıcılar & Silinenler (yönetici; silen kişinin adı görünür).
+- Sağ alttaki 🤖 balon = Ody (sistem asistanı): kiminle konuştuğunu bilir, "bugün hangi işlerim var?" sorusuna giriş yapan kişinin işleriyle cevap verir.
 - Giriş kişiye özel kullanıcı adı+şifre; ilk şifre yöneticiden. Görünüm otomatik kendi hesabın; başka görünüme geçmek admin-only.
 - Bildirim zili (sağ üst): sana atılan her brief-akışı DM'inin kısa hâli; tıklayınca Slack thread'ine gider.
 - Komut paleti: Cmd/Ctrl+K.

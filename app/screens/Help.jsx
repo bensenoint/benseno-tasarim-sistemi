@@ -103,7 +103,7 @@ function HelpScreen() {
         <Row left="Tarih filtresi" right="'Şu an (canlı)' veya geçmiş bir günü seç → o günün özeti + insight'ı" sub="Günlük kayıtlar bir önceki günle ilişkilendirilir — dünden sarkan konuların bugünkü durumu belirtilir."/>
       </Section>
 
-      <Section title="🤖 Sistem Asistanı & Geri Bildirim">
+      <Section title="🤖 Ody (Sistem Asistanı) & Geri Bildirim">
         <Row left="🤖 Asistan" right="Sağ alttaki balon — kullanım soruları + marka/iş/kişi bazlı canlı veri soruları + öneri" sub="Kişi puanlarını sadece yöneticilere söyler."/>
         <Row left="help (Slack)" right="Herhangi bir kanala 'help' yaz → sorun/öneri formu (başlık + açıklama + görsel) → sistem adminlerine DM"/>
         <Row left="🔔 Bildirim zili" right="Sana atılan her brief-akışı DM'inin kısa hâli — tıklayınca ilgili Slack thread'i açılır"/>

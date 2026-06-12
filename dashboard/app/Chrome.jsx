@@ -110,7 +110,7 @@ function Linkify({ text }) {
 }
 try { window.BnsLinkify = Linkify; } catch (e) {}
 
-// 🤖 Sistem Asistanı — sağ altta yüzen sohbet. Kullanım soruları + canlı veri
+// 🤖 Ody (sistem asistanı) — sağ altta yüzen sohbet. Kullanım soruları + canlı veri
 // (marka/iş/kişi) soruları /api/chat üzerinden yanıtlanır (JWT'li, kişiye özel).
 function ChatBot() {
   const [open, setOpen] = React.useState(false);
@@ -144,7 +144,7 @@ function ChatBot() {
     <>
       {/* Açma balonu */}
       {!open && (
-        <button onClick={() => setOpen(true)} title="Sistem Asistanı" style={{
+        <button onClick={() => setOpen(true)} title="Ody — sistem asistanı" style={{
           position: "fixed", right: 20, bottom: 20, zIndex: 90,
           width: 52, height: 52, borderRadius: "50%", border: 0, cursor: "pointer",
           background: "var(--ember)", color: "#fff", fontSize: 24,
@@ -162,7 +162,7 @@ function ChatBot() {
           <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 18 }}>🤖</span>
             <div style={{ flex: 1 }}>
-              <div style={{ font: "600 13px/1 var(--font-sans)", color: "var(--ink)" }}>Sistem Asistanı</div>
+              <div style={{ font: "600 13px/1 var(--font-sans)", color: "var(--ink)" }}>Ody</div>
               <div style={{ font: "400 10px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>kullanım · marka/iş/kişi soruları · öneri</div>
             </div>
             {msgs.length > 0 && <button onClick={() => setMsgs([])} title="Sohbeti temizle" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>temizle</button>}
@@ -171,7 +171,7 @@ function ChatBot() {
           <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
             {msgs.length === 0 && (
               <div style={{ font: "400 12px/1.6 var(--font-sans)", color: "var(--ink-4)" }}>
-                Merhaba! Bana sorabileceklerin:
+                Merhaba, ben Ody! Bana sorabileceklerin:
                 <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
                   {["Brief'in durumunu Slack'ten nasıl güncellerim?", "Bauhaus markasında şu an neler var?", "Geciken iş var mı, ne önerirsin?"].map(s => (
                     <button key={s} onClick={() => setInput(s)} style={{
