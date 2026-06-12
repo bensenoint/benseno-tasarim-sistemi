@@ -124,8 +124,10 @@ function ChatBot() {
     return { x: 20, y: (typeof window !== "undefined" ? window.innerHeight : 800) - 76 };
   });
   const dragRef = React.useRef(null);
-  const startDrag = (e) => {
-    if (e.target.closest && e.target.closest("button, input")) return;   // başlıktaki butonlar sürükleme başlatmasın
+  const startDrag = (e, force) => {
+    // Panel başlığındaki butonlar (temizle/kapat) sürükleme başlatmasın; balonun kendisi
+    // buton olduğu için force=true ile bu korumayı atlar — kapalı ikon da sürüklenebilir.
+    if (!force && e.target.closest && e.target.closest("button, input")) return;
     const start = { mx: e.clientX, my: e.clientY, x: pos.x, y: pos.y, moved: false };
     dragRef.current = start;
     const move = (ev) => {
@@ -173,7 +175,7 @@ function ChatBot() {
     <>
       {/* Açma balonu */}
       {!open && (
-        <button onPointerDown={startDrag}
+        <button onPointerDown={(e) => startDrag(e, true)}
           onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setOpen(true); }}
           title="Ody — sistem asistanı (sürükleyerek taşıyabilirsin)" style={{
           position: "fixed", left: pos.x, top: pos.y, zIndex: 90,
