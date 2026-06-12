@@ -46,13 +46,13 @@
 
   /* ---- Semantic — priority (color-blind paired with glyph) -- */
   --prio-red:     #D7263D;   /* 🔴 Acil   — triangle glyph */
-  --prio-orange:  #E07A1F;   /* 🟠 Yüksek — square glyph */
-  --prio-yellow:  #C99A1E;   /* 🟡 Normal — circle glyph */
+  --prio-orange:  #E2670A;   /* 🟠 Yüksek — square glyph (sarıdan net ayrışır) */
+  --prio-yellow:  #B5A013;   /* 🟡 Normal — circle glyph (altın-sarı, turuncudan ayrık) */
   --prio-green:   #2E8F66;   /* 🟢 Düşük  — check glyph */
 
   --prio-red-bg:    rgba(215, 38, 61, 0.10);
-  --prio-orange-bg: rgba(224, 122, 31, 0.12);
-  --prio-yellow-bg: rgba(201, 154, 30, 0.14);
+  --prio-orange-bg: rgba(226, 103, 10, 0.12);
+  --prio-yellow-bg: rgba(181, 160, 19, 0.14);
   --prio-green-bg:  rgba(46, 143, 102, 0.12);
 
   /* ---- Semantic — system feedback -------------------------- */
@@ -193,13 +193,13 @@
 
   /* ---- Semantic — priority (dark mode: lighter for contrast) -- */
   --prio-red:     #F06B78;
-  --prio-orange:  #F5A05A;
-  --prio-yellow:  #E8C050;
+  --prio-orange:  #F58B33;
+  --prio-yellow:  #E3D24A;
   --prio-green:   #52C49A;
 
   --prio-red-bg:    rgba(240, 107, 120, 0.14);
-  --prio-orange-bg: rgba(245, 160, 90,  0.14);
-  --prio-yellow-bg: rgba(232, 192, 80,  0.16);
+  --prio-orange-bg: rgba(245, 139, 51,  0.14);
+  --prio-yellow-bg: rgba(227, 210, 74,  0.16);
   --prio-green-bg:  rgba(82,  196, 154, 0.14);
 
   /* ---- Semantic — system feedback (dark) ------------------- */
