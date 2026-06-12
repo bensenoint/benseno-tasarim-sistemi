@@ -73,12 +73,14 @@ function Avatar({ user, size = 22, borderColor }) {
   // Pick from user id hash
   let h = 0; for (let i = 0; i < user.id.length; i++) { h = ((h<<5)-h) + user.id.charCodeAt(i); h |= 0; }
   const c = wheel[Math.abs(h) % wheel.length];
+  // Her yerde tıklanabilir: kişinin profil sayfasına götürür (App.jsx bnsOpenUser'ı tanımlar).
+  const go = (e) => { if (window.bnsOpenUser) { e.stopPropagation(); window.bnsOpenUser(user.id); } };
   return (
-    <span title={user.name} style={{
+    <span onClick={go} title={`${user.name} · profili aç`} style={{
       width: size, height: size, borderRadius: 999,
       display: "inline-flex", alignItems: "center", justifyContent: "center",
       fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: Math.round(size * 0.42),
-      color: "#fff", background: c,
+      color: "#fff", background: c, cursor: "pointer",
       border: borderColor ? `2px solid ${borderColor}` : "none",
       flexShrink: 0, position: "relative", overflow: "hidden"
     }}>

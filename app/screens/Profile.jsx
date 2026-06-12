@@ -24,8 +24,14 @@ function TimeRangeToggle({ value, onChange }) {
   );
 }
 
-function ProfileScreen({ data, user, onOpenBrief, currentUser }) {
+function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const [selectedUser, setSelectedUser] = React.useState(user);
+  // Avatar tıklamasından gelen kişi (window.bnsOpenUser → App.jsx initialSel) — t damgası her tıklamada değişir
+  React.useEffect(() => {
+    if (!initialSel) return;
+    const found = (data.USERS || []).find(x => x.id === initialSel.id);
+    if (found) setSelectedUser(found);
+  }, [initialSel]);
   const [timeRange, setTimeRange] = React.useState("30");
   const allBriefs    = data._allBriefs    || data.briefs    || [];
   const allCompleted = data._allCompleted || data.completed || [];

@@ -117,6 +117,12 @@ function App({ currentUser, onLogout }) {
     window.bnsOpenBrand = (name) => { setBrandSel({ name, t: Date.now() }); setTab("brand"); };
     return () => { delete window.bnsOpenBrand; };
   }, []);
+  // Kişi avatarlarından profil sayfasına gidiş (Avatar → window.bnsOpenUser)
+  const [profileSel, setProfileSel] = React.useState(null);
+  React.useEffect(() => {
+    window.bnsOpenUser = (id) => { setProfileSel({ id, t: Date.now() }); setTab("profile"); };
+    return () => { delete window.bnsOpenUser; };
+  }, []);
   const isMobile = window.useIsMobile ? window.useIsMobile() : false;
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
   const [viewMode, setViewMode] = React.useState(t.defaultView);
@@ -420,7 +426,7 @@ function App({ currentUser, onLogout }) {
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
                                        onOpenBrief={onOpenBrief} onSwitchTab={navTo} onJumpJobs={jumpToJobs} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
   else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} initialScope={jobsScope} tableMode={isMobile && t.tableMode === "table" ? "cards" : t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
-  else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} currentUser={currentUser}/>;
+  else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} currentUser={currentUser} initialSel={profileSel}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "musteride")Screen = <MusterideScreen data={liveData} onOpenBrief={onOpenBrief}/>;
