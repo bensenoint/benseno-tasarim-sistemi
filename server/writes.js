@@ -511,8 +511,13 @@ async function reflectChange(briefId, summary, source, opts) {
       await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text });
     }
     if (!dmAll) return;
+    // Bildirim linki: işin Slack thread'i (thread görünümü formatında).
+    const ws = process.env.BNS_SLACK_WORKSPACE || 'benseno';
+    const threadLink = (b.slack_ts && b.slack_channel)
+      ? `https://${ws}.slack.com/archives/${b.slack_channel}/p${String(b.slack_ts).replace('.', '')}?thread_ts=${b.slack_ts}&cid=${b.slack_channel}`
+      : null;
     const u = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1`, [briefId]);
-    for (const row of u.rows) await slack.dm(row.user_id, text);
+    for (const row of u.rows) await slack.dm(row.user_id, text, threadLink);
   } catch (e) { console.error('[writes] reflect hata:', e.message); }
 }
 
@@ -542,10 +547,11 @@ async function notifyRoleDiff(briefId, before, after, source) {
     const users = new Set([...before.keys(), ...after.keys()]);
     for (const uid of users) {
       const was = before.get(uid), now = after.get(uid);
-      if (!was && now)        await slack.dm(uid, `➕ ${head}\nBu briefe *${rolesStr(now)}* olarak eklendin.${link}`);
-      else if (was && !now)   await slack.dm(uid, `➖ ${head}\nBu briefteki görevden çıkarıldın.`);
+      const notifLink = b.slack_url && b.slack_url !== '#' ? b.slack_url : null;
+      if (!was && now)        await slack.dm(uid, `➕ ${head}\nBu briefe *${rolesStr(now)}* olarak eklendin.${link}`, notifLink);
+      else if (was && !now)   await slack.dm(uid, `➖ ${head}\nBu briefteki görevden çıkarıldın.`, notifLink);
       else if (was && now && [...was].sort().join() !== [...now].sort().join())
-                              await slack.dm(uid, `🔄 ${head}\nRolün güncellendi: *${rolesStr(now)}*.${link}`);
+                              await slack.dm(uid, `🔄 ${head}\nRolün güncellendi: *${rolesStr(now)}*.${link}`, notifLink);
     }
   } catch (e) { console.error('[writes] rol diff DM hata:', e.message); }
 }

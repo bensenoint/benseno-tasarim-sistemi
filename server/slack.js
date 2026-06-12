@@ -107,10 +107,14 @@ function shortNotifText(text) {
     .replace(/[*_~`]/g, '').trim();                                     // markdown'ı soy
   return plain.length > 110 ? plain.slice(0, 107) + '…' : plain;
 }
-async function logNotification(userId, text) {
+async function logNotification(userId, text, explicitLink) {
   try {
     const { pool } = require('./db');
-    let link = (String(text).match(/<(https:\/\/[^|>\s]+)/) || [])[1] || WT_DM_LINK;
+    // Öncelik: çağrandan gelen açık link → metindeki <link> → metindeki çıplak link → WT DM.
+    let link = explicitLink
+      || (String(text).match(/<(https:\/\/[^|>\s]+)/) || [])[1]
+      || (String(text).match(/(https:\/\/[^|>\s]+slack\.com\/archives[^|>\s]*)/) || [])[1]
+      || WT_DM_LINK;
     // Arşiv linkini thread görünümüne normalize et (dashboard kancasıyla aynı kural).
     const m = link.match(/\/archives\/([A-Z0-9]+)\/p(\d{10})(\d{6})/);
     if (m && !link.includes('thread_ts=')) link += `${link.includes('?') ? '&' : '?'}thread_ts=${m[2]}.${m[3]}&cid=${m[1]}`;
@@ -120,12 +124,12 @@ async function logNotification(userId, text) {
 }
 
 // Tek kullanıcıya DM (channel=userID → bot DM açar; im:write gerekir).
-async function dm(userId, text) {
+async function dm(userId, text, link) {
   if (!hasToken() || !userId) return { ok: false, skipped: true };
   // FR... = freelancer (Slack'te yok) — DM sessizce atlanır, takip dashboard'dan yapılır.
   if (!/^U/.test(userId)) return { ok: false, skipped: true };
   const res = await slackCall("chat.postMessage", { channel: userId, text, username: BOT_NAME, unfurl_links: false });
-  if (res.ok) logNotification(userId, text);   // await yok — DM akışını geciktirmesin
+  if (res.ok) logNotification(userId, text, link);   // await yok — DM akışını geciktirmesin
   return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 
