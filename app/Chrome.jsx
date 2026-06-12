@@ -110,6 +110,21 @@ function Linkify({ text }) {
 }
 try { window.BnsLinkify = Linkify; } catch (e) {}
 
+// Slack linkleri: tarayıcı sekmesi yalnızca desktop uygulamasına köprü görevi görür —
+// yönlendirme tetiklendikten sonra sekme otomatik kapanır ki arkada boş Slack sayfası kalmasın.
+// Tüm <a href="...slack.com/archives..."> linklerini tek delegasyonla yakalar (her ekranda geçerli).
+if (typeof document !== "undefined" && !window.__bnsSlackLinkHook) {
+  window.__bnsSlackLinkHook = true;
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest('a[href*="slack.com/archives"]');
+    if (!a) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const w = window.open(a.href, "_blank");   // handle lazım → noopener KULLANMA (kapatabilmek için)
+    if (w) setTimeout(() => { try { w.close(); } catch (err) {} }, 3500);
+  }, true);
+}
+
 // 🤖 Ody (sistem asistanı) — sağ altta yüzen sohbet. Kullanım soruları + canlı veri
 // (marka/iş/kişi) soruları /api/chat üzerinden yanıtlanır (JWT'li, kişiye özel).
 function ChatBot() {

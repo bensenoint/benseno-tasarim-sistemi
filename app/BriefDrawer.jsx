@@ -41,7 +41,11 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
 
   function handleSlackOpen() {
     const url = b.slack_url && b.slack_url !== "#" ? b.slack_url : null;
-    if (url) { window.open(url, "_blank"); }
+    if (url) {
+      // Sekme yalnız desktop'a köprü: yönlendirme sonrası otomatik kapanır (Chrome.jsx anchor hook'u ile aynı)
+      const w = window.open(url, "_blank");
+      if (w) setTimeout(() => { try { w.close(); } catch (e) {} }, 3500);
+    }
     else { alert("Bu brief için Slack linki bulunamadı."); }
   }
 
