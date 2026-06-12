@@ -56,7 +56,7 @@ const fmtDate = (ms) => {
 };
 
 // Brief mesajını kanala post et → {ok, ts, channel, permalink?, error}
-async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, contribNames, observerNames, not }) {
+async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, contribNames, observerNames, not, acan }) {
   const channel = channelForBrand(marka);
   if (!channel) return { ok: false, error: "kanal_yok", skipped: true };
   if (!hasToken()) return { ok: false, error: "token_yok", skipped: true };
@@ -73,6 +73,7 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
     leadName ? `👤 Lead: ${leadName}` : null,
     observerNames && observerNames.length ? `👁 ${observerNames.join(" · ")}` : null,
     not ? `📝 ${not}` : null,
+    acan ? `✍️ Açan: ${acan}` : null,
     `_Dashboard'dan oluşturuldu · iş bu thread'de devam eder._`,
   ].filter(Boolean).join("\n");
   // Best-effort: thread yanıtı atılamasa bile brief oluşturma bozulmaz.

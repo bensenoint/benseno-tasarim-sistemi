@@ -207,8 +207,8 @@ async function createBrief(raw) {
       const obsQ = await pool.query(
         `SELECT user_id FROM brief_assignees WHERE brief_id=$1 AND role='gozlemci'`, [result.id]);
       const observerIds = obsQ.rows.map(r => r.user_id);
-      let leadName = null, contribNames = [], observerNames = [];
-      const allIds = [...new Set([...leadIdsForPost, ...workerIds, ...observerIds])];
+      let leadName = null, contribNames = [], observerNames = [], acanName = null;
+      const allIds = [...new Set([...leadIdsForPost, ...workerIds, ...observerIds, ...(d.by ? [d.by] : [])])];
       if (allIds.length) {
         const u = await pool.query('SELECT id,name FROM users WHERE id = ANY($1)', [allIds]);
         const byId = Object.fromEntries(u.rows.map(r => [r.id, r.name]));
@@ -217,10 +217,11 @@ async function createBrief(raw) {
         leadName = leadIdsForPost.map(mention).join(', ') || null;
         contribNames = workerIds.map(mention);
         observerNames = observerIds.filter(i => !leadIdsForPost.includes(i) && !workerIds.includes(i)).map(mention);
+        if (d.by) acanName = mention(d.by);
       }
       const deadlineMs = d.deadline ? (typeof d.deadline === 'number' ? d.deadline : Date.parse(d.deadline)) : null;
       const post = await slack.postBrief({ marka: d.marka, baslik: d.baslik, no: result.no,
-        deadlineMs, dept: null, akis: d.akis, leadName, contribNames, observerNames, not: d.musteri_notu || null });
+        deadlineMs, dept: null, akis: d.akis, leadName, contribNames, observerNames, not: d.musteri_notu || null, acan: acanName });
       if (post.ok) {
         await pool.query('UPDATE briefs SET slack_ts=$1, slack_channel=$2, slack_url=$3 WHERE id=$4',
           [post.ts, post.channel, post.permalink || null, result.id]);
