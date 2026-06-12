@@ -38,49 +38,25 @@ function getOrderNum(durum) {
 }
 
 function MultiScreen({ data, onOpenBrief }) {
-  const [tab, setTab] = React.useState("all");
   const users = data.USERS || [];
 
-  // Multi-atanmış: 2+ atanan VEYA reviewer olan briefler
-  const allMulti = ( data._allBriefs || data.briefs ).filter(b =>
-    (b.contributors && b.contributors.length > 0) || b.reviewer
-  );
-
-  // Gerçek akış DB'deki akis alanından gelir (form seçimi); eski metin-ayrıştırma yalnız
-  // akis'i olmayan eski kayıtlara yedektir. Varsayılan paralel (sistem kararıyla uyumlu).
-  const tipOf = (b) => b.akis === "sirali" || b.akis === "paralel"
-    ? b.akis
-    : (getAssignType(b.durum_raw || b.durum) === "paralel" ? "paralel" : "paralel");
-  const paralel = allMulti.filter(b => tipOf(b) === "paralel");
-  const sirali  = allMulti.filter(b => tipOf(b) === "sirali");
-
-  const shown = tab === "paralel" ? paralel : tab === "sirali" ? sirali : allMulti;
+  // Yalnız SIRALI (onay zinciri) işler gösterilir — paralel işler zaten diğer
+  // tablolarda izleniyor; bu ekran el-değiştirme akışını takip etmek için.
+  const sirali = (data._allBriefs || data.briefs).filter(b => b.akis === "sirali");
+  const shown = sirali;
 
   return (
     <div className="bn-tab-in">
       <PageHead
-        title="Multi-atama"
-        subtitle="Paralel · Sıralı — kimin tamamladığı, kimin devam ettiği"
+        title="Sıralı İşler"
+        subtitle="⛓️ onay zinciri — kimin tamamladığı, sıranın kimde olduğu"
       />
 
       {/* KPI */}
       <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
-        <Kpi label="Toplam multi" value={allMulti.length} sub={`${( data._allBriefs || data.briefs ).length} aktif brief`}/>
-        <Kpi label="Paralel" value={paralel.length} sub="aynı anda birden fazla kişi"/>
-        <Kpi label="Sıralı" value={sirali.length} sub="biri bitince diğeri başlar"/>
-      </div>
-
-      {/* Tab */}
-      <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8, marginBottom:14}}>
-        {[["all","Tümü"], ["paralel","Paralel"], ["sirali","Sıralı"]].map(([k,v]) => (
-          <button key={k} onClick={() => setTab(k)} style={{
-            font:"500 12px/1 var(--font-sans)", padding:"6px 12px", border:0,
-            background: tab===k ? "var(--surface)" : "transparent",
-            color: tab===k ? "var(--ink)" : "var(--ink-3)",
-            borderRadius:6, cursor:"pointer",
-            boxShadow: tab===k ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
-          }}>{v} {tab===k ? "" : `· ${k==="all"?allMulti.length:k==="paralel"?paralel.length:sirali.length}`}</button>
-        ))}
+        <Kpi label="Sıralı iş" value={sirali.length} sub="aktif onay zinciri"/>
+        <Kpi label="Gecikmiş" value={sirali.filter(b => b.deltaH <= 0).length} color={sirali.some(b => b.deltaH <= 0) ? "var(--prio-red)" : undefined}/>
+        <Kpi label="Müşteride" value={sirali.filter(b => b.durum === "musteride").length} color="#7c5cff" sub="✈️ dönüş bekleniyor"/>
       </div>
 
       {/* List */}
