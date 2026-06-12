@@ -129,11 +129,25 @@ async function setAssignees(client, briefId, { worker_ids, lead_ids, gozlemci_id
 }
 
 // İşi yapanların dept'lerinden brief dept'i türet (distinct, virgül-join).
-async function deriveDept(client, worker_ids) {
+// Yönetici kuralı: yönetici (yetki='yonetici') bir işe ATANIRSA işi kendi departmanına değil,
+// işi AÇANIN departmanına yazılır. (Yönetici iş açarsa zaten atananların dept'i türetilir.)
+// Hem açan hem atanan yöneticiyse: yönetici-olmayan atananların dept'i; o da yoksa kendi dept'leri.
+async function deriveDept(client, worker_ids, creatorId) {
   if (!Array.isArray(worker_ids) || !worker_ids.length) return null;
   const r = await client.query(
-    `SELECT DISTINCT dept FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> ''`, [worker_ids]);
-  const depts = r.rows.map(x => x.dept).sort();
+    `SELECT dept, yetki FROM users WHERE id = ANY($1) AND dept IS NOT NULL AND dept <> ''`, [worker_ids]);
+  const normal = r.rows.filter(x => x.yetki !== 'yonetici').map(x => x.dept);
+  const mgr    = r.rows.filter(x => x.yetki === 'yonetici').map(x => x.dept);
+  let mgrSub = [];   // yönetici atananların yerine geçecek dept
+  if (mgr.length) {
+    const cr = creatorId ? await client.query(
+      `SELECT dept, yetki FROM users WHERE id=$1 AND dept IS NOT NULL AND dept <> ''`, [creatorId]) : { rows: [] };
+    const c = cr.rows[0];
+    if (c && c.yetki !== 'yonetici') mgrSub = [c.dept];          // açan normal → onun dept'i
+    else if (normal.length)          mgrSub = [];                 // açan da yönetici → normal atananlar belirler
+    else                             mgrSub = mgr;                // herkes yönetici → kendi dept'leri (son çare)
+  }
+  const depts = [...new Set([...normal, ...mgrSub])].sort();
   return depts.length ? depts.join(',') : null;
 }
 
@@ -176,7 +190,7 @@ async function createBrief(raw) {
     }
     // lead default = oluşturan; dept işi yapanlardan türetilir
     const leadIds = (d.lead_ids && d.lead_ids.length) ? d.lead_ids : (d.by ? [d.by] : []);
-    const dept = await deriveDept(client, d.worker_ids);
+    const dept = await deriveDept(client, d.worker_ids, d.by);
     const r = await client.query(
       `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
@@ -267,7 +281,7 @@ async function patchBrief(id, raw) {
     await setAssignees(client, id, d);
     // işi yapanlar değiştiyse: dept yeniden türet + dept yöneticilerini gözlemciye ekle (silmeden, idempotent)
     if (d.worker_ids !== undefined) {
-      const dept = await deriveDept(client, d.worker_ids);
+      const dept = await deriveDept(client, d.worker_ids, d.by);
       await client.query(`UPDATE briefs SET dept=$1 WHERE id=$2`, [dept, id]);
       // Auto-yöneticiler: briefteki herhangi bir non-gözlemci rolündeyse gözlemciye ekleme (çift listeyi önle).
       // setAssignees zaten çalıştı → brief_assignees güncel; lead dahil tüm çalışanları dışla.
