@@ -110,7 +110,10 @@ function shortNotifText(text) {
 async function logNotification(userId, text) {
   try {
     const { pool } = require('./db');
-    const link = (String(text).match(/<(https:\/\/[^|>\s]+)/) || [])[1] || WT_DM_LINK;
+    let link = (String(text).match(/<(https:\/\/[^|>\s]+)/) || [])[1] || WT_DM_LINK;
+    // Arşiv linkini thread görünümüne normalize et (dashboard kancasıyla aynı kural).
+    const m = link.match(/\/archives\/([A-Z0-9]+)\/p(\d{10})(\d{6})/);
+    if (m && !link.includes('thread_ts=')) link += `${link.includes('?') ? '&' : '?'}thread_ts=${m[2]}.${m[3]}&cid=${m[1]}`;
     await pool.query('INSERT INTO notifications (user_id, text, link) VALUES ($1,$2,$3)',
       [userId, shortNotifText(text), link]);
   } catch (e) { console.error('[slack] notification log hata:', e.message); }
