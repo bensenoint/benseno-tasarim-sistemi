@@ -118,6 +118,35 @@ function ChatBot() {
   const [input, setInput] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const endRef = React.useRef(null);
+  // Sürüklenebilir konum — balon/panel başlığından tutup taşınır; localStorage'da kalıcıdır.
+  const [pos, setPos] = React.useState(() => {
+    try { const p = JSON.parse(localStorage.getItem("bns_ody_pos") || "null"); if (p && typeof p.x === "number" && typeof p.y === "number") return p; } catch (e) {}
+    return { x: 20, y: (typeof window !== "undefined" ? window.innerHeight : 800) - 76 };
+  });
+  const dragRef = React.useRef(null);
+  const startDrag = (e) => {
+    if (e.target.closest && e.target.closest("button, input")) return;   // başlıktaki butonlar sürükleme başlatmasın
+    const start = { mx: e.clientX, my: e.clientY, x: pos.x, y: pos.y, moved: false };
+    dragRef.current = start;
+    const move = (ev) => {
+      const dx = ev.clientX - start.mx, dy = ev.clientY - start.my;
+      if (Math.abs(dx) + Math.abs(dy) > 4) start.moved = true;
+      setPos({ x: Math.min(Math.max(4, start.x + dx), window.innerWidth - 60),
+               y: Math.min(Math.max(4, start.y + dy), window.innerHeight - 60) });
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      setPos(p => { try { localStorage.setItem("bns_ody_pos", JSON.stringify(p)); } catch (e2) {} return p; });
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
+  // Panel pos'tan açılır ama ekrana sığacak şekilde kıstırılır (alt/sağ taşma olmaz)
+  const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
+  const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+  const panelLeft = Math.min(Math.max(8, pos.x), Math.max(8, vw - 392));
+  const panelTop  = Math.min(Math.max(8, pos.y - 468), Math.max(8, vh - 532));
   const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
   const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
@@ -144,9 +173,11 @@ function ChatBot() {
     <>
       {/* Açma balonu */}
       {!open && (
-        <button onClick={() => setOpen(true)} title="Ody — sistem asistanı" style={{
-          position: "fixed", left: 20, bottom: 20, zIndex: 90,   // sol alt: sağdaki iş detay çekmecesinin Kaydet butonuyla çakışmasın
-          width: 52, height: 52, borderRadius: "50%", border: 0, cursor: "pointer",
+        <button onPointerDown={startDrag}
+          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setOpen(true); }}
+          title="Ody — sistem asistanı (sürükleyerek taşıyabilirsin)" style={{
+          position: "fixed", left: pos.x, top: pos.y, zIndex: 90,
+          width: 52, height: 52, borderRadius: "50%", border: 0, cursor: "grab", touchAction: "none",
           background: "var(--ember)", color: "#fff", fontSize: 24,
           boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -154,12 +185,13 @@ function ChatBot() {
       )}
       {open && (
         <div style={{
-          position: "fixed", left: 20, bottom: 20, zIndex: 90,   // sol alt: sağdaki iş detay çekmecesinin Kaydet butonuyla çakışmasın
+          position: "fixed", left: panelLeft, top: panelTop, zIndex: 90,
           width: 380, maxWidth: "calc(100vw - 32px)", height: 520, maxHeight: "calc(100vh - 80px)",
           background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14,
           boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden",
         }}>
-          <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8 }}>
+          <div onPointerDown={startDrag} title="Sürükleyerek taşı"
+            style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8, cursor: "grab", touchAction: "none", userSelect: "none" }}>
             <span style={{ fontSize: 18 }}>🤖</span>
             <div style={{ flex: 1 }}>
               <div style={{ font: "600 13px/1 var(--font-sans)", color: "var(--ink)" }}>Ody</div>
