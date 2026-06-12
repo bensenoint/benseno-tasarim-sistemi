@@ -120,7 +120,12 @@ if (typeof document !== "undefined" && !window.__bnsSlackLinkHook) {
     if (!a) return;
     e.preventDefault();
     e.stopPropagation();
-    const w = window.open(a.href, "_blank");   // handle lazım → noopener KULLANMA (kapatabilmek için)
+    // Thread görünümünde açılsın: /archives/{cid}/p{ts} → ?thread_ts={ts}&cid={cid}
+    // (Slack desktop bu parametrelerle mesajı kanal yerine thread paneli olarak açar.)
+    let href = a.href;
+    const m = href.match(/\/archives\/([A-Z0-9]+)\/p(\d{10})(\d{6})/);
+    if (m && !href.includes("thread_ts=")) href += `${href.includes("?") ? "&" : "?"}thread_ts=${m[2]}.${m[3]}&cid=${m[1]}`;
+    const w = window.open(href, "_blank");   // handle lazım → noopener KULLANMA (kapatabilmek için)
     if (w) setTimeout(() => { try { w.close(); } catch (err) {} }, 3500);
   }, true);
 }

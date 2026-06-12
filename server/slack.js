@@ -84,7 +84,8 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
 
   // Permalink'i ts+channel'dan inşa et (ekstra scope/çağrı gerektirmez).
   const ws = process.env.BNS_SLACK_WORKSPACE || "benseno";
-  const permalink = `https://${ws}.slack.com/archives/${res.channel}/p${String(res.ts).replace(".", "")}`;
+  // thread_ts+cid parametreleri Slack'in mesajı thread paneli olarak açmasını sağlar.
+  const permalink = `https://${ws}.slack.com/archives/${res.channel}/p${String(res.ts).replace(".", "")}?thread_ts=${res.ts}&cid=${res.channel}`;
   return { ok: true, ts: res.ts, channel: res.channel, permalink };
 }
 
