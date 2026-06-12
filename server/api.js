@@ -294,7 +294,7 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5', max_tokens: 900, system,
+        model: 'claude-sonnet-4-6', max_tokens: 900, system,   // Ody: Sonnet — çok-kayıtlı canlı veri filtrelemede daha güvenilir
         messages: msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) })),
       }),
     });
