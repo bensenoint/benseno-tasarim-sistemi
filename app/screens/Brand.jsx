@@ -107,7 +107,9 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
 
   // Marka brief'lerini birleşik satır modeline çevir (aktif + tamamlanan)
   // Aktif brief'ler HYDRATE edilmiş (lead/priority obje/deltaH/...) → doğrudan BriefTable'a verilir.
-  const active = React.useMemo(() => (data._allBriefs || data.briefs || []).filter(b => b.marka === brand), [brand, data]);
+  // Aktif = müşteri onayında olmayanlar; musteride ayrı sekmede gösterilir
+  const active    = React.useMemo(() => (data._allBriefs || data.briefs || []).filter(b => b.marka === brand && b.durum !== "musteride"), [brand, data]);
+  const musteride = React.useMemo(() => (data._allBriefs || data.briefs || []).filter(b => b.marka === brand && b.durum === "musteride"), [brand, data]);
   const done   = React.useMemo(() => (data._allCompleted || data.completed || []).filter(c => c.marka === brand), [brand, data]);
 
   // hydrate brief deadline'ı ms (number) ya da TR string olabilir → ms'e normalize et
@@ -141,6 +143,11 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
     if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
     return true;
   });
+  const filteredMusteride = musteride.filter(b => {
+    if (person && !activeIds(b).includes(person)) return false;
+    if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
+    return true;
+  });
   const filteredDone = done.filter(c => {
     if (person && !rowIds(c).includes(person)) return false;
     if ((fromMs || toMs) && !inRange(c.deadline || null)) return false;
@@ -148,7 +155,7 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
   });
 
   const overdue = active.filter(b => { const m = dlMs(b); return m != null && m < now * 1000; }).length;
-  const shown = view === "active" ? filteredActive.length : filteredDone.length;
+  const shown = view === "active" ? filteredActive.length : view === "musteride" ? filteredMusteride.length : filteredDone.length;
   // Tamamlanan finans toplamı (görüntülenen satırlar): faturalanan/tahsil = Σ satış · ilgili bayrak
   const sumDone = filteredDone.reduce((a, c) => {
     a.m += Number(c.maliyet) || 0; a.s += Number(c.satis) || 0;
@@ -220,6 +227,7 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
       <Card style={{ marginBottom:"var(--section-gap)" }}>
         <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
           {seg("active", `Aktif · ${filteredActive.length}`)}
+          {seg("musteride", `✈️ Müşteri Onayında · ${filteredMusteride.length}`)}
           {seg("done", `Tamamlanan · ${filteredDone.length}`)}
           <select value={person} onChange={e => setPerson(e.target.value)} style={fldStyle}>
             <option value="">Herkes</option>
@@ -237,11 +245,11 @@ function BrandDetail({ brand, stats, data, onBack, onOpenBrief }) {
         </div>
       </Card>
 
-      {view === "active" ? (
-        // Aktif işler — Aktif İşler sayfasıyla birebir zengin tablo (BriefTable)
+      {view === "active" || view === "musteride" ? (
+        // Aktif / Müşteri Onayında — Aktif İşler sayfasıyla birebir zengin tablo (BriefTable)
         <Card padding={0}>
           <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
-            <BriefTable rows={filteredActive} onRowClick={onOpenBrief} financeCols/>
+            <BriefTable rows={view === "musteride" ? filteredMusteride : filteredActive} onRowClick={onOpenBrief} financeCols/>
           </div>
         </Card>
       ) : (
