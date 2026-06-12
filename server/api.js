@@ -467,7 +467,8 @@ app.get('/api/img/:id', async (req, res) => {
     if (!slackRes.ok) return res.status(slackRes.status).end();
     res.set('Content-Type', slackRes.headers.get('content-type') || 'image/jpeg');
     res.set('Cache-Control', 'public, max-age=86400');
-    slackRes.body.pipe(res);
+    // global fetch web-stream döndürür — .pipe() yok; buffer'layıp gönder
+    res.send(Buffer.from(await slackRes.arrayBuffer()));
   } catch (e) {
     console.error('[img-proxy] hata:', e.message);
     res.status(500).end();
