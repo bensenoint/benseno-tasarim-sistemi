@@ -285,8 +285,26 @@ function bnsNormDeptStats(raw) {
   return out;
 }
 
+// ── Kişi başı kapasite (TEK DOĞRULUK KAYNAĞI) ───────────────────────────────
+// Profil ve Departman ekranları AYNI limiti ve AYNI formülü kullanmalı; aksi halde
+// aynı kişi iki ekranda farklı doluluk gösterir (ör. %90 vs %50 — eski hata).
+// Limit = kişinin eşzamanlı taşıyabileceği aktif iş sayısı (lead + contributor).
+// Yöneticiler koordinasyon yükü taşıdığı için daha yüksek limitli.
+function bnsPersonCapLimit(u) {
+  if (!u) return 6;
+  if (u.yetki === "yonetici" || u.rol === "yonetici") return 10;
+  const d = u.dept || u.rol || "";
+  return ({ tasarim: 6, editor: 8, ai: 6, freelance: 6 })[d] || 6;
+}
+// Aktif iş sayısından kapasite yüzdesi (0-100). İki ekran da bunu çağırır.
+function bnsPersonCapPct(u, activeCount) {
+  return Math.min(100, Math.round((activeCount / bnsPersonCapLimit(u)) * 100));
+}
+
 window.bnsCapPct     = bnsCapPct;
 window.bnsNormDeptStats = bnsNormDeptStats;
+window.bnsPersonCapLimit = bnsPersonCapLimit;
+window.bnsPersonCapPct   = bnsPersonCapPct;
 
 // ─── BRAND STATS (for marka tab) ───────────────────────────────────────────
 const brandStats = BRANDS.map(b => {

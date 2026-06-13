@@ -33,7 +33,8 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
       user: p,
       active: my.length,
       overdue: myOverdue,
-      load: Math.min(100, my.length * 18 + (p.isNew ? -10 : 0))
+      // Profil ekranıyla AYNI kapasite hesabı (data.js bnsPersonCapPct) — tutarlılık şart.
+      load: Math.max(0, bnsPersonCapPct(p, my.length) + (p.isNew ? -10 : 0))
     };
   });
 
