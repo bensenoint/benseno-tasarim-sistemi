@@ -54,7 +54,7 @@
 - **`npm run deploy`** (= `bash scripts/deploy.sh`) — tüm koreografiyi tek komuta toplar:
   CI kapısı → dashboard derle+push+Pages bekle → API deploy → bot redeploy → tutarlılık denetimi.
   Hedefli: `npm run deploy dashboard|api|bot`. **CI kapısı kalırsa deploy YAPILMAZ.**
-- **`npm run check`** (= `scripts/ci-check.sh`) — secret'siz kapı: .js sözdizimi + .jsx derleme + **formül kilidi** (`scripts/formula-test.js`, 22 birim test).
+- **`npm run check`** (= `scripts/ci-check.sh`) — secret'siz 4 katman: ①.js sözdizimi ②.jsx derleme ③formül kilidi (`formula-test.js`, 35 birim test) ④tek-tanım güvencesi (`magic-guard.sh`: iş metrikleri yalnız calc.js'te).
 - **Saf formüller `dashboard/app/calc.js`'te** (kapasite/süre/gecikme — tek doğruluk kaynağı). index.html'de data.js'ten ÖNCE yüklenir; node'da `module.exports` ile test edilir. Yeni formül = calc.js'e ekle + formula-test'e test ekle (BAŞKA yerde yeniden tanımlama).
 - **`npm run verify`** (= `consistency-check.js`) — metrik doğruluğu (25 kontrol).
 - **`npm run build`** — yalnız bundle derle.
