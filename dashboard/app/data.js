@@ -660,4 +660,22 @@ try {
   window.BNS_DATA.__source = "mock_after_error";
 }
 
+// ── PROD GÜVENLİĞİ: canlı brief GELMEDİYSE mock fixture'ları GÖSTERME ────────────────
+// 3 kez yaşanan olay: poll 401/hata → ekranda demo markalar (Konya Un vb.) gerçek sanıldı.
+// Çözüm: prod'da __source 'live_briefs' değilse fixture koleksiyonlarını boşalt (sahte veri
+// asla render edilmez; poll başarılı olunca gerçek veri dolar, 401'de App login'e döner).
+// localhost'ta mock korunur (çevrimdışı geliştirme).
+try {
+  var _bnsLocal = typeof location !== "undefined" && /^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname || "");
+  if (!_bnsLocal && window.BNS_DATA.__source !== "live_briefs") {
+    window.BNS_DATA.briefs = [];
+    window.BNS_DATA.completed = [];
+    window.BNS_DATA.brandStats = [];
+    window.BNS_DATA.activity = [];
+    window.BNS_DATA.matrix = {};
+    window.BNS_DATA.__source = (window.BNS_DATA.__source || "no_live") + "_sanitized";
+    console.warn("[BNS] PROD: canlı brief yok → mock fixture'lar temizlendi (sahte veri gösterilmez). source=" + window.BNS_DATA.__source);
+  }
+} catch (e) {}
+
 })();
