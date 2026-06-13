@@ -198,6 +198,19 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
 - **GitHub PAT (#3):** git remote'tan plaintext token ÇIKARILDI → `gh` credential helper. ⚠️ AÇIK AKSİYON: eski (sızmış) PAT GitHub'dan iptal edilmeli.
 - **Kabul edilen (gerekçeli):** body limit 25MB (ekler gerektiriyor) · JWT TTL 7gün (iç ekip, makul).
 
+## 6.9 Mock-veri sızıntısı koruması (2026-06-13 — 3. kez yaşandı, kalıcı kapatıldı)
+
+- **Belirti:** Dashboard gerçek veri yerine demo fixture'ları (Konya Un, Adana Pamuk…) gösterir.
+- **Kök neden:** `/api/embedded` poll'u 401/hata alınca App.jsx SESSİZCE `return` ediyordu →
+  data.js'teki mock BRIEFS fixture'ları ekranda kalıyordu (baked EMBEDDED'de brand var ama brief YOK).
+  Bu sefer tetikleyici: güvenlik #1 kilidi + eski önbellekli bundle / süresi dolmuş token → poll 401.
+- **Kalıcı çözüm (iki kat):**
+  1. **App.jsx poll:** `r.status===401` → token sil + `location.reload()` → login ekranı (mock GÖSTERİLMEZ).
+  2. **data.js bridge sonu:** prod'da (`localhost` değil) `__source!=='live_briefs'` ise
+     briefs/completed/brandStats/activity/matrix BOŞALTILIR → sahte veri asla render edilmez.
+     localhost'ta mock korunur (çevrimdışı geliştirme).
+- **Kural:** Mock fixture'lar yalnız localhost'ta görünür. Prod'da veri ya canlıdır ya boştur — asla sahte.
+
 ## 7. Bilinen Davranışlar / Tuzaklar
 
 - `sleep N` ve `rm -rf` hook'larca bloklanır → until-loop + run_in_background / mktemp -d kullan.
