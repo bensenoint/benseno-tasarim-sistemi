@@ -37,5 +37,8 @@ else
   cat /tmp/ci-ft; FAIL=1
 fi
 
+echo "④ Formül tek-tanım güvencesi (iş metrikleri yalnız calc.js'te)"
+if ! bash scripts/magic-guard.sh; then FAIL=1; fi
+
 if [ "$FAIL" -eq 0 ]; then echo "🟢 CI KAPISI GEÇTİ"; else echo "🔴 CI KAPISI KALDI"; fi
 exit "$FAIL"
