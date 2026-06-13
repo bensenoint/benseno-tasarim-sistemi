@@ -1,6 +1,24 @@
 // Panom kabuğu — gridstack ızgara + React-mount widget'lar + düzenle modu + layout kalıcılık.
 var API_V2 = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
 function tokV2() { return (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || ""; }
+
+// EMBEDDED → BNS_DATA köprüsü. v2 bundle'ında (taze yol) tanımlı; paylaşılan data.js'in
+// Fastly cache durumuna BAĞIMLI DEĞİL. Hidrasyon helper'ları bugünden eski → bayat data.js'te bile var.
+function v2Apply(ed) {
+  if (!ed || typeof ed !== "object") return;
+  window.EMBEDDED_DATA = ed;
+  var D = window.BNS_DATA = window.BNS_DATA || {};
+  var sm = window.bnsSafeMap || function (a, f) { return (a || []).map(f); };
+  try {
+    if (Array.isArray(ed.bns_brands)) D.BRANDS = ed.bns_brands;
+    if (Array.isArray(ed.bns_users)) D.USERS = window.bnsMergeUser ? ed.bns_users.map(window.bnsMergeUser) : ed.bns_users;
+    if (Array.isArray(ed.bns_briefs)) D.briefs = window.bnsHydrateBrief ? sm(ed.bns_briefs, window.bnsHydrateBrief, "brief") : ed.bns_briefs;
+    if (Array.isArray(ed.bns_completed)) D.completed = window.bnsHydrateCompleted ? sm(ed.bns_completed, window.bnsHydrateCompleted, "completed") : ed.bns_completed;
+    if (ed.bns_dept_stats) D.deptStats = window.bnsNormDeptStats ? window.bnsNormDeptStats(ed.bns_dept_stats) : ed.bns_dept_stats;
+    if (typeof window.bnsApplyExtras === "function") window.bnsApplyExtras(ed);
+    D.__source = "live_briefs";
+  } catch (e) { console.warn("[v2] apply hata:", e.message); }
+}
 var btnV2 = { padding: "6px 11px", border: "0.5px solid var(--line)", borderRadius: 6, background: "var(--surface)", color: "var(--ink)", font: "400 12px/1 var(--font-sans)", cursor: "pointer" };
 
 function PanomApp() {
@@ -39,7 +57,7 @@ function PanomApp() {
         var r = await fetch(API_V2 + "/api/embedded?t=" + Date.now(), {
           cache: "no-store", headers: { Authorization: "Bearer " + tokV2() } });
         if (r.status === 401) { localStorage.removeItem("bns_token"); localStorage.removeItem("bns_user"); location.href = "../dashboard/"; return; }
-        if (r.ok && window.bnsApplyEmbedded) window.bnsApplyEmbedded(await r.json());
+        if (r.ok) v2Apply(await r.json());
       } catch (e) {}
       // 2) layout
       var layout = window.bnsV2DefaultLayout();
