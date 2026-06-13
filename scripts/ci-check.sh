@@ -20,7 +20,7 @@ for f in server/*.js scripts/*.js dashboard/app/data.js dashboard/app/live-data.
 done
 
 echo "② JSX derlenebilirlik (esbuild parse)"
-for f in dashboard/app/*.jsx dashboard/app/screens/*.jsx; do
+for f in dashboard/app/*.jsx dashboard/app/screens/*.jsx v2/app/*.jsx; do
   [ -f "$f" ] || continue
   if npx --yes esbuild --loader=jsx --jsx=transform --jsx-factory=React.createElement --jsx-fragment=React.Fragment >/dev/null 2>/tmp/ci-err < "$f"; then
     :
@@ -39,6 +39,13 @@ fi
 
 echo "④ Formül tek-tanım güvencesi (iş metrikleri yalnız calc.js'te)"
 if ! bash scripts/magic-guard.sh; then FAIL=1; fi
+
+echo "⑤ v2 layout testi"
+if node scripts/v2-layout-test.js >/tmp/ci-v2 2>&1; then
+  echo "  ✅ $(grep -o '[0-9]* geçti' /tmp/ci-v2 | tail -1)"
+else
+  cat /tmp/ci-v2; FAIL=1
+fi
 
 if [ "$FAIL" -eq 0 ]; then echo "🟢 CI KAPISI GEÇTİ"; else echo "🔴 CI KAPISI KALDI"; fi
 exit "$FAIL"
