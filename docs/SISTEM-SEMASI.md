@@ -242,3 +242,34 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
 - Öncelik: 31 🟡 · 5 🟠 · 1 🔴
 - Departman yükü: Tasarım 15 (%36) · Editör 34 (%71) · AI 8 (%33) + Freelance satırı yeni eklendi
 - 277 bildirim, tamamı thread-linkli
+
+---
+
+## 8. v2 "Panom" — Kişiye Özel Widget Panosu (1. KT canlı)
+
+**Konum:** `v2/` → GitHub Pages `/v2/`. Prod `dashboard/`'a SIFIR dokunuş (additive).
+**Canlı:** https://bensenoint.github.io/benseno-tasarim-sistemi/v2/ (giriş zorunlu; token yoksa `../dashboard/`'a yönlendirir).
+
+### 8.1 Mimari
+- **Stack:** React 18 (UMD) + esbuild bundle + gridstack.js (CDN, 12-kolon ızgara). Widget'lar `ReactDOM.createRoot` ile grid hücresine mount edilir (innerHTML yok).
+- **Veri:** v2 kendi JWT'li `/api/embedded` poll'unu yapar → `window.bnsApplyEmbedded(ed)` (data.js köprüsü, prod hidrasyon helper'larını AYNEN kullanır, çift mantık yok). 401 → login.
+- **Reuse:** `../app/calc.js` (formüller) + `../app/data.js` (hidrasyon + köprü) prod ile ortak dosya.
+
+### 8.2 Widget kayıt defteri (`v2/app/widgets.jsx`)
+`window.BNS_V2_REGISTRY[type] = { title, minW, minH, Component }`. Çekirdek 5: riskli-islerim, kapasitem, kart-akisi, musteride, bugun-yarin. Hesaplar yalnız calc.js'ten (`bnsIsRisk`, `bnsPersonCapPct`) — magic-guard korur.
+- **Kişi kimliği:** `v2Me()` → localStorage `bns_user` (`{id, slack_id, name, role}`) → kanonik USERS kaydını **slack_id** ile çözer (kapasite formülü `rol`/`yetki`/`dept` ister; brief lead/contributor'ları slack_id taşır).
+
+### 8.3 Düzenleme + kalıcılık
+- "düzenle" toggle → gridstack sürükle/boyutlandır açılır; "+ alan ekle" eklenmemiş tipleri listeler; değişiklik/silme → `PUT /api/layout`.
+- **Layout:** `dashboard_layouts(user_id text PK, layout jsonb, updated_at)`. `GET/PUT /api/layout` (authGuard, `req.user.slack_id`). Boş/geçersiz → `bnsV2DefaultLayout()` (`v2/app/layout.js`, saf, node-test edilir).
+- **Mobil:** gridstack `columnOpts.breakpoints [{w:700,c:1}]` → tek kolon.
+
+### 8.4 Ody (sistem kimliği)
+`v2/app/ody.jsx` — sürüklenebilir 🐾 avatar buton; konum localStorage `bns_v2_ody_pos`; tıkla → proaktif kişisel brief (`POST /api/chat`). Izgaranın parçası değil, yüzen sabit öğe.
+
+### 8.5 Deploy
+`npm run deploy api` (layout endpoint'leri) + `bash scripts/build-v2.sh` (bundle + cache-bust) + `git push` (Pages /v2). CI: `scripts/ci-check.sh` ⑤ = `v2-layout-test.js` (7 test); ② artık `v2/app/*.jsx`'i de parse eder.
+- **Cache notu:** mevcut yol (`app/data.js`) GitHub Pages Fastly edge'inde ~10 dk bayat kalabilir (sorgudan bağımsız cache). Yeni yollar (`v2/app/bundle.js`) anında gelir. Yayın teyidi için `gh api .../pages/builds/latest` (commit SHA), curl değil.
+
+### 8.6 Kapsam dışı (1. KT)
+Prod'a dokunma · v2'den yazma (salt-okur) · rol bazlı otomatik panolar (herkese aynı başlangıç, kişi düzenler).
