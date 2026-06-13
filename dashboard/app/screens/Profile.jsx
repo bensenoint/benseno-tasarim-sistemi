@@ -151,6 +151,15 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const CAP_LIMIT = bnsPersonCapLimit(u);
   const capPct    = bnsPersonCapPct(u, myActive.length);
 
+  // ─── Çıktı hızı (son 4 hafta tamamlanan/hafta) — calc.js bnsThroughput, düşük örneklemde uyarır.
+  //     Zaman filtresinden BAĞIMSIZ: kendi 4 haftalık penceresini kullanır.
+  const nowMsTP = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
+  const myDoneTs = allCompleted
+    .filter(b => (b.lead && b.lead.id === u.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id)))
+    .map(b => (b.bitis || 0) * (b.bitis && b.bitis < 1e10 ? 1000 : 1))
+    .filter(Boolean);
+  const tp = (typeof bnsThroughput === "function") ? bnsThroughput(myDoneTs, nowMsTP, 4) : { perWeek: 0, count: 0, lowSample: true };
+
   const roleLabel = { yonetici:"Yönetici", tasarim:"Tasarım", editor:"Editör", ai:"AI Operatör" }[u.rol] || u.rol;
 
   return (
@@ -237,6 +246,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         <Kpi label="Aktif iş"      value={myActive.length} color={myActive.length > CAP_LIMIT ? "var(--prio-red)" : undefined}/>
         <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "#7c5cff" : undefined} sub="✈️ dönüş bekleniyor"/>
         <Kpi label="Tamamlanan"    value={myCompleted.length} sub="kayıtlı"/>
+        <Kpi label="Çıktı hızı"    value={tp.lowSample ? "—" : tp.perWeek + "/hf"} sub={tp.lowSample ? `${tp.count} iş/4hf · veri ince` : `son 4 hafta · ${tp.count} iş`}/>
         <Kpi label="Toplam revize" value={totalRev} sub={`ort. ${avgRev}/iş`}/>
         <Kpi label="Toplam saat"   value={totalHours > 0 ? totalHours.toFixed(0)+"sa" : "—"} sub={`ort. ${avgHours}sa/iş`}/>
         <Kpi label="Lead olarak"   value={asLead.length} sub="açtığım"/>

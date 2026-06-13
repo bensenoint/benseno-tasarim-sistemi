@@ -61,5 +61,14 @@ t('risk: tamamlandi = false', C.bnsIsRisk('tamamlandi', -10), false);
 t('risk: deltaH yok = false', C.bnsIsRisk('yeni', null), false);
 t('risk: sınırda 24 = true', C.bnsIsRisk('calisiliyor', 24), true);
 
+// ── Çıktı hızı — son N hafta tamamlanan / hafta ──
+const NOW_T = 1000 * H * 24 * 7 * 10; // sabit "şimdi" (10 hafta)
+const wk = (n) => NOW_T - n * 7 * 24 * H; // n hafta önce
+t('çıktı: 8 iş / 4 hafta = 2/hafta', C.bnsThroughput([wk(0), wk(0), wk(1), wk(1), wk(2), wk(2), wk(3), wk(3)], NOW_T, 4).perWeek, 2);
+t('çıktı: pencere dışı sayılmaz', C.bnsThroughput([wk(0), wk(8), wk(9)], NOW_T, 4).count, 1);
+t('çıktı: <3 düşük örneklem', C.bnsThroughput([wk(0), wk(1)], NOW_T, 4).lowSample, true);
+t('çıktı: ≥3 örneklem yeterli', C.bnsThroughput([wk(0), wk(1), wk(2)], NOW_T, 4).lowSample, false);
+t('çıktı: boş liste = 0', C.bnsThroughput([], NOW_T, 4).count, 0);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);
