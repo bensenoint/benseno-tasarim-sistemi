@@ -145,6 +145,19 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
 **Ody:** sol altta, sürükle-bırak (balon+panel, localStorage `bns_ody_pos`), login kullanıcısını bilir.
 **Avatarlar:** 19/25 Slack fotoğraflı, kalan 6 freelance baş harfli; bot açılışında senkron.
 
+## 6.5 Tutarlılık Denetimi (TÜM HESAPLAMALARI DOĞRULAR)
+
+- **`node scripts/consistency-check.js`** — sistemdeki türetilmiş metrikleri DB-gerçeğiyle
+  bağımsızca yeniden hesaplayıp karşılaştırır (25 kontrol). Ayrışma varsa exit 1.
+- Kapsam: departman istatistikleri, marka istatistikleri, yıldız karneleri (firma+kişi),
+  süre/gecikme formülleri (invariant), puan aralığı, kişi kapasitesi, aktif brief toplamı.
+- İki tür kontrol: **(A) DB-SQL ↔ API-sunulan** eşitliği (sunucu metrikleri) ·
+  **(B) invariant + çapraz-tutarlılık** (istemci-türetilen metrikler: sureH/gecikmeH/kapasite
+  API'de SUNULMAZ → formül ham veriden yeniden üretilir, sunulduğu VARSAYILMAZ).
+- **Yeni bir metrik/hesaplama eklerken bu script'e de bir kontrol ekle.** Aynı metriği
+  iki yerde hesaplamaktan kaçın; tek helper'a çıkar (bkz. kapasite → bnsPersonCapPct).
+- Tipik kullanım: büyük değişiklik/deploy sonrası `node scripts/consistency-check.js` çalıştır.
+
 ## 7. Bilinen Davranışlar / Tuzaklar
 
 - `sleep N` ve `rm -rf` hook'larca bloklanır → until-loop + run_in_background / mktemp -d kullan.
