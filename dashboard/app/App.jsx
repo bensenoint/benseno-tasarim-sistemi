@@ -248,6 +248,8 @@ function App({ currentUser, onLogout }) {
     }
     async function poll() {
       try {
+        // Snapshot/önizleme modu: ağ yok, baked anonim veri kullanılır (preview/).
+        if (window.BNS_SNAPSHOT) return;
         // /api/embedded korumalı → JWT gönder (giriş yapan kullanıcının token'ı).
         const _tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
         const r = await fetch(resolveDataUrl(), {

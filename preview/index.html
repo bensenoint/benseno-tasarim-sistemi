@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Benseno · Önizleme (anonim)</title>
+<link rel="stylesheet" href="../app/tokens.css">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script>
+  // ── ANONİM ÖNİZLEME MODU ──────────────────────────────────────────────────
+  // Gerçek veri YOK; isimler/markalar maskeli. Ağ çağrısı YOK (BNS_SNAPSHOT).
+  // Login'siz render için sahte oturum kullanıcısı. Bu sayfa tasarım referansı içindir.
+  window.BNS_SNAPSHOT = true;
+  try {
+    localStorage.setItem("bns_user", JSON.stringify({ id: 0, slack_id: "PREVIEW", name: "Önizleme", role: "admin" }));
+    localStorage.setItem("bns_token", "preview");
+  } catch (e) {}
+  // Sağlamlık: bundle bayat (guard'sız) gelse bile /api/embedded'ı yerel anonim veriyle karşıla
+  // (gerçek API'ye gidip 401 → login döngüsü olmasın). Ağ çağrısı yapılmaz.
+  (function () {
+    var _f = window.fetch;
+    window.fetch = function (u) {
+      if (String(u).indexOf("/api/embedded") >= 0) {
+        return Promise.resolve(new Response(JSON.stringify(window.EMBEDDED_DATA || {}),
+          { status: 200, headers: { "content-type": "application/json" } }));
+      }
+      return _f.apply(this, arguments);
+    };
+  })();
+</script>
+</head>
+<body>
+<div id="root"></div>
+<div style="position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9999;background:var(--ember);color:#fff;font:600 11px/1 var(--font-sans);padding:7px 14px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.2)">
+  ANONİM ÖNİZLEME · gerçek veri/isim değildir
+</div>
+<script src="../app/calc.js?v=1781364211"></script>
+<script src="embedded-anon.js?v=1781364211"></script>
+<script src="../app/data.js?v=1781364211"></script>
+<script src="../app/bundle.js?v=1781364211"></script>
+</body>
+</html>
