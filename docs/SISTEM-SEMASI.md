@@ -189,6 +189,8 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
   slack-bot/termin-risk `x-bns-token` (BNS_WRITE_TOKEN env); consistency-check `data/.write-token` (gitignored).
 - **DEPLOY SIRASI (kilidi değiştirirken):** önce tüketiciler (dashboard+bot), EN SON API kilidi →
   kesinti penceresi olmaz.
+- **Login brute-force koruması (#2, ÇÖZÜLDÜ):** `/api/auth/login` hesap (slack_id) bazlı kilit —
+  5 ardışık başarısız → 15 dk 429. Bellek-içi (tek instance; restart'ta sıfırlanır). IP spoof'tan etkilenmez.
 - Write/delete: `writeGuard` (BNS_WRITE_TOKEN set → x-bns-token veya JWT). Bildirimler kişiye kısıtlı.
 - **AÇIK KALAN düşük riskler:** `/api/img/:id` (<img> Authorization yollayamaz → public; yalnız
   tasarım görselleri), `/api/brands/.../daily` (kanal özetleri). Login rate-limit (#2), helmet (#5).
