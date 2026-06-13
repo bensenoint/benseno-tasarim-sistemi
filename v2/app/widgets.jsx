@@ -1,10 +1,8 @@
 // Widget kayıt defteri. Her tip: { title, minW, minH, Component }.
 // Component, BNS_DATA'dan okuyan bir React fonksiyon bileşenidir. Hesaplar calc.js
-// global'lerinden (bnsIsRisk, bnsPersonCapPct) gelir — yeni hesap TANIMLANMAZ (magic-guard).
+// global'lerinden (bnsIsRisk, bnsPersonCapPct/CapLimit) gelir — yeni hesap TANIMLANMAZ (magic-guard).
+// Görsel chrome v2/index.html <style> bloğundadır (.w-* sınıfları).
 
-// Giriş yapan kişi: localStorage 'bns_user' = {id, slack_id, name, role}. Kapasite formülü
-// kanonik USERS kaydını (rol/yetki/dept) ister; brief lead/contributor'ları SLACK ID taşır.
-// Bu yüzden kanonik kullanıcıyı USERS içinde slack_id ile bulup döneriz (id === slack_id).
 function v2Me() {
   var stored = null;
   try { stored = JSON.parse(localStorage.getItem("bns_user") || "null"); } catch (e) {}
@@ -19,61 +17,87 @@ function v2Mine(b, uid) {
   return (b.lead && b.lead.id === uid) ||
     (Array.isArray(b.contributors) && b.contributors.some(function (c) { return c && c.id === uid; }));
 }
+function v2BrandColor(b) {
+  return (b.brand && b.brand.color) || b.marka_color ||
+    (window.WHEEL && window.brandHash ? window.WHEEL[window.brandHash(b.marka || "")] : null) || "var(--ink-5)";
+}
+var h = React.createElement;
 
 function WCard(props) {
-  return React.createElement("div", { style: { height: "100%", display: "flex", flexDirection: "column" } },
-    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 8 } },
-      React.createElement("span", { className: "bns-grip", style: { cursor: "move", color: "var(--ink-4)" } }, "⋮"),
-      React.createElement("span", { style: { font: "500 12px/1 var(--font-sans)", color: "var(--ink-3)" } }, props.title)),
-    React.createElement("div", { style: { flex: 1, overflow: "auto" } }, props.children));
+  return h("div", { className: "w-card", style: { height: "100%", display: "flex", flexDirection: "column" } },
+    h("div", { className: "w-head" },
+      h("span", { className: "bns-grip" }, "⋮⋮"),
+      h("span", { className: "w-dot", style: { background: props.accent } }),
+      h("span", { className: "w-title" }, props.title),
+      props.badge != null && h("span", { className: "w-badge" }, props.badge)),
+    h("div", { className: "w-body" }, props.children));
 }
-function WEmpty(t) { return React.createElement("div", { style: { color: "var(--ink-4)", fontSize: 12 } }, t); }
+function WEmpty(t) { return h("div", { className: "w-empty" }, t); }
 
 function RiskliIslerim() {
   var me = v2Me(), uid = me && me.id;
   var rows = v2Briefs().filter(function (b) {
     return v2Mine(b, uid) && window.bnsIsRisk && window.bnsIsRisk(b.durum, b.deltaH);
-  });
-  return React.createElement(WCard, { title: "Riskli işlerim" },
+  }).sort(function (a, b) { return a.deltaH - b.deltaH; });
+  return h(WCard, { title: "Riskli işlerim", accent: "var(--prio-red)", badge: rows.length || null },
     rows.length ? rows.map(function (b) {
-      return React.createElement("div", { key: b.no,
-        style: { borderLeft: "3px solid var(--prio-red)", padding: "4px 8px", marginBottom: 4, fontSize: 12 } },
-        "#" + b.no + " " + (b.baslik || "") + " · " +
-        (b.deltaH <= 0 ? Math.abs(Math.round(b.deltaH)) + "sa↑" : Math.round(b.deltaH) + "sa"));
+      var late = b.deltaH <= 0;
+      return h("div", { key: b.no, className: "w-risk" },
+        h("span", { className: "n", style: { color: "var(--prio-red)", minWidth: 26 } }, "#" + b.no),
+        h("span", { className: "t" }, b.baslik || ""),
+        h("span", { className: "meta" }, late ? Math.abs(Math.round(b.deltaH)) + "sa ↑" : Math.round(b.deltaH) + "sa"));
     }) : WEmpty("risk yok 👍"));
 }
+
 function Kapasitem() {
   var me = v2Me(), uid = me && me.id;
   var aktif = v2Briefs().filter(function (b) { return v2Mine(b, uid) && b.durum !== "musteride" && b.durum !== "tamamlandi"; }).length;
   var pct = (window.bnsPersonCapPct && me) ? window.bnsPersonCapPct(me, aktif) : 0;
-  return React.createElement(WCard, { title: "Kapasitem" },
-    React.createElement("div", { style: { font: "500 28px/1 var(--font-sans)" } }, "%" + pct),
-    React.createElement("div", { style: { fontSize: 11, color: "var(--ink-4)", marginTop: 4 } }, aktif + " aktif iş"));
+  var limit = (window.bnsPersonCapLimit && me) ? window.bnsPersonCapLimit(me) : 6;
+  var col = pct >= 90 ? "var(--prio-red)" : pct >= 70 ? "var(--prio-orange)" : "var(--prio-green)";
+  return h(WCard, { title: "Kapasitem", accent: "var(--ember)" },
+    h("div", { style: { display: "flex", alignItems: "baseline", gap: 8 } },
+      h("span", { className: "w-kpi", style: { color: col } }, "%" + pct),
+      h("span", { style: { font: "400 14px/1 var(--font-mono)", color: "var(--ink-4)" } }, aktif + "/" + limit)),
+    h("div", { className: "w-kpi-sub" }, aktif + " aktif iş · " + limit + " kapasite"),
+    h("div", { className: "w-bar" }, h("i", { style: { width: Math.min(100, pct) + "%", background: col } })));
 }
+
 function KartAkisi() {
-  var rows = v2Briefs().filter(function (b) { return b.durum === "calisiliyor"; }).slice(0, 8);
-  return React.createElement(WCard, { title: "Çalışılıyor" },
-    rows.length ? rows.map(function (b) {
-      return React.createElement("div", { key: b.no,
-        style: { border: "0.5px solid var(--line)", borderRadius: 6, padding: "6px 9px", marginBottom: 5, fontSize: 12 } },
-        b.baslik || "",
-        React.createElement("div", { style: { fontSize: 10, color: "var(--ink-4)" } }, b.marka || ""));
-    }) : WEmpty("—"));
+  var rows = v2Briefs().filter(function (b) { return b.durum === "calisiliyor"; });
+  return h(WCard, { title: "Çalışılıyor", accent: "var(--info, #3B82C4)", badge: rows.length || null },
+    rows.length ? rows.slice(0, 12).map(function (b) {
+      return h("div", { key: b.no, className: "w-row" },
+        h("span", { className: "w-bdot", style: { background: v2BrandColor(b) } }),
+        h("span", { className: "t" }, b.baslik || ""),
+        h("span", { className: "meta" }, b.marka || ""));
+    }) : WEmpty("aktif iş yok"));
 }
+
 function Musteride() {
   var m = v2Briefs().filter(function (b) { return b.durum === "musteride"; });
-  return React.createElement(WCard, { title: "Müşteride" },
-    React.createElement("div", { style: { font: "500 28px/1 var(--font-sans)", color: "#7c5cff" } }, m.length),
-    React.createElement("div", { style: { fontSize: 11, color: "var(--ink-4)", marginTop: 4 } }, "dönüş bekliyor"));
+  return h(WCard, { title: "Müşteride", accent: "#7C5CFF" },
+    h("div", { className: "w-kpi", style: { color: "#7C5CFF" } }, m.length),
+    h("div", { className: "w-kpi-sub" }, "müşteri dönüşü bekliyor"),
+    m.length ? h("div", { style: { marginTop: 12 } }, m.slice(0, 5).map(function (b) {
+      return h("div", { key: b.no, className: "w-row", style: { padding: "6px 0" } },
+        h("span", { className: "w-bdot", style: { background: v2BrandColor(b) } }),
+        h("span", { className: "t" }, b.baslik || ""),
+        h("span", { className: "meta" }, b.marka || ""));
+    })) : null);
 }
+
 function BugunYarin() {
-  var rows = v2Briefs().filter(function (b) { return b.deltaH != null && b.deltaH <= 48 && b.durum !== "tamamlandi"; })
-    .sort(function (a, b) { return a.deltaH - b.deltaH; }).slice(0, 8);
-  return React.createElement(WCard, { title: "Bugün ve yarın" },
-    rows.length ? rows.map(function (b) {
-      return React.createElement("div", { key: b.no, style: { fontSize: 12, padding: "3px 0" } },
-        "#" + b.no + " " + (b.baslik || "") + " · " + Math.round(b.deltaH) + "sa");
-    }) : WEmpty("—"));
+  var rows = v2Briefs().filter(function (b) { return b.deltaH != null && b.deltaH <= 48 && b.durum !== "tamamlandi" && b.durum !== "musteride"; })
+    .sort(function (a, b) { return a.deltaH - b.deltaH; });
+  return h(WCard, { title: "Bugün ve yarın", accent: "var(--prio-orange)", badge: rows.length || null },
+    rows.length ? rows.slice(0, 12).map(function (b) {
+      var col = b.deltaH <= 8 ? "var(--prio-red)" : b.deltaH <= 24 ? "var(--prio-orange)" : "var(--prio-yellow)";
+      return h("div", { key: b.no, className: "w-row" },
+        h("span", { className: "n" }, "#" + b.no),
+        h("span", { className: "t" }, b.baslik || ""),
+        h("span", { className: "meta", style: { color: col } }, Math.round(b.deltaH) + "sa"));
+    }) : WEmpty("48 saatte termin yok"));
 }
 
 window.BNS_V2_REGISTRY = {

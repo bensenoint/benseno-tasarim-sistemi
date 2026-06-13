@@ -19,7 +19,6 @@ function v2Apply(ed) {
     D.__source = "live_briefs";
   } catch (e) { console.warn("[v2] apply hata:", e.message); }
 }
-var btnV2 = { padding: "6px 11px", border: "0.5px solid var(--line)", borderRadius: 6, background: "var(--surface)", color: "var(--ink)", font: "400 12px/1 var(--font-sans)", cursor: "pointer" };
 
 function PanomApp() {
   var ref = React.useState(false), edit = ref[0], setEdit = ref[1];
@@ -37,7 +36,7 @@ function PanomApp() {
   }
   function addWidget(grid, item) {
     var node = grid.addWidget({ x: item.x, y: item.y, w: item.w, h: item.h,
-      content: '<div class="grid-stack-item-content" style="background:var(--surface);border:0.5px solid var(--line);border-radius:12px;padding:10px 12px"></div>' });
+      content: '<div class="grid-stack-item-content"></div>' });
     node.setAttribute("data-w", item.type);
     mountWidget(node);
   }
@@ -79,6 +78,8 @@ function PanomApp() {
   React.useEffect(function () {
     var g = gridRef.current; if (!g) return;
     g.enableMove(edit); g.enableResize(edit);
+    var el = document.getElementById("bns-grid");
+    if (el) el.classList.toggle("gs-edit", edit);
   }, [edit]);
 
   var eklenebilir = window.BNS_V2_WIDGETS.filter(function (t) {
@@ -86,18 +87,18 @@ function PanomApp() {
   });
   return React.createElement(React.Fragment, null,
     window.OdyV2 ? React.createElement(window.OdyV2) : null,
-    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, padding: "12px 16px" } },
-      React.createElement("h1", { style: { font: "500 20px/1 var(--font-sans)", margin: 0, flex: 1 } }, "Panom"),
-      edit && React.createElement("button", { onClick: function () { setPicker(function (p) { return !p; }); }, style: btnV2 }, "+ alan ekle"),
-      React.createElement("button", { onClick: function () { setEdit(function (e) { return !e; }); },
-        style: Object.assign({}, btnV2, { background: edit ? "var(--ember)" : "var(--surface)", color: edit ? "#fff" : "var(--ink-3)" }) },
+    React.createElement("div", { className: "bns-head" },
+      React.createElement("h1", null, "Panom"),
+      React.createElement("span", { className: "sub", style: { flex: 1 } }, edit ? "kartları sürükle · köşeden boyutlandır" : "kişisel iş panon"),
+      edit && React.createElement("button", { className: "bns-btn", onClick: function () { setPicker(function (p) { return !p; }); } }, "+ alan ekle"),
+      React.createElement("button", { className: "bns-btn" + (edit ? " on" : ""), onClick: function () { setEdit(function (e) { return !e; }); } },
         edit ? "✓ bitti" : "düzenle")),
-    picker && edit && React.createElement("div", { style: { padding: "0 16px 12px", display: "flex", gap: 8, flexWrap: "wrap" } },
+    picker && edit && React.createElement("div", { style: { padding: "0 24px 12px", display: "flex", gap: 8, flexWrap: "wrap" } },
       eklenebilir.length ? eklenebilir.map(function (t) {
-        return React.createElement("button", { key: t, style: btnV2,
+        return React.createElement("button", { key: t, className: "bns-btn",
           onClick: function () { var g = gridRef.current; addWidget(g, { type: t, x: 0, y: 100, w: 4, h: 2 }); save(g); setPicker(false); } },
-          (window.BNS_V2_REGISTRY[t] && window.BNS_V2_REGISTRY[t].title) || t);
-      }) : React.createElement("span", { style: { fontSize: 12, color: "var(--ink-4)" } }, "tüm alanlar ekli")),
-    React.createElement("div", { id: "bns-grid", className: "grid-stack", style: { padding: "0 8px" } }));
+          "+ " + ((window.BNS_V2_REGISTRY[t] && window.BNS_V2_REGISTRY[t].title) || t));
+      }) : React.createElement("span", { style: { font: "400 12px/1 var(--font-sans)", color: "var(--ink-4)" } }, "tüm alanlar ekli")),
+    React.createElement("div", { id: "bns-grid", className: "grid-stack", style: { padding: "4px 16px 24px" } }));
 }
 window.PanomApp = PanomApp;

@@ -9,12 +9,57 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://cdn.jsdelivr.net/npm/gridstack@10/dist/gridstack-all.js"></script>
+<style>
+  html, body { margin: 0; background: var(--surface-sub); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  #bns-grid { background: transparent; }
+  /* kart chrome */
+  .grid-stack-item-content {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    padding: 16px 18px; box-shadow: var(--shadow-card, 0 1px 2px rgba(0,0,0,.05));
+    overflow: hidden; transition: box-shadow .16s var(--ease-out-quart, ease), border-color .16s, transform .16s;
+    display: flex; flex-direction: column;
+  }
+  .grid-stack-item-content:hover { border-color: var(--line-strong); box-shadow: var(--shadow-2, 0 8px 24px rgba(0,0,0,.10)); transform: translateY(-1px); }
+  .grid-stack-item-content::-webkit-scrollbar, .w-body::-webkit-scrollbar { width: 6px; height: 6px; }
+  .grid-stack-item-content::-webkit-scrollbar-thumb, .w-body::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
+  /* widget iç yapısı */
+  .w-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex: 0 0 auto; }
+  .w-dot { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto; }
+  .w-title { font: 500 12px/1 var(--font-sans); letter-spacing: .5px; text-transform: uppercase; color: var(--ink-3); }
+  .w-badge { margin-left: auto; font: 600 11px/1 var(--font-mono); color: var(--ink-4); background: var(--surface-sub); border: 1px solid var(--line); border-radius: 20px; padding: 3px 9px; }
+  .w-body { flex: 1 1 auto; overflow: auto; min-height: 0; }
+  .w-kpi { font-family: var(--font-display, serif); font-weight: 400; font-size: 54px; line-height: .9; letter-spacing: -1px; }
+  .w-kpi-sub { font: 400 12px/1.3 var(--font-sans); color: var(--ink-4); margin-top: 8px; }
+  .w-bar { height: 6px; background: var(--surface-sub); border: 1px solid var(--line); border-radius: 99px; margin-top: 14px; overflow: hidden; }
+  .w-bar > i { display: block; height: 100%; border-radius: 99px; transition: width .4s var(--ease-out-quart, ease); }
+  .w-row { display: flex; align-items: center; gap: 9px; padding: 8px 0; border-bottom: 1px solid var(--line-soft); }
+  .w-row:last-child { border-bottom: 0; }
+  .w-row .n { font: 500 11px/1 var(--font-mono); color: var(--ink-4); flex: 0 0 auto; min-width: 26px; }
+  .w-row .t { flex: 1 1 auto; font: 400 13px/1.35 var(--font-sans); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .w-row .meta { font: 500 11px/1 var(--font-mono); color: var(--ink-4); flex: 0 0 auto; }
+  .w-bdot { width: 8px; height: 8px; border-radius: 3px; flex: 0 0 auto; }
+  .w-risk { display: flex; align-items: center; gap: 8px; border-left: 3px solid var(--prio-red); background: var(--prio-red-bg); border-radius: 0 8px 8px 0; padding: 8px 11px; margin-bottom: 7px; }
+  .w-risk .t { flex: 1 1 auto; font: 500 12px/1.3 var(--font-sans); color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .w-risk .meta { font: 700 11px/1 var(--font-mono); color: var(--prio-red); flex: 0 0 auto; }
+  .w-empty { color: var(--ink-4); font: 400 13px/1.4 var(--font-sans); padding: 10px 0; display: flex; align-items: center; gap: 6px; }
+  .w-pill { display: inline-block; font: 500 10px/1 var(--font-mono); padding: 3px 7px; border-radius: 5px; margin-left: 8px; }
+  /* başlık + butonlar */
+  .bns-head { display: flex; align-items: center; gap: 12px; padding: 22px 24px 10px; }
+  .bns-head h1 { font-family: var(--font-display, serif); font-weight: 400; font-size: 34px; line-height: 1; margin: 0; }
+  .bns-head .sub { font: 400 12px/1 var(--font-sans); color: var(--ink-4); align-self: flex-end; padding-bottom: 4px; }
+  .bns-btn { padding: 8px 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--ink-2); font: 500 12px/1 var(--font-sans); cursor: pointer; transition: background .14s, border-color .14s, color .14s; }
+  .bns-btn:hover { border-color: var(--line-strong); background: var(--surface-raised); }
+  .bns-btn.on { background: var(--ember); border-color: var(--ember); color: #fff; }
+  .grid-stack-item-content .bns-grip { cursor: move; color: var(--ink-5); font-size: 13px; opacity: 0; transition: opacity .14s; flex: 0 0 auto; }
+  .gs-edit .grid-stack-item-content .bns-grip { opacity: 1; }
+  .gs-edit .grid-stack-item-content { border-style: dashed; }
+</style>
 </head>
 <body>
 <div id="root"></div>
-<script src="../app/calc.js?v=1781339050"></script>
-<script src="../app/data.js?v=1781339050"></script>
-<script src="app/bundle.js?v=1781339050"></script>
+<script src="../app/calc.js?v=1781359656"></script>
+<script src="../app/data.js?v=1781359656"></script>
+<script src="app/bundle.js?v=1781359656"></script>
 <script>
   (function () {
     if (!localStorage.getItem("bns_token")) { location.href = "../dashboard/"; return; }
