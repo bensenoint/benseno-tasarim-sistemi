@@ -55,6 +55,7 @@ TS=$(date +%s)
 sed -i '' \
   -e "s|app/bundle\.js?v=[0-9]*|app/bundle.js?v=${TS}|g" \
   -e "s|app/data\.js?v=[0-9]*|app/data.js?v=${TS}|g" \
+  -e "s|app/calc\.js?v=[0-9]*|app/calc.js?v=${TS}|g" \
   "$PROJ/dashboard/index.html"
 
 # Root index.html güncelle

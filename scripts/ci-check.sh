@@ -30,5 +30,12 @@ for f in dashboard/app/*.jsx dashboard/app/screens/*.jsx; do
 done
 [ "$FAIL" -eq 0 ] && echo "  ✅ tüm .jsx derlendi"
 
+echo "③ Formül kilidi (calc.js birim testleri)"
+if node scripts/formula-test.js >/tmp/ci-ft 2>&1; then
+  echo "  ✅ $(grep -o '[0-9]* geçti' /tmp/ci-ft | tail -1)"
+else
+  cat /tmp/ci-ft; FAIL=1
+fi
+
 if [ "$FAIL" -eq 0 ]; then echo "🟢 CI KAPISI GEÇTİ"; else echo "🔴 CI KAPISI KALDI"; fi
 exit "$FAIL"

@@ -264,13 +264,8 @@ const deptStats = {
   ai:      { name: "AI",      people: 1,  active: 10, overdue: 2, capacity:  6, completed30: 38, avgComplete: 18.7, revRate: 11 }
 };
 
-// capacity = toplam slot sayısı (people × kişi_başı_limit).
-// Her zaman 0-100 yüzde döner: active / capacity * 100
-function bnsCapPct(s) {
-  if (!s || !s.capacity) return 0;
-  if (s.capacity_pct != null) return s.capacity_pct; // zaten hesaplıysa kullan
-  return Math.min(100, Math.round((s.active / s.capacity) * 100));
-}
+// NOT: bnsCapPct / bnsPersonCapLimit / bnsPersonCapPct artık calc.js'te (tek doğruluk kaynağı,
+// node'da test edilebilir). calc.js index.html'de data.js'ten ÖNCE yüklenir → global olarak gelir.
 
 // Tüm dept stats'ı capacity_pct alanı ile normalize et.
 // Canlı API capacity göndermez → people × 6 (kişi başı slot) ile türet.
@@ -285,26 +280,7 @@ function bnsNormDeptStats(raw) {
   return out;
 }
 
-// ── Kişi başı kapasite (TEK DOĞRULUK KAYNAĞI) ───────────────────────────────
-// Profil ve Departman ekranları AYNI limiti ve AYNI formülü kullanmalı; aksi halde
-// aynı kişi iki ekranda farklı doluluk gösterir (ör. %90 vs %50 — eski hata).
-// Limit = kişinin eşzamanlı taşıyabileceği aktif iş sayısı (lead + contributor).
-// Yöneticiler koordinasyon yükü taşıdığı için daha yüksek limitli.
-function bnsPersonCapLimit(u) {
-  if (!u) return 6;
-  if (u.yetki === "yonetici" || u.rol === "yonetici") return 10;
-  const d = u.dept || u.rol || "";
-  return ({ tasarim: 6, editor: 8, ai: 6, freelance: 6 })[d] || 6;
-}
-// Aktif iş sayısından kapasite yüzdesi (0-100). İki ekran da bunu çağırır.
-function bnsPersonCapPct(u, activeCount) {
-  return Math.min(100, Math.round((activeCount / bnsPersonCapLimit(u)) * 100));
-}
-
-window.bnsCapPct     = bnsCapPct;
 window.bnsNormDeptStats = bnsNormDeptStats;
-window.bnsPersonCapLimit = bnsPersonCapLimit;
-window.bnsPersonCapPct   = bnsPersonCapPct;
 
 // ─── BRAND STATS (for marka tab) ───────────────────────────────────────────
 const brandStats = BRANDS.map(b => {
@@ -536,8 +512,10 @@ function bnsHydrateCompleted(raw, idx) {
   const bitis = typeof raw.bitis === "string" ? Date.parse(raw.bitis) : raw.bitis;
   // Beklemede geçirilen süre muaftır: hem çalışma süresinden hem gecikmeden düşülür (saat durur).
   const beklemeMs = raw.bekleme_ms || 0;
-  const sureH = raw.sureH != null ? raw.sureH : raw.sure != null ? raw.sure : (bitis && baslangic && !isNaN(bitis) && !isNaN(baslangic) ? Math.max(0, bitis - baslangic - beklemeMs) / H : null);
-  const gecikmeH = (bitis && deadline && (bitis - beklemeMs) > deadline) ? Math.round((bitis - beklemeMs - deadline) / H * 10) / 10 : 0;
+  // Süre/gecikme formülleri calc.js'te (tek doğruluk kaynağı + node testi). raw.sureH/raw.sure
+  // veri-kaynağı önceliği burada kalır; saf hesap bnsSureH/bnsGecikmeH'ten gelir.
+  const sureH = raw.sureH != null ? raw.sureH : raw.sure != null ? raw.sure : bnsSureH(bitis, baslangic, beklemeMs);
+  const gecikmeH = bnsGecikmeH(bitis, beklemeMs, deadline);
   const gecikme  = gecikmeH > 0 ? gecikmeH.toFixed(1) + "h" : "—";
   const brand = BR[raw.marka] || {
     name: raw.marka, color: WHEEL[brandHash(raw.marka)], wheelIdx: brandHash(raw.marka)
