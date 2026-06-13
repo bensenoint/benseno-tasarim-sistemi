@@ -49,6 +49,18 @@
 - Slack tokenları: `data/.slack-bot-token` vb. — ASLA commit edilmez, chat'te maskelenir
 - Bot adı: WT (`chat:write.customize` ile her mesajda override)
 
+## 2.6 Tek Komutla Deploy + CI Kapısı (2026-06-13)
+
+- **`npm run deploy`** (= `bash scripts/deploy.sh`) — tüm koreografiyi tek komuta toplar:
+  CI kapısı → dashboard derle+push+Pages bekle → API deploy → bot redeploy → tutarlılık denetimi.
+  Hedefli: `npm run deploy dashboard|api|bot`. **CI kapısı kalırsa deploy YAPILMAZ.**
+- **`npm run check`** (= `scripts/ci-check.sh`) — secret'siz kapı: tüm .js sözdizimi + .jsx esbuild derleme.
+- **`npm run verify`** (= `consistency-check.js`) — metrik doğruluğu (25 kontrol).
+- **`npm run build`** — yalnız bundle derle.
+- **GitHub Actions CI** (`.github/workflows/ci.yml`): her push/PR'da `ci-check.sh` çalışır.
+  ⚠️ Bu dosya yalnızca **`workflow` scope'lu PAT** ile push edilebilir; scope yoksa GitHub
+  reddeder (dosyayı GitHub web arayüzünden elle eklemek de mümkün).
+
 ## 3. AI Model Dağılımı
 
 | Görev | Model | Yer |
