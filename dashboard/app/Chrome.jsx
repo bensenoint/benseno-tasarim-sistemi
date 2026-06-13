@@ -171,7 +171,40 @@ function ChatBot() {
   const panelTop  = Math.min(Math.max(8, pos.y - 468), Math.max(8, vh - 532));
   const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
   const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+  const [unread, setUnread] = React.useState(false);   // balonda "Ody senin için özet hazırladı" işareti
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
+
+  // Proaktif kişisel brief — kişi dashboard'ı açınca Ody onun durumunu BİR KEZ (günde) hazırlar.
+  // Kişiye özeldir: /api/chat zaten giriş yapan kullanıcıya göre filtreler. Kullanıcı+tarih
+  // anahtarlı localStorage cache → aynı gün tekrar yüklemede AI çağrısı yapılmaz (maliyet ~0).
+  React.useEffect(() => {
+    if (!tok()) return;
+    const u = (typeof bnsGetStoredUser === "function" && bnsGetStoredUser()) || null;
+    const uid = u && (u.id || u.slack_id);
+    if (!uid) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const key = `bns_ody_brief_${uid}_${today}`;
+    let cached = null; try { cached = localStorage.getItem(key); } catch (e) {}
+    if (cached) { setMsgs([{ role: "assistant", content: cached }]); setUnread(true); return; }
+    const PROMPT = "Bugünkü kısa kişisel özetimi ver: kaç aktif işim var, hangileri riskli/gecikmiş " +
+      "(varsa # numarasıyla), müşteride bekleyen işlerim, kapasite durumum. Selamla başla, en fazla " +
+      "4 kısa madde. Acil bir şey yoksa kısaca olumlu söyle.";
+    (async () => {
+      try {
+        const r = await fetch(`${API}/api/chat`, {
+          method: "POST",
+          headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
+          body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }] }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.reply) {
+          try { localStorage.setItem(key, j.reply); } catch (e) {}
+          setMsgs([{ role: "assistant", content: j.reply }]);
+          setUnread(true);
+        }
+      } catch (e) { /* sessiz — proaktif brief best-effort */ }
+    })();
+  }, []);
 
   const send = async () => {
     const q = input.trim();
@@ -196,14 +229,19 @@ function ChatBot() {
       {/* Açma balonu */}
       {!open && (
         <button onPointerDown={(e) => startDrag(e, true)}
-          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setOpen(true); }}
-          title="Ody — sistem asistanı (sürükleyerek taşıyabilirsin)" style={{
+          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setUnread(false); setOpen(true); }}
+          title={unread ? "Ody senin için bugünkü özetini hazırladı — aç" : "Ody — sistem asistanı (sürükleyerek taşıyabilirsin)"} style={{
           position: "fixed", left: pos.x, top: pos.y, zIndex: 90,
           width: 52, height: 52, borderRadius: "50%", border: 0, cursor: "grab", touchAction: "none",
           background: "var(--ember)", color: "#fff", fontSize: 24,
           boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
           display: "flex", alignItems: "center", justifyContent: "center",
-        }}>🤖</button>
+        }}>🤖
+          {unread && <span title="Yeni kişisel özet" style={{
+            position: "absolute", top: 2, right: 2, width: 13, height: 13, borderRadius: "50%",
+            background: "var(--prio-red, #E5484D)", border: "2px solid var(--surface, #fff)",
+          }}/>}
+        </button>
       )}
       {open && (
         <div style={{
