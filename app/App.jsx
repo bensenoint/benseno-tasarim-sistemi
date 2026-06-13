@@ -254,6 +254,13 @@ function App({ currentUser, onLogout }) {
           cache: "no-store",
           headers: _tok ? { Authorization: "Bearer " + _tok } : {},
         });
+        // 401 = token geçersiz/süresi dolmuş → SESSİZCE mock gösterme; oturumu kapat, login'e dön.
+        // (Eskiden 401'de return edilip baked/mock veri ekranda kalıyordu → "sahte veri gerçek sanıldı".)
+        if (r.status === 401) {
+          try { localStorage.removeItem("bns_token"); localStorage.removeItem("bns_user"); } catch (e) {}
+          if (typeof location !== "undefined") location.reload();
+          return;
+        }
         if (!r.ok || cancelled) return;
         const ed = await r.json();
         if (cancelled) return;
