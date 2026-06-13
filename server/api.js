@@ -231,10 +231,12 @@ app.post('/api/briefs/by-ts/:ts/final-deliverables', writeGuard, async (req, res
     let n = 0;
     for (const it of items) {
       if (!it || !it.url) continue;
+      // uploaded_by users(id) FK'li — geçerli U/FR id değilse NULL (backfill/bilinmeyen reactor FK'yi bozmasın).
+      const by = (req.body && req.body.by && /^(U|FR)[A-Z0-9]+$/.test(req.body.by)) ? req.body.by : null;
       await pool.query(
         `INSERT INTO brief_attachments(brief_id,url,filename,mime,uploaded_by,source,is_final)
          VALUES ($1,$2,$3,$4,$5,'final',true)`,
-        [id, it.url, it.filename || 'dosya', it.mime || '', req.body && req.body.by || null]);
+        [id, it.url, it.filename || 'dosya', it.mime || '', by]);
       n++;
     }
     res.json({ ok: true, id, count: n });
