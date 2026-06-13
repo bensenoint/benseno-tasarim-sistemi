@@ -143,6 +143,27 @@ app.get('/api/auth/me', auth.authGuard, (req, res) => {
   res.json({ user: req.user });
 });
 
+// ── v2 "Panom" kişiye özel pano düzeni ──────────────────────────────────────
+// authGuard → kişinin slack_id'sinden okur/yazar. dashboard_layouts(user_id PK, layout jsonb).
+app.get('/api/layout', auth.authGuard, async (req, res) => {
+  try {
+    const r = await pool.query('SELECT layout FROM dashboard_layouts WHERE user_id=$1', [req.user.slack_id]);
+    res.json({ layout: r.rows[0] ? r.rows[0].layout : null });
+  } catch (e) { console.error('[api] layout get hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+app.put('/api/layout', auth.authGuard, async (req, res) => {
+  try {
+    const layout = req.body && req.body.layout;
+    if (!Array.isArray(layout)) return res.status(400).json({ error: 'layout dizi olmalı' });
+    if (layout.length > 50) return res.status(400).json({ error: 'çok fazla widget' });
+    await pool.query(
+      `INSERT INTO dashboard_layouts(user_id, layout, updated_at) VALUES ($1,$2,now())
+       ON CONFLICT (user_id) DO UPDATE SET layout=$2, updated_at=now()`,
+      [req.user.slack_id, JSON.stringify(layout)]);
+    res.json({ ok: true });
+  } catch (e) { console.error('[api] layout put hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // ── Kullanıcı yönetimi (admin only) ─────────────────────────────────────────
 // GET /api/users
 app.get('/api/users', auth.authGuard, auth.adminGuard, async (req, res) => {
