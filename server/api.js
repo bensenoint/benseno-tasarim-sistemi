@@ -14,7 +14,17 @@ const slack = require('./slack');
 const { pool } = require('./db');
 
 const app = express();
-app.use(express.json({ limit: '25mb' }));   // dosya ekleri base64 ile gelir
+app.disable('x-powered-by');   // Express sürüm parmak izini gizle
+app.use(express.json({ limit: '25mb' }));   // dosya ekleri base64 ile gelir (attachment endpoint'leri gerektirir)
+
+// Güvenlik başlıkları (helmet'siz, minimal — bağımlılık eklemeden). Railway HTTPS sonlandırır → HSTS uygun.
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('X-Frame-Options', 'DENY');                 // API çerçevelenmemeli
+  res.set('Referrer-Policy', 'no-referrer');
+  res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
 
 // CORS — dashboard GitHub Pages origin'ine kısıtlı (wildcard kaldırıldı)
 const ALLOWED_ORIGINS = new Set(['https://bensenoint.github.io']);
