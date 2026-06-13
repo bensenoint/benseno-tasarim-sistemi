@@ -181,6 +181,18 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
   iki yerde hesaplamaktan kaçın; tek helper'a çıkar (bkz. kapasite → bnsPersonCapPct).
 - Tipik kullanım: büyük değişiklik/deploy sonrası `node scripts/consistency-check.js` çalıştır.
 
+## 6.8 Güvenlik (2026-06-13)
+
+- **Veri endpoint'leri korumalı (#1, ÇÖZÜLDÜ):** `/api/embedded` + `/api/state` artık `readGuard`
+  arkasında — JWT (dashboard, login sonrası) VEYA `x-bns-token` (server-to-server) gerekir.
+  Token'sız → 401. Eskiden TÜM veri açıktı. Tüketiciler: dashboard poll JWT yollar; rapor-lib/
+  slack-bot/termin-risk `x-bns-token` (BNS_WRITE_TOKEN env); consistency-check `data/.write-token` (gitignored).
+- **DEPLOY SIRASI (kilidi değiştirirken):** önce tüketiciler (dashboard+bot), EN SON API kilidi →
+  kesinti penceresi olmaz.
+- Write/delete: `writeGuard` (BNS_WRITE_TOKEN set → x-bns-token veya JWT). Bildirimler kişiye kısıtlı.
+- **AÇIK KALAN düşük riskler:** `/api/img/:id` (<img> Authorization yollayamaz → public; yalnız
+  tasarım görselleri), `/api/brands/.../daily` (kanal özetleri). Login rate-limit (#2), helmet (#5).
+
 ## 7. Bilinen Davranışlar / Tuzaklar
 
 - `sleep N` ve `rm -rf` hook'larca bloklanır → until-loop + run_in_background / mktemp -d kullan.
