@@ -52,7 +52,21 @@ function bnsIsRisk(durum, deltaH) {
   return deltaH <= BNS_RISK_H; // 24sa içinde veya geçmiş, iş hâlâ devam ediyor
 }
 
+// ── Çıktı hızı — son N hafta tamamlanan iş / hafta (düşük örneklemde uyarır) ──────────
+// bitisListMs: tamamlanma zaman damgaları (ms, NORMALİZE edilmiş). nowMs: şimdi. weeks: pencere.
+// lowSample=true → örneklem küçük, sayı yanıltıcı olabilir (sistem yeni, veri ince).
+function bnsThroughput(bitisListMs, nowMs, weeks) {
+  weeks = weeks || 4;
+  var cutoff = nowMs - weeks * 7 * 24 * 3600 * 1000;
+  var n = 0;
+  for (var i = 0; i < (bitisListMs || []).length; i++) {
+    var t = bitisListMs[i];
+    if (t && t >= cutoff) n++;
+  }
+  return { count: n, perWeek: Math.round((n / weeks) * 10) / 10, weeks: weeks, lowSample: n < 3 };
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsGecikmeH, bnsIsRisk, BNS_H, BNS_RISK_H };
+  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsGecikmeH, bnsIsRisk, bnsThroughput, BNS_H, BNS_RISK_H };
 }
