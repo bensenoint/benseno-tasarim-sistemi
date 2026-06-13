@@ -60,10 +60,15 @@ yoğun web kullanımı için tasarlanmış. Prod'a dokunmadan ayrı `/v2` demo a
 - gridstack `column(1)` (tek kolon) dar ekranda; widget SIRASI korunur (y'ye göre), boyutlandırma web-only.
 - Sabit Ody şeridi üstte kalır; widget'lar altında dikey akış. Aynı widget render'ları.
 
-## Sabit Ody (düzenlenemez)
+## Ody — Sürükle-Bırak Avatar Buton (sistem kimliği)
 
-- Üstte her zaman: ince **AI brief şeridi** (proaktif kişisel özet — mevcut /api/chat brief mantığı yeniden
-  kullanılır) + "Ody'ye sor" çubuğu (mevcut Ody sohbetini açar). Izgaranın parçası DEĞİL, sabit kabuk.
+- Ody, ekranda **taşınabilir bir avatar buton** olarak yaşar (mevcut prod'daki sürüklenebilir balonun
+  evrimi). Bir **karakter/avatar** ile sisteme kimlik katar — markaya özel, dostane bir yüz.
+- Konum **kişiye özel kaydedilir** (localStorage `bns_v2_ody_pos`); kişi istediği köşeye taşır.
+- Tıklayınca açılır: **proaktif kişisel brief** (mevcut /api/chat brief mantığı) + "Ody'ye sor" sohbeti.
+- Yeni iş/risk olduğunda avatarda **okunmadı işareti** (mevcut proaktif-brief deseni).
+- Izgaranın/widget panosunun parçası DEĞİL — her ekranda yüzen, sabit kimlik öğesi. İstenirse
+  proaktif brief'in bir **özeti** üstte ince şerit olarak da gösterilebilir (opsiyonel, kişi kapatabilir).
 
 ## Güvenlik / Tutarlılık
 
