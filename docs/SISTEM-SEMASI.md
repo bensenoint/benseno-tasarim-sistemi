@@ -211,6 +211,22 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
      localhost'ta mock korunur (çevrimdışı geliştirme).
 - **Kural:** Mock fixture'lar yalnız localhost'ta görünür. Prod'da veri ya canlıdır ya boştur — asla sahte.
 
+## 6.10 Galeri / Final Teslimler (2026-06-13 yeniden tasarım)
+
+- **Sorun:** eski galeri yalnız thread'deki SON resmi yakalıyordu (final olmayabilir) + sadece resim +
+  çoğu işte hiç yakalanmamıştı (18'de 2). Proxy çalışıyordu ama yakalanmış dosya yoktu.
+- **Yeni yöntem (elle işaret + tüm tipler):**
+  - Slack thread'inde final dosyanın olduğu mesaja **📎 (`:paperclip:`) reaction** koy → bot o mesajın
+    TÜM dosyalarını (resim/PDF/video/zip/AI…) `brief_attachments(is_final=true)` yapar + thread'e onay yazar.
+  - Yeniden 📎 = o brief'in final'larını DEĞİŞTİRİR (idempotent).
+  - Dosyalar `/api/attachment/:id` proxy'sinden servis edilir (Slack url_private + bot token).
+    `/api/img` gibi **bilinçli PUBLIC** (<img>/indirme Authorization yollayamaz; düşük risk).
+  - Galeri: resim→önizleme, diğer→tip ikonu+indirme kartı, altında **AI özeti** (thread_ozet/insight),
+    "+N dosya" rozeti, "yalnız teslimli" filtresi. Final yoksa "📎 final yok" ipucu.
+- **Geri-tarama:** `node scripts/backfill-deliverables.js` (tek seferlik, en-iyi-tahmin: thread'deki son
+  dosyalı mesaj). 16/18 iş dolduruldu; 2'sinde (#5,#52) hiç dosya yok.
+- queries.js `attachments` artık id/mime/is_final içerir (galeri proxy + tip ayrımı).
+
 ## 7. Bilinen Davranışlar / Tuzaklar
 
 - `sleep N` ve `rm -rf` hook'larca bloklanır → until-loop + run_in_background / mktemp -d kullan.
