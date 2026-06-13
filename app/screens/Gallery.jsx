@@ -5,20 +5,35 @@
 function GalleryScreen({ data }) {
   const all = data._allCompleted || data.completed || [];
   const [onlyFinal, setOnlyFinal] = React.useState(false);
+  const [brandSel, setBrandSel] = React.useState("");
   const withFinal = all.filter(c => (c.attachments || []).some(a => a.is_final) || c.image_url);
-  const items = (onlyFinal ? withFinal : all);
+  // Marka seçenekleri — tamamlanan işlerin markaları (alfabetik, tekil)
+  const brandNames = React.useMemo(() => {
+    const seen = {};
+    for (const c of all) { const n = c.brand?.name || c.marka; if (n) seen[n] = true; }
+    return Object.keys(seen).sort((a, b) => a.localeCompare(b, "tr"));
+  }, [all]);
+  let items = onlyFinal ? withFinal : all;
+  if (brandSel) items = items.filter(c => (c.brand?.name || c.marka) === brandSel);
   const fldStyle = { padding:"6px 9px", border:"1px solid var(--line)", borderRadius:6, background:"var(--surface)", color:"var(--ink)", font:"400 12px/1.2 var(--font-sans)", cursor:"pointer" };
   return (
     <div className="bn-tab-in">
       <PageHead
         title="Galeri"
         subtitle={`tamamlanan işlerin final teslimleri · ${withFinal.length}/${all.length} işte teslim var · thread'de 📎 ile işaretle`}
-        actions={
+        actions={<>
+          <select value={brandSel} onChange={e => setBrandSel(e.target.value)} title="Markaya göre filtrele"
+            style={{ ...fldStyle, maxWidth: 180 }}>
+            <option value="">Tüm markalar ({all.length})</option>
+            {brandNames.map(n => (
+              <option key={n} value={n}>{n} ({all.filter(c => (c.brand?.name || c.marka) === n).length})</option>
+            ))}
+          </select>
           <button onClick={() => setOnlyFinal(v => !v)}
             style={{ ...fldStyle, background: onlyFinal ? "var(--ember)" : "var(--surface)", color: onlyFinal ? "#fff" : "var(--ink-3)", borderColor: onlyFinal ? "var(--ember)" : "var(--line)" }}>
             {onlyFinal ? "✓ yalnız teslimli" : "yalnız teslimli göster"}
           </button>
-        }
+        </>}
       />
       <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(240px, 1fr))", gap: 14}}>
         {items.map((c, i) => <GalleryTile key={c.id} c={c} idx={i}/>)}
