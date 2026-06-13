@@ -51,5 +51,15 @@ t('gecikme: 2sa geç = 2', C.bnsGecikmeH(T0 + 12 * H, 0, T0 + 10 * H), 2);
 t('gecikme: bekleme muafiyeti gecikmeyi sıfırlar', C.bnsGecikmeH(T0 + 12 * H, 3 * H, T0 + 10 * H), 0); // net 9sa < 10
 t('gecikme: eksik veri = 0', C.bnsGecikmeH(null, 0, T0 + 10 * H), 0);
 
+// ── Termin riski — aktif iş + teslime ≤24sa ──
+t('risk: yarın teslim, çalışılıyor = true', C.bnsIsRisk('calisiliyor', 12), true);
+t('risk: 3 gün var = false', C.bnsIsRisk('yeni', 72), false);
+t('risk: termin geçmiş + aktif = true', C.bnsIsRisk('yeni', -5), true);
+t('risk: incelemede = false (esasen bitti)', C.bnsIsRisk('incelemede', 2), false);
+t('risk: musteride = false', C.bnsIsRisk('musteride', 1), false);
+t('risk: tamamlandi = false', C.bnsIsRisk('tamamlandi', -10), false);
+t('risk: deltaH yok = false', C.bnsIsRisk('yeni', null), false);
+t('risk: sınırda 24 = true', C.bnsIsRisk('calisiliyor', 24), true);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);
