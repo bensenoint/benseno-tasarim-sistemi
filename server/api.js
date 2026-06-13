@@ -87,16 +87,38 @@ function handleWrite(fn) {
 // ── Auth ─────────────────────────────────────────────────────────────────────
 const auth = require('./auth');
 
+// Brute-force koruması: hesap (slack_id) bazlı kilit — IP spoof'tan etkilenmez,
+// doğrudan şifre denemesini sınırlar. Bellek-içi (tek instance; restart'ta sıfırlanır — kabul).
+const LOGIN_MAX = 5;                 // ardışık başarısız deneme
+const LOGIN_WINDOW = 15 * 60 * 1000; // 15 dk pencere/kilit
+const loginFails = new Map();        // slack_id → { fails, until }
+function loginBlocked(id) {
+  const e = loginFails.get(id);
+  if (e && e.until && e.until > Date.now()) return Math.ceil((e.until - Date.now()) / 60000);
+  return 0;
+}
+function loginFail(id) {
+  const e = loginFails.get(id) || { fails: 0, until: 0 };
+  e.fails += 1;
+  if (e.fails >= LOGIN_MAX) { e.until = Date.now() + LOGIN_WINDOW; e.fails = 0; }
+  loginFails.set(id, e);
+  if (loginFails.size > 5000) loginFails.clear(); // güvenlik valfi (bellek)
+}
+
 // POST /api/auth/login — { slack_id, password } → { token, user }
 app.post('/api/auth/login', async (req, res) => {
   const { slack_id, password } = req.body || {};
   if (!slack_id || !password) return res.status(400).json({ error: 'slack_id ve password gerekli' });
+  const mins = loginBlocked(slack_id);
+  if (mins > 0) return res.status(429).json({ error: `çok fazla başarısız deneme — ${mins} dk sonra tekrar dene` });
   try {
     const r = await pool.query('SELECT * FROM dashboard_users WHERE slack_id=$1', [slack_id]);
     const user = r.rows[0];
     if (!user || !auth.bcrypt.compareSync(password, user.password_hash)) {
+      loginFail(slack_id);
       return res.status(401).json({ error: 'kullanıcı adı veya şifre hatalı' });
     }
+    loginFails.delete(slack_id); // başarı → sayaç sıfırla
     await pool.query('UPDATE dashboard_users SET last_login=NOW() WHERE id=$1', [user.id]);
     const token = auth.signToken({ id: user.id, slack_id: user.slack_id, name: user.name, role: user.role });
     res.json({ token, user: { id: user.id, slack_id: user.slack_id, name: user.name, role: user.role } });
