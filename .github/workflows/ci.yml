@@ -1,0 +1,20 @@
+name: CI Kapisi
+
+# Her push/PR'da bozuk JS/JSX'i yakalar (secret gerektirmez).
+# Yesil olmadan deploy yapma aliskanligi icin: bu kapi kalirsa kodu prod'a gonderme.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Sozdizimi + JSX derleme kapisi
+        run: bash scripts/ci-check.sh
