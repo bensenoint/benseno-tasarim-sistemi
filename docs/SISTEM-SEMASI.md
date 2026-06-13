@@ -165,6 +165,7 @@
 **Global köprüler (App.jsx):** `window.bnsOpenBrand(name)`, `window.bnsOpenUser(id)`;
 Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
 **Ody:** sol altta, sürükle-bırak (balon+panel, localStorage `bns_ody_pos`), login kullanıcısını bilir.
+**Proaktif Ody (2026-06-13):** kişi dashboard'a girince Ody onun KİŞİSEL günlük briefini bir kez hazırlar (aktif iş/risk/müşteride/kapasite). Login-tetikli → yapısal olarak kişiye özel; kullanıcı+tarih anahtarlı localStorage cache (`bns_ody_brief_<uid>_<tarih>`) → aynı gün tekrar AI çağrısı yok; balonda kırmızı okunmadı işareti. /api/chat zaten giriş yapan kullanıcıya göre filtreler.
 **Avatarlar:** 19/25 Slack fotoğraflı, kalan 6 freelance baş harfli; bot açılışında senkron.
 
 ## 6.5 Tutarlılık Denetimi (TÜM HESAPLAMALARI DOĞRULAR)
