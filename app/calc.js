@@ -42,7 +42,17 @@ function bnsGecikmeH(bitis, beklemeMs, deadline) {
   return 0;
 }
 
+// ── Termin riski — teslime az kaldı AMA iş hâlâ aktif (henüz inceleme/teslim değil) ─────
+// Hem dashboard rozeti hem scheduler thread-uyarısı AYNI kuralı kullanır (tek kaynak).
+var BNS_RISK_H = 24; // teslime kalan saat eşiği
+function bnsIsRisk(durum, deltaH) {
+  if (deltaH == null) return false;
+  // inceleme/müşteri/tamamlanan = riskli sayılmaz (iş esasen bitmiş/elimizde değil)
+  if (["incelemede", "musteride", "tamamlandi"].indexOf(durum) !== -1) return false;
+  return deltaH <= BNS_RISK_H; // 24sa içinde veya geçmiş, iş hâlâ devam ediyor
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsGecikmeH, BNS_H };
+  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsGecikmeH, bnsIsRisk, BNS_H, BNS_RISK_H };
 }

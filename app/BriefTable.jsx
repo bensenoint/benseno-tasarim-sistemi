@@ -157,7 +157,13 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
           {brief.contributors.length > 0 && <AvatarStack users={brief.contributors} max={2} size={18}/>}
         </span>
       </td>
-      <td style={cellStyle(true, "right")}>{formatDate(brief.deadline)}</td>
+      <td style={cellStyle(true, "right")}>
+        {typeof bnsIsRisk === "function" && bnsIsRisk(brief.durum, brief.deltaH) && (
+          <span title="Termin riski: teslime az kaldı, iş hâlâ aktif"
+            style={{marginRight:5, cursor:"default"}}>⚠️</span>
+        )}
+        {formatDate(brief.deadline)}
+      </td>
       <td className="bns-col-mobile-hide" style={{...cellStyle(), position:"relative"}}>
         <span onClick={(e) => { e.stopPropagation(); if (onStatusChange) setMenu(v => !v); }}
           style={{display:"inline-flex", padding:"4px 6px", borderRadius: 6,
