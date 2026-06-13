@@ -146,9 +146,10 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
     durumMap[d] = (durumMap[d] || 0) + 1;
   });
 
-  // ─── Kapasite (departmandaki kapasite sınırı vs aktif)
-  const CAP_LIMIT = u.rol === "tasarim" ? 6 : u.rol === "editor" ? 8 : u.rol === "ai" ? 6 : 10;
-  const capPct    = Math.round((myActive.length / CAP_LIMIT) * 100);
+  // ─── Kapasite — TEK DOĞRULUK KAYNAĞI (data.js bnsPersonCap*) ile hesaplanır.
+  //     Departman ekranındaki kişi doluluğu da aynı helper'ı kullanır → tutarlı.
+  const CAP_LIMIT = bnsPersonCapLimit(u);
+  const capPct    = bnsPersonCapPct(u, myActive.length);
 
   const roleLabel = { yonetici:"Yönetici", tasarim:"Tasarım", editor:"Editör", ai:"AI Operatör" }[u.rol] || u.rol;
 
