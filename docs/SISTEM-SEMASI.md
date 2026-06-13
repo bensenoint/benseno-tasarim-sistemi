@@ -104,6 +104,11 @@
 
 ### 4.7 Kapasite
 - Dashboard modeli: kişi × 6 EŞZAMANLI slot (günlük üretim hızı DEĞİL).
+- **Kişi kapasitesi TEK DOĞRULUK KAYNAĞI:** `data.js` → `bnsPersonCapLimit(u)` (limit:
+  yönetici=10, editor=8, tasarim/ai/freelance=6) + `bnsPersonCapPct(u, aktifSayısı)`.
+  Profil ekranı VE Departman kişi satırları AYNI helper'ı çağırır (eskiden Departman
+  `iş×18`, Profil `iş/limit` kullanıyordu → aynı kişi %90 vs %50 görünüyordu, 2026-06-13 düzeltildi).
+  Sayma kapsamı: aktif (musteride/tamamlanan hariç) lead+contributor; reviewer rolü canlıda yok.
 - **Saha bilgisi (Görkem):** 1 tasarımcı günde ortalama 3-5 iş tamamlar — veri olgunlaşınca
   "haftalık çıktı hızı" metriği bununla kıyaslanmalı.
 - Müşterideki (✈️ musteride) işler kapasite/aktif sayımına girmez; ayrı mor KPI.
