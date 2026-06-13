@@ -284,7 +284,12 @@ function briefsToBlocks(briefs, baslik) {
  */
 async function loadBriefs() {
   try {
-    const r = await fetch(`${API_BASE}/api/embedded`, { cache: 'no-store' });
+    // /api/embedded korumalı → server-to-server write token ile kimliklen.
+    const _wt = process.env.BNS_WRITE_TOKEN;
+    const r = await fetch(`${API_BASE}/api/embedded`, {
+      cache: 'no-store',
+      headers: _wt ? { 'x-bns-token': _wt } : {},
+    });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     const fmt = (ms, opts) => { try { return new Date(ms).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', ...opts }); } catch { return ''; } };

@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
-app.get('/api/state', async (req, res) => {
+app.get('/api/state', readGuard, async (req, res) => {
   try {
     res.json(await getState());
   } catch (e) {
@@ -40,7 +40,7 @@ app.get('/api/state', async (req, res) => {
 });
 
 // Dashboard'ın doğrudan tükettiği HAM bns_* shape (poll buraya bağlanacak; Faz 2).
-app.get('/api/embedded', async (req, res) => {
+app.get('/api/embedded', readGuard, async (req, res) => {
   try {
     res.json(await getEmbedded());
   } catch (e) {
@@ -64,6 +64,11 @@ function writeGuard(req, res, next) {
   }
   return res.status(401).json({ error: 'yetkisiz (giriş veya write token gerekli)' });
 }
+
+// Okuma guard'ı — write guard ile AYNI mantık (JWT veya x-bns-token; BNS_WRITE_TOKEN yoksa açık).
+// /api/embedded + /api/state TÜM veriyi (brief/müşteri/kişi/finans/özet) sunar → token'sız bırakılamaz.
+// Fonksiyon bildirimi → hoist edilir, yukarıdaki route'larda kullanılabilir.
+function readGuard(req, res, next) { return writeGuard(req, res, next); }
 
 // Zod/iş hatalarını okunaklı 400/404'e çevir
 function handleWrite(fn) {

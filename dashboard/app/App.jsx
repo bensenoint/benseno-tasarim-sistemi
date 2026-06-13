@@ -248,7 +248,12 @@ function App({ currentUser, onLogout }) {
     }
     async function poll() {
       try {
-        const r = await fetch(resolveDataUrl(), { cache: "no-store" });
+        // /api/embedded korumalı → JWT gönder (giriş yapan kullanıcının token'ı).
+        const _tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+        const r = await fetch(resolveDataUrl(), {
+          cache: "no-store",
+          headers: _tok ? { Authorization: "Bearer " + _tok } : {},
+        });
         if (!r.ok || cancelled) return;
         const ed = await r.json();
         if (cancelled) return;

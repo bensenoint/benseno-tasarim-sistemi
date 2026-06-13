@@ -44,3 +44,4 @@ logs/*.err
 graphify-out/
 data/.db-url
 server/node_modules/
+data/.write-token

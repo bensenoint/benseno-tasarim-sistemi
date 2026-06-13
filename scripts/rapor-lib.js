@@ -25,7 +25,12 @@ function targets() {
   return process.env.BNS_REPORT_LIVE === '1' ? [...MANAGERS, GRAFIK_CH] : [GORKEM];
 }
 async function fetchEmbedded() {
-  const r = await fetch(`${API_BASE}/api/embedded`, { cache: 'no-store' });
+  // /api/embedded artık korumalı → server-to-server write token (x-bns-token) ile kimliklen.
+  const wt = process.env.BNS_WRITE_TOKEN;
+  const r = await fetch(`${API_BASE}/api/embedded`, {
+    cache: 'no-store',
+    headers: wt ? { 'x-bns-token': wt } : {},
+  });
   if (!r.ok) throw new Error(`embedded HTTP ${r.status}`);
   return r.json();
 }

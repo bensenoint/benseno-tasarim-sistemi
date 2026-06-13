@@ -18,6 +18,11 @@ const path = require('path');
 
 const DB_URL = fs.readFileSync(path.join(__dirname, '../data/.db-url'), 'utf8').trim();
 const API = process.env.BNS_API || 'https://benseno-api-production.up.railway.app';
+// /api/embedded korumalı → write token ile kimliklen (env ya da data/.write-token, gitignored).
+function writeToken() {
+  if (process.env.BNS_WRITE_TOKEN) return process.env.BNS_WRITE_TOKEN;
+  try { return fs.readFileSync(path.join(__dirname, '../data/.write-token'), 'utf8').trim(); } catch { return ''; }
+}
 
 // psql → satır dizisi (| ayraçlı, başlıksız). Shell YOK (execFile) → enjeksiyon riski yok.
 function sql(q) {
@@ -34,7 +39,7 @@ function check(name, ok, detail) {
 
 (async () => {
   console.log(`\n🔍 Tutarlılık denetimi · DB ground-truth ↔ ${API}\n`);
-  const emb = await (await fetch(`${API}/api/embedded`)).json();
+  const emb = await (await fetch(`${API}/api/embedded`, { headers: { 'x-bns-token': writeToken() } })).json();
 
   // ─────────────────────────────────────────────────────────────────────────
   console.log('① DEPARTMAN istatistikleri (SQL ↔ API bns_dept_stats)');
