@@ -68,8 +68,9 @@ function run(script) {
 cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
 // Kişisel iş özeti — hafta içi 07:55, aktif işi olan her çalışana DM
 cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
-// Termin riski — hafta içi 09:35, teslime ≤24sa kalan aktif briefleri thread'e uyarır
-cron.schedule('35 9 * * 1-5', () => run('run-termin-risk.sh'), opts);
+// Termin riski — hafta içi 09-19 SAAT BAŞI (:15), tüm aktif briefleri tarar; teslime ≤24sa
+// olanı thread'e uyarır. Idempotent (20sa): her saat kontrol eder ama aynı işi spam'lemez.
+cron.schedule('15 9-19 * * 1-5', () => run('run-termin-risk.sh'), opts);
 // Thread özeti + tamamlanan iş insight'ı — hafta içi 09-19 arası saatte bir
 cron.schedule('0 9-19 * * 1-5', () => run('run-thread-ozet.sh'), opts);
 // Marka kanal özeti — hafta içi 09-19 arası saatte bir, yarım saat kaydırmalı (xx:30)

@@ -4,7 +4,8 @@
  * thread'ine bir uyarı düşer (briefteki herkes görür + thread özetine girer = sistem
  * hafızası + Ody okur). Dashboard 'risk' rozetiyle AYNI kuralı (calc.js bnsIsRisk) kullanır.
  *
- * Idempotent: aynı thread'e son 20 saatte uyarı atıldıysa tekrar atmaz.
+ * Saat başı (scheduler) tüm aktif briefleri tarar. Idempotent: aynı thread'e son 20
+ * saatte uyarı atıldıysa tekrar atmaz → her saat kontrol eder ama spam'lemez.
  * Çalıştırma:
  *   node scripts/termin-risk.js          → gerçek uyarı (scheduler kullanır)
  *   node scripts/termin-risk.js --dry    → POST etmeden ne yapacağını yazdırır (test)

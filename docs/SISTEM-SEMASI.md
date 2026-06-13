@@ -121,7 +121,8 @@
 - **Dashboard:** BriefTable termin hücresinde ⚠️ rozeti (her tabloda görünür).
 - **Slack:** `scripts/termin-risk.js` → riskli briefin thread'ine uyarı (herkes görür + thread özetine girer
   = sistem hafızası + Ody okur). Idempotent: 20sa içinde aynı thread'e tekrar atmaz. `--dry` test modu.
-- **Cron:** hafta içi 09:35 (`run-termin-risk.sh`, scheduler.js). Bot servisinde çalışır.
+- **Cron:** hafta içi 09-19 SAAT BAŞI (:15) (`run-termin-risk.sh`, scheduler.js). Her saat tüm
+  aktif briefleri tarar; idempotency (20sa) tekrar uyarıyı engeller. Bot servisinde çalışır.
 
 ### 4.7 Kapasite
 - Dashboard modeli: kişi × 6 EŞZAMANLI slot (günlük üretim hızı DEĞİL).
