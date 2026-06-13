@@ -151,7 +151,7 @@ app.get('/api/layout', auth.authGuard, async (req, res) => {
     res.json({ layout: r.rows[0] ? r.rows[0].layout : null });
   } catch (e) { console.error('[api] layout get hata:', e.message); res.status(500).json({ error: e.message }); }
 });
-app.put('/api/layout', auth.authGuard, async (req, res) => {
+app.post('/api/layout', auth.authGuard, async (req, res) => {
   try {
     const layout = req.body && req.body.layout;
     if (!Array.isArray(layout)) return res.status(400).json({ error: 'layout dizi olmalı' });

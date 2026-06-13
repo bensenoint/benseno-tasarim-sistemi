@@ -45,7 +45,7 @@ function PanomApp() {
     var layout = window.bnsV2Serialize(grid.save(false));
     layoutRef.current = layout;
     setTick(function (t) { return t + 1; });
-    fetch(API_V2 + "/api/layout", { method: "PUT",
+    fetch(API_V2 + "/api/layout", { method: "POST",
       headers: { "content-type": "application/json", Authorization: "Bearer " + tokV2() },
       body: JSON.stringify({ layout: layout }) }).catch(function () {});
   }

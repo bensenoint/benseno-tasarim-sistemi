@@ -260,8 +260,8 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
 - **Kişi kimliği:** `v2Me()` → localStorage `bns_user` (`{id, slack_id, name, role}`) → kanonik USERS kaydını **slack_id** ile çözer (kapasite formülü `rol`/`yetki`/`dept` ister; brief lead/contributor'ları slack_id taşır).
 
 ### 8.3 Düzenleme + kalıcılık
-- "düzenle" toggle → gridstack sürükle/boyutlandır açılır; "+ alan ekle" eklenmemiş tipleri listeler; değişiklik/silme → `PUT /api/layout`.
-- **Layout:** `dashboard_layouts(user_id text PK, layout jsonb, updated_at)`. `GET/PUT /api/layout` (authGuard, `req.user.slack_id`). Boş/geçersiz → `bnsV2DefaultLayout()` (`v2/app/layout.js`, saf, node-test edilir).
+- "düzenle" toggle → gridstack sürükle/boyutlandır açılır; "+ alan ekle" eklenmemiş tipleri listeler; değişiklik/silme → `POST /api/layout`.
+- **Layout:** `dashboard_layouts(user_id text PK, layout jsonb, updated_at)`. `GET/POST /api/layout` (authGuard, `req.user.slack_id`). Boş/geçersiz → `bnsV2DefaultLayout()` (`v2/app/layout.js`, saf, node-test edilir).
 - **Mobil:** gridstack `columnOpts.breakpoints [{w:700,c:1}]` → tek kolon.
 
 ### 8.4 Ody (sistem kimliği)
