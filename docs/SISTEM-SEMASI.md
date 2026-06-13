@@ -192,8 +192,11 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
 - **Login brute-force koruması (#2, ÇÖZÜLDÜ):** `/api/auth/login` hesap (slack_id) bazlı kilit —
   5 ardışık başarısız → 15 dk 429. Bellek-içi (tek instance; restart'ta sıfırlanır). IP spoof'tan etkilenmez.
 - Write/delete: `writeGuard` (BNS_WRITE_TOKEN set → x-bns-token veya JWT). Bildirimler kişiye kısıtlı.
-- **AÇIK KALAN düşük riskler:** `/api/img/:id` (<img> Authorization yollayamaz → public; yalnız
-  tasarım görselleri), `/api/brands/.../daily` (kanal özetleri). Login rate-limit (#2), helmet (#5).
+- **brands/daily korumalı (#4):** readGuard (kanal özetleri sızmaz). Dashboard JWT, kanal-ozet x-bns-token.
+- **/api/img bilinçli PUBLIC (#4):** <img src> Authorization yollayamaz → açık; düşük risk (yalnız tasarım görselleri, finans/PII yok).
+- **Güvenlik başlıkları (#5):** X-Content-Type-Options nosniff · X-Frame-Options DENY · HSTS · Referrer-Policy no-referrer · x-powered-by gizli.
+- **GitHub PAT (#3):** git remote'tan plaintext token ÇIKARILDI → `gh` credential helper. ⚠️ AÇIK AKSİYON: eski (sızmış) PAT GitHub'dan iptal edilmeli.
+- **Kabul edilen (gerekçeli):** body limit 25MB (ekler gerektiriyor) · JWT TTL 7gün (iç ekip, makul).
 
 ## 7. Bilinen Davranışlar / Tuzaklar
 
