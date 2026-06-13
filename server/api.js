@@ -384,7 +384,7 @@ app.post('/api/rating-sebep', writeGuard, async (req, res) => {
 });
 
 // Marka günlük arşivi — tarih filtresiyle geçmiş kanal özetleri + gün-sonu insight'ları
-app.get('/api/brands/by-name/:name/daily', async (req, res) => {
+app.get('/api/brands/by-name/:name/daily', readGuard, async (req, res) => {
   try {
     const r = await pool.query(`
       SELECT d.tarih, d.ozet, d.insight
@@ -493,6 +493,9 @@ app.post('/api/briefs/:id/attachments-meta', writeGuard, async (req, res) => {
 });
 
 // Slack görsel proxy — galeri için. Slack private URL → bot token ile çek → tarayıcıya ilet.
+// NOT: /api/img bilinçli olarak PUBLIC — dashboard <img src> ile çağırır ve tarayıcı
+// <img> isteğine Authorization başlığı EKLEYEMEZ. Düşük risk: yalnız briefe iliştirilmiş
+// tasarım görselleri (finans/PII yok); id enumerasyonu en fazla görseli sızdırır.
 app.get('/api/img/:id', async (req, res) => {
   try {
     const r = await pool.query('SELECT image_url FROM briefs WHERE id = $1', [+req.params.id]);

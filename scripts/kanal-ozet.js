@@ -90,7 +90,10 @@ async function haiku(system, content) {
 // Markanın dünkü arşiv kaydı (özet+insight) — bugünkü üretime süreklilik bağlamı olarak verilir.
 async function dunkuKayit(brand) {
   try {
-    const r = await fetch(`${API_BASE}/api/brands/by-name/${encodeURIComponent(brand)}/daily`);
+    const _wt = process.env.BNS_WRITE_TOKEN;
+    const r = await fetch(`${API_BASE}/api/brands/by-name/${encodeURIComponent(brand)}/daily`, {
+      headers: _wt ? { 'x-bns-token': _wt } : {},
+    });
     if (!r.ok) return null;
     const j = await r.json();
     const bugun = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Istanbul' });

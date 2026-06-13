@@ -334,7 +334,10 @@ function BrandDailyPanel({ brand }) {
   React.useEffect(() => {
     let dead = false;
     setDaily([]); setSel("live");
-    fetch(`${API}/api/brands/by-name/${encodeURIComponent(brand)}/daily`)
+    const _tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+    fetch(`${API}/api/brands/by-name/${encodeURIComponent(brand)}/daily`, {
+      headers: _tok ? { Authorization: "Bearer " + _tok } : {},
+    })
       .then(r => r.ok ? r.json() : null)
       .then(j => { if (!dead && j) setDaily(j.daily || []); })
       .catch(() => {});
