@@ -219,6 +219,27 @@ app.patch('/api/briefs/by-ts/:ts/set-image', writeGuard, async (req, res) => {
     res.json({ ok: true, id: r.rows[0].id });
   } catch (e) { console.error('[api] set-image hata:', e.message); res.status(500).json({ error: e.message }); }
 });
+
+// Final teslim(ler): 📎 ile işaretlenen mesajın dosyaları → brief_attachments(is_final=true).
+// Yeniden işaretleme = bu brief'in eski final'larını değiştir (idempotent).
+app.post('/api/briefs/by-ts/:ts/final-deliverables', writeGuard, async (req, res) => {
+  try {
+    const id = await writes.tsToId(req.params.ts);
+    if (!id) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.ts });
+    const items = Array.isArray(req.body && req.body.items) ? req.body.items : [];
+    await pool.query(`DELETE FROM brief_attachments WHERE brief_id=$1 AND is_final=true`, [id]);
+    let n = 0;
+    for (const it of items) {
+      if (!it || !it.url) continue;
+      await pool.query(
+        `INSERT INTO brief_attachments(brief_id,url,filename,mime,uploaded_by,source,is_final)
+         VALUES ($1,$2,$3,$4,$5,'final',true)`,
+        [id, it.url, it.filename || 'dosya', it.mime || '', req.body && req.body.by || null]);
+      n++;
+    }
+    res.json({ ok: true, id, count: n });
+  } catch (e) { console.error('[api] final-deliverables hata:', e.message); res.status(400).json({ error: e.message }); }
+});
 app.patch('/api/briefs/by-ts/:ts', writeGuard, handleWrite(async req => writes.patchBrief(await writes.tsToId(req.params.ts), req.body)));
 
 // Thread özeti (AI) — thread-ozet.js scripti yazar. Bilinçli olarak sessiz: DM/thread notu YOK.
@@ -521,6 +542,27 @@ app.get('/api/img/:id', async (req, res) => {
     res.send(Buffer.from(await slackRes.arrayBuffer()));
   } catch (e) {
     console.error('[img-proxy] hata:', e.message);
+    res.status(500).end();
+  }
+});
+
+// Ek/teslim dosyası proxy'si (brief_attachments.id ile). /api/img gibi bilinçli PUBLIC —
+// <img src>/indirme linki Authorization yollayamaz. Resimleri inline, diğerlerini indirme olarak servis eder.
+app.get('/api/attachment/:id', async (req, res) => {
+  try {
+    const r = await pool.query('SELECT url, filename, mime FROM brief_attachments WHERE id=$1', [+req.params.id]);
+    const row = r.rows[0];
+    if (!row || !row.url) return res.status(404).end();
+    const sres = await fetch(row.url, { headers: { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` } });
+    if (!sres.ok) return res.status(sres.status).end();
+    const ct = sres.headers.get('content-type') || row.mime || 'application/octet-stream';
+    res.set('Content-Type', ct);
+    res.set('Cache-Control', 'public, max-age=86400');
+    // Resim değilse indirme olarak sun (tarayıcı açmaya çalışmasın)
+    if (!/^image\//.test(ct)) res.set('Content-Disposition', `inline; filename="${(row.filename || 'dosya').replace(/[^\w.\-]/g, '_')}"`);
+    res.send(Buffer.from(await sres.arrayBuffer()));
+  } catch (e) {
+    console.error('[attachment-proxy] hata:', e.message);
     res.status(500).end();
   }
 });

@@ -796,6 +796,23 @@ async function captureThreadImage(client, channel, briefTs) {
   }
 }
 
+// 📎 ile işaretlenen MESAJIN tüm dosyalarını (resim+diğer tip) brief'in FINAL teslimi yapar.
+// Final = onaylanan/işaretlenen dosya (thread'deki son resim değil) — kullanıcı kontrolünde.
+async function captureFinalDeliverables(client, channel, msgTs, briefTs, byUser) {
+  const r = await client.conversations.replies({ channel, ts: briefTs, limit: 200 });
+  const msg = (r.messages || []).find(m => m.ts === msgTs);
+  const files = (msg && msg.files) || [];
+  const items = files.map(f => ({ url: f.url_private, filename: f.name || 'dosya', mime: f.mimetype || '' })).filter(x => x.url);
+  if (!items.length) {
+    await client.chat.postMessage({ channel, thread_ts: briefTs, username: BOT_NAME,
+      text: '📎 Final işareti için *dosya içeren* bir mesaja koy — bu mesajda dosya yok.' });
+    return;
+  }
+  await dbWrite('POST', `/api/briefs/by-ts/${briefTs}/final-deliverables`, { items, by: byUser });
+  await client.chat.postMessage({ channel, thread_ts: briefTs, username: BOT_NAME,
+    text: `📎 *Final teslim kaydedildi* — ${items.length} dosya: ${items.map(i => i.filename).join(', ')}. Galeride görünecek.` });
+}
+
 app.event('reaction_added', async ({ event, client }) => {
   // Mesaj tipinde değilse yoksay (dosya, canvas üzeri olabilir)
   if (event.item.type !== 'message') return;
@@ -813,6 +830,14 @@ app.event('reaction_added', async ({ event, client }) => {
     captureThreadImage(client, event.item.channel, briefTs).catch(() => {});
     // DB: brief'i slack_ts ile bul → tamamlandı (reflectChange thread onayını düşürür).
     dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: 'tamamlandi', by: event.user, source: 'slack' });
+    return;
+  }
+
+  // 📎 Final teslim işareti: bu mesaja ekli TÜM dosyaları (resim+diğer) brief'in final teslimi yap → galeri.
+  if (event.reaction === 'paperclip') {
+    if (!briefTs) return;
+    log(`📎 final teslim işareti: ${event.item.ts} @ ${briefTs} — ${event.user}`);
+    captureFinalDeliverables(client, event.item.channel, event.item.ts, briefTs, event.user).catch(e => log(`final teslim hata: ${e.message}`));
     return;
   }
 

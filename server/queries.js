@@ -121,10 +121,10 @@ async function getEmbedded() {
   ]);
   const ms = (d) => (d ? new Date(d).getTime() : 0);
 
-  // Ekler: brief_id → [{name, permalink}]
-  const att = await pool.query(`SELECT brief_id, filename AS name, url AS permalink FROM brief_attachments ORDER BY id`);
+  // Ekler: brief_id → [{id, name, permalink, mime, is_final}] (galeri proxy id + tip + final işareti)
+  const att = await pool.query(`SELECT id, brief_id, filename AS name, url AS permalink, mime, is_final FROM brief_attachments ORDER BY is_final DESC, id`);
   const attByBrief = {};
-  for (const a of att.rows) (attByBrief[a.brief_id] ||= []).push({ name: a.name, permalink: a.permalink });
+  for (const a of att.rows) (attByBrief[a.brief_id] ||= []).push({ id: a.id, name: a.name, permalink: a.permalink, mime: a.mime || '', is_final: !!a.is_final });
 
   // Bekleme süreleri: 'beklemede' durumuna girişten bir sonraki durum değişimine kadar geçen
   // toplam süre (ms). Süre/gecikme hesapları bu süreyi MUAF tutar (saat durur).
