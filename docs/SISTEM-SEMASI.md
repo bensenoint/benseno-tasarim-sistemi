@@ -115,6 +115,14 @@
 - Manuel: 🔴 ACİL / 🟠 YÜKSEK / 🟡 NORMAL (boş=🟡) / 🟢 DÜŞÜK.
 - ONC haritası data.js hydrate'te; renkler tokens.css'te ayrı (light: turuncu #E2670A, sarı #B5A013).
 
+### 4.8 Termin Riski (erken uyarı) — 2026-06-13
+- **Kural (tek kaynak, calc.js `bnsIsRisk(durum, deltaH)`):** iş aktif (incelemede/musteride/tamamlandi DEĞİL)
+  VE teslime ≤24sa (`BNS_RISK_H`) → risk. Dashboard rozeti + scheduler thread-uyarısı AYNI kuralı kullanır.
+- **Dashboard:** BriefTable termin hücresinde ⚠️ rozeti (her tabloda görünür).
+- **Slack:** `scripts/termin-risk.js` → riskli briefin thread'ine uyarı (herkes görür + thread özetine girer
+  = sistem hafızası + Ody okur). Idempotent: 20sa içinde aynı thread'e tekrar atmaz. `--dry` test modu.
+- **Cron:** hafta içi 09:35 (`run-termin-risk.sh`, scheduler.js). Bot servisinde çalışır.
+
 ### 4.7 Kapasite
 - Dashboard modeli: kişi × 6 EŞZAMANLI slot (günlük üretim hızı DEĞİL).
 - **Kişi kapasitesi TEK DOĞRULUK KAYNAĞI:** `data.js` → `bnsPersonCapLimit(u)` (limit:
