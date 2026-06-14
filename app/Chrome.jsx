@@ -132,8 +132,80 @@ if (typeof document !== "undefined" && !window.__bnsSlackLinkHook) {
 
 // 🤖 Ody (sistem asistanı) — sağ altta yüzen sohbet. Kullanım soruları + canlı veri
 // (marka/iş/kişi) soruları /api/chat üzerinden yanıtlanır (JWT'li, kişiye özel).
+// ── Ody maskotu: animasyonlu yüz ifadeleri + fx partikülleri (prod renkleriyle) ──
+var ODY_NOTIFS = [
+  { mood: 'heyecanli', text: 'Sana yeni bir brief atanmış olabilir' },
+  { mood: 'mutlu', text: 'Bir iş tamamlandı 👏' },
+  { mood: 'endiseli', text: 'Bir iş 24 saatin altına düşmüş olabilir' },
+  { mood: 'coskulu', text: 'Bugün işler iyi gidiyor!' },
+  { mood: 'sakin', text: 'Her şey planında. İçin rahat olsun ☕' },
+  { mood: 'mesgul', text: 'Yoğun bir gün — birden çok iş işleniyor' },
+  { mood: 'neseli', text: 'Ben buradayım, bir şey sorabilirsin 🌟' },
+  { mood: 'uykulu', text: 'Ortam sakin…' }
+];
+function odyRestingMood() {
+  try {
+    var b = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
+    var overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
+    var risk = b.filter(function (x) { return window.bnsIsRisk && window.bnsIsRisk(x.durum, x.deltaH); }).length;
+    if (overdue > 0) return 'kizgin';
+    if (risk > 0) return 'endiseli';
+    return 'neseli';
+  } catch (e) { return 'neseli'; }
+}
+function odyFaceProd(mood) {
+  var h = React.createElement, W = '#fff', PUP = '#7a3a22';
+  var mk = function (k, st) { return h('div', { key: k, style: Object.assign({ background: W, borderRadius: '50%' }, st) }); };
+  var left, right, anim = 'odyPop .42s ease', extra = null, gap = 8;
+  if (mood === 'mutlu' || mood === 'neseli') {
+    var arc = function (k) { return h('div', { key: k, style: { width: '12px', height: '6px', borderTop: '3px solid ' + W, borderRadius: '12px 12px 0 0' } }); };
+    left = arc('l'); right = arc('r'); if (mood === 'neseli') anim = 'odyBounce .8s ease-in-out infinite';
+  } else if (mood === 'coskulu') {
+    var star = function (k) { return h('div', { key: k, style: { width: '13px', height: '13px', background: W, clipPath: 'polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)' } }); };
+    left = star('l'); right = star('r'); anim = 'odyBounce .62s ease-in-out infinite';
+  } else if (mood === 'heyecanli') {
+    var ex = function (k) { return h('div', { key: k, style: { position: 'relative', width: '12px', height: '12px', background: W, borderRadius: '50%' } }, h('div', { key: 'p', style: { position: 'absolute', width: '4px', height: '4px', background: PUP, borderRadius: '50%', left: '4px', top: '5px' } })); };
+    left = ex('l'); right = ex('r'); anim = 'odyBounce .72s ease-in-out infinite';
+  } else if (mood === 'endiseli') {
+    var we = function (k, rot) { return h('div', { key: k, style: { position: 'relative', width: '7px', height: '10px', background: W, borderRadius: '50%', transform: 'rotate(' + rot + 'deg)' } }, h('div', { key: 'p', style: { position: 'absolute', width: '3px', height: '3px', background: PUP, borderRadius: '50%', left: '2px', top: '1.5px' } })); };
+    left = we('l', 15); right = we('r', -15); gap = 9;
+  } else if (mood === 'kizgin') {
+    left = mk('l', { width: '7px', height: '8px' }); right = mk('r', { width: '7px', height: '8px' }); anim = 'odyShake .24s linear infinite';
+    extra = h('div', { key: 'x', style: { position: 'absolute', inset: 0, pointerEvents: 'none' } }, h('div', { key: 'bl', style: { position: 'absolute', top: '13px', left: '13px', width: '11px', height: '3px', background: W, borderRadius: '2px', transform: 'rotate(20deg)' } }), h('div', { key: 'br', style: { position: 'absolute', top: '13px', left: '26px', width: '11px', height: '3px', background: W, borderRadius: '2px', transform: 'rotate(-20deg)' } }));
+  } else if (mood === 'mesgul') {
+    left = mk('l', { width: '6px', height: '8px' }); right = mk('r', { width: '6px', height: '8px' });
+  } else if (mood === 'dusunuyor') {
+    left = mk('l', { width: '6px', height: '6px', transform: 'translateY(-2px)' }); right = mk('r', { width: '6px', height: '6px', transform: 'translateY(-2px)' });
+  } else if (mood === 'uykulu') {
+    var lid = function (k) { return h('div', { key: k, style: { width: '10px', height: '4px', background: W, borderRadius: '0 0 10px 10px' } }); };
+    left = lid('l'); right = lid('r');
+  } else if (mood === 'uzgun') {
+    left = mk('l', { width: '7px', height: '8px', transform: 'translateY(2px)' }); right = mk('r', { width: '7px', height: '8px', transform: 'translateY(2px)' });
+  } else {
+    left = mk('l', { width: '7px', height: '11px', animation: 'odyBlink 4.6s infinite' }); right = mk('r', { width: '7px', height: '11px', animation: 'odyBlink 4.6s infinite' });
+  }
+  return h('div', { key: 'f-' + mood, style: { position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: gap + 'px', animation: anim || undefined } }, left, right, extra);
+}
+function odyFxProd(host, mood) {
+  if (!host) return;
+  var spawn = function (txt, color, x, size) {
+    var el = document.createElement('div');
+    if (txt) { el.textContent = txt; el.setAttribute('style', 'position:absolute;left:50%;top:0;transform:translateX(-50%);pointer-events:none;z-index:60;font-family:var(--font-sans),sans-serif;font-weight:800;font-size:' + size + 'px;color:' + color + ';'); }
+    else { el.setAttribute('style', 'position:absolute;left:50%;top:2px;transform:translateX(-50%);pointer-events:none;z-index:60;width:' + size + 'px;height:' + (size + 2) + 'px;border-radius:50%;background:' + color + ';'); }
+    host.appendChild(el);
+    var ty = -(24 + Math.random() * 14);
+    try { el.animate([{ transform: 'translateX(-50%) translate(0,0) scale(.5)', opacity: 1 }, { transform: 'translateX(-50%) translate(' + x + 'px,' + ty + 'px) scale(1.2)', opacity: 0 }], { duration: 850, easing: 'cubic-bezier(.25,.46,.45,.94)' }).onfinish = function () { el.remove(); }; }
+    catch (e) { setTimeout(function () { el.remove(); }, 850); }
+  };
+  if (mood === 'mutlu' || mood === 'neseli' || mood === 'coskulu' || mood === 'heyecanli') spawn('✦', '#E0A92B', -10, 14);
+  else if (mood === 'kizgin' || mood === 'mesgul') { spawn('', '#b9b2a6', -10, 8); setTimeout(function () { spawn('', '#b9b2a6', 10, 9); }, 220); }
+  else if (mood === 'uykulu') { for (var i = 0; i < 3; i++) (function (i) { setTimeout(function () { spawn('z', '#9a93a0', -6 + i * 6, 12); }, i * 420); })(i); }
+}
+
 function ChatBot() {
   const [open, setOpen] = React.useState(false);
+  const [mood, setMood] = React.useState('neseli');
+  const blobRef = React.useRef(null);
   const [msgs, setMsgs] = React.useState([]);   // {role:'user'|'assistant', content}
   const [input, setInput] = React.useState("");
   const [busy, setBusy] = React.useState(false);
@@ -174,6 +246,20 @@ function ChatBot() {
   const [unread, setUnread] = React.useState(false);   // balonda "Ody senin için özet hazırladı" işareti
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
 
+  // Ody ruh hâli: değişince fx partikülü; kapalıyken periyodik bildirim ifadesi + okunmadı işareti
+  React.useEffect(() => { odyFxProd(blobRef.current, mood); }, [mood]);
+  React.useEffect(() => { setMood(odyRestingMood()); }, []);
+  React.useEffect(() => {
+    let restT;
+    const t = setInterval(() => {
+      if (open) return;
+      const i = Math.floor(Math.random() * ODY_NOTIFS.length);
+      setMood(ODY_NOTIFS[i].mood); setUnread(true);
+      clearTimeout(restT); restT = setTimeout(() => { if (!open) setMood(odyRestingMood()); }, 2700);
+    }, 9000);
+    return () => { clearInterval(t); clearTimeout(restT); };
+  }, [open]);
+
   // Proaktif kişisel brief — kişi dashboard'ı açınca Ody onun durumunu BİR KEZ (günde) hazırlar.
   // Kişiye özeldir: /api/chat zaten giriş yapan kullanıcıya göre filtreler. Kullanıcı+tarih
   // anahtarlı localStorage cache → aynı gün tekrar yüklemede AI çağrısı yapılmaz (maliyet ~0).
@@ -210,7 +296,7 @@ function ChatBot() {
     const q = input.trim();
     if (!q || busy) return;
     const next = [...msgs, { role: "user", content: q }];
-    setMsgs(next); setInput(""); setBusy(true);
+    setMsgs(next); setInput(""); setBusy(true); setMood("dusunuyor");
     try {
       const r = await fetch(`${API}/api/chat`, {
         method: "POST",
@@ -218,9 +304,12 @@ function ChatBot() {
         body: JSON.stringify({ messages: next.slice(-12) }),
       });
       const j = await r.json().catch(() => ({}));
-      setMsgs(m => [...m, { role: "assistant", content: r.ok && j.reply ? j.reply : ("⚠️ " + (j.error || "Yanıt alınamadı, tekrar dene.")) }]);
+      const okReply = r.ok && j.reply;
+      setMsgs(m => [...m, { role: "assistant", content: okReply ? j.reply : ("⚠️ " + (j.error || "Yanıt alınamadı, tekrar dene.")) }]);
+      setMood(okReply ? "mutlu" : "uzgun");
     } catch (e) {
       setMsgs(m => [...m, { role: "assistant", content: "⚠️ Bağlantı hatası: " + e.message }]);
+      setMood("uzgun");
     } finally { setBusy(false); }
   };
 
@@ -232,14 +321,20 @@ function ChatBot() {
           onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setUnread(false); setOpen(true); }}
           title={unread ? "Ody senin için bugünkü özetini hazırladı — aç" : "Ody — sistem asistanı (sürükleyerek taşıyabilirsin)"} style={{
           position: "fixed", left: pos.x, top: pos.y, zIndex: 90,
-          width: 52, height: 52, borderRadius: "50%", border: 0, cursor: "grab", touchAction: "none",
-          background: "var(--ember)", color: "#fff", fontSize: 24,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
+          width: 54, height: 54, borderRadius: "50%", border: 0, cursor: "grab", touchAction: "none",
+          background: "transparent", padding: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
-        }}>🤖
+        }}>
+          <div ref={blobRef} style={{
+            position: "relative", width: 54, height: 54,
+            borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "var(--ember)",
+            boxShadow: "0 10px 18px -6px rgba(0,0,0,.28), 0 4px 8px -3px rgba(0,0,0,.2)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            animation: "odyBob 4.5s ease-in-out infinite",
+          }}>{odyFaceProd(mood)}</div>
           {unread && <span title="Yeni kişisel özet" style={{
-            position: "absolute", top: 2, right: 2, width: 13, height: 13, borderRadius: "50%",
-            background: "var(--prio-red, #E5484D)", border: "2px solid var(--surface, #fff)",
+            position: "absolute", top: 0, right: 0, width: 14, height: 14, borderRadius: "50%",
+            background: "var(--prio-red, #E5484D)", border: "2px solid var(--bg, #fff)", animation: "odyPopIn .3s ease",
           }}/>}
         </button>
       )}
@@ -252,7 +347,9 @@ function ChatBot() {
         }}>
           <div onPointerDown={startDrag} title="Sürükleyerek taşı"
             style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8, cursor: "grab", touchAction: "none", userSelect: "none" }}>
-            <span style={{ fontSize: 18 }}>🤖</span>
+            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "var(--ember)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
+            </span>
             <div style={{ flex: 1 }}>
               <div style={{ font: "600 13px/1 var(--font-sans)", color: "var(--ink)" }}>Ody</div>
               <div style={{ font: "400 10px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>kullanım · marka/iş/kişi soruları · öneri</div>

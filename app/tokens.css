@@ -608,3 +608,11 @@ button:active,
     display: none !important;
   }
 }
+
+/* ── Ody maskotu animasyonları (yeni animasyonlu Ody) ── */
+@keyframes odyBob{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-5px) rotate(2deg);}}
+@keyframes odyPop{0%{transform:scale(.78);}60%{transform:scale(1.12);}100%{transform:scale(1);}}
+@keyframes odyBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+@keyframes odyShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-1.5px);}75%{transform:translateX(1.5px);}}
+@keyframes odyBlink{0%,90%,100%{transform:scaleY(1);}95%{transform:scaleY(.1);}}
+@keyframes odyPopIn{0%{transform:scale(.8);opacity:0;}100%{transform:scale(1);opacity:1;}}

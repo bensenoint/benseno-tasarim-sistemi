@@ -679,3 +679,22 @@ try {
 } catch (e) {}
 
 })();
+
+// ── v2 "Panom" köprüsü ──────────────────────────────────────────────────────
+// v2 kendi JWT'li poll'unu yapar; EMBEDDED_DATA'yı BNS_DATA'ya uygular.
+// Hidrasyon helper'ları (window.bnsHydrateBrief vb.) prod ile AYNI — çift mantık yok.
+window.bnsApplyEmbedded = function (ed) {
+  if (!ed || typeof ed !== "object") return;
+  window.EMBEDDED_DATA = ed;
+  var D = window.BNS_DATA = window.BNS_DATA || {};
+  var sm = window.bnsSafeMap || function (a, f) { return (a || []).map(f); };
+  try {
+    if (Array.isArray(ed.bns_brands)) D.BRANDS = ed.bns_brands;
+    if (Array.isArray(ed.bns_users)) D.USERS = window.bnsMergeUser ? ed.bns_users.map(window.bnsMergeUser) : ed.bns_users;
+    if (Array.isArray(ed.bns_briefs)) D.briefs = window.bnsHydrateBrief ? sm(ed.bns_briefs, window.bnsHydrateBrief, "brief") : ed.bns_briefs;
+    if (Array.isArray(ed.bns_completed)) D.completed = window.bnsHydrateCompleted ? sm(ed.bns_completed, window.bnsHydrateCompleted, "completed") : ed.bns_completed;
+    if (ed.bns_dept_stats) D.deptStats = window.bnsNormDeptStats ? window.bnsNormDeptStats(ed.bns_dept_stats) : ed.bns_dept_stats;
+    if (typeof window.bnsApplyExtras === "function") window.bnsApplyExtras(ed);
+    D.__source = "live_briefs";
+  } catch (e) { console.warn("[v2] applyEmbedded hata:", e.message); }
+};
