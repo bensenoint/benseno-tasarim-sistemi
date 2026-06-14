@@ -18,6 +18,7 @@ const NAV_SECTIONS = [
     id: "main",
     label: "Ana",
     items: [
+      { id: "panom",     label: "Panom",          icon: "Grid" },
       { id: "overview",  label: "Genel bakış",   icon: "Home" },
       { id: "jobs",      label: "Aktif işler",    icon: "Briefcase" },
     ]

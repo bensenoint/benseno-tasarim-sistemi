@@ -41,7 +41,6 @@ function PanomScreen(props) {
   var ref = React.useState(saved.current.widgets && saved.current.widgets.length ? panomPack(saved.current.widgets) : panomDefaultLayout());
   var widgets = ref[0], setWidgets = ref[1];
   var er = React.useState(false), edit = er[0], setEdit = er[1];
-  var pk = React.useState(false), picker = pk[0], setPicker = pk[1];
   var dr = React.useState(null), dragId = dr[0], setDragId = dr[1];
   var dp = React.useState(null), dragPx = dp[0], setDragPx = dp[1];
   var wcRef = React.useRef(saved.current.wc || {});
@@ -108,10 +107,15 @@ function PanomScreen(props) {
     setRemovingId(id);
     setTimeout(function () { setWidgets(function (ws) { var n = panomPack(ws.filter(function (w) { return w.id !== id; })); persist(n); return n; }); setRemovingId(null); }, 220);
   };
-  var onAdd = function (type) {
-    var def = PANOM_DEFS[type];
-    setWidgets(function (ws) { var maxY = ws.reduce(function (m, w) { return Math.max(m, w.y + w.h); }, 0); var n = panomPack(ws.concat([{ id: type, type: type, x: 0, y: maxY, w: def.w, h: def.h }]), type); persist(n); return n; });
-    setPicker(false);
+  // Editörden tablo aç/kapa: panoda yoksa ekler (en alta), varsa çıkarır. Hep pack'ten geçer → çakışma olmaz.
+  var onToggle = function (type) {
+    setWidgets(function (ws) {
+      var has = ws.some(function (w) { return w.type === type; });
+      var n;
+      if (has) { n = panomPack(ws.filter(function (w) { return w.type !== type; })); }
+      else { var def = PANOM_DEFS[type]; var maxY = ws.reduce(function (m, w) { return Math.max(m, w.y + w.h); }, 0); n = panomPack(ws.concat([{ id: type, type: type, x: 0, y: maxY, w: def.w, h: def.h }]), type); }
+      persist(n); return n;
+    });
   };
 
   // ── widget veri + render (prod token'ları) ──
@@ -193,16 +197,23 @@ function PanomScreen(props) {
       edit ? h('div', { 'data-id': w.id, onPointerDown: onResizeDown, style: { position: 'absolute', right: 2, bottom: 2, width: 20, height: 20, cursor: 'nwse-resize', zIndex: 3, display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end', padding: 3 } }, h('div', { style: { width: 9, height: 9, borderRight: '2px solid var(--ink-4)', borderBottom: '2px solid var(--ink-4)', borderRadius: '0 0 3px 0', opacity: .6 } })) : null);
   });
 
-  var onBoard = {}; widgets.forEach(function (w) { onBoard[w.type] = 1; });
-  var addable = Object.keys(PANOM_DEFS).filter(function (t) { return !onBoard[t]; });
-
   return h('div', { style: { padding: '22px 24px 32px' } },
     h('div', { style: { display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 18 } },
       h('div', { style: { font: '500 30px/1 var(--font-display, serif)', color: 'var(--ink)' } }, 'Panom'),
-      h('div', { style: { flex: 1, font: '400 12.5px/1 var(--font-sans)', color: 'var(--ink-4)' } }, edit ? 'kartları sürükle · köşeden boyutlandır' : 'kişisel iş panon'),
-      edit ? h('button', { onClick: function () { setPicker(function (p) { return !p; }); }, style: btn }, '+ alan ekle') : null,
-      h('button', { onClick: function () { setEdit(function (e) { return !e; }); setPicker(false); }, style: Object.assign({}, btn, edit ? { background: 'var(--ember)', borderColor: 'var(--ember)', color: '#fff' } : {}) }, edit ? '✓ bitti' : 'düzenle')),
-    picker && edit ? h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 } }, addable.length ? addable.map(function (t) { return h('button', { key: t, onClick: function () { onAdd(t); }, style: btn }, '+ ' + PANOM_DEFS[t].title); }) : h('span', { style: { font: '400 12px/1 var(--font-sans)', color: 'var(--ink-4)' } }, 'tüm alanlar ekli')) : null,
-    h('div', { ref: gridRef, style: { position: 'relative', width: '100%', height: (Math.max(1, maxRows) * (PANOM_ROW + PANOM_GAP) - PANOM_GAP) + 'px', transition: 'height .26s ease' } }, widgetCards));
+      h('div', { style: { flex: 1, font: '400 12.5px/1 var(--font-sans)', color: 'var(--ink-4)' } }, edit ? 'tablo seç · kartları sürükle · köşeden boyutlandır' : 'kişisel iş panon'),
+      h('button', { onClick: function () { setEdit(function (e) { return !e; }); }, style: Object.assign({}, btn, edit ? { background: 'var(--ember)', borderColor: 'var(--ember)', color: '#fff' } : {}) }, edit ? '✓ bitti' : 'düzenle')),
+    edit ? h('div', { style: { marginBottom: 16, padding: 14, border: '0.5px solid var(--line)', borderRadius: 14, background: 'var(--surface-sub)' } },
+      h('div', { style: { font: '600 10px/1 var(--font-sans)', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ink-4)', marginBottom: 11 } }, 'Tablolar — panona eklemek/çıkarmak için seç'),
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(218px, 1fr))', gap: 8 } },
+        Object.keys(PANOM_DEFS).map(function (t) {
+          var on = widgets.some(function (w) { return w.type === t; });
+          return h('button', { key: t, onClick: function () { onToggle(t); }, style: { display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left', padding: '9px 11px', borderRadius: 10, cursor: 'pointer', border: on ? '1px solid var(--ember)' : '0.5px solid var(--line)', background: on ? 'var(--ember-tint)' : 'var(--surface)' } },
+            h('span', { style: { width: 18, height: 18, borderRadius: 5, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', background: on ? 'var(--ember)' : 'transparent', border: on ? 'none' : '1.5px solid var(--line)', color: '#fff', font: '700 11px/1 var(--font-sans)' } }, on ? '✓' : ''),
+            h('span', { style: { width: 8, height: 8, borderRadius: '50%', flex: 'none', background: PANOM_DEFS[t].dot } }),
+            h('div', { style: { flex: 1, minWidth: 0 } },
+              h('div', { style: { font: '600 12.5px/1.2 var(--font-sans)', color: 'var(--ink)' } }, PANOM_DEFS[t].title),
+              h('div', { style: { font: '400 11px/1.3 var(--font-sans)', color: 'var(--ink-4)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, PANOM_DEFS[t].desc)));
+        }))) : null,
+    h('div', { ref: gridRef, style: { position: 'relative', width: '100%', minHeight: 120, height: (Math.max(1, maxRows) * (PANOM_ROW + PANOM_GAP) - PANOM_GAP) + 'px', transition: 'height .26s ease' } }, widgetCards.length ? widgetCards : h('div', { style: { position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', font: '400 13px/1.4 var(--font-sans)', color: 'var(--ink-4)' } }, edit ? 'Yukarıdan tablo seç' : 'Panon boş — düzenle ile tablo ekle')));
 }
 try { window.PanomScreen = PanomScreen; } catch (e) {}
