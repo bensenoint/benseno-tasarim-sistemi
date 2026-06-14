@@ -124,7 +124,8 @@ function App({ currentUser, onLogout }) {
     return () => { delete window.bnsOpenUser; };
   }, []);
   const isMobile = window.useIsMobile ? window.useIsMobile() : false;
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true);
+  const [sidebarHover, setSidebarHover] = React.useState(false);
   const [viewMode, setViewMode] = React.useState(t.defaultView);
   const [openBrief, setOpenBrief] = React.useState(null);
   const [briefs, setBriefs] = React.useState(data.briefs); // mutable for live edits
@@ -486,14 +487,20 @@ function App({ currentUser, onLogout }) {
       />
       <div style={{display:"grid", gridTemplateColumns: isMobile ? "1fr" : `${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
         {!isMobile && (
-          <Sidebar
-            active={tab} onChange={navTo}
-            collapsed={sidebarCollapsed}
-            onToggle={() => setSidebarCollapsed(v => !v)}
-            data={liveData}
-            onOpenPalette={() => setPalette(true)}
-            currentUser={currentUser}
-          />
+          <div style={{position:"relative", zIndex:60}}>
+            <Sidebar
+              active={tab} onChange={navTo}
+              collapsed={sidebarCollapsed && !sidebarHover}
+              expanded={!sidebarCollapsed || sidebarHover}
+              pinned={!sidebarCollapsed}
+              onToggle={() => setSidebarCollapsed(v => !v)}
+              onHoverEnter={() => setSidebarHover(true)}
+              onHoverLeave={() => setSidebarHover(false)}
+              data={liveData}
+              onOpenPalette={() => setPalette(true)}
+              currentUser={currentUser}
+            />
+          </div>
         )}
         <main key={tab + t.overviewLayout} style={{
           flex: 1, overflowY: "auto", overflowX: "hidden", minWidth: 0,

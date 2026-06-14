@@ -847,22 +847,31 @@ function SidebarSearch({ onOpenPalette, collapsed }) {
   );
 }
 
-function Sidebar({ active, onChange, collapsed, onToggle, data, onOpenPalette, currentUser }) {
+function Sidebar({ active, onChange, collapsed, expanded, pinned, onToggle, onHoverEnter, onHoverLeave, data, onOpenPalette, currentUser }) {
   const isMobile = useIsMobile();
   const alertCount = (data && data.briefs) ? data.briefs.filter(b => b.prio && (b.prio.code === "red" || b.prio.code === "over")).length : 0;
 
   // On mobile, sidebar is hidden (MobileNav handles navigation)
   if (isMobile) return null;
 
+  // Rail varsayılan kapalı; hover'da overlay olarak açılır (içerik kaymaz).
+  var isOpen = expanded === undefined ? !collapsed : expanded;
+
   return (
-    <aside style={{
-      width: "100%",
+    <aside
+      onMouseEnter={onHoverEnter}
+      onMouseLeave={onHoverLeave}
+      style={{
+      position: "absolute", top: 0, bottom: 0, left: 0,
+      width: isOpen ? 212 : 52,
       flexShrink: 0,
       display: "flex", flexDirection: "column",
       background: "var(--sidebar-bg)",
       borderRight: "1px solid var(--line)",
       overflow: "hidden",
-      position: "relative",
+      boxShadow: (isOpen && !pinned) ? "var(--shadow-2)" : "none",
+      transition: "width 180ms cubic-bezier(0.2,0,0,1), box-shadow 180ms",
+      zIndex: 60,
     }}>
       {/* Logo area */}
       <div style={{
