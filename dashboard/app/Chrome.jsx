@@ -246,6 +246,8 @@ function ChatBot() {
   const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
   const [unread, setUnread] = React.useState(false);   // balonda "Ody senin için özet hazırladı" işareti
   const [notifPeek, setNotifPeek] = React.useState(null); // kapalıyken gösterilen son bildirim (Ody'ye bağlı)
+  const [notifCount, setNotifCount] = React.useState(0);  // okunmamış bildirim sayısı (blob rozeti)
+  const [notifItems, setNotifItems] = React.useState([]); // tüm bildirimler (panelde liste — çan Ody'ye taşındı)
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
 
   // Ody ruh hâli: değişince fx partikülü; kapalıyken periyodik bildirim ifadesi + okunmadı işareti
@@ -264,7 +266,9 @@ function ChatBot() {
         .then(r => r.ok ? r.json() : null)
         .then(j => {
           if (cancelled || !j) return;
-          // Çandan okunduysa (sunucu unread=0) Ody sakinleşsin, balon kalksın.
+          setNotifItems(j.notifications || []);
+          setNotifCount(j.unread || 0);
+          // Hepsi okunduysa Ody sakinleşsin, balon kalksın.
           if ((j.unread || 0) === 0) { setNotifPeek(null); if (!open) setMood(odyRestingMood()); return; }
           const fresh = (j.notifications || []).filter(n => !n.read_at && n.id > seenNotif());
           if (fresh.length) {
@@ -285,9 +289,12 @@ function ChatBot() {
       if (p) { try { localStorage.setItem("bns_ody_seen_notif", String(p.id)); } catch (e) {} }
       return null;
     });
+    setNotifCount(0);
+    setNotifItems(items => items.map(n => n.read_at ? n : Object.assign({}, n, { read_at: new Date().toISOString() })));
     setMood(odyRestingMood());
     if (tok()) fetch(`${API}/api/notifications/read`, { method: "POST", headers: { Authorization: "Bearer " + tok() } }).catch(() => {});
   };
+  const fmtNotifT = (iso) => { try { return new Date(iso).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } };
 
   // Proaktif kişisel brief — kişi dashboard'ı açınca Ody onun durumunu BİR KEZ (günde) hazırlar.
   // Kişiye özeldir: /api/chat zaten giriş yapan kullanıcıya göre filtreler. Kullanıcı+tarih
@@ -378,7 +385,14 @@ function ChatBot() {
             display: "flex", alignItems: "center", justifyContent: "center",
             animation: "odyBob 4.5s ease-in-out infinite",
           }}>{odyFaceProd(mood)}</div>
-          {unread && <span title="Yeni kişisel özet" style={{
+          {notifCount > 0 ? <span title={notifCount + " okunmamış bildirim"} style={{
+            position: "absolute", top: -3, right: -3, minWidth: 20, height: 20, padding: "0 5px",
+            borderRadius: 999, background: "var(--prio-red, #E5484D)", color: "#fff",
+            font: "700 11px/20px var(--font-sans)", textAlign: "center",
+            border: "2px solid var(--surface, #fff)", boxShadow: "0 2px 5px -1px rgba(0,0,0,.3)",
+            animation: "odyPopIn .3s ease",
+          }}>{notifCount > 99 ? "99+" : notifCount}</span>
+          : unread && <span title="Yeni kişisel özet" style={{
             position: "absolute", top: 0, right: 0, width: 14, height: 14, borderRadius: "50%",
             background: "var(--prio-red, #E5484D)", border: "2px solid var(--bg, #fff)", animation: "odyPopIn .3s ease",
           }}/>}
@@ -404,6 +418,25 @@ function ChatBot() {
             <button onClick={() => setOpen(false)} style={{ border: 0, background: "transparent", color: "var(--ink-3)", cursor: "pointer", padding: 4, display: "inline-flex" }}><I.X size={15}/></button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+            {notifItems.length > 0 && (
+              <div style={{ border: "1px solid var(--line)", borderRadius: 10, overflow: "hidden", background: "var(--paper-2)" }}>
+                <div style={{ padding: "7px 10px", font: "600 10px/1 var(--font-sans)", letterSpacing: ".07em", textTransform: "uppercase", color: "var(--ink-4)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 6 }}>
+                  <I.Bell size={11}/> Bildirimler
+                </div>
+                <div style={{ maxHeight: 168, overflowY: "auto" }}>
+                  {notifItems.slice(0, 30).map(n => (
+                    <a key={n.id} href={n.link || "#"} target={n.link ? "_blank" : undefined} rel="noreferrer" style={{
+                      display: "block", padding: "8px 10px", textDecoration: "none",
+                      borderLeft: n.read_at ? "2px solid transparent" : "2px solid var(--ody)",
+                      background: n.read_at ? "transparent" : "var(--ody-tint)",
+                    }}>
+                      <div style={{ font: "400 12px/1.4 var(--font-sans)", color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</div>
+                      <div style={{ font: "400 10px/1 var(--font-sans)", color: "var(--ink-4)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
             {msgs.length === 0 && (
               <div style={{ font: "400 12px/1.6 var(--font-sans)", color: "var(--ink-4)" }}>
                 Merhaba, ben Ody! Bana sorabileceklerin:
@@ -447,70 +480,6 @@ function ChatBot() {
 }
 try { window.BnsChatBot = ChatBot; } catch (e) {}
 
-// Bildirim zili — Slack brief-akışı DM'lerinin dashboard yansıması.
-// /api/notifications JWT ile kişiye özel; 60sn'de bir yoklar, açınca okundu işaretler.
-function NotificationBell() {
-  const [open, setOpen] = React.useState(false);
-  const [items, setItems] = React.useState([]);
-  const [unread, setUnread] = React.useState(0);
-  const API = (window.BNS_API_BASE || "https://benseno-api-production.up.railway.app");
-  const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
-  const load = React.useCallback(() => {
-    if (!tok()) return;
-    fetch(`${API}/api/notifications`, { headers: { Authorization: "Bearer " + tok() } })
-      .then(r => r.ok ? r.json() : null)
-      .then(j => { if (j) { setItems(j.notifications || []); setUnread(j.unread || 0); } })
-      .catch(() => {});
-  }, []);
-  React.useEffect(() => { load(); const id = setInterval(load, 60000); return () => clearInterval(id); }, [load]);
-  const openPanel = () => {
-    setOpen(v => !v);
-    if (!open && unread > 0) {
-      fetch(`${API}/api/notifications/read`, { method: "POST", headers: { Authorization: "Bearer " + tok() } })
-        .then(() => setUnread(0)).catch(() => {});
-    }
-  };
-  const fmtT = (iso) => { try { return new Date(iso).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch { return ""; } };
-  return (
-    <div style={{ position: "relative" }}>
-      <button onClick={openPanel} title="Bildirimler" style={{
-        position: "relative", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center",
-        border: 0, borderRadius: 8, background: "transparent", color: "var(--ink-3)", cursor: "pointer",
-      }}
-        onMouseEnter={e => e.currentTarget.style.background = "var(--paper-2)"}
-        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-      >
-        <I.Bell size={15}/>
-        {unread > 0 && <span style={{
-          position: "absolute", top: 3, right: 3, minWidth: 14, height: 14, padding: "0 3px",
-          borderRadius: 999, background: "var(--ember)", color: "#fff",
-          font: "700 9px/14px var(--font-sans)", textAlign: "center",
-        }}>{unread > 9 ? "9+" : unread}</span>}
-      </button>
-      {open && (
-        <div onMouseLeave={() => setOpen(false)} style={{
-          position: "absolute", top: 38, right: 0, zIndex: 50, width: 340, maxHeight: 420,
-          background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10,
-          boxShadow: "var(--shadow-2)", overflowY: "auto", padding: 4,
-        }}>
-          <div style={{ padding: "8px 10px 6px", font: "600 10px/1 var(--font-sans)", letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--ink-4)" }}>
-            Bildirimler
-          </div>
-          {items.length === 0 && <div style={{ padding: "14px 10px", font: "400 12px/1.5 var(--font-sans)", color: "var(--ink-4)" }}>Henüz bildirim yok.</div>}
-          {items.map(n => (
-            <a key={n.id} href={n.link || "#"} target={n.link ? "_blank" : undefined} rel="noreferrer" style={{
-              display: "block", padding: "8px 10px", borderRadius: 6, textDecoration: "none",
-              background: n.read_at ? "transparent" : "var(--paper-2)", marginBottom: 2,
-            }}>
-              <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</div>
-              <div style={{ font: "400 10px/1 var(--font-sans)", color: "var(--ink-4)", marginTop: 3 }}>{fmtT(n.created_at)}</div>
-            </a>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers, currentUser, onLogout }) {
   const isMobile = useIsMobile();
@@ -601,8 +570,7 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
           {theme === "dark" ? <I.Sun size={14}/> : <I.Moon size={14}/>}
         </button>
 
-        {/* Bildirimler — Slack brief-akışı DM'lerinin dashboard yansıması */}
-        <NotificationBell/>
+        {/* Bildirimler artık Ody'ye taşındı (sağ-alt maskot) — üst menüde çan yok. */}
 
         {/* New brief — icon+text on desktop, icon-only on mobile */}
         {isMobile ? (
