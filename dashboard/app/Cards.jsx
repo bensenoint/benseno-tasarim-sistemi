@@ -116,7 +116,7 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
               {trend.dir === "up" ? "↑" : trend.dir === "down" ? "↓" : "→"} {trend.value}
             </span>
           )}
-          {sub && <span style={{color:"var(--ink-4)", overflow:"hidden", textOverflow:"ellipsis", fontSize:11}}>{sub}</span>}
+          {sub && !trend && <span style={{color:"var(--ink-4)", overflow:"hidden", textOverflow:"ellipsis", fontSize:11}}>{sub}</span>}
         </div>
       )}
     </div>

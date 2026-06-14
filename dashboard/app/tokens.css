@@ -623,3 +623,13 @@ button:active,
 @keyframes odyShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-1.5px);}75%{transform:translateX(1.5px);}}
 @keyframes odyBlink{0%,90%,100%{transform:scaleY(1);}95%{transform:scaleY(.1);}}
 @keyframes odyPopIn{0%{transform:scale(.8);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+/* ── Erişilebilirlik: hareketi azalt tercihi (Ody bob, geçişler, sparkline vb.) ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
