@@ -14,7 +14,7 @@ function fmtDate(d) {
 }
 function csvCell(s) { s = String(s == null ? "" : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 
-function BrandScreen({ data, onOpenBrief, initialSel }) {
+function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel }) {
   const [sel, setSel] = React.useState(initialSel ? initialSel.name : null);
   React.useEffect(() => { if (initialSel) setSel(initialSel.name); }, [initialSel]);
   const [sort, setSort] = React.useState("active");
@@ -23,7 +23,7 @@ function BrandScreen({ data, onOpenBrief, initialSel }) {
   // Tek marka seçiliyse detay sayfasını göster
   if (sel) {
     const stats = (data.brandStats || []).find(b => b.name === sel) || { name: sel };
-    return <BrandDetail brand={sel} stats={stats} data={data} onBack={() => setSel(null)} onSwitch={setSel} onOpenBrief={onOpenBrief} />;
+    return <BrandDetail brand={sel} stats={stats} data={data} onBack={() => setSel(null)} onSwitch={setSel} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} />;
   }
 
   let rows = data.brandStats;
@@ -102,7 +102,7 @@ function BrandScreen({ data, onOpenBrief, initialSel }) {
 }
 
 // ── Tek marka detay sayfası ─────────────────────────────────────────────────
-function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief }) {
+function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpenCompleted }) {
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
 
   // Marka brief'lerini birleşik satır modeline çevir (aktif + tamamlanan)
@@ -278,7 +278,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief }) {
                 {filteredDone.length === 0 && <tr><td colSpan={13} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
                 {filteredDone.map((c, idx) => (
                   <tr key={"d" + c.no}
-                    onClick={() => onOpenBrief && onOpenBrief(c)}
+                    onClick={() => (onOpenCompleted || onOpenBrief) && (onOpenCompleted || onOpenBrief)(c)}
                     title="İş detayını aç"
                     onMouseEnter={e => e.currentTarget.style.background = "var(--paper-2)"}
                     onMouseLeave={e => e.currentTarget.style.background = idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)"}
