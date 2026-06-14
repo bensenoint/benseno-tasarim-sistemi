@@ -37,7 +37,8 @@ function PanomScreen(props) {
 
   var loadSaved = function () { try { return JSON.parse(localStorage.getItem('bns_panom_prod')) || {}; } catch (e) { return {}; } };
   var saved = React.useRef(loadSaved());
-  var ref = React.useState(saved.current.widgets && saved.current.widgets.length ? saved.current.widgets : panomDefaultLayout());
+  // Kayıtlı layout her zaman pack'ten geçer → eski/hatalı sürümün kaydettiği çakışık düzen otomatik onarılır.
+  var ref = React.useState(saved.current.widgets && saved.current.widgets.length ? panomPack(saved.current.widgets) : panomDefaultLayout());
   var widgets = ref[0], setWidgets = ref[1];
   var er = React.useState(false), edit = er[0], setEdit = er[1];
   var pk = React.useState(false), picker = pk[0], setPicker = pk[1];
