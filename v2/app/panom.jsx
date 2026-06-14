@@ -53,7 +53,7 @@ class Panom extends React.Component {
     };
     this._drag = null; this._raf = null; this._mdrag = null; this._mrefs = {};
     this._wc = {};
-    ['onWidgetPointerDown','onResizePointerDown','onPointerMove','onPointerUp','onMobileDown','onMobileMove','onMobileUp','onToggleTheme','onToggleEdit','onOpenLib','onCloseLib','onColor','onRemove','onRemovePointer','onAdd','onToggleSidebar','onCloseSidebar','onScope','onNav','onShortcuts','onBell','onYeniBrief','onProfile','onOdyPointerDown','onCloseOdy','onChatKey','onSend','gridRef','chatRef']
+    ['onWidgetPointerDown','onResizePointerDown','onPointerMove','onPointerUp','onMobileDown','onMobileMove','onMobileUp','onToggleTheme','onToggleEdit','onOpenLib','onCloseLib','onColor','onRemove','onRemovePointer','onAdd','onToggleSidebar','onCloseSidebar','onScope','onNav','onSort','onShortcuts','onBell','onYeniBrief','onProfile','onOdyPointerDown','onCloseOdy','onChatKey','onSend','gridRef','chatRef']
       .forEach(function (m) { this[m] = this[m].bind(this); }, this);
   }
   defaultLayout() { return window.bnsV2DefaultLayout(); }
@@ -234,8 +234,13 @@ class Panom extends React.Component {
   onScope(e) { this.setState({ scope: e.currentTarget.getAttribute('data-scope') }); }
   onNav(e) {
     var k = e.currentTarget.getAttribute('data-key'), label = e.currentTarget.getAttribute('data-label');
+    if (window.BNS_PAGE_SORT) { window.BNS_PAGE_SORT.key = null; window.BNS_PAGE_SORT.dir = 1; }
     this.setState({ activeNav: k, sidebarOpen: false });
-    if (k !== 'panom') this.toast(label + ' · bu görünüm yakında');
+    if (['galeri', 'yardim', 'kilavuz'].indexOf(k) >= 0) this.toast(label + ' · bu görünüm yakında');
+  }
+  onSort(e) {
+    var k = e.currentTarget.getAttribute('data-sortkey'); if (!k) return;
+    var S = window.BNS_PAGE_SORT; S.dir = S.key === k ? -S.dir : 1; S.key = k; this.forceUpdate();
   }
   onShortcuts() { this.toast('Kısayollar · yakında'); }
   onBell() {

@@ -141,11 +141,8 @@ function bnsPanomRender(self) {
 
   // ── MAIN ──
   var panomMain = h(React.Fragment, null, headerBlock, s.isMobile ? mobileGrid : grid);
-  var placeholder = h('div', { style: { minHeight: '50vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', textAlign: 'center', color: 'var(--ink2)' } },
-    h('div', { style: { width: '56px', height: '56px', borderRadius: '58% 42% 55% 45% / 52% 48% 55% 45%', background: 'var(--line)' } }),
-    h('div', { style: { fontFamily: "'Newsreader',serif", fontSize: '26px', color: 'var(--ink)' } }, (BNS_NAV.reduce(function (acc, g) { return acc.concat(g.items); }, []).find(function (it) { return it.key === s.activeNav; }) || {}).label || 'Görünüm'),
-    h('div', { style: { fontFamily: "'Geist',sans-serif", fontSize: '13px' } }, 'Bu görünüm yakında bu panoya taşınacak.'));
-  var main = h('main', { style: { flex: 1, padding: '28px 30px 18px' } }, s.activeNav === 'panom' ? panomMain : placeholder);
+  var pageCtx = { dark: dark, pal: pal, me: me, onSort: self.onSort };
+  var main = h('main', { style: { flex: 1, padding: '28px 30px 18px' } }, s.activeNav === 'panom' ? panomMain : window.bnsRenderPage(s.activeNav, pageCtx));
 
   var footer = h('footer', { style: { borderTop: '1px solid var(--line)', padding: '16px 30px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', flexWrap: 'wrap', color: 'var(--ink2)', fontFamily: "'Geist',sans-serif", fontSize: '12px', marginTop: '10px' } },
     h('div', null, '© 2026 ', h('span', { style: { color: 'var(--brand)', fontWeight: 600 } }, 'benseno'), ' · Marketing Technologies'),
