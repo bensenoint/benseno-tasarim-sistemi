@@ -17,14 +17,20 @@ function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwit
   });
 
   const overdue = filtered.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
-  const today = filtered.filter(b => b.deltaH > 0 && b.deltaH <= 24);
+  const today = filtered.filter(b => b.deltaH > 0 && b.deltaH <= 24);   // 24s pencere — "Bugün ve yarın" tablosu için
+  // "Bugün teslim" KPI'sı: takvim olarak BUGÜN (İstanbul) deadline'ı olan aktif işler.
+  const _istToday = (function(){ try { return new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Istanbul" }); } catch (e) { return ""; } })();
+  const todayDue = filtered.filter(b => {
+    if (b.durum === "tamamlandi" || !b.deadline) return false;
+    try { return new Date(b.deadline).toLocaleDateString("en-CA", { timeZone: "Europe/Istanbul" }) === _istToday; } catch (e) { return false; }
+  });
   const week = filtered.filter(b => b.deltaH > 0 && b.deltaH <= 168);
   const stale = filtered.filter(b => b.stale);
   const review = filtered.filter(b => b.durum === "incelemede");
   const blocked = filtered.filter(b => b.durum === "blokeli");
 
   const filterActive = deptFilter !== "all" || prioFilter !== "all";
-  const shared = {data,user,viewMode,setViewMode,active:filtered,musteride,overdue,today,week,stale,review,blocked,onOpenBrief,onSwitchTab,onJumpJobs,onRefresh,onStatusChange,filterOpen,setFilterOpen,deptFilter,setDeptFilter,prioFilter,setPrioFilter,filterActive,kpiVariant};
+  const shared = {data,user,viewMode,setViewMode,active:filtered,musteride,overdue,today,todayDue,week,stale,review,blocked,onOpenBrief,onSwitchTab,onJumpJobs,onRefresh,onStatusChange,filterOpen,setFilterOpen,deptFilter,setDeptFilter,prioFilter,setPrioFilter,filterActive,kpiVariant};
 
   if (layout === "dense") return <DenseLayout {...shared}/>;
   if (layout === "story") return <StoryLayout {...shared}/>;
@@ -277,7 +283,7 @@ function Rule({ name, status, hits, last }) {
   );
 }
 
-function EditorialLayout({ data, musteride, user, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+function EditorialLayout({ data, musteride, user, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   const avgCapPct = calcAvgCapPct(data);
@@ -301,7 +307,7 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, week, 
       <PageHead
         eyebrow={data.fmtTr ? data.fmtTr(Date.now()) : `${greetingTimezone()}`}
         title={`${greeting}, ${firstName}.`}
-        subtitle={`bugün ${overdue.length} geciken, ${today.length} bugün teslim. önce bunlar.`}
+        subtitle={`bugün ${overdue.length} geciken, ${todayDue.length} bugün teslim. önce bunlar.`}
         actions={<div style={{position:"relative",display:"flex",gap:6}}>
           <Button kind={filterActive ? "primary" : "secondary"} icon={<I.Filter size={14}/>} onClick={() => setFilterOpen(o=>!o)}>
             {filterActive ? "Filtre aktif" : "Filtrele"}
@@ -337,7 +343,7 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, week, 
       <KpiGrid cols={7}>
         <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"} onClick={onJumpJobs ? () => onJumpJobs("overdue") : undefined}/>
-        <Kpi label="Bugün teslim"  value={today.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Bugün teslim"  value={todayDue.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={sparkReview} trend={trendReview} sub={hist.length > 1 ? "son sync'e göre" : "dün 09:00'dan beri"} onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>
         <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={sparkStale} sub="24 iş saati hareket yok" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Müşteride"     value={musteride.length} color="#7c5cff" variant={kpiVariant} sub="✈️ dönüş bekleniyor" onClick={onSwitchTab ? () => onSwitchTab("musteride") : undefined}/>
@@ -390,7 +396,7 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, week, 
 }
 
 // ─── DENSE ──────────────────────────────────────────────────────────────────
-function DenseLayout({ data, musteride, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+function DenseLayout({ data, musteride, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const avgCapPct = calcAvgCapPct(data);
   // Bu hafta özet — canlı veriden
   const nowTs2 = data.NOW || Date.now();
@@ -422,7 +428,7 @@ function DenseLayout({ data, musteride, active, overdue, today, week, stale, rev
       <div className="bns-kpi-8" style={{display:"grid", gridTemplateColumns:"repeat(8, 1fr)", gap: 10, marginBottom: 16}}>
         <Kpi label="Aktif"        value={active.length} variant={kpiVariant} spark={[42,45,49,52,55,58,active.length]}/>
         <Kpi label="Geciken"      value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={[3,4,5,4,6,7,overdue.length]}/>
-        <Kpi label="Bugün"        value={today.length} variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]}/>
+        <Kpi label="Bugün"        value={todayDue.length} variant={kpiVariant} spark={[8,7,9,10,11,11,todayDue.length]}/>
         <Kpi label="Bu hafta"     value={week.length}  variant={kpiVariant} spark={[18,20,22,24,26,28,week.length]}/>
         <Kpi label="İncelemede"   value={review.length} color="var(--warning)" variant={kpiVariant} spark={[6,7,7,9,10,11,review.length]}/>
         <Kpi label="Blokeli"      value={blocked.length} color="var(--danger)" variant={kpiVariant}/>
@@ -467,7 +473,7 @@ function DenseLayout({ data, musteride, active, overdue, today, week, stale, rev
 }
 
 // ─── STORY (vertical narrative) ─────────────────────────────────────────────
-function StoryLayout({ data, musteride, active, overdue, today, week, stale, review, blocked, onOpenBrief, onSwitchTab, kpiVariant }) {
+function StoryLayout({ data, musteride, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, kpiVariant }) {
   const avgCapPct = calcAvgCapPct(data);
   return (
     <div className="bn-tab-in">
@@ -514,7 +520,7 @@ function StoryLayout({ data, musteride, active, overdue, today, week, stale, rev
       </Card>
 
       <KpiGrid cols={4}>
-        <Kpi label="Bugün teslim"  value={today.length} variant={kpiVariant} spark={[8,7,9,10,11,11,today.length]} trend={{dir:"flat", value:"="}}/>
+        <Kpi label="Bugün teslim"  value={todayDue.length} variant={kpiVariant} spark={[8,7,9,10,11,11,todayDue.length]} trend={{dir:"flat", value:"="}}/>
         <Kpi label="Onay bekleyen" value={review.length} color="var(--warning)" variant={kpiVariant} trend={{dir:"up", value:"+3"}}/>
         <Kpi label="Bu hafta"      value={week.length} variant={kpiVariant} trend={{dir:"up", value:"+12"}}/>
         <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}}/>

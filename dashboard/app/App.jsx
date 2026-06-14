@@ -629,10 +629,11 @@ function Toast({ msg }) {
 // ─── Keyboard shortcuts hint card ──────────────────────────────────────────
 function ShortcutsHint() {
   const [open, setOpen] = React.useState(false);
+  const isMobile = useIsMobile();
   return (
     <>
       <button onClick={() => setOpen(true)} title="Klavye kısayolları" style={{
-        position:"fixed", left: 16, bottom: 16, zIndex: 40,
+        position:"fixed", left: isMobile ? 16 : 64, bottom: 16, zIndex: 40,
         border:"1px solid var(--line)", background:"var(--surface)",
         padding:"7px 10px", borderRadius:999, cursor:"pointer",
         font:"500 11px/1 var(--font-mono)", color:"var(--ink-3)",

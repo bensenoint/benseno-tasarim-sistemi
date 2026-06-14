@@ -378,24 +378,26 @@ function ChatBot() {
           background: "transparent", padding: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
         }}>
+          <div aria-hidden="true" style={{
+            position: "absolute", left: "50%", bottom: -3, transform: "translateX(-50%)",
+            width: 32, height: 8, borderRadius: "50%",
+            background: "rgba(20,38,92,.22)", filter: "blur(3px)", zIndex: 0, pointerEvents: "none",
+          }}/>
           <div ref={blobRef} style={{
-            position: "relative", width: 54, height: 54,
-            borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "var(--ody)",
-            boxShadow: "0 10px 18px -6px rgba(0,0,0,.28), 0 4px 8px -3px rgba(0,0,0,.2)",
+            position: "relative", zIndex: 1, width: 54, height: 54,
+            borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%",
+            background: "radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--ody) 55%, #fff) 0%, var(--ody) 52%, color-mix(in srgb, var(--ody) 72%, #000) 100%)",
+            boxShadow: "0 16px 28px -8px rgba(20,38,92,.45), 0 6px 12px -4px rgba(0,0,0,.22), inset 0 2px 5px rgba(255,255,255,.40), inset 0 -7px 11px -5px rgba(0,0,0,.30)",
             display: "flex", alignItems: "center", justifyContent: "center",
             animation: "odyBob 4.5s ease-in-out infinite",
           }}>{odyFaceProd(mood)}</div>
-          {notifCount > 0 ? <span title={notifCount + " okunmamış bildirim"} style={{
+          {notifCount > 0 && <span title={notifCount + " okunmamış bildirim"} style={{
             position: "absolute", top: -3, right: -3, minWidth: 20, height: 20, padding: "0 5px",
             borderRadius: 999, background: "var(--prio-red, #E5484D)", color: "#fff",
             font: "700 11px/20px var(--font-sans)", textAlign: "center",
             border: "2px solid var(--surface, #fff)", boxShadow: "0 2px 5px -1px rgba(0,0,0,.3)",
             animation: "odyPopIn .3s ease",
-          }}>{notifCount > 99 ? "99+" : notifCount}</span>
-          : unread && <span title="Yeni kişisel özet" style={{
-            position: "absolute", top: 0, right: 0, width: 14, height: 14, borderRadius: "50%",
-            background: "var(--prio-red, #E5484D)", border: "2px solid var(--bg, #fff)", animation: "odyPopIn .3s ease",
-          }}/>}
+          }}>{notifCount > 99 ? "99+" : notifCount}</span>}
         </button>
       )}
       {open && (
@@ -407,7 +409,7 @@ function ChatBot() {
         }}>
           <div onPointerDown={startDrag} title="Sürükleyerek taşı"
             style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8, cursor: "grab", touchAction: "none", userSelect: "none" }}>
-            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "var(--ody)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--ody) 55%, #fff) 0%, var(--ody) 52%, color-mix(in srgb, var(--ody) 72%, #000) 100%)", boxShadow: "inset 0 1px 3px rgba(255,255,255,.4), inset 0 -3px 6px -2px rgba(0,0,0,.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
             </span>
             <div style={{ flex: 1 }}>
