@@ -441,7 +441,7 @@ function ChatBot() {
                 <div style={{ padding: "7px 10px", font: "600 10px/1 var(--font-sans)", letterSpacing: ".07em", textTransform: "uppercase", color: "var(--ink-4)", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 6 }}>
                   <I.Bell size={11}/> Bildirimler
                 </div>
-                <div style={{ maxHeight: 168, overflowY: "auto" }}>
+                <div style={{ maxHeight: 220, overflowY: "auto" }}>
                   {notifItems.slice(0, 30).map(n => (
                     <a key={n.id} href={n.link || "#"} target={n.link ? "_blank" : undefined} rel="noreferrer" style={{
                       display: "block", padding: "8px 10px", textDecoration: "none",
@@ -470,8 +470,8 @@ function ChatBot() {
             )}
             {msgs.map((m, i) => (
               <div key={i} style={{
-                alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%",
-                padding: "8px 11px", borderRadius: 10,
+                alignSelf: m.role === "user" ? "flex-end" : "stretch", maxWidth: m.role === "user" ? "85%" : "100%", width: m.role === "user" ? undefined : "100%",
+                padding: "8px 11px", borderRadius: 10, boxSizing: "border-box",
                 background: m.role === "user" ? "var(--ody)" : "var(--paper-2)",
                 color: m.role === "user" ? "#fff" : "var(--ink)",
                 font: "400 13px/1.55 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word",
