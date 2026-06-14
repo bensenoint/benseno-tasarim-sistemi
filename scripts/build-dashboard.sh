@@ -36,6 +36,7 @@ cat \
   "$APP/screens/Users.jsx" \
   "$APP/screens/Silinenler.jsx" \
   "$APP/screens/Help.jsx" \
+  "$APP/Panom.jsx" \
   "$APP/Chrome.jsx" \
   "$APP/App.jsx" \
   | npx esbuild \
