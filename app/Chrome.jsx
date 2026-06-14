@@ -254,6 +254,22 @@ function ChatBot() {
   React.useEffect(() => { odyFxProd(blobRef.current, mood); }, [mood]);
   React.useEffect(() => { setMood(odyRestingMood()); }, []);
 
+  // Ekran boyutu değişince Ody'yi görünür alanda tut (mount'ta kayıtlı dış-konum da düzelir).
+  React.useEffect(() => {
+    const clamp = () => setPos(p => {
+      const maxX = Math.max(4, window.innerWidth - 60);
+      const maxY = Math.max(4, window.innerHeight - 60);
+      const nx = Math.min(Math.max(4, p.x), maxX);
+      const ny = Math.min(Math.max(4, p.y), maxY);
+      if (nx === p.x && ny === p.y) return p;
+      try { localStorage.setItem("bns_ody_pos", JSON.stringify({ x: nx, y: ny })); } catch (e) {}
+      return { x: nx, y: ny };
+    });
+    clamp();
+    window.addEventListener("resize", clamp);
+    return () => window.removeEventListener("resize", clamp);
+  }, []);
+
   // Bildirimler artık Ody'ye bağlı: /api/notifications'ı yoklar; yeni (okunmamış, daha önce
   // görülmemiş) bildirim gelince Ody onun metninden çıkardığı ruh hâlini yansıtır ve kapalıyken
   // balonunda bildirimi gösterir — Ody/balon açılana (veya çandan okununca) kadar.

@@ -557,7 +557,7 @@ function App({ currentUser, onLogout }) {
       {/* 🤖 Sistem Asistanı — sağ alt yüzen sohbet */}
       <ChatBot/>
 
-      <ShortcutsHint/>
+      <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>
 
       <BenseoTweaks t={t} setTweak={setTweak}/>
     </div>
@@ -627,20 +627,23 @@ function Toast({ msg }) {
 }
 
 // ─── Keyboard shortcuts hint card ──────────────────────────────────────────
-function ShortcutsHint() {
+function ShortcutsHint({ collapsed }) {
   const [open, setOpen] = React.useState(false);
   const isMobile = useIsMobile();
+  // Sol menü kapalıyken (rail) yalnız ikon; açıkken ikon + "Kısayollar" metni.
+  const iconOnly = !!collapsed;
   return (
     <>
       <button onClick={() => setOpen(true)} title="Klavye kısayolları" style={{
-        position:"fixed", left: isMobile ? 16 : 64, bottom: 16, zIndex: 40,
+        position:"fixed", left: isMobile ? 16 : (iconOnly ? 10 : 64), bottom: 16, zIndex: 40,
         border:"1px solid var(--line)", background:"var(--surface)",
-        padding:"7px 10px", borderRadius:999, cursor:"pointer",
+        padding: iconOnly ? "8px" : "7px 10px", borderRadius:999, cursor:"pointer",
         font:"500 11px/1 var(--font-mono)", color:"var(--ink-3)",
         boxShadow:"var(--shadow-1)",
-        display:"inline-flex", alignItems:"center", gap:6
+        display:"inline-flex", alignItems:"center", justifyContent:"center", gap:6,
+        transition:"left 200ms cubic-bezier(0.2,0,0,1), padding 200ms",
       }}>
-        <I.Command size={12}/> Kısayollar
+        <I.Command size={12}/>{!iconOnly && " Kısayollar"}
       </button>
       {open && (
         <>
