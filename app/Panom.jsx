@@ -7,7 +7,9 @@ var PANOM_DEFS = {
   capacity: { title: 'Kapasitem',       desc: 'Doluluk ve rol kapasiten',    w: 4, h: 3, dot: 'var(--ember)' },
   client:   { title: 'Müşteride',       desc: 'Müşteri onayı bekleyenler',   w: 4, h: 3, dot: 'var(--prio-orange)' },
   working:  { title: 'Çalışılıyor',     desc: 'Şu an çalışılan tüm işler',   w: 6, h: 4, dot: 'var(--info, #3B82C4)' },
-  today:    { title: 'Bugün ve yarın',  desc: 'Termini 48 saat içinde',      w: 6, h: 4, dot: 'var(--prio-yellow)' }
+  today:    { title: 'Bugün ve yarın',  desc: 'Termini 48 saat içinde',      w: 6, h: 4, dot: 'var(--prio-yellow)' },
+  brandload:{ title: 'Marka yoğunluğu', desc: 'Markaya göre aktif iş',        w: 4, h: 3, dot: 'var(--info, #3B82C4)' },
+  dept:     { title: 'Departman özeti', desc: 'Departman bazında yük',        w: 4, h: 3, dot: 'var(--prio-green)' }
 };
 function panomDefaultLayout() {
   return [
@@ -46,6 +48,7 @@ function PanomScreen(props) {
   var gridRef = React.useRef(null);
   var dragRef = React.useRef(null);
   var rafRef = React.useRef(null);
+  var wRef = React.useRef(widgets); wRef.current = widgets; // her render'da taze widget listesi (closure bayatlamasın)
 
   var persist = function (ws) {
     try { localStorage.setItem('bns_panom_prod', JSON.stringify({ widgets: ws, wc: wcRef.current })); } catch (e) {}
@@ -64,49 +67,41 @@ function PanomScreen(props) {
     })();
   }, []);
 
-  // ── sürükle / boyutlandır ──
-  var onMove = function (e) {
-    if (!dragRef.current || rafRef.current) return;
-    var cx = e.clientX, cy = e.clientY;
-    rafRef.current = requestAnimationFrame(function () {
-      rafRef.current = null; var d = dragRef.current; if (!d) return;
-      var ws = widgets.map(function (w) { return Object.assign({}, w); });
-      var w = ws.find(function (x) { return x.id === d.id; }); if (!w) return;
-      if (d.mode === 'move') {
-        var left = cx - d.rect.left - d.offX, top = cy - d.rect.top - d.offY;
-        var nx = Math.max(0, Math.min(12 - w.w, Math.round(left / (d.colW + PANOM_GAP)))), ny = Math.max(0, Math.round(top / (PANOM_ROW + PANOM_GAP)));
-        w.x = nx; w.y = ny; setWidgets(panomPack(ws, d.id)); setDragPx({ left: left, top: top });
-      } else {
-        var cl = w.x * (d.colW + PANOM_GAP), ct = w.y * (PANOM_ROW + PANOM_GAP);
-        var nw = Math.max(3, Math.min(12 - w.x, Math.round((cx - d.rect.left - cl + PANOM_GAP) / (d.colW + PANOM_GAP))));
-        var nh = Math.max(2, Math.min(8, Math.round((cy - d.rect.top - ct + PANOM_GAP) / (PANOM_ROW + PANOM_GAP))));
-        w.w = nw; w.h = nh; setWidgets(panomPack(ws, d.id));
-      }
-    });
-  };
-  var onUp = function () {
-    if (!dragRef.current) return; dragRef.current = null;
-    window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp);
-    setDragId(null); setDragPx(null);
-    setWidgets(function (ws) { persist(ws); return ws; });
-  };
-  var onWidgetDown = function (e) {
-    if (!edit) return;
-    var id = e.currentTarget.getAttribute('data-id'), c = gridRef.current; if (!c) return;
-    var rect = c.getBoundingClientRect(), w = widgets.find(function (x) { return x.id === id; }); if (!w) return;
+  // ── sürükle / boyutlandır ── (ref tabanlı: taze widget + doğru listener temizliği)
+  var beginDrag = function (id, mode, e) {
+    var c = gridRef.current; if (!c) return;
+    var rect = c.getBoundingClientRect(), w = wRef.current.find(function (x) { return x.id === id; }); if (!w) return;
     var colW = (rect.width - 11 * PANOM_GAP) / 12, cl = w.x * (colW + PANOM_GAP), ct = w.y * (PANOM_ROW + PANOM_GAP);
-    dragRef.current = { id: id, mode: 'move', colW: colW, rect: rect, offX: e.clientX - rect.left - cl, offY: e.clientY - rect.top - ct };
-    setDragId(id); setDragPx({ left: cl, top: ct });
-    window.addEventListener('pointermove', onMove); window.addEventListener('pointerup', onUp); e.preventDefault();
+    dragRef.current = { id: id, mode: mode, colW: colW, rect: rect, offX: e.clientX - rect.left - cl, offY: e.clientY - rect.top - ct };
+    setDragId(id); if (mode === 'move') setDragPx({ left: cl, top: ct });
+    var move = function (ev) {
+      if (rafRef.current) return;
+      var cx = ev.clientX, cy = ev.clientY;
+      rafRef.current = requestAnimationFrame(function () {
+        rafRef.current = null; var d = dragRef.current; if (!d) return;
+        var ws = wRef.current.map(function (x) { return Object.assign({}, x); });
+        var ww = ws.find(function (x) { return x.id === d.id; }); if (!ww) return;
+        if (d.mode === 'move') {
+          var left = cx - d.rect.left - d.offX, top = cy - d.rect.top - d.offY;
+          ww.x = Math.max(0, Math.min(12 - ww.w, Math.round(left / (d.colW + PANOM_GAP))));
+          ww.y = Math.max(0, Math.round(top / (PANOM_ROW + PANOM_GAP)));
+          setWidgets(panomPack(ws, d.id)); setDragPx({ left: left, top: top });
+        } else {
+          var bcl = ww.x * (d.colW + PANOM_GAP), bct = ww.y * (PANOM_ROW + PANOM_GAP);
+          ww.w = Math.max(3, Math.min(12 - ww.x, Math.round((cx - d.rect.left - bcl + PANOM_GAP) / (d.colW + PANOM_GAP))));
+          ww.h = Math.max(2, Math.min(8, Math.round((cy - d.rect.top - bct + PANOM_GAP) / (PANOM_ROW + PANOM_GAP))));
+          setWidgets(panomPack(ws, d.id));
+        }
+      });
+    };
+    var up = function () {
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up);
+      dragRef.current = null; setDragId(null); setDragPx(null); persist(wRef.current);
+    };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up); e.preventDefault();
   };
-  var onResizeDown = function (e) {
-    e.stopPropagation(); if (!edit) return;
-    var id = e.currentTarget.getAttribute('data-id'), c = gridRef.current; if (!c) return;
-    var rect = c.getBoundingClientRect();
-    dragRef.current = { id: id, mode: 'resize', colW: (rect.width - 11 * PANOM_GAP) / 12, rect: rect };
-    setDragId(id);
-    window.addEventListener('pointermove', onMove); window.addEventListener('pointerup', onUp); e.preventDefault();
-  };
+  var onWidgetDown = function (e) { if (!edit) return; beginDrag(e.currentTarget.getAttribute('data-id'), 'move', e); };
+  var onResizeDown = function (e) { e.stopPropagation(); if (!edit) return; beginDrag(e.currentTarget.getAttribute('data-id'), 'resize', e); };
   var onRemove = function (e) {
     e.stopPropagation(); var id = e.currentTarget.getAttribute('data-id');
     setRemovingId(id);
@@ -157,6 +152,20 @@ function PanomScreen(props) {
       var rows3 = briefs.filter(function (b) { return b.deltaH != null && b.deltaH <= 48 && b.durum !== 'tamamlandi' && b.durum !== 'musteride'; }).sort(function (a, b) { return a.deltaH - b.deltaH; }).slice(0, 30);
       if (!rows3.length) return h('div', { style: { color: 'var(--ink-4)', font: '400 13px/1.4 var(--font-sans)', padding: '8px 0' } }, '48 saatte termin yok');
       return rows3.map(function (b) { var late = b.deltaH <= 0, col = late ? 'var(--prio-red)' : b.deltaH <= 24 ? 'var(--prio-orange)' : 'var(--prio-yellow)'; return h('div', { key: b.no, style: { display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: '0.5px solid var(--line)' } }, h('span', { style: { width: 30, font: '500 10.5px/1 var(--font-mono)', color: 'var(--ink-4)', flex: 'none' } }, '#' + b.no), h('span', { style: { flex: 1, font: '400 12.5px/1.35 var(--font-sans)', color: 'var(--ink-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, b.baslik || ''), h('span', { style: { font: '700 11px/1 var(--font-mono)', color: col } }, late ? Math.abs(Math.round(b.deltaH)) + 'sa↑' : Math.round(b.deltaH) + 'sa')); });
+    }
+    if (type === 'brandload') {
+      var act = briefs.filter(function (b) { return b.durum !== 'tamamlandi'; });
+      var by = {}; act.forEach(function (b) { var k = b.marka || '?'; by[k] = (by[k] || 0) + 1; });
+      var arr = Object.keys(by).map(function (k) { return { n: k, v: by[k] }; }).sort(function (a, b) { return b.v - a.v; }).slice(0, 7);
+      var mx = arr.reduce(function (m, x) { return Math.max(m, x.v); }, 1);
+      if (!arr.length) return h('div', { style: { color: 'var(--ink-4)', font: '400 13px/1.4 var(--font-sans)', padding: '8px 0' } }, 'Aktif iş yok');
+      return arr.map(function (x) { return h('div', { key: x.n, style: { marginBottom: 9 } }, h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, font: '400 12px/1.3 var(--font-sans)', marginBottom: 4 } }, h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: (data.BR && data.BR[x.n] && data.BR[x.n].color) || 'var(--ink-4)', flex: 'none' } }), h('span', { style: { flex: 1, color: 'var(--ink-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, x.n), h('span', { style: { color: 'var(--ink-4)', font: '500 11px/1 var(--font-mono)' } }, x.v)), h('div', { style: { height: 5, borderRadius: 99, background: 'var(--surface-sub)', overflow: 'hidden' } }, h('div', { style: { height: '100%', width: (x.v / mx * 100) + '%', borderRadius: 99, background: (data.BR && data.BR[x.n] && data.BR[x.n].color) || 'var(--ember)' } }))); });
+    }
+    if (type === 'dept') {
+      var ds = data.deptStats || {}; var TR = { ai: 'AI', editor: 'Editör', tasarim: 'Tasarım', freelance: 'Freelance' };
+      var keys = Object.keys(ds); if (!keys.length) return h('div', { style: { color: 'var(--ink-4)', font: '400 13px/1.4 var(--font-sans)', padding: '8px 0' } }, 'Veri yok');
+      var mxA = keys.reduce(function (m, k) { return Math.max(m, ds[k].active || 0); }, 1);
+      return keys.map(function (k) { var d = ds[k] || {}; return h('div', { key: k, style: { marginBottom: 11 } }, h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, font: '400 12.5px/1.3 var(--font-sans)', marginBottom: 5 } }, h('span', { style: { flex: 1, fontWeight: 600, color: 'var(--ink)' } }, TR[k] || k), h('span', { style: { color: 'var(--ink-3)' } }, (d.active || 0)), h('span', { style: { color: 'var(--prio-red)' } }, (d.overdue || 0))), h('div', { style: { height: 6, borderRadius: 99, background: 'var(--surface-sub)', overflow: 'hidden' } }, h('div', { style: { height: '100%', width: ((d.active || 0) / mxA * 100) + '%', borderRadius: 99, background: 'var(--ember)' } }))); });
     }
     return null;
   };
