@@ -4,28 +4,47 @@
 
 // ── Tablo kataloğu (editörde seçilebilen tüm tablolar) ───────────────────────
 var PB_DEFS = {
-  kpi:       { title: "Özet sayılar",   desc: "Aktif · geciken · müşteride · kapasite", w: 6, h: 2, dot: "var(--ember)" },
-  risk:      { title: "Riskli işlerim", desc: "Bana ait, ≤24sa veya gecikmiş",         w: 4, h: 3, dot: "var(--prio-red)" },
-  mine:      { title: "İşlerim",        desc: "Bana atanmış tüm aktif işler",           w: 4, h: 4, dot: "var(--info, #3B82C4)" },
-  capacity:  { title: "Kapasitem",      desc: "Doluluk ve rol kapasiten",               w: 4, h: 3, dot: "var(--ember)" },
-  client:    { title: "Müşteride",      desc: "Müşteri onayı bekleyenler",              w: 4, h: 3, dot: "var(--prio-orange)" },
-  working:   { title: "Çalışılıyor",    desc: "Şu an çalışılan tüm işler",              w: 6, h: 4, dot: "var(--info, #3B82C4)" },
-  today:     { title: "Bugün ve yarın", desc: "Termini 48 saat içinde",                 w: 6, h: 4, dot: "var(--prio-yellow)" },
-  overdue:   { title: "Geciken işler",  desc: "Deadline'ı geçmiş aktif işler",          w: 6, h: 3, dot: "var(--prio-red)" },
-  brandload: { title: "Marka yoğunluğu",desc: "Markaya göre aktif iş sayısı",           w: 4, h: 3, dot: "var(--info, #3B82C4)" },
-  dept:      { title: "Departman özeti",desc: "Departman bazında yük",                  w: 4, h: 3, dot: "var(--prio-green)" },
-  completed: { title: "Son tamamlanan", desc: "En son biten işler",                     w: 6, h: 3, dot: "var(--prio-green)" }
+  // ── Özet / kişisel ──
+  kpi:       { title: "Özet sayılar",   desc: "Aktif · geciken · müşteride · kapasite", grp: "Özet", w: 6, h: 2, dot: "var(--ember)" },
+  capacity:  { title: "Kapasitem",      desc: "Doluluk ve rol kapasiten",               grp: "Özet", w: 4, h: 3, dot: "var(--ember)" },
+  risk:      { title: "Riskli işlerim", desc: "Bana ait, ≤24sa veya gecikmiş",          grp: "Kişisel", w: 4, h: 3, dot: "var(--prio-red)" },
+  mine:      { title: "İşlerim",        desc: "Bana atanmış tüm aktif işler",           grp: "Kişisel", w: 4, h: 4, dot: "var(--info, #3B82C4)" },
+  // ── İş listeleri (Aktif işler / Kanban / Plan sayfalarındaki tablolar) ──
+  allactive: { title: "Tüm aktif işler",desc: "Müşteride hariç tüm açık işler",         grp: "İşler", w: 6, h: 5, dot: "var(--ink-3)" },
+  working:   { title: "Çalışılıyor",    desc: "Durumu 'çalışılıyor' olanlar",           grp: "İşler", w: 6, h: 4, dot: "var(--info, #3B82C4)" },
+  review:    { title: "İncelemede",     desc: "Durumu 'incelemede' olanlar",            grp: "İşler", w: 4, h: 3, dot: "var(--prio-yellow)" },
+  blocked:   { title: "Blokeli işler",  desc: "Durumu 'blokeli' olanlar",               grp: "İşler", w: 4, h: 3, dot: "var(--prio-red)" },
+  stale:     { title: "Hareketsiz",     desc: "Uzun süredir dokunulmamış işler",        grp: "İşler", w: 4, h: 3, dot: "var(--ink-4)" },
+  recent:    { title: "Son eklenenler", desc: "En yeni açılan briefler",                grp: "İşler", w: 6, h: 4, dot: "var(--info, #3B82C4)" },
+  // ── Termin / müşteri (Plan / Müşteri Onayı sayfaları) ──
+  today:     { title: "Bugün ve yarın", desc: "Termini 48 saat içinde",                 grp: "Termin", w: 6, h: 4, dot: "var(--prio-yellow)" },
+  deadlines: { title: "Yaklaşan terminler", desc: "Önümüzdeki 7 gün",                    grp: "Termin", w: 6, h: 4, dot: "var(--prio-orange)" },
+  overdue:   { title: "Geciken işler",  desc: "Deadline'ı geçmiş aktif işler",          grp: "Termin", w: 6, h: 3, dot: "var(--prio-red)" },
+  client:    { title: "Müşteride",      desc: "Müşteri onayı bekleyenler",              grp: "Termin", w: 4, h: 3, dot: "var(--prio-orange)" },
+  // ── Kırılımlar (Marka / Departman / Ekip / Tamamlananlar) ──
+  brandload: { title: "Marka yoğunluğu",desc: "Markaya göre aktif iş sayısı",           grp: "Kırılım", w: 4, h: 3, dot: "var(--info, #3B82C4)" },
+  dept:      { title: "Departman özeti",desc: "Departman bazında yük",                  grp: "Kırılım", w: 4, h: 3, dot: "var(--prio-green)" },
+  team:      { title: "Ekip yükü",      desc: "Kişi başına aktif iş",                   grp: "Kırılım", w: 4, h: 4, dot: "var(--info, #3B82C4)" },
+  completed: { title: "Son tamamlanan", desc: "En son biten işler",                     grp: "Kırılım", w: 6, h: 3, dot: "var(--prio-green)" }
 };
-var PB_ORDER = ["kpi", "risk", "mine", "capacity", "client", "working", "today", "overdue", "brandload", "dept", "completed"];
-function pbDefault() {
-  return [
-    { id: "risk", type: "risk", x: 0, y: 0, w: 4, h: 3 },
-    { id: "capacity", type: "capacity", x: 4, y: 0, w: 4, h: 3 },
-    { id: "client", type: "client", x: 8, y: 0, w: 4, h: 3 },
-    { id: "working", type: "working", x: 0, y: 3, w: 6, h: 4 },
-    { id: "today", type: "today", x: 6, y: 3, w: 6, h: 4 }
-  ];
+var PB_ORDER = ["kpi", "capacity", "risk", "mine", "allactive", "working", "review", "blocked", "stale", "recent", "today", "deadlines", "overdue", "client", "brandload", "dept", "team", "completed"];
+// Tip listesini 12 kolonlu ızgaraya akıtarak başlangıç düzeni üret (çakışmasız).
+function pbBuildLayout(types) {
+  var out = [], x = 0, y = 0, rowH = 0;
+  types.forEach(function (t) { var d = PB_DEFS[t]; if (!d) return; if (x + d.w > 12) { x = 0; y += rowH; rowH = 0; } out.push({ id: t, type: t, x: x, y: y, w: d.w, h: d.h }); x += d.w; rowH = Math.max(rowH, d.h); });
+  return out;
 }
+// Departmana göre standart başlangıç panosu (rol/dept anahtarı). İlk açılışta gösterilir; değiştirilebilir.
+var PB_DEPT_DEFAULT = {
+  yonetici:  ["kpi", "overdue", "client", "dept", "brandload", "team", "working"],
+  admin:     ["kpi", "overdue", "client", "dept", "brandload", "team", "working"],
+  tasarim:   ["risk", "capacity", "mine", "today", "working", "brandload"],
+  editor:    ["risk", "capacity", "mine", "today", "working", "recent"],
+  ai:        ["risk", "capacity", "mine", "today", "working", "completed"],
+  freelance: ["mine", "capacity", "today", "completed"],
+  _default:  ["risk", "capacity", "client", "working", "today"]
+};
+function pbDefaultFor(role) { return pbBuildLayout(PB_DEPT_DEFAULT[role] || PB_DEPT_DEFAULT._default); }
 
 function PanomScreen(props) {
   var data = props.data || {}, currentUser = props.currentUser || null;
@@ -35,10 +54,12 @@ function PanomScreen(props) {
 
   // ── kalıcı durum ──
   var loadSaved = function () { try { return JSON.parse(localStorage.getItem("bns_panom_v2")); } catch (e) { return null; } };
+  // Kullanıcının rol/departmanı → başlangıç panosu seçimi
+  var meRole = (function () { var u = currentUser || {}; var sid = u.slack_id || u.id; var mu = (data.USERS || []).find(function (x) { return x.id === sid; }); return (mu && (mu.rol || mu.dept)) || ""; })();
   var initItems = function () {
     var s = loadSaved();
     if (s && s.length) { var v = s.filter(function (w) { return PB_DEFS[w.type]; }); if (v.length) return v; }
-    return pbDefault();
+    return pbDefaultFor(meRole);
   };
   var st = React.useState(initItems); var items = st[0], setItems = st[1];
   var es = React.useState(false); var edit = es[0], setEdit = es[1];
@@ -110,9 +131,6 @@ function PanomScreen(props) {
   };
   var removeType = function (type) {
     setItems(function (ws) { return ws.filter(function (w) { return w.type !== type; }); });
-  };
-  var toggleType = function (type) {
-    if (itemsRef.current.some(function (w) { return w.type === type; })) removeType(type); else addType(type);
   };
   // ekle/çıkar sonrası kaydet (DOM + grid kurulduktan sonra)
   React.useEffect(function () { var t = setTimeout(function () { persistRef.current(); }, 60); return function () { clearTimeout(t); }; }, [idsKey]);
@@ -201,6 +219,43 @@ function PanomScreen(props) {
       var mxA = keys.reduce(function (m, k) { return Math.max(m, ds[k].active || 0); }, 1);
       return keys.map(function (k) { var d = ds[k] || {}; return h("div", { key: k, style: { marginBottom: 11 } }, h("div", { style: { display: "flex", alignItems: "center", gap: 8, font: "400 12.5px/1.3 var(--font-sans)", marginBottom: 5 } }, h("span", { style: { flex: 1, fontWeight: 600, color: "var(--ink)" } }, TR[k] || k), h("span", { style: { color: "var(--ink-3)" } }, (d.active || 0)), h("span", { style: { color: "var(--prio-red)" } }, (d.overdue || 0))), h("div", { style: { height: 6, borderRadius: 99, background: "var(--surface-sub)", overflow: "hidden" } }, h("div", { style: { height: "100%", width: ((d.active || 0) / mxA * 100) + "%", borderRadius: 99, background: "var(--ember)" } }))); });
     }
+    if (type === "allactive") {
+      var ra = briefs.filter(function (b) { return b.durum !== "tamamlandi" && b.durum !== "musteride"; }).sort(function (a, b) { return (a.deltaH != null ? a.deltaH : 9999) - (b.deltaH != null ? b.deltaH : 9999); }).slice(0, 60);
+      if (!ra.length) return empty("Aktif iş yok");
+      return ra.map(function (b) { return listRow(b, b.deltaH != null ? fmtDelta(b.deltaH) : null, b.deltaH != null ? deltaCol(b.deltaH) : null); });
+    }
+    if (type === "review") {
+      var rv = briefs.filter(function (b) { return b.durum === "incelemede"; });
+      if (!rv.length) return empty("İncelemede iş yok");
+      return rv.map(function (b) { return listRow(b); });
+    }
+    if (type === "blocked") {
+      var rb = briefs.filter(function (b) { return b.durum === "blokeli"; });
+      if (!rb.length) return empty("Blokeli iş yok 🎉");
+      return rb.map(function (b) { return listRow(b, b.deltaH != null ? fmtDelta(b.deltaH) : null, "var(--prio-red)"); });
+    }
+    if (type === "stale") {
+      var rsl = briefs.filter(function (b) { return b.stale && b.durum !== "tamamlandi"; });
+      if (!rsl.length) return empty("Hareketsiz iş yok");
+      return rsl.map(function (b) { return listRow(b); });
+    }
+    if (type === "recent") {
+      var rr = briefs.slice().sort(function (a, b) { return (b.created_at || b.no || 0) - (a.created_at || a.no || 0); }).slice(0, 30);
+      if (!rr.length) return empty("Brief yok");
+      return rr.map(function (b) { return listRow(b); });
+    }
+    if (type === "deadlines") {
+      var rd = briefs.filter(function (b) { return b.deltaH != null && b.deltaH > 0 && b.deltaH <= 168 && b.durum !== "tamamlandi" && b.durum !== "musteride"; }).sort(function (a, b) { return a.deltaH - b.deltaH; }).slice(0, 40);
+      if (!rd.length) return empty("7 günde termin yok");
+      return rd.map(function (b) { return listRow(b, fmtDelta(b.deltaH), deltaCol(b.deltaH)); });
+    }
+    if (type === "team") {
+      var counts = {}; briefs.filter(function (b) { return b.durum !== "tamamlandi" && b.durum !== "musteride"; }).forEach(function (b) { [b.lead].concat(b.contributors || []).forEach(function (p) { if (p && p.id) counts[p.id] = (counts[p.id] || 0) + 1; }); });
+      var tarr = (data.USERS || []).map(function (u) { return { name: u.name || u.id, v: counts[u.id] || 0 }; }).filter(function (x) { return x.v > 0; }).sort(function (a, b) { return b.v - a.v; }).slice(0, 14);
+      if (!tarr.length) return empty("Veri yok");
+      var tmx = tarr.reduce(function (m, x) { return Math.max(m, x.v); }, 1);
+      return tarr.map(function (x) { var col = x.v > 8 ? "var(--prio-red)" : x.v > 5 ? "var(--prio-orange)" : "var(--ember)"; return h("div", { key: x.name, style: { marginBottom: 8 } }, h("div", { style: { display: "flex", alignItems: "center", gap: 8, font: "400 12px/1.3 var(--font-sans)", marginBottom: 4 } }, h("span", { style: { flex: 1, color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, x.name), h("span", { style: { color: "var(--ink-4)", font: "500 11px/1 var(--font-mono)" } }, x.v)), h("div", { style: { height: 5, borderRadius: 99, background: "var(--surface-sub)", overflow: "hidden" } }, h("div", { style: { height: "100%", width: (x.v / tmx * 100) + "%", borderRadius: 99, background: col } }))); });
+    }
     if (type === "completed") {
       var rc = completed.slice().sort(function (a, b) { return (b.bitis || 0) - (a.bitis || 0); }).slice(0, 30);
       if (!rc.length) return empty("Tamamlanan iş yok");
@@ -216,18 +271,22 @@ function PanomScreen(props) {
   var noLib = typeof window === "undefined" || !window.GridStack;
 
   // ── editör paneli (tüm tablolar, toggle) ──
-  var editor = edit ? h("div", { style: { marginBottom: 16, padding: 14, border: "0.5px solid var(--line)", borderRadius: 14, background: "var(--surface-sub)" } },
-    h("div", { style: { font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-4)", marginBottom: 11 } }, "Tablolar — panona eklemek/çıkarmak için seç"),
-    h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 8 } },
-      PB_ORDER.map(function (t) {
-        var on = items.some(function (w) { return w.type === t; });
-        return h("button", { key: t, onClick: function () { toggleType(t); }, style: { display: "flex", alignItems: "center", gap: 10, textAlign: "left", padding: "9px 11px", borderRadius: 10, cursor: "pointer", border: on ? "1px solid var(--ember)" : "0.5px solid var(--line)", background: on ? "var(--ember-tint)" : "var(--surface)" } },
-          h("span", { style: { width: 18, height: 18, borderRadius: 5, flex: "none", display: "flex", alignItems: "center", justifyContent: "center", background: on ? "var(--ember)" : "transparent", border: on ? "none" : "1.5px solid var(--line)", color: "#fff", font: "700 11px/1 var(--font-sans)" } }, on ? "✓" : ""),
-          h("span", { style: { width: 8, height: 8, borderRadius: "50%", flex: "none", background: PB_DEFS[t].dot } }),
-          h("div", { style: { flex: 1, minWidth: 0 } },
-            h("div", { style: { font: "600 12.5px/1.2 var(--font-sans)", color: "var(--ink)" } }, PB_DEFS[t].title),
-            h("div", { style: { font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, PB_DEFS[t].desc)));
-      }))) : null;
+  // Editör: dropdown'dan tablo ekle (gruplu). Çıkarma kart sağ-üst ×'inden.
+  var addable = PB_ORDER.filter(function (t) { return !items.some(function (w) { return w.type === t; }); });
+  var grps = []; var gmap = {}; addable.forEach(function (t) { var g = PB_DEFS[t].grp || "Diğer"; if (!gmap[g]) { gmap[g] = []; grps.push(g); } gmap[g].push(t); });
+  var editor = edit ? h("div", { style: { marginBottom: 16, padding: "12px 14px", border: "0.5px solid var(--line)", borderRadius: 14, background: "var(--surface-sub)", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" } },
+    h("span", { style: { font: "600 11px/1 var(--font-sans)", color: "var(--ink-3)" } }, "Tablo ekle:"),
+    h("div", { style: { position: "relative", display: "inline-flex", alignItems: "center" } },
+      h("select", {
+        value: "",
+        onChange: function (e) { var v = e.target.value; if (v) { addType(v); e.target.value = ""; } },
+        disabled: !addable.length,
+        style: { appearance: "none", WebkitAppearance: "none", padding: "8px 32px 8px 12px", border: "0.5px solid var(--line)", borderRadius: 9, background: "var(--surface)", color: "var(--ink-2)", font: "500 12.5px/1 var(--font-sans)", cursor: addable.length ? "pointer" : "default", minWidth: 200 }
+      },
+        h("option", { value: "" }, addable.length ? "Tablo seç…" : "Tüm tablolar ekli"),
+        grps.map(function (g) { return h("optgroup", { key: g, label: g }, gmap[g].map(function (t) { return h("option", { key: t, value: t }, PB_DEFS[t].title); })); })),
+      h("span", { style: { position: "absolute", right: 11, pointerEvents: "none", color: "var(--ink-4)", fontSize: 10 } }, "▾")),
+    h("span", { style: { font: "400 11.5px/1.3 var(--font-sans)", color: "var(--ink-4)" } }, "kartı çıkarmak için sağ-üst ×")) : null;
 
   // ── widget kartı (grid-stack-item) ──
   var card = function (w) {
