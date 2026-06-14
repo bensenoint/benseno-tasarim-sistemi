@@ -44,6 +44,10 @@
   --ember-tint:   rgba(194, 74, 44, 0.10);
   --ember-muted:  rgba(194, 74, 44, 0.25);
 
+  /* ---- Ody mascot accent (logo mavisi) --------------------- */
+  --ody:          #24479E;   /* benseno logo wordmark */
+  --ody-tint:     rgba(36, 71, 158, 0.12);
+
   /* ---- Semantic — priority (color-blind paired with glyph) -- */
   --prio-red:     #D7263D;   /* 🔴 Acil   — triangle glyph */
   --prio-orange:  #E2670A;   /* 🟠 Yüksek — square glyph (sarıdan net ayrışır) */
@@ -179,6 +183,9 @@
   --ember-press:  #C24A2C;
   --ember-tint:   rgba(228, 98, 63, 0.14);
   --ember-muted:  rgba(228, 98, 63, 0.30);
+
+  --ody:          #5B7BD4;   /* logo mavisi, koyu temada açıltılmış */
+  --ody-tint:     rgba(91, 123, 212, 0.16);
 
   --shadow-1:
     0 1px 2px rgba(0, 0, 0, 0.40),

@@ -133,16 +133,17 @@ if (typeof document !== "undefined" && !window.__bnsSlackLinkHook) {
 // 🤖 Ody (sistem asistanı) — sağ altta yüzen sohbet. Kullanım soruları + canlı veri
 // (marka/iş/kişi) soruları /api/chat üzerinden yanıtlanır (JWT'li, kişiye özel).
 // ── Ody maskotu: animasyonlu yüz ifadeleri + fx partikülleri (prod renkleriyle) ──
-var ODY_NOTIFS = [
-  { mood: 'heyecanli', text: 'Sana yeni bir brief atanmış olabilir' },
-  { mood: 'mutlu', text: 'Bir iş tamamlandı 👏' },
-  { mood: 'endiseli', text: 'Bir iş 24 saatin altına düşmüş olabilir' },
-  { mood: 'coskulu', text: 'Bugün işler iyi gidiyor!' },
-  { mood: 'sakin', text: 'Her şey planında. İçin rahat olsun ☕' },
-  { mood: 'mesgul', text: 'Yoğun bir gün — birden çok iş işleniyor' },
-  { mood: 'neseli', text: 'Ben buradayım, bir şey sorabilirsin 🌟' },
-  { mood: 'uykulu', text: 'Ortam sakin…' }
-];
+// Gelen bildirim metninden ruh hâli çıkar (API'de tip alanı yok → anahtar kelime).
+function odyMoodFromText(t) {
+  var s = (t || '').toLowerCase();
+  if (/(gecik|24 saat|süre|acil|risk|uyar|kaldı|bekliyor çok)/.test(s)) return 'endiseli';
+  if (/(blok|iptal|reddedil|sorun|hata|olumsuz)/.test(s)) return 'uzgun';
+  if (/(tamamlan|bitti|onaylandı|teslim|tebrik|👏)/.test(s)) return 'mutlu';
+  if (/(revizyon|düzelt|tekrar|geri gönder)/.test(s)) return 'mesgul';
+  if (/(yeni brief|atandı|atanmış|eklendi|başladı|yeni iş)/.test(s)) return 'heyecanli';
+  if (/(onay|müşteride)/.test(s)) return 'neseli';
+  return 'heyecanli';
+}
 function odyRestingMood() {
   try {
     var b = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
@@ -154,7 +155,7 @@ function odyRestingMood() {
   } catch (e) { return 'neseli'; }
 }
 function odyFaceProd(mood) {
-  var h = React.createElement, W = '#fff', PUP = '#7a3a22';
+  var h = React.createElement, W = '#fff', PUP = '#16265c';
   var mk = function (k, st) { return h('div', { key: k, style: Object.assign({ background: W, borderRadius: '50%' }, st) }); };
   var left, right, anim = 'odyPop .42s ease', extra = null, gap = 8;
   if (mood === 'mutlu' || mood === 'neseli') {
@@ -244,21 +245,49 @@ function ChatBot() {
   const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
   const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
   const [unread, setUnread] = React.useState(false);   // balonda "Ody senin için özet hazırladı" işareti
+  const [notifPeek, setNotifPeek] = React.useState(null); // kapalıyken gösterilen son bildirim (Ody'ye bağlı)
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
 
   // Ody ruh hâli: değişince fx partikülü; kapalıyken periyodik bildirim ifadesi + okunmadı işareti
   React.useEffect(() => { odyFxProd(blobRef.current, mood); }, [mood]);
   React.useEffect(() => { setMood(odyRestingMood()); }, []);
+
+  // Bildirimler artık Ody'ye bağlı: /api/notifications'ı yoklar; yeni (okunmamış, daha önce
+  // görülmemiş) bildirim gelince Ody onun metninden çıkardığı ruh hâlini yansıtır ve kapalıyken
+  // balonunda bildirimi gösterir — Ody/balon açılana (veya çandan okununca) kadar.
+  const seenNotif = () => { try { return parseInt(localStorage.getItem("bns_ody_seen_notif") || "0", 10) || 0; } catch (e) { return 0; } };
   React.useEffect(() => {
-    let restT;
-    const t = setInterval(() => {
-      if (open) return;
-      const i = Math.floor(Math.random() * ODY_NOTIFS.length);
-      setMood(ODY_NOTIFS[i].mood); setUnread(true);
-      clearTimeout(restT); restT = setTimeout(() => { if (!open) setMood(odyRestingMood()); }, 2700);
-    }, 9000);
-    return () => { clearInterval(t); clearTimeout(restT); };
+    if (!tok()) return;
+    let cancelled = false;
+    const poll = () => {
+      fetch(`${API}/api/notifications`, { headers: { Authorization: "Bearer " + tok() } })
+        .then(r => r.ok ? r.json() : null)
+        .then(j => {
+          if (cancelled || !j) return;
+          // Çandan okunduysa (sunucu unread=0) Ody sakinleşsin, balon kalksın.
+          if ((j.unread || 0) === 0) { setNotifPeek(null); if (!open) setMood(odyRestingMood()); return; }
+          const fresh = (j.notifications || []).filter(n => !n.read_at && n.id > seenNotif());
+          if (fresh.length) {
+            const latest = fresh.reduce((a, b) => (b.id > a.id ? b : a));
+            setNotifPeek(latest);
+            if (!open) setMood(odyMoodFromText(latest.text));
+          }
+        }).catch(() => {});
+    };
+    poll();
+    const id = setInterval(poll, 30000);
+    return () => { cancelled = true; clearInterval(id); };
   }, [open]);
+
+  // Bildirimi "görüldü" işaretle: localStorage + sunucu okundu (çan da temizlenir) → Ody sakinleşir.
+  const markNotifSeen = () => {
+    setNotifPeek(p => {
+      if (p) { try { localStorage.setItem("bns_ody_seen_notif", String(p.id)); } catch (e) {} }
+      return null;
+    });
+    setMood(odyRestingMood());
+    if (tok()) fetch(`${API}/api/notifications/read`, { method: "POST", headers: { Authorization: "Bearer " + tok() } }).catch(() => {});
+  };
 
   // Proaktif kişisel brief — kişi dashboard'ı açınca Ody onun durumunu BİR KEZ (günde) hazırlar.
   // Kişiye özeldir: /api/chat zaten giriş yapan kullanıcıya göre filtreler. Kullanıcı+tarih
@@ -315,11 +344,28 @@ function ChatBot() {
 
   return (
     <>
+      {/* Kapalıyken son bildirim balonu (soru ekranı dışında) — Ody'ye bağlı */}
+      {!open && notifPeek && (
+        <button onClick={() => { markNotifSeen(); setUnread(false); setOpen(true); }}
+          title="Bildirimi aç"
+          style={{
+            position: "fixed",
+            left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
+            top: Math.max(8, pos.y - 72),
+            zIndex: 89, width: 248, maxWidth: "calc(100vw - 24px)", textAlign: "left",
+            border: "1px solid var(--line)", borderRadius: 12, background: "var(--surface)",
+            boxShadow: "var(--shadow-2)", padding: "9px 12px", cursor: "pointer",
+            animation: "odyPopIn .3s ease",
+          }}>
+          <div style={{ font: "700 9px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 5 }}>Ody · yeni bildirim</div>
+          <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{notifPeek.text}</div>
+        </button>
+      )}
       {/* Açma balonu */}
       {!open && (
         <button onPointerDown={(e) => startDrag(e, true)}
-          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setUnread(false); setOpen(true); }}
-          title={unread ? "Ody senin için bugünkü özetini hazırladı — aç" : "Ody — sistem asistanı (sürükleyerek taşıyabilirsin)"} style={{
+          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } if (notifPeek) markNotifSeen(); setUnread(false); setOpen(true); }}
+          title={notifPeek ? "Ody'de yeni bildirim var — aç" : (unread ? "Ody senin için bugünkü özetini hazırladı — aç" : "Ody — sistem asistanı (sürükleyerek taşıyabilirsin)")} style={{
           position: "fixed", left: pos.x, top: pos.y, zIndex: 90,
           width: 54, height: 54, borderRadius: "50%", border: 0, cursor: "grab", touchAction: "none",
           background: "transparent", padding: 0,
@@ -327,7 +373,7 @@ function ChatBot() {
         }}>
           <div ref={blobRef} style={{
             position: "relative", width: 54, height: 54,
-            borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "var(--ember)",
+            borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "var(--ody)",
             boxShadow: "0 10px 18px -6px rgba(0,0,0,.28), 0 4px 8px -3px rgba(0,0,0,.2)",
             display: "flex", alignItems: "center", justifyContent: "center",
             animation: "odyBob 4.5s ease-in-out infinite",
@@ -347,7 +393,7 @@ function ChatBot() {
         }}>
           <div onPointerDown={startDrag} title="Sürükleyerek taşı"
             style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8, cursor: "grab", touchAction: "none", userSelect: "none" }}>
-            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "var(--ember)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "var(--ody)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
             </span>
             <div style={{ flex: 1 }}>
@@ -375,7 +421,7 @@ function ChatBot() {
               <div key={i} style={{
                 alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "85%",
                 padding: "8px 11px", borderRadius: 10,
-                background: m.role === "user" ? "var(--ember)" : "var(--paper-2)",
+                background: m.role === "user" ? "var(--ody)" : "var(--paper-2)",
                 color: m.role === "user" ? "#fff" : "var(--ink)",
                 font: "400 13px/1.55 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word",
               }}>{m.role === "assistant" ? <Linkify text={m.content}/> : m.content}</div>
@@ -390,7 +436,7 @@ function ChatBot() {
               style={{ flex: 1, padding: "9px 11px", border: "1px solid var(--line)", borderRadius: 8,
                 background: "var(--surface-sub)", color: "var(--ink)", font: "400 13px/1.3 var(--font-sans)", outline: "none" }}/>
             <button onClick={send} disabled={busy || !input.trim()} style={{
-              padding: "0 14px", border: 0, borderRadius: 8, background: "var(--ember)", color: "#fff",
+              padding: "0 14px", border: 0, borderRadius: 8, background: "var(--ody)", color: "#fff",
               font: "600 13px/1 var(--font-sans)", cursor: busy ? "default" : "pointer", opacity: busy || !input.trim() ? 0.5 : 1,
             }}>Gönder</button>
           </div>
