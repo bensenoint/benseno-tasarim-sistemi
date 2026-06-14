@@ -273,3 +273,11 @@ Atoms'ta BrandChip ve Avatar her yerde tıklanabilir.
 
 ### 8.6 Kapsam dışı (1. KT)
 Prod'a dokunma · v2'den yazma (salt-okur) · rol bazlı otomatik panolar (herkese aynı başlangıç, kişi düzenler).
+
+### 8.7 Panom yeniden tasarımı (handoff portu, 2026-06-14)
+`design_handoff_panom_dashboard` hifi tasarımı /v2'ye port edildi (React-UMD/esbuild, gerçek veri).
+- **Dosyalar:** `v2/app/layout.js` (saf, node-test), `widgets.jsx` (bnsV2Me/bnsV2Apply/buildPayload/renderWidget + stats), `ody.jsx` (bnsOdyFace 14 ifade + fx WAAPI + NOTIFS + restingMood), `panom.jsx` (`class Panom extends React.Component` — state/drag/pack/resize/mobil/Ody/tema/kütüphane/palet/ikon), `render.jsx` (`bnsPanomRender` — tüm UI ağacı). build-v2.sh 5 dosyayı catler.
+- **Özellikler:** sidebar flyout (78→282px hover overlay), buzlu cam topbar (Canlı sayaç/segment/tema/zil/+brief/profil), 12-kolon absolute grid (GAP14/ROW86, sürükle scale+rotate+ghost, köşe resize, collision+downward pack), 5 canlı widget, düzenle modu (×/resize/+Alan ekle), kütüphane çekmecesi + 9-ton marka skalası alan renkleri, açık(kum)/koyu(lacivert) tema, skeleton shimmer, mobil tek-kolon + tutamaçla yeniden sıralama, sürüklenebilir Ody (ifade+fx+okunmadı+periyodik bildirim+panel+`/api/chat` sohbeti+proaktif brief), blob arka plan, toast.
+- **Veri köprüsü:** `bnsV2Apply` v2 bundle içinde (Fastly-bayat `data.js` bağımlılığı YOK; eski data.js'teki hidrasyon helper'larını kullanır). Kalıcılık `localStorage panom.v3` + `/api/layout` POST senkronu.
+- **Kapsam dışı:** Panom-dışı nav öğeleri "yakında" yer tutucu (PanomPages 15-ekran mock'u port edilmedi — prod /dashboard'da mevcut).
+- Fontlar: Geist + Newsreader (Google Fonts). tokens.css/gridstack KALDIRILDI (palet inline CSS değişkeni).
