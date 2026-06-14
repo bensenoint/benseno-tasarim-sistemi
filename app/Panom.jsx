@@ -84,7 +84,7 @@ function PanomScreen(props) {
     if (typeof window === "undefined" || !window.GridStack || !gridRef.current) return;
     if (gi.current) { try { gi.current.destroy(false); } catch (e) {} gi.current = null; }
     var g = window.GridStack.init({
-      column: 12, cellHeight: 90, margin: 7, float: false, minRow: 1,
+      column: 12, cellHeight: 90, margin: 8, float: false, minRow: 1,
       handle: ".pb-drag", disableDrag: !editRef.current, disableResize: !editRef.current,
       resizable: { handles: "se" }
     }, gridRef.current);
