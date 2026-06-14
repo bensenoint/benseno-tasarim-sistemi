@@ -38,11 +38,13 @@
   --line-soft:    #F2F0EA;   /* very faint separator */
 
   /* ---- Brand accent (single warm) -------------------------- */
-  --ember:        #C24A2C;   /* primary action, focus ring, wordmark */
-  --ember-hover:  #A93D22;
-  --ember-press:  #8E3119;
-  --ember-tint:   rgba(194, 74, 44, 0.10);
-  --ember-muted:  rgba(194, 74, 44, 0.25);
+  /* Birincil aksan = logo mavisi (#24479E). Sıcak/aciliyet vurgusu --prio-* tokenlarında.
+     Not: token adı tarihsel olarak "ember"; değeri artık logo mavisi (marka tek kimlik). */
+  --ember:        #24479E;   /* primary action, focus ring, brand — logo mavisi */
+  --ember-hover:  #1D3A82;
+  --ember-press:  #16306B;
+  --ember-tint:   rgba(36, 71, 158, 0.10);
+  --ember-muted:  rgba(36, 71, 158, 0.25);
 
   /* ---- Ody mascot accent (logo mavisi) --------------------- */
   --ody:          #24479E;   /* benseno logo wordmark */
@@ -178,11 +180,11 @@
   --line-strong:  #36363E;
   --line-soft:    #22222A;
 
-  --ember:        #E4623F;
-  --ember-hover:  #ED7A5B;
-  --ember-press:  #C24A2C;
-  --ember-tint:   rgba(228, 98, 63, 0.14);
-  --ember-muted:  rgba(228, 98, 63, 0.30);
+  --ember:        #5B7BD4;   /* logo mavisi, koyu temada açıltılmış (birincil aksan) */
+  --ember-hover:  #7491DD;
+  --ember-press:  #24479E;
+  --ember-tint:   rgba(91, 123, 212, 0.14);
+  --ember-muted:  rgba(91, 123, 212, 0.30);
 
   --ody:          #5B7BD4;   /* logo mavisi, koyu temada açıltılmış */
   --ody-tint:     rgba(91, 123, 212, 0.16);
