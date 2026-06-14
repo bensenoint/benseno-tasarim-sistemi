@@ -238,7 +238,7 @@ function PanomScreen(props) {
       h("span", { style: { flex: 1, font: "600 11px/1 var(--font-sans)", letterSpacing: ".06em", textTransform: "uppercase", color: "var(--ink-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, def.title),
       edit ? h("button", { onClick: function (e) { e.stopPropagation(); removeType(w.type); }, title: "Kaldır", style: { width: 22, height: 22, borderRadius: "50%", border: "0.5px solid var(--line)", background: "var(--surface)", color: "var(--ink-3)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flex: "none" } }, "×") : null);
     return h("div", { key: w.id, className: "grid-stack-item", "gs-id": w.id, "gs-x": gm.x, "gs-y": gm.y, "gs-w": gm.w, "gs-h": gm.h, "gs-min-w": 3, "gs-min-h": 2 },
-      h("div", { className: "grid-stack-item-content", style: { inset: 0 } },
+      h("div", { className: "grid-stack-item-content" },
         h("div", { style: cardChrome }, header, h("div", { style: { flex: 1, minHeight: 0, overflow: "auto" } }, renderBody(w.type)))));
   };
 
