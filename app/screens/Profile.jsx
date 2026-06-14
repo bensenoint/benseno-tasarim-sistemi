@@ -160,6 +160,9 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
     .filter(Boolean);
   const tp = (typeof bnsThroughput === "function") ? bnsThroughput(myDoneTs, nowMsTP, 4) : { perWeek: 0, count: 0, lowSample: true };
 
+  // "Çıktı hızı" ve "Toplam saat" yalnız Görkem'e görünür (yöneticiler dahil diğerlerine kapalı).
+  const isGorkem = !!currentUser && (currentUser.slack_id === 'U030C48PL23' || currentUser.id === 'U030C48PL23' || /görkem/i.test(currentUser.name || ''));
+
   const roleLabel = { yonetici:"Yönetici", tasarim:"Tasarım", editor:"Editör", ai:"AI Operatör" }[u.rol] || u.rol;
 
   return (
@@ -242,13 +245,13 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
       <div style={{height:16}}/>
 
       {/* ─── KPI şeridi ──────────────────────────────────────── */}
-      <div className="bns-kpi-8" style={{display:"grid", gridTemplateColumns:"repeat(9,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
+      <div className="bns-kpi-8" style={{display:"grid", gridTemplateColumns:`repeat(${isGorkem ? 9 : 7},1fr)`, gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Aktif iş"      value={myActive.length} color={myActive.length > CAP_LIMIT ? "var(--prio-red)" : undefined}/>
         <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "#7c5cff" : undefined} sub="✈️ dönüş bekleniyor"/>
         <Kpi label="Tamamlanan"    value={myCompleted.length} sub="kayıtlı"/>
-        <Kpi label="Çıktı hızı"    value={tp.lowSample ? "—" : tp.perWeek + "/hf"} sub={tp.lowSample ? `${tp.count} iş/4hf · veri ince` : `son 4 hafta · ${tp.count} iş`}/>
+        {isGorkem && <Kpi label="Çıktı hızı"    value={tp.lowSample ? "—" : tp.perWeek + "/hf"} sub={tp.lowSample ? `${tp.count} iş/4hf · veri ince` : `son 4 hafta · ${tp.count} iş`}/>}
         <Kpi label="Toplam revize" value={totalRev} sub={`ort. ${avgRev}/iş`}/>
-        <Kpi label="Toplam saat"   value={totalHours > 0 ? totalHours.toFixed(0)+"sa" : "—"} sub={`ort. ${avgHours}sa/iş`}/>
+        {isGorkem && <Kpi label="Toplam saat"   value={totalHours > 0 ? totalHours.toFixed(0)+"sa" : "—"} sub={`ort. ${avgHours}sa/iş`}/>}
         <Kpi label="Lead olarak"   value={asLead.length} sub="açtığım"/>
         <Kpi label="Contributor"   value={asContrib.length} sub="atandığım"/>
         <Kpi label="Kapasite"      value={capPct+"%"} color={capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":undefined}/>

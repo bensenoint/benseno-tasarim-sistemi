@@ -277,7 +277,12 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief }) {
               <tbody>
                 {filteredDone.length === 0 && <tr><td colSpan={13} style={{ ...bCs(), textAlign:"center", color:"var(--ink-4)", padding:"24px" }}>Tamamlanan iş yok</td></tr>}
                 {filteredDone.map((c, idx) => (
-                  <tr key={"d" + c.no} style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)" }}>
+                  <tr key={"d" + c.no}
+                    onClick={() => onOpenBrief && onOpenBrief(c)}
+                    title="İş detayını aç"
+                    onMouseEnter={e => e.currentTarget.style.background = "var(--paper-2)"}
+                    onMouseLeave={e => e.currentTarget.style.background = idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)"}
+                    style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)", cursor:"pointer" }}>
                     <td style={bCs(true, "right")}>{c.no}</td>
                     <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:280 }}>{c.baslik || c.is}</td>
                     <td style={bCs()}>
@@ -298,7 +303,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief }) {
                     <td style={bCs(true, "right")}>{fmtTRY(c.satis)}</td>
                     <td style={bCs(false, "center")}>{c.fatura ? <span title="Fatura kesildi" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                     <td style={bCs(false, "center")}>{c.odeme ? <span title="Ödeme yapıldı" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
-                    <td style={bCs(false, "center")}>{c.slack_url && c.slack_url !== "#" ? <a href={c.slack_url} target="_blank" rel="noreferrer" style={{ color:"var(--ember,#C24A2C)", textDecoration:"none" }}>↗</a> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
+                    <td style={bCs(false, "center")}>{c.slack_url && c.slack_url !== "#" ? <a href={c.slack_url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ color:"var(--ember,#C24A2C)", textDecoration:"none" }}>↗</a> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                   </tr>
                 ))}
               </tbody>
