@@ -152,6 +152,27 @@ function bnsRenderWidget(d) {
     _h("div", { style: { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }, body));
 }
 
+// EMBEDDED → BNS_DATA köprüsü, v2 bundle'ında (taze yol). data.js'in Fastly cache durumuna
+// BAĞIMLI DEĞİL; hidrasyon helper'ları (bnsHydrateBrief vb.) eski data.js'te bile mevcut.
+function bnsV2Apply(ed) {
+  if (!ed || typeof ed !== "object") return;
+  window.EMBEDDED_DATA = ed;
+  var D = window.BNS_DATA = window.BNS_DATA || {};
+  var sm = window.bnsSafeMap || function (a, f) { return (a || []).map(f); };
+  try {
+    if (Array.isArray(ed.bns_brands)) {
+      D.BRANDS = ed.bns_brands;
+      D.BR = {}; ed.bns_brands.forEach(function (b) { if (b && b.name) D.BR[b.name] = b; });
+    }
+    if (Array.isArray(ed.bns_users)) D.USERS = window.bnsMergeUser ? ed.bns_users.map(window.bnsMergeUser) : ed.bns_users;
+    if (Array.isArray(ed.bns_briefs)) D.briefs = window.bnsHydrateBrief ? sm(ed.bns_briefs, window.bnsHydrateBrief, "brief") : ed.bns_briefs;
+    if (Array.isArray(ed.bns_completed)) D.completed = window.bnsHydrateCompleted ? sm(ed.bns_completed, window.bnsHydrateCompleted, "completed") : ed.bns_completed;
+    if (ed.bns_dept_stats) D.deptStats = window.bnsNormDeptStats ? window.bnsNormDeptStats(ed.bns_dept_stats) : ed.bns_dept_stats;
+    if (typeof window.bnsApplyExtras === "function") window.bnsApplyExtras(ed);
+    D.__source = "live_briefs";
+  } catch (e) { console.warn("[v2] apply hata:", e.message); }
+}
+window.bnsV2Apply = bnsV2Apply;
 window.bnsV2Me = bnsV2Me;
 window.bnsBuildPayload = bnsBuildPayload;
 window.bnsRenderWidget = bnsRenderWidget;

@@ -72,7 +72,7 @@ class Panom extends React.Component {
       try {
         var r = await fetch(API_V2 + '/api/embedded?t=' + Date.now(), { cache: 'no-store', headers: { Authorization: 'Bearer ' + tokV2() } });
         if (r.status === 401) { localStorage.removeItem('bns_token'); localStorage.removeItem('bns_user'); location.href = '../dashboard/'; return; }
-        if (r.ok && window.bnsApplyEmbedded) window.bnsApplyEmbedded(await r.json());
+        if (r.ok && window.bnsV2Apply) window.bnsV2Apply(await r.json());
       } catch (e) {}
       self.setState({ dataReady: true });
       self.startAnims();
