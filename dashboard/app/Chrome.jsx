@@ -149,8 +149,8 @@ function odyRestingMood() {
     var b = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
     var overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
     var risk = b.filter(function (x) { return window.bnsIsRisk && window.bnsIsRisk(x.durum, x.deltaH); }).length;
-    if (overdue > 0) return 'kizgin';
-    if (risk > 0) return 'endiseli';
+    // Asistan kullanıcıya kızgın bakmaz: gecikme/risk varsa en fazla endişeli, yoksa neşeli.
+    if (overdue > 0 || risk > 0) return 'endiseli';
     return 'neseli';
   } catch (e) { return 'neseli'; }
 }
