@@ -163,6 +163,20 @@ function odyMyBriefs(uid) {
   });
   return mine;
 }
+// Ekip duygusu — KİŞİYE ÖZEL: kişinin kendi işlerinin AI thread özetlerinden (thread_ozet)
+// olumlu/olumsuz sinyal sayar. Ekstra tarama YOK; saatlik üretilen özetleri okur. -1/0/+1.
+function odyThreadSentiment(uid) {
+  try {
+    var b = odyMyBriefs(uid);
+    var NEG = /(sorun|gecik|revize|revizyon|beklemede|cevap yok|cevap alınama|yanıt yok|sıkıntı|memnun değil|memnuniyetsiz|itiraz|hata|eksik|onaylanmad|olumsuz|şikayet|düzelt|tekrar|geri gönder|stres|takıld|aciliyet|baskı)/i;
+    var POS = /(onayland|beğen|teşekkür|harika|memnun|olumlu|sorunsuz|teslim edildi|pürüzsüz|güzel oldu|akıcı|net ilerl|tebrik)/i;
+    var pos = 0, neg = 0;
+    b.forEach(function (x) { var s = x && x.thread_ozet; if (!s) return; if (NEG.test(s)) neg++; if (POS.test(s)) pos++; });
+    if (neg > pos) return -1;
+    if (pos > neg) return 1;
+    return 0;
+  } catch (e) { return 0; }
+}
 // İş yükü seviyesi — KİŞİYE ÖZEL: çok iş → 'busy' (kızgın serbest), orta → 'some', sakin → 'calm'.
 function odyBusyLevel(uid) {
   try {
@@ -186,7 +200,9 @@ function odyRestingMood(uid) {
   if (overdue > 2) return 'kizgin';          // 2'den fazla geciken iş → kızgın
   var lvl = odyBusyLevel(uid);
   if (lvl === 'busy') return 'mesgul';        // genel çok iş → meşgul
-  if (lvl === 'some') return 'endiseli';
+  var sent = odyThreadSentiment(uid);         // kişinin işlerindeki thread duygusu
+  if (lvl === 'some') return sent < 0 ? 'uzgun' : 'endiseli'; // riskli + olumsuz thread → üzgün
+  if (sent < 0) return 'endiseli';            // sakin ama thread'lerde olumsuzluk → endişeli
   var done = odyDoneToday(uid);               // sakin: bugün tamamlanan işe göre
   if (done >= 2) return 'neseli';             // 2+ iş tamamlandı → neşeli
   if (done >= 1) return 'mutlu';              // 1 iş tamamlandı → mutlu
@@ -198,7 +214,7 @@ function odyMoodLabel(mood) {
 }
 // Ody neden bu ruh halinde? Veriye dayalı kısa açıklama.
 function odyMoodReason(mood, uid) {
-  var overdue = 0, active = 0, done = odyDoneToday(uid);
+  var overdue = 0, active = 0, done = odyDoneToday(uid), sent = odyThreadSentiment(uid);
   try {
     var b = odyMyBriefs(uid);
     overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
@@ -206,16 +222,16 @@ function odyMoodReason(mood, uid) {
   } catch (e) {}
   var map = {
     kizgin: overdue > 0 ? ('senin ' + overdue + ' işin gecikti, iş yükün çok') : ('iş yükün çok (' + active + ' aktif işin var)'),
-    endiseli: overdue > 0 ? ('senin ' + overdue + ' işin gecikti, tedbirliyim') : 'bazı işlerin risk altında',
+    endiseli: sent < 0 ? "işlerinin thread'lerinde takılan/olumsuz noktalar var" : (overdue > 0 ? ('senin ' + overdue + ' işin gecikti, tedbirliyim') : 'bazı işlerin risk altında'),
     mesgul: 'iş yükün yoğun (' + active + ' aktif işin var)',
     neseli: done >= 2 ? ('bugün ' + done + ' iş tamamladın, harika gidiyorsun') : (active > 0 ? ('işlerin kontrol altında (' + active + ' aktif iş), her şey yolunda') : 'gündeminde acil iş yok, her şey yolunda'),
     mutlu: done >= 1 ? 'bugün 1 işini tamamladın 🎉' : 'iyi bir haber aldım',
     coskulu: 'bir iş tamamlandı!',
+    uzgun: sent < 0 ? "işlerinin thread'lerinde olumsuz sinyaller var" : 'olumsuz bir haber aldım',
     heyecanli: 'yeni bir hareket oldu',
     dusunuyor: 'yeni bir iş açıldı, ona bakıyorum',
     uykulu: '1 saattir yeni bildirim yok',
     sikilmis: 'bir süredir hiç hareket yok, biraz sıkıldım',
-    uzgun: 'olumsuz bir haber aldım',
   };
   return map[mood] || 'sistemini takip ediyorum';
 }
