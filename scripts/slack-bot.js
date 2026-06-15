@@ -567,9 +567,11 @@ app.command('/yardim', async ({ command, ack, respond }) => {
       { type: 'section', fields: [
         { type: 'mrkdwn', text:
           '*İş kabulü / başladım:*\n🎨 → Tasarım\n✍️ → Editör\n🤖 → AI\n🔄 → Devam Ediyor\n\n' +
-          '👀 → İncelemede\n⏸️ → Beklemede\n✏️ → Revizyon\n✈️ → Müşteriye Yollandı\n✅ → Tamamlandı\n🔃 → Yeniden Aç' },
+          '👀 → İncelemede\n⏸️ → Beklemede\n✏️ → Revizyon\n✈️ → Müşteriye Yollandı\n✅ → Tamamlandı\n🔃 → Yeniden Aç\n📎 → Final teslim (galeri)' },
         { type: 'mrkdwn', text: '*Öncelik:*\n🔴 → Acil\n🟠 → Yüksek\n🟡 → Normal\n🟢 → Düşük' },
       ]},
+      { type: 'context', elements: [{ type: 'mrkdwn', text: '📎 *Final teslim:* dosya içeren bir mesaja 📎 koy → o mesajdaki tüm dosyalar (görsel/PDF/video) işin final teslimi olarak galeriye kaydedilir (✅ otomatik son-görselden farklı: hangi dosyaların gireceğini sen seçersin).' }] },
+      { type: 'context', elements: [{ type: 'mrkdwn', text: '⏰ *Deadline uzatma puanı düşürür:* terminine ne kadar yakın uzatırsan o kadar çok (>48sa -0.5 · 24-48sa -1.0 · <24sa -1.5 · termin geçmişse -2.0). Tamamlananlarda Zamanında/Uzatılarak/Gecikmeli olarak işaretlenir.' }] },
       { type: 'context', elements: [{ type: 'mrkdwn', text: '⛓️ *Sıralı iş:* brief "Sıralı" açıldıysa ✅ yalnızca SENİN halkanı onaylar; iş sıradaki kişiye geçer ve herkes onaylamadan kapanmaz. Sonraki halka ✏️ koyarsa iş bir önceki halkaya (veya `revize: @kişi` ile seçilen halkaya) geri döner.' }] },
 
       { type: 'divider' },

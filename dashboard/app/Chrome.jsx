@@ -545,12 +545,13 @@ function ChatBot({ currentUser }) {
             animation: "odyBob 4.5s ease-in-out infinite",
           }}>{odyFaceProd(mood)}</div>
           {notifCount > 0 && <span title={notifCount + " okunmamış bildirim"} style={{
-            position: "absolute", top: -3, right: -3, zIndex: 3, minWidth: 20, height: 20, padding: "0 5px",
+            position: "absolute", top: -1, right: -1, zIndex: 3, minWidth: 15, height: 15, padding: "0 3px",
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
             borderRadius: 999, background: "var(--prio-red, #E5484D)", color: "#fff",
-            font: "700 11px/20px var(--font-sans)", textAlign: "center",
-            border: "2px solid var(--surface, #fff)", boxShadow: "0 2px 5px -1px rgba(0,0,0,.3)",
+            font: "700 9px/1 var(--font-sans)", textAlign: "center",
+            border: "1.5px solid var(--surface, #fff)", boxShadow: "0 1px 3px -1px rgba(0,0,0,.3)",
             animation: "odyPopIn .3s ease",
-          }}>{notifCount > 99 ? "99+" : notifCount}</span>}
+          }}>{notifCount > 9 ? "9+" : notifCount}</span>}
         </button>
       )}
       {open && (
