@@ -14,13 +14,34 @@ function bnsCapPct(s) {
   return Math.min(100, Math.round((s.active / s.capacity) * 100));
 }
 
+// ── Yarım gün / part-time çalışanlar — kapasite çarpanı (1 = tam gün) ───────
+// Serhat Tokmak yarım gün çalışıyor (08:00-13:00) → kapasitesi 0.5. dept bilgisi
+// departman kapasite indiriminde kullanılır (roster sırasından bağımsız, deterministik).
+var BNS_PARTTIME = { 'U08HLMHTGEL': { factor: 0.5, dept: 'tasarim' } }; // Serhat Tokmak
+function bnsCapFactor(u) {
+  if (!u || !u.id) return 1;
+  var p = BNS_PARTTIME[u.id];
+  return (p && p.factor != null) ? p.factor : 1;
+}
+// Bir departmandaki part-time çalışanların eksik kapasitesi (kişi başı 6 slot bazında).
+function bnsDeptCapDeduction(deptKey) {
+  var ded = 0;
+  for (var id in BNS_PARTTIME) {
+    var p = BNS_PARTTIME[id];
+    if (p && p.dept === deptKey) ded += (1 - p.factor) * 6;
+  }
+  return ded;
+}
+
 // ── Kişi başı kapasite limiti (eşzamanlı taşınabilir aktif iş) ──────────────
 // Yöneticiler koordinasyon yükü için daha yüksek limitli. Profil + Departman AYNI çağırır.
+// Yarım gün çalışanlarda limit çarpanla küçülür (ör. tasarım 6 → 3).
 function bnsPersonCapLimit(u) {
   if (!u) return 6;
-  if (u.yetki === "yonetici" || u.rol === "yonetici") return 10;
-  var d = u.dept || u.rol || "";
-  return ({ tasarim: 6, editor: 8, ai: 6, freelance: 6 })[d] || 6;
+  var base;
+  if (u.yetki === "yonetici" || u.rol === "yonetici") base = 10;
+  else { var d = u.dept || u.rol || ""; base = ({ tasarim: 6, editor: 8, ai: 6, freelance: 6 })[d] || 6; }
+  return Math.max(1, Math.round(base * bnsCapFactor(u)));
 }
 function bnsPersonCapPct(u, activeCount) {
   return Math.min(100, Math.round((activeCount / bnsPersonCapLimit(u)) * 100));

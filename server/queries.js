@@ -63,7 +63,7 @@ async function getState() {
             SELECT 1 FROM brief_assignees a2
             WHERE a2.brief_id = b.id AND a2.role = 'contributor' AND a2.onay_at IS NULL
               AND COALESCE(a2.sira, 999999) < COALESCE(a.sira, 999999))))
-      WHERE u.dept IS NOT NULL GROUP BY u.dept`),
+      WHERE u.dept IS NOT NULL AND u.active GROUP BY u.dept`),
     // marka istatistik
     pool.query(`
       SELECT br.name, br.color,
@@ -117,7 +117,7 @@ async function getEmbedded() {
             SELECT 1 FROM brief_assignees a2
             WHERE a2.brief_id = b.id AND a2.role = 'contributor' AND a2.onay_at IS NULL
               AND COALESCE(a2.sira, 999999) < COALESCE(a.sira, 999999))))
-      WHERE u.dept IS NOT NULL GROUP BY u.dept`),
+      WHERE u.dept IS NOT NULL AND u.active GROUP BY u.dept`),
   ]);
   const ms = (d) => (d ? new Date(d).getTime() : 0);
 

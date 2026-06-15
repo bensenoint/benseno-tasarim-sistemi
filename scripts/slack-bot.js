@@ -79,7 +79,6 @@ const TASARIMCI_IDS = new Set([
 const EDITOR_IDS = new Set([
   'U02SZQDAFPF', // Erdem Akoğlu (hem yönetici hem editör)
   'U07PV0RA9L2', // Eda Ayral
-  'U09BZHR25NG', // Eda Tireli
   'U08NQJ27G5S', // Melis
   'U063T8M5HL4', // Buse Gürbüzer
   'U05PP70GQTX', // Aylin Caner
@@ -106,7 +105,6 @@ const TASARIMCI_ISIM = {
 const EDITOR_ISIM = {
   'U02SZQDAFPF': 'Erdem Akoğlu',
   'U07PV0RA9L2': 'Eda Ayral',
-  'U09BZHR25NG': 'Eda Tireli',
   'U08NQJ27G5S': 'Melis',
   'U063T8M5HL4': 'Buse Gürbüzer',
   'U05PP70GQTX': 'Aylin Caner',

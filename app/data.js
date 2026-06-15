@@ -273,7 +273,11 @@ const DEPT_TR = { tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "
 function bnsNormDeptStats(raw) {
   const out = {};
   for (const [k, s] of Object.entries(raw || {})) {
-    const capacity = s.capacity || (s.people ? s.people * 6 : 0);
+    let capacity = s.capacity || (s.people ? s.people * 6 : 0);
+    // Yarım gün çalışanların eksik kapasitesini departmandan düş (Serhat 0.5 → -3 slot).
+    if (!s.capacity && typeof bnsDeptCapDeduction === 'function') {
+      capacity = Math.max(0, Math.round(capacity - bnsDeptCapDeduction(k)));
+    }
     // Canlı API name göndermez (yalnız dept anahtarı) → görünen ad burada eklenir.
     out[k] = { ...s, name: s.name || DEPT_TR[k] || k, capacity, capacity_pct: bnsCapPct({ ...s, capacity }) };
   }
