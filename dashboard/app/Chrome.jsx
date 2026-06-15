@@ -273,7 +273,8 @@ function ChatBot() {
   // Bildirimler artık Ody'ye bağlı: /api/notifications'ı yoklar; yeni (okunmamış, daha önce
   // görülmemiş) bildirim gelince Ody onun metninden çıkardığı ruh hâlini yansıtır ve kapalıyken
   // balonunda bildirimi gösterir — Ody/balon açılana (veya çandan okununca) kadar.
-  const seenNotif = () => { try { return parseInt(localStorage.getItem("bns_ody_seen_notif") || "0", 10) || 0; } catch (e) { return 0; } };
+  // Bildirim durumu TAMAMEN sunucu read_at'ine bağlı (yerel id-gate yok). Okunmamış varsa
+  // Ody en son okunmamışın duygusunu yansıtır + kapalıyken balonda gösterir; hepsi okununca normale döner.
   React.useEffect(() => {
     if (!tok()) return;
     let cancelled = false;
@@ -282,16 +283,14 @@ function ChatBot() {
         .then(r => r.ok ? r.json() : null)
         .then(j => {
           if (cancelled || !j) return;
-          setNotifItems(j.notifications || []);
-          setNotifCount(j.unread || 0);
-          // Hepsi okunduysa Ody sakinleşsin, balon kalksın.
-          if ((j.unread || 0) === 0) { setNotifPeek(null); if (!open) setMood(odyRestingMood()); return; }
-          const fresh = (j.notifications || []).filter(n => !n.read_at && n.id > seenNotif());
-          if (fresh.length) {
-            const latest = fresh.reduce((a, b) => (b.id > a.id ? b : a));
-            setNotifPeek(latest);
-            if (!open) setMood(odyMoodFromText(latest.text));
-          }
+          const items = j.notifications || [];
+          setNotifItems(items);
+          const unread = items.filter(n => !n.read_at);
+          setNotifCount(unread.length);
+          if (!unread.length) { setNotifPeek(null); if (!open) setMood(odyRestingMood()); return; }
+          const latest = unread.reduce((a, b) => (b.id > a.id ? b : a));
+          setNotifPeek(latest);
+          if (!open) setMood(odyMoodFromText(latest.text));
         }).catch(() => {});
     };
     poll();
@@ -299,12 +298,9 @@ function ChatBot() {
     return () => { cancelled = true; clearInterval(id); };
   }, [open]);
 
-  // Bildirimi "görüldü" işaretle: localStorage + sunucu okundu (çan da temizlenir) → Ody sakinleşir.
-  const markNotifSeen = () => {
-    setNotifPeek(p => {
-      if (p) { try { localStorage.setItem("bns_ody_seen_notif", String(p.id)); } catch (e) {} }
-      return null;
-    });
+  // Tüm bildirimleri okundu işaretle (panel kapanınca): sunucu + optimistik → Ody normale döner.
+  const markNotifRead = () => {
+    setNotifPeek(null);
     setNotifCount(0);
     setNotifItems(items => items.map(n => n.read_at ? n : Object.assign({}, n, { read_at: new Date().toISOString() })));
     setMood(odyRestingMood());
@@ -369,7 +365,7 @@ function ChatBot() {
     <>
       {/* Kapalıyken son bildirim balonu (soru ekranı dışında) — Ody'ye bağlı */}
       {!open && notifPeek && (
-        <button onClick={() => { markNotifSeen(); setUnread(false); setOpen(true); }}
+        <button onClick={() => { setNotifPeek(null); setUnread(false); setOpen(true); }}
           title="Bildirimi aç"
           style={{
             position: "fixed",
@@ -387,7 +383,7 @@ function ChatBot() {
       {/* Açma balonu */}
       {!open && (
         <button onPointerDown={(e) => startDrag(e, true)}
-          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } if (notifPeek) markNotifSeen(); setUnread(false); setOpen(true); }}
+          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setNotifPeek(null); setUnread(false); setOpen(true); }}
           title={notifPeek ? "Ody'de yeni bildirim var — aç" : (unread ? "Ody senin için bugünkü özetini hazırladı — aç" : "Ody — sistem asistanı (sürükleyerek taşıyabilirsin)")} style={{
           position: "fixed", left: pos.x, top: pos.y, zIndex: 90,
           width: 54, height: 54, borderRadius: "50%", border: 0, cursor: "grab", touchAction: "none",
@@ -433,7 +429,7 @@ function ChatBot() {
               <div style={{ font: "400 10px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>kullanım · marka/iş/kişi soruları · öneri</div>
             </div>
             {msgs.length > 0 && <button onClick={() => setMsgs([])} title="Sohbeti temizle" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>temizle</button>}
-            <button onClick={() => setOpen(false)} style={{ border: 0, background: "transparent", color: "var(--ink-3)", cursor: "pointer", padding: 4, display: "inline-flex" }}><I.X size={15}/></button>
+            <button onClick={() => { setOpen(false); markNotifRead(); }} style={{ border: 0, background: "transparent", color: "var(--ink-3)", cursor: "pointer", padding: 4, display: "inline-flex" }}><I.X size={15}/></button>
           </div>
           <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
             {notifItems.length > 0 && (
@@ -442,16 +438,21 @@ function ChatBot() {
                   <I.Bell size={11}/> Bildirimler
                 </div>
                 <div style={{ maxHeight: 220, overflowY: "auto" }}>
-                  {notifItems.slice(0, 30).map(n => (
+                  {notifItems.slice(0, 30).map(n => {
+                    var unread = !n.read_at;
+                    return (
                     <a key={n.id} href={n.link || "#"} target={n.link ? "_blank" : undefined} rel="noreferrer" style={{
-                      display: "block", padding: "8px 10px", textDecoration: "none",
-                      borderLeft: n.read_at ? "2px solid transparent" : "2px solid var(--ody)",
-                      background: n.read_at ? "transparent" : "var(--ody-tint)",
+                      display: "flex", alignItems: "flex-start", gap: 8, padding: "8px 10px", textDecoration: "none",
+                      borderLeft: unread ? "3px solid var(--ody)" : "3px solid transparent",
+                      background: unread ? "var(--ody-tint)" : "transparent",
                     }}>
-                      <div style={{ font: "400 12px/1.4 var(--font-sans)", color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</div>
-                      <div style={{ font: "400 10px/1 var(--font-sans)", color: "var(--ink-4)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</div>
+                      <span aria-hidden="true" style={{ marginTop: 5, flex: "none", width: 7, height: 7, borderRadius: "50%", background: unread ? "var(--ody)" : "transparent" }}/>
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{ display: "block", font: (unread ? "600" : "400") + " 12px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</span>
+                        <span style={{ display: "block", font: "400 10px/1 var(--font-sans)", color: unread ? "var(--ink-3)" : "var(--ink-5)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</span>
+                      </span>
                     </a>
-                  ))}
+                  );})}
                 </div>
               </div>
             )}
