@@ -51,6 +51,7 @@ function HelpScreen() {
         <EmojiRow emoji="✏️" label="Revizyon" desc="Düzeltme isteği geldi. ✈️'dan sonraki İLK ✏️ müşteri revizyonu, diğerleri iç revizyon sayılır."/>
         <EmojiRow emoji="✈️" label="Müşteriye Yollandı" desc="İş müşteri onayına gönderildi. İş 'Müşteri Onayı' sayfasına taşınır; aktif yük/kapasite ve hareketsizlik hesabından çıkar. Müşteri revizyonla dönünce otomatik aktif listeye geri gelir."/>
         <EmojiRow emoji="✅" label="Tamamlandı" desc="İş bitti. Thread'deki son görsel otomatik olarak galeriye kaydedilir."/>
+        <EmojiRow emoji="📎" label="Final teslim (galeri)" desc="Dosya içeren bir mesaja 📎 koy → o mesajdaki TÜM dosyalar (görsel + diğer tipler: PDF, video, vb.) işin final teslimi olarak galeriye kaydedilir. ✅'in otomatik 'son görsel'inden farkı: hangi dosyaların galeriye gireceğini SEN seçersin. Dosyasız mesaja koyarsan bot uyarır."/>
         <EmojiRow emoji="🔃" label="Yeniden açıldı" desc="Tamamlanmış brief'i tekrar çalışılıyor durumuna çeker."/>
       </Section>
 
