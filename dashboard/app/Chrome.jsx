@@ -144,21 +144,33 @@ function odyMoodFromText(t) {
   if (/(onay|müşteride)/.test(s)) return 'neseli';
   return 'heyecanli';
 }
-// İş yükü seviyesi: çok iş → 'busy' (kızgın serbest), orta → 'some', sakin → 'calm'.
-function odyBusyLevel() {
+// Giriş yapan kullanıcının işleri (lead/katkı/gözlemci/reviewer). uid yoksa tüm işler (fallback).
+function odyMyBriefs(uid) {
+  var b = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
+  if (!uid) return b;
+  var inArr = function (a) { return Array.isArray(a) && a.some(function (u) { return u && u.id === uid; }); };
+  var mine = b.filter(function (x) {
+    if (x.lead && x.lead.id === uid) return true;
+    if (x.reviewer && x.reviewer.id === uid) return true;
+    return inArr(x.contributors) || inArr(x.workers) || inArr(x.leads) || inArr(x.observers);
+  });
+  return mine;
+}
+// İş yükü seviyesi — KİŞİYE ÖZEL: çok iş → 'busy' (kızgın serbest), orta → 'some', sakin → 'calm'.
+function odyBusyLevel(uid) {
   try {
-    var b = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
+    var b = odyMyBriefs(uid);
     var overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
     var active = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride'; }).length;
     var risk = b.filter(function (x) { return window.bnsIsRisk && window.bnsIsRisk(x.durum, x.deltaH); }).length;
-    if (overdue >= 3 || active >= 12) return 'busy';   // çok iş
+    if (overdue >= 2 || active >= 6) return 'busy';   // birey için çok iş eşiği
     if (overdue > 0 || risk > 0) return 'some';
     return 'calm';
   } catch (e) { return 'calm'; }
 }
 // Anlık "yerine otur" mood'u: çok iş → kızgın, orta → endişeli, sakin → neşeli.
-function odyRestingMood() {
-  var lvl = odyBusyLevel();
+function odyRestingMood(uid) {
+  var lvl = odyBusyLevel(uid);
   if (lvl === 'busy') return 'kizgin';
   if (lvl === 'some') return 'endiseli';
   return 'neseli';
@@ -168,18 +180,18 @@ function odyMoodLabel(mood) {
   return ({ mutlu: 'mutlu', neseli: 'neşeli', coskulu: 'coşkulu', heyecanli: 'heyecanlı', endiseli: 'endişeli', kizgin: 'kızgın', mesgul: 'meşgul', dusunuyor: 'düşünüyor', uykulu: 'uykulu', uzgun: 'üzgün', sikilmis: 'sıkılmış' })[mood] || 'sakin';
 }
 // Ody neden bu ruh halinde? Veriye dayalı kısa açıklama.
-function odyMoodReason(mood) {
+function odyMoodReason(mood, uid) {
   var overdue = 0, active = 0;
   try {
-    var b = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
+    var b = odyMyBriefs(uid);
     overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
     active = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride'; }).length;
   } catch (e) {}
   var map = {
-    kizgin: overdue > 0 ? (overdue + ' iş gecikti, iş yükü çok') : ('iş yükü çok (' + active + ' aktif iş)'),
-    endiseli: overdue > 0 ? (overdue + ' iş gecikti, tedbirliyim') : 'bazı işler risk altında',
+    kizgin: overdue > 0 ? ('senin ' + overdue + ' işin gecikti, iş yükün çok') : ('iş yükün çok (' + active + ' aktif işin var)'),
+    endiseli: overdue > 0 ? ('senin ' + overdue + ' işin gecikti, tedbirliyim') : 'bazı işlerin risk altında',
     mesgul: 'revizyon / iş yoğunluğu var',
-    neseli: 'işler kontrol altında, her şey yolunda',
+    neseli: active > 0 ? ('işlerin kontrol altında (' + active + ' aktif iş), her şey yolunda') : 'gündeminde acil iş yok, her şey yolunda',
     mutlu: 'iyi bir haber aldım',
     coskulu: 'harika bir gelişme oldu',
     heyecanli: 'yeni bir hareket oldu',
@@ -242,7 +254,8 @@ function odyFxProd(host, mood) {
   else if (mood === 'uykulu') { for (var i = 0; i < 3; i++) (function (i) { setTimeout(function () { spawn('z', '#9a93a0', -6 + i * 6, 12); }, i * 420); })(i); }
 }
 
-function ChatBot() {
+function ChatBot({ currentUser }) {
+  const uid = (currentUser && (currentUser.slack_id || currentUser.id)) || null;
   const [open, setOpen] = React.useState(false);
   const [mood, setMood] = React.useState('neseli');
   const blobRef = React.useRef(null);
@@ -293,7 +306,7 @@ function ChatBot() {
 
   // Ody ruh hâli: değişince fx partikülü; kapalıyken periyodik bildirim ifadesi + okunmadı işareti
   React.useEffect(() => { odyFxProd(blobRef.current, mood); }, [mood]);
-  React.useEffect(() => { setMood(odyRestingMood()); }, []);
+  React.useEffect(() => { setMood(odyRestingMood(uid)); }, [uid]);
 
   // Idle ruh-hali: bildirim yokken normal (neşeli); uzun süre boşta → sıkılmış; çok iş → kızgın.
   // Taşınınca kısa süre farklı ifade (heyecanlı), sonra normale döner.
@@ -307,7 +320,7 @@ function ChatBot() {
     const t = setInterval(() => {
       if (openRef.current || countRef.current > 0) { idleStartRef.current = Date.now(); return; } // aktif/bildirim varken karışma
       if (Date.now() < reactUntilRef.current) return;                 // taşıma tepkisi sürüyor
-      if (odyBusyLevel() === 'busy') { setMood('kizgin'); return; }   // çok iş → kızgın
+      if (odyBusyLevel(uid) === 'busy') { setMood('kizgin'); return; }   // çok iş → kızgın
       const idleMs = Date.now() - idleStartRef.current;
       setMood(idleMs > ODY_BORED_MS ? 'sikilmis' : 'neseli');         // uzun boşta sıkılmış, yoksa normal
     }, 4000);
@@ -363,7 +376,7 @@ function ChatBot() {
     setNotifPeek(null);
     setNotifCount(0);
     setNotifItems(items => items.map(n => n.read_at ? n : Object.assign({}, n, { read_at: new Date().toISOString() })));
-    setMood(odyRestingMood());
+    setMood(odyRestingMood(uid));
     if (tok()) fetch(`${API}/api/notifications/read`, { method: "POST", headers: { Authorization: "Bearer " + tok() } }).catch(() => {});
   };
   // dismissBrief tanımı brief efektinin hemen altında.
@@ -436,7 +449,7 @@ function ChatBot() {
     <>
       {/* Kapalıyken son bildirim balonu (soru ekranı dışında) — Ody'ye bağlı */}
       {!open && notifPeek && (
-        <button onClick={() => { setNotifPeek(null); setUnread(false); setOpen(true); }}
+        <button onClick={() => { setUnread(false); setOpen(true); markNotifRead(); }}
           title="Bildirimi aç"
           style={{
             position: "fixed",
@@ -454,8 +467,8 @@ function ChatBot() {
       {/* Açma balonu */}
       {!open && (
         <button onPointerDown={(e) => startDrag(e, true)}
-          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setNotifPeek(null); setUnread(false); setOpen(true); }}
-          title={"Ody şu an " + odyMoodLabel(mood) + " — " + odyMoodReason(mood) + ". " + (notifPeek ? "Yeni bildirim var, açmak için tıkla." : (unread ? "Bugünkü özetin hazır, açmak için tıkla." : "Sürükleyerek taşıyabilirsin."))} style={{
+          onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setUnread(false); setOpen(true); markNotifRead(); }}
+          title={"Ody şu an " + odyMoodLabel(mood) + " — " + odyMoodReason(mood, uid) + ". " + (notifPeek ? "Yeni bildirim var, açmak için tıkla." : (unread ? "Bugünkü özetin hazır, açmak için tıkla." : "Sürükleyerek taşıyabilirsin."))} style={{
           position: "fixed", left: pos.x, top: pos.y, zIndex: 90,
           width: 54, height: 54, borderRadius: "50%", border: 0, cursor: "grab", touchAction: "none",
           background: "transparent", padding: 0,
@@ -475,7 +488,7 @@ function ChatBot() {
             animation: "odyBob 4.5s ease-in-out infinite",
           }}>{odyFaceProd(mood)}</div>
           {notifCount > 0 && <span title={notifCount + " okunmamış bildirim"} style={{
-            position: "absolute", top: -3, right: -3, minWidth: 20, height: 20, padding: "0 5px",
+            position: "absolute", top: -3, right: -3, zIndex: 3, minWidth: 20, height: 20, padding: "0 5px",
             borderRadius: 999, background: "var(--prio-red, #E5484D)", color: "#fff",
             font: "700 11px/20px var(--font-sans)", textAlign: "center",
             border: "2px solid var(--surface, #fff)", boxShadow: "0 2px 5px -1px rgba(0,0,0,.3)",

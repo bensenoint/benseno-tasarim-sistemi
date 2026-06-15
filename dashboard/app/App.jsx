@@ -555,7 +555,7 @@ function App({ currentUser, onLogout }) {
 
       {toast && <Toast msg={toast}/>}
       {/* 🤖 Sistem Asistanı — sağ alt yüzen sohbet */}
-      <ChatBot/>
+      <ChatBot currentUser={currentUser}/>
 
       <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>
 
