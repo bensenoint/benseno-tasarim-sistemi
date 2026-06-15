@@ -1034,6 +1034,19 @@ async function handleFinancialsThread(event, client) {
   await reply(`✅ Finansal bilgi güncellendi:\n${lines.map(l => `• ${l}`).join('\n')}\n_Güncellemek için bu thread'e tekrar yaz. Birkaç dk içinde dashboard'a yansır._`);
 }
 
+// ── Serhat Tokmak yarım gün (hafta içi 08:00-13:00) — mesai dışı mention hatırlatması ──
+const SERHAT_ID = 'U08HLMHTGEL';
+function serhatMusaitMi() {
+  // Europe/Istanbul duvar saati: hafta içi 08:00-13:00 arası müsait.
+  const tr = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
+  const gun = tr.getDay();           // 0=Pazar .. 6=Cumartesi
+  if (gun === 0 || gun === 6) return false;
+  const saat = tr.getHours();
+  return saat >= 8 && saat < 13;
+}
+const serhatHatirlatmaCache = new Map(); // thread_ts → son hatırlatma (ms) — spam önler
+const SERHAT_HATIRLATMA_ARALIK = 30 * 60 * 1000; // aynı thread'de en fazla 30 dk'da bir
+
 app.event('message', async ({ event, client }) => {
   // Slack thread silinince ilgili brief'i soft-delete yap
   if (event.subtype === 'message_deleted') {
@@ -1048,6 +1061,20 @@ app.event('message', async ({ event, client }) => {
   if (event.subtype && event.subtype !== 'bot_message') return;
   // Text yoksa yoksay
   if (!event.text) return;
+
+  // ── Serhat mesai dışında mention'landıysa thread'e nazik hatırlatma ─────────
+  // (yarım gün: hafta içi 08:00-13:00). Kendi mesajını ve bot mesajlarını atla; spam önlemek
+  // için aynı thread'de 30 dk'da bir.
+  if (!event.bot_id && event.user !== SERHAT_ID && event.text.includes(`<@${SERHAT_ID}>`) && !serhatMusaitMi()) {
+    const key = event.thread_ts || event.ts;
+    if (Date.now() - (serhatHatirlatmaCache.get(key) || 0) > SERHAT_HATIRLATMA_ARALIK) {
+      serhatHatirlatmaCache.set(key, Date.now());
+      client.chat.postMessage({
+        channel: event.channel, thread_ts: key, username: BOT_NAME,
+        text: ':wave: Serhat şu anda burada değil — yarım gün çalışıyor (hafta içi *08:00–13:00*). Mesajını mesai saatinde görüp dönecektir.',
+      }).catch(() => {});
+    }
+  }
 
   // ── "help" → uygulama sorun/öneri bildirim formu ───────────────────────────
   // Herhangi bir kanalda tek başına "help" yazılırsa form butonu sunulur
