@@ -5,7 +5,7 @@ FROM node:22-bookworm-slim
 # Sistem bağımlılıkları: git+curl (push & headless Slack/GitHub API), python3 (aylik script),
 # tzdata (Europe/Istanbul), bash (run-*.sh)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      git curl python3 ca-certificates tzdata bash \
+      git curl python3 ca-certificates tzdata bash postgresql-client \
  && rm -rf /var/lib/apt/lists/*
 
 ENV TZ=Europe/Istanbul

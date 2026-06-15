@@ -39,23 +39,24 @@ function brandFromChannelName(name) {
 }
 
 // DB'ye best-effort yazma (b3 — Slack aksiyonları DB'ye de düşsün). Hata bot'u BOZMAZ.
-// ── Çevrimdışı yazma kuyruğu ────────────────────────────────────────────────
-// API erişilemezken (5xx/ağ hatası) idempotent yazmalar kuyruğa alınır; API canlanınca
-// FIFO sırayla replay edilir. Hiçbir olay kaybolmaz. Dosyaya yazılır → aynı konteyner
-// restart'ında da hayatta kalır (tam rebuild'de kaybolur — DB/volume olmadan sınır budur).
+// ── Çevrimdışı yazma kuyruğu (DB-tabanlı, dosya yedekli) ─────────────────────
+// API erişilemezken idempotent yazmalar KALICI olarak bot_write_queue tablosuna alınır
+// (Postgres API'den bağımsız ayakta; deploy/rebuild'e dayanır → hiç kayıp yok). DB de
+// erişilemezse data/.write-queue.jsonl'e düşer, DB dönünce tabloya taşınır. API canlanınca
+// FIFO replay + DELETE. Yeni-brief POST'u idempotent DEĞİL → kuyruğa ALINMAZ (replay kopya yaratır).
 const _fs = require('fs'), _path = require('path');
 const QUEUE_FILE = _path.join(__dirname, '../data/.write-queue.jsonl');
-const QUEUE_MAX = 1000;
-let writeQueue = [];
-function loadQueue() {
-  try { writeQueue = _fs.readFileSync(QUEUE_FILE, 'utf8').split('\n').filter(Boolean).map(JSON.parse); }
-  catch (e) { writeQueue = []; }
-  if (writeQueue.length) log(`[kuyruk] ${writeQueue.length} bekleyen yazma yüklendi`);
+let _pool;  // server/db.js havuzu (lazy; DATABASE_URL/data/.db-url'den)
+function dbPool() {
+  if (_pool !== undefined) return _pool || null;
+  try { _pool = require('../server/db.js').pool; } catch (e) { _pool = null; log('[kuyruk] DB havuzu yok: ' + e.message); }
+  return _pool || null;
 }
-function persistQueue() { try { _fs.writeFileSync(QUEUE_FILE, writeQueue.map(x => JSON.stringify(x)).join('\n')); } catch (e) {} }
-// Yeni-brief (POST /api/briefs) idempotent DEĞİL → kuyruğa alınmaz (replay kopya yaratır;
-// modal zaten kullanıcıya hata gösterir). Diğer tüm güncellemeler (status/priority/deadline/delete) idempotent.
+function fileAppend(it) { try { _fs.appendFileSync(QUEUE_FILE, JSON.stringify(it) + '\n'); } catch (e) {} }
+function fileReadAll() { try { return _fs.readFileSync(QUEUE_FILE, 'utf8').split('\n').filter(Boolean).map(JSON.parse); } catch (e) { return []; } }
+function fileClear() { try { _fs.unlinkSync(QUEUE_FILE); } catch (e) {} }
 function isQueueable(method, urlPath) { return !(method === 'POST' && urlPath === '/api/briefs'); }
+
 async function sendWrite(method, urlPath, body) {
   try {
     const r = await fetch(`${API_BASE}${urlPath}`, {
@@ -65,28 +66,47 @@ async function sendWrite(method, urlPath, body) {
     return { ok: r.ok, status: r.status, err };
   } catch (e) { return { ok: false, status: 0, err: e.message }; }
 }
+async function enqueueWrite(method, urlPath, body) {
+  const pool = dbPool();
+  if (pool) {
+    try { await pool.query('INSERT INTO bot_write_queue(method,url_path,body) VALUES($1,$2,$3)', [method, urlPath, body ?? null]); return 'db'; }
+    catch (e) { log('[kuyruk] DB insert hata, dosyaya: ' + e.message); }
+  }
+  fileAppend({ method, urlPath, body }); return 'dosya';
+}
 let _flushing = false;
 async function flushQueue() {
-  if (_flushing || !writeQueue.length) return;
-  _flushing = true;
+  if (_flushing) return; _flushing = true;
   try {
-    while (writeQueue.length) {
-      const it = writeQueue[0];
-      const res = await sendWrite(it.method, it.urlPath, it.body);
-      if (res.ok) { writeQueue.shift(); persistQueue(); log(`[kuyruk] ✓ ${it.method} ${it.urlPath} (${writeQueue.length} kaldı)`); }
-      else if (res.status === 0 || res.status >= 500) { break; }  // API hâlâ çevrimdışı → dur, sonra tekrar dene
-      else { writeQueue.shift(); persistQueue(); log(`[kuyruk] ✗ kalıcı hata, atıldı: ${it.method} ${it.urlPath} → ${res.status} ${res.err || ''}`); }
+    const pool = dbPool();
+    if (!pool) {  // DB yok → yalnız dosyadan dene
+      const items = fileReadAll(); if (!items.length) return;
+      let i = 0; for (; i < items.length; i++) { const r = await sendWrite(items[i].method, items[i].urlPath, items[i].body); if (!r.ok && (r.status === 0 || r.status >= 500)) break; }
+      const rest = items.slice(i); fileClear(); rest.forEach(fileAppend); return;
     }
-  } finally { _flushing = false; }
+    // 1) Dosya yedeğini tabloya taşı (DB ayağa kalkmışsa)
+    const fitems = fileReadAll();
+    if (fitems.length) { for (const it of fitems) { try { await pool.query('INSERT INTO bot_write_queue(method,url_path,body) VALUES($1,$2,$3)', [it.method, it.urlPath, it.body ?? null]); } catch (e) {} } fileClear(); log(`[kuyruk] ${fitems.length} dosya-kaydı tabloya taşındı`); }
+    // 2) Tabloyu FIFO replay et
+    for (;;) {
+      const q = await pool.query('SELECT id, method, url_path, body FROM bot_write_queue ORDER BY id LIMIT 1');
+      if (!q.rows.length) break;
+      const it = q.rows[0];
+      const res = await sendWrite(it.method, it.url_path, it.body);
+      if (res.ok) { await pool.query('DELETE FROM bot_write_queue WHERE id=$1', [it.id]); log(`[kuyruk] ✓ ${it.method} ${it.url_path}`); }
+      else if (res.status === 0 || res.status >= 500) break;  // API hâlâ çevrimdışı → dur
+      else { await pool.query('DELETE FROM bot_write_queue WHERE id=$1', [it.id]); log(`[kuyruk] ✗ kalıcı hata, atıldı: ${it.method} ${it.url_path} → ${res.status} ${res.err || ''}`); }
+    }
+  } catch (e) { log('[kuyruk] flush hata: ' + e.message); }
+  finally { _flushing = false; }
 }
 async function dbWrite(method, urlPath, body) {
   const res = await sendWrite(method, urlPath, body);
   if (res.ok) { log(`DB ${method} ${urlPath} ✓`); flushQueue(); return true; }   // başarı → bekleyenleri de boşalt
   const transient = res.status === 0 || res.status >= 500;   // ağ hatası / API çökük
   if (transient && isQueueable(method, urlPath)) {
-    if (writeQueue.length >= QUEUE_MAX) { writeQueue.shift(); log(`[kuyruk] DOLU — en eski atıldı (cap ${QUEUE_MAX})`); }
-    writeQueue.push({ method, urlPath, body, ts: Date.now() }); persistQueue();
-    log(`DB ${method} ${urlPath} → ${res.status || 'ağ'} · KUYRUĞA ALINDI (${writeQueue.length} bekliyor, API dönünce işlenecek)`);
+    const where = await enqueueWrite(method, urlPath, body);
+    log(`DB ${method} ${urlPath} → ${res.status || 'ağ'} · KUYRUĞA ALINDI (${where}) — API dönünce işlenecek`);
   } else {
     log(`DB ${method} ${urlPath} → ${res.status} ${res.err || ''} (kuyruğa alınmadı)`);
   }
@@ -1301,7 +1321,6 @@ app.event('message', async ({ event, client }) => {
   await app.start();
   log('Benseno Slack Bot başlatıldı (Socket Mode)');
   syncAvatars(app.client);   // best-effort, açılışı bloklamaz
-  loadQueue();               // restart sonrası bekleyen yazmaları yükle...
-  flushQueue();              // ...ve API ayaktaysa hemen işle
+  flushQueue();              // restart sonrası bekleyen yazmaları (DB+dosya) işle
   setInterval(flushQueue, 30_000);  // API çökük→canlı geçişinde periyodik boşaltma
 })();

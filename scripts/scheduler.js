@@ -88,6 +88,8 @@ cron.schedule('15 17 25-31 * *', () => run('run-aylik-strateji.sh'), opts);
 cron.schedule('30 3 * * *', () => run('run-log-temizle.sh'), opts);
 // PAT süre/geçerlilik kontrolü — Pazartesi 09:00 (P1.3; geçersizse kendi DM'ini atar)
 cron.schedule('0 9 * * 1', () => run('check-pat-expiry.sh'), opts);
+// Günlük DB yedeği — her gece 04:00 (pg_dump → db_backups, en yeni 2 tutulur, rolling)
+cron.schedule('0 4 * * *', () => run('run-yedek.sh'), opts);
 
 console.log(`[scheduler] cron job'lar kuruldu (TZ=${TZ}). Slack bot başlatılıyor...`);
 

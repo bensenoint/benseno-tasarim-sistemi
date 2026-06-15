@@ -22,6 +22,7 @@ write_secret ".slack-user-token"    "${SLACK_USER_TOKEN:-}"
 write_secret ".slack-list-id"       "${SLACK_LIST_ID:-}"
 write_secret ".dashboard-auth-hash" "${DASHBOARD_AUTH_HASH:-}"
 write_secret ".github-pat-created"  "${BENSENO_PAT_CREATED:-}"  # PAT expiry sayımı için (opsiyonel)
+write_secret ".db-url"              "${DATABASE_URL:-}"          # DB-tabanlı yazma kuyruğu + yedek (pg_dump) için
 
 # git kimliği
 git config --global user.email "${GIT_AUTHOR_EMAIL:-bot@benseno.com.tr}"
