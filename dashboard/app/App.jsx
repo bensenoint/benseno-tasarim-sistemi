@@ -98,6 +98,30 @@ function bnsLogout() {
   location.reload();
 }
 
+// Sistem çevrimdışı ekranı — API erişilemezken sahte veri yerine gösterilir, erişimi durdurur.
+// 30sn'de bir otomatik tekrar dener (App poll'u); API dönünce kendiliğinden kapanır.
+function OfflineScreen({ onRetry }) {
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center",
+      background: "var(--paper, #f6f5f1)", color: "var(--ink, #16161a)", padding: 24, textAlign: "center" }}>
+      <div style={{ maxWidth: 420 }}>
+        <div style={{ width: 56, height: 56, margin: "0 auto 18px", borderRadius: "50%", background: "var(--prio-red, #E5484D)",
+          display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 18px -6px rgba(229,72,77,.5)" }}>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20"/><path d="M12 8v5M12 16.5h.01"/></svg>
+        </div>
+        <div style={{ font: "700 19px/1.3 var(--font-sans)", marginBottom: 8 }}>Sistem şu anda çevrimdışı</div>
+        <div style={{ font: "400 14px/1.6 var(--font-sans)", color: "var(--ink-3, #5c5c66)", marginBottom: 20 }}>
+          Sunucuya şu an ulaşılamıyor. Yanlış/eski veri göstermemek için panele erişim geçici olarak durduruldu.
+          Sistem tekrar çevrimiçi olunca bu ekran kendiliğinden kapanacak. <strong>Bu sırada Slack'te yaptığınız işlemler kaybolmaz</strong> — sistem canlanınca işlenir.
+        </div>
+        <button onClick={onRetry} style={{ font: "600 13px/1 var(--font-sans)", color: "#fff", background: "var(--ody, #24479E)",
+          border: 0, borderRadius: 8, padding: "11px 20px", cursor: "pointer" }}>Tekrar dene</button>
+        <div style={{ font: "400 11px/1.5 var(--font-sans)", color: "var(--ink-4, #8a8a93)", marginTop: 14 }}>30 saniyede bir otomatik kontrol ediliyor…</div>
+      </div>
+    </div>
+  );
+}
+
 function App({ currentUser, onLogout }) {
   const data = window.BNS_DATA;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -142,6 +166,9 @@ function App({ currentUser, onLogout }) {
   const [brandStats, setBrandStats] = React.useState(data.brandStats);
   const [history, setHistory] = React.useState(data.history || []); // 7 günlük geçmiş
   const [lastPollTime, setLastPollTime] = React.useState(null); // son başarılı poll zamanı
+  const [online, setOnline] = React.useState(true);   // API erişilebilir mi (false → çevrimdışı ekranı)
+  const offlineFailsRef = React.useRef(0);             // ardışık başarısız poll sayısı
+  const everLoadedRef = React.useRef(false);           // en az bir kez canlı veri yüklendi mi
 
   // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
   // Bana / Departman / Tümü filtresi briefs ve completed'a uygulanır.
@@ -264,7 +291,12 @@ function App({ currentUser, onLogout }) {
           if (typeof location !== "undefined") location.reload();
           return;
         }
-        if (!r.ok || cancelled) return;
+        if (cancelled) return;
+        if (!r.ok) {   // 5xx vb. — API erişilemiyor (401 yukarıda ele alındı). Mock GÖSTERME, çevrimdışı ekranı aç.
+          offlineFailsRef.current++;
+          if (!everLoadedRef.current || offlineFailsRef.current >= 2) setOnline(false);
+          return;
+        }
         const ed = await r.json();
         if (cancelled) return;
         // EMBEDDED_DATA güncelle (next time data.js bridge yeniden çalışsa diye)
@@ -381,12 +413,17 @@ function App({ currentUser, onLogout }) {
           setHistory(ed.bns_history);
         }
         window.BNS_DATA.__lastPoll = Date.now();
+        everLoadedRef.current = true; offlineFailsRef.current = 0; setOnline(true);  // canlı veri geldi → çevrimiçi
         setLastPollTime(Date.now()); // footer'daki "son güncelleme" için re-render tetikle
         console.info("[BNS] poll OK · source=" + ed.source + " · reason=" + ed.reason +
                      " · briefs=" + (ed.bns_briefs?.length||0) +
                      " · completed=" + (ed.bns_completed?.length||0));
       } catch (e) {
-        // Network/JSON hatası — bir sonraki poll'da tekrar dener. Mock kalır.
+        // Network/JSON hatası — API erişilemiyor. Mock GÖSTERME, çevrimdışı ekranı aç.
+        if (!cancelled) {
+          offlineFailsRef.current++;
+          if (!everLoadedRef.current || offlineFailsRef.current >= 2) setOnline(false);
+        }
       }
     }
     poll(); // ilk çağrı hemen (initial script load'dan farklı timestamp olabilir)
@@ -471,6 +508,9 @@ function App({ currentUser, onLogout }) {
     ? <SilinenlerScreen data={liveData} currentUser={currentUser}/>
     : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;
   else Screen = <div>Not found</div>;
+
+  // API erişilemiyorsa: mock/sahte veri GÖSTERME — çevrimdışı ekranıyla erişimi geçici durdur (otomatik döner).
+  if (!online) return <OfflineScreen onRetry={() => { offlineFailsRef.current = 0; setPollTick(t => t + 1); }} />;
 
   return (
     <div data-screen-label={tab} style={{display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden", position:"relative"}}>

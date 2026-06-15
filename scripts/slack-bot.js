@@ -39,15 +39,58 @@ function brandFromChannelName(name) {
 }
 
 // DB'ye best-effort yazma (b3 — Slack aksiyonları DB'ye de düşsün). Hata bot'u BOZMAZ.
-async function dbWrite(method, urlPath, body) {
+// ── Çevrimdışı yazma kuyruğu ────────────────────────────────────────────────
+// API erişilemezken (5xx/ağ hatası) idempotent yazmalar kuyruğa alınır; API canlanınca
+// FIFO sırayla replay edilir. Hiçbir olay kaybolmaz. Dosyaya yazılır → aynı konteyner
+// restart'ında da hayatta kalır (tam rebuild'de kaybolur — DB/volume olmadan sınır budur).
+const _fs = require('fs'), _path = require('path');
+const QUEUE_FILE = _path.join(__dirname, '../data/.write-queue.jsonl');
+const QUEUE_MAX = 1000;
+let writeQueue = [];
+function loadQueue() {
+  try { writeQueue = _fs.readFileSync(QUEUE_FILE, 'utf8').split('\n').filter(Boolean).map(JSON.parse); }
+  catch (e) { writeQueue = []; }
+  if (writeQueue.length) log(`[kuyruk] ${writeQueue.length} bekleyen yazma yüklendi`);
+}
+function persistQueue() { try { _fs.writeFileSync(QUEUE_FILE, writeQueue.map(x => JSON.stringify(x)).join('\n')); } catch (e) {} }
+// Yeni-brief (POST /api/briefs) idempotent DEĞİL → kuyruğa alınmaz (replay kopya yaratır;
+// modal zaten kullanıcıya hata gösterir). Diğer tüm güncellemeler (status/priority/deadline/delete) idempotent.
+function isQueueable(method, urlPath) { return !(method === 'POST' && urlPath === '/api/briefs'); }
+async function sendWrite(method, urlPath, body) {
   try {
     const r = await fetch(`${API_BASE}${urlPath}`, {
       method, headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' }, body: JSON.stringify(body),
     });
-    if (!r.ok) { const j = await r.json().catch(() => ({})); log(`DB ${method} ${urlPath} → ${r.status} ${j.error || ''}`); return false; }
-    log(`DB ${method} ${urlPath} ✓`);
-    return true;
-  } catch (e) { log(`DB ${method} ${urlPath} hata: ${e.message}`); return false; }
+    const err = r.ok ? null : ((await r.json().catch(() => ({}))).error || '');
+    return { ok: r.ok, status: r.status, err };
+  } catch (e) { return { ok: false, status: 0, err: e.message }; }
+}
+let _flushing = false;
+async function flushQueue() {
+  if (_flushing || !writeQueue.length) return;
+  _flushing = true;
+  try {
+    while (writeQueue.length) {
+      const it = writeQueue[0];
+      const res = await sendWrite(it.method, it.urlPath, it.body);
+      if (res.ok) { writeQueue.shift(); persistQueue(); log(`[kuyruk] ✓ ${it.method} ${it.urlPath} (${writeQueue.length} kaldı)`); }
+      else if (res.status === 0 || res.status >= 500) { break; }  // API hâlâ çevrimdışı → dur, sonra tekrar dene
+      else { writeQueue.shift(); persistQueue(); log(`[kuyruk] ✗ kalıcı hata, atıldı: ${it.method} ${it.urlPath} → ${res.status} ${res.err || ''}`); }
+    }
+  } finally { _flushing = false; }
+}
+async function dbWrite(method, urlPath, body) {
+  const res = await sendWrite(method, urlPath, body);
+  if (res.ok) { log(`DB ${method} ${urlPath} ✓`); flushQueue(); return true; }   // başarı → bekleyenleri de boşalt
+  const transient = res.status === 0 || res.status >= 500;   // ağ hatası / API çökük
+  if (transient && isQueueable(method, urlPath)) {
+    if (writeQueue.length >= QUEUE_MAX) { writeQueue.shift(); log(`[kuyruk] DOLU — en eski atıldı (cap ${QUEUE_MAX})`); }
+    writeQueue.push({ method, urlPath, body, ts: Date.now() }); persistQueue();
+    log(`DB ${method} ${urlPath} → ${res.status || 'ağ'} · KUYRUĞA ALINDI (${writeQueue.length} bekliyor, API dönünce işlenecek)`);
+  } else {
+    log(`DB ${method} ${urlPath} → ${res.status} ${res.err || ''} (kuyruğa alınmadı)`);
+  }
+  return false;
 }
 // TR para metni → sayı ("1.500,50"→1500.5, "1500"→1500). Boş/geçersiz → null.
 function parseTRMoney(s) {
@@ -1258,4 +1301,7 @@ app.event('message', async ({ event, client }) => {
   await app.start();
   log('Benseno Slack Bot başlatıldı (Socket Mode)');
   syncAvatars(app.client);   // best-effort, açılışı bloklamaz
+  loadQueue();               // restart sonrası bekleyen yazmaları yükle...
+  flushQueue();              // ...ve API ayaktaysa hemen işle
+  setInterval(flushQueue, 30_000);  // API çökük→canlı geçişinde periyodik boşaltma
 })();

@@ -45,3 +45,6 @@ graphify-out/
 data/.db-url
 server/node_modules/
 data/.write-token
+
+# Çevrimdışı yazma kuyruğu (runtime, asla commit edilmez)
+data/.write-queue.jsonl
