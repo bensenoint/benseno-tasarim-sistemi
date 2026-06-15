@@ -16,7 +16,7 @@ function OverviewScreen({ data, user, viewMode, setViewMode, onOpenBrief, onSwit
     return true;
   });
 
-  const overdue = filtered.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
+  const overdue = filtered.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && b.durum !== "musteride");
   const today = filtered.filter(b => b.deltaH > 0 && b.deltaH <= 24);   // 24s pencere — "Bugün ve yarın" tablosu için
   // "Bugün teslim" KPI'sı: takvim olarak BUGÜN (İstanbul) deadline'ı olan aktif işler.
   const _istToday = (function(){ try { return new Date().toLocaleDateString("en-CA", { timeZone: "Europe/Istanbul" }); } catch (e) { return ""; } })();
@@ -108,7 +108,7 @@ function histTrend(history, field, currentVal) {
 // ─── MANAGER SECTION (embedded in Editorial) ─────────────────────────────────
 function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab, onStatusChange }) {
   const briefs = data._allBriefs || data.briefs;
-  const allOverdue  = briefs.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
+  const allOverdue  = briefs.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && b.durum !== "musteride");
   const allReview   = briefs.filter(b => b.durum === "incelemede");
 
   // Senkron zamanı

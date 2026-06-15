@@ -3,7 +3,7 @@
 function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange }) {
   // Yönetici komuta merkezi tüm sistemi izler — viewMode (mine/dept/all) etkilemez.
   const briefs = data._allBriefs || data.briefs;
-  const overdue = briefs.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
+  const overdue = briefs.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && b.durum !== "musteride");
   const review  = briefs.filter(b => b.durum === "incelemede");
   const blocked = briefs.filter(b => b.durum === "blokeli");
 
