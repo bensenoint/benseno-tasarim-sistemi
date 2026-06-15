@@ -163,6 +163,33 @@ function odyRestingMood() {
   if (lvl === 'some') return 'endiseli';
   return 'neseli';
 }
+// Ruh halinin Türkçe etiketi (hover'da göstermek için).
+function odyMoodLabel(mood) {
+  return ({ mutlu: 'mutlu', neseli: 'neşeli', coskulu: 'coşkulu', heyecanli: 'heyecanlı', endiseli: 'endişeli', kizgin: 'kızgın', mesgul: 'meşgul', dusunuyor: 'düşünüyor', uykulu: 'uykulu', uzgun: 'üzgün', sikilmis: 'sıkılmış' })[mood] || 'sakin';
+}
+// Ody neden bu ruh halinde? Veriye dayalı kısa açıklama.
+function odyMoodReason(mood) {
+  var overdue = 0, active = 0;
+  try {
+    var b = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
+    overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
+    active = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride'; }).length;
+  } catch (e) {}
+  var map = {
+    kizgin: overdue > 0 ? (overdue + ' iş gecikti, iş yükü çok') : ('iş yükü çok (' + active + ' aktif iş)'),
+    endiseli: overdue > 0 ? (overdue + ' iş gecikti, tedbirliyim') : 'bazı işler risk altında',
+    mesgul: 'revizyon / iş yoğunluğu var',
+    neseli: 'işler kontrol altında, her şey yolunda',
+    mutlu: 'iyi bir haber aldım',
+    coskulu: 'harika bir gelişme oldu',
+    heyecanli: 'yeni bir hareket oldu',
+    dusunuyor: 'cevabını hazırlıyorum',
+    uykulu: 'uzun süredir sessizlik var',
+    sikilmis: 'bir süredir hiç hareket yok, biraz sıkıldım',
+    uzgun: 'olumsuz bir haber aldım',
+  };
+  return map[mood] || 'sistemini takip ediyorum';
+}
 function odyFaceProd(mood) {
   var h = React.createElement, W = '#fff', PUP = '#16265c';
   var mk = function (k, st) { return h('div', { key: k, style: Object.assign({ background: W, borderRadius: '50%' }, st) }); };
@@ -428,7 +455,7 @@ function ChatBot() {
       {!open && (
         <button onPointerDown={(e) => startDrag(e, true)}
           onClick={() => { if (dragRef.current && dragRef.current.moved) { dragRef.current = null; return; } setNotifPeek(null); setUnread(false); setOpen(true); }}
-          title={notifPeek ? "Ody'de yeni bildirim var — aç" : (unread ? "Ody senin için bugünkü özetini hazırladı — aç" : "Ody — sistem asistanı (sürükleyerek taşıyabilirsin)")} style={{
+          title={"Ody şu an " + odyMoodLabel(mood) + " — " + odyMoodReason(mood) + ". " + (notifPeek ? "Yeni bildirim var, açmak için tıkla." : (unread ? "Bugünkü özetin hazır, açmak için tıkla." : "Sürükleyerek taşıyabilirsin."))} style={{
           position: "fixed", left: pos.x, top: pos.y, zIndex: 90,
           width: 54, height: 54, borderRadius: "50%", border: 0, cursor: "grab", touchAction: "none",
           background: "transparent", padding: 0,
