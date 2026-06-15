@@ -107,7 +107,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             : <EditableTitle value={b.baslik} onChange={(v) => set({ baslik: v })}/>}
 
           <div style={{marginTop: 12, display:"flex", alignItems:"center", gap:8, flexWrap:"wrap"}}>
-            {!ro && <PriorityBadge p={b.priority} deltaH={b.deltaH}/>}
+            {!ro && <PriorityBadge p={b.oncelik || { code: "ylw", label: "NORMAL" }}/>}
             {ro
               ? <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--prio-green)", background:"var(--prio-green-bg, var(--paper-2))", padding:"5px 9px", borderRadius:999}}>✅ Tamamlandı</span>
               : <StatusEditor current={b.durum} onPick={changeStatus}/>}
