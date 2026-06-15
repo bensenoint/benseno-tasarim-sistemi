@@ -504,6 +504,8 @@ function bnsHydrateBrief(raw, idx) {
     gonderim_sayisi: raw.gonderim_sayisi || 0,
     son_gonderim_at: raw.son_gonderim_at || null,
     musteri_bekliyor: !!raw.musteri_bekliyor,
+    uzatma_sayisi: raw.uzatma_sayisi || 0,           // deadline kaç kez uzatıldı
+    uzatildi:      (raw.uzatma_sayisi || 0) > 0,     // aktif iş rozeti
     _kimden_id:   raw._kimden_id || null
   };
 }
@@ -546,6 +548,10 @@ function bnsHydrateCompleted(raw, idx) {
     rev_ic: raw.rev_ic || 0, rev_musteri: raw.rev_musteri || 0,
     gecikme,
     gecikmeH,
+    uzatma_sayisi: raw.uzatma_sayisi || 0,           // deadline kaç kez uzatıldı
+    uzatildi:      (raw.uzatma_sayisi || 0) > 0,
+    // Teslim durumu: gecikmeli > uzatılarak teslim > zamanında (calc.js tek kaynak)
+    delivery_status: bnsDeliveryStatus(bitis, deadline, beklemeMs, (raw.uzatma_sayisi || 0) > 0),
     rating: raw.rating != null ? raw.rating : null,
     rating_by: raw.rating_by || null,   // 'ai' = AI puanı, U... = yönetici override
     rating_sebep: raw.rating_sebep || null, // puanın tek cümlelik AI gerekçesi (yıldız tooltip'i)

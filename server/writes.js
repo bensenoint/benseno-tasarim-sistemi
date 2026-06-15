@@ -11,6 +11,7 @@
 const { z } = require('zod');
 const { pool, tx } = require('./db');
 const slack = require('./slack');
+const calc = require('../dashboard/app/calc.js'); // deadline uzatma cezası — formül kilidi: tek kaynak
 
 const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'musteride', 'tamamlandi'];
 
@@ -196,8 +197,8 @@ async function createBrief(raw) {
     const leadIds = (d.lead_ids && d.lead_ids.length) ? d.lead_ids : (d.by ? [d.by] : []);
     const dept = await deriveDept(client, d.worker_ids, d.by);
     const r = await client.query(
-      `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
+      `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,deadline_orig,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url)
+       VALUES ($1,$2,$3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
       [no, markaId, d.baslik, dept, toTs(d.deadline), d.priority || null,
        d.akis || 'paralel', d.maliyet ?? null, d.satis ?? null, d.musteri_notu || null,
        d.slack_ts || null, null]);
@@ -273,7 +274,21 @@ async function patchBrief(id, raw) {
     const put = (col, v) => { vals.push(v); sets.push(`${col}=$${vals.length}`); };
     if (d.marka !== undefined) put('marka_id', await brandIdByName(client, d.marka));
     if (d.baslik !== undefined) put('baslik', d.baslik);
-    if (d.deadline !== undefined) put('deadline', toTs(d.deadline));
+    if (d.deadline !== undefined) {
+      // Uzatma takibi: eski deadline'ı al; orijinali bir kez sabitle; daha GEÇ tarihe taşıma = uzatma → ceza.
+      const cur = await client.query('SELECT deadline, deadline_orig FROM briefs WHERE id=$1', [id]);
+      const oldRow = cur.rows[0] || {};
+      const oldMs = oldRow.deadline ? new Date(oldRow.deadline).getTime() : null;
+      const newDl = toTs(d.deadline);
+      const newMs = newDl ? new Date(newDl).getTime() : null;
+      if (!oldRow.deadline_orig && oldRow.deadline) put('deadline_orig', oldRow.deadline);
+      put('deadline', newDl);
+      if (oldMs && newMs && newMs > oldMs) {            // deadline ileri taşındı → uzatma
+        const ceza = calc.bnsUzatmaCezaFromTimes(Date.now(), oldMs);
+        sets.push('uzatma_sayisi = uzatma_sayisi + 1');
+        vals.push(ceza); sets.push(`uzatma_ceza = GREATEST(uzatma_ceza, $${vals.length})`);
+      }
+    }
     if (d.priority !== undefined) put('priority', d.priority);
     if (d.akis !== undefined) put('akis', d.akis);
     if (d.musteri_notu !== undefined) put('musteri_notu', d.musteri_notu);

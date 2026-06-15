@@ -36,6 +36,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
     { h: "Süre",     mobile: true  },
     { h: "Rev",      mobile: false },
     { h: "Gecikme",  mobile: true  },
+    { h: "Teslim",   mobile: true  },
     { h: "⭐",       mobile: true  },
     { h: "🔗",       mobile: false },
   ];
@@ -86,7 +87,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan={12} style={{padding:"32px 16px", textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>
+              <tr><td colSpan={13} style={{padding:"32px 16px", textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>
                 Son {range} günde tamamlanan brief bulunamadı.
               </td></tr>
             )}
@@ -105,6 +106,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
                 <td style={{...cs(true, "right"), color: c.gecikmeH > 0 ? "var(--prio-red)" : "var(--ink-4)"}}>
                   {c.gecikmeH > 0 ? c.gecikmeH.toFixed(1) + " sa" : "—"}
                 </td>
+                <td style={cs()}><DeliveryBadge status={c.delivery_status} kez={c.uzatma_sayisi}/></td>
                 <td style={cs()} onClick={e => e.stopPropagation()}>
                   <Stars n={c.rating} ai={c.rating_by === 'ai'}
                     sebep={c.rating_sebep || (c.insight ? c.insight.split(/(?<=[.!?])\s/).slice(0, 2).join(' ').slice(0, 200) : null)}
@@ -139,17 +141,41 @@ function rateBrief(id, n) {
     .catch(() => {});
 }
 
+// Teslim durumu rozeti: 🟢 Zamanında · 🟡 Uzatılarak · 🔴 Gecikmeli.
+function DeliveryBadge({ status, kez }) {
+  const map = {
+    zamaninda: { renk: "var(--prio-green)", tint: "var(--prio-green-tint, rgba(46,160,67,.12))", txt: "Zamanında" },
+    uzatildi:  { renk: "var(--prio-yellow)", tint: "rgba(224,169,43,.14)", txt: kez > 1 ? `Uzatıldı ×${kez}` : "Uzatılarak" },
+    gec:       { renk: "var(--prio-red)", tint: "rgba(229,72,77,.12)", txt: "Gecikmeli" },
+  };
+  const m = map[status];
+  if (!m) return <span style={{ color: "var(--ink-5)" }}>—</span>;
+  return (
+    <span title={status === 'uzatildi' ? 'Deadline uzatılarak (yeni süreye) teslim edildi' : status === 'gec' ? 'Son deadline geçtikten sonra tamamlandı' : 'Süresinde teslim edildi'}
+      style={{ display: "inline-flex", alignItems: "center", gap: 5, font: "600 11px/1 var(--font-sans)", color: m.renk, background: m.tint, padding: "4px 8px", borderRadius: 999, whiteSpace: "nowrap" }}>
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: m.renk, flexShrink: 0 }}/>{m.txt}
+    </span>
+  );
+}
+
 function Stars({ n, onRate, ai, sebep }) {
   const tip = [n > 0 && sebep ? sebep : null, onRate ? "Puanı değiştirmek için yıldıza tıkla" : null].filter(Boolean).join("\n");
+  const val = n || 0;
   return (
     <span style={{display:"inline-flex", gap: 1, alignItems:"center"}} title={tip || undefined}>
-      {[1,2,3,4,5].map(i => (
-        <span key={i} onClick={onRate ? () => onRate(i) : undefined}
-          style={{display:"inline-flex", cursor: onRate ? "pointer" : "default", padding: onRate ? 1 : 0}}>
-          <I.StarFill size={11} color={i <= n ? "var(--prio-yellow)" : "var(--line-strong)"}/>
-        </span>
-      ))}
-      {ai && n > 0 && <span style={{font:"600 8px/1 var(--font-sans)", color:"var(--ink-4)", marginLeft:3, letterSpacing:"0.05em"}}>AI</span>}
+      {[1,2,3,4,5].map(i => {
+        // tam yıldız: i <= floor · yarım yıldız (yarım gün cezasından .5 puanlar): kalan ≥0.5
+        const dolu = i <= Math.floor(val);
+        const yarim = !dolu && (val - Math.floor(val) >= 0.5) && i === Math.floor(val) + 1;
+        return (
+          <span key={i} onClick={onRate ? () => onRate(i) : undefined}
+            style={{display:"inline-flex", cursor: onRate ? "pointer" : "default", padding: onRate ? 1 : 0, opacity: yarim ? 0.5 : 1}}>
+            <I.StarFill size={11} color={(dolu || yarim) ? "var(--prio-yellow)" : "var(--line-strong)"}/>
+          </span>
+        );
+      })}
+      {val > 0 && val % 1 !== 0 && <span style={{font:"600 9px/1 var(--font-mono)", color:"var(--ink-4)", marginLeft:2}}>{val.toFixed(1)}</span>}
+      {ai && val > 0 && <span style={{font:"600 8px/1 var(--font-sans)", color:"var(--ink-4)", marginLeft:3, letterSpacing:"0.05em"}}>AI</span>}
     </span>
   );
 }

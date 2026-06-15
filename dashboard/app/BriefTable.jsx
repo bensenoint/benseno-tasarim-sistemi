@@ -163,6 +163,13 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
             style={{marginRight:5, cursor:"default"}}>⚠️</span>
         )}
         {formatDate(brief.deadline)}
+        {brief.uzatildi && (
+          <span title={`Deadline ${brief.uzatma_sayisi}× uzatıldı`}
+            style={{marginLeft:5, font:"600 9px/1 var(--font-sans)", color:"var(--prio-yellow)",
+              background:"rgba(224,169,43,.14)", padding:"2px 5px", borderRadius:4, whiteSpace:"nowrap"}}>
+            uzatıldı{brief.uzatma_sayisi > 1 ? ` ×${brief.uzatma_sayisi}` : ""}
+          </span>
+        )}
       </td>
       <td className="bns-col-mobile-hide" style={{...cellStyle(), position:"relative"}}>
         <span onClick={(e) => { e.stopPropagation(); if (onStatusChange) setMenu(v => !v); }}

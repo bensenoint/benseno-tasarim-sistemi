@@ -12,6 +12,7 @@ const { getState, getEmbedded } = require('./queries');
 const writes = require('./writes');
 const slack = require('./slack');
 const { pool } = require('./db');
+const calc = require('../dashboard/app/calc.js'); // deadline uzatma cezası — formül kilidi: tek kaynak
 
 const app = express();
 app.disable('x-powered-by');   // Express sürüm parmak izini gizle
@@ -285,15 +286,27 @@ app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
   try {
     const { insight, puan, puan_sebep } = req.body || {};
     if (!insight) return res.status(400).json({ error: 'insight gerekli' });
-    const p = Number.isInteger(puan) && puan >= 1 && puan <= 5 ? puan : null;
+    const aiPuan = Number.isInteger(puan) && puan >= 1 && puan <= 5 ? puan : null;
+    // Deadline uzatma cezasını AI puanına uygula (formül calc.js'te tek kaynak). Yönetici override'ı etkilenmez.
+    let p = aiPuan, sebep = puan_sebep ? String(puan_sebep).slice(0, 500) : null;
+    if (aiPuan != null) {
+      const cz = await pool.query('SELECT uzatma_ceza, uzatma_sayisi FROM briefs WHERE id=$1', [+req.params.id]);
+      const ceza = cz.rows[0] ? (Number(cz.rows[0].uzatma_ceza) || 0) : 0;
+      if (ceza > 0) {
+        p = calc.bnsRatingWithPenalty(aiPuan, ceza);
+        const ek = `(deadline ${cz.rows[0].uzatma_sayisi}× uzatıldı → puan ${aiPuan}'den ${p}'e: -${ceza})`;
+        sebep = (sebep ? sebep + ' ' : '') + ek;
+        sebep = sebep.slice(0, 500);
+      }
+    }
     const r = await pool.query(
       `UPDATE briefs SET insight=$1, insight_at=now(),
-         rating    = CASE WHEN $3::int IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN $3 ELSE rating END,
-         rating_by = CASE WHEN $3::int IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN 'ai' ELSE rating_by END,
-         rating_at = CASE WHEN $3::int IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN now() ELSE rating_at END,
+         rating    = CASE WHEN $3::real IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN $3 ELSE rating END,
+         rating_by = CASE WHEN $3::real IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN 'ai' ELSE rating_by END,
+         rating_at = CASE WHEN $3::real IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN now() ELSE rating_at END,
          rating_sebep = CASE WHEN $4::text IS NOT NULL AND (rating_by IS NULL OR rating_by='ai') THEN $4 ELSE rating_sebep END
        WHERE id=$2 RETURNING id`,
-      [String(insight).slice(0, 4000), +req.params.id, p, puan_sebep ? String(puan_sebep).slice(0, 500) : null]
+      [String(insight).slice(0, 4000), +req.params.id, p, sebep]
     );
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true, id: r.rows[0].id });

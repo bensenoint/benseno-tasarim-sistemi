@@ -87,7 +87,38 @@ function bnsThroughput(bitisListMs, nowMs, weeks) {
   return { count: n, perWeek: Math.round((n / weeks) * 10) / 10, weeks: weeks, lowSample: n < 3 };
 }
 
+// ── Deadline uzatma cezası (puan etkisi) ───────────────────────────────────
+// Uzatma, o an geçerli deadline'a NE KADAR yakın yapıldıysa o kadar çok ceza.
+// gapH = (eski_deadline - uzatma_anı) saat. Negatifse uzatma deadline GEÇTİKTEN sonra yapılmış.
+// Orta eğri: >48sa → 0.5 · 24-48sa → 1.0 · <24sa → 1.5 · deadline geçmiş → 2.0.
+function bnsUzatmaCeza(gapH) {
+  if (gapH == null || isNaN(gapH)) return 0;
+  if (gapH < 0) return 2.0;     // deadline geçtikten sonra uzatıldı
+  if (gapH <= 24) return 1.5;   // son 24 saat
+  if (gapH <= 48) return 1.0;   // 24-48 saat
+  return 0.5;                   // 48 saatten erken
+}
+// Zaman damgalarından ceza (uzatma anı + o an geçerli/eski deadline, ms).
+function bnsUzatmaCezaFromTimes(uzatmaAniMs, eskiDeadlineMs) {
+  if (!uzatmaAniMs || !eskiDeadlineMs) return 0;
+  return bnsUzatmaCeza((eskiDeadlineMs - uzatmaAniMs) / BNS_H);
+}
+// AI puanına uzatma cezasını uygula (1-5 arası kırp, 0.5 hassasiyet). Yönetici override'a uygulanmaz.
+function bnsRatingWithPenalty(aiRating, uzatmaCeza) {
+  if (aiRating == null) return null;
+  var r = aiRating - (uzatmaCeza || 0);
+  if (r < 1) r = 1; if (r > 5) r = 5;
+  return Math.round(r * 2) / 2;
+}
+// Teslim durumu: gecikmeli (en ağır) > uzatılarak teslim > zamanında.
+function bnsDeliveryStatus(bitisMs, deadlineMs, beklemeMs, uzatildi) {
+  if (!bitisMs || !deadlineMs) return null;
+  if (bnsGecikmeH(bitisMs, beklemeMs, deadlineMs) > 0) return 'gec';
+  if (uzatildi) return 'uzatildi';
+  return 'zamaninda';
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsGecikmeH, bnsIsRisk, bnsThroughput, BNS_H, BNS_RISK_H };
+  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H };
 }
