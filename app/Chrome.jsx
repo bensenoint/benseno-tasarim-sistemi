@@ -168,10 +168,17 @@ function odyBusyLevel(uid) {
     return 'calm';
   } catch (e) { return 'calm'; }
 }
-// Anlık "yerine otur" mood'u: çok iş → kızgın, orta → endişeli, sakin → neşeli.
+// Anlık "yerine otur" mood'u: 2'den fazla geciken → kızgın, genel çok iş → meşgul,
+// orta → endişeli, sakin → neşeli.
 function odyRestingMood(uid) {
+  var overdue = 0;
+  try {
+    var b = odyMyBriefs(uid);
+    overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
+  } catch (e) {}
+  if (overdue > 2) return 'kizgin';          // 2'den fazla geciken iş → kızgın
   var lvl = odyBusyLevel(uid);
-  if (lvl === 'busy') return 'kizgin';
+  if (lvl === 'busy') return 'mesgul';        // genel çok iş → meşgul
   if (lvl === 'some') return 'endiseli';
   return 'neseli';
 }
@@ -190,7 +197,7 @@ function odyMoodReason(mood, uid) {
   var map = {
     kizgin: overdue > 0 ? ('senin ' + overdue + ' işin gecikti, iş yükün çok') : ('iş yükün çok (' + active + ' aktif işin var)'),
     endiseli: overdue > 0 ? ('senin ' + overdue + ' işin gecikti, tedbirliyim') : 'bazı işlerin risk altında',
-    mesgul: 'revizyon / iş yoğunluğu var',
+    mesgul: 'iş yükün yoğun (' + active + ' aktif işin var)',
     neseli: active > 0 ? ('işlerin kontrol altında (' + active + ' aktif iş), her şey yolunda') : 'gündeminde acil iş yok, her şey yolunda',
     mutlu: 'iyi bir haber aldım',
     coskulu: 'harika bir gelişme oldu',
@@ -320,7 +327,7 @@ function ChatBot({ currentUser }) {
     const t = setInterval(() => {
       if (openRef.current || countRef.current > 0) { idleStartRef.current = Date.now(); return; } // aktif/bildirim varken karışma
       if (Date.now() < reactUntilRef.current) return;                 // taşıma tepkisi sürüyor
-      if (odyBusyLevel(uid) === 'busy') { setMood('kizgin'); return; }   // çok iş → kızgın
+      if (odyBusyLevel(uid) === 'busy') { setMood(odyRestingMood(uid)); return; }   // çok iş → meşgul/kızgın
       const idleMs = Date.now() - idleStartRef.current;
       setMood(idleMs > ODY_BORED_MS ? 'sikilmis' : 'neseli');         // uzun boşta sıkılmış, yoksa normal
     }, 4000);
