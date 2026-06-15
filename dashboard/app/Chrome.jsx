@@ -144,15 +144,31 @@ function odyMoodFromText(t) {
   if (/(onay|müşteride)/.test(s)) return 'neseli';
   return 'heyecanli';
 }
-function odyRestingMood() {
+// İş yükü seviyesi: çok iş → 'busy' (kızgın serbest), orta → 'some', sakin → 'calm'.
+function odyBusyLevel() {
   try {
     var b = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
     var overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
+    var active = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride'; }).length;
     var risk = b.filter(function (x) { return window.bnsIsRisk && window.bnsIsRisk(x.durum, x.deltaH); }).length;
-    // Asistan kullanıcıya kızgın bakmaz: gecikme/risk varsa en fazla endişeli, yoksa neşeli.
-    if (overdue > 0 || risk > 0) return 'endiseli';
-    return 'neseli';
-  } catch (e) { return 'neseli'; }
+    if (overdue >= 3 || active >= 12) return 'busy';   // çok iş
+    if (overdue > 0 || risk > 0) return 'some';
+    return 'calm';
+  } catch (e) { return 'calm'; }
+}
+// Idle ruh-hali havuzları: kızgın YALNIZ 'busy' havuzunda; sakinde dostane yüzler döner.
+var ODY_CALM_POOL = ['neseli', 'mutlu', 'dusunuyor', 'heyecanli', 'uykulu'];
+var ODY_BUSY_POOL = ['kizgin', 'mesgul', 'endiseli', 'dusunuyor', 'neseli'];
+function odyIdleMood(i) {
+  var pool = odyBusyLevel() === 'busy' ? ODY_BUSY_POOL : ODY_CALM_POOL;
+  return pool[((i % pool.length) + pool.length) % pool.length];
+}
+// Anlık "yerine otur" mood'u: çok iş → kızgın, orta → endişeli, sakin → neşeli.
+function odyRestingMood() {
+  var lvl = odyBusyLevel();
+  if (lvl === 'busy') return 'kizgin';
+  if (lvl === 'some') return 'endiseli';
+  return 'neseli';
 }
 function odyFaceProd(mood) {
   var h = React.createElement, W = '#fff', PUP = '#16265c';
@@ -254,6 +270,19 @@ function ChatBot() {
   React.useEffect(() => { odyFxProd(blobRef.current, mood); }, [mood]);
   React.useEffect(() => { setMood(odyRestingMood()); }, []);
 
+  // Idle ruh-hali döngüsü: sohbet kapalı ve okunmamış bildirim yokken Ody belli aralıkla
+  // havuzdan bir sonraki ruh haline geçer (çok iş varsa kızgın da rotasyonda; sakinde dostane).
+  var openRef = React.useRef(open); openRef.current = open;
+  var countRef = React.useRef(notifCount); countRef.current = notifCount;
+  React.useEffect(() => {
+    var i = 0;
+    var t = setInterval(() => {
+      if (openRef.current || countRef.current > 0) return;
+      i++; setMood(odyIdleMood(i));
+    }, 6500);
+    return () => clearInterval(t);
+  }, []);
+
   // Ekran boyutu değişince Ody'yi görünür alanda tut (mount'ta kayıtlı dış-konum da düzelir).
   React.useEffect(() => {
     const clamp = () => setPos(p => {
@@ -287,7 +316,7 @@ function ChatBot() {
           setNotifItems(items);
           const unread = items.filter(n => !n.read_at);
           setNotifCount(unread.length);
-          if (!unread.length) { setNotifPeek(null); if (!open) setMood(odyRestingMood()); return; }
+          if (!unread.length) { setNotifPeek(null); return; }
           const latest = unread.reduce((a, b) => (b.id > a.id ? b : a));
           setNotifPeek(latest);
           if (!open) setMood(odyMoodFromText(latest.text));
