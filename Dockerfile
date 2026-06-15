@@ -3,9 +3,15 @@
 FROM node:22-bookworm-slim
 
 # Sistem bağımlılıkları: git+curl (push & headless Slack/GitHub API), python3 (aylik script),
-# tzdata (Europe/Istanbul), bash (run-*.sh)
+# tzdata (Europe/Istanbul), bash (run-*.sh), postgresql-client (pg_dump — DB yedeği).
+# NOT: bookworm'un varsayılan postgresql-client'ı 15; sunucu 18 → "version mismatch". PGDG
+# deposundan güncel client (>= sunucu) kurulur (pg_dump sunucudan yeni/eşit olmalı).
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      git curl python3 ca-certificates tzdata bash postgresql-client \
+      git curl python3 ca-certificates tzdata bash gnupg \
+ && install -d /usr/share/postgresql-common/pgdg \
+ && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+ && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+ && apt-get update && apt-get install -y --no-install-recommends postgresql-client-18 \
  && rm -rf /var/lib/apt/lists/*
 
 ENV TZ=Europe/Istanbul
