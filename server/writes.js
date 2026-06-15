@@ -11,7 +11,7 @@
 const { z } = require('zod');
 const { pool, tx } = require('./db');
 const slack = require('./slack');
-const calc = require('../dashboard/app/calc.js'); // deadline uzatma cezası — formül kilidi: tek kaynak
+const calc = require('./calc-penalty.js'); // deadline uzatma cezası (API kökü server/; dashboard calc.js imajda yok)
 
 const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'musteride', 'tamamlandi'];
 

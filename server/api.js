@@ -12,7 +12,7 @@ const { getState, getEmbedded } = require('./queries');
 const writes = require('./writes');
 const slack = require('./slack');
 const { pool } = require('./db');
-const calc = require('../dashboard/app/calc.js'); // deadline uzatma cezası — formül kilidi: tek kaynak
+const calc = require('./calc-penalty.js'); // deadline uzatma cezası (API kökü server/; dashboard calc.js imajda yok)
 
 const app = express();
 app.disable('x-powered-by');   // Express sürüm parmak izini gizle
