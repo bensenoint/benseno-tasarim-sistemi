@@ -182,6 +182,28 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             </>}
             <span style={{color:"var(--ink-3)"}}>Timezone</span>
             <span style={{fontFamily:"var(--font-mono)"}}>Europe/Istanbul (UTC+3)</span>
+            {Array.isArray(b.deadline_history) && b.deadline_history.length > 0 ? (() => {
+              const f = (x) => { try { return new Date(x).toLocaleString("tr-TR", { timeZone: "Europe/Istanbul", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch (e) { return "—"; } };
+              return <>
+                <span style={{color:"var(--ink-3)"}}>Önceki deadline{b.deadline_history.length > 1 ? "'lar" : ""}</span>
+                <span style={{display:"flex", flexDirection:"column", gap:3}}>
+                  {b.deadline_history.map((h, i) => (
+                    <span key={i} style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-3)"}}>
+                      <span style={{textDecoration:"line-through", color:"var(--ink-4)"}}>{f(h.eski)}</span> → {f(h.yeni)}
+                      <span style={{color: h.ileri ? "var(--prio-orange)" : "var(--ink-4)", marginLeft:6, fontSize:11}}>
+                        {h.ileri ? "uzatıldı" : "öne çekildi"}{h.at ? " · " + f(h.at) : ""}
+                      </span>
+                    </span>
+                  ))}
+                </span>
+              </>;
+            })() : (b.deadline_orig && b.deadline_orig !== b.deadline && <>
+              <span style={{color:"var(--ink-3)"}}>İlk deadline</span>
+              <span style={{color:"var(--ink-3)"}}>
+                <span style={{textDecoration:"line-through", color:"var(--ink-4)"}}>{formatFull(b.deadline_orig)}</span>
+                {b.uzatma_sayisi > 0 ? ` · ${b.uzatma_sayisi} kez değişti` : ""}
+              </span>
+            </>)}
           </div>
 
           <Hr/>

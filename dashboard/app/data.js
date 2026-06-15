@@ -506,6 +506,8 @@ function bnsHydrateBrief(raw, idx) {
     musteri_bekliyor: !!raw.musteri_bekliyor,
     uzatma_sayisi: raw.uzatma_sayisi || 0,           // deadline kaç kez uzatıldı
     uzatildi:      (raw.uzatma_sayisi || 0) > 0,     // aktif iş rozeti
+    deadline_orig: raw.deadline_orig != null ? raw.deadline_orig : null,   // ilk konan deadline
+    deadline_history: Array.isArray(raw.deadline_history) ? raw.deadline_history : [],  // [{eski,yeni,at,by}]
     _kimden_id:   raw._kimden_id || null
   };
 }
@@ -550,6 +552,8 @@ function bnsHydrateCompleted(raw, idx) {
     gecikmeH,
     uzatma_sayisi: raw.uzatma_sayisi || 0,           // deadline kaç kez uzatıldı
     uzatildi:      (raw.uzatma_sayisi || 0) > 0,
+    deadline_orig: raw.deadline_orig != null ? raw.deadline_orig : null,
+    deadline_history: Array.isArray(raw.deadline_history) ? raw.deadline_history : [],
     // Teslim durumu: gecikmeli > uzatılarak teslim > zamanında (calc.js tek kaynak)
     delivery_status: bnsDeliveryStatus(bitis, deadline, beklemeMs, (raw.uzatma_sayisi || 0) > 0),
     rating: raw.rating != null ? raw.rating : null,

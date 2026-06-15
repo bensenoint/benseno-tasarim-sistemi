@@ -13,7 +13,7 @@ async function allBriefsWithAssignees() {
            b.akis, b.stale, b.created_at, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
            b.rating, b.rating_by, b.rating_sebep,
-           b.deadline_orig, b.uzatma_sayisi, b.uzatma_ceza,
+           b.deadline_orig, b.uzatma_sayisi, b.uzatma_ceza, b.deadline_history,
            b.image_url, b.started_at,
            b.rev_ic, b.rev_musteri, b.gonderim_sayisi, b.son_gonderim_at, b.musteri_bekliyor,
            COALESCE(json_agg(
@@ -154,7 +154,7 @@ async function getEmbedded() {
     observers: b.observers.map(o => ({ id: o.id, name: o.name })),
     notes: b.musteri_notu || '',
     deadline: ms(b.deadline), durum: b.durum, rev: b.rev || 0,
-    deadline_orig: ms(b.deadline_orig), uzatma_sayisi: b.uzatma_sayisi || 0,
+    deadline_orig: ms(b.deadline_orig), uzatma_sayisi: b.uzatma_sayisi || 0, deadline_history: b.deadline_history || [],
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     gonderim_sayisi: b.gonderim_sayisi || 0, son_gonderim_at: ms(b.son_gonderim_at), musteri_bekliyor: !!b.musteri_bekliyor,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
@@ -171,7 +171,7 @@ async function getEmbedded() {
     workers: b.workers.map(w => ({ id: w.id, name: w.name, sira: w.sira ?? null, onay: !!w.onay_at })),
     akis: b.akis || 'paralel',
     deadline: ms(b.deadline), baslangic: ms(b.started_at), bitis: ms(b.completed_at),
-    deadline_orig: ms(b.deadline_orig), uzatma_sayisi: b.uzatma_sayisi || 0,
+    deadline_orig: ms(b.deadline_orig), uzatma_sayisi: b.uzatma_sayisi || 0, deadline_history: b.deadline_history || [],
     bekleme_ms: pauseByBrief[b.id] || 0,   // süre/gecikme hesabından düşülür
     rev: b.rev || 0,
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,

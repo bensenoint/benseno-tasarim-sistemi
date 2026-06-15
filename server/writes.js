@@ -288,6 +288,10 @@ async function patchBrief(id, raw) {
         sets.push('uzatma_sayisi = uzatma_sayisi + 1');
         vals.push(ceza); sets.push(`uzatma_ceza = GREATEST(uzatma_ceza, $${vals.length})`);
       }
+      if (oldMs && newMs && newMs !== oldMs) {          // her deadline değişimini geçmişe yaz (eski→yeni)
+        const hist = JSON.stringify({ eski: oldRow.deadline, yeni: newDl, at: new Date().toISOString(), by: d.by || null, ileri: newMs > oldMs });
+        vals.push(hist); sets.push(`deadline_history = COALESCE(deadline_history,'[]'::jsonb) || $${vals.length}::jsonb`);
+      }
     }
     if (d.priority !== undefined) put('priority', d.priority);
     if (d.akis !== undefined) put('akis', d.akis);
