@@ -72,7 +72,7 @@ async function getState() {
         count(b.id) FILTER (WHERE b.completed_at >= now() - interval '30 days')::int done30,
         count(b.id) FILTER (WHERE b.completed_at IS NULL AND b.deadline < now())::int overdue,
         round(avg(b.rev) FILTER (WHERE b.completed_at IS NOT NULL), 1) avg_rev,
-        round(avg(b.rating) FILTER (WHERE b.rating IS NOT NULL), 1)::float rating,
+        round((avg(b.rating) FILTER (WHERE b.rating IS NOT NULL))::numeric, 1)::float rating,
         count(b.id) FILTER (WHERE b.rating IS NOT NULL)::int rating_count
       FROM brands br LEFT JOIN briefs b ON b.marka_id = br.id
       GROUP BY br.name, br.color ORDER BY active DESC, br.name`),
@@ -212,16 +212,16 @@ async function getEmbedded() {
   let bns_ratings = null, bns_sebep = [];
   try {
     const [firma, deptR, userR, sebep] = await Promise.all([
-      pool.query(`SELECT round(avg(rating),1)::float avg, count(*)::int cnt FROM briefs WHERE rating IS NOT NULL`),
+      pool.query(`SELECT round(avg(rating)::numeric,1)::float avg, count(*)::int cnt FROM briefs WHERE rating IS NOT NULL`),
       // Dept ortalaması katılımcıların departmanından: çok departmanlı işte (örn. tasarım+editör)
       // puan HER İKİ departmana da işler — briefs.dept tek etiketi bunu kaçırıyordu.
-      pool.query(`SELECT u.dept, round(avg(b.rating),1)::float avg, count(DISTINCT b.id)::int cnt
+      pool.query(`SELECT u.dept, round(avg(b.rating)::numeric,1)::float avg, count(DISTINCT b.id)::int cnt
                   FROM briefs b
                   JOIN brief_assignees a ON a.brief_id=b.id AND a.role IN ('contributor','lead')
                   JOIN users u ON u.id=a.user_id
                   WHERE b.rating IS NOT NULL AND u.dept IS NOT NULL AND u.dept <> 'freelance'
                   GROUP BY u.dept`),
-      pool.query(`SELECT a.user_id AS id, round(avg(b.rating),1)::float avg, count(DISTINCT b.id)::int cnt
+      pool.query(`SELECT a.user_id AS id, round(avg(b.rating)::numeric,1)::float avg, count(DISTINCT b.id)::int cnt
                   FROM briefs b JOIN brief_assignees a ON a.brief_id=b.id AND a.role IN ('contributor','lead')
                   WHERE b.rating IS NOT NULL GROUP BY a.user_id`),
       pool.query(`SELECT type, key, sebep, rating_avg::float, rating_count, updated_at FROM entity_sebep`),
