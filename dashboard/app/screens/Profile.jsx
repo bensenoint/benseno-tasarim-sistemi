@@ -150,7 +150,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const JOB_VIEWS = [
     { key: "aktif",      label: "Aktif işler",                rows: myActive,                                   note: "müşteride hariç aktif yük" },
     { key: "lead",       label: "Lead olduğum işler",         rows: asLead.filter(b => b.durum !== "musteride"), note: "lead olduğum aktif işler" },
-    { key: "aldigim",    label: "Aldığım / yapacağım işler",  rows: assigned,                                   note: "başkası lead, ben yapıyorum" },
+    { key: "aldigim",    label: "Aldığım / yapacağım işler",  rows: asContrib.filter(b => b.durum !== "musteride"), note: "işi yapan olarak seçildiğim işler (lead ben olsam da)" },
     { key: "gozlemci",   label: "Gözlemci olduğum işler",     rows: asObserver,                                 note: "izlediğim işler" },
     { key: "tamamlanan", label: "Tamamlanan işler",           rows: myCompleted, completed: true,               note: "seçili aralıkta tamamlananlar" },
   ];
