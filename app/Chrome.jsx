@@ -156,13 +156,6 @@ function odyBusyLevel() {
     return 'calm';
   } catch (e) { return 'calm'; }
 }
-// Idle ruh-hali havuzları: kızgın YALNIZ 'busy' havuzunda; sakinde dostane yüzler döner.
-var ODY_CALM_POOL = ['neseli', 'mutlu', 'dusunuyor', 'heyecanli', 'uykulu'];
-var ODY_BUSY_POOL = ['kizgin', 'mesgul', 'endiseli', 'dusunuyor', 'neseli'];
-function odyIdleMood(i) {
-  var pool = odyBusyLevel() === 'busy' ? ODY_BUSY_POOL : ODY_CALM_POOL;
-  return pool[((i % pool.length) + pool.length) % pool.length];
-}
 // Anlık "yerine otur" mood'u: çok iş → kızgın, orta → endişeli, sakin → neşeli.
 function odyRestingMood() {
   var lvl = odyBusyLevel();
@@ -198,6 +191,9 @@ function odyFaceProd(mood) {
     left = lid('l'); right = lid('r');
   } else if (mood === 'uzgun') {
     left = mk('l', { width: '7px', height: '8px', transform: 'translateY(2px)' }); right = mk('r', { width: '7px', height: '8px', transform: 'translateY(2px)' });
+  } else if (mood === 'sikilmis') {
+    // Sıkılmış: yarı kapalı düz gözler (meh / canı sıkkın)
+    left = mk('l', { width: '10px', height: '3px' }); right = mk('r', { width: '10px', height: '3px' }); gap = 7;
   } else {
     left = mk('l', { width: '7px', height: '11px', animation: 'odyBlink 4.6s infinite' }); right = mk('r', { width: '7px', height: '11px', animation: 'odyBlink 4.6s infinite' });
   }
@@ -249,6 +245,7 @@ function ChatBot() {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
       setPos(p => { try { localStorage.setItem("bns_ody_pos", JSON.stringify(p)); } catch (e2) {} return p; });
+      if (start.moved) reactMove();   // taşındıysa kısa süre farklı ruh hali
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
@@ -271,16 +268,22 @@ function ChatBot() {
   React.useEffect(() => { odyFxProd(blobRef.current, mood); }, [mood]);
   React.useEffect(() => { setMood(odyRestingMood()); }, []);
 
-  // Idle ruh-hali döngüsü: sohbet kapalı ve okunmamış bildirim yokken Ody belli aralıkla
-  // havuzdan bir sonraki ruh haline geçer (çok iş varsa kızgın da rotasyonda; sakinde dostane).
+  // Idle ruh-hali: bildirim yokken normal (neşeli); uzun süre boşta → sıkılmış; çok iş → kızgın.
+  // Taşınınca kısa süre farklı ifade (heyecanlı), sonra normale döner.
   var openRef = React.useRef(open); openRef.current = open;
   var countRef = React.useRef(notifCount); countRef.current = notifCount;
+  var idleStartRef = React.useRef(Date.now());   // boşta kalma başlangıcı
+  var reactUntilRef = React.useRef(0);            // taşıma tepki ifadesinin bitiş zamanı
+  const ODY_BORED_MS = 75000;                     // bu süreden uzun boşta → sıkılmış
+  const reactMove = () => { reactUntilRef.current = Date.now() + 3500; idleStartRef.current = Date.now(); setMood('heyecanli'); };
   React.useEffect(() => {
-    var i = 0;
-    var t = setInterval(() => {
-      if (openRef.current || countRef.current > 0) return;
-      i++; setMood(odyIdleMood(i));
-    }, 6500);
+    const t = setInterval(() => {
+      if (openRef.current || countRef.current > 0) { idleStartRef.current = Date.now(); return; } // aktif/bildirim varken karışma
+      if (Date.now() < reactUntilRef.current) return;                 // taşıma tepkisi sürüyor
+      if (odyBusyLevel() === 'busy') { setMood('kizgin'); return; }   // çok iş → kızgın
+      const idleMs = Date.now() - idleStartRef.current;
+      setMood(idleMs > ODY_BORED_MS ? 'sikilmis' : 'neseli');         // uzun boşta sıkılmış, yoksa normal
+    }, 4000);
     return () => clearInterval(t);
   }, []);
 
