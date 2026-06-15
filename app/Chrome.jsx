@@ -138,11 +138,18 @@ function odyMoodFromText(t) {
   var s = (t || '').toLowerCase();
   if (/(gecik|24 saat|süre|acil|risk|uyar|kaldı|bekliyor çok)/.test(s)) return 'endiseli';
   if (/(blok|iptal|reddedil|sorun|hata|olumsuz)/.test(s)) return 'uzgun';
-  if (/(tamamlan|bitti|onaylandı|teslim|tebrik|👏)/.test(s)) return 'mutlu';
+  if (/(tamamlan|bitti|onaylandı|teslim|tebrik|👏)/.test(s)) return 'coskulu';   // iş tamamlandı → coşkulu
   if (/(revizyon|düzelt|tekrar|geri gönder)/.test(s)) return 'mesgul';
-  if (/(yeni brief|atandı|atanmış|eklendi|başladı|yeni iş)/.test(s)) return 'heyecanli';
+  if (/(yeni brief|atandı|atanmış|eklendi|başladı|yeni iş|açıldı)/.test(s)) return 'dusunuyor'; // yeni iş → düşünüyor
   if (/(onay|müşteride)/.test(s)) return 'neseli';
   return 'heyecanli';
+}
+// Bugün tamamlanan iş sayısı (kişi+tarih anahtarlı, bildirimlerden sayılır).
+function odyDoneToday(uid) {
+  try { return parseInt(localStorage.getItem('bns_ody_done_' + (uid || 'x') + '_' + new Date().toISOString().slice(0, 10)) || '0', 10) || 0; } catch (e) { return 0; }
+}
+function odyBumpDone(uid) {
+  try { var k = 'bns_ody_done_' + (uid || 'x') + '_' + new Date().toISOString().slice(0, 10); localStorage.setItem(k, String((parseInt(localStorage.getItem(k) || '0', 10) || 0) + 1)); } catch (e) {}
 }
 // Giriş yapan kullanıcının işleri (lead/katkı/gözlemci/reviewer). uid yoksa tüm işler (fallback).
 function odyMyBriefs(uid) {
@@ -180,6 +187,9 @@ function odyRestingMood(uid) {
   var lvl = odyBusyLevel(uid);
   if (lvl === 'busy') return 'mesgul';        // genel çok iş → meşgul
   if (lvl === 'some') return 'endiseli';
+  var done = odyDoneToday(uid);               // sakin: bugün tamamlanan işe göre
+  if (done >= 2) return 'neseli';             // 2+ iş tamamlandı → neşeli
+  if (done >= 1) return 'mutlu';              // 1 iş tamamlandı → mutlu
   return 'neseli';
 }
 // Ruh halinin Türkçe etiketi (hover'da göstermek için).
@@ -188,7 +198,7 @@ function odyMoodLabel(mood) {
 }
 // Ody neden bu ruh halinde? Veriye dayalı kısa açıklama.
 function odyMoodReason(mood, uid) {
-  var overdue = 0, active = 0;
+  var overdue = 0, active = 0, done = odyDoneToday(uid);
   try {
     var b = odyMyBriefs(uid);
     overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.deltaH != null && x.deltaH < 0; }).length;
@@ -198,12 +208,12 @@ function odyMoodReason(mood, uid) {
     kizgin: overdue > 0 ? ('senin ' + overdue + ' işin gecikti, iş yükün çok') : ('iş yükün çok (' + active + ' aktif işin var)'),
     endiseli: overdue > 0 ? ('senin ' + overdue + ' işin gecikti, tedbirliyim') : 'bazı işlerin risk altında',
     mesgul: 'iş yükün yoğun (' + active + ' aktif işin var)',
-    neseli: active > 0 ? ('işlerin kontrol altında (' + active + ' aktif iş), her şey yolunda') : 'gündeminde acil iş yok, her şey yolunda',
-    mutlu: 'iyi bir haber aldım',
-    coskulu: 'harika bir gelişme oldu',
+    neseli: done >= 2 ? ('bugün ' + done + ' iş tamamladın, harika gidiyorsun') : (active > 0 ? ('işlerin kontrol altında (' + active + ' aktif iş), her şey yolunda') : 'gündeminde acil iş yok, her şey yolunda'),
+    mutlu: done >= 1 ? 'bugün 1 işini tamamladın 🎉' : 'iyi bir haber aldım',
+    coskulu: 'bir iş tamamlandı!',
     heyecanli: 'yeni bir hareket oldu',
-    dusunuyor: 'cevabını hazırlıyorum',
-    uykulu: 'uzun süredir sessizlik var',
+    dusunuyor: 'yeni bir iş açıldı, ona bakıyorum',
+    uykulu: '1 saattir yeni bildirim yok',
     sikilmis: 'bir süredir hiç hareket yok, biraz sıkıldım',
     uzgun: 'olumsuz bir haber aldım',
   };
@@ -321,15 +331,21 @@ function ChatBot({ currentUser }) {
   var countRef = React.useRef(notifCount); countRef.current = notifCount;
   var idleStartRef = React.useRef(Date.now());   // boşta kalma başlangıcı
   var reactUntilRef = React.useRef(0);            // taşıma tepki ifadesinin bitiş zamanı
+  var lastNotifRef = React.useRef(Date.now());    // en son bildirimin geldiği an (uyku sayacı)
+  var newestIdRef = React.useRef(0);              // görülen en yeni bildirim id'si
   const ODY_BORED_MS = 75000;                     // bu süreden uzun boşta → sıkılmış
+  const ODY_SLEEP_MS = 3600000;                   // 1 saat+ bildirim gelmezse → uyuyor
   const reactMove = () => { reactUntilRef.current = Date.now() + 3500; idleStartRef.current = Date.now(); setMood('heyecanli'); };
   React.useEffect(() => {
     const t = setInterval(() => {
       if (openRef.current || countRef.current > 0) { idleStartRef.current = Date.now(); return; } // aktif/bildirim varken karışma
-      if (Date.now() < reactUntilRef.current) return;                 // taşıma tepkisi sürüyor
-      if (odyBusyLevel(uid) === 'busy') { setMood(odyRestingMood(uid)); return; }   // çok iş → meşgul/kızgın
-      const idleMs = Date.now() - idleStartRef.current;
-      setMood(idleMs > ODY_BORED_MS ? 'sikilmis' : 'neseli');         // uzun boşta sıkılmış, yoksa normal
+      if (Date.now() < reactUntilRef.current) return;                 // taşıma/yeni iş tepkisi sürüyor
+      const rest = odyRestingMood(uid);
+      if (rest !== 'neseli' && rest !== 'mutlu') { setMood(rest); return; } // kızgın/meşgul/endişeli → doğrudan
+      const now = Date.now();
+      if (now - lastNotifRef.current > ODY_SLEEP_MS) { setMood('uykulu'); return; } // 1 saat+ bildirim yok → uyuyor
+      if (now - idleStartRef.current > ODY_BORED_MS) { setMood('sikilmis'); return; } // uzun boşta → sıkılmış
+      setMood(rest);                                                  // sakin baz: mutlu/neşeli
     }, 4000);
     return () => clearInterval(t);
   }, []);
@@ -365,6 +381,24 @@ function ChatBot({ currentUser }) {
           if (cancelled || !j) return;
           const items = j.notifications || [];
           setNotifItems(items);
+          // Uyku sayacı: oturum içinde yeni bildirim geldiyse "son bildirim" anını güncelle.
+          const maxId = items.reduce((m, n) => (n.id > m ? n.id : m), 0);
+          if (newestIdRef.current === 0) newestIdRef.current = maxId;          // ilk yükleme — baz al
+          else if (maxId > newestIdRef.current) { lastNotifRef.current = Date.now(); newestIdRef.current = maxId; }
+          // Günlük tamamlanan iş sayısı: created_at bugünse, id-dedupe ile (yeni iş → düşünüyor mood'u zaten metinden).
+          try {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const dk = 'bns_ody_donemax_' + (uid || 'x');
+            let counted = parseInt(localStorage.getItem(dk) || '0', 10) || 0;
+            let newMax = counted;
+            items.forEach(n => {
+              if (n.id > counted) {
+                if (/(tamamlan|bitti|teslim|onaylandı)/i.test(n.text || '') && (n.created_at || '').slice(0, 10) === todayStr) odyBumpDone(uid);
+                if (n.id > newMax) newMax = n.id;
+              }
+            });
+            if (newMax > counted) localStorage.setItem(dk, String(newMax));
+          } catch (e) {}
           const unread = items.filter(n => !n.read_at);
           setNotifCount(unread.length);
           if (!unread.length) { setNotifPeek(null); return; }
