@@ -103,10 +103,13 @@ function HelpScreen() {
         <Row left="Tarih filtresi" right="'Şu an (canlı)' veya geçmiş bir günü seç → o günün özeti + insight'ı" sub="Günlük kayıtlar bir önceki günle ilişkilendirilir — dünden sarkan konuların bugünkü durumu belirtilir."/>
       </Section>
 
-      <Section title="🤖 Ody (Sistem Asistanı) & Geri Bildirim">
-        <Row left="🤖 Asistan" right="Sağ alttaki balon — kullanım soruları + marka/iş/kişi bazlı canlı veri soruları + öneri" sub="Kişi puanlarını sadece yöneticilere söyler."/>
+      <Section title="🤖 Ody — Sistem Asistanı, Bildirimler & Ruh Halleri" note="Sağ altta yüzen maskot. Sürükleyerek istediğin yere taşıyabilirsin; pencere küçülünce kendini görünür alana çeker.">
+        <Row left="Soru sor" right="Ody'ye tıkla → kullanım soruları + marka/iş/kişi bazlı canlı veri soruları + öneri" sub="Kişi puanlarını sadece yöneticilere söyler."/>
+        <Row left="🔔 Bildirimler" right="Çan artık Ody'de; okunmamış bildirim sayısı üstteki kırmızı rozette görünür" sub="Bildirimi/paneli açtığın an okundu sayılır; okunan/okunmayan renkle ayrışır. Bir bildirime tıklayınca ilgili Slack thread'i açılır."/>
+        <Row left="📋 Günlük özet" right="Ody'yi açınca bugünkü kişisel iş özetini bir kez gösterir" sub="Bir kez görülünce o gün tekrar çıkmaz."/>
+        <Row left="😊 Ruh halleri" right="Ody senin kişisel iş akışına göre ifade değiştirir — kendi işlerin, bildirimlerin ve işlerinin thread özetlerine göre" sub="Üzerine fareyle gelince neden o ruh halinde olduğunu yazar. Her kişinin Ody'si kendi işlerine göre davranır."/>
+        <Row left="Ruh hali ne anlatır" right="meşgul = işin çok · kızgın = 2'den fazla geciken iş · endişeli/üzgün = thread'lerde takılan veya olumsuz konular · düşünüyor = yeni iş geldi · mutlu/neşeli = iş tamamladın · coşkulu = iş bittiği an · uyuyor = 1 saattir bildirim yok · sıkılmış = uzun süre sessizlik"/>
         <Row left="help (Slack)" right="Herhangi bir kanala 'help' yaz → sorun/öneri formu (başlık + açıklama + görsel) → sistem adminlerine DM"/>
-        <Row left="🔔 Bildirim zili" right="Sana atılan her brief-akışı DM'inin kısa hâli — tıklayınca ilgili Slack thread'i açılır"/>
       </Section>
 
       <Section title="💬 Thread Özeti & Raporlar">
@@ -132,7 +135,9 @@ function HelpScreen() {
 
       <Section title="🔍 Dashboard İpuçları">
         <Row left="Komut paleti" right="Cmd+K (Mac) / Ctrl+K — brief adı, marka veya kişiye göre hızlı arama"/>
+        <Row left="Sol menü" right="Varsayılan olarak ikon şeridi halinde durur; üzerine gelince açılır" sub="Altındaki ‹‹ / ›› düğmesiyle daraltıp genişletebilirsin."/>
         <Row left="Tamamlananlar" right="Satıra tıkla → işin salt-okunur detayı (thread özeti, iş insight'ı, not)" sub="Hiçbir alan değiştirilemez; sadece yıldız puanı yönetici tarafından güncellenebilir."/>
+        <Row left="Marka detayı" right="Marka sayfasında tamamlanan işlere de tıklayıp salt-okunur detayını açabilirsin"/>
         <Row left="Geçmiş" right="Olay satırına tıkla → ilgili işin detayı açılır (aktifse normal, tamamlanmışsa salt-okunur)"/>
         <Row left="Departman" right="Sol menüden Tasarım / Editör / AI / Freelance departman görünümleri"/>
         <Row left="Görünüm" right="Açılışta görünüm otomatik olarak sana ayarlanır" sub="Başka birinin görünümüne geçmek sadece yönetici hesaplarda mümkündür."/>

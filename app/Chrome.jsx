@@ -1153,7 +1153,7 @@ function Sidebar({ active, onChange, collapsed, expanded, pinned, onToggle, onHo
 
       {/* Kılavuz linki */}
       {!collapsed && (
-        <a href="docs/kullanim-klavuzu.html" target="_blank" rel="noopener noreferrer"
+        <a href="/benseno-tasarim-sistemi/docs/kullanim-klavuzu.html" target="_blank" rel="noopener noreferrer"
           style={{
             display: "flex", alignItems: "center", gap: 8,
             padding: "10px 16px", borderTop: "1px solid var(--line-soft)",
