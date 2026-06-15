@@ -498,7 +498,7 @@ function DelegateRow({ brief: b, mode, uid, onOpen, last }) {
       }}
       onMouseEnter={e=>e.currentTarget.style.background="var(--surface-sub)"}
       onMouseLeave={e=>e.currentTarget.style.background=""}>
-      <PriorityBadge p={b.prio||b.priority||{code:"grn",label:"—"}} deltaH={b.deltaH||999} compact/>
+      <PriorityBadge p={b.oncelik||{code:"ylw",label:"NORMAL"}}/>
       <div style={{flex:1, minWidth:0}}>
         <div style={{font:"500 12px/1.35 var(--font-sans)", color:"var(--ink)", overflow:"hidden", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical"}}>
           {b.marka} · {b.baslik || b.is || "—"}

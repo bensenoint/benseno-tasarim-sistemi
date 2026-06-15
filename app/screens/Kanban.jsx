@@ -137,9 +137,10 @@ function KanbanCard({ brief, onClick }) {
       }}>{brief.baslik || "—"}</div>
       {/* Alt satır: öncelik + avatarlar */}
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:4, marginTop:2}}>
-        {brief.priority
-          ? <PriorityBadge p={brief.priority} deltaH={brief.deltaH || 0} compact/>
-          : <span/>}
+        <span style={{display:"flex", alignItems:"center", gap:6, minWidth:0}}>
+          <PriorityBadge p={brief.oncelik || { code: "ylw", label: "NORMAL" }}/>
+          {brief.deltaH != null && <span style={{font:"500 10px/1 var(--font-mono)", color:(brief.deltaH<=8?"var(--prio-red)":"var(--ink-4)")}}>{formatDelta(brief.deltaH)}</span>}
+        </span>
         <span style={{display:"inline-flex", flexShrink:0}}>
           <Avatar user={brief.lead} size={18}/>
           {brief.contributors && brief.contributors.length > 0 &&

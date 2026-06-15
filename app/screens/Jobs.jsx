@@ -169,7 +169,10 @@ function KanbanView({ rows, onOpenBrief }) {
                   marginBottom: 8, wordBreak:"break-word", overflowWrap:"anywhere", whiteSpace:"normal"
                 }}>{b.baslik}</div>
                 <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 6, marginTop: 2}}>
-                  <PriorityBadge p={b.priority} deltaH={b.deltaH} compact/>
+                  <span style={{display:"flex", alignItems:"center", gap:6, minWidth:0}}>
+                    <PriorityBadge p={b.oncelik || { code: "ylw", label: "NORMAL" }}/>
+                    {b.deltaH != null && <span style={{font:"500 11px/1 var(--font-mono)", color:(b.deltaH<=8?"var(--prio-red)":"var(--ink-4)")}}>{formatDelta(b.deltaH)}</span>}
+                  </span>
                   <Avatar user={b.lead} size={20}/>
                 </div>
               </button>
@@ -202,7 +205,8 @@ function CardsView({ rows, onOpenBrief }) {
           </div>
           <div style={{font:"600 14px/1.3 var(--font-sans)", color:"var(--ink)"}}>{b.baslik}</div>
           <div style={{display:"flex", alignItems:"center", gap: 8}}>
-            <PriorityBadge p={b.priority} deltaH={b.deltaH} compact/>
+            <PriorityBadge p={b.oncelik || { code: "ylw", label: "NORMAL" }}/>
+            {b.deltaH != null && <span style={{font:"500 11px/1 var(--font-mono)", color:(b.deltaH<=8?"var(--prio-red)":"var(--ink-4)")}}>{formatDelta(b.deltaH)}</span>}
             <StatusPill status={b.durum}/>
           </div>
           <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginTop: 2, paddingTop: 8, borderTop:"1px solid var(--line-soft)"}}>

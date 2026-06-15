@@ -145,7 +145,7 @@ function MultiCard({ brief: b, users, onClick }) {
 
       {/* Sağ: öncelik + durum + deadline */}
       <div style={{display:"flex", flexDirection:"column", alignItems:"flex-end", gap:6}}>
-        <PriorityBadge p={b.priority} deltaH={b.deltaH} compact/>
+        <PriorityBadge p={b.oncelik || { code: "ylw", label: "NORMAL" }}/>
         <StatusPill status={b.durum}/>
         <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>
           {b.deadline ? new Date(b.deadline).toLocaleDateString("tr-TR",{day:"numeric",month:"short"}) : "—"}
