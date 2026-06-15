@@ -33,6 +33,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
     if (found) setSelectedUser(found);
   }, [initialSel]);
   const [timeRange, setTimeRange] = React.useState("30");
+  const [jobView, setJobView] = React.useState("aktif");   // ana iş tablosu görünümü (dropdown)
   const allBriefs    = data._allBriefs    || data.briefs    || [];
   const allCompleted = data._allCompleted || data.completed || [];
   const allUsers     = data.USERS || [];
@@ -138,6 +139,29 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
     b.lead && b.lead.id !== u.id &&
     Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id)
   );
+
+  // ─── Gözlemci olduğum aktif işler
+  const asObserver = allBriefs.filter(b =>
+    b.durum !== "musteride" &&
+    Array.isArray(b.observers) && b.observers.some(o => o && o.id === u.id)
+  );
+
+  // ─── Ana iş tablosu görünümleri (dropdown). "tamamlanan" zaman aralığına (hero'daki toggle) tabi.
+  const JOB_VIEWS = [
+    { key: "aktif",      label: "Aktif işler",                rows: myActive,                                   note: "müşteride hariç aktif yük" },
+    { key: "lead",       label: "Lead olduğum işler",         rows: asLead.filter(b => b.durum !== "musteride"), note: "lead olduğum aktif işler" },
+    { key: "aldigim",    label: "Aldığım / yapacağım işler",  rows: assigned,                                   note: "başkası lead, ben yapıyorum" },
+    { key: "gozlemci",   label: "Gözlemci olduğum işler",     rows: asObserver,                                 note: "izlediğim işler" },
+    { key: "tamamlanan", label: "Tamamlanan işler",           rows: myCompleted, completed: true,               note: "seçili aralıkta tamamlananlar" },
+  ];
+  const curView = JOB_VIEWS.find(v => v.key === jobView) || JOB_VIEWS[0];
+  // Tamamlananlar BriefTable için güvenli default'larla normalize edilir (priority/deltaH alanları yok).
+  const tableRows = curView.completed
+    ? curView.rows.map(b => ({ ...b, durum: "tamamlandi",
+        priority: b.priority || { code: "grn", label: "—" },
+        oncelik: b.oncelik || { code: "ylw", label: "NORMAL" },
+        deltaH: (b.deltaH != null ? b.deltaH : null) }))
+    : curView.rows;
 
   // ─── Durum dağılımı
   const durumMap = {};
@@ -245,7 +269,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
       <div style={{height:16}}/>
 
       {/* ─── KPI şeridi ──────────────────────────────────────── */}
-      <div className="bns-kpi-8" style={{display:"grid", gridTemplateColumns:`repeat(${isGorkem ? 9 : 7},1fr)`, gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
+      <div className="bns-kpi-8" style={{display:"grid", gridAutoFlow:"column", gridAutoColumns:"minmax(0,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)", overflowX:"auto"}}>
         <Kpi label="Aktif iş"      value={myActive.length} color={myActive.length > CAP_LIMIT ? "var(--prio-red)" : undefined}/>
         <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "#7c5cff" : undefined} sub="✈️ dönüş bekleniyor"/>
         <Kpi label="Tamamlanan"    value={myCompleted.length} sub="kayıtlı"/>
@@ -258,116 +282,31 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         <Kpi label="Marka"         value={Object.keys(brandCount).length} sub="farklı"/>
       </div>
 
-      {/* ─── Ana grid ────────────────────────────────────────── */}
-      <div style={{display:"grid", gridTemplateColumns:"1.6fr 1fr", gap:"var(--grid-gap)", marginBottom:"var(--grid-gap)"}} className="bn-grid-2">
-
-        {/* Sol: aktif işler */}
-        <Card padding={0} style={{minWidth:0}}>
-          <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-            <div>
-              <h2 style={{font:"600 14px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Üzerimdeki aktif işler</h2>
-              <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)", marginTop:3}}>
-                {overdue.length > 0 && <span style={{color:"var(--prio-red)", fontWeight:600}}>{overdue.length} gecikmiş · </span>}
-                {urgent.length > 0 && <span style={{color:"var(--prio-orange)", fontWeight:600}}>{urgent.length} bugün · </span>}
-                toplam {myActive.length}
-              </div>
-            </div>
-            <div style={{display:"flex", gap:6}}>
-              <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>lead: {asLead.length}</span>
-              <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>contrib: {asContrib.length}</span>
-              {asReviewer.length > 0 && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>review: {asReviewer.length}</span>}
+      {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
+      <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
+        <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center", gap:12, flexWrap:"wrap"}}>
+          <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap"}}>
+            <select value={jobView} onChange={e => setJobView(e.target.value)} aria-label="İş görünümü"
+              style={{font:"600 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:8, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
+              {JOB_VIEWS.map(v => <option key={v.key} value={v.key}>{v.label}</option>)}
+            </select>
+            <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)"}}>
+              {curView.completed && (overdue.length || urgent.length) ? "" : (overdue.length > 0 && jobView==="aktif" && <span style={{color:"var(--prio-red)", fontWeight:600}}>{overdue.length} gecikmiş · </span>)}
+              toplam {tableRows.length} · {curView.note}
             </div>
           </div>
-          {myActive.length > 0
-            ? <BriefTable rows={myActive} onRowClick={onOpenBrief}/>
-            : <div style={{padding:32, textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>Aktif iş yok 🎉</div>
-          }
-        </Card>
-
-        {/* Sağ kolon */}
-        <div style={{display:"flex", flexDirection:"column", gap:"var(--grid-gap)"}}>
-
-          {/* Kapasite göstergesi */}
-          <Card>
-            <CardHead title="Kapasite" sub={`${myActive.length} / ${CAP_LIMIT} iş limiti`}/>
-            <div style={{margin:"8px 0 4px"}}>
-              <div style={{display:"flex", justifyContent:"space-between", marginBottom:6}}>
-                <span style={{font:"600 28px/1.15 var(--font-sans)", color: capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":"var(--ink)", letterSpacing:"-0.02em"}}>
-                  %{capPct}
-                </span>
-                <span style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", textAlign:"right"}}>
-                  {capPct < 75 ? "Müsait" : capPct < 100 ? "Dolmak üzere" : "Kapasite aşıldı"}
-                </span>
-              </div>
-              <div style={{height:8, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
-                <div style={{
-                  width:"100%", height:"100%", borderRadius:999,
-                  background: capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":"var(--prio-green)",
-                  transform:`scaleX(${Math.min(capPct,100)/100})`, transformOrigin:"left",
-                  transition:"transform 400ms cubic-bezier(0.2,0,0,1)"
-                }}/>
-              </div>
-            </div>
-            {/* Durum dağılımı */}
-            <div style={{marginTop:12, display:"flex", flexDirection:"column", gap:4}}>
-              {Object.entries(durumMap).slice(0,4).map(([d,n]) => (
-                <div key={d} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"4px 0", borderBottom:"1px solid var(--line-soft)"}}>
-                  <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:160}}>{d}</span>
-                  <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--ink-2)"}}>{n}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Marka dağılımı */}
-          <Card>
-            <CardHead title="Marka dağılımı" sub="aktif + tamamlanan"/>
-            {topBrands.length > 0
-              ? topBrands.map((b,i) => <BrandBar key={b.name} {...b} last={i===topBrands.length-1}/>)
-              : <div style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-4)"}}>Henüz veri yok</div>
-            }
-          </Card>
+          <div style={{display:"flex", gap:6}}>
+            <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>lead: {asLead.length}</span>
+            <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>contrib: {asContrib.length}</span>
+            {asObserver.length > 0 && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>gözlemci: {asObserver.length}</span>}
+            {curView.completed && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>aralık: {timeRange === "all" ? "tümü" : timeRange + "g"}</span>}
+          </div>
         </div>
-      </div>
-
-      {/* ─── Verdiğim / Aldığım işler ────────────────────────── */}
-      <div style={{display:"flex", flexDirection:"column", gap:"var(--grid-gap)", marginBottom:"var(--grid-gap)"}}>
-        <Card padding={0}>
-          <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"600 14px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Verdiğim işler</h2>
-            <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)", marginTop:3}}>
-              Ben lead, başkası yapıyor · {delegated.length} iş
-            </div>
-          </div>
-          {delegated.length > 0 ? (
-            <div style={{padding:"4px 0"}}>
-              {delegated.map((b,i) => (
-                <DelegateRow key={b.id} brief={b} mode="delegated" onOpen={onOpenBrief} last={i===delegated.length-1}/>
-              ))}
-            </div>
-          ) : (
-            <div style={{padding:24, font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", textAlign:"center"}}>Başkasına atadığın aktif iş yok</div>
-          )}
-        </Card>
-
-        <Card padding={0}>
-          <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"600 14px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Aldığım işler</h2>
-            <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)", marginTop:3}}>
-              Başkası açtı, ben yapıyorum · {assigned.length} iş
-            </div>
-          </div>
-          {assigned.length > 0 ? (
-            <div style={{padding:"4px 0"}}>
-              {assigned.map((b,i) => (
-                <DelegateRow key={b.id} brief={b} mode="assigned" uid={u.id} onOpen={onOpenBrief} last={i===assigned.length-1}/>
-              ))}
-            </div>
-          ) : (
-            <div style={{padding:24, font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", textAlign:"center"}}>Başkasından aldığın aktif iş yok</div>
-          )}
-        </Card>
-      </div>
+        {tableRows.length > 0
+          ? <BriefTable rows={tableRows} onRowClick={onOpenBrief}/>
+          : <div style={{padding:32, textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>Bu görünümde iş yok.</div>
+        }
+      </Card>
 
       {/* ─── İş tipi analizi + Tamamlananlar ────────────────── */}
       <div style={{display:"grid", gridTemplateColumns:"1fr 1.8fr", gap:"var(--grid-gap)", marginBottom:"var(--grid-gap)"}} className="bn-grid-2">
@@ -477,6 +416,43 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
           ) : (
             <div style={{padding:32, font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", textAlign:"center"}}>Kayıtlı tamamlanan iş yok</div>
           )}
+        </Card>
+      </div>
+
+      {/* ─── Kapasite + Marka dağılımı (en alt, yan yana) ─── */}
+      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--grid-gap)", marginBottom:"var(--grid-gap)"}} className="bn-grid-2">
+        <Card>
+          <CardHead title="Kapasite" sub={`${myActive.length} / ${CAP_LIMIT} iş limiti`}/>
+          <div style={{margin:"8px 0 4px"}}>
+            <div style={{display:"flex", justifyContent:"space-between", marginBottom:6}}>
+              <span style={{font:"600 28px/1.15 var(--font-sans)", color: capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":"var(--ink)", letterSpacing:"-0.02em"}}>%{capPct}</span>
+              <span style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", textAlign:"right"}}>
+                {capPct < 75 ? "Müsait" : capPct < 100 ? "Dolmak üzere" : "Kapasite aşıldı"}
+              </span>
+            </div>
+            <div style={{height:8, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
+              <div style={{width:"100%", height:"100%", borderRadius:999,
+                background: capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":"var(--prio-green)",
+                transform:`scaleX(${Math.min(capPct,100)/100})`, transformOrigin:"left",
+                transition:"transform 400ms cubic-bezier(0.2,0,0,1)"}}/>
+            </div>
+          </div>
+          <div style={{marginTop:12, display:"flex", flexDirection:"column", gap:4}}>
+            {Object.entries(durumMap).slice(0,4).map(([d,n]) => (
+              <div key={d} style={{display:"flex", justifyContent:"space-between", alignItems:"center", padding:"4px 0", borderBottom:"1px solid var(--line-soft)"}}>
+                <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:160}}>{d}</span>
+                <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--ink-2)"}}>{n}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <CardHead title="Marka dağılımı" sub="aktif + tamamlanan"/>
+          {topBrands.length > 0
+            ? topBrands.map((b,i) => <BrandBar key={b.name} {...b} last={i===topBrands.length-1}/>)
+            : <div style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-4)"}}>Henüz veri yok</div>
+          }
         </Card>
       </div>
 
