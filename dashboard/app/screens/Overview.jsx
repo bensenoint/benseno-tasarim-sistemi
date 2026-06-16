@@ -603,7 +603,7 @@ function ProblemBrands({ data }) {
     if (!byBrand[m]) byBrand[m] = { name: m, brand: b.brand, active: 0, overdue: 0, stale: 0, blokeli: 0, highRev: 0, score: 0 };
     const s = byBrand[m];
     s.active++;
-    if (b.deltaH <= 0)          s.overdue++;
+    if (b.deltaH <= 0 && b.durum !== "tamamlandi" && b.durum !== "musteride") s.overdue++;
     if (b.stale)                s.stale++;
     if (b.durum === "blokeli")  s.blokeli++;
     if ((b.revision || 0) >= 3) s.highRev++;

@@ -44,7 +44,7 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
             ["all",     `Tümü · ${data.briefs.length}`],
             ["open",    `Açık · ${data.briefs.filter(b => b.durum==="yeni"||b.durum==="calisiliyor").length}`],
             ["review",  `İncelemede · ${data.briefs.filter(b => b.durum==="incelemede").length}`],
-            ["overdue", `Geciken · ${data.briefs.filter(b => b.deltaH<=0 && b.durum!=="tamamlandi").length}`]
+            ["overdue", `Geciken · ${data.briefs.filter(b => b.deltaH<=0 && b.durum!=="tamamlandi" && b.durum!=="musteride").length}`]
           ]}/>
 
         <div style={{display:"inline-flex", gap: 6, alignItems:"center"}}>

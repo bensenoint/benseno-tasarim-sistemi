@@ -181,7 +181,7 @@ function odyThreadSentiment(uid) {
 function odyBusyLevel(uid) {
   try {
     var b = odyMyBriefs(uid);
-    var overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride' && x.deltaH != null && x.deltaH < 0; }).length;
+    var overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride' && x.deltaH != null && x.deltaH <= 0; }).length;
     var active = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride'; }).length;
     var risk = b.filter(function (x) { return window.bnsIsRisk && window.bnsIsRisk(x.durum, x.deltaH); }).length;
     if (overdue >= 2 || active >= 6) return 'busy';   // birey için çok iş eşiği
@@ -195,7 +195,7 @@ function odyRestingMood(uid) {
   var overdue = 0;
   try {
     var b = odyMyBriefs(uid);
-    overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride' && x.deltaH != null && x.deltaH < 0; }).length;
+    overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride' && x.deltaH != null && x.deltaH <= 0; }).length;
   } catch (e) {}
   if (overdue > 2) return 'kizgin';          // 2'den fazla geciken iş → kızgın
   var lvl = odyBusyLevel(uid);
@@ -217,7 +217,7 @@ function odyMoodReason(mood, uid) {
   var overdue = 0, active = 0, done = odyDoneToday(uid), sent = odyThreadSentiment(uid);
   try {
     var b = odyMyBriefs(uid);
-    overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride' && x.deltaH != null && x.deltaH < 0; }).length;
+    overdue = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride' && x.deltaH != null && x.deltaH <= 0; }).length;
     active = b.filter(function (x) { return x.durum !== 'tamamlandi' && x.durum !== 'musteride'; }).length;
   } catch (e) {}
   var map = {

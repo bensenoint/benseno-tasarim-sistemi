@@ -1,0 +1,9 @@
+# metric_direction: higher_is_better
+iteration	timestamp	hypothesis	status	technique	evidence	file_line
+1	07:50	Jobs overdue musteride hariç tutmuyor	confirmed	differential	Overview/Manager/Chrome musteride hariç, Jobs değil	Jobs.jsx:13,47
+2	07:50	Ody overdue deltaH<0 vs client <=0	confirmed	differential	sınır farkı, Ody 1 eksik sayabilir	Chrome.jsx:184,198,220
+3	07:50	Bot kuyruk status replay idempotent değil	confirmed	trace	slack_ts yok→logEvent dedupe edemez, sayaç tekrar artar	slack-bot.js:60-113;writes.js:459
+4	07:50	Brand-stats SQL musteride hariç tutmuyor	confirmed	pattern	dept-stats hariç tutar, brand-stats tutmaz	queries.js:71,73
+5	07:50	Overview brand-summary overdue durum guard yok	confirmed	pattern	marka kartı over-count	Overview.jsx:606
+6	07:50	Bot kuyruk FIFO file→table sıra inversiyonu	confirmed	trace	dosya kayıtları daha yüksek id alıp sonra oynanır	slack-bot.js:88-92
+7	07:50	Ody setInterval uid stale-closure	inconclusive	trace	currentUser mount sonrası değişmezse tetiklenmez	Chrome.jsx:355,390

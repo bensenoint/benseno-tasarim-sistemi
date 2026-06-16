@@ -396,6 +396,17 @@ async function setStatus(id, raw) {
   const res = await tx(async (client) => {
     const ctx = await zincirCtx(client, id);
     if (!ctx) throw new Error('brief bulunamadı: ' + id);
+    // Idempotency: aynı Slack olayı (slack_ts) daha önce durum değiştirmişse tekrar uygulama
+    // (kuyruk replay'inde sayaç/zincir mükerrer ilerlemesini önler)
+    if (d.slack_ts) {
+      const dup = await client.query(
+        `SELECT 1 FROM events WHERE slack_ts = $1 AND verb LIKE 'durum:%' LIMIT 1`, [d.slack_ts]);
+      if (dup.rows.length) {
+        const cur = await client.query(
+          'SELECT id, durum, rev_ic, rev_musteri, gonderim_sayisi, musteri_bekliyor FROM briefs WHERE id=$1', [id]);
+        return cur.rows[0] || null;
+      }
+    }
     let durum = d.durum;
 
     // ── Sıralı onay zinciri (akis='sirali', 2+ işi yapan) ──

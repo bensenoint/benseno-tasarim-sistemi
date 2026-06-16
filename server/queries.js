@@ -68,9 +68,9 @@ async function getState() {
     // marka istatistik
     pool.query(`
       SELECT br.name, br.color,
-        count(b.id) FILTER (WHERE b.completed_at IS NULL)::int active,
+        count(b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride')::int active,
         count(b.id) FILTER (WHERE b.completed_at >= now() - interval '30 days')::int done30,
-        count(b.id) FILTER (WHERE b.completed_at IS NULL AND b.deadline < now())::int overdue,
+        count(b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum <> 'musteride' AND b.deadline < now())::int overdue,
         round(avg(b.rev) FILTER (WHERE b.completed_at IS NOT NULL), 1) avg_rev,
         round((avg(b.rating) FILTER (WHERE b.rating IS NOT NULL))::numeric, 1)::float rating,
         count(b.id) FILTER (WHERE b.rating IS NOT NULL)::int rating_count

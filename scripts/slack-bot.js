@@ -72,7 +72,7 @@ async function enqueueWrite(method, urlPath, body) {
     try { await pool.query('INSERT INTO bot_write_queue(method,url_path,body) VALUES($1,$2,$3)', [method, urlPath, body ?? null]); return 'db'; }
     catch (e) { log('[kuyruk] DB insert hata, dosyaya: ' + e.message); }
   }
-  fileAppend({ method, urlPath, body }); return 'dosya';
+  fileAppend({ method, urlPath, body, at: Date.now() }); return 'dosya';
 }
 let _flushing = false;
 async function flushQueue() {
@@ -86,10 +86,10 @@ async function flushQueue() {
     }
     // 1) Dosya yedeğini tabloya taşı (DB ayağa kalkmışsa)
     const fitems = fileReadAll();
-    if (fitems.length) { for (const it of fitems) { try { await pool.query('INSERT INTO bot_write_queue(method,url_path,body) VALUES($1,$2,$3)', [it.method, it.urlPath, it.body ?? null]); } catch (e) {} } fileClear(); log(`[kuyruk] ${fitems.length} dosya-kaydı tabloya taşındı`); }
-    // 2) Tabloyu FIFO replay et
+    if (fitems.length) { for (const it of fitems) { try { await pool.query('INSERT INTO bot_write_queue(method,url_path,body,created_at) VALUES($1,$2,$3,to_timestamp($4/1000.0))', [it.method, it.urlPath, it.body ?? null, it.at || Date.now()]); } catch (e) {} } fileClear(); log(`[kuyruk] ${fitems.length} dosya-kaydı tabloya taşındı`); }
+    // 2) Tabloyu FIFO replay et (kronolojik: dosyadan taşınan eski kayıtlar önce)
     for (;;) {
-      const q = await pool.query('SELECT id, method, url_path, body FROM bot_write_queue ORDER BY id LIMIT 1');
+      const q = await pool.query('SELECT id, method, url_path, body FROM bot_write_queue ORDER BY created_at, id LIMIT 1');
       if (!q.rows.length) break;
       const it = q.rows[0];
       const res = await sendWrite(it.method, it.url_path, it.body);
@@ -1264,7 +1264,7 @@ app.event('message', async ({ event, client }) => {
       const briefTs = event.thread_ts;
       if (iso) {
         log(`termin keyword: ${tMatch[1]} → ${iso} | ${briefTs} — ${event.user}`);
-        dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { deadline: iso, by: event.user, source: 'slack' });
+        dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { deadline: iso, by: event.user, source: 'slack', slack_ts: event.event_ts });
       } else {
         try { await client.chat.postMessage({ channel: event.channel, thread_ts: briefTs,
           text: '⚠️ Termin formatını anlayamadım. Örnek: `termin 15.06 17:00` · `termin 15.06.2026` · `termin yarın 14:30` (saat yoksa 18:00 alınır).', username: BOT_NAME }); } catch {}
@@ -1277,10 +1277,10 @@ app.event('message', async ({ event, client }) => {
       const briefTs = event.thread_ts;
       if (kMatch.type === 'durum') {
         log(`durum keyword: "${kMatch.key}" → ${kMatch.value} | ${briefTs} — ${event.user}`);
-        dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: kMatch.value, by: event.user, source: 'slack' });
+        dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: kMatch.value, by: event.user, source: 'slack', slack_ts: event.event_ts });
       } else {
         log(`öncelik keyword: "${kMatch.key}" → ${kMatch.value} | ${briefTs} — ${event.user}`);
-        dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { priority: kMatch.value, by: event.user, source: 'slack' });
+        dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { priority: kMatch.value, by: event.user, source: 'slack', slack_ts: event.event_ts });
       }
       return;
     }
