@@ -43,7 +43,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
     { id: "oncelik", label: "Öncelik",  sort: true },
     { id: "deltaH",  label: "Kalan",    sort: true },
     { id: "marka",   label: "Marka",    sort: true },
-    { id: "baslik",  label: "İş",       sort: true },
+    { id: "baslik",  label: "İş",       sort: true, width: 340 },
     { id: "atanan",  label: "Atanan",   sort: false, mobileHide: true },
     { id: "deadline",label: "Teslim",   sort: true,  align: "right" },
     { id: "durum",   label: "Durum",    sort: true,  mobileHide: true },
@@ -88,7 +88,8 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
                   font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
                   letterSpacing:"0.04em", textTransform:"uppercase",
                   textAlign: c.align === "right" ? "right" : "left",
-                  padding:"10px 10px",
+                  width: c.width ? c.width : "auto",
+                  padding:"10px 7px",
                   borderBottom:"1px solid var(--line-strong)",
                   whiteSpace:"nowrap", cursor: c.sort && sortable ? "pointer" : "default",
                   userSelect:"none", position:"sticky", top: 0, zIndex: 5,
@@ -148,7 +149,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
       <td style={cellStyle()}><PriorityBadge p={brief.oncelik || { code: "ylw", label: "NORMAL" }}/></td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
-      <td style={{...cellStyle(), maxWidth: 200, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
+      <td style={{...cellStyle(), width: 340, minWidth: 240, maxWidth: 340, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
         {brief.baslik}
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle()}>
@@ -251,7 +252,7 @@ function EmptyRow() {
 
 function cellStyle(mono, align) {
   return {
-    padding: "var(--row-pad) 10px",
+    padding: "var(--row-pad) 7px",
     borderBottom: "1px solid var(--line)",
     verticalAlign: "middle",
     textAlign: align || "left",
