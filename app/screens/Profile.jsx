@@ -34,6 +34,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   }, [initialSel]);
   const [timeRange, setTimeRange] = React.useState("30");
   const [jobView, setJobView] = React.useState("aktif");   // ana iş tablosu görünümü (dropdown)
+  const [markaSel, setMarkaSel] = React.useState("all");   // ana iş tablosu marka filtresi
   const allBriefs    = data._allBriefs    || data.briefs    || [];
   const allCompleted = data._allCompleted || data.completed || [];
   const allUsers     = data.USERS || [];
@@ -163,6 +164,11 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         deltaH: (b.deltaH != null ? b.deltaH : null) }))
     : curView.rows;
 
+  // Marka filtresi — seçenekler aktif görünümün işlerinden; seçili marka görünümde yoksa "tümü" gibi davran
+  const viewBrands = [...new Set(tableRows.map(b => b.marka).filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
+  const markaActive = markaSel !== "all" && viewBrands.includes(markaSel);
+  const displayRows = markaActive ? tableRows.filter(b => b.marka === markaSel) : tableRows;
+
   // ─── Durum dağılımı
   const durumMap = {};
   myActive.forEach(b => {
@@ -290,9 +296,14 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
               style={{font:"600 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:8, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
               {JOB_VIEWS.map(v => <option key={v.key} value={v.key}>{v.label}</option>)}
             </select>
+            <select value={markaActive ? markaSel : "all"} onChange={e => setMarkaSel(e.target.value)} aria-label="Marka filtresi"
+              style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:8, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
+              <option value="all">Tüm markalar</option>
+              {viewBrands.map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
             <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)"}}>
-              {curView.completed && (overdue.length || urgent.length) ? "" : (overdue.length > 0 && jobView==="aktif" && <span style={{color:"var(--prio-red)", fontWeight:600}}>{overdue.length} gecikmiş · </span>)}
-              toplam {tableRows.length} · {curView.note}
+              {curView.completed && (overdue.length || urgent.length) ? "" : (overdue.length > 0 && jobView==="aktif" && !markaActive && <span style={{color:"var(--prio-red)", fontWeight:600}}>{overdue.length} gecikmiş · </span>)}
+              toplam {displayRows.length}{markaActive ? ` · ${markaSel}` : ""} · {curView.note}
             </div>
           </div>
           <div style={{display:"flex", gap:6}}>
@@ -302,9 +313,9 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
             {curView.completed && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>aralık: {timeRange === "all" ? "tümü" : timeRange + "g"}</span>}
           </div>
         </div>
-        {tableRows.length > 0
-          ? <BriefTable rows={tableRows} onRowClick={onOpenBrief}/>
-          : <div style={{padding:32, textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>Bu görünümde iş yok.</div>
+        {displayRows.length > 0
+          ? <BriefTable rows={displayRows} onRowClick={onOpenBrief}/>
+          : <div style={{padding:32, textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>{markaActive ? `${markaSel} markasında bu görünümde iş yok.` : "Bu görünümde iş yok."}</div>
         }
       </Card>
 
