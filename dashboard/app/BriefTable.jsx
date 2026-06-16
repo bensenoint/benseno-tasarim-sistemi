@@ -148,7 +148,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
       <td style={cellStyle()}><PriorityBadge p={brief.oncelik || { code: "ylw", label: "NORMAL" }}/></td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
-      <td style={{...cellStyle(), maxWidth: 160, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
+      <td style={{...cellStyle(), maxWidth: 200, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
         {brief.baslik}
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle()}>
