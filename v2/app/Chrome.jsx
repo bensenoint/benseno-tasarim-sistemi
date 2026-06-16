@@ -20,7 +20,6 @@ const NAV_SECTIONS = [
     items: [
       { id: "overview",  label: "Genel bakış",   icon: "Home" },
       { id: "jobs",      label: "Aktif işler",    icon: "Briefcase" },
-      { id: "lab",       label: "Analitik Lab",   icon: "BarChart2" },
     ]
   },
   {

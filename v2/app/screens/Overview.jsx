@@ -350,6 +350,22 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
         <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması" onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}/>
       </KpiGrid>
 
+      {/* Gömülü mini-widget'lar — termin ufku + kapasite ısısı */}
+      <div className="bn-grid-2" style={{display:"grid", gridTemplateColumns:"1.5fr 1fr", gap:"var(--grid-gap)", marginTop:"var(--section-gap)"}}>
+        <Card padding={0}>
+          <CardHead title="Termin ufku" sub="önümüzdeki 14 gün · noktaya tıkla"/>
+          <div style={{padding:16}}>
+            <LabHorizon briefs={active} now={(data && data.NOW) || Date.now()} onOpenBrief={onOpenBrief}/>
+          </div>
+        </Card>
+        <Card padding={0}>
+          <CardHead title="Kapasite ısısı" sub="kişi yükü / kapasite"/>
+          <div style={{padding:16, maxHeight:280, overflowY:"auto"}}>
+            <LabCapacity briefs={active} users={data.USERS}/>
+          </div>
+        </Card>
+      </div>
+
       {/* Tablo — tam genişlik */}
       <Card padding={0} style={{marginTop:"var(--section-gap)"}}>
         <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line-soft)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
