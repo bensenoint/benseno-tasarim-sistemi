@@ -647,7 +647,52 @@ function ChatBot({ currentUser }) {
 try { window.BnsChatBot = ChatBot; } catch (e) {}
 
 
-function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers, currentUser, onLogout }) {
+// Global tarih aralığı filtresi — preset'ler + özel aralık. Açılış default'u son 30 gün.
+function DateRangeControl({ range, onChange, now, compact }) {
+  const [open, setOpen] = React.useState(false);
+  const DAY = 86400000;
+  const PRESETS = [["7d","Son 7 gün",7],["30d","Son 30 gün",30],["90d","Son 90 gün",90],["year","Bu yıl",null],["all","Tümü",null]];
+  function apply(code, days) {
+    if (code === "all")  { onChange({ from: 0, to: 8.64e15, preset: "all" }); setOpen(false); return; }
+    if (code === "year") { const f = new Date(new Date(now).getFullYear(), 0, 1).getTime(); onChange({ from: f, to: now, preset: "year" }); setOpen(false); return; }
+    onChange({ from: now - days * DAY, to: now, preset: code }); setOpen(false);
+  }
+  const label = (PRESETS.find(p => p[0] === range.preset) || [null, "Özel aralık"])[1];
+  const toYMD = (ms) => { const d = new Date(ms); return isNaN(d.getTime()) ? "" : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+  const parseYMD = (s, end) => { const p = (s||"").split("-").map(Number); if (!p[0]) return null; return new Date(p[0], p[1]-1, p[2], end?23:0, end?59:0, end?59:0).getTime(); };
+  return (
+    <div style={{ position: "relative", flexShrink: 0 }}>
+      <button onClick={() => setOpen(o => !o)} title="Tarih aralığı"
+        style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: compact ? "5px 7px" : "5px 9px",
+          border: "1px solid var(--line)", borderRadius: 7, background: range.preset === "30d" ? "var(--paper-2)" : "var(--ember-tint)",
+          color: range.preset === "30d" ? "var(--ink-3)" : "var(--ember)", font: "500 11px/1 var(--font-sans)", cursor: "pointer" }}>
+        <span>📅</span>{!compact && <span>{label}</span>}<span style={{ color: "var(--ink-4)" }}>▾</span>
+      </button>
+      {open && (
+        <div onMouseLeave={() => setOpen(false)} style={{ position: "absolute", top: "100%", right: 0, marginTop: 6, zIndex: 80,
+          background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10, padding: 6, boxShadow: "var(--shadow-1)", minWidth: 184 }}>
+          {PRESETS.map(([code, lbl, days]) => (
+            <button key={code} onClick={() => apply(code, days)} style={{ display: "flex", width: "100%", textAlign: "left",
+              padding: "7px 9px", border: 0, borderRadius: 6, cursor: "pointer",
+              background: range.preset === code ? "var(--paper-2)" : "transparent",
+              font: `${range.preset === code ? 600 : 500} 12px/1 var(--font-sans)`, color: "var(--ink)" }}>{lbl}</button>
+          ))}
+          <div style={{ borderTop: "1px solid var(--line)", margin: "5px 4px", paddingTop: 6 }}>
+            <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ink-4)", textTransform: "uppercase", letterSpacing: "0.04em", padding: "0 5px 6px" }}>Özel aralık</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 5, padding: "0 4px 2px" }}>
+              <input type="date" value={toYMD(range.from)} onChange={e => { const v = parseYMD(e.target.value, false); if (v != null) onChange({ ...range, from: v, preset: "custom" }); }}
+                style={{ font: "500 12px/1 var(--font-sans)", padding: "5px 7px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)" }}/>
+              <input type="date" value={toYMD(range.to)} onChange={e => { const v = parseYMD(e.target.value, true); if (v != null) onChange({ ...range, to: v, preset: "custom" }); }}
+                style={{ font: "500 12px/1 var(--font-sans)", padding: "5px 7px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)" }}/>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers, currentUser, onLogout }) {
   const isMobile = useIsMobile();
   const [tick, setTick] = React.useState(0);
   React.useEffect(() => {
@@ -704,6 +749,12 @@ function Header({ user, viewMode, setViewMode, theme, setTheme, onOpenPalette, o
           }}/>
           {isMobile ? "Canlı" : `Canlı · ${syncSecs}sn`}
         </span>
+
+        {/* Tarih aralığı filtresi — global, açılışta son 30 gün */}
+        {dateRange && setDateRange && (
+          <DateRangeControl range={dateRange} onChange={setDateRange}
+            now={(window.BNS_DATA && window.BNS_DATA.NOW) || Date.now()} compact={isMobile}/>
+        )}
 
         {/* View mode — hidden on mobile (bottom nav handles navigation) */}
         {!isMobile && (

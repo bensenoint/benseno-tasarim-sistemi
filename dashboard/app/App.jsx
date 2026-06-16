@@ -168,6 +168,11 @@ function App({ currentUser, onLogout }) {
   const [lastPollTime, setLastPollTime] = React.useState(null); // son başarılı poll zamanı
   const [online, setOnline] = React.useState(true);   // API erişilebilir mi (false → çevrimdışı ekranı)
   const offlineFailsRef = React.useRef(0);             // ardışık başarısız poll sayısı
+  // ─── Tarih aralığı filtresi (global) — açılışta son 30 gün ──────────────
+  const [dateRange, setDateRange] = React.useState(() => {
+    const now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
+    return { from: now - 30 * 86400000, to: now, preset: "30d" };
+  });
   const everLoadedRef = React.useRef(false);           // en az bir kez canlı veri yüklendi mi
 
   // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
@@ -221,8 +226,16 @@ function App({ currentUser, onLogout }) {
   const filteredBriefs    = React.useMemo(() => filterByViewMode(briefs),         [filterByViewMode, briefs]);
   const filteredCompleted = React.useMemo(() => filterByViewMode(data.completed), [filterByViewMode, data.completed, briefs]);
 
-  // Live data shape — briefs ve completed artık filtered (viewMode'a göre)
-  const liveData = { ...data, briefs: filteredBriefs, completed: filteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats, history };
+  // Tarih aralığı (akıllı): aktif işler her zaman görünür (filteredBriefs dokunulmaz);
+  // tamamlanan işler tamamlanma tarihine (bitis) göre aralıkta süzülür.
+  const dateFilteredCompleted = React.useMemo(() => filteredCompleted.filter(c => {
+    const t = c.bitis;
+    if (t == null) return true;
+    return t >= dateRange.from && t <= dateRange.to;
+  }), [filteredCompleted, dateRange]);
+
+  // Live data shape — briefs ve completed artık filtered (viewMode + tarih aralığı)
+  const liveData = { ...data, briefs: filteredBriefs, completed: dateFilteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats, history, dateRange };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
   React.useEffect(() => { document.documentElement.setAttribute("data-theme", t.theme); }, [t.theme]);
@@ -517,6 +530,7 @@ function App({ currentUser, onLogout }) {
       <Header
         user={user}
         viewMode={viewMode} setViewMode={setViewMode}
+        dateRange={dateRange} setDateRange={setDateRange}
         theme={t.theme} setTheme={(v) => setTweak("theme", v)}
         onOpenPalette={() => setPalette(true)}
         onNewBrief={() => setNewBrief(true)}
