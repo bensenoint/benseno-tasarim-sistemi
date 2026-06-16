@@ -1,0 +1,637 @@
+/* ============================================================
+   Benseno Tasarım Sistemi — colors_and_type.css
+   Foundation tokens. Used by every preview card and UI kit.
+   ============================================================ */
+
+/* ----- Fonts (Google Fonts CDN) ------------------------------ */
+/* If offline, drop WOFF2s in fonts/ and uncomment the @font-face
+   block at the bottom of this file. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap");
+
+/* ------------------------------------------------------------ */
+/*  CORE TOKENS                                                 */
+/* ------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- Surfaces (warm-paper canvas) -------------------------- */
+  --paper:        #FBFAF7;   /* page canvas */
+  --paper-2:      #F4F2EC;   /* secondary surface (toolbar fills) */
+  --surface:      #FFFFFF;   /* card / panel */
+  --surface-sub:  #FAF9F6;   /* inset / table-stripe */
+  --surface-raised: #FFFFFF; /* elevated card (hover state) */
+  --sidebar-bg:   #F7F5F0;   /* sidebar — slightly warmer than paper */
+  --header-blur:  rgba(251, 250, 247, 0.88); /* header backdrop */
+  --overlay:      rgba(22, 22, 26, 0.40); /* modal backdrop */
+
+  /* ---- Ink (text) ------------------------------------------ */
+  --ink:          #16161A;   /* primary text */
+  --ink-2:        #2E2E36;   /* secondary text */
+  --ink-3:        #5B5B66;   /* tertiary / labels */
+  --ink-4:        #8A8A94;   /* placeholder / disabled text */
+  --ink-5:        #B6B6BE;   /* hint / icon idle */
+
+  /* ---- Lines ----------------------------------------------- */
+  --line:         #ECEAE3;   /* hairline border */
+  --line-strong:  #DFDCD3;   /* divider / table grid */
+  --line-soft:    #F2F0EA;   /* very faint separator */
+
+  /* ---- Brand accent (single warm) -------------------------- */
+  /* Birincil aksan = logo mavisi (#24479E). Sıcak/aciliyet vurgusu --prio-* tokenlarında.
+     Not: token adı tarihsel olarak "ember"; değeri artık logo mavisi (marka tek kimlik). */
+  --ember:        #24479E;   /* primary action, focus ring, brand — logo mavisi */
+  --ember-hover:  #1D3A82;
+  --ember-press:  #16306B;
+  --ember-tint:   rgba(36, 71, 158, 0.10);
+  --ember-muted:  rgba(36, 71, 158, 0.25);
+
+  /* ---- Ody mascot accent (logo mavisi) --------------------- */
+  --ody:          #24479E;   /* benseno logo wordmark */
+  --ody-tint:     rgba(36, 71, 158, 0.12);
+
+  /* ---- Semantic — priority (color-blind paired with glyph) -- */
+  --prio-red:     #D7263D;   /* 🔴 Acil   — triangle glyph */
+  --prio-orange:  #E2670A;   /* 🟠 Yüksek — square glyph (sarıdan net ayrışır) */
+  --prio-yellow:  #B5A013;   /* 🟡 Normal — circle glyph (altın-sarı, turuncudan ayrık) */
+  --prio-green:   #2E8F66;   /* 🟢 Düşük  — check glyph */
+
+  --prio-red-bg:    rgba(215, 38, 61, 0.10);
+  --prio-orange-bg: rgba(226, 103, 10, 0.12);
+  --prio-yellow-bg: rgba(181, 160, 19, 0.14);
+  --prio-green-bg:  rgba(46, 143, 102, 0.12);
+
+  /* ---- Semantic — system feedback -------------------------- */
+  --success:      #2E8F66;
+  --warning:      #E07A1F;
+  --danger:       #D7263D;
+  --info:         #3360A4;
+
+  /* ---- 16-hue brand wheel (color-blind safe, Wong-derived) -- */
+  --bw-1:  #4E79A7;  --bw-2:  #F28E2B;  --bw-3:  #59A14F;  --bw-4:  #B07AA1;
+  --bw-5:  #76B7B2;  --bw-6:  #E15759;  --bw-7:  #EDC948;  --bw-8:  #9C755F;
+  --bw-9:  #BAB0AC;  --bw-10: #2C7FB8;  --bw-11: #D9881F;  --bw-12: #6A8E3D;
+  --bw-13: #8E5BA1;  --bw-14: #00786F;  --bw-15: #C44545;  --bw-16: #B79100;
+
+  /* ---- Type families --------------------------------------- */
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* ---- Type scale (px) ------------------------------------- */
+  --fs-11: 11px;   /* caption / mono labels */
+  --fs-12: 12px;   /* tabular minor */
+  --fs-13: 13px;   /* secondary UI */
+  --fs-14: 14px;   /* body */
+  --fs-15: 15px;   /* large body */
+  --fs-16: 16px;   /* paragraph */
+  --fs-18: 18px;   /* section title */
+  --fs-20: 20px;   /* card heading */
+  --fs-22: 22px;   /* page heading */
+  --fs-28: 28px;   /* KPI value small */
+  --fs-36: 36px;   /* KPI value large */
+  --fs-44: 44px;   /* display number */
+  --fs-56: 56px;   /* hero number */
+
+  /* ---- Line heights ---------------------------------------- */
+  --lh-tight:   1.15;
+  --lh-snug:    1.30;
+  --lh-normal:  1.45;
+  --lh-prose:   1.60;
+
+  /* ---- Letter spacing -------------------------------------- */
+  --ls-tight:   -0.01em;
+  --ls-normal:   0;
+  --ls-wide:     0.04em;
+  --ls-eyebrow:  0.10em;   /* for ALLCAPS labels */
+
+  /* ---- Weights --------------------------------------------- */
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* ---- Spacing (4px base) ---------------------------------- */
+  --sp-0:   0;
+  --sp-1:   4px;
+  --sp-2:   8px;
+  --sp-3:   12px;
+  --sp-4:   16px;
+  --sp-6:   24px;
+  --sp-8:   32px;
+  --sp-12:  48px;
+  --sp-16:  64px;
+  --sp-24:  96px;
+
+  /* ---- Radii ----------------------------------------------- */
+  --r-1:   4px;    /* tag, dot */
+  --r-2:   6px;    /* button, input */
+  --r-3:   10px;   /* card */
+  --r-4:   14px;   /* modal, drawer */
+  --r-pill: 999px; /* chip, focus ring */
+
+  /* ---- Shadows --------------------------------------------- */
+  --shadow-0: none;
+  --shadow-1:
+    0 1px 2px rgba(22, 22, 26, 0.05),
+    0 4px 16px rgba(22, 22, 26, 0.07);
+  --shadow-2:
+    0 2px 8px rgba(22, 22, 26, 0.07),
+    0 12px 32px rgba(22, 22, 26, 0.12);
+  --shadow-card:
+    0 1px 2px rgba(22, 22, 26, 0.04),
+    0 4px 14px rgba(22, 22, 26, 0.06);
+  --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
+
+  /* ---- Motion ---------------------------------------------- */
+  --ease-out-quart: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out:    cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-slow:    320ms;
+
+  /* ---- Layout ---------------------------------------------- */
+  --max-content: 1440px;
+  --header-h:    56px;
+  --tabbar-h:    44px;
+}
+
+/* ------------------------------------------------------------ */
+/*  DARK MODE (optional)                                        */
+/* ------------------------------------------------------------ */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --paper:        #0F0F12;
+  --paper-2:      #15151A;
+  --surface:      #18181D;
+  --surface-sub:  #1C1C22;
+  --surface-raised: #1E1E24;
+  --sidebar-bg:   #111116;
+  --header-blur:  rgba(15, 15, 18, 0.90);
+  --overlay:      rgba(0, 0, 0, 0.55);
+
+  --ink:          #F1EFE9;
+  --ink-2:        #C9C7C1;
+  --ink-3:        #8F8E8A;
+  --ink-4:        #6B6A67;
+  --ink-5:        #4B4A48;
+
+  --line:         #2A2A30;
+  --line-strong:  #36363E;
+  --line-soft:    #22222A;
+
+  --ember:        #5B7BD4;   /* logo mavisi, koyu temada açıltılmış (birincil aksan) */
+  --ember-hover:  #7491DD;
+  --ember-press:  #24479E;
+  --ember-tint:   rgba(91, 123, 212, 0.14);
+  --ember-muted:  rgba(91, 123, 212, 0.30);
+
+  --ody:          #5B7BD4;   /* logo mavisi, koyu temada açıltılmış */
+  --ody-tint:     rgba(91, 123, 212, 0.16);
+
+  --shadow-1:
+    0 1px 2px rgba(0, 0, 0, 0.40),
+    0 4px 12px rgba(0, 0, 0, 0.32);
+  --shadow-2:
+    0 2px 6px rgba(0, 0, 0, 0.40),
+    0 16px 40px rgba(0, 0, 0, 0.48);
+  --shadow-card:
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    0 6px 20px rgba(0, 0, 0, 0.36);
+  --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
+
+  /* ---- Semantic — priority (dark mode: lighter for contrast) -- */
+  --prio-red:     #F06B78;
+  --prio-orange:  #F58B33;
+  --prio-yellow:  #E3D24A;
+  --prio-green:   #52C49A;
+
+  --prio-red-bg:    rgba(240, 107, 120, 0.14);
+  --prio-orange-bg: rgba(245, 139, 51,  0.14);
+  --prio-yellow-bg: rgba(227, 210, 74,  0.16);
+  --prio-green-bg:  rgba(82,  196, 154, 0.14);
+
+  /* ---- Semantic — system feedback (dark) ------------------- */
+  --success: #52C49A;
+  --warning: #F5A05A;
+  --danger:  #F06B78;
+  --info:    #6B9FD4;
+}
+
+/* ------------------------------------------------------------ */
+/*  SEMANTIC ROLES                                              */
+/* ------------------------------------------------------------ */
+
+/* Use these classes (or the matching vars) wherever you'd otherwise
+   write h1/h2/etc. They tie to the scale above and add the right
+   font-family + weight + line-height + tracking. */
+
+.bn-display {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-56);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+}
+.bn-h1 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-22);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+}
+.bn-h2 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-18);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+.bn-h3 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-15);
+  line-height: var(--lh-snug);
+  color: var(--ink);
+}
+.bn-subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-20);
+  line-height: var(--lh-snug);
+  color: var(--ink-2);
+}
+.bn-body {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-14);
+  line-height: var(--lh-normal);
+  color: var(--ink);
+}
+.bn-body-sm {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-13);
+  line-height: var(--lh-normal);
+  color: var(--ink-2);
+}
+.bn-label {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+.bn-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-11);
+  line-height: 1;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.bn-caption {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  color: var(--ink-3);
+}
+.bn-mono {
+  font-family: var(--font-mono);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-12);
+  line-height: var(--lh-snug);
+  letter-spacing: 0;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.bn-kpi-value {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-36);
+  line-height: var(--lh-tight);   /* 1.15 — prevents Türkçe descender clip */
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.bn-kpi-value-lg {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-44);
+  line-height: var(--lh-tight);   /* 1.15 — prevents Türkçe descender clip */
+  letter-spacing: var(--ls-tight);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* No-wrap helpers — most chrome labels should never wrap */
+button, .bn-eyebrow, .bn-label, .bn-mono { white-space: nowrap; }
+
+/* Tabular numerics everywhere inside tables and KPI cells */
+table, .bn-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------ */
+/*  BASE PAGE                                                   */
+/* ------------------------------------------------------------ */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-14);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+  border-radius: var(--r-2);
+}
+
+/* ------------------------------------------------------------ */
+/*  DENSITY MODES                                               */
+/*  Set on <html data-density="…"> via Tweaks.                  */
+/* ------------------------------------------------------------ */
+:root {
+  --row-h: 38px;         /* table row default */
+  --row-pad: 10px;
+  --card-pad: 16px;
+  --section-gap: 24px;
+  --grid-gap: 16px;
+  --kpi-fs: 36px;
+}
+html[data-density="compact"] {
+  --row-h: 32px;
+  --row-pad: 7px;
+  --card-pad: 12px;
+  --section-gap: 18px;
+  --grid-gap: 12px;
+  --kpi-fs: 28px;
+}
+html[data-density="spacious"] {
+  --row-h: 48px;
+  --row-pad: 14px;
+  --card-pad: 22px;
+  --section-gap: 32px;
+  --grid-gap: 20px;
+  --kpi-fs: 44px;
+}
+
+/* ------------------------------------------------------------ */
+/*  PAPER NOISE OVERLAY                                         */
+/*  Set on <html data-noise="on"> — faint 2% paper texture.     */
+/* ------------------------------------------------------------ */
+html[data-noise="on"] body::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+html[data-theme="dark"][data-noise="on"] body::before {
+  opacity: 0.06;
+  mix-blend-mode: screen;
+}
+
+/* ------------------------------------------------------------ */
+/*  SCROLLBAR (subtle)                                          */
+/* ------------------------------------------------------------ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  border: 2px solid var(--paper);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--ink-5); }
+
+/* ------------------------------------------------------------ */
+/*  SCREEN ANIMATION                                            */
+/* ------------------------------------------------------------ */
+@keyframes bn-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes bn-slide-r { from { transform: translateX(100%); } to { transform: translateX(0); } }
+/* Emil: 8px → 5px; opacity always paired with translate */
+@keyframes bn-slide-up {
+  from { transform: translateY(5px); opacity: 0 }
+  to   { transform: translateY(0);   opacity: 1 }
+}
+/* Emil: tab enter = opacity + subtle Y, not just fade */
+@keyframes bn-tab-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.bn-tab-in { animation: bn-tab-enter 180ms var(--ease-out-quart); }
+
+/* ------------------------------------------------------------ */
+/*  PRESS FEEDBACK (Emil: every pressable must feel responsive) */
+/* ------------------------------------------------------------ */
+button,
+[role="button"],
+.bns-tab,
+.bns-nav-item,
+.bns-row-clickable,
+.bns-cmd-item,
+.bns-kpi-card[onclick],
+.bns-brief-row {
+  transition: transform 120ms var(--ease-out-quart),
+              background 120ms var(--ease-out-quart),
+              color 120ms var(--ease-out-quart);
+}
+button:active,
+[role="button"]:active,
+.bns-tab:active,
+.bns-nav-item:active,
+.bns-row-clickable:active,
+.bns-cmd-item:active,
+.bns-brief-row:active {
+  transform: scale(0.97);
+}
+
+/* ------------------------------------------------------------ */
+/*  FOCUS RING — animated transition                            */
+/* ------------------------------------------------------------ */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--ring-focus);
+  border-radius: var(--r-2);
+  transition: box-shadow 120ms var(--ease-out-quart);
+}
+
+/* ------------------------------------------------------------ */
+/*  POPOVER / TOOLTIP origin-aware scale                        */
+/* ------------------------------------------------------------ */
+.bns-popover,
+.bns-tooltip,
+.bns-dropdown {
+  transform-origin: var(--radix-popover-content-transform-origin, top center);
+}
+
+/* ------------------------------------------------------------ */
+/*  PREFERS-REDUCED-MOTION                                      */
+/* ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  /* Keep opacity transitions for comprehension */
+  .bn-tab-in,
+  #bns-loading {
+    transition-duration: 150ms !important;
+    animation-duration: 150ms !important;
+  }
+}
+
+/* ------------------------------------------------------------ */
+/*  HOVER — only on devices that support it (not touch)         */
+/* ------------------------------------------------------------ */
+@media (hover: hover) and (pointer: fine) {
+  .bns-row-clickable:hover,
+  .bns-brief-row:hover {
+    background: var(--surface-sub);
+  }
+  .bns-nav-item:hover {
+    background: var(--paper-2);
+  }
+}
+
+/* Tabular numerics for KPIs */
+.bn-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* ------------------------------------------------------------ */
+/*  MOBILE RESPONSIVE                                           */
+/* ------------------------------------------------------------ */
+/* MobileNav: hidden on desktop, shown on mobile via CSS */
+.bns-mobile-nav-wrap { display: none; }
+
+/* Desktop footer shown by default */
+.bns-desktop-footer { display: flex; }
+
+@media (max-width: 767px) {
+  /* Sidebar: always hidden on mobile — CSS guarantees this even if JS isMobile fails */
+  aside { display: none !important; }
+
+  /* MobileNav: always shown on mobile */
+  .bns-mobile-nav-wrap { display: block; }
+
+  /* Footer: hidden on mobile */
+  .bns-desktop-footer { display: none !important; }
+
+  /* Main content: extra bottom padding for bottom nav */
+  .bns-main-content { padding: 8px 14px 80px !important; }
+
+  /* Table: hide non-essential columns on mobile */
+  .bns-col-mobile-hide { display: none !important; }
+
+  /* Overview 2-col grid → single col on mobile */
+  .bn-grid-2 { grid-template-columns: 1fr !important; }
+  .bn-grid-2 > * { min-width: 0; }
+
+  /* 3-col grids → single col on mobile */
+  .bn-grid-3 { grid-template-columns: 1fr !important; }
+  .bn-grid-3 > * { min-width: 0; }
+
+  /* KPI grid — 2 columns on mobile (bn-kpi-grid and bns-kpi-grid) */
+  .bns-kpi-grid, .bn-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* All multi-col KPI grids → 2 col on mobile */
+  .bns-kpi-8,
+  .bns-kpi-6,
+  .bns-kpi-5,
+  .bns-kpi-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Kanban columns → horizontal scroll on mobile */
+  .bns-kanban-grid {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Deadlines 7-col grid → 2x4 on mobile */
+  .bns-deadlines-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Brief table — fit to screen on mobile (columns already reduced) */
+  .bns-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bns-table-wrap table {
+    min-width: 380px !important;
+    width: 100% !important;
+  }
+
+  /* Card padding reduced */
+  .bns-card-mobile {
+    padding: 12px !important;
+  }
+
+  /* PageHead title smaller */
+  .bns-page-title {
+    font-size: 22px !important;
+  }
+
+  /* BriefDrawer — full screen on mobile */
+  .bns-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    top: auto !important;
+    bottom: 0 !important;
+    height: 92vh !important;
+  }
+
+  /* Hide desktop-only shortcuts hint */
+  .bns-shortcuts-hint {
+    display: none !important;
+  }
+
+  /* Tweak panel hidden on mobile */
+  .bns-tweaks {
+    display: none !important;
+  }
+}
+
+/* ── Ody maskotu animasyonları (yeni animasyonlu Ody) ── */
+@keyframes odyBob{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-5px) rotate(2deg);}}
+@keyframes odyPop{0%{transform:scale(.78);}60%{transform:scale(1.12);}100%{transform:scale(1);}}
+@keyframes odyBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+@keyframes odyShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-1.5px);}75%{transform:translateX(1.5px);}}
+@keyframes odyBlink{0%,90%,100%{transform:scaleY(1);}95%{transform:scaleY(.1);}}
+@keyframes odyPopIn{0%{transform:scale(.8);opacity:0;}100%{transform:scale(1);opacity:1;}}
+
+/* ── Erişilebilirlik: hareketi azalt tercihi (Ody bob, geçişler, sparkline vb.) ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
