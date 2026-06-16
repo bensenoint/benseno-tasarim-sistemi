@@ -269,6 +269,7 @@ async function patchBrief(id, raw) {
   // Rol değişikliği bildirimi için: mutasyondan ÖNCE atanan kümesini al (çıkarılanları yakalamak için).
   const roleChange = d.worker_ids !== undefined || d.lead_ids !== undefined || d.gozlemci_ids !== undefined;
   const before = roleChange ? await assigneeMap(id) : null;
+  let deadlineChange = null;   // {eski,yeni,ileri} — thread notunu özelleştirmek için
   const res = await tx(async (client) => {
     const sets = [], vals = [];
     const put = (col, v) => { vals.push(v); sets.push(`${col}=$${vals.length}`); };
@@ -291,6 +292,7 @@ async function patchBrief(id, raw) {
       if (oldMs && newMs && newMs !== oldMs) {          // her deadline değişimini geçmişe yaz (eski→yeni)
         const hist = JSON.stringify({ eski: oldRow.deadline, yeni: newDl, at: new Date().toISOString(), by: d.by || null, ileri: newMs > oldMs });
         vals.push(hist); sets.push(`deadline_history = COALESCE(deadline_history,'[]'::jsonb) || $${vals.length}::jsonb`);
+        deadlineChange = { eski: oldRow.deadline, yeni: newDl, ileri: newMs > oldMs };  // thread notu için
       }
     }
     if (d.priority !== undefined) put('priority', d.priority);
@@ -328,6 +330,13 @@ async function patchBrief(id, raw) {
   // Rol değişimi varsa bulk DM'i kapat — notifyRoleDiff hedefli atar; thread notu her zaman düşer.
   // Mixed (içerik+rol) patch'te de aynı: çift DM'i önler, mevcut atananlar thread'den görür.
   let summary = `✏️ güncellendi: ${friendly}`;
+  if (deadlineChange) {   // termin değiştiyse thread'e eski→yeni'yi açıkça yaz
+    const f = (x) => { try { return new Date(x).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) { return '—'; } };
+    const yon = deadlineChange.ileri ? 'uzatıldı' : 'öne çekildi';
+    const dlNote = `📅 Termin ${yon}: ${f(deadlineChange.eski)} → ${f(deadlineChange.yeni)}`;
+    const other = fields.filter(k => k !== 'deadline' && !roleKeys.includes(k));
+    summary = other.length ? `✏️ güncellendi: ${other.map(k => FIELD_TR[k] || k).join(', ')}\n${dlNote}` : dlNote;
+  }
   let after = null;
   if (roleChange) {
     // Thread notuna mention'lı ekleme/çıkarma satırı — dashboard'dan eklenen kişi
