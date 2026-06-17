@@ -184,7 +184,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
         )}
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{(brief.rev_ic > 0 || brief.rev_musteri > 0)
-        ? <span title={`${brief.rev_ic||0} iç · ${brief.rev_musteri||0} müşteri revizyonu`}>{brief.rev_ic||0}<span style={{color:"var(--ink-5)"}}>/</span><span style={{color:"#7c5cff"}}>{brief.rev_musteri||0}</span></span>
+        ? <span title={`${brief.rev_ic||0} iç · ${brief.rev_musteri||0} müşteri revizyonu`}>{brief.rev_ic||0}<span style={{color:"var(--ink-5)"}}>/</span><span style={{color:"var(--musteride)"}}>{brief.rev_musteri||0}</span></span>
         : brief.revision > 0 ? brief.revision : <span style={{color:"var(--ink-5)"}}>—</span>}</td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title="İşin açıldığı tarih ve saat">
         {brief.acilma ? new Date(brief.acilma).toLocaleString("tr-TR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "—"}

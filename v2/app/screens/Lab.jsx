@@ -182,7 +182,7 @@ function LabQuality({ completed }) {
 function LabFunnel({ briefs, completedCount }) {
   const order = [["yeni", "Yeni", "var(--ink-3)"], ["calisiliyor", "Çalışılıyor", "var(--prio-orange)"],
     ["incelemede", "İncelemede", "var(--prio-yellow)"], ["blokeli", "Blokeli", "var(--prio-red)"],
-    ["musteride", "Müşteride", "#7c5cff"], ["tamamlandi", "Tamamlandı", "var(--prio-green)"]];
+    ["musteride", "Müşteride", "var(--musteride)"], ["tamamlandi", "Tamamlandı", "var(--prio-green)"]];
   const counts = {};
   briefs.forEach(b => { counts[b.durum] = (counts[b.durum] || 0) + 1; });
   counts.tamamlandi = completedCount;

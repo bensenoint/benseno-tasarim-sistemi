@@ -278,7 +278,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
       {/* ─── KPI şeridi ──────────────────────────────────────── */}
       <div className="bns-kpi-8" style={{display:"grid", gridAutoFlow:"column", gridAutoColumns:"minmax(0,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)", overflowX:"auto"}}>
         <Kpi label="Aktif iş"      value={myActive.length} color={myActive.length > CAP_LIMIT ? "var(--prio-red)" : undefined}/>
-        <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "#7c5cff" : undefined} sub="✈️ dönüş bekleniyor"/>
+        <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "var(--musteride)" : undefined} sub="✈️ dönüş bekleniyor"/>
         <Kpi label="Tamamlanan"    value={myCompleted.length} sub="kayıtlı"/>
         {isGorkem && <Kpi label="Çıktı hızı"    value={tp.lowSample ? "—" : tp.perWeek + "/hf"} sub={tp.lowSample ? `${tp.count} iş/4hf · veri ince` : `son 4 hafta · ${tp.count} iş`}/>}
         <Kpi label="Toplam revize" value={totalRev} sub={`ort. ${avgRev}/iş`}/>

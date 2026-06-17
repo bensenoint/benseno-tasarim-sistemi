@@ -60,7 +60,7 @@ function MultiScreen({ data, onOpenBrief }) {
       <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Sıralı iş" value={sirali.length} sub="aktif onay zinciri" onClick={() => setFiltre("all")} active={filtre === "all"}/>
         <Kpi label="Gecikmiş" value={gecikmis.length} color={gecikmis.length ? "var(--prio-red)" : undefined} sub="termin geçti" onClick={() => tgl("gecikmis")} active={filtre === "gecikmis"}/>
-        <Kpi label="Müşteride" value={musteride.length} color="#7c5cff" sub="✈️ dönüş bekleniyor" onClick={() => tgl("musteride")} active={filtre === "musteride"}/>
+        <Kpi label="Müşteride" value={musteride.length} color="var(--musteride)" sub="✈️ dönüş bekleniyor" onClick={() => tgl("musteride")} active={filtre === "musteride"}/>
       </div>
 
       {/* List */}

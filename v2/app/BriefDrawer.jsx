@@ -118,7 +118,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             </span>
             {b.musteri_bekliyor && !ro && (
               <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase",
-                color:"#7c5cff", background:"rgba(124,92,255,0.1)", padding:"4px 8px", borderRadius:999}}>
+                color:"var(--musteride)", background:"rgba(124,92,255,0.1)", padding:"4px 8px", borderRadius:999}}>
                 ✈️ müşteri dönüşü bekleniyor
               </span>
             )}

@@ -25,7 +25,7 @@ function MusterideScreen({ data, onOpenBrief }) {
       />
 
       <div className="bns-kpi-4" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)" }}>
-        <Kpi label="Müşteride" value={rows.length} color="#7c5cff"/>
+        <Kpi label="Müşteride" value={rows.length} color="var(--musteride)"/>
         <Kpi label="Ort. bekleme" value={fmtBekleme(ortBekleme)} sub="gönderimden beri"/>
         <Kpi label="En uzun bekleyen" value={fmtBekleme(enUzun)} color={enUzun != null && enUzun >= 72 ? "var(--prio-orange)" : undefined}/>
         <Kpi label="Toplam gönderim" value={rows.reduce((a, b) => a + (b.gonderim_sayisi || 0), 0)} sub="bu işlerde"/>
@@ -70,7 +70,7 @@ function MusterideScreen({ data, onOpenBrief }) {
                         ✈️ {b.gonderim_sayisi || 1}.{b.son_gonderim_at ? ` · ${fmtAt(b.son_gonderim_at)}` : ""}
                       </td>
                       <td style={{ ...mCs(true, "right"), color: sa != null && sa >= 72 ? "var(--prio-orange)" : "var(--ink)" , fontWeight: 600 }}>{fmtBekleme(sa)}</td>
-                      <td style={mCs(true, "right")}>{b.rev_ic || 0}<span style={{ color:"var(--ink-5)" }}>/</span><span style={{ color:"#7c5cff" }}>{b.rev_musteri || 0}</span></td>
+                      <td style={mCs(true, "right")}>{b.rev_ic || 0}<span style={{ color:"var(--ink-5)" }}>/</span><span style={{ color:"var(--musteride)" }}>{b.rev_musteri || 0}</span></td>
                       <td style={mCs(true, "right")}>{b.deadline ? fmtAt(b.deadline) : "—"}</td>
                     </tr>
                   );
