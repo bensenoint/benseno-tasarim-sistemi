@@ -61,7 +61,7 @@ function LabOdyCard({ active, overdue, today, review, extended, onChip }) {
 
 // ── ③ Termin ufku şeridi (14 gün) ──────────────────────────────────
 function LabHorizon({ briefs, now, onOpenBrief }) {
-  const W = 1000, H = 150, padL = 8, padR = 8, top = 18, bot = 26;
+  const W = 1000, H = 172, padL = 8, padR = 8, top = 20, bot = 28;
   const dMin = -3, dMax = 14;
   const xOf = (days) => padL + ((Math.max(dMin, Math.min(dMax, days)) - dMin) / (dMax - dMin)) * (W - padL - padR);
   const items = briefs
@@ -82,7 +82,7 @@ function LabHorizon({ briefs, now, onOpenBrief }) {
         ))}
         {items.map(({ b, d, i }) => {
           const cx = xOf(d);
-          const cy = top + 10 + ((i * 37) % (H - top - bot - 20));
+          const cy = top + 8 + ((i * 41) % (H - top - bot - 16));
           const col = labPrioColor((b.oncelik && b.oncelik.code) || (b.priority && b.priority.code));
           return (
             <circle key={b.id} cx={cx} cy={cy} r={6} fill={col} stroke="var(--surface)" strokeWidth="1.5"
@@ -120,13 +120,17 @@ function LabCapacity({ briefs, users, onSwitchTab }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {rows.map(({ u, load, cap, pct }) => (
-        <div key={u.id} style={{ display: "grid", gridTemplateColumns: "120px 1fr 64px", alignItems: "center", gap: 10 }}>
+        <div key={u.id} style={{ display: "grid", gridTemplateColumns: "108px 1fr 74px", alignItems: "center", gap: 10 }}>
           <span style={{ font: "500 12px/1.2 var(--font-sans)", color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.name || u.id}</span>
-          <div style={{ height: 16, background: "var(--paper-2)", borderRadius: 5, overflow: "hidden", position: "relative" }}>
+          <div style={{ height: 18, background: "var(--paper-2)", borderRadius: 5, overflow: "hidden", position: "relative" }}>
             <div style={{ width: Math.min(100, pct) + "%", height: "100%", background: barColor(pct), borderRadius: 5, transition: "width 240ms" }} />
-            {pct > 100 && <div style={{ position: "absolute", right: 4, top: 1, font: "700 10px/14px var(--font-sans)", color: "#fff" }}>aşırı</div>}
+            {pct > 100 && <div style={{ position: "absolute", right: 4, top: 2, font: "700 10px/14px var(--font-sans)", color: "#fff" }}>aşırı</div>}
           </div>
-          <span style={{ font: "600 11px/1 var(--font-mono)", color: barColor(pct), textAlign: "right" }}>{load}/{cap} · %{pct}</span>
+          {/* label-değer hiyerarşisi: değer (%) baskın, yük/kapasite destekleyici */}
+          <span style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+            <span style={{ font: "700 12px/1 var(--font-mono)", color: barColor(pct) }}>%{pct}</span>
+            <span style={{ font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)", marginLeft: 5 }}>{load}/{cap}</span>
+          </span>
         </div>
       ))}
     </div>
