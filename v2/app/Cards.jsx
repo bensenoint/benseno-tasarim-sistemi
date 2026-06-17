@@ -41,7 +41,7 @@ function CardHead({ title, sub, action, style }) {
 }
 
 // Kpi has three variants: "plain" | "trendchart" | "hero"
-function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, accent, onClick, active }) {
+function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, accent, onClick, active, emphasis, tint }) {
   const [hov, setHov] = React.useState(false);
   // Determine left-border accent color from color prop or trend
   const borderAccent = accent || color || null;
@@ -54,9 +54,9 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } } : undefined}
       style={{
-        background: "var(--surface)",
+        background: emphasis && tint ? tint : "var(--surface)",
         border: "1px solid var(--line)",
-        borderLeft: borderAccent ? `3px solid ${borderAccent}` : "1px solid var(--line)",
+        borderLeft: borderAccent ? `${emphasis ? 4 : 3}px solid ${borderAccent}` : "1px solid var(--line)",
         outline: active ? "2px solid var(--ember)" : "none",
         outlineOffset: -2,
         borderRadius: 12,
