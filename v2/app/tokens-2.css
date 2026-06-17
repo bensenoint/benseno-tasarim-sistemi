@@ -389,8 +389,8 @@ body {
 :root {
   --row-h: 38px;         /* table row default */
   --row-pad: 10px;
-  --card-pad: 18px;      /* refactoring-ui: kart içi nefes */
-  --section-gap: 30px;   /* refactoring-ui: bantlar arası daha çok boşluk */
+  --card-pad: 20px;      /* editoryal: kart içi nefes */
+  --section-gap: 36px;   /* editoryal: bantlar arası geniş boşluk */
   --grid-gap: 18px;
   --kpi-fs: 40px;        /* refactoring-ui: birincil metrik daha baskın */
 }

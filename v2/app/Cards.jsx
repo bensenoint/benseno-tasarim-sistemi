@@ -30,7 +30,7 @@ function CardHead({ title, sub, action, style }) {
     }}>
       <div style={{minWidth: 0}}>
         <h2 style={{
-          font: "500 17px/1.2 var(--font-display)", color: "var(--ink)",
+          font: "italic 500 18px/1.15 var(--font-display)", color: "var(--ink)",
           margin: 0, letterSpacing: "0"
         }}>{title}</h2>
         {sub && <div style={{font: "400 12px/1.3 var(--font-sans)", color: "var(--ink-3)", marginTop: 4}}>{sub}</div>}
@@ -183,21 +183,18 @@ function PageHead({ title, subtitle, actions, eyebrow }) {
     }}>
       <div style={{minWidth: 0, flex: "0 1 auto"}}>
         {eyebrow && <div style={{
-          display:"inline-flex", alignItems:"center", gap:6,
-          font: "600 10px/1 var(--font-sans)", color:"var(--ink-4)",
-          letterSpacing:"0.10em", textTransform:"uppercase", marginBottom: 8,
-          padding:"3px 8px", borderRadius:4,
-          background:"var(--paper-2)", border:"1px solid var(--line)",
+          font: "italic 400 15px/1 var(--font-display)", color:"var(--ink-3)",
+          marginBottom: 12,
         }}>{eyebrow}</div>}
         <h1 style={{
           fontFamily: "var(--font-display)", fontStyle: "italic",
-          fontWeight: 400, fontSize: 34, lineHeight: 1.1, color: "var(--ink)",
-          margin: 0, letterSpacing: "-0.015em"
+          fontWeight: 400, fontSize: "clamp(34px, 4.5vw, 50px)", lineHeight: 1.04, color: "var(--ink)",
+          margin: 0, letterSpacing: "-0.02em", textWrap: "balance",
         }}>{title}</h1>
         {subtitle && (
           <div style={{
             fontFamily: "var(--font-sans)",
-            fontSize: 13, lineHeight: 1.5, color: "var(--ink-3)", marginTop: 6,
+            fontSize: 14, lineHeight: 1.6, color: "var(--ink-3)", marginTop: 12, maxWidth: "52ch",
             fontStyle: "normal", fontWeight: 400,
           }}>{subtitle}</div>
         )}
