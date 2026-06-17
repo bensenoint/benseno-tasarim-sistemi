@@ -145,7 +145,6 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
       style={{
         cursor:"pointer",
         background: hover ? "var(--paper-2)" : (isOverdue ? "var(--prio-red-bg)" : (stripe ? "var(--surface-sub)" : "var(--surface)")),
-        boxShadow: isOverdue ? "inset 3px 0 0 var(--prio-red)" : "none",
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
