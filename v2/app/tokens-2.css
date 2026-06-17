@@ -6,7 +6,7 @@
 /* ----- Fonts (Google Fonts CDN) ------------------------------ */
 /* If offline, drop WOFF2s in fonts/ and uncomment the @font-face
    block at the bottom of this file. */
-@import url("https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500&family=Ubuntu+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@300..700&family=Instrument+Serif:ital@0;1&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap");
 
 /* ------------------------------------------------------------ */
 /*  CORE TOKENS                                                 */
@@ -78,9 +78,9 @@
   --bw-13: #8E5BA1;  --bw-14: #00786F;  --bw-15: #C44545;  --bw-16: #B79100;
 
   /* ---- Type families --------------------------------------- */
-  --font-sans: "Ubuntu", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;   /* Benseno kurumsal */
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;   /* editoryal tamamlayıcı başlık */
-  --font-mono: "Ubuntu Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Fraunces", "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 
   /* ---- Type scale (px) ------------------------------------- */
   --fs-11: 11px;   /* caption / mono labels */
