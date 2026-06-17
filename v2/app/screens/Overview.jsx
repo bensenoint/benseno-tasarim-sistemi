@@ -370,7 +370,7 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
       <Card padding={0} style={{marginTop:"var(--section-gap)"}}>
         <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line-soft)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <div>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.01em"}}>Bugün ve yarın</h2>
+            <h2 style={{font:"500 17px/1.2 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"0"}}>Bugün ve yarın</h2>
             <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>
               {today.length + overdue.length} brief
               {overdue.length > 0 && <span style={{color:"var(--prio-red)", fontWeight:600, marginLeft:6}}>· {overdue.length} gecikmiş</span>}

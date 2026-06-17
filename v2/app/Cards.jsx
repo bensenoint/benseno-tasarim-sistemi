@@ -30,14 +30,39 @@ function CardHead({ title, sub, action, style }) {
     }}>
       <div style={{minWidth: 0}}>
         <h2 style={{
-          font: "600 15px/1.2 var(--font-sans)", color: "var(--ink)",
-          margin: 0, letterSpacing: "-0.005em"
+          font: "500 17px/1.2 var(--font-display)", color: "var(--ink)",
+          margin: 0, letterSpacing: "0"
         }}>{title}</h2>
         {sub && <div style={{font: "400 12px/1.3 var(--font-sans)", color: "var(--ink-3)", marginTop: 4}}>{sub}</div>}
       </div>
       {action}
     </header>
   );
+}
+
+// Sayıyı 0'dan değerine bir kez sayar (mount'ta). reduced-motion'da veya sayısal değilse anında.
+// Animasyon bitince null'a döner → canlı veri (poll güncellemeleri) doğrudan akar.
+function CountUp({ value }) {
+  const [disp, setDisp] = React.useState(null);
+  const startedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    const m = String(value).match(/^([^\d-]*)(-?\d+)([^\d]*)$/);
+    const rm = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!m || rm) return;                       // sayısal değil ya da reduced-motion → canlı değeri göster
+    const pre = m[1], target = parseInt(m[2], 10), suf = m[3];
+    let raf, t0;
+    const tick = (now) => {
+      if (!t0) t0 = now;
+      const p = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - p, 3);
+      if (p < 1) { setDisp(pre + Math.round(target * e) + suf); raf = requestAnimationFrame(tick); }
+      else setDisp(null);                       // bitti → canlı değer akar
+    };
+    raf = requestAnimationFrame(tick);
+    return () => raf && cancelAnimationFrame(raf);
+  }, []);
+  return disp == null ? value : disp;
 }
 
 // Kpi has three variants: "plain" | "trendchart" | "hero"
@@ -74,11 +99,11 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
         position: "relative",
       }}>{label}</div>
       <div style={{
-        font: `600 ${variant === "hero" ? 56 : "var(--kpi-fs)"}/1 var(--font-sans)`,
+        font: `500 ${variant === "hero" ? 56 : "var(--kpi-fs)"}/1 var(--font-display)`,
         color: color || "var(--ink)",
-        letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums",
+        letterSpacing: "-0.01em", fontVariantNumeric: "tabular-nums",
         position: "relative",
-      }}>{value}</div>
+      }}><CountUp value={value}/></div>
 
       {variant === "trendchart" && spark && (
         <Sparkline points={spark} color={color || "var(--ember)"}/>
