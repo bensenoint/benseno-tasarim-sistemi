@@ -138,18 +138,21 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
 function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
   const [hover, setHover] = React.useState(false);
   const [menu, setMenu] = React.useState(false);
+  // geciken satır = aktif (tamamlanmamış, müşteride değil) + termin geçmiş → durum rengiyle işaretle
+  const isOverdue = brief.deltaH != null && brief.deltaH <= 0 && brief.durum !== "tamamlandi" && brief.durum !== "musteride";
   return (
     <tr onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{
         cursor:"pointer",
-        background: hover ? "var(--paper-2)" : (stripe ? "var(--surface-sub)" : "var(--surface)"),
+        background: hover ? "var(--paper-2)" : (isOverdue ? "var(--prio-red-bg)" : (stripe ? "var(--surface-sub)" : "var(--surface)")),
+        boxShadow: isOverdue ? "inset 3px 0 0 var(--prio-red)" : "none",
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
       <td style={cellStyle()}><PriorityBadge p={brief.oncelik || { code: "ylw", label: "NORMAL" }}/></td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
-      <td style={{...cellStyle(), width: 340, minWidth: 240, maxWidth: 340, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
+      <td style={{...cellStyle(), width: 340, minWidth: 240, maxWidth: 340, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)", fontWeight:500}}>
         {brief.baslik}
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle()}>
