@@ -75,7 +75,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
                 <Avatar user={p.user} size={28}/>
                 <div style={{flex: 1, minWidth: 0}}>
                   <div style={{display:"flex", alignItems:"center", gap: 6, font:"500 13px/1 var(--font-sans)", color:"var(--ink)"}}>
-                    <span onClick={() => window.bnsOpenUser && window.bnsOpenUser(p.user.id)} title={`${p.user.name} · profili aç`} style={{whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", cursor:"pointer"}}>{p.user.name}</span>
+                    <span onClick={() => window.bnsOpenUser && window.bnsOpenUser(p.user)} title={`${p.user.name} · profili aç`} style={{whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", cursor:"pointer"}}>{p.user.name}</span>
                     {p.user.isNew && <Tag>onboarding</Tag>}
                   </div>
                   <div style={{font:"400 11px/1.2 var(--font-sans)", color:"var(--ink-3)", marginTop: 3}}>

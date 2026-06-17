@@ -28,10 +28,11 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const [selectedUser, setSelectedUser] = React.useState(user);
   // Avatar tıklamasından gelen kişi (window.bnsOpenUser → App.jsx initialSel) — t damgası her tıklamada değişir
   React.useEffect(() => {
-    if (!initialSel) return;
-    const found = (data.USERS || []).find(x => x.id === initialSel.id);
+    if (!initialSel || !initialSel.id) return;
+    // önce güncel USERS'ta ara; bulunamazsa tıklamayla gelen nesneye düş (asla eski kişide takılı kalma)
+    const found = (data.USERS || []).find(x => x.id === initialSel.id) || initialSel.user || null;
     if (found) setSelectedUser(found);
-  }, [initialSel]);
+  }, [initialSel ? initialSel.t : null, initialSel ? initialSel.id : null]);
   const [timeRange, setTimeRange] = React.useState("30");
   const [jobView, setJobView] = React.useState("aktif");   // ana iş tablosu görünümü (dropdown)
   const [markaSel, setMarkaSel] = React.useState("all");   // ana iş tablosu marka filtresi

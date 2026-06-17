@@ -144,7 +144,11 @@ function App({ currentUser, onLogout }) {
   // Kişi avatarlarından profil sayfasına gidiş (Avatar → window.bnsOpenUser)
   const [profileSel, setProfileSel] = React.useState(null);
   React.useEffect(() => {
-    window.bnsOpenUser = (id) => { setProfileSel({ id, t: Date.now() }); setTab("profile"); };
+    window.bnsOpenUser = (arg) => {
+      const u = (arg && typeof arg === "object") ? arg : null;   // tam kullanıcı nesnesi de gelebilir (fallback için)
+      setProfileSel({ id: u ? u.id : arg, user: u, t: Date.now() });
+      setTab("profile");
+    };
     return () => { delete window.bnsOpenUser; };
   }, []);
   const isMobile = window.useIsMobile ? window.useIsMobile() : false;
