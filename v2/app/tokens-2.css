@@ -458,6 +458,17 @@ html[data-theme="dark"][data-noise="on"] body::before {
 }
 .bn-tab-in { animation: bn-tab-enter 180ms var(--ease-out-quart); }
 
+/* KPI kartları: amaçlı staggered giriş (ease-out, no bounce; reduced-motion guard aşağıda sıfırlar) */
+@keyframes bn-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.bn-kpi-grid > * { animation: bn-rise 360ms var(--ease-out-quart) both; }
+.bn-kpi-grid > *:nth-child(1) { animation-delay: 20ms; }
+.bn-kpi-grid > *:nth-child(2) { animation-delay: 55ms; }
+.bn-kpi-grid > *:nth-child(3) { animation-delay: 90ms; }
+.bn-kpi-grid > *:nth-child(4) { animation-delay: 125ms; }
+.bn-kpi-grid > *:nth-child(5) { animation-delay: 160ms; }
+.bn-kpi-grid > *:nth-child(6) { animation-delay: 195ms; }
+.bn-kpi-grid > *:nth-child(7) { animation-delay: 230ms; }
+
 /* ------------------------------------------------------------ */
 /*  PRESS FEEDBACK (Emil: every pressable must feel responsive) */
 /* ------------------------------------------------------------ */
@@ -508,6 +519,7 @@ button:active,
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
