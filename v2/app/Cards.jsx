@@ -162,7 +162,7 @@ function PageHead({ title, subtitle, actions, eyebrow }) {
   return (
     <header style={{
       display: "flex", alignItems: "flex-end", justifyContent: "space-between",
-      gap: 16, padding: "22px 0 16px", flexWrap: "wrap",
+      gap: 16, padding: "24px 0 18px", flexWrap: "wrap",
       borderBottom: "1px solid var(--line-soft)", marginBottom: 4,
     }}>
       <div style={{minWidth: 0, flex: "0 1 auto"}}>
@@ -175,8 +175,8 @@ function PageHead({ title, subtitle, actions, eyebrow }) {
         }}>{eyebrow}</div>}
         <h1 style={{
           fontFamily: "var(--font-display)", fontStyle: "italic",
-          fontWeight: 400, fontSize: 30, lineHeight: 1.12, color: "var(--ink)",
-          margin: 0, letterSpacing: "-0.01em"
+          fontWeight: 400, fontSize: 34, lineHeight: 1.1, color: "var(--ink)",
+          margin: 0, letterSpacing: "-0.015em"
         }}>{title}</h1>
         {subtitle && (
           <div style={{

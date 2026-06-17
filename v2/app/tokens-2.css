@@ -376,10 +376,10 @@ body {
 :root {
   --row-h: 38px;         /* table row default */
   --row-pad: 10px;
-  --card-pad: 16px;
-  --section-gap: 24px;
-  --grid-gap: 16px;
-  --kpi-fs: 36px;
+  --card-pad: 18px;      /* refactoring-ui: kart içi nefes */
+  --section-gap: 30px;   /* refactoring-ui: bantlar arası daha çok boşluk */
+  --grid-gap: 18px;
+  --kpi-fs: 40px;        /* refactoring-ui: birincil metrik daha baskın */
 }
 html[data-density="compact"] {
   --row-h: 32px;
