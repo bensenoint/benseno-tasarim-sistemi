@@ -62,7 +62,7 @@ function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNew
         position:"fixed", top: "12vh", left: "50%", transform: "translateX(-50%)",
         width: "min(640px, 92vw)", zIndex: 91,
         background:"var(--surface)", border:"1px solid var(--line)",
-        borderRadius: 14, boxShadow:"var(--shadow-2)",
+        borderRadius: 14, boxShadow:"var(--shadow-xl)",
         animation: "bn-slide-up 180ms var(--ease-out-quart)",
         overflow: "hidden"
       }}>

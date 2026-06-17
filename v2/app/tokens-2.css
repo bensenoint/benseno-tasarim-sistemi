@@ -136,15 +136,22 @@
 
   /* ---- Shadows --------------------------------------------- */
   --shadow-0: none;
-  --shadow-1:
-    0 1px 2px rgba(22, 22, 26, 0.05),
-    0 4px 16px rgba(22, 22, 26, 0.07);
-  --shadow-2:
-    0 2px 8px rgba(22, 22, 26, 0.07),
-    0 12px 32px rgba(22, 22, 26, 0.12);
+  /* Yükseklik merdiveni: card < 1(popover) < 2(hover) < lg(drawer/modal) < xl(palette) */
   --shadow-card:
     0 1px 2px rgba(22, 22, 26, 0.04),
-    0 4px 14px rgba(22, 22, 26, 0.06);
+    0 2px 8px rgba(22, 22, 26, 0.05);
+  --shadow-1:
+    0 2px 4px rgba(22, 22, 26, 0.06),
+    0 6px 16px rgba(22, 22, 26, 0.08);
+  --shadow-2:
+    0 2px 6px rgba(22, 22, 26, 0.06),
+    0 8px 20px rgba(22, 22, 26, 0.10);
+  --shadow-lg:
+    0 8px 16px rgba(22, 22, 26, 0.10),
+    0 16px 40px rgba(22, 22, 26, 0.14);
+  --shadow-xl:
+    0 12px 24px rgba(22, 22, 26, 0.12),
+    0 28px 60px rgba(22, 22, 26, 0.20);
   --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
 
   /* ---- Motion ---------------------------------------------- */
@@ -205,6 +212,12 @@
   --shadow-card:
     0 1px 3px rgba(0, 0, 0, 0.30),
     0 6px 20px rgba(0, 0, 0, 0.36);
+  --shadow-lg:
+    0 8px 18px rgba(0, 0, 0, 0.45),
+    0 20px 48px rgba(0, 0, 0, 0.55);
+  --shadow-xl:
+    0 14px 28px rgba(0, 0, 0, 0.50),
+    0 32px 70px rgba(0, 0, 0, 0.65);
   --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
 
   /* ---- Semantic — priority (dark mode: lighter for contrast) -- */

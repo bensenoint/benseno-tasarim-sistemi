@@ -79,7 +79,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         position:"fixed", top: 0, right: 0, bottom: 0, width: 480,
         background: "var(--surface)",
         borderLeft: "1px solid var(--line)",
-        boxShadow: "var(--shadow-2)",
+        boxShadow: "var(--shadow-lg)",
         zIndex: 81,
         display:"flex", flexDirection:"column",
         animation: "bn-slide-r 220ms var(--ease-out-quart)"

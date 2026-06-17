@@ -284,7 +284,7 @@ function NewBriefModal({ open, onClose, data }) {
         position: "fixed", top: wide ? "8vh" : "20vh", left: "50%", transform: "translateX(-50%)",
         width: wide ? "min(520px, 94vw)" : "min(400px, 92vw)", zIndex: 93,
         background: "var(--surface)", border: "1px solid var(--line)",
-        borderRadius: 14, boxShadow: "var(--shadow-2)",
+        borderRadius: 14, boxShadow: "var(--shadow-lg)",
         animation: "bn-slide-up 220ms var(--ease-out-quart)"
       }}>
         <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
