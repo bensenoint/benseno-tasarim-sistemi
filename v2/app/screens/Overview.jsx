@@ -351,15 +351,15 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
       </KpiGrid>
 
       {/* Gömülü mini-widget'lar — termin ufku + kapasite ısısı */}
-      <div className="bn-grid-2" style={{display:"grid", gridTemplateColumns:"1.5fr 1fr", gap:"var(--grid-gap)", marginTop:"var(--section-gap)"}}>
-        <Card padding={0}>
-          <CardHead title="Termin ufku" sub="önümüzdeki 14 gün · noktaya tıkla"/>
+      <div className="bn-grid-2" style={{display:"grid", gridTemplateColumns:"1.5fr 1fr", gap:"1px", background:"var(--line)", border:"1px solid var(--line)", marginTop:"var(--section-gap)"}}>
+        <Card padding={0} style={{border:"none", background:"var(--paper)"}}>
+          <CardHead title="Termin ufku" sub="önümüzdeki 14 gün · noktaya tıkla" style={{padding:"16px 16px 0"}}/>
           <div style={{padding:16}}>
             <LabHorizon briefs={active} now={(data && data.NOW) || Date.now()} onOpenBrief={onOpenBrief}/>
           </div>
         </Card>
-        <Card padding={0}>
-          <CardHead title="Kapasite ısısı" sub="kişi yükü / kapasite"/>
+        <Card padding={0} style={{border:"none", background:"var(--paper)"}}>
+          <CardHead title="Kapasite ısısı" sub="kişi yükü / kapasite" style={{padding:"16px 16px 0"}}/>
           <div style={{padding:16, maxHeight:280, overflowY:"auto"}}>
             <LabCapacity briefs={active} users={data.USERS}/>
           </div>
@@ -384,27 +384,31 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
         <BriefTable rows={today.concat(overdue).slice(0, 9)} onRowClick={onOpenBrief}/>
       </Card>
 
-      {/* Stat kartları — tablonun altında 3 kolon */}
-      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
-        <Card>
-          <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
-          <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
-          <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"/>
-          <DeptRow s={data.deptStats.ai}        color="var(--bw-14)"/>
-          <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" last/>
-        </Card>
-        <Card>
-          <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
-          <ProblemBrands data={data}/>
-        </Card>
-        {/* Bu hafta parlayan — kişi performansı: sadece yöneticiler görür */}
-        {(typeof bnsGetStoredUser === "function" && bnsGetStoredUser()?.role === "admin") && (
-        <Card>
-          <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
-          <StarOfTheWeek data={data}/>
-        </Card>
-        )}
-      </div>
+      {/* Stat kartları — KPI gibi boşluksuz paylaşılan-hairline ızgara */}
+      {(() => {
+        const _admin = typeof bnsGetStoredUser === "function" && bnsGetStoredUser()?.role === "admin";
+        return (
+        <div style={{display:"grid", gridTemplateColumns:`repeat(${_admin?3:2}, 1fr)`, gap:"1px", background:"var(--line)", border:"1px solid var(--line)", marginTop:"var(--section-gap)"}}>
+          <Card style={{border:"none", background:"var(--paper)"}}>
+            <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
+            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
+            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"/>
+            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)"/>
+            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" last/>
+          </Card>
+          <Card style={{border:"none", background:"var(--paper)"}}>
+            <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
+            <ProblemBrands data={data}/>
+          </Card>
+          {_admin && (
+          <Card style={{border:"none", background:"var(--paper)"}}>
+            <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
+            <StarOfTheWeek data={data}/>
+          </Card>
+          )}
+        </div>
+        );
+      })()}
 
       <ManagerSection data={data} user={user} overdue={overdue} review={review} onOpenBrief={onOpenBrief} onSwitchTab={onSwitchTab} onStatusChange={onStatusChange}/>
     </div>
