@@ -121,7 +121,7 @@ function StatusPill({ status }) {
     incelemede:  { color: "var(--warning)",  label: "İnceleme",  full: "İncelemede" },
     beklemede:   { color: "var(--ink-3)",       label: "Bekliyor",  full: "Beklemede" },
     revizyon:    { color: "var(--prio-orange)", label: "Revizyon",  full: "Revizyon" },
-    musteride:   { color: "var(--musteride)",            label: "Müşteride", full: "Müşteri Onayında — dönüş bekleniyor" },
+    musteride:   { color: "var(--musteride)",            label: "Müşteride", full: "Müşteri onayında · dönüş bekleniyor" },
     blokeli:     { color: "var(--danger)",   label: "Blokeli",   full: "Blokeli" },
     tamamlandi:  { color: "var(--success)",  label: "Tamam",     full: "Tamamlandı" }
   };

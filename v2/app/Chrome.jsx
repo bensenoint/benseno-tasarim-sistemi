@@ -707,13 +707,10 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
       height: isMobile ? 52 : 56,
       display: "flex", alignItems: "center", gap: isMobile ? 8 : 12,
       padding: isMobile ? "0 12px" : "0 20px 0 20px",
-      background: "var(--header-blur)",
-      backdropFilter: "blur(20px) saturate(180%)",
-      WebkitBackdropFilter: "blur(20px) saturate(180%)",
-      borderBottom: "1px solid var(--line)",
+      background: "var(--paper)",
+      borderBottom: "1px solid var(--line-strong)",
       flexShrink: 0,
       position: "sticky", top: 0, zIndex: 30,
-      boxShadow: "0 1px 0 var(--line-soft)",
     }}>
       {/* Logo — mobil VE desktop header'da */}
       <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
