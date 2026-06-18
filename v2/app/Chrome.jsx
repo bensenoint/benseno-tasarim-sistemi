@@ -240,16 +240,17 @@ function odyFaceProd(mood) {
   var mk = function (k, st) { return h('div', { key: k, style: Object.assign({ background: W, borderRadius: '50%' }, st) }); };
   // Canlı göz: bebek (pupil) + ufak ışık parıltısı — herhangi bir boyutta merkezlenir
   var liveEye = function (k, w, hpx, st) {
-    var ps = Math.max(3.6, w * 0.46), gs = 2.2;
-    return h('div', { key: k, style: Object.assign({ position: 'relative', width: w + 'px', height: hpx + 'px', borderRadius: '50%',
-      background: 'radial-gradient(circle at 50% 28%, #fff 0%, #fbfbfd 45%, #DADCE6 100%)',
-      boxShadow: 'inset 0 -1.8px 2.6px rgba(20,38,92,.26), inset 0 1.4px 1.4px rgba(255,255,255,.95)' }, st || {}) },
+    var ps = Math.max(3.8, w * 0.48), gs = 2.6;
+    return h('div', { key: k, style: Object.assign({ position: 'relative', width: w + 'px', height: hpx + 'px', borderRadius: '50%', overflow: 'hidden',
+      background: 'radial-gradient(circle at 50% 26%, #fff 0%, #f4f5f9 42%, #CFD2DE 100%)',
+      boxShadow: 'inset 0 -2.2px 3px rgba(20,38,92,.30), inset 0 1.6px 1.6px rgba(255,255,255,1), 0 1px 1.6px rgba(13,25,66,.30)' }, st || {}) },
+      h('div', { key: 'sheen', style: { position: 'absolute', left: '12%', top: '5%', width: '76%', height: '34%', background: 'rgba(255,255,255,.85)', borderRadius: '50%' } }),
       h('div', { key: 'p', style: { position: 'absolute', width: ps + 'px', height: ps + 'px', borderRadius: '50%',
-        background: 'radial-gradient(circle at 36% 28%, #44609a 0%, ' + PUP + ' 60%, #0d1942 100%)',
-        boxShadow: '0 0.5px 1.2px rgba(0,0,0,.38)',
-        left: (w / 2 - ps / 2) + 'px', top: (hpx / 2 - ps / 2 + 0.5) + 'px' } },
-        h('div', { key: 'rim', style: { position: 'absolute', width: (ps * 0.3) + 'px', height: (ps * 0.3) + 'px', background: 'rgba(255,255,255,.45)', borderRadius: '50%', right: '0.5px', bottom: '0.5px' } })),
-      h('div', { key: 'g', style: { position: 'absolute', width: gs + 'px', height: gs + 'px', background: '#fff', borderRadius: '50%', left: (w / 2 - ps / 2 + 0.4) + 'px', top: (hpx / 2 - ps / 2 + 0.5) + 'px' } }));
+        background: 'radial-gradient(circle at 35% 26%, #4a66a0 0%, ' + PUP + ' 55%, #0b1640 100%)',
+        boxShadow: '0 0.6px 1.4px rgba(0,0,0,.42)',
+        left: (w / 2 - ps / 2) + 'px', top: (hpx / 2 - ps / 2 + 0.6) + 'px' } },
+        h('div', { key: 'rim', style: { position: 'absolute', width: (ps * 0.3) + 'px', height: (ps * 0.3) + 'px', background: 'rgba(185,205,255,.5)', borderRadius: '50%', right: '0.5px', bottom: '0.5px' } })),
+      h('div', { key: 'g', style: { position: 'absolute', width: gs + 'px', height: gs + 'px', background: '#fff', borderRadius: '50%', boxShadow: '0 0 1.6px rgba(255,255,255,.9)', left: (w / 2 - ps / 2 + 0.3) + 'px', top: (hpx / 2 - ps / 2 + 0.3) + 'px', zIndex: 2 } }));
   };
   var left, right, anim = 'odyPop .42s ease', extra = null, gap = 8;
   if (mood === 'mutlu' || mood === 'neseli') {
@@ -259,11 +260,9 @@ function odyFaceProd(mood) {
     var star = function (k) { return h('div', { key: k, style: { width: '13px', height: '13px', background: W, clipPath: 'polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)' } }); };
     left = star('l'); right = star('r'); anim = 'odyBounce .62s ease-in-out infinite';
   } else if (mood === 'heyecanli') {
-    var ex = function (k) { return h('div', { key: k, style: { position: 'relative', width: '12px', height: '12px', background: W, borderRadius: '50%' } }, h('div', { key: 'p', style: { position: 'absolute', width: '4px', height: '4px', background: PUP, borderRadius: '50%', left: '4px', top: '5px' } })); };
-    left = ex('l'); right = ex('r'); anim = 'odyBounce .72s ease-in-out infinite';
+    left = liveEye('l', 12, 12); right = liveEye('r', 12, 12); anim = 'odyBounce .72s ease-in-out infinite';
   } else if (mood === 'endiseli') {
-    var we = function (k, rot) { return h('div', { key: k, style: { position: 'relative', width: '7px', height: '10px', background: W, borderRadius: '50%', transform: 'rotate(' + rot + 'deg)' } }, h('div', { key: 'p', style: { position: 'absolute', width: '3px', height: '3px', background: PUP, borderRadius: '50%', left: '2px', top: '1.5px' } })); };
-    left = we('l', 15); right = we('r', -15); gap = 9;
+    left = liveEye('l', 8, 11, { transform: 'rotate(15deg)' }); right = liveEye('r', 8, 11, { transform: 'rotate(-15deg)' }); gap = 9;
   } else if (mood === 'kizgin') {
     left = liveEye('l', 8, 8); right = liveEye('r', 8, 8); anim = 'odyShake .24s linear infinite';
     extra = h('div', { key: 'x', style: { position: 'absolute', inset: 0, pointerEvents: 'none' } }, h('div', { key: 'bl', style: { position: 'absolute', top: '13px', left: '13px', width: '11px', height: '3px', background: W, borderRadius: '2px', transform: 'rotate(20deg)' } }), h('div', { key: 'br', style: { position: 'absolute', top: '13px', left: '26px', width: '11px', height: '3px', background: W, borderRadius: '2px', transform: 'rotate(-20deg)' } }));
