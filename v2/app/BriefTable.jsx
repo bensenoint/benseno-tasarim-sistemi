@@ -137,13 +137,11 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
 function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
   const [hover, setHover] = React.useState(false);
   const [menu, setMenu] = React.useState(false);
-  // geciken satır = aktif (tamamlanmamış, müşteride değil) + termin geçmiş → durum rengiyle işaretle
-  const isOverdue = brief.deltaH != null && brief.deltaH <= 0 && brief.durum !== "tamamlandi" && brief.durum !== "musteride";
   return (
     <tr onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{
         cursor:"pointer",
-        background: hover ? "var(--paper-2)" : (isOverdue ? "var(--prio-red-bg)" : "transparent"),
+        background: hover ? "var(--paper-2)" : "transparent",
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
@@ -167,8 +165,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
         {formatDate(brief.deadline)}
         {brief.uzatildi && (
           <span title={`Deadline ${brief.uzatma_sayisi}× uzatıldı`}
-            style={{marginLeft:5, font:"600 9px/1 var(--font-sans)", color:"var(--prio-yellow)",
-              background:"rgba(224,169,43,.14)", padding:"2px 5px", borderRadius:4, whiteSpace:"nowrap"}}>
+            style={{marginLeft:6, font:"italic 500 10px/1 var(--font-display)", color:"var(--prio-yellow)", whiteSpace:"nowrap"}}>
             uzatıldı{brief.uzatma_sayisi > 1 ? ` ×${brief.uzatma_sayisi}` : ""}
           </span>
         )}

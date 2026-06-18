@@ -33,10 +33,9 @@ function PriorityBadge({ p, deltaH, compact }) {
   return (
     <span className="bn-prio" style={{
       display: "inline-flex", alignItems: "center", gap: 5,
-      padding: "3px 8px 3px 6px", borderRadius: 999,
       fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 600,
       letterSpacing: "0.04em", textTransform: "uppercase",
-      background: PRIO_BG[p.code], color: PRIO_FG[p.code], whiteSpace: "nowrap"
+      color: "var(--ink-2)", whiteSpace: "nowrap"
     }}>
       <span style={{display:"inline-flex", alignItems:"center", color: PRIO_FG[p.code]}}>
         {PRIO_GLYPH[p.code]}
@@ -55,13 +54,10 @@ function BrandChip({ brand, size = "md" }) {
     <span onClick={go} title={`${brand.name} marka detayını aç`} style={{
       cursor: "pointer",
       display: "inline-flex", alignItems: "center", gap: 6,
-      padding: small ? "2px 7px 2px 4px" : "3px 9px 3px 5px",
-      borderRadius: 999, background: "var(--surface)",
-      border: "1px solid var(--line)",
       fontFamily: "var(--font-sans)", fontSize: small ? 11 : 12, fontWeight: 500,
       color: "var(--ink)", whiteSpace: "nowrap", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis"
     }}>
-      <span style={{width:8, height:8, borderRadius:999, background: brand.color, flexShrink:0}}/>
+      <span style={{width:7, height:7, borderRadius:999, background: brand.color, flexShrink:0}}/>
       {brand.name}
     </span>
   );
