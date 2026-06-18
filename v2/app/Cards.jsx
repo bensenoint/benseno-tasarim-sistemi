@@ -118,14 +118,10 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
           {trend && (
             <span style={{
               display:"inline-flex", alignItems:"center", gap:3,
-              padding:"2px 6px", borderRadius:4,
-              background: trend.dir === "up" ? (trend.bad ? "var(--prio-red-bg)" : "var(--prio-green-bg)")
-                        : trend.dir === "down" ? (trend.good ? "var(--prio-green-bg)" : "var(--prio-red-bg)")
-                        : "var(--paper-2)",
               color: trend.dir === "up" ? (trend.bad ? "var(--danger)" : "var(--success)")
                    : trend.dir === "down" ? (trend.good ? "var(--success)" : "var(--danger)")
                    : "var(--ink-4)",
-              fontWeight: 600, fontSize: 10,
+              fontWeight: 600, fontSize: 11,
               flexShrink: 0,
             }}>
               {trend.dir === "up" ? "↑" : trend.dir === "down" ? "↓" : "→"} {trend.value}
