@@ -161,14 +161,14 @@ function Sparkline({ points, color = "var(--ember)", w = 100, h = 32 }) {
     <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{display:"block", marginTop:2}}>
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.18"/>
-          <stop offset="100%" stopColor={color} stopOpacity="0.02"/>
+          <stop offset="0%" stopColor={color} stopOpacity="0.09"/>
+          <stop offset="100%" stopColor={color} stopOpacity="0"/>
         </linearGradient>
       </defs>
       <path d={area} fill={`url(#${gradId})`}/>
-      <path d={path} stroke={color} strokeWidth="1.5" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
+      <path d={path} stroke={color} strokeWidth="1.25" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
       {/* Last point dot */}
-      <circle cx={last.x.toFixed(1)} cy={last.y.toFixed(1)} r="2.5" fill={color} opacity="0.9"/>
+      <circle cx={last.x.toFixed(1)} cy={last.y.toFixed(1)} r="2" fill={color}/>
     </svg>
   );
 }

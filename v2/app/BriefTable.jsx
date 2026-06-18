@@ -75,12 +75,11 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
 
   return (
     <div className="bns-table-wrap" style={{
-      background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10,
-      overflowX: "auto", WebkitOverflowScrolling: "touch"
+      background: "transparent", overflowX: "auto", WebkitOverflowScrolling: "touch"
     }}>
       <table style={{width:"100%", minWidth: 0, borderCollapse: "collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
         <thead>
-          <tr style={{background:"var(--surface-sub)"}}>
+          <tr style={{background:"var(--surface)"}}>
             {cols.map(c => (
               <th key={c.id} onClick={() => c.sort && sortable && toggle(c.id)}
                 className={c.mobileHide ? "bns-col-mobile-hide" : ""}
@@ -93,7 +92,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
                   borderBottom:"1px solid var(--line-strong)",
                   whiteSpace:"nowrap", cursor: c.sort && sortable ? "pointer" : "default",
                   userSelect:"none", position:"sticky", top: 0, zIndex: 5,
-                  background:"var(--surface-sub)"
+                  background:"var(--surface)"
                 }}>
                 <span style={{display:"inline-flex", alignItems:"center", gap:4}}>
                   {c.label}
@@ -144,7 +143,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
     <tr onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{
         cursor:"pointer",
-        background: hover ? "var(--paper-2)" : (isOverdue ? "var(--prio-red-bg)" : (stripe ? "var(--surface-sub)" : "var(--surface)")),
+        background: hover ? "var(--paper-2)" : (isOverdue ? "var(--prio-red-bg)" : "transparent"),
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
