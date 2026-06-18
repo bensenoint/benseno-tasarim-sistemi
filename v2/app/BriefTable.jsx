@@ -79,7 +79,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
     }}>
       <table style={{width:"100%", minWidth: 0, borderCollapse: "collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
         <thead>
-          <tr style={{background:"var(--surface)"}}>
+          <tr style={{background:"var(--paper)"}}>
             {cols.map(c => (
               <th key={c.id} onClick={() => c.sort && sortable && toggle(c.id)}
                 className={c.mobileHide ? "bns-col-mobile-hide" : ""}
@@ -92,7 +92,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
                   borderBottom:"1px solid var(--line-strong)",
                   whiteSpace:"nowrap", cursor: c.sort && sortable ? "pointer" : "default",
                   userSelect:"none", position:"sticky", top: 0, zIndex: 5,
-                  background:"var(--surface)"
+                  background:"var(--paper)"
                 }}>
                 <span style={{display:"inline-flex", alignItems:"center", gap:4}}>
                   {c.label}

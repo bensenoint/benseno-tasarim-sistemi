@@ -7,10 +7,10 @@ function Card({ children, style, padding, accent, hover }) {
       onMouseEnter={() => hover && setHovered(true)}
       onMouseLeave={() => hover && setHovered(false)}
       style={{
-        // Editoryal: düz/baskı estetiği — gölge yok, hairline kenar; hover'da kenar koyulaşır
-        background: "var(--surface)",
+        // Tam editoryal: KPI şeridiyle aynı malzeme — şeffaf zemin, köşesiz, hairline çerçeve, gölge yok
+        background: "transparent",
         border: hovered ? "1px solid var(--line-strong)" : "1px solid var(--line)",
-        borderRadius: 8,
+        borderRadius: 0,
         padding: padding === 0 ? 0 : (padding || "var(--card-pad)"),
         boxShadow: "none",
         transition: "border-color 200ms var(--ease-out-quart)",
