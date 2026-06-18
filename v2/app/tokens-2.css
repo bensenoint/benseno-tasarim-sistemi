@@ -387,8 +387,8 @@ body {
 /*  Set on <html data-density="…"> via Tweaks.                  */
 /* ------------------------------------------------------------ */
 :root {
-  --row-h: 38px;         /* table row default */
-  --row-pad: 10px;
+  --row-h: 44px;         /* editoryal: satır ferahlığı */
+  --row-pad: 13px;
   --card-pad: 20px;      /* editoryal: kart içi nefes */
   --section-gap: 36px;   /* editoryal: bantlar arası geniş boşluk */
   --grid-gap: 18px;
