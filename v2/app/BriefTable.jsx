@@ -84,7 +84,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
               <th key={c.id} onClick={() => c.sort && sortable && toggle(c.id)}
                 className={c.mobileHide ? "bns-col-mobile-hide" : ""}
                 style={{
-                  font:"600 11px/1 var(--font-sans)", color:"var(--ink-4)",
+                  font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
                   letterSpacing:"0.06em", textTransform:"uppercase",
                   textAlign: c.align === "right" ? "right" : "left",
                   width: c.width ? c.width : "auto",

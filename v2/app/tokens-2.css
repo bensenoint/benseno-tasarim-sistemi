@@ -187,9 +187,9 @@
   --ink-4:        #6B6A67;
   --ink-5:        #4B4A48;
 
-  --line:         #2A2A30;
-  --line-strong:  #36363E;
-  --line-soft:    #22222A;
+  --line:         #30303A;   /* koyu temada editoryal hairline biraz daha okunur */
+  --line-strong:  #3D3D47;
+  --line-soft:    #24242C;
 
   --ember:        #5B7BD4;   /* logo mavisi, koyu temada açıltılmış (birincil aksan) */
   --ember-hover:  #7491DD;
