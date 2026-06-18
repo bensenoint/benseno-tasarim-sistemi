@@ -267,7 +267,12 @@ function odyFaceProd(mood) {
     // Sıkılmış: yarı kapalı düz gözler (meh / canı sıkkın)
     left = mk('l', { width: '10px', height: '3px' }); right = mk('r', { width: '10px', height: '3px' }); gap = 7;
   } else {
-    left = mk('l', { width: '7px', height: '11px', animation: 'odyBlink 4.6s infinite' }); right = mk('r', { width: '7px', height: '11px', animation: 'odyBlink 4.6s infinite' });
+    // Varsayılan: canlı bakan göz (bebek + ufak ışık) + hafif gülümseme — küçük ama karakterli
+    var eye = function (k) { return h('div', { key: k, style: { position: 'relative', width: '9px', height: '11px', background: W, borderRadius: '50%', animation: 'odyBlink 4.6s infinite' } },
+      h('div', { key: 'p', style: { position: 'absolute', width: '4px', height: '4px', background: PUP, borderRadius: '50%', left: '2.5px', top: '4px' } }),
+      h('div', { key: 'g', style: { position: 'absolute', width: '1.8px', height: '1.8px', background: W, borderRadius: '50%', left: '3px', top: '4.5px' } })); };
+    left = eye('l'); right = eye('r'); gap = 7;
+    extra = h('div', { key: 'm', style: { position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', width: '11px', height: '5px', borderBottom: '2.5px solid ' + W, borderRadius: '0 0 11px 11px' } });
   }
   return h('div', { key: 'f-' + mood, style: { position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: gap + 'px', animation: anim || undefined } }, left, right, extra);
 }
