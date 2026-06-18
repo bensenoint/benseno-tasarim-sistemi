@@ -240,14 +240,16 @@ function odyFaceProd(mood) {
   var mk = function (k, st) { return h('div', { key: k, style: Object.assign({ background: W, borderRadius: '50%' }, st) }); };
   // Canlı göz: bebek (pupil) + ufak ışık parıltısı — herhangi bir boyutta merkezlenir
   var liveEye = function (k, w, hpx, st) {
-    var ps = Math.max(3.4, w * 0.44), gs = 1.8;
+    var ps = Math.max(3.6, w * 0.46), gs = 2.2;
     return h('div', { key: k, style: Object.assign({ position: 'relative', width: w + 'px', height: hpx + 'px', borderRadius: '50%',
-      background: 'radial-gradient(circle at 50% 32%, #fff 0%, #fff 52%, #E6E7EE 100%)',
-      boxShadow: 'inset 0 -1.2px 2px rgba(20,38,92,.18), inset 0 1px 1px rgba(255,255,255,.9)' }, st || {}) },
+      background: 'radial-gradient(circle at 50% 28%, #fff 0%, #fbfbfd 45%, #DADCE6 100%)',
+      boxShadow: 'inset 0 -1.8px 2.6px rgba(20,38,92,.26), inset 0 1.4px 1.4px rgba(255,255,255,.95)' }, st || {}) },
       h('div', { key: 'p', style: { position: 'absolute', width: ps + 'px', height: ps + 'px', borderRadius: '50%',
-        background: 'radial-gradient(circle at 38% 30%, #3a568f 0%, ' + PUP + ' 72%)',
-        left: (w / 2 - ps / 2) + 'px', top: (hpx / 2 - ps / 2 + 0.5) + 'px' } }),
-      h('div', { key: 'g', style: { position: 'absolute', width: gs + 'px', height: gs + 'px', background: '#fff', borderRadius: '50%', left: (w / 2 - ps / 2 + 0.4) + 'px', top: (hpx / 2 - ps / 2 + 0.6) + 'px' } }));
+        background: 'radial-gradient(circle at 36% 28%, #44609a 0%, ' + PUP + ' 60%, #0d1942 100%)',
+        boxShadow: '0 0.5px 1.2px rgba(0,0,0,.38)',
+        left: (w / 2 - ps / 2) + 'px', top: (hpx / 2 - ps / 2 + 0.5) + 'px' } },
+        h('div', { key: 'rim', style: { position: 'absolute', width: (ps * 0.3) + 'px', height: (ps * 0.3) + 'px', background: 'rgba(255,255,255,.45)', borderRadius: '50%', right: '0.5px', bottom: '0.5px' } })),
+      h('div', { key: 'g', style: { position: 'absolute', width: gs + 'px', height: gs + 'px', background: '#fff', borderRadius: '50%', left: (w / 2 - ps / 2 + 0.4) + 'px', top: (hpx / 2 - ps / 2 + 0.5) + 'px' } }));
   };
   var left, right, anim = 'odyPop .42s ease', extra = null, gap = 8;
   if (mood === 'mutlu' || mood === 'neseli') {
