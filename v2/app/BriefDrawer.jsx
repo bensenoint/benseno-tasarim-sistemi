@@ -245,7 +245,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
               <Eyebrow>🔍 İş Insight</Eyebrow>
               <div style={{
                 marginTop:10, padding:"12px 14px", background:"var(--paper-2)", borderRadius:8,
-                borderLeft:"3px solid var(--prio-green)",
+                border:"1px solid var(--line)",
                 font:"400 13px/1.6 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap"
               }}>
                 <Linkify text={b.insight}/>

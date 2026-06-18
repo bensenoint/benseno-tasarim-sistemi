@@ -166,7 +166,7 @@ function PanomScreen(props) {
     if (type === "risk") {
       var rows = briefs.filter(function (b) { return mine(b) && window.bnsIsRisk && window.bnsIsRisk(b.durum, b.deltaH); }).sort(function (a, b) { return a.deltaH - b.deltaH; });
       if (!rows.length) return empty("Risk yok — temiz.", "👍");
-      return rows.map(function (b) { return h("div", { key: b.no, style: { display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderLeft: "3px solid var(--prio-red)", background: "var(--prio-red-bg)", borderRadius: "0 10px 10px 0", marginBottom: 7 } }, h("span", { style: { font: "500 10.5px/1 var(--font-mono)", color: "var(--ink-4)" } }, "#" + b.no), h("span", { style: { flex: 1, font: "500 12.5px/1.3 var(--font-sans)", color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, b.baslik || ""), h("span", { style: { font: "700 11px/1 var(--font-mono)", color: "var(--prio-red)" } }, fmtDelta(b.deltaH))); });
+      return rows.map(function (b) { return h("div", { key: b.no, style: { display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "var(--prio-red-bg)", borderRadius: 0, marginBottom: 7 } }, h("span", { style: { font: "500 10.5px/1 var(--font-mono)", color: "var(--ink-4)" } }, "#" + b.no), h("span", { style: { flex: 1, font: "500 12.5px/1.3 var(--font-sans)", color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, b.baslik || ""), h("span", { style: { font: "700 11px/1 var(--font-mono)", color: "var(--prio-red)" } }, fmtDelta(b.deltaH))); });
     }
     if (type === "mine") {
       var rm = briefs.filter(function (b) { return mine(b) && b.durum !== "tamamlandi"; }).sort(function (a, b) { return (a.deltaH || 999) - (b.deltaH || 999); });
