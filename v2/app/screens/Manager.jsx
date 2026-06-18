@@ -135,13 +135,15 @@ function Alert({ tone, Icon, title, body, action, metric }) {
     danger: "var(--danger)", warn: "var(--warning)",
     info: "var(--info)", success: "var(--success)"
   }[tone] || "var(--ink)";
-  // Editorial: nötr hairline çerçeve; yalnız tehlike kartı hafif alarm yıkaması taşır.
-  const bg = tone === "danger" ? "var(--prio-red-bg)" : "transparent";
+  // Editoryal: kare/hairline kalır; uzun sayfada kartları ayrıştırmak için
+  // her ton çok hafif renk yıkaması + soluk ton-kenarlık taşır (tehlike biraz daha belirgin).
+  const bg = `color-mix(in srgb, ${fg} ${tone === "danger" ? 7 : 5}%, var(--paper))`;
+  const bd = `color-mix(in srgb, ${fg} ${tone === "danger" ? 36 : 26}%, var(--line))`;
   return (
     <div style={{
       display:"flex", flexDirection:"column", gap: 12,
       padding: 18, borderRadius: 0,
-      border: "1px solid var(--line)", background: bg, position:"relative"
+      border: `1px solid ${bd}`, background: bg, position:"relative"
     }}>
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 8}}>
         <div style={{display:"flex", alignItems:"center", gap: 8, color: fg}}>

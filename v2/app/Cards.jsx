@@ -79,8 +79,12 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } } : undefined}
       style={{
-        // Editoryal stat-ızgara hücresi: kart değil; hairline çizgiler KpiGrid + hücre kenarından
-        background: emphasis && tint ? tint : (hov ? "var(--paper-2)" : "transparent"),
+        // Editoryal stat-ızgara hücresi: kart değil; hairline çizgiler KpiGrid + hücre kenarından.
+        // Semantik renk/accent taşıyan hücreler çok hafif ton yıkaması alır (monotonluğu kırar, nötr hücreler temiz kalır).
+        background: emphasis && tint ? tint
+          : hov ? "var(--paper-2)"
+          : borderAccent ? `color-mix(in srgb, ${borderAccent} 5%, var(--paper))`
+          : "transparent",
         borderRight: "1px solid var(--line)",
         borderBottom: "1px solid var(--line)",
         outline: active ? "2px solid var(--ember)" : "none",
