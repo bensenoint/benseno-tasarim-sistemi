@@ -47,14 +47,14 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
         title="Tamamlananlar"
         subtitle="12 sütun · post-completion rating ile"
         actions={
-          <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8}}>
+          <div style={{display:"inline-flex", padding:2, border:"1px solid var(--line)", borderRadius:6}}>
             {[["7","Son 7 gün"],["30","30 gün"],["90","90 gün"]].map(([k,v]) => (
               <button key={k} onClick={() => setRange(k)} style={{
-                font:"500 12px/1 var(--font-sans)", padding:"6px 10px",
-                border:0, background: range===k ? "var(--surface)" : "transparent",
-                color: range===k ? "var(--ink)" : "var(--ink-3)",
-                borderRadius:6, cursor:"pointer",
-                boxShadow: range===k ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
+                font:`${range===k?600:500} 12px/1 var(--font-sans)`, padding:"6px 11px",
+                border:0, borderRadius:4, cursor:"pointer",
+                background: range===k ? "var(--paper-2)" : "transparent",
+                color: range===k ? "var(--ink)" : "var(--ink-4)",
+                transition:"background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1)"
               }}>{v}</button>
             ))}
           </div>
@@ -69,12 +69,12 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
       </div>
 
       <div className="bns-table-wrap" style={{
-        background:"var(--surface)", border:"1px solid var(--line)", borderRadius:10,
+        background:"transparent", border:"1px solid var(--line)", borderRadius:0,
         overflowX:"auto", WebkitOverflowScrolling:"touch", minWidth:0
       }}>
         <table style={{width:"100%", minWidth:440, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
           <thead>
-            <tr style={{background:"var(--surface-sub)"}}>
+            <tr style={{background:"var(--paper)"}}>
               {cols.map((c, i) => (
                 <th key={i} className={c.mobile ? "" : "bns-col-mobile-hide"} style={{
                   font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
@@ -93,7 +93,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
             )}
             {rows.map((c, idx) => (
               <tr key={c.id} onClick={() => onOpenBrief && onOpenBrief(c)} title="İşin akışını görüntüle"
-                style={{background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)", cursor: onOpenBrief ? "pointer" : "default"}}>
+                style={{background: idx % 2 === 1 ? "var(--row-stripe)" : "transparent", cursor: onOpenBrief ? "pointer" : "default"}}>
                 <td style={cs(true, "right")}>{c.no}</td>
                 <td style={cs()}><BrandChip brand={c.brand} size="sm"/></td>
                 <td style={{...cs(), maxWidth: 240, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{c.baslik}</td>
@@ -144,15 +144,15 @@ function rateBrief(id, n) {
 // Teslim durumu rozeti: 🟢 Zamanında · 🟡 Uzatılarak · 🔴 Gecikmeli.
 function DeliveryBadge({ status, kez }) {
   const map = {
-    zamaninda: { renk: "var(--prio-green)", tint: "var(--prio-green-tint, rgba(46,160,67,.12))", txt: "Zamanında" },
-    uzatildi:  { renk: "var(--prio-yellow)", tint: "rgba(224,169,43,.14)", txt: kez > 1 ? `Uzatıldı ×${kez}` : "Uzatılarak" },
-    gec:       { renk: "var(--prio-red)", tint: "rgba(229,72,77,.12)", txt: "Gecikmeli" },
+    zamaninda: { renk: "var(--prio-green)", txt: "Zamanında" },
+    uzatildi:  { renk: "var(--prio-yellow)", txt: kez > 1 ? `Uzatıldı ×${kez}` : "Uzatılarak" },
+    gec:       { renk: "var(--prio-red)", txt: "Gecikmeli" },
   };
   const m = map[status];
   if (!m) return <span style={{ color: "var(--ink-5)" }}>—</span>;
   return (
     <span title={status === 'uzatildi' ? 'Deadline uzatılarak (yeni süreye) teslim edildi' : status === 'gec' ? 'Son deadline geçtikten sonra tamamlandı' : 'Süresinde teslim edildi'}
-      style={{ display: "inline-flex", alignItems: "center", gap: 5, font: "600 11px/1 var(--font-sans)", color: m.renk, background: m.tint, padding: "4px 8px", borderRadius: 999, whiteSpace: "nowrap" }}>
+      style={{ display: "inline-flex", alignItems: "center", gap: 5, font: "500 12px/1 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "nowrap" }}>
       <span style={{ width: 6, height: 6, borderRadius: "50%", background: m.renk, flexShrink: 0 }}/>{m.txt}
     </span>
   );

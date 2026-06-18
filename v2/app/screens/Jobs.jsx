@@ -75,14 +75,14 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
 
 function Segment({ value, onChange, options }) {
   return (
-    <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8, flexWrap:"wrap"}}>
+    <div style={{display:"inline-flex", padding:2, border:"1px solid var(--line)", borderRadius:6, flexWrap:"wrap"}}>
       {options.map(([k,v]) => (
         <button key={k} onClick={() => onChange(k)} style={{
-          font:"500 12px/1 var(--font-sans)",
-          padding:"6px 10px", border:0, cursor:"pointer", borderRadius:6,
-          background: value===k ? "var(--surface)" : "transparent",
-          color: value===k ? "var(--ink)" : "var(--ink-3)",
-          boxShadow: value===k ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
+          font:`${value===k?600:500} 12px/1 var(--font-sans)`,
+          padding:"6px 11px", border:0, cursor:"pointer", borderRadius:4,
+          background: value===k ? "var(--paper-2)" : "transparent",
+          color: value===k ? "var(--ink)" : "var(--ink-4)",
+          transition:"background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1)"
         }}>{v}</button>
       ))}
     </div>
