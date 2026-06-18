@@ -79,18 +79,17 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } } : undefined}
       style={{
-        background: emphasis && tint ? tint : "var(--surface)",
-        border: emphasis && borderAccent ? `1px solid ${borderAccent}` : "1px solid var(--line)",
+        // Editoryal stat-ızgara hücresi: kart değil; hairline çizgiler KpiGrid + hücre kenarından
+        background: emphasis && tint ? tint : (hov ? "var(--paper-2)" : "transparent"),
+        borderRight: "1px solid var(--line)",
+        borderBottom: "1px solid var(--line)",
         outline: active ? "2px solid var(--ember)" : "none",
         outlineOffset: -2,
-        borderRadius: 12,
-        padding: "14px 16px 12px",
-        display: "flex", flexDirection: "column", gap: 6, minWidth: 0,
-        position: "relative", overflow: "hidden",
+        padding: "18px 18px 16px",
+        display: "flex", flexDirection: "column", gap: 8, minWidth: 0,
+        position: "relative",
         cursor: onClick ? "pointer" : "default",
-        boxShadow: hov ? "var(--shadow-2)" : "var(--shadow-card)",
-        transform: hov ? "translateY(-1px)" : "none",
-        transition: "box-shadow 180ms var(--ease-out-quart), transform 180ms var(--ease-out-quart)",
+        transition: "background 160ms var(--ease-out-quart)",
       }}>
       <div style={{
         font: "600 10px/1 var(--font-sans)", color: "var(--ink-3)",
@@ -179,7 +178,7 @@ function PageHead({ title, subtitle, actions, eyebrow }) {
     <header style={{
       display: "flex", alignItems: "flex-end", justifyContent: "space-between",
       gap: 16, padding: "24px 0 18px", flexWrap: "wrap",
-      borderBottom: "1px solid var(--line-soft)", marginBottom: 4,
+      borderBottom: "1px solid var(--line-strong)", marginBottom: 4,
     }}>
       <div style={{minWidth: 0, flex: "0 1 auto"}}>
         {eyebrow && <div style={{

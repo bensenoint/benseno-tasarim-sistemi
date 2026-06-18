@@ -577,7 +577,9 @@ function KpiGrid({ children, cols = 6 }) {
     <div className={`bn-kpi-grid bns-kpi-${cols}`} style={{
       display:"grid",
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
-      gap: "var(--grid-gap)",
+      gap: 0,
+      borderTop: "1px solid var(--line)",
+      borderLeft: "1px solid var(--line)",
       marginTop: "var(--section-gap)"
     }}>
       {children}
