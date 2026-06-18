@@ -80,7 +80,7 @@ function TeamScreen({ data }) {
         <table style={{borderCollapse:"collapse", minWidth:480, font:"400 11px/1 var(--font-mono)", color:"var(--ink-2)"}}>
           <thead>
             <tr>
-              <th style={{
+              <th className="bns-mtx-h" style={{
                 position:"sticky", left: 0, top: 0, zIndex: 3,
                 background:"var(--paper)", padding:"10px 12px",
                 borderRight:"1px solid var(--line-strong)",
@@ -112,7 +112,7 @@ function TeamScreen({ data }) {
           <tbody>
             {users.map(u => (
               <tr key={u.id}>
-                <td style={{
+                <td className="bns-mtx-h" style={{
                   position:"sticky", left: 0, zIndex: 1, background:"var(--paper)",
                   padding:"6px 12px", borderRight:"1px solid var(--line-strong)",
                   borderBottom:"1px solid var(--line-soft)",
@@ -120,8 +120,8 @@ function TeamScreen({ data }) {
                   display:"flex", alignItems:"center", gap:8, minWidth: 200
                 }}>
                   <Avatar user={u} size={20}/>
-                  <span onClick={() => window.bnsOpenUser && window.bnsOpenUser(u.id)} title={`${u.name} · profili aç`} style={{whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", cursor:"pointer"}}>{u.name}</span>
-                  <span style={{marginLeft:"auto", font:"500 10px/1 var(--font-mono)", color:"var(--ink-4)"}}>{u.rol}</span>
+                  <span onClick={() => window.bnsOpenUser && window.bnsOpenUser(u.id)} title={`${u.name} · profili aç`} style={{whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", cursor:"pointer", minWidth:0}}>{u.name}</span>
+                  <span className="bns-mtx-role" style={{marginLeft:"auto", font:"500 10px/1 var(--font-mono)", color:"var(--ink-4)"}}>{u.rol}</span>
                 </td>
                 {brands.map(b => {
                   const v = (m[u.id] || {})[b.name] || 0;
