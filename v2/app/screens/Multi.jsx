@@ -89,7 +89,7 @@ function MultiCard({ brief: b, users, onClick }) {
 
   return (
     <div onClick={onClick} style={{
-      background:"var(--surface)", border:"1px solid var(--line)", borderRadius:0,
+      background:"var(--paper)", border:"1px solid var(--line)", borderRadius:0,
       padding:"14px 16px", cursor:"pointer",
       display:"grid", gridTemplateColumns:"1fr auto",
       gap:12, alignItems:"start"

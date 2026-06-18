@@ -113,7 +113,7 @@ function TeamScreen({ data }) {
             {users.map(u => (
               <tr key={u.id}>
                 <td style={{
-                  position:"sticky", left: 0, zIndex: 1, background:"var(--surface)",
+                  position:"sticky", left: 0, zIndex: 1, background:"var(--paper)",
                   padding:"6px 12px", borderRight:"1px solid var(--line-strong)",
                   borderBottom:"1px solid var(--line-soft)",
                   font:"500 12px/1 var(--font-sans)", color:"var(--ink)",

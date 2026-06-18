@@ -44,7 +44,7 @@ function MusterideScreen({ data, onOpenBrief }) {
           <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
             <table style={{ width:"100%", minWidth:720, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
               <thead>
-                <tr style={{ background:"var(--surface-sub)" }}>
+                <tr style={{ background:"var(--paper)" }}>
                   {["#","Marka","İş","Öncelik","Atanan","Gönderim","Bekliyor","Rev (iç/müşt)","Termin"].map((h, i) => (
                     <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: i === 0 || i >= 5 ? "right" : "left", whiteSpace:"nowrap" }}>{h}</th>
                   ))}
@@ -55,7 +55,7 @@ function MusterideScreen({ data, onOpenBrief }) {
                   const sa = bekleyenSa(b);
                   return (
                     <tr key={b.id} onClick={() => onOpenBrief && onOpenBrief(b)} title="Detayı aç"
-                      style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)", cursor:"pointer" }}>
+                      style={{ background: idx % 2 === 1 ? "var(--row-stripe)" : "transparent", cursor:"pointer" }}>
                       <td style={mCs(true, "right")}>{b.no}</td>
                       <td style={mCs()}><BrandChip brand={b.brand} size="sm"/></td>
                       <td style={{ ...mCs(), maxWidth: 260, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{b.baslik}</td>
