@@ -381,7 +381,7 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
             Tümünü gör <I.ChevronRight size={12}/>
           </button>
         </div>
-        <BriefTable rows={today.concat(overdue).slice(0, 9)} onRowClick={onOpenBrief}/>
+        <EditorialJobs rows={today.concat(overdue).slice(0, 9)} onOpen={onOpenBrief}/>
       </Card>
 
       {/* Stat kartları — tablonun altında 3 kolon */}
@@ -583,6 +583,37 @@ function KpiGrid({ children, cols = 6 }) {
       marginTop: "var(--section-gap)"
     }}>
       {children}
+    </div>
+  );
+}
+
+// Editoryal "Bugün ve yarın" listesi — tablo yerine serif iş başlıkları + ince ayraçlar
+function EditorialJobs({ rows, onOpen }) {
+  if (!rows || !rows.length) return (
+    <div style={{padding:"30px 16px", textAlign:"center", color:"var(--ink-4)", font:"400 14px/1.4 var(--font-sans)"}}>Bugün ve yarın için iş yok.</div>
+  );
+  const PC = { red:"var(--prio-red)", org:"var(--prio-orange)", ylw:"var(--prio-yellow)", grn:"var(--prio-green)" };
+  return (
+    <div>
+      {rows.map((b, i) => {
+        const late = b.deltaH != null && b.deltaH <= 0 && b.durum !== "tamamlandi" && b.durum !== "musteride";
+        const dot = late ? "var(--prio-red)" : (b.oncelik && PC[b.oncelik.code]) || "var(--ink-4)";
+        const kalan = b.deltaH == null ? "—" : (b.deltaH <= 0 ? Math.abs(Math.round(b.deltaH/24)) + "g geç" : (b.deltaH <= 24 ? "bugün" : Math.round(b.deltaH/24) + "g"));
+        return (
+          <div key={b.id} onClick={() => onOpen && onOpen(b)} style={{
+            display:"grid", gridTemplateColumns:"auto 1fr auto", gap:14, alignItems:"baseline",
+            padding:"15px 16px", borderTop: i ? "1px solid var(--line)" : "none",
+            cursor:"pointer", background: late ? "var(--prio-red-bg)" : "transparent",
+          }}>
+            <span style={{width:7, height:7, borderRadius:"50%", background:dot, alignSelf:"center", flexShrink:0}}/>
+            <span style={{minWidth:0}}>
+              <span style={{display:"block", font:"500 10px/1 var(--font-sans)", letterSpacing:"0.07em", textTransform:"uppercase", color:"var(--ink-4)", marginBottom:4}}>{b.marka}</span>
+              <span style={{font:"400 17px/1.25 var(--font-display)", color:"var(--ink)", display:"block", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{b.baslik}</span>
+            </span>
+            <span style={{font:"500 12px/1 var(--font-mono)", color: late ? "var(--prio-red)" : "var(--ink-3)", whiteSpace:"nowrap", alignSelf:"center"}}>{kalan}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }

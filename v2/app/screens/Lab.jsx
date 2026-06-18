@@ -120,17 +120,13 @@ function LabCapacity({ briefs, users, onSwitchTab }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {rows.map(({ u, load, cap, pct }) => (
-        <div key={u.id} style={{ display: "grid", gridTemplateColumns: "108px 1fr 74px", alignItems: "center", gap: 10 }}>
-          <span style={{ font: "500 12px/1.2 var(--font-sans)", color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.name || u.id}</span>
-          <div style={{ height: 18, background: "var(--paper-2)", borderRadius: 5, overflow: "hidden", position: "relative" }}>
-            <div style={{ width: Math.min(100, pct) + "%", height: "100%", background: barColor(pct), borderRadius: 5, transition: "width 240ms" }} />
-            {pct > 100 && <div style={{ position: "absolute", right: 4, top: 2, font: "700 10px/14px var(--font-sans)", color: "#fff" }}>aşırı</div>}
+        <div key={u.id} title={`${load}/${cap} iş`} style={{ display: "grid", gridTemplateColumns: "100px 1fr 56px", alignItems: "center", gap: 14, padding: "5px 0" }}>
+          <span style={{ font: "400 13px/1.2 var(--font-sans)", color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.name || u.id}</span>
+          {/* editoryal ince cetvel: 1px çizgi + ince dolgu */}
+          <div style={{ height: 1, background: "var(--line)", position: "relative" }}>
+            <div style={{ position: "absolute", left: 0, top: -1, height: 3, width: Math.min(100, pct) + "%", background: barColor(pct), transition: "width 240ms" }} />
           </div>
-          {/* label-değer hiyerarşisi: değer (%) baskın, yük/kapasite destekleyici */}
-          <span style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-            <span style={{ font: "700 12px/1 var(--font-mono)", color: barColor(pct) }}>%{pct}</span>
-            <span style={{ font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)", marginLeft: 5 }}>{load}/{cap}</span>
-          </span>
+          <span style={{ textAlign: "right", font: "500 16px/1 var(--font-display)", color: barColor(pct) }}>%{pct}</span>
         </div>
       ))}
     </div>

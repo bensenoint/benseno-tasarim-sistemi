@@ -7,13 +7,13 @@ function Card({ children, style, padding, accent, hover }) {
       onMouseEnter={() => hover && setHovered(true)}
       onMouseLeave={() => hover && setHovered(false)}
       style={{
+        // Editoryal: düz/baskı estetiği — gölge yok, hairline kenar; hover'da kenar koyulaşır
         background: "var(--surface)",
-        border: "1px solid var(--line)",
-        borderRadius: 12,
+        border: hovered ? "1px solid var(--line-strong)" : "1px solid var(--line)",
+        borderRadius: 8,
         padding: padding === 0 ? 0 : (padding || "var(--card-pad)"),
-        boxShadow: hovered ? "var(--shadow-2)" : "var(--shadow-card)",
-        transform: hovered ? "translateY(-1px)" : "none",
-        transition: "box-shadow 200ms var(--ease-out-quart), transform 200ms var(--ease-out-quart)",
+        boxShadow: "none",
+        transition: "border-color 200ms var(--ease-out-quart)",
         ...(accent ? { borderTop: `2px solid ${accent}` } : {}),
         ...style
       }}>
