@@ -92,7 +92,8 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
                   borderBottom:"1px solid var(--line-strong)",
                   whiteSpace:"nowrap", cursor: c.sort && sortable ? "pointer" : "default",
                   userSelect:"none", position:"sticky", top: 0, zIndex: 5,
-                  background:"var(--paper)"
+                  background:"var(--paper)",
+                  boxShadow:"0 6px 6px -6px rgba(22,22,26,0.14)"
                 }}>
                 <span style={{display:"inline-flex", alignItems:"center", gap:4}}>
                   {c.label}
