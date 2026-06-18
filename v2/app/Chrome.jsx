@@ -252,12 +252,16 @@ function odyFaceProd(mood) {
         h('div', { key: 'rim', style: { position: 'absolute', width: (ps * 0.3) + 'px', height: (ps * 0.3) + 'px', background: 'rgba(185,205,255,.5)', borderRadius: '50%', right: '0.5px', bottom: '0.5px' } })),
       h('div', { key: 'g', style: { position: 'absolute', width: gs + 'px', height: gs + 'px', background: '#fff', borderRadius: '50%', boxShadow: '0 0 1.6px rgba(255,255,255,.9)', left: (w / 2 - ps / 2 + 0.3) + 'px', top: (hpx / 2 - ps / 2 + 0.3) + 'px', zIndex: 2 } }));
   };
+  // Boyutlu beyaz yüz objeleri (yay/yıldız/kapak/çizgi/kaş) — gözlerle aynı ton: gradyan + ince gölge
+  var WGRAD = 'linear-gradient(180deg, #fff 0%, #E4E6EE 100%)';
+  var faceShine = '0 1px 1.5px rgba(13,25,66,.32)';
+  var faceDrop = 'drop-shadow(0 1px 1px rgba(13,25,66,.35))';
   var left, right, anim = 'odyPop .42s ease', extra = null, gap = 8;
   if (mood === 'mutlu' || mood === 'neseli') {
-    var arc = function (k) { return h('div', { key: k, style: { width: '12px', height: '6px', borderTop: '3px solid ' + W, borderRadius: '12px 12px 0 0' } }); };
+    var arc = function (k) { return h('div', { key: k, style: { width: '12px', height: '6px', borderTop: '3px solid #fff', borderRadius: '12px 12px 0 0', filter: faceDrop } }); };
     left = arc('l'); right = arc('r'); if (mood === 'neseli') anim = 'odyBounce .8s ease-in-out infinite';
   } else if (mood === 'coskulu') {
-    var star = function (k) { return h('div', { key: k, style: { width: '13px', height: '13px', background: W, clipPath: 'polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)' } }); };
+    var star = function (k) { return h('div', { key: k, style: { width: '13px', height: '13px', background: WGRAD, filter: faceDrop, clipPath: 'polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)' } }); };
     left = star('l'); right = star('r'); anim = 'odyBounce .62s ease-in-out infinite';
   } else if (mood === 'heyecanli') {
     left = liveEye('l', 12, 12); right = liveEye('r', 12, 12); anim = 'odyBounce .72s ease-in-out infinite';
@@ -265,19 +269,19 @@ function odyFaceProd(mood) {
     left = liveEye('l', 8, 11, { transform: 'rotate(15deg)' }); right = liveEye('r', 8, 11, { transform: 'rotate(-15deg)' }); gap = 9;
   } else if (mood === 'kizgin') {
     left = liveEye('l', 8, 8); right = liveEye('r', 8, 8); anim = 'odyShake .24s linear infinite';
-    extra = h('div', { key: 'x', style: { position: 'absolute', inset: 0, pointerEvents: 'none' } }, h('div', { key: 'bl', style: { position: 'absolute', top: '13px', left: '13px', width: '11px', height: '3px', background: W, borderRadius: '2px', transform: 'rotate(20deg)' } }), h('div', { key: 'br', style: { position: 'absolute', top: '13px', left: '26px', width: '11px', height: '3px', background: W, borderRadius: '2px', transform: 'rotate(-20deg)' } }));
+    extra = h('div', { key: 'x', style: { position: 'absolute', inset: 0, pointerEvents: 'none' } }, h('div', { key: 'bl', style: { position: 'absolute', top: '13px', left: '13px', width: '11px', height: '3px', background: WGRAD, borderRadius: '2px', boxShadow: faceShine, transform: 'rotate(20deg)' } }), h('div', { key: 'br', style: { position: 'absolute', top: '13px', left: '26px', width: '11px', height: '3px', background: WGRAD, borderRadius: '2px', boxShadow: faceShine, transform: 'rotate(-20deg)' } }));
   } else if (mood === 'mesgul') {
     left = liveEye('l', 8, 9); right = liveEye('r', 8, 9);
   } else if (mood === 'dusunuyor') {
     left = liveEye('l', 8, 8, { transform: 'translateY(-2px)' }); right = liveEye('r', 8, 8, { transform: 'translateY(-2px)' });
   } else if (mood === 'uykulu') {
-    var lid = function (k) { return h('div', { key: k, style: { width: '10px', height: '4px', background: W, borderRadius: '0 0 10px 10px' } }); };
+    var lid = function (k) { return h('div', { key: k, style: { width: '10px', height: '4px', background: WGRAD, borderRadius: '0 0 10px 10px', boxShadow: faceShine } }); };
     left = lid('l'); right = lid('r');
   } else if (mood === 'uzgun') {
     left = liveEye('l', 8, 9, { transform: 'translateY(2px)' }); right = liveEye('r', 8, 9, { transform: 'translateY(2px)' });
   } else if (mood === 'sikilmis') {
     // Sıkılmış: yarı kapalı düz gözler (meh / canı sıkkın)
-    left = mk('l', { width: '10px', height: '3px' }); right = mk('r', { width: '10px', height: '3px' }); gap = 7;
+    left = mk('l', { width: '10px', height: '3px', background: WGRAD, boxShadow: faceShine }); right = mk('r', { width: '10px', height: '3px', background: WGRAD, boxShadow: faceShine }); gap = 7;
   } else {
     // Varsayılan: canlı bakan göz + hafif gülümseme — küçük ama karakterli
     left = liveEye('l', 10, 12, { animation: 'odyBlink 4.6s infinite' });
