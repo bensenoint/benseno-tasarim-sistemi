@@ -591,12 +591,18 @@ button:active,
     gap: 8px !important;
   }
 
-  /* All multi-col KPI grids → 2 col on mobile */
+  /* All multi-col KPI grids → 2 col on mobile.
+     NOT: bazı şeritler grid-auto-flow:column + grid-auto-columns kullanıyor
+     (template-columns değil) — onları da satır akışına + 2 sütuna zorla,
+     yoksa öğeler daralıp serif rakamlar üst üste biner. */
   .bns-kpi-8,
   .bns-kpi-6,
   .bns-kpi-5,
   .bns-kpi-4 {
+    grid-auto-flow: row !important;
     grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-columns: auto !important;
+    overflow-x: visible !important;
     gap: 8px !important;
   }
 

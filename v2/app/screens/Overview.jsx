@@ -190,7 +190,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
       </Card>
 
       {/* Stat kartları — 3 kolon */}
-      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
+      <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
         <Card>
           <CardHead title="Onay bekleyenler" sub={`${allReview.length} brief · rev tamamlandı`}/>
           {allReview.slice(0, 5).map((b, i) => (
@@ -374,7 +374,7 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
       {(() => {
         const _admin = typeof bnsGetStoredUser === "function" && bnsGetStoredUser()?.role === "admin";
         return (
-        <div style={{display:"grid", gridTemplateColumns:`repeat(${_admin?3:2}, 1fr)`, gap:"1px", background:"var(--line)", border:"1px solid var(--line)", marginTop:"var(--section-gap)"}}>
+        <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:`repeat(${_admin?3:2}, 1fr)`, gap:"1px", background:"var(--line)", border:"1px solid var(--line)", marginTop:"var(--section-gap)"}}>
           <Card style={{border:"none", background:"var(--paper)"}}>
             <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
             <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
