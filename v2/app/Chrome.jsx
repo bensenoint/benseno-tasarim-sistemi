@@ -240,10 +240,14 @@ function odyFaceProd(mood) {
   var mk = function (k, st) { return h('div', { key: k, style: Object.assign({ background: W, borderRadius: '50%' }, st) }); };
   // Canlı göz: bebek (pupil) + ufak ışık parıltısı — herhangi bir boyutta merkezlenir
   var liveEye = function (k, w, hpx, st) {
-    var ps = 3.4, gs = 1.5;
-    return h('div', { key: k, style: Object.assign({ position: 'relative', width: w + 'px', height: hpx + 'px', background: W, borderRadius: '50%' }, st || {}) },
-      h('div', { key: 'p', style: { position: 'absolute', width: ps + 'px', height: ps + 'px', background: PUP, borderRadius: '50%', left: (w / 2 - ps / 2) + 'px', top: (hpx / 2 - ps / 2 + 0.5) + 'px' } }),
-      h('div', { key: 'g', style: { position: 'absolute', width: gs + 'px', height: gs + 'px', background: W, borderRadius: '50%', left: (w / 2 - ps / 2 + 0.5) + 'px', top: (hpx / 2 - ps / 2 + 1) + 'px' } }));
+    var ps = Math.max(3.4, w * 0.44), gs = 1.8;
+    return h('div', { key: k, style: Object.assign({ position: 'relative', width: w + 'px', height: hpx + 'px', borderRadius: '50%',
+      background: 'radial-gradient(circle at 50% 32%, #fff 0%, #fff 52%, #E6E7EE 100%)',
+      boxShadow: 'inset 0 -1.2px 2px rgba(20,38,92,.18), inset 0 1px 1px rgba(255,255,255,.9)' }, st || {}) },
+      h('div', { key: 'p', style: { position: 'absolute', width: ps + 'px', height: ps + 'px', borderRadius: '50%',
+        background: 'radial-gradient(circle at 38% 30%, #3a568f 0%, ' + PUP + ' 72%)',
+        left: (w / 2 - ps / 2) + 'px', top: (hpx / 2 - ps / 2 + 0.5) + 'px' } }),
+      h('div', { key: 'g', style: { position: 'absolute', width: gs + 'px', height: gs + 'px', background: '#fff', borderRadius: '50%', left: (w / 2 - ps / 2 + 0.4) + 'px', top: (hpx / 2 - ps / 2 + 0.6) + 'px' } }));
   };
   var left, right, anim = 'odyPop .42s ease', extra = null, gap = 8;
   if (mood === 'mutlu' || mood === 'neseli') {
@@ -275,8 +279,8 @@ function odyFaceProd(mood) {
     left = mk('l', { width: '10px', height: '3px' }); right = mk('r', { width: '10px', height: '3px' }); gap = 7;
   } else {
     // Varsayılan: canlı bakan göz + hafif gülümseme — küçük ama karakterli
-    left = liveEye('l', 9, 11, { animation: 'odyBlink 4.6s infinite' });
-    right = liveEye('r', 9, 11, { animation: 'odyBlink 4.6s infinite' });
+    left = liveEye('l', 10, 12, { animation: 'odyBlink 4.6s infinite' });
+    right = liveEye('r', 10, 12, { animation: 'odyBlink 4.6s infinite' });
     gap = 7;
     extra = h('div', { key: 'm', style: { position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', width: '11px', height: '5px', borderBottom: '2.5px solid ' + W, borderRadius: '0 0 11px 11px' } });
   }
