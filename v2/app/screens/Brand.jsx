@@ -64,7 +64,7 @@ function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel }) {
         <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
           <table style={{ width:"100%", minWidth:540, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
             <thead>
-              <tr style={{ background:"var(--surface-sub)" }}>
+              <tr style={{ background:"var(--paper)" }}>
                 {[["name","Marka"],["active","Aktif"],["done30","Son 30g"],["medianH","Medyan deadline"],["madH","MAD"],["avgRev","Ort. revize"],["rating","Puan"],["risk","Risk"]].map(([k, v]) => (
                   <th key={k} onClick={() => k !== "risk" && setSort(k)} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", cursor: k === "risk" ? "default" : "pointer", textAlign: ["active","done30","medianH","madH","avgRev","rating"].includes(k) ? "right" : "left", whiteSpace:"nowrap", userSelect:"none" }}>
                     {v} {sort === k && <span style={{ color:"var(--ink-2)" }}>↓</span>}
@@ -74,7 +74,7 @@ function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel }) {
             </thead>
             <tbody>
               {rows.map((b, idx) => (
-                <tr key={b.name} onClick={() => setSel(b.name)} title={`${b.name} → tüm işler`} style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)", cursor:"pointer" }}>
+                <tr key={b.name} onClick={() => setSel(b.name)} title={`${b.name} → tüm işler`} style={{ background: idx % 2 === 1 ? "var(--row-stripe)" : "transparent", cursor:"pointer" }}>
                   <td style={bCs()}>
                     <span style={{ display:"inline-flex", alignItems:"center", gap:8 }}>
                       <span style={{ width:10, height:10, borderRadius:999, background:b.color, flexShrink:0 }}/>
@@ -89,7 +89,7 @@ function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel }) {
                   <td style={bCs(true, "right")}>{b.avgRev != null ? b.avgRev : "—"}</td>
                   <td style={bCs(true, "right")}>{b.rating != null ? <span style={{ color:"var(--prio-yellow)" }}>{b.rating}</span> : "—"}</td>
                   <td style={bCs()}>
-                    {b.stale ? <span style={{ font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase", color:"var(--prio-orange)", background:"var(--prio-orange-bg)", padding:"3px 7px", borderRadius:999 }}>İzle</span> : <span style={{ font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)" }}>—</span>}
+                    {b.stale ? <span style={{ display:"inline-flex", alignItems:"center", gap:5 }}><I.Dot size={6} color="var(--prio-orange)"/><span style={{ font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase", color:"var(--prio-orange)" }}>İzle</span></span> : <span style={{ font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)" }}>—</span>}
                   </td>
                 </tr>
               ))}
@@ -183,7 +183,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
 
   const fldStyle = { padding:"6px 9px", border:"1px solid var(--line)", borderRadius:6, background:"var(--surface)", color:"var(--ink)", font:"400 12px/1.2 var(--font-sans)" };
   const seg = (id, label) => (
-    <button key={id} onClick={() => setView(id)} style={{ ...fldStyle, cursor:"pointer", background: view === id ? "var(--ember,#C24A2C)" : "var(--surface)", color: view === id ? "#fff" : "var(--ink-3)", borderColor: view === id ? "var(--ember,#C24A2C)" : "var(--line)" }}>{label}</button>
+    <button key={id} onClick={() => setView(id)} style={{ padding:"6px 9px", border:0, borderRadius:4, cursor:"pointer", font:"400 12px/1.2 var(--font-sans)", background: view === id ? "var(--paper-2)" : "transparent", color: view === id ? "var(--ink)" : "var(--ink-4)", fontWeight: view === id ? 600 : 400 }}>{label}</button>
   );
 
   return (
@@ -222,7 +222,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
         const why = typeof window.bnsSebep === "function" ? window.bnsSebep("marka", brand) : null;
         if (!stats.rating && !why) return null;
         return (
-          <div style={{display:"flex", alignItems:"flex-start", gap:10, marginBottom:"var(--section-gap)", padding:"10px 14px", background:"var(--surface)", border:"1px solid var(--line)", borderRadius:10}}>
+          <div style={{display:"flex", alignItems:"flex-start", gap:10, marginBottom:"var(--section-gap)", padding:"10px 14px", background:"var(--surface)", border:"1px solid var(--line)", borderRadius:0}}>
             <span style={{display:"inline-flex", gap:1, paddingTop:2}}>
               {[1,2,3,4,5].map(i => <I.StarFill key={i} size={13} color={i <= Math.round(why?.rating_avg || stats.rating || 0) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
             </span>
@@ -236,9 +236,11 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
       {/* Filtreler */}
       <Card style={{ marginBottom:"var(--section-gap)" }}>
         <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
-          {seg("active", `Aktif · ${filteredActive.length}`)}
-          {seg("musteride", `✈️ Müşteri Onayında · ${filteredMusteride.length}`)}
-          {seg("done", `Tamamlanan · ${filteredDone.length}`)}
+          <div style={{ display:"inline-flex", border:"1px solid var(--line)", borderRadius:6, padding:2 }}>
+            {seg("active", `Aktif · ${filteredActive.length}`)}
+            {seg("musteride", `✈️ Müşteri Onayında · ${filteredMusteride.length}`)}
+            {seg("done", `Tamamlanan · ${filteredDone.length}`)}
+          </div>
           <select value={person} onChange={e => setPerson(e.target.value)} style={fldStyle}>
             <option value="">Herkes</option>
             {people.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -268,7 +270,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
           <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
             <table style={{ width:"100%", minWidth:720, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
               <thead>
-                <tr style={{ background:"var(--surface-sub)" }}>
+                <tr style={{ background:"var(--paper)" }}>
                   {[["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["Maliyet","right"],["Satış","right"],["Fatura","center"],["Ödeme","center"],["🔗","center"]].map(([v, al], i) => (
                     <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: al, whiteSpace:"nowrap" }}>{v}</th>
                   ))}
@@ -281,8 +283,8 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
                     onClick={() => (onOpenCompleted || onOpenBrief) && (onOpenCompleted || onOpenBrief)(c)}
                     title="İş detayını aç"
                     onMouseEnter={e => e.currentTarget.style.background = "var(--paper-2)"}
-                    onMouseLeave={e => e.currentTarget.style.background = idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)"}
-                    style={{ background: idx % 2 === 1 ? "var(--surface-sub)" : "var(--surface)", cursor:"pointer" }}>
+                    onMouseLeave={e => e.currentTarget.style.background = idx % 2 === 1 ? "var(--row-stripe)" : "transparent"}
+                    style={{ background: idx % 2 === 1 ? "var(--row-stripe)" : "transparent", cursor:"pointer" }}>
                     <td style={bCs(true, "right")}>{c.no}</td>
                     <td style={{ ...bCs(), whiteSpace:"normal", maxWidth:280 }}>{c.baslik || c.is}</td>
                     <td style={bCs()}>
@@ -309,7 +311,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
               </tbody>
               {filteredDone.length > 0 && (
                 <tfoot>
-                  <tr style={{ background:"var(--surface-sub)", borderTop:"2px solid var(--line-strong)" }}>
+                  <tr style={{ background:"var(--paper)", borderTop:"2px solid var(--line-strong)" }}>
                     <td colSpan={8} style={{ ...bCs(), textAlign:"right", font:"700 11px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase", color:"var(--ink-2)" }}>Toplam</td>
                     <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink)" }}>{fmtTRY(sumDone.m)}</td>
                     <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink)" }}>{fmtTRY(sumDone.s)}</td>
@@ -383,7 +385,7 @@ function BrandDailyPanel({ brand }) {
       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
         <span style={{ font:"600 13px/1 var(--font-sans)", color:"var(--ink)" }}>Günlük Kanal Takibi</span>
         <select value={sel} onChange={e => setSel(e.target.value)} style={{
-          padding:"6px 10px", border:"1px solid var(--line)", borderRadius:8,
+          padding:"6px 10px", border:"1px solid var(--line)", borderRadius:6,
           background:"var(--surface)", color:"var(--ink)", font:"500 12px/1.2 var(--font-sans)",
           cursor:"pointer", outline:"none",
         }}>

@@ -10,14 +10,13 @@ const TIME_RANGES = [
 
 function TimeRangeToggle({ value, onChange }) {
   return (
-    <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8, gap:1}}>
+    <div style={{display:"inline-flex", padding:2, border:"1px solid var(--line)", borderRadius:6, gap:1}}>
       {TIME_RANGES.map(r => (
         <button key={r.key} onClick={() => onChange(r.key)} style={{
-          font:"500 11px/1 var(--font-sans)", padding:"5px 10px", border:0,
-          background: value === r.key ? "var(--surface)" : "transparent",
-          color: value === r.key ? "var(--ink)" : "var(--ink-3)",
-          borderRadius:5, cursor:"pointer",
-          boxShadow: value === r.key ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
+          font:`${value === r.key ? 600 : 500} 11px/1 var(--font-sans)`, padding:"5px 10px", border:0,
+          background: value === r.key ? "var(--paper-2)" : "transparent",
+          color: value === r.key ? "var(--ink)" : "var(--ink-4)",
+          borderRadius:4, cursor:"pointer"
         }}>{r.label}</button>
       ))}
     </div>
@@ -204,7 +203,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         <Avatar user={u} size={64}/>
         <div style={{flex:1, minWidth:200}}>
           <Eyebrow>{roleLabel}</Eyebrow>
-          <h1 style={{font:"600 26px/1.1 var(--font-sans)", color:"var(--ink)", margin:"5px 0 0", letterSpacing:"-0.01em"}}>{u.name}</h1>
+          <h1 style={{font:"italic 500 30px/1.05 var(--font-display)", color:"var(--ink)", margin:"5px 0 0", letterSpacing:"0"}}>{u.name}</h1>
           <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:17, color:"var(--ink-3)", marginTop:6}}>
             {myActive.length} aktif{myMusteride.length > 0 ? ` · ${myMusteride.length} müşteride` : ""} · {myCompleted.length} tamamlandı · {totalRev} toplam revize
           </div>
@@ -254,7 +253,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
                 const nu = allUsers.find(x => x.id === e.target.value);
                 if (nu) setSelectedUser(nu);
               }} style={{
-                padding:"7px 10px", border:"1px solid var(--line)", borderRadius:8,
+                padding:"7px 10px", border:"1px solid var(--line)", borderRadius:6,
                 background:"var(--surface)", color:"var(--ink)",
                 font:"500 13px/1.2 var(--font-sans)", cursor:"pointer", outline:"none", minWidth:200,
               }}>
@@ -294,11 +293,11 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center", gap:12, flexWrap:"wrap"}}>
           <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap"}}>
             <select value={jobView} onChange={e => setJobView(e.target.value)} aria-label="İş görünümü"
-              style={{font:"600 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:8, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
+              style={{font:"600 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
               {JOB_VIEWS.map(v => <option key={v.key} value={v.key}>{v.label}</option>)}
             </select>
             <select value={markaActive ? markaSel : "all"} onChange={e => setMarkaSel(e.target.value)} aria-label="Marka filtresi"
-              style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:8, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
+              style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
               <option value="all">Tüm markalar</option>
               {viewBrands.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
@@ -371,7 +370,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         <Card padding={0}>
           <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
             <div>
-              <h2 style={{font:"600 14px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Tamamlanan işler</h2>
+              <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"0"}}>Tamamlanan işler</h2>
               <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)", marginTop:3}}>
                 {myCompleted.length} iş · {totalHours > 0 ? totalHours.toFixed(0)+"sa toplam" : "süre kaydı yok"}
               </div>
@@ -407,8 +406,11 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
                         </td>
                         <td style={{padding:"8px 12px", color:"var(--ink)", maxWidth:200, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{b.baslik || b.is || "—"}</td>
                         <td style={{padding:"8px 12px", whiteSpace:"nowrap"}}>
-                          <span style={{font:"600 10px/1 var(--font-sans)", padding:"2px 6px", borderRadius:4, background: isLead?"var(--ember-tint)":"var(--paper-2)", color: isLead?"var(--ember)":"var(--ink-4)"}}>
-                            {isLead ? "Lead" : "Contrib"}
+                          <span style={{display:"inline-flex", alignItems:"center", gap:5}}>
+                            <I.Dot size={6} color={isLead?"var(--ember)":"var(--ink-4)"}/>
+                            <span style={{font:"600 10px/1 var(--font-sans)", color: isLead?"var(--ember)":"var(--ink-4)"}}>
+                              {isLead ? "Lead" : "Contrib"}
+                            </span>
                           </span>
                         </td>
                         <td style={{padding:"8px 12px", color:"var(--ink-3)", textAlign:"center", fontVariantNumeric:"tabular-nums"}}>{b.revision || b.rev || 0}</td>
@@ -519,7 +521,7 @@ function BrandBar({ name, v, color, last }) {
 
 function StatBox({ label, value }) {
   return (
-    <div style={{padding:"8px 10px", background:"var(--paper-2)", borderRadius:7, textAlign:"center"}}>
+    <div style={{padding:"8px 10px", background:"var(--paper-2)", borderRadius:0, textAlign:"center"}}>
       <div style={{font:"600 18px/1.15 var(--font-sans)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{value}</div>
       <div style={{font:"400 10px/1.3 var(--font-sans)", color:"var(--ink-4)", marginTop:4}}>{label}</div>
     </div>

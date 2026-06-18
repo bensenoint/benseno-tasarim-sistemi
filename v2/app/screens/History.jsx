@@ -31,7 +31,7 @@ function HistoryScreen({ data, onOpenByNo }) {
         title="Geçmiş"
         subtitle="sistem aktivite log'u · brief açıldı / atandı / durumu değişti / tamamlandı"
         actions={
-          <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8}}>
+          <div style={{display:"inline-flex", padding:2, background:"transparent", border:"1px solid var(--line)", borderRadius:6}}>
             {[
               ["all", "Tümü"],
               ["open", "Açıldı"],
@@ -40,11 +40,10 @@ function HistoryScreen({ data, onOpenByNo }) {
               ["done", "Tamamlandı"]
             ].map(([k, v]) => (
               <button key={k} onClick={() => setFilter(k)} style={{
-                font:"500 12px/1 var(--font-sans)", padding:"6px 10px",
-                border:0, background: filter === k ? "var(--surface)" : "transparent",
-                color: filter === k ? "var(--ink)" : "var(--ink-3)",
-                borderRadius:6, cursor:"pointer",
-                boxShadow: filter === k ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
+                font: filter === k ? "600 12px/1 var(--font-sans)" : "500 12px/1 var(--font-sans)", padding:"6px 10px",
+                border:0, background: filter === k ? "var(--paper-2)" : "transparent",
+                color: filter === k ? "var(--ink)" : "var(--ink-4)",
+                borderRadius:4, cursor:"pointer"
               }}>{v}</button>
             ))}
           </div>
@@ -54,7 +53,7 @@ function HistoryScreen({ data, onOpenByNo }) {
         {groups.map((g, gi) => (
           <div key={g.key}>
             <div style={{
-              padding:"10px 16px", background:"var(--surface-sub)",
+              padding:"10px 16px", background:"var(--paper)",
               borderBottom:"1px solid var(--line)", borderTop: gi === 0 ? 0 : "1px solid var(--line)",
               font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
               letterSpacing:"0.06em", textTransform:"uppercase",

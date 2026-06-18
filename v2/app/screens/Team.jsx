@@ -82,7 +82,7 @@ function TeamScreen({ data }) {
             <tr>
               <th style={{
                 position:"sticky", left: 0, top: 0, zIndex: 3,
-                background:"var(--surface-sub)", padding:"10px 12px",
+                background:"var(--paper)", padding:"10px 12px",
                 borderRight:"1px solid var(--line-strong)",
                 borderBottom:"1px solid var(--line-strong)",
                 font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
@@ -91,7 +91,7 @@ function TeamScreen({ data }) {
               }}>Kişi / Marka</th>
               {brands.map(b => (
                 <th key={b.name} title={b.name} style={{
-                  position:"sticky", top: 0, zIndex: 2, background:"var(--surface-sub)",
+                  position:"sticky", top: 0, zIndex: 2, background:"var(--paper)",
                   padding:"8px 6px", borderBottom:"1px solid var(--line-strong)",
                   font:"500 10px/1 var(--font-sans)", color:"var(--ink-3)",
                   height: 120, verticalAlign:"bottom", minWidth: 32

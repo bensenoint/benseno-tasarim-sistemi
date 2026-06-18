@@ -183,7 +183,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
       {/* Geciken işler — tam genişlik */}
       <Card padding={0}>
         <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-          <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
+          <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"0"}}>Geciken işler</h2>
           <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline geçmiş · acil müdahale</div>
         </div>
         <BriefTable rows={allOverdue} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>
@@ -269,12 +269,13 @@ function Rule({ name, status, hits, last }) {
     }}>
       <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)"}}>{name}</span>
       <div style={{display:"flex", alignItems:"center", gap: 8}}>
-        <span style={{
-          font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em",
-          padding:"3px 7px", borderRadius:999,
-          background: status === "ON" ? "var(--prio-green-bg)" : "var(--paper-2)",
-          color:      status === "ON" ? "var(--prio-green)"    : "var(--ink-4)"
-        }}>{status}</span>
+        <span style={{display:"inline-flex", alignItems:"center", gap:5}}>
+          <I.Dot size={6} color={status === "ON" ? "var(--prio-green)" : "var(--ink-4)"}/>
+          <span style={{
+            font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em",
+            color: status === "ON" ? "var(--prio-green)" : "var(--ink-4)"
+          }}>{status}</span>
+        </span>
         <span style={{font:"500 12px/1 var(--font-mono)", color: hits > 0 ? "var(--prio-red)" : "var(--ink-4)", minWidth: 30, textAlign:"right"}}>
           {hits} hit
         </span>
@@ -534,7 +535,7 @@ function StoryLayout({ data, musteride, active, overdue, today, todayDue, week, 
       <div style={{marginTop: "var(--section-gap)", display:"grid", gridTemplateColumns:"1.6fr 1fr", gap:"var(--grid-gap)"}} className="bn-grid-2">
         <Card padding={0}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Önümüzdeki 24 saat</h2>
+            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"0"}}>Önümüzdeki 24 saat</h2>
             <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{today.length} brief · öncelik sırasına göre</div>
           </div>
           <BriefTable rows={today.slice(0, 10)} onRowClick={onOpenBrief}/>
@@ -782,9 +783,6 @@ function WeekStat({ label, value, trend, good, bad, last }) {
   const trendColor = trend.dir === "flat" ? "var(--ink-4)" :
                 (good ? "var(--success)" : bad ? "var(--danger)" :
                   (trend.dir === "up" ? "var(--success)" : "var(--danger)"));
-  const trendBg = trend.dir === "flat" ? "var(--paper-2)" :
-                (good ? "var(--prio-green-bg)" : bad ? "var(--prio-red-bg)" :
-                  (trend.dir === "up" ? "var(--prio-green-bg)" : "var(--prio-red-bg)"));
   return (
     <div style={{
       display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0",
@@ -795,7 +793,6 @@ function WeekStat({ label, value, trend, good, bad, last }) {
         <span style={{font:"600 15px/1 var(--font-sans)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{value}</span>
         <span style={{
           font:"600 10px/1 var(--font-sans)", color:trendColor,
-          padding:"2px 6px", borderRadius:4, background:trendBg,
         }}>{trend.dir==="up"?"↑":trend.dir==="down"?"↓":"→"} {trend.value}</span>
       </span>
     </div>

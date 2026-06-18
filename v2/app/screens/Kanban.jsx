@@ -64,7 +64,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
 
       {/* Arama */}
       <div style={{marginBottom:12}}>
-        <div style={{display:"inline-flex", alignItems:"center", gap:6, background:"var(--surface-sub)", border:"1px solid var(--line)", borderRadius:8, padding:"6px 10px", width:240}}>
+        <div style={{display:"inline-flex", alignItems:"center", gap:6, background:"var(--surface-sub)", border:"1px solid var(--line)", borderRadius:6, padding:"6px 10px", width:240}}>
           <I.Search size={13} style={{color:"var(--ink-4)", flexShrink:0}}/>
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Brief, marka, kişi…"
@@ -81,7 +81,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
           return (
             <div key={col.id} style={{
               background:"var(--surface-sub)", border:"1px solid var(--line)",
-              borderRadius: 10, padding: 10,
+              borderRadius: 0, padding: 10,
               display:"flex", flexDirection:"column", gap: 8,
               minWidth: 0, overflow:"hidden"
             }}>
@@ -118,7 +118,7 @@ function KanbanCard({ brief, onClick }) {
   return (
     <button onClick={onClick} style={{
       display:"flex", flexDirection:"column", gap: 6, padding: "10px 10px 8px",
-      background:"var(--surface)", border:"1px solid var(--line)", borderRadius: 8,
+      background:"var(--surface)", border:"1px solid var(--line)", borderRadius: 0,
       cursor:"pointer", textAlign:"left", color:"var(--ink)",
       width:"100%", minWidth:0, boxSizing:"border-box"
     }}>

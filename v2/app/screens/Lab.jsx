@@ -14,10 +14,10 @@ function labPersonOn(b, uid) {
 }
 function LabCard({ title, hint, children, pad = 16 }) {
   return (
-    <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 12, marginBottom: 16, overflow: "hidden" }}>
+    <div style={{ background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 0, marginBottom: 16, overflow: "hidden" }}>
       {title && (
         <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
-          <span style={{ font: "600 13px/1 var(--font-sans)", color: "var(--ink)" }}>{title}</span>
+          <span style={{ font: "italic 500 18px/1.15 var(--font-display)", color: "var(--ink)", letterSpacing: "0" }}>{title}</span>
           {hint && <span style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)" }}>{hint}</span>}
         </div>
       )}
@@ -41,16 +41,17 @@ function LabOdyCard({ active, overdue, today, review, extended, onChip }) {
     extended > 0 && { k: "extended", t: `${extended} uzatılmış`, c: "var(--prio-yellow)" },
   ].filter(Boolean);
   return (
-    <div style={{ display: "flex", gap: 14, alignItems: "center", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 12, padding: 16, marginBottom: 16 }}>
+    <div style={{ display: "flex", gap: 14, alignItems: "center", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 0, padding: 16, marginBottom: 16 }}>
       <div style={{ fontSize: 40, lineHeight: 1, flexShrink: 0 }}>{mood}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ font: "600 14px/1.3 var(--font-sans)", color: "var(--ink)", marginBottom: 8 }}>{line}</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {chips.length ? chips.map(ch => (
             <button key={ch.k} onClick={() => onChip(ch.k)} style={{
-              font: "600 11px/1 var(--font-sans)", color: ch.c, background: "var(--paper-2)",
-              border: `1px solid ${ch.c}`, borderRadius: 999, padding: "5px 11px", cursor: "pointer" }}>
-              {ch.t} →
+              display: "inline-flex", alignItems: "center", gap: 5,
+              font: "600 12px/1 var(--font-sans)", color: ch.c, background: "transparent",
+              border: 0, padding: "2px 0", cursor: "pointer" }}>
+              <I.Dot size={6} color={ch.c}/>{ch.t} →
             </button>
           )) : <span style={{ font: "400 12px/1 var(--font-sans)", color: "var(--ink-4)" }}>aksiyon gerektiren iş yok</span>}
         </div>
@@ -221,12 +222,12 @@ function LabBrands({ briefs, completed, brands, sel, onSel }) {
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
           <span style={{ width: 12, height: 12, borderRadius: 4, background: colorOf(sel) }} />
-          <span style={{ font: "700 16px/1 var(--font-sans)", color: "var(--ink)" }}>{sel}</span>
-          <button onClick={() => onSel(null)} style={{ marginLeft: "auto", font: "500 12px/1 var(--font-sans)", color: "var(--ink-3)", background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 7, padding: "5px 10px", cursor: "pointer" }}>← tüm markalar</button>
+          <span style={{ font: "italic 500 18px/1.15 var(--font-display)", color: "var(--ink)", letterSpacing: "0" }}>{sel}</span>
+          <button onClick={() => onSel(null)} style={{ marginLeft: "auto", font: "500 12px/1 var(--font-sans)", color: "var(--ink-3)", background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "5px 10px", cursor: "pointer" }}>← tüm markalar</button>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 10 }}>
           {kpi.map(([l, v]) => (
-            <div key={l} style={{ background: "var(--paper-2)", borderRadius: 10, padding: "12px 10px", textAlign: "center" }}>
+            <div key={l} style={{ background: "var(--paper-2)", borderRadius: 0, padding: "12px 10px", textAlign: "center" }}>
               <div style={{ font: "700 22px/1 var(--font-sans)", color: "var(--ink)" }}>{v}</div>
               <div style={{ font: "500 11px/1 var(--font-sans)", color: "var(--ink-4)", marginTop: 5 }}>{l}</div>
             </div>
@@ -242,7 +243,7 @@ function LabBrands({ briefs, completed, brands, sel, onSel }) {
         return (
           <button key={name} onClick={() => onSel(name)} style={{
             display: "inline-flex", alignItems: "center", gap: 7, font: "500 12px/1 var(--font-sans)", color: "var(--ink-2)",
-            background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 999, padding: "7px 12px", cursor: "pointer" }}>
+            background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "7px 12px", cursor: "pointer" }}>
             <span style={{ width: 9, height: 9, borderRadius: 999, background: colorOf(name) }} />{name}
             <span style={{ font: "600 11px var(--font-mono)", color: "var(--ink-4)" }}>{n}</span>
           </button>
@@ -264,11 +265,11 @@ function LabJobList({ briefs, chip, setChip, now, onOpenBrief }) {
   }).sort((a, b) => (a.deltaH ?? 999) - (b.deltaH ?? 999)).slice(0, 40);
   return (
     <div>
-      <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 12 }}>
+      <div style={{ display: "inline-flex", gap: 1, flexWrap: "wrap", marginBottom: 12, padding: 2, border: "1px solid var(--line)", borderRadius: 6 }}>
         {defs.map(([k, l]) => (
           <button key={k} onClick={() => setChip(k)} style={{
-            font: `${chip === k ? 600 : 500} 12px/1 var(--font-sans)`, color: chip === k ? "var(--surface)" : "var(--ink-2)",
-            background: chip === k ? "var(--ink)" : "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 999,
+            font: `${chip === k ? 600 : 500} 12px/1 var(--font-sans)`, color: chip === k ? "var(--ink)" : "var(--ink-4)",
+            background: chip === k ? "var(--paper-2)" : "transparent", border: 0, borderRadius: 4,
             padding: "6px 13px", cursor: "pointer" }}>{l}</button>
         ))}
       </div>
@@ -283,7 +284,7 @@ function LabJobList({ briefs, chip, setChip, now, onOpenBrief }) {
               <span style={{ font: "500 13px/1.2 var(--font-sans)", color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 <span style={{ color: "var(--ink-4)" }}>{b.marka} · </span>{b.baslik}
               </span>
-              {b.uzatildi && <span style={{ font: "600 9px/1 var(--font-sans)", color: "var(--prio-yellow)", background: "rgba(224,169,43,.14)", padding: "2px 5px", borderRadius: 4 }}>uzatıldı</span>}
+              {b.uzatildi && <span style={{ display: "inline-flex", alignItems: "center", gap: 4, font: "600 10px/1 var(--font-sans)", color: "var(--prio-yellow)" }}><I.Dot size={6} color="var(--prio-yellow)"/>uzatıldı</span>}
               <span style={{ font: "600 11px/1 var(--font-mono)", color: b.deltaH <= 0 ? "var(--prio-red)" : "var(--ink-4)", textAlign: "right", whiteSpace: "nowrap" }}>
                 {b.deltaH == null ? "—" : b.deltaH <= 0 ? `${Math.abs(Math.round(b.deltaH / 24))}g geç` : `${Math.round(b.deltaH / 24)}g`}
               </span>
@@ -311,7 +312,7 @@ function LabScreen({ data, user, currentUser, onOpenBrief, onSwitchTab }) {
 
   return (
     <div style={{ padding: "20px 24px", maxWidth: 1180, margin: "0 auto" }}>
-      <div style={{ font: "700 22px/1.2 var(--font-sans)", color: "var(--ink)", marginBottom: 4 }}>Analitik Lab</div>
+      <div style={{ font: "italic 500 30px/1.05 var(--font-display)", color: "var(--ink)", letterSpacing: "0", marginBottom: 4 }}>Analitik Lab</div>
       <div style={{ font: "400 13px/1.4 var(--font-sans)", color: "var(--ink-4)", marginBottom: 18 }}>
         Deneysel görseller ve interaktif alanlar — gerçek verilerle. (v2 sandbox)
       </div>

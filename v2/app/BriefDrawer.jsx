@@ -103,7 +103,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         <div style={{padding:"18px 20px", overflowY:"auto", flex: 1}}>
           {/* Title (editable — tamamlananlarda salt-okunur) */}
           {ro
-            ? <h2 style={{font:"600 20px/1.25 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.005em", padding:"4px 0"}}>{b.baslik}</h2>
+            ? <h2 style={{font:"italic 500 23px/1.2 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"-0.005em", padding:"4px 0"}}>{b.baslik}</h2>
             : <EditableTitle value={b.baslik} onChange={(v) => set({ baslik: v })}/>}
 
           <div style={{marginTop: 12, display:"flex", alignItems:"center", gap:8, flexWrap:"wrap"}}>
@@ -357,7 +357,7 @@ function EditableTitle({ value, onChange }) {
       }}/>
   ) : (
     <h2 onClick={() => setEdit(true)} style={{
-      font:"600 20px/1.25 var(--font-sans)", color:"var(--ink)",
+      font:"italic 500 23px/1.2 var(--font-display)", color:"var(--ink)",
       margin:0, letterSpacing:"-0.005em", cursor:"text",
       padding:"4px 0", borderRadius: 4
     }}>{value}</h2>

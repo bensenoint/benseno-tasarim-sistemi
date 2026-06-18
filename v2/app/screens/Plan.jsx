@@ -103,7 +103,7 @@ function PlanScreen({ data, onOpenBrief }) {
 
       <Card padding={0}>
         {/* Day header */}
-        <div style={{display:"flex", borderBottom:"1px solid var(--line)", background:"var(--surface-sub)"}}>
+        <div style={{display:"flex", borderBottom:"1px solid var(--line)", background:"var(--paper)"}}>
           <div style={{width: 240, padding:"10px 14px", borderRight:"1px solid var(--line)", font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase"}}>Brief</div>
           <div style={{flex:1, display:"flex", position:"relative"}}>
             {Array.from({length: days}).map((_, i) => {
@@ -208,7 +208,7 @@ function PlanScreen({ data, onOpenBrief }) {
               gridTemplateColumns:"240px 1fr 140px 100px 100px",
               padding:"9px 14px",
               borderBottom:"1px solid var(--line)",
-              background:"var(--surface-sub)",
+              background:"var(--paper)",
               font:"600 11px/1 var(--font-sans)",
               color:"var(--ink-3)",
               letterSpacing:"0.04em",
@@ -255,12 +255,11 @@ function PlanScreen({ data, onOpenBrief }) {
                   <span style={{font:"500 12px/1.3 var(--font-sans)", color:"var(--ink-2)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{b.baslik}</span>
                   <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--prio-red)", whiteSpace:"nowrap"}}>{dlLabel}</span>
                   <span style={{
-                    font:"600 12px/1 var(--font-sans)",
-                    color:"var(--prio-red)",
-                    padding:"3px 8px", borderRadius:5,
-                    background:"var(--prio-red-bg)",
-                    whiteSpace:"nowrap", display:"inline-block"
-                  }}>+{gecikmeLabel}</span>
+                    display:"inline-flex", alignItems:"center", gap:5, whiteSpace:"nowrap"
+                  }}>
+                    <I.Dot size={6} color="var(--prio-red)"/>
+                    <span style={{font:"600 12px/1 var(--font-sans)", color:"var(--prio-red)"}}>+{gecikmeLabel}</span>
+                  </span>
                   <span style={{font:"500 12px/1 var(--font-sans)", color:durumColor}}>{durumLabel}</span>
                 </div>
               );
@@ -339,7 +338,7 @@ function DeadlinesScreen({ data, onOpenBrief }) {
             return (
             <div key={i} style={{
               border:"1px solid " + (i === 0 ? "rgba(194,74,44,0.4)" : isOff ? "var(--line-soft)" : "var(--line)"),
-              borderRadius: 8, padding: 10, minHeight: 100,
+              borderRadius: 0, padding: 10, minHeight: 100,
               background: i === 0 ? "rgba(194,74,44,0.04)" : isOff ? "var(--paper-2)" : "var(--surface)"
             }}>
               <div style={{font:"600 12px/1 var(--font-sans)", color: i === 0 ? "var(--ember)" : isHoliday ? "var(--prio-orange)" : "var(--ink-2)", marginBottom: 8}}>

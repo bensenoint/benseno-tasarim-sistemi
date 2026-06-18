@@ -67,7 +67,7 @@ function SilinenlerScreen({ data, currentUser }) {
             return (
               <div key={b.id} style={{
                 background: 'var(--surface)', border: '1px solid var(--line)',
-                borderRadius: 12, padding: '14px 16px',
+                borderRadius: 0, padding: '14px 16px',
                 display: 'flex', alignItems: 'center', gap: 14,
                 opacity: 0.85,
               }}>
@@ -104,10 +104,11 @@ function SilinenlerScreen({ data, currentUser }) {
 
                 {/* Durum chip */}
                 <span style={{
-                  font: '500 11px var(--font-mono)', color: 'var(--ink-4)',
-                  background: 'var(--paper-2)', padding: '3px 8px', borderRadius: 20,
-                  flexShrink: 0,
-                }}>{b.durum || '—'}</span>
+                  display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
+                }}>
+                  <I.Dot size={6} color="var(--ink-4)"/>
+                  <span style={{ font: '500 12px/1 var(--font-sans)', color: 'var(--ink-2)' }}>{b.durum || '—'}</span>
+                </span>
 
                 {/* Aksiyon butonları — sadece admin */}
                 {canRestore && (
@@ -146,7 +147,8 @@ function SilinenlerScreen({ data, currentUser }) {
 
       {!canRestore && items.length > 0 && (
         <div style={{
-          marginTop: 20, padding: '10px 14px', borderRadius: 8,
+          marginTop: 20, padding: '10px 14px', borderRadius: 0,
+          border: '1px solid var(--line)',
           background: 'var(--paper-2)', color: 'var(--ink-4)',
           font: '400 12px/1.4 var(--font-sans)',
         }}>

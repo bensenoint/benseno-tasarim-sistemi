@@ -63,7 +63,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
         {/* People */}
         <Card padding={0}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>{r.name} ekibi</h2>
+            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} ekibi</h2>
             <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{people.length} kişi · yüke göre sıralı</div>
           </div>
           <div>
@@ -96,7 +96,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
         {/* Briefs */}
         <Card padding={0} style={{minWidth:0}}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>{r.name} işleri</h2>
+            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} işleri</h2>
             <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{rows.length} aktif</div>
           </div>
           <BriefTable rows={rows} onRowClick={onOpenBrief}/>
@@ -108,11 +108,10 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
 
 function Tag({ children }) {
   return (
-    <span style={{
-      font:"600 9px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase",
-      padding:"3px 6px", borderRadius: 999,
-      background: "var(--ember-tint)", color:"var(--ember)"
-    }}>{children}</span>
+    <span style={{display:"inline-flex", alignItems:"center", gap:5}}>
+      <I.Dot size={6} color="var(--ember)"/>
+      <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-2)"}}>{children}</span>
+    </span>
   );
 }
 
