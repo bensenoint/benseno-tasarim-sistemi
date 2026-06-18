@@ -71,7 +71,7 @@ function HistoryScreen({ data, onOpenByNo }) {
                   onMouseEnter={clickable ? (e => e.currentTarget.style.background = "var(--paper-2)") : undefined}
                   onMouseLeave={clickable ? (e => e.currentTarget.style.background = "transparent") : undefined}
                   style={{
-                  display:"flex", alignItems:"center", gap: 12, padding:"10px 16px",
+                  display:"flex", flexWrap:"wrap", alignItems:"center", gap: 12, rowGap: 6, padding:"10px 16px",
                   cursor: clickable ? "pointer" : "default",
                   borderBottom: i === g.items.length - 1 ? 0 : "1px solid var(--line-soft)"
                 }}>

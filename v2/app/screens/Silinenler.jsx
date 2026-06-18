@@ -68,7 +68,7 @@ function SilinenlerScreen({ data, currentUser }) {
               <div key={b.id} style={{
                 background: 'var(--surface)', border: '1px solid var(--line)',
                 borderRadius: 0, padding: '14px 16px',
-                display: 'flex', alignItems: 'center', gap: 14,
+                display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14, rowGap: 10,
                 opacity: 0.85,
               }}>
                 {/* Brief no */}
