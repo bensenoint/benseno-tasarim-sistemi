@@ -59,7 +59,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
         <Kpi label="Onay bekleyen" value={reviewCount} color="var(--warning)"/>
       </div>
 
-      <div style={{display:"grid", gridTemplateColumns:"1fr 1.6fr", gap:"var(--grid-gap)"}} className="bn-grid-2">
+      <div style={{display:"flex", flexDirection:"column", gap:"var(--section-gap)"}}>
         {/* People */}
         <Card padding={0}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
