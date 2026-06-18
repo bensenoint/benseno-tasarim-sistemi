@@ -20,6 +20,7 @@
   --paper-2:      #F4F2EC;   /* secondary surface (toolbar fills) */
   --surface:      #FFFFFF;   /* card / panel */
   --surface-sub:  #FAF9F6;   /* inset / table-stripe */
+  --row-stripe:   #F8F6F0;   /* zebra: paper ile paper-2 arası ince ton */
   --surface-raised: #FFFFFF; /* elevated card (hover state) */
   --sidebar-bg:   #F7F5F0;   /* sidebar — slightly warmer than paper */
   --header-blur:  rgba(251, 250, 247, 0.88); /* header backdrop */
@@ -176,6 +177,7 @@
   --paper-2:      #15151A;
   --surface:      #18181D;
   --surface-sub:  #1C1C22;
+  --row-stripe:   #121218;   /* zebra: koyu temada ince ton */
   --surface-raised: #1E1E24;
   --sidebar-bg:   #111116;
   --header-blur:  rgba(15, 15, 18, 0.90);

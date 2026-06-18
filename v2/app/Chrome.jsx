@@ -539,17 +539,17 @@ function ChatBot({ currentUser }) {
           <div ref={blobRef} style={{
             position: "relative", zIndex: 1, width: 54, height: 54,
             borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%",
-            background: "radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--ody) 55%, #fff) 0%, var(--ody) 52%, color-mix(in srgb, var(--ody) 72%, #000) 100%)",
-            boxShadow: "0 16px 28px -8px rgba(20,38,92,.45), 0 6px 12px -4px rgba(0,0,0,.22), inset 0 2px 5px rgba(255,255,255,.40), inset 0 -7px 11px -5px rgba(0,0,0,.30)",
+            background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)",
+            boxShadow: "0 10px 20px -8px rgba(20,38,92,.28)",
             display: "flex", alignItems: "center", justifyContent: "center",
             animation: "odyBob 4.5s ease-in-out infinite",
           }}>{odyFaceProd(mood)}</div>
           {notifCount > 0 && <span title={notifCount + " okunmamış bildirim"} style={{
-            position: "absolute", top: -1, right: -1, zIndex: 3, minWidth: 15, height: 15, padding: "0 3px",
+            position: "absolute", bottom: -2, right: -2, zIndex: 3, minWidth: 16, height: 16, padding: "0 3px",
             display: "inline-flex", alignItems: "center", justifyContent: "center",
-            borderRadius: 999, background: "var(--prio-red, #E5484D)", color: "#fff",
+            borderRadius: 999, background: "var(--ember)", color: "#fff",
             font: "700 9px/1 var(--font-sans)", textAlign: "center",
-            border: "1.5px solid var(--surface, #fff)", boxShadow: "0 1px 3px -1px rgba(0,0,0,.3)",
+            border: "2px solid var(--paper)", boxShadow: "0 1px 3px -1px rgba(0,0,0,.3)",
             animation: "odyPopIn .3s ease",
           }}>{notifCount > 9 ? "9+" : notifCount}</span>}
         </button>
@@ -563,7 +563,7 @@ function ChatBot({ currentUser }) {
         }}>
           <div onPointerDown={startDrag} title="Sürükleyerek taşı"
             style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8, cursor: "grab", touchAction: "none", userSelect: "none" }}>
-            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--ody) 55%, #fff) 0%, var(--ody) 52%, color-mix(in srgb, var(--ody) 72%, #000) 100%)", boxShadow: "inset 0 1px 3px rgba(255,255,255,.4), inset 0 -3px 6px -2px rgba(0,0,0,.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
             </span>
             <div style={{ flex: 1 }}>

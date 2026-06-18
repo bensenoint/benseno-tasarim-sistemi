@@ -142,7 +142,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
     <tr onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{
         cursor:"pointer",
-        background: hover ? "var(--paper-2)" : "transparent",
+        background: hover ? "var(--paper-2)" : (stripe ? "var(--row-stripe)" : "transparent"),
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
