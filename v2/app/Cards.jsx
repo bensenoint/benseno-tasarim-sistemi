@@ -83,7 +83,7 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
         // Semantik renk/accent taşıyan hücreler çok hafif ton yıkaması alır (monotonluğu kırar, nötr hücreler temiz kalır).
         background: emphasis && tint ? tint
           : hov ? "var(--paper-2)"
-          : borderAccent ? `color-mix(in srgb, ${borderAccent} 5%, var(--paper))`
+          : borderAccent ? `color-mix(in srgb, ${borderAccent} 8%, var(--paper))`
           : "transparent",
         borderRight: "1px solid var(--line)",
         borderBottom: "1px solid var(--line)",

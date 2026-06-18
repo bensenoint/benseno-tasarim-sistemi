@@ -137,8 +137,8 @@ function Alert({ tone, Icon, title, body, action, metric }) {
   }[tone] || "var(--ink)";
   // Editoryal: kare/hairline kalır; uzun sayfada kartları ayrıştırmak için
   // her ton çok hafif renk yıkaması + soluk ton-kenarlık taşır (tehlike biraz daha belirgin).
-  const bg = `color-mix(in srgb, ${fg} ${tone === "danger" ? 7 : 5}%, var(--paper))`;
-  const bd = `color-mix(in srgb, ${fg} ${tone === "danger" ? 36 : 26}%, var(--line))`;
+  const bg = `color-mix(in srgb, ${fg} ${tone === "danger" ? 10 : 8}%, var(--paper))`;
+  const bd = `color-mix(in srgb, ${fg} ${tone === "danger" ? 42 : 32}%, var(--line))`;
   return (
     <div style={{
       display:"flex", flexDirection:"column", gap: 12,
