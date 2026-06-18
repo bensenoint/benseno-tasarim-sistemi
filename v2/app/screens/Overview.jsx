@@ -48,7 +48,7 @@ function FilterPanel({ open, onClose, deptFilter, setDeptFilter, prioFilter, set
       <div style={{
         position:"absolute", top:"100%", right:0, marginTop:6, zIndex:89,
         background:"var(--surface)", border:"1px solid var(--line)",
-        borderRadius:12, boxShadow:"var(--shadow-2)", padding:16, minWidth:220,
+        borderRadius:8, boxShadow:"var(--shadow-1)", padding:16, minWidth:220,
         display:"flex", flexDirection:"column", gap:14
       }}>
         <div style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.07em", textTransform:"uppercase", color:"var(--ink-3)"}}>Filtrele</div>

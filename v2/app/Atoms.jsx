@@ -147,15 +147,12 @@ function Button({ children, kind = "secondary", icon, size = "md", onClick, styl
   const fs = size === "sm" ? 12 : 13;
   return (
     <button onClick={onClick}
-      onMouseDown={e => e.currentTarget.style.transform="scale(0.97)"}
-      onMouseUp={e => e.currentTarget.style.transform=""}
-      onMouseLeave={e => e.currentTarget.style.transform=""}
       style={{
         font: `600 ${fs}px/1 var(--font-sans)`,
         padding: pad, borderRadius: 6, border: `1px solid ${c.bd}`,
         background: c.bg, color: c.fg, cursor: "pointer",
         display: "inline-flex", alignItems: "center", gap: 6,
-        transition: "background 120ms cubic-bezier(0.2,0,0,1), transform 120ms cubic-bezier(0.2,0,0,1)", ...style
+        transition: "background 120ms cubic-bezier(0.2,0,0,1), border-color 120ms cubic-bezier(0.2,0,0,1)", ...style
       }}>
       {icon}{children}
     </button>

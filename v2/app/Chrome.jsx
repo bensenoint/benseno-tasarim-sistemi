@@ -684,7 +684,7 @@ function DateRangeControl({ range, onChange, now, compact }) {
     <div style={{ position: "relative", flexShrink: 0 }}>
       <button onClick={() => setOpen(o => !o)} title="Tarih aralığı"
         style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: compact ? "5px 7px" : "5px 9px",
-          border: "1px solid var(--line)", borderRadius: 7, background: range.preset === "30d" ? "var(--paper-2)" : "var(--ember-tint)",
+          border: "1px solid var(--line)", borderRadius: 6, background: range.preset === "30d" ? "var(--paper-2)" : "var(--ember-tint)",
           color: range.preset === "30d" ? "var(--ink-3)" : "var(--ember)", font: "500 11px/1 var(--font-sans)", cursor: "pointer" }}>
         <span>📅</span>{!compact && <span>{label}</span>}<span style={{ color: "var(--ink-4)" }}>▾</span>
       </button>
@@ -755,13 +755,12 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
       <div style={{marginLeft: "auto", display: "flex", alignItems: "center", gap: isMobile ? 6 : 8}}>
         {/* Sync pill */}
         <span title="Slack Canvas senkron" style={{
-          display: "inline-flex", alignItems: "center", gap: 5,
-          padding: isMobile ? "4px 7px 4px 6px" : "4px 9px 4px 7px", borderRadius: 999,
-          background: "var(--ember-tint)", color: "var(--ember)",
+          display: "inline-flex", alignItems: "center", gap: 6,
+          color: "var(--ink-4)",
           font: `500 ${isMobile ? 10 : 11}px/1 var(--font-sans)`, flexShrink: 0,
         }}>
           <span style={{
-            width: 5, height: 5, borderRadius: 999, background: "var(--ember)",
+            width: 6, height: 6, borderRadius: 999, background: "var(--ember)",
             animation: "bn-pulse 2.4s ease-in-out infinite", flexShrink: 0,
           }}/>
           {isMobile ? "Canlı" : `Canlı · ${syncSecs}sn`}
@@ -775,15 +774,14 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
 
         {/* View mode — hidden on mobile (bottom nav handles navigation) */}
         {!isMobile && (
-          <div style={{display: "inline-flex", padding: 2, background: "var(--paper-2)", borderRadius: 7, gap: 1}}>
+          <div style={{display: "inline-flex", padding: 2, border: "1px solid var(--line)", borderRadius: 6, gap: 1}}>
             {[["mine", "Ben"], ["dept", "Dept"], ["all", "Tümü"]].map(([k, v]) => (
               <button key={k} onClick={() => setViewMode(k)} style={{
-                font: "500 11px/1 var(--font-sans)", padding: "5px 9px",
-                border: 0, background: viewMode === k ? "var(--surface)" : "transparent",
-                color: viewMode === k ? "var(--ink)" : "var(--ink-3)",
-                borderRadius: 5, cursor: "pointer",
-                boxShadow: viewMode === k ? "0 1px 2px rgba(22,22,26,0.06)" : "none",
-                transition: "background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1), box-shadow 120ms cubic-bezier(0.2,0,0,1), transform 120ms cubic-bezier(0.2,0,0,1)",
+                font: `${viewMode === k ? 600 : 500} 11px/1 var(--font-sans)`, padding: "5px 10px",
+                border: 0, background: viewMode === k ? "var(--paper-2)" : "transparent",
+                color: viewMode === k ? "var(--ink)" : "var(--ink-4)",
+                borderRadius: 4, cursor: "pointer",
+                transition: "background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1)",
               }}>{v}</button>
             ))}
           </div>
@@ -794,7 +792,7 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           style={{
             border: "1px solid var(--line)", background: "transparent",
-            padding: "5px 6px", borderRadius: 7, color: "var(--ink-3)", cursor: "pointer",
+            padding: "5px 6px", borderRadius: 6, color: "var(--ink-3)", cursor: "pointer",
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             transition: "color 150ms, background 150ms",
           }}
@@ -811,14 +809,13 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
           <button onClick={onNewBrief} style={{
             width: 36, height: 36, flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center",
-            border: "1.5px solid var(--ember)", borderRadius: 8,
-            background: "transparent", color: "var(--ember)", cursor: "pointer",
+            border: "1px solid var(--ember)", borderRadius: 6,
+            background: "var(--ember)", color: "#fff", cursor: "pointer",
           }}>
             <I.Plus size={16}/>
           </button>
         ) : (
-          <Button kind="secondary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}
-            style={{borderColor:"var(--ember)", color:"var(--ember)", fontWeight:600}}>Yeni brief</Button>
+          <Button kind="primary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}>Yeni brief</Button>
         )}
 
         {/* User avatar + menu */}
