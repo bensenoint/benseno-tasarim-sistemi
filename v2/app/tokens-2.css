@@ -662,14 +662,21 @@ button:active,
   }
   .bns-kanban-grid > * { scroll-snap-align: start; }
 
-  /* Ekip matrisi: kişi sütununu daralt, rol etiketini gizle → daha çok marka kolonu görünür */
+  /* Ekip matrisi: kişi sütununu daralt; rol etiketi isim ALTINA iner (mobilde de görünür) */
   .bns-mtx-h {
-    min-width: 124px !important;
-    max-width: 124px !important;
-    width: 124px !important;
+    min-width: 138px !important;
+    max-width: 138px !important;
+    width: 138px !important;
+    flex-wrap: wrap !important;
+    row-gap: 2px !important;
   }
-  .bns-mtx-role { display: none !important; }
-  .bns-mtx-name { max-width: 84px !important; }
+  .bns-mtx-role {
+    display: block !important;
+    flex-basis: 100% !important;
+    margin-left: 28px !important;
+    text-align: left !important;
+  }
+  .bns-mtx-name { max-width: 96px !important; }
 
   /* Swipe-to-action: mobilde inline aksiyon butonlarını gizle (sola kaydır → tepsi açılır) */
   .bns-row-actions { display: none !important; }
