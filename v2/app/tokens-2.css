@@ -571,8 +571,15 @@ button:active,
   /* Footer: hidden on mobile */
   .bns-desktop-footer { display: none !important; }
 
-  /* Main content: extra bottom padding for bottom nav */
-  .bns-main-content { padding: 8px 14px 80px !important; }
+  /* Main content: bottom nav + safe-area için alt boşluk */
+  .bns-main-content { padding: 8px 14px calc(84px + env(safe-area-inset-bottom, 0px)) !important; }
+
+  /* Native dokunma hissi: tap-highlight kaldır + basılı (:active) geri bildirim */
+  button, a, [role="button"], summary { -webkit-tap-highlight-color: transparent; }
+  button:active, a:active, [role="button"]:active { opacity: .55; transition: opacity 60ms ease; }
+  .bns-fab:active { transform: scale(0.92); opacity: 1 !important; transition: transform 90ms ease; }
+  /* iOS momentum scroll + taşma sıçramasını sınırla */
+  html, body { overscroll-behavior-y: none; }
 
   /* Table: hide non-essential columns on mobile */
   .bns-col-mobile-hide { display: none !important; }

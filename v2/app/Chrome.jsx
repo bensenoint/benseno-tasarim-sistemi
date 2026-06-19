@@ -804,17 +804,8 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
 
         {/* Bildirimler artık Ody'ye taşındı (sağ-alt maskot) — üst menüde çan yok. */}
 
-        {/* New brief — icon+text on desktop, icon-only on mobile */}
-        {isMobile ? (
-          <button onClick={onNewBrief} style={{
-            width: 36, height: 36, flexShrink: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            border: "1px solid var(--ember)", borderRadius: 6,
-            background: "var(--ember)", color: "#fff", cursor: "pointer",
-          }}>
-            <I.Plus size={16}/>
-          </button>
-        ) : (
+        {/* New brief — desktop'ta header butonu; mobilde FAB (alt sağ) devralır */}
+        {!isMobile && (
           <Button kind="primary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}>Yeni brief</Button>
         )}
 
@@ -951,7 +942,7 @@ function MobileNav({ active, onChange, data }) {
 
       {/* Slide-up drawer */}
       <div style={{
-        position: "fixed", left: 0, right: 0, bottom: menuOpen ? 60 : "-100%",
+        position: "fixed", left: 0, right: 0, bottom: menuOpen ? "calc(60px + env(safe-area-inset-bottom, 0px))" : "-100%",
         zIndex: 81, background: "var(--surface)",
         borderRadius: "16px 16px 0 0",
         border: "1px solid var(--line)", borderBottom: "none",
@@ -994,6 +985,20 @@ function MobileNav({ active, onChange, data }) {
           </div>
         ))}
       </div>
+
+      {/* FAB — Yeni brief (mobil-only native aksiyon butonu) */}
+      <button onClick={() => window.openNewBriefModal && window.openNewBriefModal()}
+        aria-label="Yeni brief" className="bns-fab" style={{
+          position: "fixed", right: 16, zIndex: 79,
+          bottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 16px)",
+          width: 56, height: 56, borderRadius: "50%", border: "none",
+          background: "var(--ember)", color: "#fff",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 6px 16px -4px rgba(20,38,92,.45), 0 2px 6px rgba(0,0,0,.18)",
+          cursor: "pointer",
+        }}>
+        <I.Plus size={24}/>
+      </button>
 
       {/* Bottom tab bar */}
       <nav style={{
