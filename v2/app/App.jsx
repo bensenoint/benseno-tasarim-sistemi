@@ -554,6 +554,7 @@ function App({ currentUser, onLogout }) {
     <div data-screen-label={tab} style={{display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden", position:"relative"}}>
       <Header
         user={user}
+        tab={tab} onNav={navTo}
         viewMode={viewMode} setViewMode={setViewMode}
         dateRange={dateRange} setDateRange={setDateRange}
         theme={t.theme} setTheme={(v) => setTweak("theme", v)}

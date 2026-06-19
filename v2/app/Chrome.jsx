@@ -952,7 +952,7 @@ function DateRangeControl({ range, onChange, now, compact }) {
   );
 }
 
-function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers, currentUser, onLogout }) {
+function Header({ user, tab, onNav, viewMode, setViewMode, dateRange, setDateRange, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers, currentUser, onLogout }) {
   const isMobile = useIsMobile();
   const [tick, setTick] = React.useState(0);
   React.useEffect(() => {
@@ -961,6 +961,15 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
   }, []);
   const syncSecs = 22 + (tick % 60);
   const [userMenu, setUserMenu] = React.useState(false);
+
+  // Mobil alt-sayfa başlığı: ana sekmeler (Özet/İşler/Profil/Markalar) logo gösterir;
+  // diğer sayfalar (Tamamlanan/Ekip/Geçmiş…) logo yerine başlık + geri butonu (referans).
+  const PRIMARY_TABS = ["overview", "jobs", "profile", "brand"];
+  const SUB_TITLES = {};
+  (NAV_SECTIONS || []).forEach(s => (s.items || []).forEach(it => { SUB_TITLES[it.id] = it.label; }));
+  Object.assign(SUB_TITLES, { completed:"Tamamlanan", musteride:"Müşteride", "dept-comp":"Karşılaştırma", team:"Ekip", multi:"Sıralı işler" });
+  const isSubPage = isMobile && tab && !PRIMARY_TABS.includes(tab);
+  const pageTitle = SUB_TITLES[tab] || "";
 
   return (
     <header style={{
@@ -972,13 +981,25 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
       flexShrink: 0,
       position: "sticky", top: 0, zIndex: 30,
     }}>
-      {/* Logo — mobil VE desktop header'da */}
-      <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
-        <img src="app/logo.png?v=2" alt="Benseno" style={{
-          height: isMobile ? 34 : 44, width: "auto", objectFit: "contain",
-          mixBlendMode: "multiply", flexShrink: 0,
-        }}/>
-      </a>
+      {/* Mobil alt-sayfa: logo yerine geri butonu + sayfa başlığı (referans) */}
+      {isSubPage ? (
+        <div style={{display:"flex", alignItems:"center", gap:8, minWidth:0}}>
+          <button onClick={() => onNav && onNav("overview")} aria-label="Geri" style={{
+            width:34, height:34, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center",
+            border:0, borderRadius:8, background:"transparent", color:"var(--ink-2)", cursor:"pointer",
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span style={{font:"600 19px/1.1 var(--font-sans)", color:"var(--ink)", letterSpacing:"-0.01em", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{pageTitle}</span>
+        </div>
+      ) : (
+        <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
+          <img src="app/logo.png?v=2" alt="Benseno" style={{
+            height: isMobile ? 34 : 44, width: "auto", objectFit: "contain",
+            mixBlendMode: "multiply", flexShrink: 0,
+          }}/>
+        </a>
+      )}
 
       <div style={{marginLeft: "auto", display: "flex", alignItems: "center", gap: isMobile ? 8 : 8}}>
         {/* Mobile: arama (hairline kutu) — referans header'da sağda */}

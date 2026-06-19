@@ -33,7 +33,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       <PageHead
         title="Aktif işler"
         subtitle="11 sütun · sırala · filtrele · drawer'da düzenle"
-        actions={<>
+        actions={isMobile ? null : <>
           <Button kind="ghost" size="sm" icon={<I.Refresh size={13}/>}>Yenile</Button>
         </>}
       />
