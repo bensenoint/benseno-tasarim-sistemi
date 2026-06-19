@@ -86,7 +86,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         position:"fixed", inset: 0, background:"var(--overlay)", zIndex: 80,
         animation: "bn-fade 200ms var(--ease-out-quart)"
       }}/>
-      <aside style={isMobile ? {
+      <div role="dialog" aria-modal="true" style={isMobile ? {
         position:"fixed", left: 0, right: 0, bottom: 0,
         maxHeight: "92vh", height: "92vh",
         background: "var(--surface)",
@@ -339,7 +339,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             </Button>}
           </div>
         </footer>
-      </aside>
+      </div>
     </>
   );
 }
