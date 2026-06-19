@@ -245,7 +245,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
             <option value="">Herkes</option>
             {people.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
-          <label className="bns-hide-mobile" style={{ font:"400 12px/1.2 var(--font-sans)", color:"var(--ink-3)", display:"inline-flex", alignItems:"center", gap:6 }}>
+          <label style={{ font:"400 12px/1.2 var(--font-sans)", color:"var(--ink-3)", display:"inline-flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
             <I.Calendar size={13}/> Deadline:
             <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={fldStyle}/>
             <span style={{ color:"var(--ink-4)" }}>→</span>

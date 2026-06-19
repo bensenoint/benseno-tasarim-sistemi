@@ -617,8 +617,8 @@ button:active,
   .bns-chip-scroll::-webkit-scrollbar { display: none; }
   .bns-chip-scroll > * { flex-shrink: 0; }
 
-  /* Table: hide non-essential columns on mobile */
-  .bns-col-mobile-hide { display: none !important; }
+  /* Tablolar mobilde de TÜM sütunları gösterir — yatay kaydırma ile (referans).
+     Eskiden .bns-col-mobile-hide sütunları gizliyordu; artık tüm alanlar erişilebilir. */
 
   /* Overview 2-col grid → single col on mobile */
   .bn-grid-2 { grid-template-columns: 1fr !important; }
