@@ -980,33 +980,35 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
         }}/>
       </a>
 
-      {/* Mobile: search icon (desktop'ta sidebar'da) */}
-      {isMobile && (
-        <button onClick={onOpenPalette} style={{
-          width: 36, height: 36, flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          border: "1px solid var(--line)", borderRadius: 8,
-          background: "var(--paper-2)", color: "var(--ink-4)", cursor: "pointer",
-        }}>
-          <I.Search size={15}/>
-        </button>
-      )}
+      <div style={{marginLeft: "auto", display: "flex", alignItems: "center", gap: isMobile ? 8 : 8}}>
+        {/* Mobile: arama (hairline kutu) — referans header'da sağda */}
+        {isMobile && (
+          <button onClick={onOpenPalette} aria-label="Ara" style={{
+            width: 38, height: 38, flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: "1px solid var(--line)", borderRadius: 10,
+            background: "var(--surface)", color: "var(--ink-3)", cursor: "pointer",
+          }}>
+            <I.Search size={16}/>
+          </button>
+        )}
 
-      <div style={{marginLeft: "auto", display: "flex", alignItems: "center", gap: isMobile ? 6 : 8}}>
-        {/* Sync pill */}
-        <span title="Slack Canvas senkron" style={{
-          display: "inline-flex", alignItems: "center", gap: 6,
-          color: "var(--ink-4)",
-          font: `500 ${isMobile ? 10 : 11}px/1 var(--font-sans)`, flexShrink: 0,
-        }}>
-          <span style={{
-            width: 6, height: 6, borderRadius: 999, background: "var(--ember)",
-            animation: "bn-pulse 2.4s ease-in-out infinite", flexShrink: 0,
-          }}/>
-          {isMobile ? "Canlı" : `Canlı · ${syncSecs}sn`}
-        </span>
+        {/* Sync pill — yalnız desktop (referans mobil header'da yok) */}
+        {!isMobile && (
+          <span title="Slack Canvas senkron" style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            color: "var(--ink-4)",
+            font: `500 11px/1 var(--font-sans)`, flexShrink: 0,
+          }}>
+            <span style={{
+              width: 6, height: 6, borderRadius: 999, background: "var(--ember)",
+              animation: "bn-pulse 2.4s ease-in-out infinite", flexShrink: 0,
+            }}/>
+            {`Canlı · ${syncSecs}sn`}
+          </span>
+        )}
 
-        {/* Tarih aralığı filtresi — global, açılışta son 30 gün */}
+        {/* Tarih aralığı filtresi — global, açılışta son 30 gün (mobilde de korunur, ▾ kompakt) */}
         {dateRange && setDateRange && (
           <DateRangeControl range={dateRange} onChange={setDateRange}
             now={(window.BNS_DATA && window.BNS_DATA.NOW) || Date.now()} compact={isMobile}/>
@@ -1027,42 +1029,54 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
           </div>
         )}
 
-        {/* Theme toggle */}
-        <button title={theme === "dark" ? "Aydınlık mod" : "Karanlık mod"}
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          style={{
-            border: "1px solid var(--line)", background: "transparent",
-            padding: "5px 6px", borderRadius: 6, color: "var(--ink-3)", cursor: "pointer",
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            transition: "color 150ms, background 150ms",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ink-3)"; }}
-        >
-          {theme === "dark" ? <I.Sun size={14}/> : <I.Moon size={14}/>}
-        </button>
+        {/* Theme toggle — yalnız desktop (referans mobil header'da yok; mobilde Daha menüsünde) */}
+        {!isMobile && (
+          <button title={theme === "dark" ? "Aydınlık mod" : "Karanlık mod"}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            style={{
+              border: "1px solid var(--line)", background: "transparent",
+              padding: "5px 6px", borderRadius: 6, color: "var(--ink-3)", cursor: "pointer",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              transition: "color 150ms, background 150ms",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ink-3)"; }}
+          >
+            {theme === "dark" ? <I.Sun size={14}/> : <I.Moon size={14}/>}
+          </button>
+        )}
 
         {/* Bildirimler artık Ody'ye taşındı (sağ-alt maskot) — üst menüde çan yok. */}
 
-        {/* New brief — desktop'ta header butonu; mobilde FAB (alt sağ) devralır */}
-        {!isMobile && (
+        {/* New brief — mobil: accent dolgulu + butonu (referans); desktop: etiketli buton */}
+        {isMobile ? (
+          <button onClick={onNewBrief} aria-label="Yeni brief" style={{
+            width: 38, height: 38, flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: 0, borderRadius: 10, background: "var(--ember)", color: "#fff",
+            cursor: "pointer", boxShadow: "0 2px 6px -2px rgba(20,38,92,.35)",
+          }}>
+            <I.Plus size={18}/>
+          </button>
+        ) : (
           <Button kind="primary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}>Yeni brief</Button>
         )}
 
         {/* User avatar + menu */}
         <div style={{position: "relative"}}>
           <button onClick={() => setUserMenu(v => !v)} style={{
-            display: "inline-flex", alignItems: "center", gap: 7,
-            padding: "3px 8px 3px 3px", border: "1px solid var(--line)",
+            display: "inline-flex", alignItems: "center", gap: isMobile ? 0 : 7,
+            padding: isMobile ? 0 : "3px 8px 3px 3px",
+            border: isMobile ? 0 : "1px solid var(--line)",
             borderRadius: 999, background: "transparent", cursor: "pointer",
             transition: "background 120ms",
           }}
-            onMouseEnter={e => e.currentTarget.style.background = "var(--paper-2)"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            onMouseEnter={e => { if (!isMobile) e.currentTarget.style.background = "var(--paper-2)"; }}
+            onMouseLeave={e => { if (!isMobile) e.currentTarget.style.background = "transparent"; }}
           >
-            <Avatar user={user} size={22}/>
-            <span style={{font: "500 12px/1 var(--font-sans)", color: "var(--ink)"}}>{user.name.split(" ")[0]}</span>
-            <I.ChevronDown size={10} style={{color: "var(--ink-4)"}}/>
+            <Avatar user={user} size={isMobile ? 34 : 22}/>
+            {!isMobile && <span style={{font: "500 12px/1 var(--font-sans)", color: "var(--ink)"}}>{user.name.split(" ")[0]}</span>}
+            {!isMobile && <I.ChevronDown size={10} style={{color: "var(--ink-4)"}}/>}
           </button>
           {userMenu && (() => {
             const ROL_LABELS = { yonetici: "Yönetici", tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "Freelance", diger: "Diğer" };
@@ -1164,10 +1178,10 @@ function MobileNav({ active, onChange, data, menuOpen: menuOpenProp, setMenuOpen
   const alertCount = (data && data.briefs) ? data.briefs.filter(b => b.prio && (b.prio.code === "red" || b.prio.code === "over")).length : 0;
 
   const PRIMARY = [
-    { id: "overview",  label: "Özet",    icon: "Home" },
-    { id: "jobs",      label: "İşler",   icon: "Briefcase" },
-    { id: "kanban",    label: "Kanban",  icon: "Columns" },
-    { id: "profile",   label: "Profil",  icon: "User" },
+    { id: "overview",  label: "Özet",     icon: "Home" },
+    { id: "jobs",      label: "İşler",    icon: "Briefcase" },
+    { id: "profile",   label: "Profil",   icon: "User" },
+    { id: "brand",     label: "Markalar", icon: "Tag" },
   ];
 
   // All nav items for drawer
@@ -1300,10 +1314,10 @@ function MobileNav({ active, onChange, data, menuOpen: menuOpenProp, setMenuOpen
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
             {menuOpen
               ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
-              : <><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>
+              : <><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></>
             }
           </svg>
-          <span style={{font:"400 9.5px/1 var(--font-sans)"}}>Menü</span>
+          <span style={{font:`${menuOpen ? 600 : 400} 9.5px/1 var(--font-sans)`}}>Daha</span>
         </button>
       </nav>
     </>
