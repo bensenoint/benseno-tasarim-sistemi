@@ -196,6 +196,10 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
 
   const roleLabel = { yonetici:"Yönetici", tasarim:"Tasarım", editor:"Editör", ai:"AI Operatör" }[u.rol] || u.rol;
 
+  // Dönemsel özet yalnız yöneticilere görünür (giriş yapan kullanıcıya göre).
+  const meRec = (data.USERS || []).find(x => x.id === (currentUser && (currentUser.slack_id || currentUser.id)));
+  const isManager = !!((currentUser && currentUser.role === "admin") || (meRec && meRec.rol === "yonetici"));
+
   // ─── Performans özeti — üstte seçili GLOBAL tarih aralığına göre (data.completed zaten süzülü) ───
   const RANGE_LABELS = { "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
   const perfRangeLabel = RANGE_LABELS[(data.dateRange && data.dateRange.preset) || "all"] || "seçili aralık";
@@ -512,10 +516,11 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         </Card>
       </div>
 
-      {/* ─── Performans özeti — seçili tarih aralığına göre (sayfa altı) ─── */}
+      {/* ─── Dönemsel özet — yalnız yöneticilere, seçili tarih aralığına göre (sayfa altı) ─── */}
+      {isManager && (
       <Card padding={0} style={{minWidth:0, marginTop:"var(--section-gap)"}}>
         <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10, padding:"13px 16px", borderBottom:"1px solid var(--line-strong)", flexWrap:"wrap"}}>
-          <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>{u.name.split(" ")[0]} · performans özeti</span>
+          <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>Dönemsel özet</span>
           <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"4px 9px", border:"1px solid var(--line)", borderRadius:999}}>{perfRangeLabel}</span>
         </div>
         {perfN === 0 ? (
@@ -553,6 +558,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
           </>
         )}
       </Card>
+      )}
 
     </div>
   );

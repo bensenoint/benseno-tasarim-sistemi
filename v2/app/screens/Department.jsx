@@ -1,6 +1,9 @@
 // app/screens/Department.jsx — reused for Tasarım / Editör / AI tabs.
 
-function DepartmentScreen({ data, role, onOpenBrief }) {
+function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
+  // Dönemsel özet yalnız yöneticilere görünür (giriş yapan kullanıcıya göre).
+  const meRec = (data.USERS || []).find(x => x.id === (currentUser && (currentUser.slack_id || currentUser.id)));
+  const isManager = !!((currentUser && currentUser.role === "admin") || (meRec && meRec.rol === "yonetici"));
   const roleMap = {
     tasarim:   { name: "Tasarım",   emoji: "🎨", stats: data.deptStats.tasarim,   accent: "var(--bw-1)" },
     editor:    { name: "Editör",    emoji: "✍️", stats: data.deptStats.editor,    accent: "var(--bw-4)" },
@@ -145,10 +148,11 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
           <BriefTable rows={rows} onRowClick={onOpenBrief}/>
         </Card>
 
-        {/* Performans özeti — seçili tarih aralığına göre (sayfa altı) */}
+        {/* Dönemsel özet — yalnız yöneticilere, seçili tarih aralığına göre (sayfa altı) */}
+        {isManager && (
         <Card padding={0} style={{minWidth:0}}>
           <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10, padding:"13px 16px", borderBottom:"1px solid var(--line-strong)", flexWrap:"wrap"}}>
-            <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>{r.name} · performans özeti</span>
+            <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>Dönemsel özet</span>
             <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"4px 9px", border:"1px solid var(--line)", borderRadius:999}}>{deptRangeLabel}</span>
           </div>
           {dN === 0 ? (
@@ -202,6 +206,7 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
             </>
           )}
         </Card>
+        )}
       </div>
     </div>
   );

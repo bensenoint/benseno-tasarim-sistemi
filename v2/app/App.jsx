@@ -533,10 +533,10 @@ function App({ currentUser, onLogout }) {
   else if (tab === "musteride")Screen = <MusterideScreen data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "completed")Screen = <CompletedScreen data={liveData} onOpenBrief={onOpenCompleted} currentUser={currentUser}/>;
   else if (tab === "dept-comp")Screen = <DeptCompareScreen data={liveData}/>;
-  else if (tab === "design")   Screen = <DepartmentScreen data={liveData} role="tasarim" onOpenBrief={onOpenBrief}/>;
-  else if (tab === "editor")   Screen = <DepartmentScreen data={liveData} role="editor"  onOpenBrief={onOpenBrief}/>;
-  else if (tab === "ai")       Screen = <DepartmentScreen data={liveData} role="ai"      onOpenBrief={onOpenBrief}/>;
-  else if (tab === "freelance") Screen = <DepartmentScreen data={liveData} role="freelance" onOpenBrief={onOpenBrief}/>;
+  else if (tab === "design")   Screen = <DepartmentScreen data={liveData} role="tasarim" currentUser={currentUser} onOpenBrief={onOpenBrief}/>;
+  else if (tab === "editor")   Screen = <DepartmentScreen data={liveData} role="editor"  currentUser={currentUser} onOpenBrief={onOpenBrief}/>;
+  else if (tab === "ai")       Screen = <DepartmentScreen data={liveData} role="ai"      currentUser={currentUser} onOpenBrief={onOpenBrief}/>;
+  else if (tab === "freelance") Screen = <DepartmentScreen data={liveData} role="freelance" currentUser={currentUser} onOpenBrief={onOpenBrief}/>;
   else if (tab === "gallery")  Screen = <GalleryScreen  data={liveData}/>;
   else if (tab === "multi")    Screen = <MultiScreen    data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "brand")    Screen = <BrandScreen    data={liveData} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} initialSel={brandSel}/>;
