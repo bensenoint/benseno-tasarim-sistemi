@@ -655,9 +655,10 @@ function ChatBot({ currentUser }) {
     setOpenAdvice(n.id);
     fetchAdvice(n);
   };
-  // Okunmamış bildirimlerin önerisini BİLDİRİMLE BİRLİKTE otomatik getir (ilk 6, cache'li) — toggle arkasında kaybolmasın.
+  // En yeni bildirimlerin önerisini BİLDİRİMLE BİRLİKTE otomatik getir (ilk 6, cache'li) — toggle arkasında kaybolmasın.
+  // (Panel açılınca okundu işaretlendiği için read/unread değil, sıraya göre.)
   React.useEffect(() => {
-    (notifItems || []).filter(n => !n.read_at).slice(0, 6).forEach(fetchAdvice);
+    (notifItems || []).slice(0, 6).forEach(fetchAdvice);
   }, [notifItems]);
 
   const send = async () => {
@@ -766,8 +767,9 @@ function ChatBot({ currentUser }) {
                   {notifCount > 0 && <span style={{ minWidth: 18, height: 18, padding: "0 5px", borderRadius: 999, background: "#24479E", color: "#fff", font: "700 10px/18px var(--font-sans)", textAlign: "center" }}>{notifCount}</span>}
                 </div>
                 <div style={{ maxHeight: msgs.length ? 150 : 300, overflowY: "auto" }}>
-                  {notifItems.slice(0, 30).map(n => {
+                  {notifItems.slice(0, 30).map((n, idx) => {
                     var unread = !n.read_at;
+                    var autoShow = idx < 3;   // en yeni 3 bildirimde öneri otomatik açık (toggle arkasında kaybolmasın)
                     return (
                     <div key={n.id} style={{
                       borderLeft: unread ? "3px solid var(--ody)" : "3px solid transparent",
@@ -780,7 +782,7 @@ function ChatBot({ currentUser }) {
                           <span style={{ display: "block", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</span>
                           <span style={{ display: "block", font: "400 10px/1 var(--font-sans)", color: unread ? "var(--ink-3)" : "var(--ink-5)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</span>
                           <span style={{ display: "flex", gap: 14, marginTop: 6, alignItems: "center" }}>
-                            {unread
+                            {autoShow
                               ? <span style={{ font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>💡 Ody'nin önerisi</span>
                               : <button onClick={() => toggleAdvice(n)} style={{ border: 0, background: "transparent", cursor: "pointer", padding: 0, font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>
                                   💡 Ody'nin önerisi <span style={{ display: "inline-flex", transform: openAdvice === n.id ? "rotate(180deg)" : "none", transition: "transform 160ms" }}><I.ChevronDown size={11}/></span>
@@ -789,7 +791,7 @@ function ChatBot({ currentUser }) {
                           </span>
                         </span>
                       </div>
-                      {(unread || openAdvice === n.id) && (
+                      {(autoShow || openAdvice === n.id) && (
                         <div style={{ padding: "0 12px 11px 27px" }}>
                           <div style={{ background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 11px", font: "400 12px/1.55 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
                             {advice[n.id] && advice[n.id].state === "loading"
