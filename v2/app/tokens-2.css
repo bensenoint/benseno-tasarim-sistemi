@@ -584,13 +584,12 @@ button:active,
   /* Sayfa geçişi: her sekme/ekran mount'ta hafif fade + yukarı kayma (native push hissi) */
   .bn-tab-in { animation: bn-tab-enter 260ms cubic-bezier(0.2,0,0,1); }
 
-  /* PageHead mobilde: başlık + tarih eyebrow gizli (nav zaten konumu gösteriyor), sadece aksiyonlar/özet kalır */
-  .bns-pagehead { padding: 8px 0 8px !important; gap: 8px !important; }
+  /* PageHead mobilde: başlık + tarih + açıklama gizli (nav konumu gösterir, KPI'lar özeti verir) */
+  .bns-pagehead { padding: 0 0 6px !important; gap: 8px !important; border-bottom: none !important; margin-bottom: 0 !important; }
   .bns-pagehead h1 { display: none !important; }
   .bns-pagehead .bns-ph-eyebrow { display: none !important; }
-  .bns-pagehead .bns-ph-sub { font-size: 12px !important; line-height: 1.4 !important; margin-top: 0 !important; }
-  /* Başlık gizliyse sol metin bloğu daralmasın, aksiyonlar tam satıra otursun */
-  .bns-pagehead > div:first-child { flex: 1 1 100%; }
+  .bns-pagehead .bns-ph-sub { display: none !important; }
+  .bns-pagehead > div:first-child { flex: 0 1 auto; }
 
   /* Filtre satırı mobilde tek satır — yatay kaydırılır, dikeyde yer kaplamaz */
   .bns-sticky-filters { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
