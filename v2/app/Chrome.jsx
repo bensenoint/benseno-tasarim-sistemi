@@ -584,7 +584,7 @@ function ChatBot({ currentUser }) {
           {notifCount > 0 && <span title={notifCount + " okunmamış bildirim"} style={{
             position: "absolute", bottom: -3, right: -3, zIndex: 3, width: 18, height: 18, padding: 0,
             display: "inline-flex", alignItems: "center", justifyContent: "center",
-            borderRadius: "50%", background: "var(--ember)", color: "#fff",
+            borderRadius: "50%", background: "#24479E", color: "#fff",
             font: "700 9px/1 var(--font-sans)", textAlign: "center",
             border: "2px solid var(--paper)", boxShadow: "0 1px 3px -1px rgba(0,0,0,.3)",
             animation: "odyPopIn .3s ease",
@@ -617,7 +617,7 @@ function ChatBot({ currentUser }) {
                 <div style={{ padding: "9px 12px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 7, background: "var(--ody-tint)" }}>
                   <span style={{ color: "var(--ody)", display: "inline-flex" }}><I.Bell size={13}/></span>
                   <span style={{ flex: 1, font: "700 11px/1 var(--font-sans)", letterSpacing: ".06em", textTransform: "uppercase", color: "var(--ody)" }}>Bildirimler</span>
-                  {notifCount > 0 && <span style={{ minWidth: 18, height: 18, padding: "0 5px", borderRadius: 999, background: "var(--ody)", color: "#fff", font: "700 10px/18px var(--font-sans)", textAlign: "center" }}>{notifCount}</span>}
+                  {notifCount > 0 && <span style={{ minWidth: 18, height: 18, padding: "0 5px", borderRadius: 999, background: "#24479E", color: "#fff", font: "700 10px/18px var(--font-sans)", textAlign: "center" }}>{notifCount}</span>}
                 </div>
                 <div style={{ maxHeight: msgs.length ? 150 : 300, overflowY: "auto" }}>
                   {notifItems.slice(0, 30).map(n => {
