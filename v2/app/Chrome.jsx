@@ -443,7 +443,7 @@ function ChatBot({ currentUser }) {
           setNotifCount(unread.length);
           if (!unread.length) { setNotifPeek(null); return; }
           const latest = unread.reduce((a, b) => (b.id > a.id ? b : a));
-          setNotifPeek(latest);
+          if (latest.id !== peekDismissedRef.current) setNotifPeek(latest);
           if (!open) setMood(odyMoodFromText(latest.text));
         }).catch(() => {});
     };
@@ -451,6 +451,15 @@ function ChatBot({ currentUser }) {
     const id = setInterval(poll, 30000);
     return () => { cancelled = true; clearInterval(id); };
   }, [open]);
+
+  // Bildirim balonu (notifPeek) 6 sn sonra otomatik kapanır — üst kontrolleri kalıcı kapatmasın.
+  // Okunmamış rozeti (notifCount) Ody'de kalır; tıklayınca yine açılır.
+  const peekDismissedRef = React.useRef(0);
+  React.useEffect(() => {
+    if (!notifPeek) return;
+    const t = setTimeout(() => { peekDismissedRef.current = notifPeek.id; setNotifPeek(null); }, 6000);
+    return () => clearTimeout(t);
+  }, [notifPeek]);
 
   // Tüm bildirimleri okundu işaretle (panel kapanınca): sunucu + optimistik → Ody normale döner.
   const markNotifRead = () => {
