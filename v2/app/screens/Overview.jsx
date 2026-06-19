@@ -285,6 +285,7 @@ function Rule({ name, status, hits, last }) {
 }
 
 function EditorialLayout({ data, musteride, user, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   const avgCapPct = calcAvgCapPct(data);
@@ -303,12 +304,35 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
   const trendToday   = histTrend(hist, "today",   today.length)   || { dir:"flat", value:"=" };
   const trendReview  = histTrend(hist, "review",  review.length)  || { dir:"up",   value:"+3" };
 
+  // Firma yıldız rozeti — mobilde PageHead'e (boş başlık alanına) lead olarak, masaüstünde altta render edilir.
+  const ratingPill = (() => {
+    const R = window.BNS_DATA && window.BNS_DATA.ratings;
+    if (!R || !R.firma || !R.firma.cnt) return null;
+    return (
+      <div onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}
+        title="Yıldız Karnesi'ni aç"
+        style={{
+          display:"inline-flex", alignItems:"center", gap:8, marginTop: isMobile ? 0 : 12,
+          padding:"7px 12px", background:"var(--surface)", border:"1px solid var(--line)",
+          borderRadius:999, cursor: onSwitchTab ? "pointer" : "default",
+        }}>
+        <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--ink-3)"}}>Benseno</span>
+        <span style={{display:"inline-flex", gap:1}}>
+          {[1,2,3,4,5].map(i => <I.StarFill key={i} size={12} color={i <= Math.round(R.firma.avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
+        </span>
+        <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)"}}>{R.firma.avg}</span>
+        <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>({R.firma.cnt} iş)</span>
+      </div>
+    );
+  })();
+
   return (
     <div className="bn-tab-in">
       <PageHead
         eyebrow={data.fmtTr ? data.fmtTr(Date.now()) : `${greetingTimezone()}`}
         title={`${greeting}, ${firstName}.`}
         subtitle={<>bugün <strong style={{fontWeight:600, color: overdue.length ? "var(--prio-red)" : "var(--ink-2)"}}>{overdue.length} geciken</strong>, <strong style={{fontWeight:600, color:"var(--ink-2)"}}>{todayDue.length} bugün teslim</strong>. önce bunlar.</>}
+        lead={isMobile ? ratingPill : null}
         actions={<div style={{position:"relative",display:"flex",gap:6}}>
           <Button kind={filterActive ? "primary" : "secondary"} icon={<I.Filter size={14}/>} onClick={() => setFilterOpen(o=>!o)}>
             <span className="bns-btn-label">{filterActive ? "Filtre aktif" : "Filtrele"}</span>
@@ -318,27 +342,8 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
         </div>}
       />
 
-      {/* ⭐ Firma yıldızı — tıklayınca Karşılaştırma'daki Yıldız Karnesi'ne gider */}
-      {(() => {
-        const R = window.BNS_DATA && window.BNS_DATA.ratings;
-        if (!R || !R.firma || !R.firma.cnt) return null;
-        return (
-          <div onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}
-            title="Yıldız Karnesi'ni aç"
-            style={{
-              display:"inline-flex", alignItems:"center", gap:8, marginTop:12,
-              padding:"7px 12px", background:"var(--surface)", border:"1px solid var(--line)",
-              borderRadius:999, cursor: onSwitchTab ? "pointer" : "default",
-            }}>
-            <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--ink-3)"}}>Benseno</span>
-            <span style={{display:"inline-flex", gap:1}}>
-              {[1,2,3,4,5].map(i => <I.StarFill key={i} size={12} color={i <= Math.round(R.firma.avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
-            </span>
-            <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)"}}>{R.firma.avg}</span>
-            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>({R.firma.cnt} iş)</span>
-          </div>
-        );
-      })()}
+      {/* ⭐ Firma yıldızı — masaüstünde altta; mobilde PageHead lead'inde (yukarıda) */}
+      {!isMobile && ratingPill}
 
       {/* KPI grid */}
       <KpiGrid cols={7}>

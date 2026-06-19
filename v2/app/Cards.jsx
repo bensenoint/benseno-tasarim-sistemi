@@ -173,7 +173,7 @@ function Sparkline({ points, color = "var(--ember)", w = 100, h = 32 }) {
   );
 }
 
-function PageHead({ title, subtitle, actions, eyebrow }) {
+function PageHead({ title, subtitle, actions, eyebrow, lead }) {
   return (
     <header className="bns-pagehead" style={{
       display: "flex", alignItems: "flex-end", justifyContent: "space-between",
@@ -181,6 +181,7 @@ function PageHead({ title, subtitle, actions, eyebrow }) {
       borderBottom: "1px solid var(--line-strong)", marginBottom: 4,
     }}>
       <div style={{minWidth: 0, flex: "0 1 auto"}}>
+        {lead}
         {eyebrow && <div className="bns-ph-eyebrow" style={{
           font: "italic 400 15px/1 var(--font-display)", color:"var(--ink-3)",
           marginBottom: 12,
