@@ -358,6 +358,8 @@ function ChatBot({ currentUser }) {
   const [notifPeek, setNotifPeek] = React.useState(null); // kapalıyken gösterilen son bildirim (Ody'ye bağlı)
   const [notifCount, setNotifCount] = React.useState(0);  // okunmamış bildirim sayısı (blob rozeti)
   const [notifItems, setNotifItems] = React.useState([]); // tüm bildirimler (panelde liste — çan Ody'ye taşındı)
+  const [advice, setAdvice] = React.useState({});         // {notifId: {state:"loading"|"done"|"err", text}} — Ody'nin danışman önerisi
+  const [openAdvice, setOpenAdvice] = React.useState(null); // hangi bildirimin önerisi açık
   const [brief, setBrief] = React.useState(null);         // günlük iş özeti (msgs'ten ayrı kart; görülünce kaybolur)
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
 
@@ -514,6 +516,38 @@ function ChatBot({ currentUser }) {
     } catch (e) {}
   };
 
+  // Bildirim için Ody'nin danışman önerisi — geçmiş thread/insight'lara göre ne yapılmalı/uyarı/yönlendirme.
+  // /api/chat zaten sistem verisine (kişiye özel) erişiyor; bildirim metnini verip danışman gibi yorum istiyoruz.
+  const toggleAdvice = (n) => {
+    if (openAdvice === n.id) { setOpenAdvice(null); return; }
+    setOpenAdvice(n.id);
+    if (advice[n.id] && advice[n.id].state === "done") return;     // zaten yüklü
+    const ck = "bns_ody_advice_" + n.id;
+    try { const c = localStorage.getItem(ck); if (c) { setAdvice(a => ({ ...a, [n.id]: { state: "done", text: c } })); return; } } catch (e) {}
+    setAdvice(a => ({ ...a, [n.id]: { state: "loading", text: "" } }));
+    const PROMPT = "Şu bildirim geldi: \"" + (n.text || "") + "\". Bu iş/marka ile ilgili geçmiş Slack thread'lerine ve gün-sonu insight'larına bakarak bir proje danışmanı gibi KISA yönlendir: "
+      + "ne yapılmalı, dikkat edilecek nokta/uyarı, varsa öneri. En fazla 2-3 kısa madde (•). # numarası veya marka belliyse referans ver. "
+      + "Selam/giriş cümlesi yazma, doğrudan maddelere geç. İlgili geçmiş veri yoksa kısa ama işe yarar genel bir öneri ver.";
+    (async () => {
+      try {
+        const r = await fetch(`${API}/api/chat`, {
+          method: "POST",
+          headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
+          body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }] }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.reply) {
+          try { localStorage.setItem(ck, j.reply); } catch (e) {}
+          setAdvice(a => ({ ...a, [n.id]: { state: "done", text: j.reply } }));
+        } else {
+          setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Öneri alınamadı, tekrar dene." } }));
+        }
+      } catch (e) {
+        setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Bağlantı hatası." } }));
+      }
+    })();
+  };
+
   const send = async () => {
     const q = input.trim();
     if (!q || busy) return;
@@ -623,17 +657,34 @@ function ChatBot({ currentUser }) {
                   {notifItems.slice(0, 30).map(n => {
                     var unread = !n.read_at;
                     return (
-                    <a key={n.id} href={n.link || "#"} target={n.link ? "_blank" : undefined} rel="noreferrer" style={{
-                      display: "flex", alignItems: "flex-start", gap: 8, padding: "9px 12px", textDecoration: "none",
+                    <div key={n.id} style={{
                       borderLeft: unread ? "3px solid var(--ody)" : "3px solid transparent",
                       background: unread ? "var(--ody-tint)" : "transparent",
+                      borderBottom: "1px solid var(--line-soft)",
                     }}>
-                      <span aria-hidden="true" style={{ marginTop: 5, flex: "none", width: 7, height: 7, borderRadius: "50%", background: unread ? "var(--ody)" : "transparent" }}/>
-                      <span style={{ flex: 1, minWidth: 0 }}>
-                        <span style={{ display: "block", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</span>
-                        <span style={{ display: "block", font: "400 10px/1 var(--font-sans)", color: unread ? "var(--ink-3)" : "var(--ink-5)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</span>
-                      </span>
-                    </a>
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "9px 12px" }}>
+                        <span aria-hidden="true" style={{ marginTop: 5, flex: "none", width: 7, height: 7, borderRadius: "50%", background: unread ? "var(--ody)" : "transparent" }}/>
+                        <span style={{ flex: 1, minWidth: 0 }}>
+                          <span style={{ display: "block", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</span>
+                          <span style={{ display: "block", font: "400 10px/1 var(--font-sans)", color: unread ? "var(--ink-3)" : "var(--ink-5)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</span>
+                          <span style={{ display: "flex", gap: 14, marginTop: 6, alignItems: "center" }}>
+                            <button onClick={() => toggleAdvice(n)} style={{ border: 0, background: "transparent", cursor: "pointer", padding: 0, font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                              💡 Ody'nin önerisi <span style={{ display: "inline-flex", transform: openAdvice === n.id ? "rotate(180deg)" : "none", transition: "transform 160ms" }}><I.ChevronDown size={11}/></span>
+                            </button>
+                            {n.link && <a href={n.link} target="_blank" rel="noreferrer" style={{ font: "500 11px/1 var(--font-sans)", color: "var(--ink-4)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3 }}><I.Link size={11}/> Slack</a>}
+                          </span>
+                        </span>
+                      </div>
+                      {openAdvice === n.id && (
+                        <div style={{ padding: "0 12px 11px 27px" }}>
+                          <div style={{ background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 11px", font: "400 12px/1.55 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+                            {advice[n.id] && advice[n.id].state === "loading"
+                              ? <span style={{ color: "var(--ink-4)" }}>Ody düşünüyor…</span>
+                              : <Linkify text={(advice[n.id] && advice[n.id].text) || ""}/>}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   );})}
                 </div>
               </div>
