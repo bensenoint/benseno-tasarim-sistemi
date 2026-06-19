@@ -5,6 +5,7 @@ function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNew
   // All hooks must come before any early return (Rules of Hooks)
   const [q, setQ] = React.useState("");
   const [sel, setSel] = React.useState(0);
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const ql = q.toLowerCase().trim();
 
   React.useEffect(() => { if (open) setQ(""); }, [open]);
@@ -58,7 +59,14 @@ function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNew
         backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",
         animation: "bn-fade 160ms var(--ease-out-quart)"
       }}/>
-      <div style={{
+      <div style={isMobile ? {
+        position:"fixed", inset: 0, zIndex: 91,
+        background:"var(--surface)",
+        display:"flex", flexDirection:"column",
+        paddingTop: "env(safe-area-inset-top, 0px)",
+        animation: "bn-fade 160ms var(--ease-out-quart)",
+        overflow: "hidden"
+      } : {
         position:"fixed", top: "12vh", left: "50%", transform: "translateX(-50%)",
         width: "min(640px, 92vw)", zIndex: 91,
         background:"var(--surface)", border:"1px solid var(--line)",
