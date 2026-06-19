@@ -117,7 +117,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
   const syncLabel = syncAgo < 60 ? `${syncAgo} sn önce` : syncAgo < 3600 ? `${Math.round(syncAgo/60)} dk önce` : `${Math.round(syncAgo/3600)} sa önce`;
 
   // Bu hafta özet
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
   const weekCutoff = nowTs - 7 * 24 * 3600 * 1000;
   const prevWeekCutoff = nowTs - 14 * 24 * 3600 * 1000;
   const thisWeek = allCompleted.filter(c => (c.bitis||0) >= weekCutoff);
@@ -452,7 +452,7 @@ function DenseLayout({ data, musteride, active, overdue, today, todayDue, week, 
   const avgCapPct = calcAvgCapPct(data);
   // Bu hafta özet — canlı veriden
   const nowTs2 = data.NOW || Date.now();
-  const allComp2 = data._allCompleted || data.completed || [];
+  const allComp2 = data.completed || data._allCompleted || [];
   const wk2 = allComp2.filter(c => (c.bitis||0) >= nowTs2 - 7*24*3600*1000);
   const wkCount2 = wk2.length;
   const prevWk2 = allComp2.filter(c => { const t=c.bitis||0; return t>=nowTs2-14*24*3600*1000 && t<nowTs2-7*24*3600*1000; });
@@ -726,7 +726,7 @@ function BrandRow({ name, note, color, v, last }) {
 function StarOfTheWeek({ data }) {
   const nowTs = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
   const cutoff = nowTs - 7 * 24 * 3600 * 1000;
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
   const thisWeek = allCompleted.filter(c => (c.bitis || 0) >= cutoff);
 
   if (thisWeek.length === 0) {

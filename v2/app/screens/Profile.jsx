@@ -37,7 +37,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const [jobView, setJobView] = React.useState("aktif");   // ana iş tablosu görünümü (dropdown)
   const [markaSel, setMarkaSel] = React.useState("all");   // ana iş tablosu marka filtresi
   const allBriefs    = data._allBriefs    || data.briefs    || [];
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
   const allUsers     = data.USERS || [];
 
   // Zaman filtresi — sadece tamamlananlara uygulanır, aktifler hep gösterilir

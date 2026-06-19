@@ -3,7 +3,7 @@
 function CompletedScreen({ data, onOpenBrief, currentUser }) {
   const [range, setRange] = React.useState("30");
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
 
   // Range filtresi
   const cutoff = now - parseInt(range) * 24 * 3600 * 1000;

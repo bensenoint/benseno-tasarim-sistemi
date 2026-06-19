@@ -110,7 +110,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   // Aktif = müşteri onayında olmayanlar; musteride ayrı sekmede gösterilir
   const active    = React.useMemo(() => (data._allBriefs || data.briefs || []).filter(b => b.marka === brand && b.durum !== "musteride"), [brand, data]);
   const musteride = React.useMemo(() => (data._allBriefs || data.briefs || []).filter(b => b.marka === brand && b.durum === "musteride"), [brand, data]);
-  const done   = React.useMemo(() => (data._allCompleted || data.completed || []).filter(c => c.marka === brand), [brand, data]);
+  const done   = React.useMemo(() => (data.completed || data._allCompleted || []).filter(c => c.marka === brand), [brand, data]);
 
   // hydrate brief deadline'ı ms (number) ya da TR string olabilir → ms'e normalize et
   const dlMs = b => { const d = b.deadline; if (typeof d === 'number') return d; const p = parseTRDeadline(d); return p ? p.getTime() : null; };

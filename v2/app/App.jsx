@@ -187,8 +187,8 @@ function App({ currentUser, onLogout }) {
   const offlineFailsRef = React.useRef(0);             // ardışık başarısız poll sayısı
   // ─── Tarih aralığı filtresi (global) — açılışta son 30 gün ──────────────
   const [dateRange, setDateRange] = React.useState(() => {
-    const now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
-    return { from: now - 30 * 86400000, to: now, preset: "30d" };
+    // Varsayılan: Tümü → hiçbir şey daralmaz; kullanıcı aralık SEÇİNCE her yer süzülür.
+    return { from: 0, to: 8.64e15, preset: "all" };
   });
   const everLoadedRef = React.useRef(false);           // en az bir kez canlı veri yüklendi mi
 
@@ -243,27 +243,27 @@ function App({ currentUser, onLogout }) {
   const filteredBriefs    = React.useMemo(() => filterByViewMode(briefs),         [filterByViewMode, briefs]);
   const filteredCompleted = React.useMemo(() => filterByViewMode(data.completed), [filterByViewMode, data.completed, briefs]);
 
-  // Tarih aralığı: TÜM sayfalarda uygulanır.
-  //  • Aktif işler → açılış tarihine (acilma; yoksa created_at) göre aralıkta süzülür.
-  //  • Tamamlanan işler → tamamlanma tarihine (bitis) göre süzülür.
-  // Tarih alanı olmayan kayıtlar (null) gizlenmez (veri kaybı olmasın).
+  // Tarih aralığı: AKTİF işler her zaman tam görünür (filteredBriefs dokunulmaz).
+  // Yalnız tamamlanan işler tamamlanma tarihine (bitis) göre aralıkta süzülür;
+  // geçmiş (history) olay tarihine göre süzülür. Tarihi olmayan kayıt gizlenmez.
   const inDateRange = React.useCallback((t) => {
     if (t == null) return true;
     return t >= dateRange.from && t <= dateRange.to;
   }, [dateRange]);
-  const briefDate = (b) => (b.acilma != null ? b.acilma : (b.created_at != null ? b.created_at : null));
-
-  const dateFilteredBriefs = React.useMemo(
-    () => filteredBriefs.filter(b => inDateRange(briefDate(b))),
-    [filteredBriefs, inDateRange]
-  );
   const dateFilteredCompleted = React.useMemo(
     () => filteredCompleted.filter(c => inDateRange(c.bitis)),
     [filteredCompleted, inDateRange]
   );
+  // Geçmiş/aktivite akışı olay zamanına (a.t, ms) göre süzülür.
+  // NOT: data.history = sparkline verisidir (FİLTRELENMEZ); data.activity = olay log'u.
+  const dateFilteredActivity = React.useMemo(() => {
+    const acts = data.activity;
+    if (!Array.isArray(acts)) return acts;
+    return acts.filter(a => inDateRange(a.t != null ? a.t : null));
+  }, [data.activity, inDateRange]);
 
-  // Live data shape — briefs ve completed artık filtered (viewMode + tarih aralığı)
-  const liveData = { ...data, briefs: dateFilteredBriefs, completed: dateFilteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats, history, dateRange };
+  // Live data shape — completed + activity tarih aralığına göre süzülür; aktif briefs ve spark history tam.
+  const liveData = { ...data, briefs: filteredBriefs, completed: dateFilteredCompleted, activity: dateFilteredActivity, _allBriefs: briefs, _allCompleted: data.completed, _allActivity: data.activity, brandStats, history, dateRange };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
   React.useEffect(() => {

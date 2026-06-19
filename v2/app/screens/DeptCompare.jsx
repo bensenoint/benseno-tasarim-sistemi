@@ -10,7 +10,7 @@ function DeptCompareScreen({ data }) {
 
   // active ve overdue'yu Department screen ile aynı mantıkla live hesapla
   const allBriefs    = data._allBriefs    || data.briefs    || [];
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
   const cutoff30 = Date.now() - 30 * 24 * 3600000;
 
   function deptRows(role) {
