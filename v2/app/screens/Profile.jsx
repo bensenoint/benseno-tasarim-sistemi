@@ -292,13 +292,13 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
       {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
       <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
         <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center", gap:12, flexWrap:"wrap"}}>
-          <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap"}}>
+          <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", flex: isMobile ? "1 1 100%" : undefined, width: isMobile ? "100%" : undefined}}>
             <select value={jobView} onChange={e => setJobView(e.target.value)} aria-label="İş görünümü"
-              style={{font:"600 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
+              style={{font:`600 13px/1 var(--font-sans)`, color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer", flex: isMobile ? "1 1 0" : undefined, minWidth: isMobile ? 0 : undefined}}>
               {JOB_VIEWS.map(v => <option key={v.key} value={v.key}>{v.label}</option>)}
             </select>
             <select value={markaActive ? markaSel : "all"} onChange={e => setMarkaSel(e.target.value)} aria-label="Marka filtresi"
-              style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
+              style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer", flex: isMobile ? "1 1 0" : undefined, minWidth: isMobile ? 0 : undefined}}>
               <option value="all">Tüm markalar</option>
               {viewBrands.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
