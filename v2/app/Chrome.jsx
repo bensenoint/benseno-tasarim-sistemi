@@ -1268,6 +1268,144 @@ function Sidebar({ active, onChange, collapsed, expanded, pinned, onToggle, onHo
 // Backwards-compat exports (TabBar still referenced in old snapshots — no-op if unused)
 function TabBar() { return null; }
 
+// A2HS — "Ana ekrana ekle" banner'ı (mobil). Android: beforeinstallprompt. iOS Safari: ipucu.
+function InstallBanner() {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const [evt, setEvt] = React.useState(null);
+  const [show, setShow] = React.useState(false);
+  const [ios, setIos] = React.useState(false);
+  React.useEffect(() => {
+    try { if (localStorage.getItem("bns_a2hs") === "dismissed") return; } catch (e) {}
+    const standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone;
+    if (standalone) return;
+    const onBIP = (e) => { e.preventDefault(); setEvt(e); setShow(true); };
+    window.addEventListener("beforeinstallprompt", onBIP);
+    const ua = navigator.userAgent || "";
+    const isIOS = /iphone|ipad|ipod/i.test(ua);
+    const isSafari = /safari/i.test(ua) && !/crios|fxios|edgios|android/i.test(ua);
+    if (isIOS && isSafari) { setIos(true); setShow(true); }
+    return () => window.removeEventListener("beforeinstallprompt", onBIP);
+  }, []);
+  if (!isMobile || !show) return null;
+  const dismiss = () => { setShow(false); try { localStorage.setItem("bns_a2hs", "dismissed"); } catch (e) {} };
+  const install = async () => {
+    if (!evt) return;
+    evt.prompt();
+    try { const r = await evt.userChoice; if (r && r.outcome === "accepted") localStorage.setItem("bns_a2hs", "dismissed"); } catch (e) {}
+    setShow(false); setEvt(null);
+  };
+  return (
+    <div style={{
+      position: "fixed", left: 12, right: 12, zIndex: 78,
+      bottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 84px)",
+      background: "var(--surface)", border: "1px solid var(--line-strong)",
+      borderRadius: 14, boxShadow: "var(--shadow-lg)",
+      padding: "12px 14px", display: "flex", alignItems: "center", gap: 12,
+      animation: "bn-slide-up 260ms var(--ease-out-quart)",
+    }}>
+      <img src="app/icon-192.png" alt="" width="40" height="40" style={{ borderRadius: 9, flexShrink: 0 }}/>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ font: "600 13px/1.2 var(--font-sans)", color: "var(--ink)" }}>Benseno'yu ana ekrana ekle</div>
+        <div style={{ font: "400 11px/1.35 var(--font-sans)", color: "var(--ink-3)", marginTop: 2 }}>
+          {ios ? "Paylaş ⎙ → “Ana Ekrana Ekle”" : "Uygulama gibi tam ekran aç"}
+        </div>
+      </div>
+      {!ios && (
+        <button onClick={install} style={{
+          flexShrink: 0, font: "600 12px/1 var(--font-sans)", color: "#fff",
+          background: "var(--ember)", border: "none", borderRadius: 8, padding: "9px 14px", cursor: "pointer",
+        }}>Ekle</button>
+      )}
+      <button onClick={dismiss} aria-label="Kapat" style={{
+        flexShrink: 0, border: "none", background: "transparent", color: "var(--ink-4)",
+        cursor: "pointer", padding: 6, display: "flex",
+      }}><I.X size={16}/></button>
+    </div>
+  );
+}
+
+// Pull-to-refresh — sayfa tepesindeyken aşağı çek → window.bnsRefresh() (mobil)
+function PullToRefresh() {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const startY = React.useRef(null);
+  const pulling = React.useRef(false);
+  const distRef = React.useRef(0);
+  const refreshingRef = React.useRef(false);
+  const [dist, setDist] = React.useState(0);
+  const [refreshing, setRefreshing] = React.useState(false);
+  React.useEffect(() => {
+    if (!isMobile) return;
+    const TH = 70, MAX = 100;
+    const main = () => document.querySelector(".bns-main-content");
+    const sTop = () => (document.scrollingElement || document.documentElement).scrollTop;
+    const onStart = (e) => {
+      if (refreshingRef.current || sTop() > 0) { startY.current = null; return; }
+      startY.current = e.touches[0].clientY; pulling.current = false;
+    };
+    const onMove = (e) => {
+      if (startY.current == null) return;
+      const dy = e.touches[0].clientY - startY.current;
+      if (dy > 4 && sTop() <= 0) {
+        pulling.current = true;
+        const d = Math.min(MAX, dy * 0.5);
+        distRef.current = d; setDist(d);
+        const m = main(); if (m) m.style.transform = `translateY(${d}px)`;
+        if (e.cancelable) e.preventDefault();
+      }
+    };
+    const reset = (anim) => {
+      const m = main();
+      if (m) { if (anim) { m.style.transition = "transform 220ms var(--ease-out-quart)"; setTimeout(() => { m.style.transition = ""; }, 240); } m.style.transform = ""; }
+      distRef.current = 0; setDist(0);
+    };
+    const onEnd = () => {
+      if (!pulling.current) { startY.current = null; return; }
+      if (distRef.current >= TH) {
+        refreshingRef.current = true; setRefreshing(true);
+        const m = main(); if (m) { m.style.transition = "transform 220ms var(--ease-out-quart)"; m.style.transform = "translateY(42px)"; }
+        try { if (window.bnsRefresh) window.bnsRefresh(); } catch (e) {}
+        setTimeout(() => { refreshingRef.current = false; setRefreshing(false); reset(true); }, 750);
+      } else { reset(true); }
+      startY.current = null; pulling.current = false;
+    };
+    document.addEventListener("touchstart", onStart, { passive: true });
+    document.addEventListener("touchmove", onMove, { passive: false });
+    document.addEventListener("touchend", onEnd, { passive: true });
+    document.addEventListener("touchcancel", onEnd, { passive: true });
+    return () => {
+      document.removeEventListener("touchstart", onStart);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", onEnd);
+      document.removeEventListener("touchcancel", onEnd);
+    };
+  }, [isMobile]);
+  if (!isMobile) return null;
+  const show = dist > 2 || refreshing;
+  return (
+    <div style={{
+      position: "fixed", top: "calc(50px + env(safe-area-inset-top, 0px))", left: 0, right: 0,
+      display: "flex", justifyContent: "center", pointerEvents: "none", zIndex: 25,
+      opacity: show ? 1 : 0, transition: "opacity 140ms",
+      transform: `translateY(${Math.min(dist, 56)}px)`,
+    }}>
+      <div style={{
+        width: 32, height: 32, borderRadius: "50%", background: "var(--surface)",
+        border: "1px solid var(--line)", boxShadow: "var(--shadow-1)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <div style={{
+          width: 16, height: 16, borderRadius: "50%",
+          border: "2px solid var(--line-strong)", borderTopColor: "var(--ember)",
+          animation: refreshing ? "spin 0.6s linear infinite" : "none",
+          transform: refreshing ? "none" : `rotate(${dist * 4}deg)`,
+        }}/>
+      </div>
+    </div>
+  );
+}
+
+window.PullToRefresh = PullToRefresh;
+window.InstallBanner = InstallBanner;
 window.Header = Header;
 window.Sidebar = Sidebar;
 window.MobileNav = MobileNav;

@@ -612,6 +612,12 @@ function App({ currentUser, onLogout }) {
         <MobileNav active={tab} onChange={navTo} data={liveData}/>
       </div>
 
+      {/* PWA "ana ekrana ekle" banner'ı (mobil) */}
+      <InstallBanner/>
+
+      {/* Aşağı çekerek yenile (mobil) */}
+      <PullToRefresh/>
+
       {openBrief && (
         <BriefDrawer brief={openBrief} onClose={onCloseBrief}
           onUpdate={onUpdateBrief} allUsers={data.USERS} currentUser={currentUser}/>

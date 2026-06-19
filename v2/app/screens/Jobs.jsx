@@ -35,7 +35,7 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
       />
 
       {/* Filter row */}
-      <div style={{
+      <div className="bns-sticky-filters" style={{
         display:"flex", alignItems:"center", gap: 12, marginBottom: 14, flexWrap:"wrap"
       }}>
         <Segment

@@ -584,13 +584,21 @@ button:active,
   /* Sayfa geçişi: her sekme/ekran mount'ta hafif fade + yukarı kayma (native push hissi) */
   .bn-tab-in { animation: bn-tab-enter 260ms cubic-bezier(0.2,0,0,1); }
 
-  /* Sticky filtre/segment satırı: header altında yapışır (yatay scroll-snap çip şeritleri) */
+  /* Sticky filtre/segment satırı: header (52px) altında yapışır */
   .bns-sticky-filters {
     position: sticky; top: 52px; z-index: 20;
     background: var(--paper);
-    margin: 0 -14px; padding: 8px 14px;
+    padding: 8px 0 10px;
     border-bottom: 1px solid var(--line);
   }
+  /* Yatay kaydırılır çip şeridi (öncelik/segment) — taşarsa native yan kaydırma */
+  .bns-chip-scroll {
+    display: flex; gap: 8px; overflow-x: auto; flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .bns-chip-scroll::-webkit-scrollbar { display: none; }
+  .bns-chip-scroll > * { flex-shrink: 0; }
 
   /* Table: hide non-essential columns on mobile */
   .bns-col-mobile-hide { display: none !important; }
