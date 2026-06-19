@@ -271,7 +271,8 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           {b.insight && (
             <>
               <Hr/>
-              <Eyebrow>🔍 İş Insight</Eyebrow>
+              {!isMobile && <Eyebrow>🔍 İş Insight</Eyebrow>}
+              <MobileAccordion title="🔍 İş Insight">
               <div style={{
                 marginTop:10, padding:"12px 14px", background:"var(--paper-2)", borderRadius:8,
                 border:"1px solid var(--line)",
@@ -279,6 +280,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
               }}>
                 <Linkify text={b.insight}/>
               </div>
+              </MobileAccordion>
               <div style={{marginTop:6, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
                 Tamamlanma değerlendirmesi · marka/iş analizleri için arşivlenir
               </div>
