@@ -330,49 +330,6 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         <Kpi label="Marka"         value={Object.keys(brandCount).length} sub="farklı"/>
       </div>
 
-      {/* ─── Performans özeti — üstte seçili tarih aralığına göre ─── */}
-      <Card padding={0} style={{minWidth:0, marginBottom:"var(--section-gap)"}}>
-        <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10, padding:"13px 16px", borderBottom:"1px solid var(--line-strong)", flexWrap:"wrap"}}>
-          <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>{u.name.split(" ")[0]} · performans özeti</span>
-          <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"4px 9px", border:"1px solid var(--line)", borderRadius:999}}>{perfRangeLabel}</span>
-        </div>
-        {perfN === 0 ? (
-          <div style={{padding:"20px 16px", font:"400 13px/1.5 var(--font-sans)", color:"var(--ink-4)"}}>
-            Seçili aralıkta ({perfRangeLabel.toLowerCase()}) {u.name.split(" ")[0]} için tamamlanan iş kaydı yok. Üstteki 📅 tarih aralığını genişletmeyi dene.
-          </div>
-        ) : (
-          <>
-            <div style={{overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
-              <table style={{width:"100%", borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)"}}>
-                <tbody>
-                  {perfRows.map(([label, val], i) => (
-                    <tr key={label} style={{background: i % 2 === 1 ? "var(--row-stripe)" : "transparent"}}>
-                      <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>{label}</td>
-                      <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", textAlign:"right", font:"500 13px/1.3 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{val}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            {/* Çalışılan markalar — renk noktalı çipler + iş sayısı */}
-            {perfBrandList.length > 0 && (
-              <div style={{padding:"12px 16px", borderTop:"1px solid var(--line-strong)"}}>
-                <div style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", marginBottom:9}}>Çalışılan markalar ({perfBrandList.length})</div>
-                <div style={{display:"flex", flexWrap:"wrap", gap:7}}>
-                  {perfBrandList.map(([name, cnt]) => (
-                    <span key={name} style={{display:"inline-flex", alignItems:"center", gap:6, padding:"5px 10px", border:"1px solid var(--line)", borderRadius:999, background:"var(--surface)"}}>
-                      <span style={{width:8, height:8, borderRadius:999, background:brandColorOf(name), flexShrink:0}}/>
-                      <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-2)"}}>{name}</span>
-                      <span style={{font:"600 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>{cnt}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </Card>
-
       {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
       <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
         <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center", gap:12, flexWrap:"wrap"}}>
@@ -554,6 +511,48 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
           }
         </Card>
       </div>
+
+      {/* ─── Performans özeti — seçili tarih aralığına göre (sayfa altı) ─── */}
+      <Card padding={0} style={{minWidth:0, marginTop:"var(--section-gap)"}}>
+        <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10, padding:"13px 16px", borderBottom:"1px solid var(--line-strong)", flexWrap:"wrap"}}>
+          <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>{u.name.split(" ")[0]} · performans özeti</span>
+          <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"4px 9px", border:"1px solid var(--line)", borderRadius:999}}>{perfRangeLabel}</span>
+        </div>
+        {perfN === 0 ? (
+          <div style={{padding:"20px 16px", font:"400 13px/1.5 var(--font-sans)", color:"var(--ink-4)"}}>
+            Seçili aralıkta ({perfRangeLabel.toLowerCase()}) {u.name.split(" ")[0]} için tamamlanan iş kaydı yok. Üstteki 📅 tarih aralığını genişletmeyi dene.
+          </div>
+        ) : (
+          <>
+            <div style={{overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
+              <table style={{width:"100%", borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)"}}>
+                <tbody>
+                  {perfRows.map(([label, val], i) => (
+                    <tr key={label} style={{background: i % 2 === 1 ? "var(--row-stripe)" : "transparent"}}>
+                      <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>{label}</td>
+                      <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", textAlign:"right", font:"500 13px/1.3 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{val}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {perfBrandList.length > 0 && (
+              <div style={{padding:"12px 16px", borderTop:"1px solid var(--line-strong)"}}>
+                <div style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", marginBottom:9}}>Çalışılan markalar ({perfBrandList.length})</div>
+                <div style={{display:"flex", flexWrap:"wrap", gap:7}}>
+                  {perfBrandList.map(([name, cnt]) => (
+                    <span key={name} style={{display:"inline-flex", alignItems:"center", gap:6, padding:"5px 10px", border:"1px solid var(--line)", borderRadius:999, background:"var(--surface)"}}>
+                      <span style={{width:8, height:8, borderRadius:999, background:brandColorOf(name), flexShrink:0}}/>
+                      <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-2)"}}>{name}</span>
+                      <span style={{font:"600 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>{cnt}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </Card>
 
     </div>
   );
