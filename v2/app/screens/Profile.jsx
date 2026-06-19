@@ -200,9 +200,9 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
     <div className="bn-tab-in">
 
       {/* ─── Kullanıcı seçici + hero ──────────────────────────── */}
-      <div style={{display:"flex", alignItems:"center", gap: isMobile ? 12 : 20, padding: isMobile ? "6px 0 2px" : "20px 0 4px", flexWrap:"wrap"}}>
-        <Avatar user={u} size={isMobile ? 40 : 64}/>
-        <div style={{flex:1, minWidth: isMobile ? 0 : 200}}>
+      <div style={{display:"flex", alignItems:"center", gap: isMobile ? 12 : 20, padding: isMobile ? "4px 0 2px" : "20px 0 4px", flexWrap:"wrap"}}>
+        {!isMobile && <Avatar user={u} size={64}/>}
+        <div style={{flex: isMobile ? "1 1 100%" : 1, minWidth: isMobile ? 0 : 200}}>
           {!isMobile && <Eyebrow>{roleLabel}</Eyebrow>}
           <h1 style={{font:`italic 500 ${isMobile ? 20 : 30}px/1.05 var(--font-display)`, color:"var(--ink)", margin: isMobile ? 0 : "5px 0 0", letterSpacing:"0"}}>{u.name}</h1>
           <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize: isMobile ? 13 : 17, color:"var(--ink-3)", marginTop: isMobile ? 2 : 6}}>
@@ -231,7 +231,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         </div>
 
         {/* Zaman filtresi */}
-        <div style={{display:"flex", flexDirection:"column", alignItems:"flex-end", gap:8}}>
+        <div style={{display:"flex", flexDirection:"column", alignItems: isMobile ? "flex-start" : "flex-end", gap:8}}>
           <TimeRangeToggle value={timeRange} onChange={setTimeRange}/>
           <div style={{font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
             tamamlanan · {rangeDays ? `son ${rangeDays} gün` : "tüm zamanlar"}
