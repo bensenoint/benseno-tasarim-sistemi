@@ -724,7 +724,7 @@ function ChatBot({ currentUser }) {
             position: "fixed", zIndex: 89, textAlign: "left",
             // Mobilde: üst banner (Ody konumundan bağımsız, içeriğe binmez). Desktop: Ody'ye bağlı.
             ...(vw < 768 ? {
-              left: 8, right: 8, top: "calc(56px + env(safe-area-inset-top, 0px))", maxWidth: "none",
+              left: 8, right: 80, bottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 14px)", maxWidth: "none",
             } : {
               left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
               top: Math.max(8, pos.y - 72), width: 248, maxWidth: "calc(100vw - 24px)",
@@ -747,7 +747,7 @@ function ChatBot({ currentUser }) {
           style={{
             position: "fixed", zIndex: 89, textAlign: "left",
             ...(vw < 768 ? {
-              left: 8, right: 8, top: "calc(56px + env(safe-area-inset-top, 0px))", maxWidth: "none",
+              left: 8, right: 80, bottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 14px)", maxWidth: "none",
             } : {
               left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
               top: Math.max(8, pos.y - 72), width: 248, maxWidth: "calc(100vw - 24px)",
