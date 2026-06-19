@@ -5,8 +5,19 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
   const [saved, setSaved] = React.useState(false);
   const [assignedMe, setAssignedMe] = React.useState(false);
   const [inlineToast, setInlineToast] = React.useState(null); // ← hook'lar erken return'dan önce
-  React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); setInlineToast(null); }, [brief]);
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const [dragY, setDragY] = React.useState(0);            // mobil bottom-sheet sürükleme ofseti
+  const [dragging, setDragging] = React.useState(false);
+  const dragStartY = React.useRef(null);
+  React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); setInlineToast(null); setDragY(0); }, [brief]);
   if (!b) return null;
+
+  // Bottom-sheet aşağı sürükle-kapat (yalnız mobil, handle/başlık bölgesinden)
+  const sheetDrag = isMobile ? {
+    onTouchStart: (e) => { dragStartY.current = e.touches[0].clientY; setDragging(true); },
+    onTouchMove: (e) => { if (dragStartY.current == null) return; const dy = e.touches[0].clientY - dragStartY.current; if (dy > 0) setDragY(dy); },
+    onTouchEnd: () => { setDragging(false); if (dragY > 110) { onClose && onClose(); } else { setDragY(0); } dragStartY.current = null; },
+  } : {};
   const ro = !!b._readOnly;   // tamamlanan iş: akış görünür, güncelleme kapalı
 
   function set(patch) { if (ro) return; const next = { ...b, ...patch }; setB(next); setSaved(false); }
@@ -75,7 +86,20 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         position:"fixed", inset: 0, background:"var(--overlay)", zIndex: 80,
         animation: "bn-fade 200ms var(--ease-out-quart)"
       }}/>
-      <aside style={{
+      <aside style={isMobile ? {
+        position:"fixed", left: 0, right: 0, bottom: 0,
+        maxHeight: "92vh", height: "92vh",
+        background: "var(--surface)",
+        borderTop: "1px solid var(--line)",
+        borderRadius: "18px 18px 0 0",
+        boxShadow: "var(--shadow-lg)",
+        zIndex: 81,
+        display:"flex", flexDirection:"column",
+        transform: `translateY(${dragY}px)`,
+        transition: dragging ? "none" : "transform 240ms var(--ease-out-quart)",
+        animation: dragY === 0 && !dragging ? "bn-slide-up 260ms var(--ease-out-quart)" : "none",
+        overflow: "hidden",
+      } : {
         position:"fixed", top: 0, right: 0, bottom: 0, width: 480,
         background: "var(--surface)",
         borderLeft: "1px solid var(--line)",
@@ -84,7 +108,12 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         display:"flex", flexDirection:"column",
         animation: "bn-slide-r 220ms var(--ease-out-quart)"
       }}>
-        <div style={{padding:"14px 20px", borderBottom:"1px solid var(--line)", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+        {isMobile && (
+          <div {...sheetDrag} style={{padding:"10px 0 4px", display:"flex", justifyContent:"center", flexShrink:0, cursor:"grab", touchAction:"none"}}>
+            <div style={{width:40, height:4, borderRadius:2, background:"var(--line-strong)"}}/>
+          </div>
+        )}
+        <div {...(isMobile ? sheetDrag : {})} style={{padding: isMobile ? "6px 16px 14px" : "14px 20px", borderBottom:"1px solid var(--line)", display:"flex", alignItems:"center", justifyContent:"space-between", touchAction: isMobile ? "none" : "auto"}}>
           <div style={{display:"flex", alignItems:"center", gap:10}}>
             <BrandChip brand={b.brand}/>
             <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{b.no}</span>
