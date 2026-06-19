@@ -581,6 +581,17 @@ button:active,
   /* iOS momentum scroll + taşma sıçramasını sınırla */
   html, body { overscroll-behavior-y: none; }
 
+  /* Sayfa geçişi: her sekme/ekran mount'ta hafif fade + yukarı kayma (native push hissi) */
+  .bn-tab-in { animation: bn-tab-enter 260ms cubic-bezier(0.2,0,0,1); }
+
+  /* Sticky filtre/segment satırı: header altında yapışır (yatay scroll-snap çip şeritleri) */
+  .bns-sticky-filters {
+    position: sticky; top: 52px; z-index: 20;
+    background: var(--paper);
+    margin: 0 -14px; padding: 8px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
   /* Table: hide non-essential columns on mobile */
   .bns-col-mobile-hide { display: none !important; }
 

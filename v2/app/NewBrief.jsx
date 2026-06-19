@@ -260,6 +260,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
 
 function NewBriefModal({ open, onClose, data }) {
   const [marka, setMarka] = React.useState("");
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   React.useEffect(() => { if (open) setMarka(""); }, [open]);
   if (!open) return null;
 
@@ -280,13 +281,25 @@ function NewBriefModal({ open, onClose, data }) {
         position: "fixed", inset: 0, background: "var(--overlay)", zIndex: 92,
         animation: "bn-fade 180ms var(--ease-out-quart)"
       }} />
-      <div style={{
+      <div style={isMobile ? {
+        position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 93,
+        maxHeight: "92vh", overflowY: "auto", WebkitOverflowScrolling: "touch",
+        background: "var(--surface)", borderTop: "1px solid var(--line)",
+        borderRadius: "18px 18px 0 0", boxShadow: "var(--shadow-lg)",
+        animation: "bn-slide-up 260ms var(--ease-out-quart)",
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+      } : {
         position: "fixed", top: wide ? "8vh" : "20vh", left: "50%", transform: "translateX(-50%)",
         width: wide ? "min(520px, 94vw)" : "min(400px, 92vw)", zIndex: 93,
         background: "var(--surface)", border: "1px solid var(--line)",
         borderRadius: 14, boxShadow: "var(--shadow-lg)",
         animation: "bn-slide-up 220ms var(--ease-out-quart)"
       }}>
+        {isMobile && (
+          <div style={{padding:"10px 0 2px", display:"flex", justifyContent:"center"}}>
+            <div style={{width:40, height:4, borderRadius:2, background:"var(--line-strong)"}}/>
+          </div>
+        )}
         <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <div style={{ font: "600 11px/1 var(--font-sans)", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--ink-3)" }}>Yeni brief</div>
