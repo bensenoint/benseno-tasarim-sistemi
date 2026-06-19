@@ -52,11 +52,11 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
           <PrioFilter value={prioFilter} onChange={setPrioFilter}/>
         </div>
 
-        <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
+        <span className="bns-hide-mobile" style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
           Kapsam: <span style={{color:"var(--ink)"}}>{viewMode==="mine" ? "bana atanmış" : viewMode==="dept" ? "departmanım" : "tüm ekip"}</span>
         </span>
 
-        <div style={{marginLeft:"auto", display:"flex", gap: 8, alignItems:"center"}}>
+        <div className="bns-hide-mobile" style={{marginLeft:"auto", display:"flex", gap: 8, alignItems:"center"}}>
           <SearchBox value={search} onChange={setSearch}/>
         </div>
       </div>

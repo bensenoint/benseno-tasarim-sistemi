@@ -584,11 +584,19 @@ button:active,
   /* Sayfa geçişi: her sekme/ekran mount'ta hafif fade + yukarı kayma (native push hissi) */
   .bn-tab-in { animation: bn-tab-enter 260ms cubic-bezier(0.2,0,0,1); }
 
-  /* PageHead mobilde kompakt: dev serif başlık + tarih eyebrow gereksiz yer kaplamasın */
-  .bns-pagehead { padding: 12px 0 12px !important; }
-  .bns-pagehead h1 { font-size: 24px !important; line-height: 1.12 !important; }
-  .bns-pagehead .bns-ph-eyebrow { display: none !important; }   /* tarih satırı — mobilde gizli */
-  .bns-pagehead .bns-ph-sub { font-size: 12.5px !important; line-height: 1.45 !important; margin-top: 6px !important; }
+  /* PageHead mobilde: başlık + tarih eyebrow gizli (nav zaten konumu gösteriyor), sadece aksiyonlar/özet kalır */
+  .bns-pagehead { padding: 8px 0 8px !important; gap: 8px !important; }
+  .bns-pagehead h1 { display: none !important; }
+  .bns-pagehead .bns-ph-eyebrow { display: none !important; }
+  .bns-pagehead .bns-ph-sub { font-size: 12px !important; line-height: 1.4 !important; margin-top: 0 !important; }
+  /* Başlık gizliyse sol metin bloğu daralmasın, aksiyonlar tam satıra otursun */
+  .bns-pagehead > div:first-child { flex: 1 1 100%; }
+
+  /* Filtre satırı mobilde tek satır — yatay kaydırılır, dikeyde yer kaplamaz */
+  .bns-sticky-filters { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
+  .bns-sticky-filters::-webkit-scrollbar { display: none; }
+  .bns-sticky-filters > * { flex-shrink: 0; }
+  .bns-hide-mobile { display: none !important; }
 
   /* Sticky filtre/segment satırı: scroller <main> içinde, header zaten dışında → top:0 */
   .bns-sticky-filters {
