@@ -918,7 +918,7 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
     }}>
       {/* Logo — mobil VE desktop header'da */}
       <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
-        <img src="app/logo.png" alt="Benseno" style={{
+        <img src="app/logo.png?v=2" alt="Benseno" style={{
           height: isMobile ? 34 : 44, width: "auto", objectFit: "contain",
           mixBlendMode: "multiply", flexShrink: 0,
         }}/>
