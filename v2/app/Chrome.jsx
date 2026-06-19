@@ -347,12 +347,35 @@ function bnsAdviceContext(n) {
     if (p.length) brandCtx = p.join("\n");
   }
 
-  // 3) Diğer markalardaki benzer işler
+  // 3) Diğer markalardaki benzer işler — iş tipi (başlıktan çıkarılır, kayıtlı alan yok) + kelime eşleşmesi.
+  //    Aynı iş tipindekiler öncelikli (skor 2), kelime eşleşenler (skor 1). Profil'deki tip mantığıyla aynı.
   let simCtx = "(benzer iş bulunamadı)";
   if (job && job.baslik) {
+    const TYPES = [
+      ["sosyal medya", ["sosyal", "sm ", "instagram", "story", "post", "reels"]],
+      ["video", ["video", "reel", "film", "klip"]],
+      ["web/dijital", ["banner", "dijital", "display", "web", "website", "site", "landing", "mailing", "newsletter"]],
+      ["bröşür/baskı", ["bröşür", "broşür", "katalog", "baskı", "davetiye", "afiş", "föy", "foy"]],
+      ["ambalaj", ["ambalaj", "paket", "kutu", "etiket", "pouch"]],
+      ["sunum/deck", ["sunum", "deck", "ppt", "slide", "rapor"]],
+      ["logo/kimlik", ["logo", "kimlik", "identity"]],
+    ];
+    const typeOf = (t) => { t = (t || "").toLowerCase(); for (const pair of TYPES) { if (pair[1].some(w => t.includes(w))) return pair[0]; } return null; };
+    const tType = typeOf(job.baslik + " " + (job.marka || ""));
     const words = job.baslik.toLowerCase().split(/[^a-zçğıöşü0-9]+/).filter(w => w.length > 4);
-    const sims = completed.filter(c => c.no !== job.no && c.marka !== marka && c.insight && c.baslik && words.some(w => c.baslik.toLowerCase().includes(w))).slice(0, 2);
-    if (sims.length) simCtx = sims.map(c => `• ${c.marka} #${c.no} ${clip(c.baslik, 40)} (puan ${c.rating || "?"}): ` + clip(c.insight, 220)).join("\n");
+    const scored = completed.filter(c => c.no !== job.no && c.marka !== marka && c.insight && c.baslik)
+      .map(c => {
+        const sameType = tType && typeOf(c.baslik + " " + (c.marka || "")) === tType;
+        const kw = words.some(w => c.baslik.toLowerCase().includes(w));
+        return { c, score: (sameType ? 2 : 0) + (kw ? 1 : 0) };
+      })
+      .filter(x => x.score > 0)
+      .sort((a, b) => (b.score - a.score) || ((b.c.rating || 0) - (a.c.rating || 0)))
+      .slice(0, 3);
+    if (scored.length) {
+      simCtx = (tType ? `bu işin tipi: ${tType}\n` : "") +
+        scored.map(x => `• ${x.c.marka} #${x.c.no} ${clip(x.c.baslik, 40)} (puan ${x.c.rating || "?"}): ` + clip(x.c.insight, 200)).join("\n");
+    }
   }
 
   // 4) İlgili kişi — değerlendirme + yıldız
