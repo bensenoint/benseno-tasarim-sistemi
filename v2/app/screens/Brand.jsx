@@ -235,7 +235,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
 
       {/* Filtreler */}
       <Card style={{ marginBottom:"var(--section-gap)" }}>
-        <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
+        <div className="bns-chip-scroll" style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
           <div style={{ display:"inline-flex", border:"1px solid var(--line)", borderRadius:6, padding:2 }}>
             {seg("active", `Aktif · ${filteredActive.length}`)}
             {seg("musteride", `✈️ Müşteri Onayında · ${filteredMusteride.length}`)}
