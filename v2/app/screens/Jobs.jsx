@@ -1,11 +1,15 @@
 // app/screens/Jobs.jsx — Aktif İşler tab. Supports table / kanban / cards view.
 
-function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief, onStatusChange }) {
+function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope, onOpenBrief, onStatusChange }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [scope, setScope] = React.useState(initialScope || "all");
   // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle
   React.useEffect(() => { if (initialScope) setScope(initialScope); }, [initialScope]);
   const [search, setSearch] = React.useState("");
   const [prioFilter, setPrioFilter] = React.useState("all");
+  // Mobil görünüm geçişi: tablo / liste / kanban (referans). Desktop tableMode prop'unu kullanır.
+  const [mView, setMView] = React.useState("table");
+  const view = isMobile ? mView : tableMode;
 
   // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
   // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
@@ -34,6 +38,35 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
         </>}
       />
 
+      {/* Mobil: viewMode segmenti (referans) */}
+      {isMobile && setViewMode && (
+        <div style={{display:"flex", padding:3, background:"var(--paper-2)", borderRadius:11, gap:3, marginBottom:12}}>
+          {[["all","Tüm ekip"],["mine","Bana atanan"],["dept","Departmanım"]].map(([k,v]) => (
+            <button key={k} onClick={() => setViewMode(k)} style={{
+              flex:1, padding:"9px 6px", border:0, borderRadius:8, cursor:"pointer",
+              font:`${viewMode===k?700:500} 12.5px/1 var(--font-sans)`,
+              background: viewMode===k ? "var(--surface)" : "transparent",
+              color: viewMode===k ? "var(--ink)" : "var(--ink-3)",
+              boxShadow: viewMode===k ? "0 1px 3px rgba(0,0,0,.08)" : "none", transition:"all 150ms",
+            }}>{v}</button>
+          ))}
+        </div>
+      )}
+
+      {/* Mobil: görünüm geçişi (tablo / liste / kanban) — referans ikon segment */}
+      {isMobile && (
+        <div style={{display:"flex", padding:3, border:"1px solid var(--line)", borderRadius:10, gap:2, marginBottom:12, width:"fit-content"}}>
+          {[["table", <I.Grid size={15}/>], ["list", <I.List size={15}/>], ["kanban", <I.Columns size={15}/>]].map(([k, ic]) => (
+            <button key={k} onClick={() => setMView(k)} aria-label={k} style={{
+              padding:"7px 13px", border:0, borderRadius:7, cursor:"pointer",
+              display:"inline-flex", alignItems:"center", justifyContent:"center",
+              background: mView===k ? "var(--ember-tint)" : "transparent",
+              color: mView===k ? "var(--ember)" : "var(--ink-4)", transition:"all 150ms",
+            }}>{ic}</button>
+          ))}
+        </div>
+      )}
+
       {/* Filter row */}
       <div className="bns-sticky-filters" style={{
         display:"flex", alignItems:"center", gap: 12, marginBottom: 14, flexWrap:"wrap"
@@ -61,8 +94,8 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
         </div>
       </div>
 
-      {tableMode === "kanban" ? <KanbanView rows={rows} onOpenBrief={onOpenBrief}/> :
-       tableMode === "cards"  ? <CardsView  rows={rows} onOpenBrief={onOpenBrief}/> :
+      {view === "kanban" ? <KanbanView rows={rows} onOpenBrief={onOpenBrief}/> :
+       view === "cards" || view === "list" ? <CardsView rows={rows} onOpenBrief={onOpenBrief}/> :
        <BriefTable rows={rows} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>}
 
       <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop: 14, font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", flexWrap:"wrap", gap:8}}>
