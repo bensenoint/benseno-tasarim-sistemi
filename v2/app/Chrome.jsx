@@ -943,6 +943,10 @@ function DateRangeControl({ range, onChange, now, compact }) {
   const label = (PRESETS.find(p => p[0] === range.preset) || [null, "Özel aralık"])[1];
   const toYMD = (ms) => { const d = new Date(ms); return isNaN(d.getTime()) ? "" : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
   const parseYMD = (s, end) => { const p = (s||"").split("-").map(Number); if (!p[0]) return null; return new Date(p[0], p[1]-1, p[2], end?23:0, end?59:0, end?59:0).getTime(); };
+  // Özel aralık inputları: her açılışta başlangıç ve bitiş bugüne sıfırlanır.
+  const [cFrom, setCFrom] = React.useState("");
+  const [cTo, setCTo] = React.useState("");
+  React.useEffect(() => { if (open) { const t = toYMD(now); setCFrom(t); setCTo(t); } }, [open]);
   return (
     <div style={{ position: "relative", flexShrink: 0 }}>
       <button onClick={() => setOpen(o => !o)} title="Tarih aralığı"
@@ -963,9 +967,9 @@ function DateRangeControl({ range, onChange, now, compact }) {
           <div style={{ borderTop: "1px solid var(--line)", margin: "5px 4px", paddingTop: 6 }}>
             <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ink-4)", textTransform: "uppercase", letterSpacing: "0.04em", padding: "0 5px 6px" }}>Özel aralık</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 5, padding: "0 4px 2px" }}>
-              <input type="date" value={toYMD(range.from)} onChange={e => { const v = parseYMD(e.target.value, false); if (v != null) onChange({ ...range, from: v, preset: "custom" }); }}
+              <input type="date" value={cFrom} onChange={e => { setCFrom(e.target.value); const v = parseYMD(e.target.value, false); if (v != null) onChange({ ...range, from: v, preset: "custom" }); }}
                 style={{ font: "500 12px/1 var(--font-sans)", padding: "5px 7px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)" }}/>
-              <input type="date" value={toYMD(range.to)} onChange={e => { const v = parseYMD(e.target.value, true); if (v != null) onChange({ ...range, to: v, preset: "custom" }); }}
+              <input type="date" value={cTo} onChange={e => { setCTo(e.target.value); const v = parseYMD(e.target.value, true); if (v != null) onChange({ ...range, to: v, preset: "custom" }); }}
                 style={{ font: "500 12px/1 var(--font-sans)", padding: "5px 7px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)" }}/>
             </div>
           </div>
