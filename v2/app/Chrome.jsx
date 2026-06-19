@@ -533,10 +533,14 @@ function ChatBot({ currentUser }) {
         <button onClick={() => { setUnread(false); setOpen(true); markNotifRead(); }}
           title="Bildirimi aç"
           style={{
-            position: "fixed",
-            left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
-            top: Math.max(8, pos.y - 72),
-            zIndex: 89, width: 248, maxWidth: "calc(100vw - 24px)", textAlign: "left",
+            position: "fixed", zIndex: 89, textAlign: "left",
+            // Mobilde: üst banner (Ody konumundan bağımsız, içeriğe binmez). Desktop: Ody'ye bağlı.
+            ...(vw < 768 ? {
+              left: 8, right: 8, top: "calc(56px + env(safe-area-inset-top, 0px))", maxWidth: "none",
+            } : {
+              left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
+              top: Math.max(8, pos.y - 72), width: 248, maxWidth: "calc(100vw - 24px)",
+            }),
             border: "1px solid var(--line)", borderRadius: 12, background: "var(--surface)",
             boxShadow: "var(--shadow-2)", padding: "9px 12px", cursor: "pointer",
             animation: "odyPopIn .3s ease",
