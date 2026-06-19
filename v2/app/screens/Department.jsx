@@ -106,7 +106,9 @@ function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
       </div>
 
       <div style={{display:"flex", flexDirection:"column", gap:"var(--section-gap)"}}>
-        {/* People */}
+        {/* Ekip + Dönemsel özet yan yana (mobilde alt alta) */}
+        <div className="bn-grid-2" style={{display:"grid", gridTemplateColumns: isManager ? "minmax(0,1fr) minmax(0,1fr)" : "1fr", gap:"var(--section-gap)", alignItems:"start"}}>
+        {/* Ekip */}
         <Card padding={0}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
             <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} ekibi</h2>
@@ -139,16 +141,7 @@ function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
           </div>
         </Card>
 
-        {/* Briefs */}
-        <Card padding={0} style={{minWidth:0}}>
-          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} işleri</h2>
-            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{rows.length} aktif</div>
-          </div>
-          <BriefTable rows={rows} onRowClick={onOpenBrief}/>
-        </Card>
-
-        {/* Dönemsel özet — yalnız yöneticilere, seçili tarih aralığına göre (sayfa altı) */}
+        {/* Dönemsel özet — Ekip ile yan yana (yalnız yöneticilere) */}
         {isManager && (
         <Card padding={0} style={{minWidth:0}}>
           <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10, padding:"13px 16px", borderBottom:"1px solid var(--line-strong)", flexWrap:"wrap"}}>
@@ -207,6 +200,16 @@ function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
           )}
         </Card>
         )}
+        </div>
+
+        {/* İşler — tam genişlik (geniş tablo) */}
+        <Card padding={0} style={{minWidth:0}}>
+          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
+            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} işleri</h2>
+            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{rows.length} aktif</div>
+          </div>
+          <BriefTable rows={rows} onRowClick={onOpenBrief}/>
+        </Card>
       </div>
     </div>
   );
