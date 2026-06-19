@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CA6349"/>
+      <stop offset="0.64" stop-color="#C24A2C"/>
+      <stop offset="1" stop-color="#B23F22"/>
+    </linearGradient>
+    <radialGradient id="eye" cx="0.5" cy="0.26" r="0.78">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.42" stop-color="#f4f5f9"/>
+      <stop offset="1" stop-color="#CFD2DE"/>
+    </radialGradient>
+    <radialGradient id="pup" cx="0.35" cy="0.26" r="0.8">
+      <stop offset="0" stop-color="#4a66a0"/>
+      <stop offset="0.55" stop-color="#16265c"/>
+      <stop offset="1" stop-color="#0b1640"/>
+    </radialGradient>
+  </defs>
+  <!-- Ody gövdesi (organik blob) -->
+  <path d="M32 6 C46 6 58 15 58 29 C58 44 50 58 34 58 C18 58 6 47 6 31 C6 16 18 6 32 6 Z" fill="url(#body)"/>
+  <!-- üst parlama -->
+  <path d="M20 13 C26 9 40 9 46 14 C40 18 24 18 20 13 Z" fill="#ffffff" opacity="0.18"/>
+  <!-- sol göz -->
+  <g>
+    <ellipse cx="23" cy="30" rx="6.5" ry="7.5" fill="url(#eye)">
+      <animate attributeName="ry" values="7.5;7.5;0.8;7.5;7.5" keyTimes="0;0.84;0.89;0.94;1" dur="4.8s" repeatCount="indefinite"/>
+    </ellipse>
+    <circle cx="23" cy="31" r="3.2" fill="url(#pup)">
+      <animate attributeName="r" values="3.2;3.2;0.4;3.2;3.2" keyTimes="0;0.84;0.89;0.94;1" dur="4.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="23.8" cy="29.7" r="1.1" fill="#ffffff"/>
+  </g>
+  <!-- sağ göz -->
+  <g>
+    <ellipse cx="41" cy="30" rx="6.5" ry="7.5" fill="url(#eye)">
+      <animate attributeName="ry" values="7.5;7.5;0.8;7.5;7.5" keyTimes="0;0.84;0.89;0.94;1" dur="4.8s" repeatCount="indefinite"/>
+    </ellipse>
+    <circle cx="41" cy="31" r="3.2" fill="url(#pup)">
+      <animate attributeName="r" values="3.2;3.2;0.4;3.2;3.2" keyTimes="0;0.84;0.89;0.94;1" dur="4.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="41.8" cy="29.7" r="1.1" fill="#ffffff"/>
+  </g>
+  <!-- gülümseme -->
+  <path d="M26 43 Q32 49 38 43" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+</svg>
