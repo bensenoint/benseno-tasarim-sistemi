@@ -173,25 +173,26 @@
 /* ------------------------------------------------------------ */
 [data-theme="dark"] {
   color-scheme: dark;
-  --paper:        #0F0F12;
-  --paper-2:      #15151A;
-  --surface:      #18181D;
-  --surface-sub:  #1C1C22;
-  --row-stripe:   #121218;   /* zebra: koyu temada ince ton */
-  --surface-raised: #1E1E24;
-  --sidebar-bg:   #111116;
-  --header-blur:  rgba(15, 15, 18, 0.90);
-  --overlay:      rgba(0, 0, 0, 0.55);
+  /* Lacivert (navy) koyu tema — siyah değil, logo mavisi ailesinden mavi-tonlu koyu yüzeyler */
+  --paper:        #0B1326;   /* en koyu lacivert tuval */
+  --paper-2:      #111B33;
+  --surface:      #15203C;
+  --surface-sub:  #192645;
+  --row-stripe:   #0F1A30;   /* zebra: lacivertte ince ton */
+  --surface-raised: #1D2A4A;
+  --sidebar-bg:   #0D1528;
+  --header-blur:  rgba(11, 19, 38, 0.90);
+  --overlay:      rgba(3, 7, 18, 0.58);
 
-  --ink:          #F1EFE9;
-  --ink-2:        #C9C7C1;
-  --ink-3:        #8F8E8A;
-  --ink-4:        #6B6A67;
-  --ink-5:        #4B4A48;
+  --ink:          #EEF1F8;   /* metinler lacivertte hafif soğuk-beyaz */
+  --ink-2:        #C3C9D8;
+  --ink-3:        #8A92A6;
+  --ink-4:        #656D82;
+  --ink-5:        #495062;
 
-  --line:         #30303A;   /* koyu temada editoryal hairline biraz daha okunur */
-  --line-strong:  #3D3D47;
-  --line-soft:    #24242C;
+  --line:         #2A3759;   /* lacivert hairline — mavi-tonlu, okunur */
+  --line-strong:  #374669;
+  --line-soft:    #1F2B49;
 
   --ember:        #5B7BD4;   /* logo mavisi, koyu temada açıltılmış (birincil aksan) */
   --ember-hover:  #7491DD;
