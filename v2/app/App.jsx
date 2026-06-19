@@ -131,6 +131,7 @@ function App({ currentUser, onLogout }) {
   const [user, setUser] = React.useState(
     () => data.USERS.find(u => u.id === currentUser?.slack_id) || data.ME);
   const [tab, setTab] = React.useState("overview");
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false); // alt-nav "Menü" drawer'ı (Ody'yi gizlemek için App'te)
   const [jobsScope, setJobsScope] = React.useState("all"); // Overview KPI → Jobs deep-link filtresi
   const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
   // Normal navigasyon (sidebar/alt-nav/buton): Jobs'a giderken KPI deep-link filtresini sıfırla
@@ -609,7 +610,7 @@ function App({ currentUser, onLogout }) {
 
       {/* MobileNav — always rendered, CSS controls visibility (display:none on desktop) */}
       <div className="bns-mobile-nav-wrap">
-        <MobileNav active={tab} onChange={navTo} data={liveData}/>
+        <MobileNav active={tab} onChange={navTo} data={liveData} menuOpen={mobileMenuOpen} setMenuOpen={setMobileMenuOpen}/>
       </div>
 
       {/* PWA "ana ekrana ekle" banner'ı (mobil) */}
@@ -639,8 +640,8 @@ function App({ currentUser, onLogout }) {
 
       {toast && <Toast msg={toast}/>}
       {/* 🤖 Sistem Asistanı — sağ alt yüzen sohbet */}
-      {/* Ody — bir bottom-sheet/modal açıkken gizle (üstüne binmesin) */}
-      {!(openBrief || newBrief || palette) && <ChatBot currentUser={currentUser}/>}
+      {/* Ody — bir bottom-sheet/modal/menü açıkken gizle (üstüne binmesin, navigasyonu engellemesin) */}
+      {!(openBrief || newBrief || palette || mobileMenuOpen) && <ChatBot currentUser={currentUser}/>}
 
       <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>
 

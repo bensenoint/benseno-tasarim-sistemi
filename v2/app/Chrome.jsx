@@ -318,8 +318,12 @@ function ChatBot({ currentUser }) {
   const endRef = React.useRef(null);
   // Sürüklenebilir konum — balon/panel başlığından tutup taşınır; localStorage'da kalıcıdır.
   const [pos, setPos] = React.useState(() => {
+    const W = typeof window !== "undefined" ? window.innerWidth : 1200;
+    const H = typeof window !== "undefined" ? window.innerHeight : 800;
+    // Mobilde kaydedilmiş (masaüstü) konumu yok say — içeriği/menüyü kapatmasın; sol-altta, nav üstünde sabitle
+    if (W < 768) return { x: 14, y: H - 150 };
     try { const p = JSON.parse(localStorage.getItem("bns_ody_pos") || "null"); if (p && typeof p.x === "number" && typeof p.y === "number") return p; } catch (e) {}
-    return { x: 20, y: (typeof window !== "undefined" ? window.innerHeight : 800) - 76 };
+    return { x: 20, y: H - 76 };
   });
   const dragRef = React.useRef(null);
   const startDrag = (e, force) => {
@@ -916,8 +920,11 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
 }
 
 // ─── Mobile bottom navigation bar ────────────────────────────────────────
-function MobileNav({ active, onChange, data }) {
-  const [menuOpen, setMenuOpen] = React.useState(false);
+function MobileNav({ active, onChange, data, menuOpen: menuOpenProp, setMenuOpen: setMenuOpenProp }) {
+  const [menuOpenInner, setMenuOpenInner] = React.useState(false);
+  // menuOpen App'ten kontrol edilebilir (Ody'yi menü açıkken gizlemek için); yoksa iç state
+  const menuOpen = menuOpenProp !== undefined ? menuOpenProp : menuOpenInner;
+  const setMenuOpen = setMenuOpenProp || setMenuOpenInner;
   const alertCount = (data && data.briefs) ? data.briefs.filter(b => b.prio && (b.prio.code === "red" || b.prio.code === "over")).length : 0;
 
   const PRIMARY = [
