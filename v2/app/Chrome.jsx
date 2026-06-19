@@ -307,6 +307,67 @@ function odyFxProd(host, mood) {
   else if (mood === 'uykulu') { for (var i = 0; i < 3; i++) (function (i) { setTimeout(function () { spawn('z', '#9a93a0', -6 + i * 6, 12); }, i * 420); })(i); }
 }
 
+// Bildirim için katmanlı danışman bağlamı (öncelik sırası):
+//  1) o işe yazılanlar (thread özeti / iş insight / puan sebebi)
+//  2) o marka için geçmiş (kanal özeti / son insight / marka değerlendirmesi)
+//  3) diğer markalardaki benzer işler (insight'lı tamamlananlar)
+//  4) ilgili kişinin değerlendirmesi + yıldız puanı (karşılaştırma için)
+function bnsAdviceContext(n) {
+  const D = window.BNS_DATA || {};
+  const E = window.EMBEDDED_DATA || {};
+  const text = (n && n.text) || "";
+  const clip = (s, k) => s ? String(s).replace(/\s+/g, " ").trim().slice(0, k) : "";
+  const noM = text.match(/#(\d+)/);
+  const no = noM ? parseInt(noM[1], 10) : null;
+  const briefs = D._allBriefs || D.briefs || [];
+  const completed = D._allCompleted || D.completed || [];
+  const job = no != null ? [...briefs, ...completed].find(b => b.no === no) : null;
+  const marka = (job && job.marka) || (text.split("—")[0] || "").replace(/#\d+/, "").trim();
+
+  // 1) İş
+  let jobCtx = "(bu işe dair kayıt yok)";
+  if (job) {
+    const p = [`#${job.no} ${clip(job.baslik, 80)} · durum: ${job.durum || job.delivery_status || "—"}` + (job.lead ? ` · atanan: ${job.lead.name}` : "")];
+    if (job.thread_ozet) p.push("thread özeti: " + clip(job.thread_ozet, 650));
+    if (job.insight) p.push("iş insight: " + clip(job.insight, 500));
+    if (job.rating_sebep) p.push("puan sebebi: " + clip(job.rating_sebep, 300));
+    if (job.rating) p.push("iş puanı: " + job.rating + "/5");
+    jobCtx = p.join("\n");
+  }
+
+  // 2) Marka
+  let brandCtx = "(marka geçmişi yok)";
+  const bObj = ((E.bns_brands) || []).find(b => b.name === marka) || ((D.BRANDS) || []).find(b => b.name === marka);
+  const bSebep = (typeof window.bnsSebep === "function") ? window.bnsSebep("marka", marka) : null;
+  {
+    const p = [];
+    if (bObj && bObj.son_insight) p.push("marka son insight: " + clip(bObj.son_insight, 420));
+    if (bObj && bObj.kanal_ozet) p.push("kanal özeti: " + clip(bObj.kanal_ozet, 380));
+    if (bSebep && bSebep.sebep) p.push(`marka değerlendirmesi (${bSebep.rating_avg || "?"}/5): ` + clip(bSebep.sebep, 380));
+    if (p.length) brandCtx = p.join("\n");
+  }
+
+  // 3) Diğer markalardaki benzer işler
+  let simCtx = "(benzer iş bulunamadı)";
+  if (job && job.baslik) {
+    const words = job.baslik.toLowerCase().split(/[^a-zçğıöşü0-9]+/).filter(w => w.length > 4);
+    const sims = completed.filter(c => c.no !== job.no && c.marka !== marka && c.insight && c.baslik && words.some(w => c.baslik.toLowerCase().includes(w))).slice(0, 2);
+    if (sims.length) simCtx = sims.map(c => `• ${c.marka} #${c.no} ${clip(c.baslik, 40)} (puan ${c.rating || "?"}): ` + clip(c.insight, 220)).join("\n");
+  }
+
+  // 4) İlgili kişi — değerlendirme + yıldız
+  let personCtx = "(kişi değerlendirmesi yok)";
+  if (job && job.lead && job.lead.id) {
+    const r = D.ratings && D.ratings.users && D.ratings.users[job.lead.id];
+    const ps = (typeof window.bnsSebep === "function") ? window.bnsSebep("kisi", job.lead.id) : null;
+    const p = [job.lead.name + (r ? ` — yıldız: ${r.avg}/5 (${r.cnt} iş)` : "")];
+    if (ps && ps.sebep) p.push("değerlendirme: " + clip(ps.sebep, 360));
+    personCtx = p.join("\n");
+  }
+
+  return { marka, jobCtx, brandCtx, simCtx, personCtx };
+}
+
 function ChatBot({ currentUser }) {
   const uid = (currentUser && (currentUser.slack_id || currentUser.id)) || null;
   const [open, setOpen] = React.useState(false);
@@ -525,9 +586,18 @@ function ChatBot({ currentUser }) {
     const ck = "bns_ody_advice_" + n.id;
     try { const c = localStorage.getItem(ck); if (c) { setAdvice(a => ({ ...a, [n.id]: { state: "done", text: c } })); return; } } catch (e) {}
     setAdvice(a => ({ ...a, [n.id]: { state: "loading", text: "" } }));
-    const PROMPT = "Şu bildirim geldi: \"" + (n.text || "") + "\". Bu iş/marka ile ilgili geçmiş Slack thread'lerine ve gün-sonu insight'larına bakarak bir proje danışmanı gibi KISA yönlendir: "
-      + "ne yapılmalı, dikkat edilecek nokta/uyarı, varsa öneri. En fazla 2-3 kısa madde (•). # numarası veya marka belliyse referans ver. "
-      + "Selam/giriş cümlesi yazma, doğrudan maddelere geç. İlgili geçmiş veri yoksa kısa ama işe yarar genel bir öneri ver.";
+    const c = bnsAdviceContext(n);
+    const PROMPT =
+      "Şu bildirim geldi: \"" + (n.text || "") + "\".\n\n" +
+      "Aşağıdaki bağlamı ÖNCELİK SIRASIYLA kullanarak değerlendir (1 en öncelikli):\n\n" +
+      "1) BU İŞE YAZILANLAR:\n" + c.jobCtx + "\n\n" +
+      "2) BU MARKA İÇİN GEÇMİŞ:\n" + c.brandCtx + "\n\n" +
+      "3) DİĞER MARKALARDAKİ BENZER İŞLER:\n" + c.simCtx + "\n\n" +
+      "4) İLGİLİ KİŞİNİN DEĞERLENDİRMESİ VE YILDIZ PUANI (bununla karşılaştır):\n" + c.personCtx + "\n\n" +
+      "Bu katmanları sentezle; özellikle işin/markanın geçmişini kişinin yıldız puanı ve değerlendirmesiyle KARŞILAŞTIR. " +
+      "Bir proje danışmanı gibi KISA yönlendir: ne yapılmalı, dikkat edilecek nokta/uyarı, varsa öneri. " +
+      "En fazla 3 kısa madde (•). Mümkünse # numarası/markaya referans ver. Selam/giriş cümlesi yazma, doğrudan maddelere geç. " +
+      "Veri zayıfsa kısa ama işe yarar genel bir öneri ver.";
     (async () => {
       try {
         const r = await fetch(`${API}/api/chat`, {
