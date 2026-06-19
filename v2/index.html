@@ -2,11 +2,21 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Benseno Dashboard · Pano + Raporlar</title>
+<!-- PWA: yüklenebilir uygulama -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#24479E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Benseno">
+<link rel="apple-touch-icon" href="app/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="app/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="app/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="app/tokens-2.css?v=1781844779">
+<link rel="stylesheet" href="app/tokens-2.css?v=1781845235">
 <!-- React (pre-built — no Babel runtime overhead) -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -63,13 +73,13 @@ https://docs.google.com/document/d/1w4GDJNyK8qqMfnI4OuQjXE8Ntru0iAFtZTbgjQIVRNk/
 </script>
 
 <!-- calc.js: saf hesap formülleri (data.js'ten ÖNCE — global olarak gelir) -->
-<script src="app/calc.js?v=1781844779"></script>
+<script src="app/calc.js?v=1781845235"></script>
 
 <!-- data.js: EMBEDDED_DATA → window.BNS_DATA bridge (plain script, no Babel) -->
-<script src="app/data.js?v=1781844779"></script>
+<script src="app/data.js?v=1781845235"></script>
 
 <!-- Pre-built bundle (esbuild — no Babel runtime) -->
-<script src="app/bundle.js?v=1781844779"></script>
+<script src="app/bundle.js?v=1781845235"></script>
 
 <!-- Bootstrap: mount React app -->
 <script>
@@ -98,6 +108,15 @@ https://docs.google.com/document/d/1w4GDJNyK8qqMfnI4OuQjXE8Ntru0iAFtZTbgjQIVRNk/
   }
   setTimeout(check, 300);
 })();
+</script>
+
+<!-- PWA service worker — yüklenebilirlik + çevrimdışı app-shell -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
 </script>
 </body>
 </html>
