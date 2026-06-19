@@ -223,7 +223,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
                   <span style={{font:"600 14px/1 var(--font-mono)", color:"var(--ink)"}}>{my.avg}</span>
                   <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>({my.cnt} puanlı iş)</span>
                 </div>
-                {why && <div style={{marginTop:5, font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", maxWidth:520}}><Linkify text={why.sebep}/></div>}
+                {why && <div style={{marginTop:8}}><MobileAccordion title="Değerlendirme"><div style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", maxWidth:520}}><Linkify text={why.sebep}/></div></MobileAccordion></div>}
               </div>
             );
           })()}

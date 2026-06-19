@@ -203,6 +203,25 @@ function PageHead({ title, subtitle, actions, eyebrow }) {
   );
 }
 
+// MobileAccordion — mobilde uzun değerlendirme yazılarını katlar; desktop'ta içerik aynen (web değişmez).
+function MobileAccordion({ title, children, defaultOpen }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const [open, setOpen] = React.useState(!!defaultOpen);
+  if (!isMobile) return children;
+  return (
+    <div style={{ border: "1px solid var(--line)", marginBottom: 12, background: "var(--surface)", flex: "1 1 100%", width: "100%", minWidth: 0 }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+        gap: 8, padding: "11px 14px", background: "transparent", border: 0, cursor: "pointer", textAlign: "left",
+      }}>
+        <span style={{ font: "600 12px/1 var(--font-sans)", letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--ink-3)" }}>{title}</span>
+        <span style={{ display: "inline-flex", transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms", color: "var(--ink-4)" }}><I.ChevronDown size={15}/></span>
+      </button>
+      {open && <div style={{ padding: "0 14px 14px" }}>{children}</div>}
+    </div>
+  );
+}
+
 // SectionTitle — small headers used inside screens
 function SectionTitle({ children, action, sub }) {
   return (
@@ -222,3 +241,4 @@ window.Kpi = Kpi;
 window.PageHead = PageHead;
 window.Sparkline = Sparkline;
 window.SectionTitle = SectionTitle;
+window.MobileAccordion = MobileAccordion;

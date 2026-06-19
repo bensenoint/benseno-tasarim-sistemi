@@ -83,7 +83,7 @@ function DeptCompareScreen({ data }) {
             </span>
             <span style={{font:"600 13px/1.3 var(--font-mono)", color:"var(--ink)", flexShrink:0}}>{avg}</span>
             <span style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)", flexShrink:0}}>({cnt} iş)</span>
-            {why && <span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", flex:"1 1 220px", minWidth:0, overflowWrap:"anywhere"}}><Linkify text={why.sebep}/></span>}
+            {why && <MobileAccordion title="Değerlendirme"><span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", flex:"1 1 220px", minWidth:0, overflowWrap:"anywhere"}}><Linkify text={why.sebep}/></span></MobileAccordion>}
           </div>
         );
         return (
