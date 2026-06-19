@@ -191,6 +191,35 @@ function KanbanView({ rows, onOpenBrief }) {
 
 // ─── CARDS VIEW ─────────────────────────────────────────────────────────────
 function CardsView({ rows, onOpenBrief }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+
+  // Mobil: kompakt 2-satır özet satırları (tıkla → detay bottom-sheet). Desktop: tam kart.
+  if (isMobile) {
+    return (
+      <div style={{display:"flex", flexDirection:"column", gap: 0, border:"1px solid var(--line)"}}>
+        {rows.map((b, i) => (
+          <button key={b.id} onClick={() => onOpenBrief(b)} style={{
+            display:"flex", flexDirection:"column", gap: 5, padding:"11px 13px",
+            background: i % 2 ? "var(--row-stripe)" : "transparent",
+            border: 0, borderTop: i ? "1px solid var(--line-soft)" : "none",
+            cursor:"pointer", textAlign:"left", color:"var(--ink)", width:"100%",
+          }}>
+            <div style={{display:"flex", alignItems:"baseline", gap: 8}}>
+              <span style={{flex:1, minWidth:0, font:"500 14px/1.25 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{b.baslik}</span>
+              <span style={{flexShrink:0, font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{b.no}</span>
+            </div>
+            <div style={{display:"flex", alignItems:"center", gap: 10, flexWrap:"wrap"}}>
+              <BrandChip brand={b.brand} size="sm"/>
+              <StatusPill status={b.durum}/>
+              {b.deltaH != null && <span style={{font:"500 11px/1 var(--font-mono)", color:(b.deltaH<=8?"var(--prio-red)":"var(--ink-4)")}}>{formatDelta(b.deltaH)}</span>}
+              <span style={{marginLeft:"auto", font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>{formatDate(b.deadline)}</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))", gap: 12}}>
       {rows.map(b => (
