@@ -222,13 +222,13 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
         const why = typeof window.bnsSebep === "function" ? window.bnsSebep("marka", brand) : null;
         if (!stats.rating && !why) return null;
         return (
-          <div style={{display:"flex", alignItems:"flex-start", gap:10, marginBottom:"var(--section-gap)", padding:"10px 14px", background:"var(--surface)", border:"1px solid var(--line)", borderRadius:0}}>
+          <div style={{display:"flex", flexWrap:"wrap", alignItems:"flex-start", gap:10, rowGap:8, marginBottom:"var(--section-gap)", padding:"10px 14px", background:"var(--surface)", border:"1px solid var(--line)", borderRadius:0}}>
             <span style={{display:"inline-flex", gap:1, paddingTop:2}}>
               {[1,2,3,4,5].map(i => <I.StarFill key={i} size={13} color={i <= Math.round(why?.rating_avg || stats.rating || 0) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
             </span>
             <span style={{font:"600 14px/1.4 var(--font-mono)", color:"var(--ink)"}}>{why?.rating_avg || stats.rating}</span>
             {why?.rating_count != null && <span style={{font:"400 11px/1.5 var(--font-sans)", color:"var(--ink-4)"}}>({why.rating_count} iş)</span>}
-            {why && <span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}><Linkify text={why.sebep}/></span>}
+            {why && <MobileAccordion title="Değerlendirme"><span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}><Linkify text={why.sebep}/></span></MobileAccordion>}
           </div>
         );
       })()}
@@ -374,7 +374,7 @@ function BrandDailyPanel({ brand }) {
         <span style={{ font:"600 12px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)" }}>{title}</span>
       </div>
       {text
-        ? <div style={{ font:"400 13px/1.65 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap" }}><Linkify text={text}/></div>
+        ? <MobileAccordion title="Detayı oku"><div style={{ font:"400 13px/1.65 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap" }}><Linkify text={text}/></div></MobileAccordion>
         : <div style={{ font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-4)" }}>Bu gün için kayıt yok.</div>}
       <div style={{ marginTop:10, paddingTop:8, borderTop:"1px solid var(--line-soft)", font:"400 10px/1.4 var(--font-sans)", color:"var(--ink-4)" }}>{sub}</div>
     </Card>

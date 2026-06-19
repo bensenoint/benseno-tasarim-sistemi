@@ -24,6 +24,7 @@ function TimeRangeToggle({ value, onChange }) {
 }
 
 function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [selectedUser, setSelectedUser] = React.useState(user);
   // Avatar tıklamasından gelen kişi (window.bnsOpenUser → App.jsx initialSel) — t damgası her tıklamada değişir
   React.useEffect(() => {
@@ -199,12 +200,12 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
     <div className="bn-tab-in">
 
       {/* ─── Kullanıcı seçici + hero ──────────────────────────── */}
-      <div style={{display:"flex", alignItems:"flex-start", gap:20, padding:"20px 0 4px", flexWrap:"wrap"}}>
-        <Avatar user={u} size={64}/>
-        <div style={{flex:1, minWidth:200}}>
-          <Eyebrow>{roleLabel}</Eyebrow>
-          <h1 style={{font:"italic 500 30px/1.05 var(--font-display)", color:"var(--ink)", margin:"5px 0 0", letterSpacing:"0"}}>{u.name}</h1>
-          <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:17, color:"var(--ink-3)", marginTop:6}}>
+      <div style={{display:"flex", alignItems:"center", gap: isMobile ? 12 : 20, padding: isMobile ? "6px 0 2px" : "20px 0 4px", flexWrap:"wrap"}}>
+        <Avatar user={u} size={isMobile ? 40 : 64}/>
+        <div style={{flex:1, minWidth: isMobile ? 0 : 200}}>
+          {!isMobile && <Eyebrow>{roleLabel}</Eyebrow>}
+          <h1 style={{font:`italic 500 ${isMobile ? 20 : 30}px/1.05 var(--font-display)`, color:"var(--ink)", margin: isMobile ? 0 : "5px 0 0", letterSpacing:"0"}}>{u.name}</h1>
+          <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize: isMobile ? 13 : 17, color:"var(--ink-3)", marginTop: isMobile ? 2 : 6}}>
             {myActive.length} aktif{myMusteride.length > 0 ? ` · ${myMusteride.length} müşteride` : ""} · {myCompleted.length} tamamlandı · {totalRev} toplam revize
           </div>
           {/* ⭐ Kişi yıldız puanı + gün-sonu sebep açıklaması — sadece yöneticiler görür */}
