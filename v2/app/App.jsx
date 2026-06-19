@@ -134,7 +134,19 @@ function App({ currentUser, onLogout }) {
   const [jobsScope, setJobsScope] = React.useState("all"); // Overview KPI → Jobs deep-link filtresi
   const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
   // Normal navigasyon (sidebar/alt-nav/buton): Jobs'a giderken KPI deep-link filtresini sıfırla
-  const navTo = (id) => { if (id === "jobs") setJobsScope("all"); setTab(id); };
+  const navTo = (id) => {
+    if (typeof navigator !== "undefined" && navigator.vibrate) { try { navigator.vibrate(6); } catch (e) {} }
+    // Native: zaten açık sekmeye tekrar dokun → en üste yumuşak kaydır
+    if (id === tab) {
+      try {
+        const sc = document.querySelector(".bns-main-content");
+        if (sc && sc.scrollTop > 0) sc.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (e) { window.scrollTo(0, 0); }
+      return;
+    }
+    if (id === "jobs") setJobsScope("all"); setTab(id);
+  };
   // Marka chip'lerinden detay sayfasına gidiş (BrandChip → window.bnsOpenBrand)
   const [brandSel, setBrandSel] = React.useState(null);
   React.useEffect(() => {
@@ -242,7 +254,15 @@ function App({ currentUser, onLogout }) {
   const liveData = { ...data, briefs: filteredBriefs, completed: dateFilteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats, history, dateRange };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
-  React.useEffect(() => { document.documentElement.setAttribute("data-theme", t.theme); }, [t.theme]);
+  React.useEffect(() => {
+    document.documentElement.setAttribute("data-theme", t.theme);
+    // PWA durum çubuğu rengini header (--paper) ile eşle — temayla birlikte değişir
+    try {
+      const m = document.querySelector('meta[name="theme-color"]');
+      const paper = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim();
+      if (m && paper) m.setAttribute("content", paper);
+    } catch (e) {}
+  }, [t.theme]);
   React.useEffect(() => { document.documentElement.setAttribute("data-density", t.density); }, [t.density]);
   React.useEffect(() => { document.documentElement.setAttribute("data-noise", t.noise ? "on" : "off"); }, [t.noise]);
   React.useEffect(() => {
@@ -613,7 +633,8 @@ function App({ currentUser, onLogout }) {
 
       {toast && <Toast msg={toast}/>}
       {/* 🤖 Sistem Asistanı — sağ alt yüzen sohbet */}
-      <ChatBot currentUser={currentUser}/>
+      {/* Ody — bir bottom-sheet/modal açıkken gizle (üstüne binmesin) */}
+      {!(openBrief || newBrief || palette) && <ChatBot currentUser={currentUser}/>}
 
       <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>
 
