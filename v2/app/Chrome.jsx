@@ -448,6 +448,7 @@ function ChatBot({ currentUser }) {
   const [notifItems, setNotifItems] = React.useState([]); // tüm bildirimler (panelde liste — çan Ody'ye taşındı)
   const [advice, setAdvice] = React.useState({});         // {notifId: {state:"loading"|"done"|"err", text}} — Ody'nin danışman önerisi
   const [openAdvice, setOpenAdvice] = React.useState(null); // hangi bildirimin önerisi açık
+  const [advicePeek, setAdvicePeek] = React.useState(null); // boştayken dönüşümlü gösterilen öneri-balonu bildirimi
   const [brief, setBrief] = React.useState(null);         // günlük iş özeti (msgs'ten ayrı kart; görülünce kaybolur)
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
 
@@ -550,6 +551,37 @@ function ChatBot({ currentUser }) {
     const t = setTimeout(() => { peekDismissedRef.current = notifPeek.id; setNotifPeek(null); }, 6000);
     return () => clearTimeout(t);
   }, [notifPeek]);
+
+  // Öneri-balonu döngüsü: öneriyi okumayan kullanıcı için, panel kapalı ve yeni-bildirim balonu
+  // yokken Ody boş anlarda önerilerin ÖZETİNİ dönüşümlü gösterir; kullanıcı tıklayıp okuyana kadar
+  // farklı bildirimleri sırayla sergiler. Tıklayınca detay açılır ve döngü durur.
+  var notifPeekRef = React.useRef(notifPeek); notifPeekRef.current = notifPeek;
+  var adviceRef = React.useRef(advice); adviceRef.current = advice;
+  var notifItemsRef = React.useRef(notifItems); notifItemsRef.current = notifItems;
+  var adviceCycleIdxRef = React.useRef(0);   // hangi öneriye sıra geldi
+  var adviceEngagedRef = React.useRef(false); // kullanıcı bir öneriye tıkladı mı → döngü dur
+  // Öneri metninden kısa balon özeti: madde işaretlerini/boş satırları temizle, ilk anlamlı cümle.
+  const adviceSummary = (t) => {
+    if (!t) return "";
+    const first = String(t).split(/\n+/).map(s => s.replace(/^[•\-\*\d\.\)\s]+/, "").trim()).filter(Boolean)[0] || "";
+    return first.length > 130 ? first.slice(0, 127) + "…" : first;
+  };
+  React.useEffect(() => {
+    const ADVICE_CYCLE_MS = 11000;
+    const tick = () => {
+      if (openRef.current || adviceEngagedRef.current) { setAdvicePeek(null); return; }
+      if (notifPeekRef.current) { setAdvicePeek(null); return; }   // yeni-bildirim balonuyla çakışma
+      const items = (notifItemsRef.current || []).slice(0, 6);
+      const ready = items.filter(n => { const a = adviceRef.current[n.id]; return a && a.state === "done" && adviceSummary(a.text); });
+      if (!ready.length) { setAdvicePeek(null); return; }
+      const idx = adviceCycleIdxRef.current % ready.length;
+      adviceCycleIdxRef.current = idx + 1;
+      setAdvicePeek(ready[idx]);
+    };
+    const t0 = setTimeout(tick, 4000);       // ilk balon için kısa gecikme
+    const id = setInterval(tick, ADVICE_CYCLE_MS);
+    return () => { clearTimeout(t0); clearInterval(id); };
+  }, []);
 
   // Tüm bildirimleri okundu işaretle (panel kapanınca): sunucu + optimistik → Ody normale döner.
   const markNotifRead = () => {
@@ -703,6 +735,30 @@ function ChatBot({ currentUser }) {
           }}>
           <div style={{ font: "700 9px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 5 }}>Ody · yeni bildirim</div>
           <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{notifPeek.text}</div>
+        </button>
+      )}
+      {/* Boştayken dönüşümlü ÖNERİ balonu — öneriyi okumayan kullanıcı için. Tıkla → detay açılır, döngü durur. */}
+      {!open && !notifPeek && advicePeek && (
+        <button onClick={() => {
+            adviceEngagedRef.current = true; setAdvicePeek(null);
+            setUnread(false); setOpen(true); setOpenAdvice(advicePeek.id); fetchAdvice(advicePeek);
+          }}
+          title="Ody'nin önerisini aç"
+          style={{
+            position: "fixed", zIndex: 89, textAlign: "left",
+            ...(vw < 768 ? {
+              left: 8, right: 8, top: "calc(56px + env(safe-area-inset-top, 0px))", maxWidth: "none",
+            } : {
+              left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
+              top: Math.max(8, pos.y - 72), width: 248, maxWidth: "calc(100vw - 24px)",
+            }),
+            border: "1px solid var(--ody)", borderRadius: 12, background: "var(--surface)",
+            boxShadow: "var(--shadow-2)", padding: "9px 12px", cursor: "pointer",
+            animation: "odyPopIn .3s ease",
+          }}>
+          <div style={{ font: "700 9px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 5, display: "flex", alignItems: "center", gap: 4 }}>💡 Ody'nin önerisi</div>
+          <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{adviceSummary(advice[advicePeek.id] && advice[advicePeek.id].text)}</div>
+          <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ody)", marginTop: 6 }}>Detay için dokun →</div>
         </button>
       )}
       {/* Açma balonu */}
