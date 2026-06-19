@@ -1336,8 +1336,9 @@ function PullToRefresh() {
   React.useEffect(() => {
     if (!isMobile) return;
     const TH = 70, MAX = 100;
+    const scroller = () => document.querySelector("main");
     const main = () => document.querySelector(".bns-main-content");
-    const sTop = () => (document.scrollingElement || document.documentElement).scrollTop;
+    const sTop = () => { const s = scroller(); return s ? s.scrollTop : 0; };
     const onStart = (e) => {
       if (refreshingRef.current || sTop() > 0) { startY.current = null; return; }
       startY.current = e.touches[0].clientY; pulling.current = false;
