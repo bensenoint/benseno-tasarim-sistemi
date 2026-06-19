@@ -351,16 +351,20 @@ function bnsAdviceContext(n) {
   //    Aynı iş tipindekiler öncelikli (skor 2), kelime eşleşenler (skor 1). Profil'deki tip mantığıyla aynı.
   let simCtx = "(benzer iş bulunamadı)";
   if (job && job.baslik) {
+    // İş tipi başlıktan çıkarılır (kayıtlı alan yok). Spesifik tipler önce gelir (ilk eşleşen kazanır).
     const TYPES = [
-      ["sosyal medya", ["sosyal", "sm ", "instagram", "story", "post", "reels"]],
-      ["video", ["video", "reel", "film", "klip"]],
-      ["web/dijital", ["banner", "dijital", "display", "web", "website", "site", "landing", "mailing", "newsletter"]],
-      ["bröşür/baskı", ["bröşür", "broşür", "katalog", "baskı", "davetiye", "afiş", "föy", "foy"]],
-      ["ambalaj", ["ambalaj", "paket", "kutu", "etiket", "pouch"]],
-      ["sunum/deck", ["sunum", "deck", "ppt", "slide", "rapor"]],
-      ["logo/kimlik", ["logo", "kimlik", "identity"]],
+      ["3d/animasyon", ["3d", " render", "modelleme", "animasyon", "motion"]],
+      ["mailing", ["mailing", "e-posta", "eposta", "newsletter", "edm", "mail "]],
+      ["video kurgu", ["video", "reel", "kurgu", "montaj", "film", "klip", "youtube"]],
+      ["sosyal medya", ["sosyal", "sm ", "sm-", "instagram", "story", "post", "içerik plan", "icerik plan"]],
+      ["web/dijital", ["banner", "dijital", "display", "web", "website", "site", "landing", "ux", "ui", "arayüz"]],
+      ["bröşür/baskı", ["bröşür", "broşür", "katalog", "baskı", "davetiye", "afiş", "föy", "foy", "el ilanı"]],
+      ["ambalaj", ["ambalaj", "paket", "kutu", "etiket", "pouch", "label"]],
+      ["sunum/deck", ["sunum", "deck", "ppt", "slide", "rapor", "pitch"]],
+      ["logo/kimlik", ["logo", "kimlik", "identity", "kurumsal kimlik"]],
+      ["banner/görsel", ["görsel", "key visual", "kv", "poster", "billboard"]],
     ];
-    const typeOf = (t) => { t = (t || "").toLowerCase(); for (const pair of TYPES) { if (pair[1].some(w => t.includes(w))) return pair[0]; } return null; };
+    const typeOf = (t) => { t = " " + (t || "").toLowerCase() + " "; for (const pair of TYPES) { if (pair[1].some(w => t.includes(w))) return pair[0]; } return null; };
     const tType = typeOf(job.baslik + " " + (job.marka || ""));
     const words = job.baslik.toLowerCase().split(/[^a-zçğıöşü0-9]+/).filter(w => w.length > 4);
     const scored = completed.filter(c => c.no !== job.no && c.marka !== marka && c.insight && c.baslik)
@@ -371,7 +375,7 @@ function bnsAdviceContext(n) {
       })
       .filter(x => x.score > 0)
       .sort((a, b) => (b.score - a.score) || ((b.c.rating || 0) - (a.c.rating || 0)))
-      .slice(0, 3);
+      .slice(0, 5);
     if (scored.length) {
       simCtx = (tType ? `bu işin tipi: ${tType}\n` : "") +
         scored.map(x => `• ${x.c.marka} #${x.c.no} ${clip(x.c.baslik, 40)} (puan ${x.c.rating || "?"}): ` + clip(x.c.insight, 200)).join("\n");
@@ -602,12 +606,13 @@ function ChatBot({ currentUser }) {
 
   // Bildirim için Ody'nin danışman önerisi — geçmiş thread/insight'lara göre ne yapılmalı/uyarı/yönlendirme.
   // /api/chat zaten sistem verisine (kişiye özel) erişiyor; bildirim metnini verip danışman gibi yorum istiyoruz.
-  const toggleAdvice = (n) => {
-    if (openAdvice === n.id) { setOpenAdvice(null); return; }
-    setOpenAdvice(n.id);
-    if (advice[n.id] && advice[n.id].state === "done") return;     // zaten yüklü
+  const adviceReqRef = React.useRef({});   // tekrar istek/loop önleme (id bazlı)
+  const fetchAdvice = (n) => {
+    if (!n || adviceReqRef.current[n.id]) return;
+    if (advice[n.id] && advice[n.id].state === "done") return;
     const ck = "bns_ody_advice_" + n.id;
     try { const c = localStorage.getItem(ck); if (c) { setAdvice(a => ({ ...a, [n.id]: { state: "done", text: c } })); return; } } catch (e) {}
+    adviceReqRef.current[n.id] = true;
     setAdvice(a => ({ ...a, [n.id]: { state: "loading", text: "" } }));
     const c = bnsAdviceContext(n);
     const PROMPT =
@@ -615,12 +620,14 @@ function ChatBot({ currentUser }) {
       "Aşağıdaki bağlamı ÖNCELİK SIRASIYLA kullanarak değerlendir (1 en öncelikli):\n\n" +
       "1) BU İŞE YAZILANLAR:\n" + c.jobCtx + "\n\n" +
       "2) BU MARKA İÇİN GEÇMİŞ:\n" + c.brandCtx + "\n\n" +
-      "3) DİĞER MARKALARDAKİ BENZER İŞLER:\n" + c.simCtx + "\n\n" +
+      "3) DİĞER MARKALARDAKİ BENZER İŞLER (aynı iş tipi öncelikli):\n" + c.simCtx + "\n\n" +
       "4) İLGİLİ KİŞİNİN DEĞERLENDİRMESİ VE YILDIZ PUANI (bununla karşılaştır):\n" + c.personCtx + "\n\n" +
-      "Bu katmanları sentezle; özellikle işin/markanın geçmişini kişinin yıldız puanı ve değerlendirmesiyle KARŞILAŞTIR. " +
-      "Bir proje danışmanı gibi KISA yönlendir: ne yapılmalı, dikkat edilecek nokta/uyarı, varsa öneri. " +
-      "En fazla 3 kısa madde (•). Mümkünse # numarası/markaya referans ver. Selam/giriş cümlesi yazma, doğrudan maddelere geç. " +
-      "Veri zayıfsa kısa ama işe yarar genel bir öneri ver.";
+      "Bu katmanları sentezle; işin/markanın geçmişini kişinin yıldız puanı ve değerlendirmesiyle KARŞILAŞTIR. " +
+      "TON: net, doğrudan, uyarıcı bir proje danışmanı — riski açıkça söyle, temenni/gevşek cümle kurma. " +
+      "Risk varsa neyin yanlış gidebileceğini ve sonucunu belirt (örn. 'X yapılmazsa termin kayar'). " +
+      "EN FAZLA 3 madde (•), her madde TEK kısa cümle, gereksiz kelime yok. " +
+      "Mümkünse # numarası/markaya referans ver. Selam/giriş yazma, doğrudan maddelere geç. " +
+      "Veri zayıfsa 1-2 maddeyle işe yarar uyarı/öneri ver.";
     (async () => {
       try {
         const r = await fetch(`${API}/api/chat`, {
@@ -633,13 +640,25 @@ function ChatBot({ currentUser }) {
           try { localStorage.setItem(ck, j.reply); } catch (e) {}
           setAdvice(a => ({ ...a, [n.id]: { state: "done", text: j.reply } }));
         } else {
+          adviceReqRef.current[n.id] = false;   // hata → tekrar denenebilir
           setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Öneri alınamadı, tekrar dene." } }));
         }
       } catch (e) {
+        adviceReqRef.current[n.id] = false;
         setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Bağlantı hatası." } }));
       }
     })();
   };
+  // Manuel aç/kapa (okunmuş bildirimler için)
+  const toggleAdvice = (n) => {
+    if (openAdvice === n.id) { setOpenAdvice(null); return; }
+    setOpenAdvice(n.id);
+    fetchAdvice(n);
+  };
+  // Okunmamış bildirimlerin önerisini BİLDİRİMLE BİRLİKTE otomatik getir (ilk 6, cache'li) — toggle arkasında kaybolmasın.
+  React.useEffect(() => {
+    (notifItems || []).filter(n => !n.read_at).slice(0, 6).forEach(fetchAdvice);
+  }, [notifItems]);
 
   const send = async () => {
     const q = input.trim();
@@ -761,14 +780,16 @@ function ChatBot({ currentUser }) {
                           <span style={{ display: "block", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</span>
                           <span style={{ display: "block", font: "400 10px/1 var(--font-sans)", color: unread ? "var(--ink-3)" : "var(--ink-5)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</span>
                           <span style={{ display: "flex", gap: 14, marginTop: 6, alignItems: "center" }}>
-                            <button onClick={() => toggleAdvice(n)} style={{ border: 0, background: "transparent", cursor: "pointer", padding: 0, font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>
-                              💡 Ody'nin önerisi <span style={{ display: "inline-flex", transform: openAdvice === n.id ? "rotate(180deg)" : "none", transition: "transform 160ms" }}><I.ChevronDown size={11}/></span>
-                            </button>
+                            {unread
+                              ? <span style={{ font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>💡 Ody'nin önerisi</span>
+                              : <button onClick={() => toggleAdvice(n)} style={{ border: 0, background: "transparent", cursor: "pointer", padding: 0, font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                                  💡 Ody'nin önerisi <span style={{ display: "inline-flex", transform: openAdvice === n.id ? "rotate(180deg)" : "none", transition: "transform 160ms" }}><I.ChevronDown size={11}/></span>
+                                </button>}
                             {n.link && <a href={n.link} target="_blank" rel="noreferrer" style={{ font: "500 11px/1 var(--font-sans)", color: "var(--ink-4)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3 }}><I.Link size={11}/> Slack</a>}
                           </span>
                         </span>
                       </div>
-                      {openAdvice === n.id && (
+                      {(unread || openAdvice === n.id) && (
                         <div style={{ padding: "0 12px 11px 27px" }}>
                           <div style={{ background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 11px", font: "400 12px/1.55 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
                             {advice[n.id] && advice[n.id].state === "loading"
