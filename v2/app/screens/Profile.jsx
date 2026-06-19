@@ -196,6 +196,47 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
 
   const roleLabel = { yonetici:"Yönetici", tasarim:"Tasarım", editor:"Editör", ai:"AI Operatör" }[u.rol] || u.rol;
 
+  // ─── Performans özeti — üstte seçili GLOBAL tarih aralığına göre (data.completed zaten süzülü) ───
+  const RANGE_LABELS = { "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
+  const perfRangeLabel = RANGE_LABELS[(data.dateRange && data.dateRange.preset) || "all"] || "seçili aralık";
+  const perfDone = allCompleted.filter(b =>
+    (b.lead && b.lead.id === u.id) ||
+    (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
+  );
+  const perfN = perfDone.length;
+  const perfBrands = {};
+  perfDone.forEach(b => { if (b.marka) perfBrands[b.marka] = (perfBrands[b.marka] || 0) + 1; });
+  const perfBrandList = Object.entries(perfBrands).sort((a, b) => b[1] - a[1]);
+  const perfRevTotal = perfDone.reduce((s, b) => s + (parseInt(b.revision) || 0), 0);
+  const perfAvgRev = perfN ? (perfRevTotal / perfN).toFixed(1) : "—";
+  const perfSureArr = perfDone.map(b => b.sureH || 0).filter(h => h > 0);
+  const perfHours = perfSureArr.reduce((s, v) => s + v, 0);
+  const perfAvgSure = perfSureArr.length ? (perfHours / perfSureArr.length).toFixed(1) : "—";
+  const perfLead = perfDone.filter(b => b.lead && b.lead.id === u.id).length;
+  const perfContrib = perfN - perfLead;
+  const perfOnTime = perfDone.filter(b => (b.gecikmeH || 0) <= 0).length;
+  const perfLate = perfN - perfOnTime;
+  const perfOnTimePct = perfN ? Math.round(perfOnTime / perfN * 100) : null;
+  const perfRatingArr = perfDone.filter(b => b.rating > 0).map(b => b.rating);
+  const perfAvgRating = perfRatingArr.length ? (perfRatingArr.reduce((s, v) => s + v, 0) / perfRatingArr.length).toFixed(1) : "—";
+  const perfRows = [
+    ["Toplam tamamlanan iş", String(perfN)],
+    ["Lead / Katkı", `${perfLead} / ${perfContrib}`],
+    ["Teslim edilen iş", String(perfN)],
+    ["Zamanında teslim", perfOnTimePct != null ? `${perfOnTime} · %${perfOnTimePct}` : "—"],
+    ["Gecikmeli teslim", String(perfLate)],
+    ["Toplam revize", String(perfRevTotal)],
+    ["Ort. revize / iş", perfAvgRev],
+    ["Ort. tamamlama süresi", perfAvgSure !== "—" ? perfAvgSure + " sa" : "—"],
+    ["Toplam çalışma süresi", perfHours > 0 ? perfHours.toFixed(0) + " sa" : "—"],
+    ["Çalışılan marka", String(perfBrandList.length)],
+    ["Ort. puan", perfAvgRating !== "—" ? perfAvgRating + " ★" : "—"],
+  ];
+  const brandColorOf = (name) => (data.BRANDS || []).find(b => b.name === name)?.color
+    || (data.BR && data.BR[name] && data.BR[name].color)
+    || (perfDone.find(b => b.marka === name && b.brand && b.brand.color)?.brand.color)
+    || "var(--ink-4)";
+
   return (
     <div className="bn-tab-in">
 
@@ -288,6 +329,49 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         <Kpi label="Kapasite"      value={capPct+"%"} color={capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":undefined}/>
         <Kpi label="Marka"         value={Object.keys(brandCount).length} sub="farklı"/>
       </div>
+
+      {/* ─── Performans özeti — üstte seçili tarih aralığına göre ─── */}
+      <Card padding={0} style={{minWidth:0, marginBottom:"var(--section-gap)"}}>
+        <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10, padding:"13px 16px", borderBottom:"1px solid var(--line-strong)", flexWrap:"wrap"}}>
+          <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>{u.name.split(" ")[0]} · performans özeti</span>
+          <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"4px 9px", border:"1px solid var(--line)", borderRadius:999}}>{perfRangeLabel}</span>
+        </div>
+        {perfN === 0 ? (
+          <div style={{padding:"20px 16px", font:"400 13px/1.5 var(--font-sans)", color:"var(--ink-4)"}}>
+            Seçili aralıkta ({perfRangeLabel.toLowerCase()}) {u.name.split(" ")[0]} için tamamlanan iş kaydı yok. Üstteki 📅 tarih aralığını genişletmeyi dene.
+          </div>
+        ) : (
+          <>
+            <div style={{overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
+              <table style={{width:"100%", borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)"}}>
+                <tbody>
+                  {perfRows.map(([label, val], i) => (
+                    <tr key={label} style={{background: i % 2 === 1 ? "var(--row-stripe)" : "transparent"}}>
+                      <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>{label}</td>
+                      <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", textAlign:"right", font:"500 13px/1.3 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{val}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Çalışılan markalar — renk noktalı çipler + iş sayısı */}
+            {perfBrandList.length > 0 && (
+              <div style={{padding:"12px 16px", borderTop:"1px solid var(--line-strong)"}}>
+                <div style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", marginBottom:9}}>Çalışılan markalar ({perfBrandList.length})</div>
+                <div style={{display:"flex", flexWrap:"wrap", gap:7}}>
+                  {perfBrandList.map(([name, cnt]) => (
+                    <span key={name} style={{display:"inline-flex", alignItems:"center", gap:6, padding:"5px 10px", border:"1px solid var(--line)", borderRadius:999, background:"var(--surface)"}}>
+                      <span style={{width:8, height:8, borderRadius:999, background:brandColorOf(name), flexShrink:0}}/>
+                      <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-2)"}}>{name}</span>
+                      <span style={{font:"600 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>{cnt}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </Card>
 
       {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
       <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
