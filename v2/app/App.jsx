@@ -243,16 +243,27 @@ function App({ currentUser, onLogout }) {
   const filteredBriefs    = React.useMemo(() => filterByViewMode(briefs),         [filterByViewMode, briefs]);
   const filteredCompleted = React.useMemo(() => filterByViewMode(data.completed), [filterByViewMode, data.completed, briefs]);
 
-  // Tarih aralığı (akıllı): aktif işler her zaman görünür (filteredBriefs dokunulmaz);
-  // tamamlanan işler tamamlanma tarihine (bitis) göre aralıkta süzülür.
-  const dateFilteredCompleted = React.useMemo(() => filteredCompleted.filter(c => {
-    const t = c.bitis;
+  // Tarih aralığı: TÜM sayfalarda uygulanır.
+  //  • Aktif işler → açılış tarihine (acilma; yoksa created_at) göre aralıkta süzülür.
+  //  • Tamamlanan işler → tamamlanma tarihine (bitis) göre süzülür.
+  // Tarih alanı olmayan kayıtlar (null) gizlenmez (veri kaybı olmasın).
+  const inDateRange = React.useCallback((t) => {
     if (t == null) return true;
     return t >= dateRange.from && t <= dateRange.to;
-  }), [filteredCompleted, dateRange]);
+  }, [dateRange]);
+  const briefDate = (b) => (b.acilma != null ? b.acilma : (b.created_at != null ? b.created_at : null));
+
+  const dateFilteredBriefs = React.useMemo(
+    () => filteredBriefs.filter(b => inDateRange(briefDate(b))),
+    [filteredBriefs, inDateRange]
+  );
+  const dateFilteredCompleted = React.useMemo(
+    () => filteredCompleted.filter(c => inDateRange(c.bitis)),
+    [filteredCompleted, inDateRange]
+  );
 
   // Live data shape — briefs ve completed artık filtered (viewMode + tarih aralığı)
-  const liveData = { ...data, briefs: filteredBriefs, completed: dateFilteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats, history, dateRange };
+  const liveData = { ...data, briefs: dateFilteredBriefs, completed: dateFilteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats, history, dateRange };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
   React.useEffect(() => {
