@@ -284,7 +284,7 @@ function Rule({ name, status, hits, last }) {
   );
 }
 
-function EditorialLayout({ data, musteride, user, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
@@ -326,14 +326,33 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
     );
   })();
 
+  // Mobil öncelik filtre çipleri (referans Overview) — prioFilter'ı sürer
+  const prioChips = [["all","Tümü",null],["over","Geçmiş","var(--prio-red)"],["org","Yüksek","var(--prio-orange)"],["ylw","Normal","var(--prio-yellow)"],["grn","Düşük","var(--prio-green)"]];
+
   return (
     <div className="bn-tab-in">
+      {/* Mobil: viewMode segmenti (referans) — desktop'ta header'da */}
+      {isMobile && setViewMode && (
+        <div style={{display:"flex", padding:3, background:"var(--paper-2)", borderRadius:11, gap:3, marginBottom:12}}>
+          {[["all","Tüm ekip"],["mine","Bana"],["dept","Departmanım"]].map(([k,v]) => (
+            <button key={k} onClick={() => setViewMode(k)} style={{
+              flex:1, padding:"9px 6px", border:0, borderRadius:8, cursor:"pointer",
+              font:`${viewMode===k?700:500} 13px/1 var(--font-sans)`,
+              background: viewMode===k ? "var(--surface)" : "transparent",
+              color: viewMode===k ? "var(--ink)" : "var(--ink-3)",
+              boxShadow: viewMode===k ? "0 1px 3px rgba(0,0,0,.08)" : "none",
+              transition:"all 150ms",
+            }}>{v}</button>
+          ))}
+        </div>
+      )}
+
       <PageHead
         eyebrow={data.fmtTr ? data.fmtTr(Date.now()) : `${greetingTimezone()}`}
         title={`${greeting}, ${firstName}.`}
         subtitle={<>bugün <strong style={{fontWeight:600, color: overdue.length ? "var(--prio-red)" : "var(--ink-2)"}}>{overdue.length} geciken</strong>, <strong style={{fontWeight:600, color:"var(--ink-2)"}}>{todayDue.length} bugün teslim</strong>. önce bunlar.</>}
         lead={isMobile ? ratingPill : null}
-        actions={<div style={{position:"relative",display:"flex",gap:6}}>
+        actions={isMobile ? null : <div style={{position:"relative",display:"flex",gap:6}}>
           <Button kind={filterActive ? "primary" : "secondary"} icon={<I.Filter size={14}/>} onClick={() => setFilterOpen(o=>!o)}>
             <span className="bns-btn-label">{filterActive ? "Filtre aktif" : "Filtrele"}</span>
           </Button>
@@ -344,6 +363,28 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
 
       {/* ⭐ Firma yıldızı — masaüstünde altta; mobilde PageHead lead'inde (yukarıda) */}
       {!isMobile && ratingPill}
+
+      {/* Mobil: öncelik filtre çipleri (yatay kaydırılır) — referans Overview */}
+      {isMobile && (
+        <div className="bns-chip-scroll" style={{display:"flex", gap:8, overflowX:"auto", padding:"12px 0 4px"}}>
+          {prioChips.map(([k,v,c]) => {
+            const on = prioFilter===k;
+            return (
+              <button key={k} onClick={() => setPrioFilter(on && k!=="all" ? "all" : k)} style={{
+                flexShrink:0, display:"inline-flex", alignItems:"center", gap:7,
+                padding:"8px 14px", borderRadius:999, cursor:"pointer", whiteSpace:"nowrap",
+                border:`1px solid ${on ? "var(--ember)" : "var(--line)"}`,
+                background: on ? "var(--ember-tint)" : "var(--surface)",
+                color: on ? "var(--ink)" : "var(--ink-2)",
+                font:`${on?600:500} 13px/1 var(--font-sans)`,
+              }}>
+                {c && <span style={{width:9,height:9,borderRadius:999,background:c,flexShrink:0}}/>}
+                {v}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* KPI grid */}
       <KpiGrid cols={7}>
