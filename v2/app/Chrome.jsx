@@ -392,7 +392,12 @@ function bnsAdviceContext(n) {
     personCtx = p.join("\n");
   }
 
-  return { marka, jobCtx, brandCtx, simCtx, personCtx };
+  // Bağlam tamamen boşsa (dört katman da varsayılan) → öneri üretme (API'ye gitme).
+  const weak = jobCtx === "(bu işe dair kayıt yok)" &&
+               brandCtx === "(marka geçmişi yok)" &&
+               simCtx === "(benzer iş bulunamadı)" &&
+               personCtx === "(kişi değerlendirmesi yok)";
+  return { marka, jobCtx, brandCtx, simCtx, personCtx, weak };
 }
 
 function ChatBot({ currentUser }) {
@@ -641,12 +646,17 @@ function ChatBot({ currentUser }) {
   const adviceReqRef = React.useRef({});   // tekrar istek/loop önleme (id bazlı)
   const fetchAdvice = (n) => {
     if (!n || adviceReqRef.current[n.id]) return;
-    if (advice[n.id] && advice[n.id].state === "done") return;
-    const ck = "bns_ody_advice_" + n.id;
-    try { const c = localStorage.getItem(ck); if (c) { setAdvice(a => ({ ...a, [n.id]: { state: "done", text: c } })); return; } } catch (e) {}
+    if (advice[n.id] && (advice[n.id].state === "done" || advice[n.id].state === "none")) return;
+    const ck = "bns_ody_advice2_" + n.id;   // v2: yetersiz bağlamda "YOK" döner → öneri gizlenir
+    try {
+      const c = localStorage.getItem(ck);
+      if (c != null) { setAdvice(a => ({ ...a, [n.id]: c === "YOK" ? { state: "none", text: "" } : { state: "done", text: c } })); return; }
+    } catch (e) {}
+    const c = bnsAdviceContext(n);
+    // Hiç bağlam yoksa öneri üretme — boş/dolgu mesaj yazma.
+    if (c.weak) { try { localStorage.setItem(ck, "YOK"); } catch (e) {} setAdvice(a => ({ ...a, [n.id]: { state: "none", text: "" } })); return; }
     adviceReqRef.current[n.id] = true;
     setAdvice(a => ({ ...a, [n.id]: { state: "loading", text: "" } }));
-    const c = bnsAdviceContext(n);
     const PROMPT =
       "Şu bildirim geldi: \"" + (n.text || "") + "\".\n\n" +
       "Aşağıdaki bağlamı ÖNCELİK SIRASIYLA kullanarak değerlendir (1 en öncelikli):\n\n" +
@@ -659,7 +669,9 @@ function ChatBot({ currentUser }) {
       "Risk varsa neyin yanlış gidebileceğini ve sonucunu belirt (örn. 'X yapılmazsa termin kayar'). " +
       "EN FAZLA 3 madde (•), her madde TEK kısa cümle, gereksiz kelime yok. " +
       "Mümkünse # numarası/markaya referans ver. Selam/giriş yazma, doğrudan maddelere geç. " +
-      "Veri zayıfsa 1-2 maddeyle işe yarar uyarı/öneri ver.";
+      "ÖNEMLİ: Bu bildirim için VERİYE DAYALI, SPESİFİK bir öneri/uyarı veremiyorsan (yalnızca genel/temenni " +
+      "cümle ya da 'teyit et / netleştir / elimde bağlam yok' türü dolgu yazabiliyorsan), yanıt olarak SADECE " +
+      "tek kelime yaz: YOK — başka hiçbir şey ekleme. Gerçek, spesifik bir içgörün varsa maddeleri yaz.";
     (async () => {
       try {
         const r = await fetch(`${API}/api/chat`, {
@@ -669,8 +681,15 @@ function ChatBot({ currentUser }) {
         });
         const j = await r.json().catch(() => ({}));
         if (r.ok && j.reply) {
-          try { localStorage.setItem(ck, j.reply); } catch (e) {}
-          setAdvice(a => ({ ...a, [n.id]: { state: "done", text: j.reply } }));
+          const rep = String(j.reply).trim();
+          // Yetersiz bağlam → "YOK" (veya boş): öneri gösterme, dolgu mesaj yazma.
+          if (!rep || /^yok\.?$/i.test(rep)) {
+            try { localStorage.setItem(ck, "YOK"); } catch (e) {}
+            setAdvice(a => ({ ...a, [n.id]: { state: "none", text: "" } }));
+          } else {
+            try { localStorage.setItem(ck, rep); } catch (e) {}
+            setAdvice(a => ({ ...a, [n.id]: { state: "done", text: rep } }));
+          }
         } else {
           adviceReqRef.current[n.id] = false;   // hata → tekrar denenebilir
           setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Öneri alınamadı, tekrar dene." } }));
@@ -826,6 +845,10 @@ function ChatBot({ currentUser }) {
                   {notifItems.slice(0, 30).map((n, idx) => {
                     var unread = !n.read_at;
                     var autoShow = idx < 3;   // en yeni 3 bildirimde öneri otomatik açık (toggle arkasında kaybolmasın)
+                    var adv = advice[n.id];
+                    var advMeaningful = adv && adv.state === "done" && (adv.text || "").trim();
+                    var advPending = adv && adv.state === "loading";
+                    var advNone = adv && adv.state === "none";   // yeterli bağlam yok → öneri gösterilmez
                     return (
                     <div key={n.id} style={{
                       borderLeft: unread ? "3px solid var(--ody)" : "3px solid transparent",
@@ -838,21 +861,21 @@ function ChatBot({ currentUser }) {
                           <span style={{ display: "block", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</span>
                           <span style={{ display: "block", font: "400 10px/1 var(--font-sans)", color: unread ? "var(--ink-3)" : "var(--ink-5)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</span>
                           <span style={{ display: "flex", gap: 14, marginTop: 6, alignItems: "center" }}>
-                            {autoShow
+                            {(autoShow ? (advMeaningful || advPending) : !advNone) && (autoShow
                               ? <span style={{ font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>💡 Ody'nin önerisi</span>
                               : <button onClick={() => toggleAdvice(n)} style={{ border: 0, background: "transparent", cursor: "pointer", padding: 0, font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>
                                   💡 Ody'nin önerisi <span style={{ display: "inline-flex", transform: openAdvice === n.id ? "rotate(180deg)" : "none", transition: "transform 160ms" }}><I.ChevronDown size={11}/></span>
-                                </button>}
+                                </button>)}
                             {n.link && <a href={n.link} target="_blank" rel="noreferrer" style={{ font: "500 11px/1 var(--font-sans)", color: "var(--ink-4)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3 }}><I.Link size={11}/> Slack</a>}
                           </span>
                         </span>
                       </div>
-                      {(autoShow || openAdvice === n.id) && (
+                      {(autoShow || openAdvice === n.id) && (advMeaningful || advPending) && (
                         <div style={{ padding: "0 12px 11px 27px" }}>
                           <div style={{ background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 11px", font: "400 12px/1.55 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                            {advice[n.id] && advice[n.id].state === "loading"
+                            {advPending
                               ? <span style={{ color: "var(--ink-4)" }}>Ody düşünüyor…</span>
-                              : <Linkify text={(advice[n.id] && advice[n.id].text) || ""}/>}
+                              : <Linkify text={(adv && adv.text) || ""}/>}
                           </div>
                         </div>
                       )}
