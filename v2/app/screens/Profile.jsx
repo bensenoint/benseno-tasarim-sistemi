@@ -302,12 +302,12 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
               <option value="all">Tüm markalar</option>
               {viewBrands.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
-            <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)"}}>
+            <div className="bns-hide-mobile" style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)"}}>
               {curView.completed && (overdue.length || urgent.length) ? "" : (overdue.length > 0 && jobView==="aktif" && !markaActive && <span style={{color:"var(--prio-red)", fontWeight:600}}>{overdue.length} gecikmiş · </span>)}
               toplam {displayRows.length}{markaActive ? ` · ${markaSel}` : ""} · {curView.note}
             </div>
           </div>
-          <div style={{display:"flex", gap:6}}>
+          <div className="bns-hide-mobile" style={{display:"flex", gap:6}}>
             <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>lead: {asLead.length}</span>
             <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>contrib: {asContrib.length}</span>
             {asObserver.length > 0 && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>gözlemci: {asObserver.length}</span>}

@@ -311,10 +311,10 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
         subtitle={<>bugün <strong style={{fontWeight:600, color: overdue.length ? "var(--prio-red)" : "var(--ink-2)"}}>{overdue.length} geciken</strong>, <strong style={{fontWeight:600, color:"var(--ink-2)"}}>{todayDue.length} bugün teslim</strong>. önce bunlar.</>}
         actions={<div style={{position:"relative",display:"flex",gap:6}}>
           <Button kind={filterActive ? "primary" : "secondary"} icon={<I.Filter size={14}/>} onClick={() => setFilterOpen(o=>!o)}>
-            {filterActive ? "Filtre aktif" : "Filtrele"}
+            <span className="bns-btn-label">{filterActive ? "Filtre aktif" : "Filtrele"}</span>
           </Button>
           <FilterPanel open={filterOpen} onClose={() => setFilterOpen(false)} deptFilter={deptFilter} setDeptFilter={setDeptFilter} prioFilter={prioFilter} setPrioFilter={setPrioFilter} filterActive={filterActive}/>
-          <Button kind="ghost" icon={<I.Refresh size={14}/>} onClick={onRefresh}>Yenile</Button>
+          <Button kind="ghost" icon={<I.Refresh size={14}/>} onClick={onRefresh}><span className="bns-btn-label">Yenile</span></Button>
         </div>}
       />
 

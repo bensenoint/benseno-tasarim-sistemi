@@ -63,7 +63,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
       />
 
       {/* Arama */}
-      <div style={{marginBottom:12}}>
+      <div className="bns-hide-mobile" style={{marginBottom:12}}>
         <div style={{display:"inline-flex", alignItems:"center", gap:6, background:"var(--paper)", border:"1px solid var(--line)", borderRadius:6, padding:"6px 10px", width:240}}>
           <I.Search size={13} style={{color:"var(--ink-4)", flexShrink:0}}/>
           <input value={search} onChange={e => setSearch(e.target.value)}

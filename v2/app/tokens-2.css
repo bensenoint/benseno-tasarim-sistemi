@@ -596,6 +596,10 @@ button:active,
   .bns-sticky-filters::-webkit-scrollbar { display: none; }
   .bns-sticky-filters > * { flex-shrink: 0; }
   .bns-hide-mobile { display: none !important; }
+  /* İkon-only butonlar: etiket gizli, sadece ikon (Filtrele/Yenile vb.) */
+  .bns-btn-label { display: none !important; }
+  /* Mobilde input/select/segment kompakt — dikeyde yer kaplamasın */
+  .bns-pagehead select, .bns-sticky-filters select, select.bns-compact { padding-top: 6px !important; padding-bottom: 6px !important; }
 
   /* Sticky filtre/segment satırı: scroller <main> içinde, header zaten dışında → top:0 */
   .bns-sticky-filters {
