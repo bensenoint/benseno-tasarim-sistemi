@@ -949,17 +949,20 @@ function ChatBot({ currentUser }) {
                     const advNone = adv && adv.state === "none";
                     const bc = brandColor(m.marka);
                     const initials = (m.lead && m.lead.name || "").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
+                    // Başlıktan "#no marka —" önekini çıkar → yalnız olay kalsın (üst satırda zaten var, tekrar olmasın)
+                    const titleText = (sel.text || "").replace(/^#\d+\s+[^—–-]*[—–-]\s*/, "").trim() || sel.text;
                     return (
-                      <div style={{ padding: "22px 24px 26px", display: "flex", flexDirection: "column", gap: 16 }}>
+                      <div style={{ padding: "18px 20px 22px", display: "flex", flexDirection: "column", gap: 13 }}>
                         {isM && <button onClick={() => setSelId(null)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", color: "var(--blue, #24479E)", cursor: "pointer", font: "600 13px/1 var(--font-sans)", padding: 0, display: "inline-flex", alignItems: "center", gap: 4 }}>‹ bildirimler</button>}
-                        <div style={{ font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--blue, #24479E)", display: "flex", alignItems: "center", gap: 6 }}><I.Bell size={12}/> {(m.marka || "Bildirim")}{m.no ? " · #" + m.no : ""}</div>
-                        <div style={{ font: "500 24px/1.2 var(--font-display)", fontStyle: "italic", color: "var(--ink)", letterSpacing: "-.01em" }}>{sel.text}</div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, font: "400 13px/1 var(--font-mono)", color: "var(--ink-3)", flexWrap: "wrap" }}>
-                          <span style={{ width: 9, height: 9, borderRadius: "50%", background: bc }}/>
-                          {m.marka && <span style={{ color: "var(--ink-2)", fontWeight: 600 }}>{m.marka}</span>}
+                        {/* Tek kompakt üst satır: #no · marka · zaman + atanan avatar (tekrar yok) */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", font: "600 11px/1.3 var(--font-mono)", color: "var(--ink-4)" }}>
+                          <span style={{ width: 8, height: 8, borderRadius: "50%", background: bc, flex: "none" }}/>
+                          {m.no && <span style={{ color: "var(--blue, #24479E)", fontWeight: 700 }}>#{m.no}</span>}
+                          {m.marka && <span style={{ color: "var(--ink-2)" }}>{m.marka}</span>}
                           <span>· {fmtNotifT(sel.created_at)}</span>
-                          {initials && <span title={m.lead.name} style={{ width: 24, height: 24, borderRadius: "50%", background: bc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", font: "700 9px var(--font-sans)" }}>{initials}</span>}
+                          {initials && <span title={m.lead.name} style={{ marginLeft: "auto", width: 22, height: 22, borderRadius: "50%", background: bc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", font: "700 9px var(--font-sans)" }}>{initials}</span>}
                         </div>
+                        <div style={{ font: "600 16px/1.35 var(--font-sans)", color: "var(--ink)", wordBreak: "break-word" }}>{titleText}</div>
                         {/* Marka/iş bağlam şeridi — kare, mavi sol şerit (yalnız iş eşleştiyse) */}
                         {(m.durum || m.rating > 0) && (
                           <div style={{ display: "flex", gap: "8px 18px", flexWrap: "wrap", padding: "11px 13px", border: "1px solid var(--line)", borderLeft: "3px solid var(--blue, #24479E)", background: "var(--paper-2)", font: "600 11px/1.4 var(--font-mono)", color: "var(--ink-3)" }}>
