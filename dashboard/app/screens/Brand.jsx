@@ -138,11 +138,11 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   const fromMs = from ? new Date(from + "T00:00:00").getTime() : null;
   const toMs = to ? new Date(to + "T23:59:59").getTime() : null;
   const inRange = ms => { if (ms == null) return !fromMs && !toMs ? true : false; if (fromMs && ms < fromMs) return false; if (toMs && ms > toMs) return false; return true; };
-  // "Yarın" (devam edecek): aktif işlerden bugün kapanmayacaklar — deadline yarın+sonrası
-  // VEYA gecikmiş (hâlâ aktif). Bugünün kalanında teslim edilecekler hariç. (now referans NOW)
+  // "Yarın" (devam edecek): deadline'ı yarın 00:00 ve sonrası olan aktif işler.
+  // Gecikmiş (bugün bitecek varsayılır) ve bugün teslim edilecekler HARİÇ. (now referans NOW)
   const _d = new Date(now);
   const startTom = new Date(_d.getFullYear(), _d.getMonth(), _d.getDate() + 1).getTime();
-  const continuesTomorrow = ms => ms != null && (ms >= startTom || ms < now);
+  const continuesTomorrow = ms => ms != null && ms >= startTom;
 
   const filteredActive = active.filter(b => {
     if (person && !activeIds(b).includes(person)) return false;
