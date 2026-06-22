@@ -1045,10 +1045,12 @@ try { window.BnsChatBot = ChatBot; } catch (e) {}
 function DateRangeControl({ range, onChange, now, compact }) {
   const [open, setOpen] = React.useState(false);
   const DAY = 86400000;
-  const PRESETS = [["7d","Son 7 gün",7],["30d","Son 30 gün",30],["90d","Son 90 gün",90],["year","Bu yıl",null],["all","Tümü",null]];
+  const PRESETS = [["today","Bugün",null],["yesterday","Dün",null],["7d","Son 7 gün",7],["30d","Son 30 gün",30],["90d","Son 90 gün",90],["year","Bu yıl",null],["all","Tümü",null]];
   function apply(code, days) {
     if (code === "all")  { onChange({ from: 0, to: 8.64e15, preset: "all" }); setOpen(false); return; }
     if (code === "year") { const f = new Date(new Date(now).getFullYear(), 0, 1).getTime(); onChange({ from: f, to: now, preset: "year" }); setOpen(false); return; }
+    if (code === "today")     { const d = new Date(now); const s = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); onChange({ from: s, to: now, preset: "today" }); setOpen(false); return; }
+    if (code === "yesterday") { const d = new Date(now); const s = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); onChange({ from: s - DAY, to: s - 1, preset: "yesterday" }); setOpen(false); return; }
     onChange({ from: now - days * DAY, to: now, preset: code }); setOpen(false);
   }
   const label = (PRESETS.find(p => p[0] === range.preset) || [null, "Özel aralık"])[1];
