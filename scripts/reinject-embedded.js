@@ -38,7 +38,9 @@ function main() {
   let live; try { live = JSON.parse(fs.readFileSync(LIVE, 'utf8')); } catch { logLine('live-data okunamadı'); return; }
   // Saf JSON EMBEDDED — backtick/template YOK. canvas_markdown live-data'da olmadığı için doğal olarak düşer.
   const body = 'window.EMBEDDED_DATA = ' + JSON.stringify(live, null, 2) + ';';
-  const re = /window\.EMBEDDED_DATA = \{[\s\S]*?\n\};/;
+  // </script> ile anchor'lı: blok ister satır-içi (…"};) ister girintili (\n};) bitsin yakalar.
+  // Eski /…\n\};/ regex'i agent'ın satır-içi yazdığı bloğu kaçırıp ham-newline SyntaxError'ını bırakıyordu.
+  const re = /window\.EMBEDDED_DATA = \{[\s\S]*?\};(?=\s*<\/script>)/;
 
   let changed = 0;
   for (const f of IDX) {
