@@ -72,10 +72,11 @@ function LoginScreen({ onLogin }) {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--ink-3, #5B5B66)', display: 'block', marginBottom: 6 }}>
+            <label htmlFor="bns-slackid" style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--ink-3, #5B5B66)', display: 'block', marginBottom: 6 }}>
               Slack ID
             </label>
             <input
+              id="bns-slackid" name="username" autoComplete="username"
               type="text" value={slackId} onChange={e => setSlackId(e.target.value)}
               placeholder="U0123ABCDEF" required autoFocus
               onFocus={() => setFocusField('slackId')}
@@ -84,10 +85,11 @@ function LoginScreen({ onLogin }) {
             />
           </div>
           <div style={{ marginBottom: 22 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--ink-3, #5B5B66)', display: 'block', marginBottom: 6 }}>
+            <label htmlFor="bns-password" style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--ink-3, #5B5B66)', display: 'block', marginBottom: 6 }}>
               Şifre
             </label>
             <input
+              id="bns-password" name="password"
               type="password" value={password} onChange={e => setPassword(e.target.value)}
               required autoComplete="current-password"
               onFocus={() => setFocusField('password')}
