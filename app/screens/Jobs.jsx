@@ -1,11 +1,15 @@
 // app/screens/Jobs.jsx — Aktif İşler tab. Supports table / kanban / cards view.
 
-function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief, onStatusChange }) {
+function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope, onOpenBrief, onStatusChange }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [scope, setScope] = React.useState(initialScope || "all");
   // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle
   React.useEffect(() => { if (initialScope) setScope(initialScope); }, [initialScope]);
   const [search, setSearch] = React.useState("");
   const [prioFilter, setPrioFilter] = React.useState("all");
+  // Mobil görünüm geçişi: tablo / liste / kanban (referans). Desktop tableMode prop'unu kullanır.
+  const [mView, setMView] = React.useState("table");
+  const view = isMobile ? mView : tableMode;
 
   // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
   // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
@@ -29,13 +33,42 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
       <PageHead
         title="Aktif işler"
         subtitle="11 sütun · sırala · filtrele · drawer'da düzenle"
-        actions={<>
+        actions={isMobile ? null : <>
           <Button kind="ghost" size="sm" icon={<I.Refresh size={13}/>}>Yenile</Button>
         </>}
       />
 
+      {/* Mobil: viewMode segmenti (referans) */}
+      {isMobile && setViewMode && (
+        <div style={{display:"flex", padding:3, background:"var(--paper-2)", borderRadius:11, gap:3, marginBottom:12}}>
+          {[["all","Tüm ekip"],["mine","Bana atanan"],["dept","Departmanım"]].map(([k,v]) => (
+            <button key={k} onClick={() => setViewMode(k)} style={{
+              flex:1, padding:"9px 6px", border:0, borderRadius:8, cursor:"pointer",
+              font:`${viewMode===k?700:500} 12.5px/1 var(--font-sans)`,
+              background: viewMode===k ? "var(--surface)" : "transparent",
+              color: viewMode===k ? "var(--ink)" : "var(--ink-3)",
+              boxShadow: viewMode===k ? "0 1px 3px rgba(0,0,0,.08)" : "none", transition:"all 150ms",
+            }}>{v}</button>
+          ))}
+        </div>
+      )}
+
+      {/* Mobil: görünüm geçişi (tablo / liste / kanban) — referans ikon segment */}
+      {isMobile && (
+        <div style={{display:"flex", padding:3, border:"1px solid var(--line)", borderRadius:10, gap:2, marginBottom:12, width:"fit-content"}}>
+          {[["table", <I.Grid size={15}/>], ["list", <I.List size={15}/>], ["kanban", <I.Columns size={15}/>]].map(([k, ic]) => (
+            <button key={k} onClick={() => setMView(k)} aria-label={k} style={{
+              padding:"7px 13px", border:0, borderRadius:7, cursor:"pointer",
+              display:"inline-flex", alignItems:"center", justifyContent:"center",
+              background: mView===k ? "var(--ember-tint)" : "transparent",
+              color: mView===k ? "var(--ember)" : "var(--ink-4)", transition:"all 150ms",
+            }}>{ic}</button>
+          ))}
+        </div>
+      )}
+
       {/* Filter row */}
-      <div style={{
+      <div className="bns-sticky-filters" style={{
         display:"flex", alignItems:"center", gap: 12, marginBottom: 14, flexWrap:"wrap"
       }}>
         <Segment
@@ -52,17 +85,17 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
           <PrioFilter value={prioFilter} onChange={setPrioFilter}/>
         </div>
 
-        <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
+        <span className="bns-hide-mobile" style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
           Kapsam: <span style={{color:"var(--ink)"}}>{viewMode==="mine" ? "bana atanmış" : viewMode==="dept" ? "departmanım" : "tüm ekip"}</span>
         </span>
 
-        <div style={{marginLeft:"auto", display:"flex", gap: 8, alignItems:"center"}}>
+        <div className="bns-hide-mobile" style={{marginLeft:"auto", display:"flex", gap: 8, alignItems:"center"}}>
           <SearchBox value={search} onChange={setSearch}/>
         </div>
       </div>
 
-      {tableMode === "kanban" ? <KanbanView rows={rows} onOpenBrief={onOpenBrief}/> :
-       tableMode === "cards"  ? <CardsView  rows={rows} onOpenBrief={onOpenBrief}/> :
+      {view === "kanban" ? <KanbanView rows={rows} onOpenBrief={onOpenBrief}/> :
+       view === "cards" || view === "list" ? <CardsView rows={rows} onOpenBrief={onOpenBrief}/> :
        <BriefTable rows={rows} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>}
 
       <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop: 14, font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", flexWrap:"wrap", gap:8}}>
@@ -75,14 +108,14 @@ function JobsScreen({ data, user, viewMode, tableMode, initialScope, onOpenBrief
 
 function Segment({ value, onChange, options }) {
   return (
-    <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8, flexWrap:"wrap"}}>
+    <div style={{display:"inline-flex", padding:2, border:"1px solid var(--line)", borderRadius:6, flexWrap:"wrap"}}>
       {options.map(([k,v]) => (
         <button key={k} onClick={() => onChange(k)} style={{
-          font:"500 12px/1 var(--font-sans)",
-          padding:"6px 10px", border:0, cursor:"pointer", borderRadius:6,
-          background: value===k ? "var(--surface)" : "transparent",
-          color: value===k ? "var(--ink)" : "var(--ink-3)",
-          boxShadow: value===k ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
+          font:`${value===k?600:500} 12px/1 var(--font-sans)`,
+          padding:"6px 11px", border:0, cursor:"pointer", borderRadius:4,
+          background: value===k ? "var(--paper-2)" : "transparent",
+          color: value===k ? "var(--ink)" : "var(--ink-4)",
+          transition:"background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1)"
         }}>{v}</button>
       ))}
     </div>
@@ -191,6 +224,35 @@ function KanbanView({ rows, onOpenBrief }) {
 
 // ─── CARDS VIEW ─────────────────────────────────────────────────────────────
 function CardsView({ rows, onOpenBrief }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+
+  // Mobil: kompakt 2-satır özet satırları (tıkla → detay bottom-sheet). Desktop: tam kart.
+  if (isMobile) {
+    return (
+      <div style={{display:"flex", flexDirection:"column", gap: 0, border:"1px solid var(--line)"}}>
+        {rows.map((b, i) => (
+          <button key={b.id} onClick={() => onOpenBrief(b)} style={{
+            display:"flex", flexDirection:"column", gap: 5, padding:"11px 13px",
+            background: i % 2 ? "var(--row-stripe)" : "transparent",
+            border: 0, borderTop: i ? "1px solid var(--line-soft)" : "none",
+            cursor:"pointer", textAlign:"left", color:"var(--ink)", width:"100%",
+          }}>
+            <div style={{display:"flex", alignItems:"baseline", gap: 8}}>
+              <span style={{flex:1, minWidth:0, font:"500 14px/1.25 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{b.baslik}</span>
+              <span style={{flexShrink:0, font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{b.no}</span>
+            </div>
+            <div style={{display:"flex", alignItems:"center", gap: 10, flexWrap:"wrap"}}>
+              <BrandChip brand={b.brand} size="sm"/>
+              <StatusPill status={b.durum}/>
+              {b.deltaH != null && <span style={{font:"500 11px/1 var(--font-mono)", color:(b.deltaH<=8?"var(--prio-red)":"var(--ink-4)")}}>{formatDelta(b.deltaH)}</span>}
+              <span style={{marginLeft:"auto", font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>{formatDate(b.deadline)}</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))", gap: 12}}>
       {rows.map(b => (

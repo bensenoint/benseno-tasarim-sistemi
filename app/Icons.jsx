@@ -13,6 +13,8 @@ const I = {
   Calendar:(p) => <Ic {...p}><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></Ic>,
   Clock:   (p) => <Ic {...p}><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></Ic>,
   Grid:    (p) => <Ic {...p}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></Ic>,
+  List:    (p) => <Ic {...p}><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></Ic>,
+  Columns: (p) => <Ic {...p}><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></Ic>,
   Filter:  (p) => <Ic {...p}><path d="M3 6h18M6 12h12M9 18h6"/></Ic>,
   Plus:    (p) => <Ic {...p}><path d="M12 5v14M5 12h14"/></Ic>,
   Right:   (p) => <Ic {...p}><path d="M5 12h14M13 6l6 6-6 6"/></Ic>,

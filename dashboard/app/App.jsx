@@ -131,10 +131,23 @@ function App({ currentUser, onLogout }) {
   const [user, setUser] = React.useState(
     () => data.USERS.find(u => u.id === currentUser?.slack_id) || data.ME);
   const [tab, setTab] = React.useState("overview");
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false); // alt-nav "Menü" drawer'ı (Ody'yi gizlemek için App'te)
   const [jobsScope, setJobsScope] = React.useState("all"); // Overview KPI → Jobs deep-link filtresi
   const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
   // Normal navigasyon (sidebar/alt-nav/buton): Jobs'a giderken KPI deep-link filtresini sıfırla
-  const navTo = (id) => { if (id === "jobs") setJobsScope("all"); setTab(id); };
+  const navTo = (id) => {
+    if (typeof navigator !== "undefined" && navigator.vibrate) { try { navigator.vibrate(6); } catch (e) {} }
+    // Native: zaten açık sekmeye tekrar dokun → en üste yumuşak kaydır
+    if (id === tab) {
+      try {
+        const sc = document.querySelector(".bns-main-content");
+        if (sc && sc.scrollTop > 0) sc.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (e) { window.scrollTo(0, 0); }
+      return;
+    }
+    if (id === "jobs") setJobsScope("all"); setTab(id);
+  };
   // Marka chip'lerinden detay sayfasına gidiş (BrandChip → window.bnsOpenBrand)
   const [brandSel, setBrandSel] = React.useState(null);
   React.useEffect(() => {
@@ -174,8 +187,8 @@ function App({ currentUser, onLogout }) {
   const offlineFailsRef = React.useRef(0);             // ardışık başarısız poll sayısı
   // ─── Tarih aralığı filtresi (global) — açılışta son 30 gün ──────────────
   const [dateRange, setDateRange] = React.useState(() => {
-    const now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
-    return { from: now - 30 * 86400000, to: now, preset: "30d" };
+    // Varsayılan: Tümü → hiçbir şey daralmaz; kullanıcı aralık SEÇİNCE her yer süzülür.
+    return { from: 0, to: 8.64e15, preset: "all" };
   });
   const everLoadedRef = React.useRef(false);           // en az bir kez canlı veri yüklendi mi
 
@@ -230,19 +243,38 @@ function App({ currentUser, onLogout }) {
   const filteredBriefs    = React.useMemo(() => filterByViewMode(briefs),         [filterByViewMode, briefs]);
   const filteredCompleted = React.useMemo(() => filterByViewMode(data.completed), [filterByViewMode, data.completed, briefs]);
 
-  // Tarih aralığı (akıllı): aktif işler her zaman görünür (filteredBriefs dokunulmaz);
-  // tamamlanan işler tamamlanma tarihine (bitis) göre aralıkta süzülür.
-  const dateFilteredCompleted = React.useMemo(() => filteredCompleted.filter(c => {
-    const t = c.bitis;
+  // Tarih aralığı: AKTİF işler her zaman tam görünür (filteredBriefs dokunulmaz).
+  // Yalnız tamamlanan işler tamamlanma tarihine (bitis) göre aralıkta süzülür;
+  // geçmiş (history) olay tarihine göre süzülür. Tarihi olmayan kayıt gizlenmez.
+  const inDateRange = React.useCallback((t) => {
     if (t == null) return true;
     return t >= dateRange.from && t <= dateRange.to;
-  }), [filteredCompleted, dateRange]);
+  }, [dateRange]);
+  const dateFilteredCompleted = React.useMemo(
+    () => filteredCompleted.filter(c => inDateRange(c.bitis)),
+    [filteredCompleted, inDateRange]
+  );
+  // Geçmiş/aktivite akışı olay zamanına (a.t, ms) göre süzülür.
+  // NOT: data.history = sparkline verisidir (FİLTRELENMEZ); data.activity = olay log'u.
+  const dateFilteredActivity = React.useMemo(() => {
+    const acts = data.activity;
+    if (!Array.isArray(acts)) return acts;
+    return acts.filter(a => inDateRange(a.t != null ? a.t : null));
+  }, [data.activity, inDateRange]);
 
-  // Live data shape — briefs ve completed artık filtered (viewMode + tarih aralığı)
-  const liveData = { ...data, briefs: filteredBriefs, completed: dateFilteredCompleted, _allBriefs: briefs, _allCompleted: data.completed, brandStats, history, dateRange };
+  // Live data shape — completed + activity tarih aralığına göre süzülür; aktif briefs ve spark history tam.
+  const liveData = { ...data, briefs: filteredBriefs, completed: dateFilteredCompleted, activity: dateFilteredActivity, _allBriefs: briefs, _allCompleted: data.completed, _allActivity: data.activity, brandStats, history, dateRange };
 
   // ─── Effects: apply tweak tokens to <html> ────────────────────────────
-  React.useEffect(() => { document.documentElement.setAttribute("data-theme", t.theme); }, [t.theme]);
+  React.useEffect(() => {
+    document.documentElement.setAttribute("data-theme", t.theme);
+    // PWA durum çubuğu rengini header (--paper) ile eşle — temayla birlikte değişir
+    try {
+      const m = document.querySelector('meta[name="theme-color"]');
+      const paper = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim();
+      if (m && paper) m.setAttribute("content", paper);
+    } catch (e) {}
+  }, [t.theme]);
   React.useEffect(() => { document.documentElement.setAttribute("data-density", t.density); }, [t.density]);
   React.useEffect(() => { document.documentElement.setAttribute("data-noise", t.noise ? "on" : "off"); }, [t.noise]);
   React.useEffect(() => {
@@ -494,17 +526,17 @@ function App({ currentUser, onLogout }) {
                             Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode}
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
                                        onOpenBrief={onOpenBrief} onSwitchTab={navTo} onJumpJobs={jumpToJobs} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
-  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} initialScope={jobsScope} tableMode={isMobile && t.tableMode === "table" ? "cards" : t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
+  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode} initialScope={jobsScope} tableMode={t.tableMode} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} currentUser={currentUser} initialSel={profileSel}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "musteride")Screen = <MusterideScreen data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "completed")Screen = <CompletedScreen data={liveData} onOpenBrief={onOpenCompleted} currentUser={currentUser}/>;
   else if (tab === "dept-comp")Screen = <DeptCompareScreen data={liveData}/>;
-  else if (tab === "design")   Screen = <DepartmentScreen data={liveData} role="tasarim" onOpenBrief={onOpenBrief}/>;
-  else if (tab === "editor")   Screen = <DepartmentScreen data={liveData} role="editor"  onOpenBrief={onOpenBrief}/>;
-  else if (tab === "ai")       Screen = <DepartmentScreen data={liveData} role="ai"      onOpenBrief={onOpenBrief}/>;
-  else if (tab === "freelance") Screen = <DepartmentScreen data={liveData} role="freelance" onOpenBrief={onOpenBrief}/>;
+  else if (tab === "design")   Screen = <DepartmentScreen data={liveData} role="tasarim" currentUser={currentUser} onOpenBrief={onOpenBrief}/>;
+  else if (tab === "editor")   Screen = <DepartmentScreen data={liveData} role="editor"  currentUser={currentUser} onOpenBrief={onOpenBrief}/>;
+  else if (tab === "ai")       Screen = <DepartmentScreen data={liveData} role="ai"      currentUser={currentUser} onOpenBrief={onOpenBrief}/>;
+  else if (tab === "freelance") Screen = <DepartmentScreen data={liveData} role="freelance" currentUser={currentUser} onOpenBrief={onOpenBrief}/>;
   else if (tab === "gallery")  Screen = <GalleryScreen  data={liveData}/>;
   else if (tab === "multi")    Screen = <MultiScreen    data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "brand")    Screen = <BrandScreen    data={liveData} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} initialSel={brandSel}/>;
@@ -533,6 +565,7 @@ function App({ currentUser, onLogout }) {
     <div data-screen-label={tab} style={{display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden", position:"relative"}}>
       <Header
         user={user}
+        tab={tab} onNav={navTo}
         viewMode={viewMode} setViewMode={setViewMode}
         dateRange={dateRange} setDateRange={setDateRange}
         theme={t.theme} setTheme={(v) => setTweak("theme", v)}
@@ -589,8 +622,14 @@ function App({ currentUser, onLogout }) {
 
       {/* MobileNav — always rendered, CSS controls visibility (display:none on desktop) */}
       <div className="bns-mobile-nav-wrap">
-        <MobileNav active={tab} onChange={navTo} data={liveData}/>
+        <MobileNav active={tab} onChange={navTo} data={liveData} menuOpen={mobileMenuOpen} setMenuOpen={setMobileMenuOpen}/>
       </div>
+
+      {/* PWA "ana ekrana ekle" banner'ı (mobil) */}
+      <InstallBanner/>
+
+      {/* Aşağı çekerek yenile (mobil) */}
+      <PullToRefresh/>
 
       {openBrief && (
         <BriefDrawer brief={openBrief} onClose={onCloseBrief}
@@ -613,7 +652,8 @@ function App({ currentUser, onLogout }) {
 
       {toast && <Toast msg={toast}/>}
       {/* 🤖 Sistem Asistanı — sağ alt yüzen sohbet */}
-      <ChatBot currentUser={currentUser}/>
+      {/* Ody — bir bottom-sheet/modal/menü açıkken gizle (üstüne binmesin, navigasyonu engellemesin) */}
+      {!(openBrief || newBrief || palette || mobileMenuOpen) && <ChatBot currentUser={currentUser}/>}
 
       <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>
 

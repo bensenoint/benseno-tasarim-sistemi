@@ -80,9 +80,9 @@ function TeamScreen({ data }) {
         <table style={{borderCollapse:"collapse", minWidth:480, font:"400 11px/1 var(--font-mono)", color:"var(--ink-2)"}}>
           <thead>
             <tr>
-              <th style={{
+              <th className="bns-mtx-h" style={{
                 position:"sticky", left: 0, top: 0, zIndex: 3,
-                background:"var(--surface-sub)", padding:"10px 12px",
+                background:"var(--paper)", padding:"10px 12px",
                 borderRight:"1px solid var(--line-strong)",
                 borderBottom:"1px solid var(--line-strong)",
                 font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
@@ -91,7 +91,7 @@ function TeamScreen({ data }) {
               }}>Kişi / Marka</th>
               {brands.map(b => (
                 <th key={b.name} title={b.name} style={{
-                  position:"sticky", top: 0, zIndex: 2, background:"var(--surface-sub)",
+                  position:"sticky", top: 0, zIndex: 2, background:"var(--paper)",
                   padding:"8px 6px", borderBottom:"1px solid var(--line-strong)",
                   font:"500 10px/1 var(--font-sans)", color:"var(--ink-3)",
                   height: 120, verticalAlign:"bottom", minWidth: 32
@@ -112,16 +112,16 @@ function TeamScreen({ data }) {
           <tbody>
             {users.map(u => (
               <tr key={u.id}>
-                <td style={{
-                  position:"sticky", left: 0, zIndex: 1, background:"var(--surface)",
+                <td className="bns-mtx-h" style={{
+                  position:"sticky", left: 0, zIndex: 1, background:"var(--paper)",
                   padding:"6px 12px", borderRight:"1px solid var(--line-strong)",
                   borderBottom:"1px solid var(--line-soft)",
                   font:"500 12px/1 var(--font-sans)", color:"var(--ink)",
                   display:"flex", alignItems:"center", gap:8, minWidth: 200
                 }}>
                   <Avatar user={u} size={20}/>
-                  <span onClick={() => window.bnsOpenUser && window.bnsOpenUser(u.id)} title={`${u.name} · profili aç`} style={{whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", cursor:"pointer"}}>{u.name}</span>
-                  <span style={{marginLeft:"auto", font:"500 10px/1 var(--font-mono)", color:"var(--ink-4)"}}>{u.rol}</span>
+                  <span className="bns-mtx-name" onClick={() => window.bnsOpenUser && window.bnsOpenUser(u.id)} title={`${u.name} · profili aç`} style={{whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", cursor:"pointer", minWidth:0}}>{u.name}</span>
+                  <span className="bns-mtx-role" style={{marginLeft:"auto", font:"500 10px/1 var(--font-mono)", color:"var(--ink-4)"}}>{u.rol}</span>
                 </td>
                 {brands.map(b => {
                   const v = (m[u.id] || {})[b.name] || 0;

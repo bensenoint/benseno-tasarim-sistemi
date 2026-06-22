@@ -7,13 +7,13 @@ function Card({ children, style, padding, accent, hover }) {
       onMouseEnter={() => hover && setHovered(true)}
       onMouseLeave={() => hover && setHovered(false)}
       style={{
-        background: "var(--surface)",
-        border: "1px solid var(--line)",
-        borderRadius: 12,
+        // Tam editoryal: KPI şeridiyle aynı malzeme — şeffaf zemin, köşesiz, hairline çerçeve, gölge yok
+        background: "transparent",
+        border: hovered ? "1px solid var(--line-strong)" : "1px solid var(--line)",
+        borderRadius: 0,
         padding: padding === 0 ? 0 : (padding || "var(--card-pad)"),
-        boxShadow: hovered ? "var(--shadow-2)" : "var(--shadow-card)",
-        transform: hovered ? "translateY(-1px)" : "none",
-        transition: "box-shadow 200ms var(--ease-out-quart), transform 200ms var(--ease-out-quart)",
+        boxShadow: "none",
+        transition: "border-color 200ms var(--ease-out-quart)",
         ...(accent ? { borderTop: `2px solid ${accent}` } : {}),
         ...style
       }}>
@@ -30,8 +30,8 @@ function CardHead({ title, sub, action, style }) {
     }}>
       <div style={{minWidth: 0}}>
         <h2 style={{
-          font: "600 15px/1.2 var(--font-sans)", color: "var(--ink)",
-          margin: 0, letterSpacing: "-0.005em"
+          font: "italic 500 18px/1.15 var(--font-display)", color: "var(--ink)",
+          margin: 0, letterSpacing: "0"
         }}>{title}</h2>
         {sub && <div style={{font: "400 12px/1.3 var(--font-sans)", color: "var(--ink-3)", marginTop: 4}}>{sub}</div>}
       </div>
@@ -40,8 +40,33 @@ function CardHead({ title, sub, action, style }) {
   );
 }
 
+// Sayıyı 0'dan değerine bir kez sayar (mount'ta). reduced-motion'da veya sayısal değilse anında.
+// Animasyon bitince null'a döner → canlı veri (poll güncellemeleri) doğrudan akar.
+function CountUp({ value }) {
+  const [disp, setDisp] = React.useState(null);
+  const startedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    const m = String(value).match(/^([^\d-]*)(-?\d+)([^\d]*)$/);
+    const rm = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!m || rm) return;                       // sayısal değil ya da reduced-motion → canlı değeri göster
+    const pre = m[1], target = parseInt(m[2], 10), suf = m[3];
+    let raf, t0;
+    const tick = (now) => {
+      if (!t0) t0 = now;
+      const p = Math.min(1, (now - t0) / 900), e = 1 - Math.pow(1 - p, 3);
+      if (p < 1) { setDisp(pre + Math.round(target * e) + suf); raf = requestAnimationFrame(tick); }
+      else setDisp(null);                       // bitti → canlı değer akar
+    };
+    raf = requestAnimationFrame(tick);
+    return () => raf && cancelAnimationFrame(raf);
+  }, []);
+  return disp == null ? value : disp;
+}
+
 // Kpi has three variants: "plain" | "trendchart" | "hero"
-function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, accent, onClick, active }) {
+function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, accent, onClick, active, emphasis, tint }) {
   const [hov, setHov] = React.useState(false);
   // Determine left-border accent color from color prop or trend
   const borderAccent = accent || color || null;
@@ -54,28 +79,22 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } } : undefined}
       style={{
-        background: "var(--surface)",
-        border: "1px solid var(--line)",
-        borderLeft: borderAccent ? `3px solid ${borderAccent}` : "1px solid var(--line)",
+        // Editoryal stat-ızgara hücresi: kart değil; hairline çizgiler KpiGrid + hücre kenarından.
+        // Semantik renk/accent taşıyan hücreler çok hafif ton yıkaması alır (monotonluğu kırar, nötr hücreler temiz kalır).
+        background: emphasis && tint ? tint
+          : hov ? "var(--paper-2)"
+          : borderAccent ? `color-mix(in srgb, ${borderAccent} 8%, var(--paper))`
+          : "transparent",
+        borderRight: "1px solid var(--line)",
+        borderBottom: "1px solid var(--line)",
         outline: active ? "2px solid var(--ember)" : "none",
         outlineOffset: -2,
-        borderRadius: 12,
-        padding: "14px 16px 12px",
-        display: "flex", flexDirection: "column", gap: 6, minWidth: 0,
-        position: "relative", overflow: "hidden",
+        padding: "18px 18px 16px",
+        display: "flex", flexDirection: "column", gap: 8, minWidth: 0,
+        position: "relative",
         cursor: onClick ? "pointer" : "default",
-        boxShadow: hov ? "var(--shadow-2)" : "var(--shadow-card)",
-        transform: hov ? "translateY(-1px)" : "none",
-        transition: "box-shadow 180ms var(--ease-out-quart), transform 180ms var(--ease-out-quart)",
+        transition: "background 160ms var(--ease-out-quart)",
       }}>
-      {/* subtle tint overlay matching border accent */}
-      {borderAccent && (
-        <div style={{
-          position:"absolute", inset:0, pointerEvents:"none",
-          background: `linear-gradient(135deg, ${borderAccent}08 0%, transparent 50%)`,
-          borderRadius: 12,
-        }}/>
-      )}
       <div style={{
         font: "600 10px/1 var(--font-sans)", color: "var(--ink-3)",
         letterSpacing: "0.08em", textTransform: "uppercase",
@@ -83,11 +102,11 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
         position: "relative",
       }}>{label}</div>
       <div style={{
-        font: `600 ${variant === "hero" ? 56 : "var(--kpi-fs)"}/1 var(--font-sans)`,
+        font: `500 ${variant === "hero" ? 56 : "var(--kpi-fs)"}/1 var(--font-display)`,
         color: color || "var(--ink)",
-        letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums",
+        letterSpacing: "-0.01em", fontVariantNumeric: "tabular-nums",
         position: "relative",
-      }}>{value}</div>
+      }}><CountUp value={value}/></div>
 
       {variant === "trendchart" && spark && (
         <Sparkline points={spark} color={color || "var(--ember)"}/>
@@ -103,14 +122,10 @@ function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, a
           {trend && (
             <span style={{
               display:"inline-flex", alignItems:"center", gap:3,
-              padding:"2px 6px", borderRadius:4,
-              background: trend.dir === "up" ? (trend.bad ? "var(--prio-red-bg)" : "var(--prio-green-bg)")
-                        : trend.dir === "down" ? (trend.good ? "var(--prio-green-bg)" : "var(--prio-red-bg)")
-                        : "var(--paper-2)",
               color: trend.dir === "up" ? (trend.bad ? "var(--danger)" : "var(--success)")
                    : trend.dir === "down" ? (trend.good ? "var(--success)" : "var(--danger)")
                    : "var(--ink-4)",
-              fontWeight: 600, fontSize: 10,
+              fontWeight: 600, fontSize: 11,
               flexShrink: 0,
             }}>
               {trend.dir === "up" ? "↑" : trend.dir === "down" ? "↓" : "→"} {trend.value}
@@ -146,48 +161,65 @@ function Sparkline({ points, color = "var(--ember)", w = 100, h = 32 }) {
     <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{display:"block", marginTop:2}}>
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.18"/>
-          <stop offset="100%" stopColor={color} stopOpacity="0.02"/>
+          <stop offset="0%" stopColor={color} stopOpacity="0.09"/>
+          <stop offset="100%" stopColor={color} stopOpacity="0"/>
         </linearGradient>
       </defs>
       <path d={area} fill={`url(#${gradId})`}/>
-      <path d={path} stroke={color} strokeWidth="1.5" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
+      <path d={path} stroke={color} strokeWidth="1.25" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
       {/* Last point dot */}
-      <circle cx={last.x.toFixed(1)} cy={last.y.toFixed(1)} r="2.5" fill={color} opacity="0.9"/>
+      <circle cx={last.x.toFixed(1)} cy={last.y.toFixed(1)} r="2" fill={color}/>
     </svg>
   );
 }
 
-function PageHead({ title, subtitle, actions, eyebrow }) {
+function PageHead({ title, subtitle, actions, eyebrow, lead }) {
   return (
-    <header style={{
+    <header className="bns-pagehead" style={{
       display: "flex", alignItems: "flex-end", justifyContent: "space-between",
-      gap: 16, padding: "22px 0 16px", flexWrap: "wrap",
-      borderBottom: "1px solid var(--line-soft)", marginBottom: 4,
+      gap: 16, padding: "24px 0 18px", flexWrap: "wrap",
+      borderBottom: "1px solid var(--line-strong)", marginBottom: 4,
     }}>
       <div style={{minWidth: 0, flex: "0 1 auto"}}>
-        {eyebrow && <div style={{
-          display:"inline-flex", alignItems:"center", gap:6,
-          font: "600 10px/1 var(--font-sans)", color:"var(--ink-4)",
-          letterSpacing:"0.10em", textTransform:"uppercase", marginBottom: 8,
-          padding:"3px 8px", borderRadius:4,
-          background:"var(--paper-2)", border:"1px solid var(--line)",
+        {lead}
+        {eyebrow && <div className="bns-ph-eyebrow" style={{
+          font: "italic 400 15px/1 var(--font-display)", color:"var(--ink-3)",
+          marginBottom: 12,
         }}>{eyebrow}</div>}
         <h1 style={{
           fontFamily: "var(--font-display)", fontStyle: "italic",
-          fontWeight: 400, fontSize: 30, lineHeight: 1.12, color: "var(--ink)",
-          margin: 0, letterSpacing: "-0.01em"
+          fontWeight: 400, fontSize: "clamp(34px, 4.5vw, 50px)", lineHeight: 1.04, color: "var(--ink)",
+          margin: 0, letterSpacing: "-0.02em", textWrap: "balance",
         }}>{title}</h1>
         {subtitle && (
-          <div style={{
+          <div className="bns-ph-sub" style={{
             fontFamily: "var(--font-sans)",
-            fontSize: 13, lineHeight: 1.5, color: "var(--ink-3)", marginTop: 6,
+            fontSize: 14, lineHeight: 1.6, color: "var(--ink-3)", marginTop: 12, maxWidth: "52ch",
             fontStyle: "normal", fontWeight: 400,
           }}>{subtitle}</div>
         )}
       </div>
       {actions && <div style={{display:"flex", gap:8, alignItems:"center", flexShrink:0, flexWrap:"wrap"}}>{actions}</div>}
     </header>
+  );
+}
+
+// MobileAccordion — mobilde uzun değerlendirme yazılarını katlar; desktop'ta içerik aynen (web değişmez).
+function MobileAccordion({ title, children, defaultOpen }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const [open, setOpen] = React.useState(!!defaultOpen);
+  if (!isMobile) return children;
+  return (
+    <div style={{ border: "1px solid var(--line)", marginBottom: 12, background: "var(--surface)", flex: "1 1 100%", width: "100%", minWidth: 0 }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+        gap: 8, padding: "11px 14px", background: "transparent", border: 0, cursor: "pointer", textAlign: "left",
+      }}>
+        <span style={{ font: "600 12px/1 var(--font-sans)", letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--ink-3)" }}>{title}</span>
+        <span style={{ display: "inline-flex", transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms", color: "var(--ink-4)" }}><I.ChevronDown size={15}/></span>
+      </button>
+      {open && <div style={{ padding: "0 14px 14px" }}>{children}</div>}
+    </div>
   );
 }
 
@@ -210,3 +242,4 @@ window.Kpi = Kpi;
 window.PageHead = PageHead;
 window.Sparkline = Sparkline;
 window.SectionTitle = SectionTitle;
+window.MobileAccordion = MobileAccordion;

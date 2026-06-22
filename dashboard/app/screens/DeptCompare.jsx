@@ -10,7 +10,7 @@ function DeptCompareScreen({ data }) {
 
   // active ve overdue'yu Department screen ile aynı mantıkla live hesapla
   const allBriefs    = data._allBriefs    || data.briefs    || [];
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
   const cutoff30 = Date.now() - 30 * 24 * 3600000;
 
   function deptRows(role) {
@@ -76,14 +76,14 @@ function DeptCompareScreen({ data }) {
         const sebep = (t, k) => (typeof window.bnsSebep === "function" && window.bnsSebep(t, k)) || null;
         const DEPT_TR = { tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "Freelance" };
         const Row = ({ label, avg, cnt, why, big }) => (
-          <div style={{display:"flex", alignItems:"flex-start", gap:12, padding:"9px 0", borderBottom:"1px solid var(--line-soft)"}}>
+          <div style={{display:"flex", flexWrap:"wrap", alignItems:"flex-start", gap:12, rowGap:6, padding:"9px 0", borderBottom:"1px solid var(--line-soft)"}}>
             <span style={{font:`${big?600:500} 13px/1.3 var(--font-sans)`, color:"var(--ink)", minWidth:150, flexShrink:0}}>{label}</span>
             <span style={{display:"inline-flex", gap:1, flexShrink:0, paddingTop:1}}>
               {[1,2,3,4,5].map(i => <I.StarFill key={i} size={12} color={i <= Math.round(avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
             </span>
             <span style={{font:"600 13px/1.3 var(--font-mono)", color:"var(--ink)", flexShrink:0}}>{avg}</span>
             <span style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)", flexShrink:0}}>({cnt} iş)</span>
-            {why && <span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}><Linkify text={why.sebep}/></span>}
+            {why && <MobileAccordion title="Değerlendirme"><span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", flex:"1 1 220px", minWidth:0, overflowWrap:"anywhere"}}><Linkify text={why.sebep}/></span></MobileAccordion>}
           </div>
         );
         return (

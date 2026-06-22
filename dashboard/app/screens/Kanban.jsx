@@ -8,7 +8,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     { id: "yeni",        label: "Yeni",        Ic: I.Inbox,  accent: "var(--ink-3)" },
     { id: "calisiliyor", label: "Çalışılıyor", Ic: I.Pencil, accent: "var(--info)" },
     { id: "incelemede",  label: "İncelemede",  Ic: I.User,   accent: "var(--warning)" },
-    { id: "musteride",   label: "✈️ Müşteri Onayında", Ic: I.Clock, accent: "#7c5cff" },
+    { id: "musteride",   label: "✈️ Müşteri Onayında", Ic: I.Clock, accent: "var(--musteride)" },
     { id: "blokeli",     label: "Blokeli",     Ic: I.Warn,   accent: "var(--danger)" },
     { id: "tamamlandi",  label: "Tamamlandı",  Ic: I.Check,  accent: "var(--success)" }
   ];
@@ -63,8 +63,8 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
       />
 
       {/* Arama */}
-      <div style={{marginBottom:12}}>
-        <div style={{display:"inline-flex", alignItems:"center", gap:6, background:"var(--surface-sub)", border:"1px solid var(--line)", borderRadius:8, padding:"6px 10px", width:240}}>
+      <div className="bns-hide-mobile" style={{marginBottom:12}}>
+        <div style={{display:"inline-flex", alignItems:"center", gap:6, background:"var(--paper)", border:"1px solid var(--line)", borderRadius:6, padding:"6px 10px", width:240}}>
           <I.Search size={13} style={{color:"var(--ink-4)", flexShrink:0}}/>
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Brief, marka, kişi…"
@@ -80,8 +80,8 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
           const items = col.id === "tamamlandi" ? completedAsBriefs : allBriefs.filter(b => b.durum === col.id);
           return (
             <div key={col.id} style={{
-              background:"var(--surface-sub)", border:"1px solid var(--line)",
-              borderRadius: 10, padding: 10,
+              background:"transparent", border:"1px solid var(--line)",
+              borderRadius: 0, padding: 10,
               display:"flex", flexDirection:"column", gap: 8,
               minWidth: 0, overflow:"hidden"
             }}>
@@ -95,7 +95,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
                 </span>
                 <span style={{
                   font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)",
-                  padding:"3px 6px", background:"var(--surface)", borderRadius: 4, border:"1px solid var(--line)"
+                  padding:"3px 6px", background:"var(--paper)", borderRadius: 4, border:"1px solid var(--line)"
                 }}>{items.length}</span>
               </div>
               <div style={{display:"flex", flexDirection:"column", gap: 8, flex:1, overflowY:"auto", overflowX:"hidden", maxHeight: "60vh", minWidth:0}}>
@@ -118,7 +118,7 @@ function KanbanCard({ brief, onClick }) {
   return (
     <button onClick={onClick} style={{
       display:"flex", flexDirection:"column", gap: 6, padding: "10px 10px 8px",
-      background:"var(--surface)", border:"1px solid var(--line)", borderRadius: 8,
+      background:"var(--paper)", border:"1px solid var(--line)", borderRadius: 0,
       cursor:"pointer", textAlign:"left", color:"var(--ink)",
       width:"100%", minWidth:0, boxSizing:"border-box"
     }}>

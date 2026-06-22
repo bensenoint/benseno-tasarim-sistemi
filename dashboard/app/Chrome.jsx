@@ -238,36 +238,56 @@ function odyMoodReason(mood, uid) {
 function odyFaceProd(mood) {
   var h = React.createElement, W = '#fff', PUP = '#16265c';
   var mk = function (k, st) { return h('div', { key: k, style: Object.assign({ background: W, borderRadius: '50%' }, st) }); };
+  // Canlı göz: bebek (pupil) + ufak ışık parıltısı — herhangi bir boyutta merkezlenir
+  var liveEye = function (k, w, hpx, st) {
+    var ps = Math.max(3.8, w * 0.48), gs = 2.6;
+    return h('div', { key: k, style: Object.assign({ position: 'relative', width: w + 'px', height: hpx + 'px', borderRadius: '50%', overflow: 'hidden',
+      background: 'radial-gradient(circle at 50% 26%, #fff 0%, #f4f5f9 42%, #CFD2DE 100%)',
+      boxShadow: 'inset 0 -2.2px 3px rgba(20,38,92,.30), inset 0 1.6px 1.6px rgba(255,255,255,1), 0 1px 1.6px rgba(13,25,66,.30)' }, st || {}) },
+      h('div', { key: 'sheen', style: { position: 'absolute', left: '12%', top: '5%', width: '76%', height: '34%', background: 'rgba(255,255,255,.85)', borderRadius: '50%' } }),
+      h('div', { key: 'p', style: { position: 'absolute', width: ps + 'px', height: ps + 'px', borderRadius: '50%',
+        background: 'radial-gradient(circle at 35% 26%, #4a66a0 0%, ' + PUP + ' 55%, #0b1640 100%)',
+        boxShadow: '0 0.6px 1.4px rgba(0,0,0,.42)',
+        left: (w / 2 - ps / 2) + 'px', top: (hpx / 2 - ps / 2 + 0.6) + 'px' } },
+        h('div', { key: 'rim', style: { position: 'absolute', width: (ps * 0.3) + 'px', height: (ps * 0.3) + 'px', background: 'rgba(185,205,255,.5)', borderRadius: '50%', right: '0.5px', bottom: '0.5px' } })),
+      h('div', { key: 'g', style: { position: 'absolute', width: gs + 'px', height: gs + 'px', background: '#fff', borderRadius: '50%', boxShadow: '0 0 1.6px rgba(255,255,255,.9)', left: (w / 2 - ps / 2 + 0.3) + 'px', top: (hpx / 2 - ps / 2 + 0.3) + 'px', zIndex: 2 } }));
+  };
+  // Boyutlu beyaz yüz objeleri (yay/yıldız/kapak/çizgi/kaş) — gözlerle aynı ton: gradyan + ince gölge
+  var WGRAD = 'linear-gradient(180deg, #fff 0%, #E4E6EE 100%)';
+  var faceShine = '0 1px 1.5px rgba(13,25,66,.32)';
+  var faceDrop = 'drop-shadow(0 1px 1px rgba(13,25,66,.35))';
   var left, right, anim = 'odyPop .42s ease', extra = null, gap = 8;
   if (mood === 'mutlu' || mood === 'neseli') {
-    var arc = function (k) { return h('div', { key: k, style: { width: '12px', height: '6px', borderTop: '3px solid ' + W, borderRadius: '12px 12px 0 0' } }); };
+    var arc = function (k) { return h('div', { key: k, style: { width: '12px', height: '6px', borderTop: '3px solid #fff', borderRadius: '12px 12px 0 0', filter: faceDrop } }); };
     left = arc('l'); right = arc('r'); if (mood === 'neseli') anim = 'odyBounce .8s ease-in-out infinite';
   } else if (mood === 'coskulu') {
-    var star = function (k) { return h('div', { key: k, style: { width: '13px', height: '13px', background: W, clipPath: 'polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)' } }); };
+    var star = function (k) { return h('div', { key: k, style: { width: '13px', height: '13px', background: WGRAD, filter: faceDrop, clipPath: 'polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)' } }); };
     left = star('l'); right = star('r'); anim = 'odyBounce .62s ease-in-out infinite';
   } else if (mood === 'heyecanli') {
-    var ex = function (k) { return h('div', { key: k, style: { position: 'relative', width: '12px', height: '12px', background: W, borderRadius: '50%' } }, h('div', { key: 'p', style: { position: 'absolute', width: '4px', height: '4px', background: PUP, borderRadius: '50%', left: '4px', top: '5px' } })); };
-    left = ex('l'); right = ex('r'); anim = 'odyBounce .72s ease-in-out infinite';
+    left = liveEye('l', 12, 12); right = liveEye('r', 12, 12); anim = 'odyBounce .72s ease-in-out infinite';
   } else if (mood === 'endiseli') {
-    var we = function (k, rot) { return h('div', { key: k, style: { position: 'relative', width: '7px', height: '10px', background: W, borderRadius: '50%', transform: 'rotate(' + rot + 'deg)' } }, h('div', { key: 'p', style: { position: 'absolute', width: '3px', height: '3px', background: PUP, borderRadius: '50%', left: '2px', top: '1.5px' } })); };
-    left = we('l', 15); right = we('r', -15); gap = 9;
+    left = liveEye('l', 8, 11, { transform: 'rotate(15deg)' }); right = liveEye('r', 8, 11, { transform: 'rotate(-15deg)' }); gap = 9;
   } else if (mood === 'kizgin') {
-    left = mk('l', { width: '7px', height: '8px' }); right = mk('r', { width: '7px', height: '8px' }); anim = 'odyShake .24s linear infinite';
-    extra = h('div', { key: 'x', style: { position: 'absolute', inset: 0, pointerEvents: 'none' } }, h('div', { key: 'bl', style: { position: 'absolute', top: '13px', left: '13px', width: '11px', height: '3px', background: W, borderRadius: '2px', transform: 'rotate(20deg)' } }), h('div', { key: 'br', style: { position: 'absolute', top: '13px', left: '26px', width: '11px', height: '3px', background: W, borderRadius: '2px', transform: 'rotate(-20deg)' } }));
+    left = liveEye('l', 8, 8); right = liveEye('r', 8, 8); anim = 'odyShake .24s linear infinite';
+    extra = h('div', { key: 'x', style: { position: 'absolute', inset: 0, pointerEvents: 'none' } }, h('div', { key: 'bl', style: { position: 'absolute', top: '13px', left: '13px', width: '11px', height: '3px', background: WGRAD, borderRadius: '2px', boxShadow: faceShine, transform: 'rotate(20deg)' } }), h('div', { key: 'br', style: { position: 'absolute', top: '13px', left: '26px', width: '11px', height: '3px', background: WGRAD, borderRadius: '2px', boxShadow: faceShine, transform: 'rotate(-20deg)' } }));
   } else if (mood === 'mesgul') {
-    left = mk('l', { width: '6px', height: '8px' }); right = mk('r', { width: '6px', height: '8px' });
+    left = liveEye('l', 8, 9); right = liveEye('r', 8, 9);
   } else if (mood === 'dusunuyor') {
-    left = mk('l', { width: '6px', height: '6px', transform: 'translateY(-2px)' }); right = mk('r', { width: '6px', height: '6px', transform: 'translateY(-2px)' });
+    left = liveEye('l', 8, 8, { transform: 'translateY(-2px)' }); right = liveEye('r', 8, 8, { transform: 'translateY(-2px)' });
   } else if (mood === 'uykulu') {
-    var lid = function (k) { return h('div', { key: k, style: { width: '10px', height: '4px', background: W, borderRadius: '0 0 10px 10px' } }); };
+    var lid = function (k) { return h('div', { key: k, style: { width: '10px', height: '4px', background: WGRAD, borderRadius: '0 0 10px 10px', boxShadow: faceShine } }); };
     left = lid('l'); right = lid('r');
   } else if (mood === 'uzgun') {
-    left = mk('l', { width: '7px', height: '8px', transform: 'translateY(2px)' }); right = mk('r', { width: '7px', height: '8px', transform: 'translateY(2px)' });
+    left = liveEye('l', 8, 9, { transform: 'translateY(2px)' }); right = liveEye('r', 8, 9, { transform: 'translateY(2px)' });
   } else if (mood === 'sikilmis') {
     // Sıkılmış: yarı kapalı düz gözler (meh / canı sıkkın)
-    left = mk('l', { width: '10px', height: '3px' }); right = mk('r', { width: '10px', height: '3px' }); gap = 7;
+    left = mk('l', { width: '10px', height: '3px', background: WGRAD, boxShadow: faceShine }); right = mk('r', { width: '10px', height: '3px', background: WGRAD, boxShadow: faceShine }); gap = 7;
   } else {
-    left = mk('l', { width: '7px', height: '11px', animation: 'odyBlink 4.6s infinite' }); right = mk('r', { width: '7px', height: '11px', animation: 'odyBlink 4.6s infinite' });
+    // Varsayılan: canlı bakan göz + hafif gülümseme — küçük ama karakterli
+    left = liveEye('l', 10, 12, { animation: 'odyBlink 4.6s infinite' });
+    right = liveEye('r', 10, 12, { animation: 'odyBlink 4.6s infinite' });
+    gap = 7;
+    extra = h('div', { key: 'm', style: { position: 'absolute', bottom: '12px', left: '50%', transform: 'translateX(-50%)', width: '11px', height: '5px', borderBottom: '2.5px solid ' + W, borderRadius: '0 0 11px 11px' } });
   }
   return h('div', { key: 'f-' + mood, style: { position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: gap + 'px', animation: anim || undefined } }, left, right, extra);
 }
@@ -287,9 +307,105 @@ function odyFxProd(host, mood) {
   else if (mood === 'uykulu') { for (var i = 0; i < 3; i++) (function (i) { setTimeout(function () { spawn('z', '#9a93a0', -6 + i * 6, 12); }, i * 420); })(i); }
 }
 
+// Bildirim için katmanlı danışman bağlamı (öncelik sırası):
+//  1) o işe yazılanlar (thread özeti / iş insight / puan sebebi)
+//  2) o marka için geçmiş (kanal özeti / son insight / marka değerlendirmesi)
+//  3) diğer markalardaki benzer işler (insight'lı tamamlananlar)
+//  4) ilgili kişinin değerlendirmesi + yıldız puanı (karşılaştırma için)
+function bnsAdviceContext(n) {
+  const D = window.BNS_DATA || {};
+  const E = window.EMBEDDED_DATA || {};
+  const text = (n && n.text) || "";
+  const clip = (s, k) => s ? String(s).replace(/\s+/g, " ").trim().slice(0, k) : "";
+  const noM = text.match(/#(\d+)/);
+  const no = noM ? parseInt(noM[1], 10) : null;
+  const briefs = D._allBriefs || D.briefs || [];
+  const completed = D._allCompleted || D.completed || [];
+  const job = no != null ? [...briefs, ...completed].find(b => b.no === no) : null;
+  const marka = (job && job.marka) || (text.split("—")[0] || "").replace(/#\d+/, "").trim();
+
+  // 1) İş
+  let jobCtx = "(bu işe dair kayıt yok)";
+  if (job) {
+    const p = [`#${job.no} ${clip(job.baslik, 80)} · durum: ${job.durum || job.delivery_status || "—"}` + (job.lead ? ` · atanan: ${job.lead.name}` : "")];
+    if (job.thread_ozet) p.push("thread özeti: " + clip(job.thread_ozet, 650));
+    if (job.insight) p.push("iş insight: " + clip(job.insight, 500));
+    if (job.rating_sebep) p.push("puan sebebi: " + clip(job.rating_sebep, 300));
+    if (job.rating) p.push("iş puanı: " + job.rating + "/5");
+    jobCtx = p.join("\n");
+  }
+
+  // 2) Marka
+  let brandCtx = "(marka geçmişi yok)";
+  const bObj = ((E.bns_brands) || []).find(b => b.name === marka) || ((D.BRANDS) || []).find(b => b.name === marka);
+  const bSebep = (typeof window.bnsSebep === "function") ? window.bnsSebep("marka", marka) : null;
+  {
+    const p = [];
+    if (bObj && bObj.son_insight) p.push("marka son insight: " + clip(bObj.son_insight, 420));
+    if (bObj && bObj.kanal_ozet) p.push("kanal özeti: " + clip(bObj.kanal_ozet, 380));
+    if (bSebep && bSebep.sebep) p.push(`marka değerlendirmesi (${bSebep.rating_avg || "?"}/5): ` + clip(bSebep.sebep, 380));
+    if (p.length) brandCtx = p.join("\n");
+  }
+
+  // 3) Diğer markalardaki benzer işler — iş tipi (başlıktan çıkarılır, kayıtlı alan yok) + kelime eşleşmesi.
+  //    Aynı iş tipindekiler öncelikli (skor 2), kelime eşleşenler (skor 1). Profil'deki tip mantığıyla aynı.
+  let simCtx = "(benzer iş bulunamadı)";
+  if (job && job.baslik) {
+    // İş tipi başlıktan çıkarılır (kayıtlı alan yok). Spesifik tipler önce gelir (ilk eşleşen kazanır).
+    const TYPES = [
+      ["3d/animasyon", ["3d", " render", "modelleme", "animasyon", "motion"]],
+      ["mailing", ["mailing", "e-posta", "eposta", "newsletter", "edm", "mail "]],
+      ["video kurgu", ["video", "reel", "kurgu", "montaj", "film", "klip", "youtube"]],
+      ["sosyal medya", ["sosyal", "sm ", "sm-", "instagram", "story", "post", "içerik plan", "icerik plan"]],
+      ["web/dijital", ["banner", "dijital", "display", "web", "website", "site", "landing", "ux", "ui", "arayüz"]],
+      ["bröşür/baskı", ["bröşür", "broşür", "katalog", "baskı", "davetiye", "afiş", "föy", "foy", "el ilanı"]],
+      ["ambalaj", ["ambalaj", "paket", "kutu", "etiket", "pouch", "label"]],
+      ["sunum/deck", ["sunum", "deck", "ppt", "slide", "rapor", "pitch"]],
+      ["logo/kimlik", ["logo", "kimlik", "identity", "kurumsal kimlik"]],
+      ["banner/görsel", ["görsel", "key visual", "kv", "poster", "billboard"]],
+    ];
+    const typeOf = (t) => { t = " " + (t || "").toLowerCase() + " "; for (const pair of TYPES) { if (pair[1].some(w => t.includes(w))) return pair[0]; } return null; };
+    const tType = typeOf(job.baslik + " " + (job.marka || ""));
+    const words = job.baslik.toLowerCase().split(/[^a-zçğıöşü0-9]+/).filter(w => w.length > 4);
+    const scored = completed.filter(c => c.no !== job.no && c.marka !== marka && c.insight && c.baslik)
+      .map(c => {
+        const sameType = tType && typeOf(c.baslik + " " + (c.marka || "")) === tType;
+        const kw = words.some(w => c.baslik.toLowerCase().includes(w));
+        return { c, score: (sameType ? 2 : 0) + (kw ? 1 : 0) };
+      })
+      .filter(x => x.score > 0)
+      .sort((a, b) => (b.score - a.score) || ((b.c.rating || 0) - (a.c.rating || 0)))
+      .slice(0, 5);
+    if (scored.length) {
+      simCtx = (tType ? `bu işin tipi: ${tType}\n` : "") +
+        scored.map(x => `• ${x.c.marka} #${x.c.no} ${clip(x.c.baslik, 40)} (puan ${x.c.rating || "?"}): ` + clip(x.c.insight, 200)).join("\n");
+    }
+  }
+
+  // 4) İlgili kişi — değerlendirme + yıldız
+  let personCtx = "(kişi değerlendirmesi yok)";
+  if (job && job.lead && job.lead.id) {
+    const r = D.ratings && D.ratings.users && D.ratings.users[job.lead.id];
+    const ps = (typeof window.bnsSebep === "function") ? window.bnsSebep("kisi", job.lead.id) : null;
+    const p = [job.lead.name + (r ? ` — yıldız: ${r.avg}/5 (${r.cnt} iş)` : "")];
+    if (ps && ps.sebep) p.push("değerlendirme: " + clip(ps.sebep, 360));
+    personCtx = p.join("\n");
+  }
+
+  // Bağlam tamamen boşsa (dört katman da varsayılan) → öneri üretme (API'ye gitme).
+  const weak = jobCtx === "(bu işe dair kayıt yok)" &&
+               brandCtx === "(marka geçmişi yok)" &&
+               simCtx === "(benzer iş bulunamadı)" &&
+               personCtx === "(kişi değerlendirmesi yok)";
+  return { marka, jobCtx, brandCtx, simCtx, personCtx, weak };
+}
+
 function ChatBot({ currentUser }) {
   const uid = (currentUser && (currentUser.slack_id || currentUser.id)) || null;
   const [open, setOpen] = React.useState(false);
+  const [tab, setTab] = React.useState("notif");   // panel sekmesi: "notif" (bildirim+öneri) | "chat" (sohbet)
+  const [selId, setSelId] = React.useState(null);   // master-detail: seçili bildirim (mobilde liste→detay)
+  const [notifFilter, setNotifFilter] = React.useState("all");   // liste filtresi: "all" | "unread"
   const [mood, setMood] = React.useState('neseli');
   const blobRef = React.useRef(null);
   const [msgs, setMsgs] = React.useState([]);   // {role:'user'|'assistant', content}
@@ -298,8 +414,12 @@ function ChatBot({ currentUser }) {
   const endRef = React.useRef(null);
   // Sürüklenebilir konum — balon/panel başlığından tutup taşınır; localStorage'da kalıcıdır.
   const [pos, setPos] = React.useState(() => {
+    const W = typeof window !== "undefined" ? window.innerWidth : 1200;
+    const H = typeof window !== "undefined" ? window.innerHeight : 800;
+    // Mobilde kaydedilmiş (masaüstü) konumu yok say — içeriği/menüyü kapatmasın; sol-altta, nav üstünde sabitle
+    if (W < 768) return { x: 14, y: H - 150 };
     try { const p = JSON.parse(localStorage.getItem("bns_ody_pos") || "null"); if (p && typeof p.x === "number" && typeof p.y === "number") return p; } catch (e) {}
-    return { x: 20, y: (typeof window !== "undefined" ? window.innerHeight : 800) - 76 };
+    return { x: 20, y: H - 76 };
   });
   const dragRef = React.useRef(null);
   const startDrag = (e, force) => {
@@ -334,6 +454,9 @@ function ChatBot({ currentUser }) {
   const [notifPeek, setNotifPeek] = React.useState(null); // kapalıyken gösterilen son bildirim (Ody'ye bağlı)
   const [notifCount, setNotifCount] = React.useState(0);  // okunmamış bildirim sayısı (blob rozeti)
   const [notifItems, setNotifItems] = React.useState([]); // tüm bildirimler (panelde liste — çan Ody'ye taşındı)
+  const [advice, setAdvice] = React.useState({});         // {notifId: {state:"loading"|"done"|"err", text}} — Ody'nin danışman önerisi
+  const [openAdvice, setOpenAdvice] = React.useState(null); // hangi bildirimin önerisi açık
+  const [advicePeek, setAdvicePeek] = React.useState(null); // boştayken dönüşümlü gösterilen öneri-balonu bildirimi
   const [brief, setBrief] = React.useState(null);         // günlük iş özeti (msgs'ten ayrı kart; görülünce kaybolur)
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
 
@@ -419,7 +542,7 @@ function ChatBot({ currentUser }) {
           setNotifCount(unread.length);
           if (!unread.length) { setNotifPeek(null); return; }
           const latest = unread.reduce((a, b) => (b.id > a.id ? b : a));
-          setNotifPeek(latest);
+          if (latest.id !== peekDismissedRef.current) setNotifPeek(latest);
           if (!open) setMood(odyMoodFromText(latest.text));
         }).catch(() => {});
     };
@@ -427,6 +550,46 @@ function ChatBot({ currentUser }) {
     const id = setInterval(poll, 30000);
     return () => { cancelled = true; clearInterval(id); };
   }, [open]);
+
+  // Bildirim balonu (notifPeek) 6 sn sonra otomatik kapanır — üst kontrolleri kalıcı kapatmasın.
+  // Okunmamış rozeti (notifCount) Ody'de kalır; tıklayınca yine açılır.
+  const peekDismissedRef = React.useRef(0);
+  React.useEffect(() => {
+    if (!notifPeek) return;
+    const t = setTimeout(() => { peekDismissedRef.current = notifPeek.id; setNotifPeek(null); }, 6000);
+    return () => clearTimeout(t);
+  }, [notifPeek]);
+
+  // Öneri-balonu döngüsü: öneriyi okumayan kullanıcı için, panel kapalı ve yeni-bildirim balonu
+  // yokken Ody boş anlarda önerilerin ÖZETİNİ dönüşümlü gösterir; kullanıcı tıklayıp okuyana kadar
+  // farklı bildirimleri sırayla sergiler. Tıklayınca detay açılır ve döngü durur.
+  var notifPeekRef = React.useRef(notifPeek); notifPeekRef.current = notifPeek;
+  var adviceRef = React.useRef(advice); adviceRef.current = advice;
+  var notifItemsRef = React.useRef(notifItems); notifItemsRef.current = notifItems;
+  var adviceCycleIdxRef = React.useRef(0);   // hangi öneriye sıra geldi
+  var adviceEngagedRef = React.useRef(false); // kullanıcı bir öneriye tıkladı mı → döngü dur
+  // Öneri metninden kısa balon özeti: madde işaretlerini/boş satırları temizle, ilk anlamlı cümle.
+  const adviceSummary = (t) => {
+    if (!t) return "";
+    const first = String(t).split(/\n+/).map(s => s.replace(/^[•\-\*\d\.\)\s]+/, "").trim()).filter(Boolean)[0] || "";
+    return first.length > 130 ? first.slice(0, 127) + "…" : first;
+  };
+  React.useEffect(() => {
+    const ADVICE_CYCLE_MS = 11000;
+    const tick = () => {
+      if (openRef.current || adviceEngagedRef.current) { setAdvicePeek(null); return; }
+      if (notifPeekRef.current) { setAdvicePeek(null); return; }   // yeni-bildirim balonuyla çakışma
+      const items = (notifItemsRef.current || []).slice(0, 6);
+      const ready = items.filter(n => { const a = adviceRef.current[n.id]; return a && a.state === "done" && adviceSummary(a.text); });
+      if (!ready.length) { setAdvicePeek(null); return; }
+      const idx = adviceCycleIdxRef.current % ready.length;
+      adviceCycleIdxRef.current = idx + 1;
+      setAdvicePeek(ready[idx]);
+    };
+    const t0 = setTimeout(tick, 4000);       // ilk balon için kısa gecikme
+    const id = setInterval(tick, ADVICE_CYCLE_MS);
+    return () => { clearTimeout(t0); clearInterval(id); };
+  }, []);
 
   // Tüm bildirimleri okundu işaretle (panel kapanınca): sunucu + optimistik → Ody normale döner.
   const markNotifRead = () => {
@@ -481,6 +644,77 @@ function ChatBot({ currentUser }) {
     } catch (e) {}
   };
 
+  // Bildirim için Ody'nin danışman önerisi — geçmiş thread/insight'lara göre ne yapılmalı/uyarı/yönlendirme.
+  // /api/chat zaten sistem verisine (kişiye özel) erişiyor; bildirim metnini verip danışman gibi yorum istiyoruz.
+  const adviceReqRef = React.useRef({});   // tekrar istek/loop önleme (id bazlı)
+  const fetchAdvice = (n) => {
+    if (!n || adviceReqRef.current[n.id]) return;
+    if (advice[n.id] && (advice[n.id].state === "done" || advice[n.id].state === "none")) return;
+    const ck = "bns_ody_advice2_" + n.id;   // v2: yetersiz bağlamda "YOK" döner → öneri gizlenir
+    try {
+      const c = localStorage.getItem(ck);
+      if (c != null) { setAdvice(a => ({ ...a, [n.id]: c === "YOK" ? { state: "none", text: "" } : { state: "done", text: c } })); return; }
+    } catch (e) {}
+    const c = bnsAdviceContext(n);
+    // Hiç bağlam yoksa öneri üretme — boş/dolgu mesaj yazma.
+    if (c.weak) { try { localStorage.setItem(ck, "YOK"); } catch (e) {} setAdvice(a => ({ ...a, [n.id]: { state: "none", text: "" } })); return; }
+    adviceReqRef.current[n.id] = true;
+    setAdvice(a => ({ ...a, [n.id]: { state: "loading", text: "" } }));
+    const PROMPT =
+      "Şu bildirim geldi: \"" + (n.text || "") + "\".\n\n" +
+      "Aşağıdaki bağlamı ÖNCELİK SIRASIYLA kullanarak değerlendir (1 en öncelikli):\n\n" +
+      "1) BU İŞE YAZILANLAR:\n" + c.jobCtx + "\n\n" +
+      "2) BU MARKA İÇİN GEÇMİŞ:\n" + c.brandCtx + "\n\n" +
+      "3) DİĞER MARKALARDAKİ BENZER İŞLER (aynı iş tipi öncelikli):\n" + c.simCtx + "\n\n" +
+      "4) İLGİLİ KİŞİNİN DEĞERLENDİRMESİ VE YILDIZ PUANI (bununla karşılaştır):\n" + c.personCtx + "\n\n" +
+      "Bu katmanları sentezle; işin/markanın geçmişini kişinin yıldız puanı ve değerlendirmesiyle KARŞILAŞTIR. " +
+      "TON: net, doğrudan, uyarıcı bir proje danışmanı — riski açıkça söyle, temenni/gevşek cümle kurma. " +
+      "Risk varsa neyin yanlış gidebileceğini ve sonucunu belirt (örn. 'X yapılmazsa termin kayar'). " +
+      "EN FAZLA 3 madde (•), her madde TEK kısa cümle, gereksiz kelime yok. " +
+      "Mümkünse # numarası/markaya referans ver. Selam/giriş yazma, doğrudan maddelere geç. " +
+      "ÖNEMLİ: Bu bildirim için VERİYE DAYALI, SPESİFİK bir öneri/uyarı veremiyorsan (yalnızca genel/temenni " +
+      "cümle ya da 'teyit et / netleştir / elimde bağlam yok' türü dolgu yazabiliyorsan), yanıt olarak SADECE " +
+      "tek kelime yaz: YOK — başka hiçbir şey ekleme. Gerçek, spesifik bir içgörün varsa maddeleri yaz.";
+    (async () => {
+      try {
+        const r = await fetch(`${API}/api/chat`, {
+          method: "POST",
+          headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
+          body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }] }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.reply) {
+          const rep = String(j.reply).trim();
+          // Yetersiz bağlam → "YOK" (veya boş): öneri gösterme, dolgu mesaj yazma.
+          if (!rep || /^yok\.?$/i.test(rep)) {
+            try { localStorage.setItem(ck, "YOK"); } catch (e) {}
+            setAdvice(a => ({ ...a, [n.id]: { state: "none", text: "" } }));
+          } else {
+            try { localStorage.setItem(ck, rep); } catch (e) {}
+            setAdvice(a => ({ ...a, [n.id]: { state: "done", text: rep } }));
+          }
+        } else {
+          adviceReqRef.current[n.id] = false;   // hata → tekrar denenebilir
+          setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Öneri alınamadı, tekrar dene." } }));
+        }
+      } catch (e) {
+        adviceReqRef.current[n.id] = false;
+        setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Bağlantı hatası." } }));
+      }
+    })();
+  };
+  // Manuel aç/kapa (okunmuş bildirimler için)
+  const toggleAdvice = (n) => {
+    if (openAdvice === n.id) { setOpenAdvice(null); return; }
+    setOpenAdvice(n.id);
+    fetchAdvice(n);
+  };
+  // En yeni bildirimlerin önerisini BİLDİRİMLE BİRLİKTE otomatik getir (ilk 6, cache'li) — toggle arkasında kaybolmasın.
+  // (Panel açılınca okundu işaretlendiği için read/unread değil, sıraya göre.)
+  React.useEffect(() => {
+    (notifItems || []).slice(0, 6).forEach(fetchAdvice);
+  }, [notifItems]);
+
   const send = async () => {
     const q = input.trim();
     if (!q || busy) return;
@@ -502,6 +736,33 @@ function ChatBot({ currentUser }) {
     } finally { setBusy(false); }
   };
 
+  // Bildirimden detay-meta türet: metindeki #no eşleşen iş varsa marka/kişi/puan/durum döner; yoksa sade.
+  const notifMeta = (n) => {
+    const D = window.BNS_DATA || {};
+    const text = (n && n.text) || "";
+    const noM = text.match(/#(\d+)/); const no = noM ? parseInt(noM[1], 10) : null;
+    const briefs = D._allBriefs || D.briefs || [];
+    const completed = D._allCompleted || D.completed || [];
+    const job = no != null ? [...briefs, ...completed].find(b => b.no === no) : null;
+    const marka = (job && job.marka) || ((text.split("—")[0] || "").replace(/#\d+/, "").trim());
+    return { no, marka, lead: job && job.lead, rating: (job && job.rating) || 0,
+             durum: job && (job.durum || job.delivery_status), link: n && n.link };
+  };
+  // Marka adından kararlı renk (detayda marka noktası için).
+  const brandColor = (s) => { let h = 0; for (let i = 0; i < (s || "").length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return `hsl(${h} 52% 46%)`; };
+  // Gün etiketi (Bugün / Dün / tarih) — bildirim listesini gruplamak için.
+  const dayLabel = (iso) => {
+    try { const d = new Date(iso); const t = new Date(); const y = new Date(Date.now() - 86400000);
+      if (d.toDateString() === t.toDateString()) return "Bugün";
+      if (d.toDateString() === y.toDateString()) return "Dün";
+      return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long" }); } catch (e) { return ""; }
+  };
+  // Panel açılınca / sekme değişince masaüstünde ilk bildirimi otomatik seç (detay boş kalmasın).
+  React.useEffect(() => {
+    if (!open || tab !== "notif") return;
+    if (vw >= 768 && (!selId || !notifItems.some(n => n.id === selId)) && notifItems.length) setSelId(notifItems[0].id);
+  }, [open, tab, notifItems]);
+
   return (
     <>
       {/* Kapalıyken son bildirim balonu (soru ekranı dışında) — Ody'ye bağlı */}
@@ -509,16 +770,44 @@ function ChatBot({ currentUser }) {
         <button onClick={() => { setUnread(false); setOpen(true); markNotifRead(); }}
           title="Bildirimi aç"
           style={{
-            position: "fixed",
-            left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
-            top: Math.max(8, pos.y - 72),
-            zIndex: 89, width: 248, maxWidth: "calc(100vw - 24px)", textAlign: "left",
+            position: "fixed", zIndex: 89, textAlign: "left",
+            // Mobilde: üst banner (Ody konumundan bağımsız, içeriğe binmez). Desktop: Ody'ye bağlı.
+            ...(vw < 768 ? {
+              left: 8, right: 80, bottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 14px)", maxWidth: "none",
+            } : {
+              left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
+              top: Math.max(8, pos.y - 72), width: 248, maxWidth: "calc(100vw - 24px)",
+            }),
             border: "1px solid var(--line)", borderRadius: 12, background: "var(--surface)",
             boxShadow: "var(--shadow-2)", padding: "9px 12px", cursor: "pointer",
             animation: "odyPopIn .3s ease",
           }}>
           <div style={{ font: "700 9px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 5 }}>Ody · yeni bildirim</div>
           <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{notifPeek.text}</div>
+        </button>
+      )}
+      {/* Boştayken dönüşümlü ÖNERİ balonu — öneriyi okumayan kullanıcı için. Tıkla → detay açılır, döngü durur. */}
+      {!open && !notifPeek && advicePeek && (
+        <button onClick={() => {
+            adviceEngagedRef.current = true; setAdvicePeek(null);
+            setUnread(false); setOpen(true); setTab("notif"); setSelId(advicePeek.id); setOpenAdvice(advicePeek.id); fetchAdvice(advicePeek);
+          }}
+          title="Ody'nin önerisini aç"
+          style={{
+            position: "fixed", zIndex: 89, textAlign: "left",
+            ...(vw < 768 ? {
+              left: 8, right: 80, bottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 14px)", maxWidth: "none",
+            } : {
+              left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
+              top: Math.max(8, pos.y - 72), width: 248, maxWidth: "calc(100vw - 24px)",
+            }),
+            border: "1px solid var(--ody)", borderRadius: 12, background: "var(--surface)",
+            boxShadow: "var(--shadow-2)", padding: "9px 12px", cursor: "pointer",
+            animation: "odyPopIn .3s ease",
+          }}>
+          <div style={{ font: "700 9px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 5, display: "flex", alignItems: "center", gap: 4 }}>💡 Ody'nin önerisi</div>
+          <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{adviceSummary(advice[advicePeek.id] && advice[advicePeek.id].text)}</div>
+          <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ody)", marginTop: 6 }}>Detay için dokun →</div>
         </button>
       )}
       {/* Açma balonu */}
@@ -539,108 +828,213 @@ function ChatBot({ currentUser }) {
           <div ref={blobRef} style={{
             position: "relative", zIndex: 1, width: 54, height: 54,
             borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%",
-            background: "radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--ody) 55%, #fff) 0%, var(--ody) 52%, color-mix(in srgb, var(--ody) 72%, #000) 100%)",
-            boxShadow: "0 16px 28px -8px rgba(20,38,92,.45), 0 6px 12px -4px rgba(0,0,0,.22), inset 0 2px 5px rgba(255,255,255,.40), inset 0 -7px 11px -5px rgba(0,0,0,.30)",
+            background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)",
+            boxShadow: "0 10px 20px -8px rgba(20,38,92,.28)",
             display: "flex", alignItems: "center", justifyContent: "center",
             animation: "odyBob 4.5s ease-in-out infinite",
           }}>{odyFaceProd(mood)}</div>
           {notifCount > 0 && <span title={notifCount + " okunmamış bildirim"} style={{
-            position: "absolute", top: -1, right: -1, zIndex: 3, minWidth: 15, height: 15, padding: "0 3px",
+            position: "absolute", bottom: -3, right: -3, zIndex: 3, width: 18, height: 18, padding: 0,
             display: "inline-flex", alignItems: "center", justifyContent: "center",
-            borderRadius: 999, background: "var(--prio-red, #E5484D)", color: "#fff",
+            borderRadius: "50%", background: "#24479E", color: "#fff",
             font: "700 9px/1 var(--font-sans)", textAlign: "center",
-            border: "1.5px solid var(--surface, #fff)", boxShadow: "0 1px 3px -1px rgba(0,0,0,.3)",
+            border: "2px solid var(--paper)", boxShadow: "0 1px 3px -1px rgba(0,0,0,.3)",
             animation: "odyPopIn .3s ease",
           }}>{notifCount > 9 ? "9+" : notifCount}</span>}
         </button>
       )}
-      {open && (
-        <div style={{
-          position: "fixed", left: panelLeft, top: panelTop, zIndex: 90,
-          width: 380, maxWidth: "calc(100vw - 32px)", height: 520, maxHeight: "calc(100vh - 80px)",
-          background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14,
-          boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden",
-        }}>
-          <div onPointerDown={startDrag} title="Sürükleyerek taşı"
-            style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8, cursor: "grab", touchAction: "none", userSelect: "none" }}>
-            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--ody) 55%, #fff) 0%, var(--ody) 52%, color-mix(in srgb, var(--ody) 72%, #000) 100%)", boxShadow: "inset 0 1px 3px rgba(255,255,255,.4), inset 0 -3px 6px -2px rgba(0,0,0,.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {open && (() => {
+        const isM = vw < 768;
+        const panelW = tab === "notif" ? 720 : 400;
+        const panelH = 560;
+        const left = Math.min(Math.max(8, pos.x), Math.max(8, vw - (panelW + 12)));
+        const top  = Math.min(Math.max(8, pos.y - (panelH - 52)), Math.max(8, vh - (panelH + 12)));
+        const shell = isM
+          ? { position: "fixed", inset: 0, width: "100vw", height: "100dvh", borderRadius: 0, border: "none" }
+          : { position: "fixed", left, top, width: panelW, height: panelH, maxWidth: "calc(100vw - 16px)", maxHeight: "calc(100vh - 16px)", borderRadius: 14, border: "1px solid var(--line-strong)" };
+        const sel = notifItems.find(n => n.id === selId) || null;
+        const showList = isM ? !sel : true;
+        const showDetail = isM ? !!sel : true;
+        const selectNotif = (n) => { setSelId(n.id); fetchAdvice(n); };
+        // SegBtn — Bildirimler/Sohbet segment kontrolü (v2: kenar, r6, aktifte mavi alt çizgi)
+        const segBtn = (key, label, badge) => (
+          <button onClick={() => setTab(key)} style={{
+            border: 0, borderRight: key === "notif" ? "1px solid var(--line)" : 0, background: tab === key ? "var(--paper-2)" : "transparent",
+            color: tab === key ? "var(--ink)" : "var(--ink-4)", padding: "8px 14px", cursor: "pointer",
+            font: "600 12px/1 var(--font-sans)", position: "relative", display: "inline-flex", alignItems: "center", gap: 6,
+          }}>
+            {label}{badge > 0 && <span style={{ color: "var(--ody)", font: "700 10px/1 var(--font-mono)" }}>{badge}</span>}
+            {tab === key && <span style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "var(--blue, #24479E)" }}/>}
+          </button>
+        );
+        return (
+        <div style={Object.assign({ zIndex: 90, background: "var(--surface)", boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden" }, shell)}>
+          {/* Başlık — Ody + segment + kapat (sürüklenebilir; mobilde sabit) */}
+          <div onPointerDown={isM ? undefined : startDrag} title={isM ? undefined : "Sürükleyerek taşı"}
+            style={{ padding: "12px 14px", borderBottom: "1px solid var(--line-strong)", display: "flex", alignItems: "center", gap: 10, cursor: isM ? "default" : "grab", touchAction: "none", userSelect: "none", background: "var(--paper)", flex: "none" }}>
+            <span style={{ position: "relative", width: 32, height: 32, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
             </span>
-            <div style={{ flex: 1 }}>
-              <div style={{ font: "600 13px/1 var(--font-sans)", color: "var(--ink)" }}>Ody</div>
-              <div style={{ font: "400 10px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>kullanım · marka/iş/kişi soruları · öneri</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ font: "600 14px/1 var(--font-sans)", color: "var(--ink)", display: "flex", alignItems: "center", gap: 7 }}>Ody <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--ok, #2E8F66)" }}/></div>
+              <div style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>bildirim · öneri · sohbet</div>
             </div>
-            {msgs.length > 0 && <button onClick={() => setMsgs([])} title="Sohbeti temizle" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>temizle</button>}
-            <button onClick={() => { setOpen(false); markNotifRead(); dismissBrief(); }} style={{ border: 0, background: "transparent", color: "var(--ink-3)", cursor: "pointer", padding: 4, display: "inline-flex" }}><I.X size={15}/></button>
+            <div style={{ display: "flex", border: "1px solid var(--line-strong)", borderRadius: 6, overflow: "hidden", flex: "none" }}>
+              {segBtn("notif", "Bildirimler", notifCount)}
+              {segBtn("chat", "Sohbet", 0)}
+            </div>
+            <button onClick={() => { setOpen(false); markNotifRead(); dismissBrief(); }} title="Kapat" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", padding: 5, display: "inline-flex" }}><I.X size={16}/></button>
           </div>
-          <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* Bildirimler — belirgin alan */}
-            {notifItems.length > 0 && (
-              <div style={{ border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden", background: "var(--surface)", boxShadow: "var(--shadow-card)", flex: "none" }}>
-                <div style={{ padding: "9px 12px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 7, background: "var(--ody-tint)" }}>
-                  <span style={{ color: "var(--ody)", display: "inline-flex" }}><I.Bell size={13}/></span>
-                  <span style={{ flex: 1, font: "700 11px/1 var(--font-sans)", letterSpacing: ".06em", textTransform: "uppercase", color: "var(--ody)" }}>Bildirimler</span>
-                  {notifCount > 0 && <span style={{ minWidth: 18, height: 18, padding: "0 5px", borderRadius: 999, background: "var(--ody)", color: "#fff", font: "700 10px/18px var(--font-sans)", textAlign: "center" }}>{notifCount}</span>}
+
+          {/* GÖVDE */}
+          {tab === "notif" ? (
+            <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+              {/* SOL — bildirim listesi */}
+              {showList && (
+                <div style={{ width: isM ? "100%" : 312, flex: isM ? 1 : "none", borderRight: isM ? "none" : "1px solid var(--line-strong)", display: "flex", flexDirection: "column", minHeight: 0, background: "var(--paper)" }}>
+                  <div style={{ display: "flex", gap: 6, padding: 12, borderBottom: "1px solid var(--line)", flex: "none" }}>
+                    {[["all", "Tümü"], ["unread", "Okunmamış"]].map(([k, lbl]) => (
+                      <button key={k} onClick={() => setNotifFilter(k)} style={{
+                        border: "1px solid " + (notifFilter === k ? "var(--ody)" : "var(--line)"), background: "transparent",
+                        color: notifFilter === k ? "var(--ody)" : "var(--ink-3)", borderRadius: 999, padding: "6px 13px",
+                        font: "600 11px/1 var(--font-sans)", cursor: "pointer",
+                      }}>{lbl}</button>
+                    ))}
+                  </div>
+                  <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+                    {(() => {
+                      const list = notifItems.slice(0, 40).filter(n => notifFilter === "all" ? true : !n.read_at);
+                      if (!list.length) return <div style={{ padding: 24, textAlign: "center", font: "400 12px var(--font-sans)", color: "var(--ink-4)" }}>{notifFilter === "unread" ? "Okunmamış bildirim yok." : "Bildirim yok."}</div>;
+                      let lastDay = null;
+                      return list.map((n) => {
+                        const unread = !n.read_at;
+                        const active = n.id === selId;
+                        const dl = dayLabel(n.created_at);
+                        const head = dl !== lastDay ? (lastDay = dl, dl) : null;
+                        return (
+                          <React.Fragment key={n.id}>
+                            {head && <div style={{ padding: "10px 15px 6px", font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-4)", display: "flex", alignItems: "center", gap: 8 }}><span style={{ width: 14, height: 2, background: "var(--blue, #24479E)" }}/>{head}</div>}
+                            <div onClick={() => selectNotif(n)} style={{
+                              display: "flex", gap: 11, padding: "12px 15px", cursor: "pointer",
+                              borderBottom: "1px solid var(--line-soft)",
+                              borderLeft: "3px solid " + (active ? "var(--ody)" : unread ? "var(--blue, #24479E)" : "transparent"),
+                              background: active ? "var(--ody-tint)" : "transparent",
+                            }}>
+                              <span style={{ width: 24, height: 24, flex: "none", borderRadius: 4, border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: unread ? "var(--ody)" : "var(--ink-4)" }}><I.Bell size={12}/></span>
+                              <span style={{ flex: 1, minWidth: 0 }}>
+                                <span style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-2)" }}>{n.text}</span>
+                                <span style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 5, font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)" }}>
+                                  {fmtNotifT(n.created_at)}{n.link && <><span>·</span><span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}><I.Link size={10}/> Slack</span></>}
+                                </span>
+                              </span>
+                              {unread && <span style={{ width: 7, height: 7, flex: "none", marginTop: 7, borderRadius: "50%", background: "var(--blue, #24479E)" }}/>}
+                            </div>
+                          </React.Fragment>
+                        );
+                      });
+                    })()}
+                  </div>
                 </div>
-                <div style={{ maxHeight: msgs.length ? 150 : 300, overflowY: "auto" }}>
-                  {notifItems.slice(0, 30).map(n => {
-                    var unread = !n.read_at;
+              )}
+              {/* SAĞ — detay */}
+              {showDetail && (
+                <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "var(--surface)" }}>
+                  {!sel ? (
+                    <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, font: "400 13px var(--font-sans)", color: "var(--ink-4)", textAlign: "center" }}>Soldan bir bildirim seç.</div>
+                  ) : (() => {
+                    const m = notifMeta(sel);
+                    const adv = advice[sel.id];
+                    const advDone = adv && adv.state === "done" && (adv.text || "").trim();
+                    const advLoading = adv && adv.state === "loading";
+                    const advNone = adv && adv.state === "none";
+                    const bc = brandColor(m.marka);
+                    const initials = (m.lead && m.lead.name || "").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
                     return (
-                    <a key={n.id} href={n.link || "#"} target={n.link ? "_blank" : undefined} rel="noreferrer" style={{
-                      display: "flex", alignItems: "flex-start", gap: 8, padding: "9px 12px", textDecoration: "none",
-                      borderLeft: unread ? "3px solid var(--ody)" : "3px solid transparent",
-                      background: unread ? "var(--ody-tint)" : "transparent",
-                    }}>
-                      <span aria-hidden="true" style={{ marginTop: 5, flex: "none", width: 7, height: 7, borderRadius: "50%", background: unread ? "var(--ody)" : "transparent" }}/>
-                      <span style={{ flex: 1, minWidth: 0 }}>
-                        <span style={{ display: "block", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</span>
-                        <span style={{ display: "block", font: "400 10px/1 var(--font-sans)", color: unread ? "var(--ink-3)" : "var(--ink-5)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</span>
-                      </span>
-                    </a>
-                  );})}
+                      <div style={{ padding: "22px 24px 26px", display: "flex", flexDirection: "column", gap: 16 }}>
+                        {isM && <button onClick={() => setSelId(null)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", color: "var(--blue, #24479E)", cursor: "pointer", font: "600 13px/1 var(--font-sans)", padding: 0, display: "inline-flex", alignItems: "center", gap: 4 }}>‹ bildirimler</button>}
+                        <div style={{ font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--blue, #24479E)", display: "flex", alignItems: "center", gap: 6 }}><I.Bell size={12}/> {(m.marka || "Bildirim")}{m.no ? " · #" + m.no : ""}</div>
+                        <div style={{ font: "500 24px/1.2 var(--font-display)", fontStyle: "italic", color: "var(--ink)", letterSpacing: "-.01em" }}>{sel.text}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, font: "400 13px/1 var(--font-mono)", color: "var(--ink-3)", flexWrap: "wrap" }}>
+                          <span style={{ width: 9, height: 9, borderRadius: "50%", background: bc }}/>
+                          {m.marka && <span style={{ color: "var(--ink-2)", fontWeight: 600 }}>{m.marka}</span>}
+                          <span>· {fmtNotifT(sel.created_at)}</span>
+                          {initials && <span title={m.lead.name} style={{ width: 24, height: 24, borderRadius: "50%", background: bc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", font: "700 9px var(--font-sans)" }}>{initials}</span>}
+                        </div>
+                        {/* Marka/iş bağlam şeridi — kare, mavi sol şerit (yalnız iş eşleştiyse) */}
+                        {(m.durum || m.rating > 0) && (
+                          <div style={{ display: "flex", gap: "8px 18px", flexWrap: "wrap", padding: "11px 13px", border: "1px solid var(--line)", borderLeft: "3px solid var(--blue, #24479E)", background: "var(--paper-2)", font: "600 11px/1.4 var(--font-mono)", color: "var(--ink-3)" }}>
+                            {m.durum && <span>durum <b style={{ color: "var(--ink)" }}>{m.durum}</b></span>}
+                            {m.rating > 0 && <span>puan <span style={{ color: "var(--gold, #E2A100)", letterSpacing: 1 }}>{"★".repeat(Math.round(m.rating))}<span style={{ color: "var(--line-strong)" }}>{"★".repeat(Math.max(0, 5 - Math.round(m.rating)))}</span></span></span>}
+                          </div>
+                        )}
+                        {/* Ody önerisi — kare, ember sol şerit */}
+                        {advLoading ? (
+                          <div style={{ padding: "13px 15px", border: "1px solid var(--line)", borderLeft: "3px solid var(--ody)", background: "var(--paper-2)", font: "400 12.5px var(--font-sans)", color: "var(--ink-4)", fontStyle: "italic" }}>Ody düşünüyor…</div>
+                        ) : advDone ? (
+                          <div style={{ padding: "15px 16px", border: "1px solid var(--line)", borderLeft: "3px solid var(--ody)", background: "var(--paper-2)" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 11 }}>
+                              <span style={{ width: 16, height: 16, borderRadius: "55% 45% 58% 42% / 52% 48% 56% 44%", background: "var(--ody)", flex: "none" }}/> Ody'nin önerisi
+                            </div>
+                            <div style={{ font: "400 13px/1.6 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={adv.text}/></div>
+                          </div>
+                        ) : advNone ? (
+                          <div style={{ padding: "13px 15px", border: "1px dashed var(--line-strong)", background: "var(--paper-2)", font: "400 12.5px/1.6 var(--font-sans)", color: "var(--ink-4)", fontStyle: "italic" }}>Bu bildirim için yeterli bağlam yok.</div>
+                        ) : null}
+                        {/* Aksiyonlar — v2 Button yapısı (r6, hairline, 600/13) */}
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
+                          {sel.link && <a href={sel.link} target="_blank" rel="noreferrer" style={{ textDecoration: "none", border: "1px solid var(--ody)", background: "var(--ody)", color: "#fff", borderRadius: 6, padding: "9px 14px", font: "600 13px/1 var(--font-sans)", display: "inline-flex", alignItems: "center", gap: 6 }}><I.Link size={14}/> Slack thread'inde aç</a>}
+                          <button onClick={() => setTab("chat")} style={{ border: "1px solid var(--line-strong)", background: "var(--surface)", color: "var(--ink)", borderRadius: 6, padding: "9px 14px", font: "600 13px/1 var(--font-sans)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}><I.Bell size={14}/> Ody'ye sor</button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
-              </div>
-            )}
-            {/* Günlük iş özeti — görülünce (× veya panel kapanınca) otomatik kaybolur */}
-            {brief && (
-              <div style={{ border: "1px solid var(--ody-muted, var(--line))", borderRadius: 12, background: "var(--ody-tint)", padding: "11px 13px", flex: "none" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                  <span style={{ flex: 1, font: "700 10px/1 var(--font-sans)", letterSpacing: ".07em", textTransform: "uppercase", color: "var(--ody)" }}>Günlük özet</span>
-                  <button onClick={dismissBrief} title="Kapat" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", padding: 0, display: "inline-flex" }}><I.X size={13}/></button>
-                </div>
-                <div style={{ font: "400 12.5px/1.55 var(--font-sans)", color: "var(--ink)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={brief}/></div>
-              </div>
-            )}
-            {/* Sohbet — yalnız aktifken (soru sorulunca) açılır */}
-            {(msgs.length > 0 || busy) && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {msgs.map((m, i) => (
+              )}
+            </div>
+          ) : (
+            /* SOHBET sekmesi */
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+              <div style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 10, minHeight: 0 }}>
+                {brief && (
+                  <div style={{ border: "1px solid var(--line)", borderLeft: "3px solid var(--ody)", background: "var(--paper-2)", padding: "11px 13px", flex: "none" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                      <span style={{ flex: 1, font: "700 10px/1 var(--font-sans)", letterSpacing: ".07em", textTransform: "uppercase", color: "var(--ody)" }}>Günlük özet</span>
+                      <button onClick={dismissBrief} title="Kapat" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", padding: 0, display: "inline-flex" }}><I.X size={13}/></button>
+                    </div>
+                    <div style={{ font: "400 12.5px/1.55 var(--font-sans)", color: "var(--ink)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={brief}/></div>
+                  </div>
+                )}
+                {!msgs.length && !busy && !brief && <div style={{ margin: "auto", textAlign: "center", font: "400 13px/1.6 var(--font-sans)", color: "var(--ink-4)", maxWidth: 280 }}>Marka, iş veya kişi hakkında soru sor — Ody sistem verisiyle yanıtlar.</div>}
+                {msgs.map((mm, i) => (
                   <div key={i} style={{
-                    alignSelf: m.role === "user" ? "flex-end" : "stretch", maxWidth: m.role === "user" ? "85%" : "100%", width: m.role === "user" ? undefined : "100%",
-                    padding: "8px 11px", borderRadius: 10, boxSizing: "border-box",
-                    background: m.role === "user" ? "var(--ody)" : "var(--paper-2)",
-                    color: m.role === "user" ? "#fff" : "var(--ink)",
+                    alignSelf: mm.role === "user" ? "flex-end" : "stretch", maxWidth: mm.role === "user" ? "85%" : "100%", width: mm.role === "user" ? undefined : "100%",
+                    padding: "10px 13px", borderRadius: 10, boxSizing: "border-box",
+                    background: mm.role === "user" ? "var(--blue, #24479E)" : "var(--paper-2)",
+                    color: mm.role === "user" ? "#fff" : "var(--ink-2)",
+                    border: mm.role === "user" ? 0 : "1px solid var(--line)",
                     font: "400 13px/1.55 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word",
-                  }}>{m.role === "assistant" ? <Linkify text={m.content}/> : m.content}</div>
+                  }}>{mm.role === "assistant" ? <Linkify text={mm.content}/> : mm.content}</div>
                 ))}
-                {busy && <div style={{ alignSelf: "flex-start", padding: "8px 11px", borderRadius: 10, background: "var(--paper-2)", color: "var(--ink-4)", font: "400 13px/1 var(--font-sans)" }}>yazıyor…</div>}
+                {busy && <div style={{ alignSelf: "flex-start", padding: "10px 13px", borderRadius: 10, background: "var(--paper-2)", border: "1px solid var(--line)", color: "var(--ink-4)", font: "400 13px/1 var(--font-sans)" }}>yazıyor…</div>}
                 <div ref={endRef}/>
               </div>
-            )}
-          </div>
-          <div style={{ padding: 10, borderTop: "1px solid var(--line)", display: "flex", gap: 8 }}>
-            <input value={input} onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter") send(); }}
-              placeholder="Soru yaz…" disabled={busy}
-              style={{ flex: 1, padding: "9px 11px", border: "1px solid var(--line)", borderRadius: 8,
-                background: "var(--surface-sub)", color: "var(--ink)", font: "400 13px/1.3 var(--font-sans)", outline: "none" }}/>
-            <button onClick={send} disabled={busy || !input.trim()} style={{
-              padding: "0 14px", border: 0, borderRadius: 8, background: "var(--ody)", color: "#fff",
-              font: "600 13px/1 var(--font-sans)", cursor: busy ? "default" : "pointer", opacity: busy || !input.trim() ? 0.5 : 1,
-            }}>Gönder</button>
-          </div>
+              {msgs.length > 0 && <div style={{ padding: "0 16px 10px", flex: "none" }}><button onClick={() => setMsgs([])} style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>sohbeti temizle</button></div>}
+              <div style={{ padding: 12, borderTop: "1px solid var(--line-strong)", display: "flex", gap: 9, background: "var(--paper)", flex: "none" }}>
+                <input value={input} onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") send(); }}
+                  placeholder="Soru yaz…" disabled={busy}
+                  style={{ flex: 1, padding: "11px 14px", border: "1px solid var(--line-strong)", borderRadius: 6,
+                    background: "var(--surface)", color: "var(--ink)", font: "400 13px/1.3 var(--font-sans)", outline: "none" }}/>
+                <button onClick={send} disabled={busy || !input.trim()} style={{
+                  padding: "0 18px", border: 0, borderRadius: 6, background: "var(--ody)", color: "#fff",
+                  font: "600 13px/1 var(--font-sans)", cursor: busy ? "default" : "pointer", opacity: busy || !input.trim() ? 0.5 : 1,
+                }}>Gönder</button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+        );
+      })()}
     </>
   );
 }
@@ -660,11 +1054,15 @@ function DateRangeControl({ range, onChange, now, compact }) {
   const label = (PRESETS.find(p => p[0] === range.preset) || [null, "Özel aralık"])[1];
   const toYMD = (ms) => { const d = new Date(ms); return isNaN(d.getTime()) ? "" : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
   const parseYMD = (s, end) => { const p = (s||"").split("-").map(Number); if (!p[0]) return null; return new Date(p[0], p[1]-1, p[2], end?23:0, end?59:0, end?59:0).getTime(); };
+  // Özel aralık inputları: her açılışta başlangıç ve bitiş bugüne sıfırlanır.
+  const [cFrom, setCFrom] = React.useState("");
+  const [cTo, setCTo] = React.useState("");
+  React.useEffect(() => { if (open) { const t = toYMD(now); setCFrom(t); setCTo(t); } }, [open]);
   return (
     <div style={{ position: "relative", flexShrink: 0 }}>
       <button onClick={() => setOpen(o => !o)} title="Tarih aralığı"
         style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: compact ? "5px 7px" : "5px 9px",
-          border: "1px solid var(--line)", borderRadius: 7, background: range.preset === "30d" ? "var(--paper-2)" : "var(--ember-tint)",
+          border: "1px solid var(--line)", borderRadius: 6, background: range.preset === "30d" ? "var(--paper-2)" : "var(--ember-tint)",
           color: range.preset === "30d" ? "var(--ink-3)" : "var(--ember)", font: "500 11px/1 var(--font-sans)", cursor: "pointer" }}>
         <span>📅</span>{!compact && <span>{label}</span>}<span style={{ color: "var(--ink-4)" }}>▾</span>
       </button>
@@ -680,9 +1078,9 @@ function DateRangeControl({ range, onChange, now, compact }) {
           <div style={{ borderTop: "1px solid var(--line)", margin: "5px 4px", paddingTop: 6 }}>
             <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ink-4)", textTransform: "uppercase", letterSpacing: "0.04em", padding: "0 5px 6px" }}>Özel aralık</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 5, padding: "0 4px 2px" }}>
-              <input type="date" value={toYMD(range.from)} onChange={e => { const v = parseYMD(e.target.value, false); if (v != null) onChange({ ...range, from: v, preset: "custom" }); }}
+              <input type="date" value={cFrom} onChange={e => { setCFrom(e.target.value); const v = parseYMD(e.target.value, false); if (v != null) onChange({ ...range, from: v, preset: "custom" }); }}
                 style={{ font: "500 12px/1 var(--font-sans)", padding: "5px 7px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)" }}/>
-              <input type="date" value={toYMD(range.to)} onChange={e => { const v = parseYMD(e.target.value, true); if (v != null) onChange({ ...range, to: v, preset: "custom" }); }}
+              <input type="date" value={cTo} onChange={e => { setCTo(e.target.value); const v = parseYMD(e.target.value, true); if (v != null) onChange({ ...range, to: v, preset: "custom" }); }}
                 style={{ font: "500 12px/1 var(--font-sans)", padding: "5px 7px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)" }}/>
             </div>
           </div>
@@ -692,7 +1090,7 @@ function DateRangeControl({ range, onChange, now, compact }) {
   );
 }
 
-function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers, currentUser, onLogout }) {
+function Header({ user, tab, onNav, viewMode, setViewMode, dateRange, setDateRange, theme, setTheme, onOpenPalette, onNewBrief, defaultUsers, currentUser, onLogout }) {
   const isMobile = useIsMobile();
   const [tick, setTick] = React.useState(0);
   React.useEffect(() => {
@@ -702,55 +1100,74 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
   const syncSecs = 22 + (tick % 60);
   const [userMenu, setUserMenu] = React.useState(false);
 
+  // Mobil alt-sayfa başlığı: ana sekmeler (Özet/İşler/Profil/Markalar) logo gösterir;
+  // diğer sayfalar (Tamamlanan/Ekip/Geçmiş…) logo yerine başlık + geri butonu (referans).
+  const PRIMARY_TABS = ["overview", "jobs", "profile", "brand"];
+  const SUB_TITLES = {};
+  (NAV_SECTIONS || []).forEach(s => (s.items || []).forEach(it => { SUB_TITLES[it.id] = it.label; }));
+  Object.assign(SUB_TITLES, { completed:"Tamamlanan", musteride:"Müşteride", "dept-comp":"Karşılaştırma", team:"Ekip", multi:"Sıralı işler" });
+  const isSubPage = isMobile && tab && !PRIMARY_TABS.includes(tab);
+  const pageTitle = SUB_TITLES[tab] || "";
+
   return (
     <header style={{
       height: isMobile ? 52 : 56,
       display: "flex", alignItems: "center", gap: isMobile ? 8 : 12,
       padding: isMobile ? "0 12px" : "0 20px 0 20px",
-      background: "var(--header-blur)",
-      backdropFilter: "blur(20px) saturate(180%)",
-      WebkitBackdropFilter: "blur(20px) saturate(180%)",
-      borderBottom: "1px solid var(--line)",
+      background: "var(--paper)",
+      borderBottom: "1px solid var(--line-strong)",
       flexShrink: 0,
       position: "sticky", top: 0, zIndex: 30,
-      boxShadow: "0 1px 0 var(--line-soft)",
     }}>
-      {/* Logo — mobil VE desktop header'da */}
-      <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
-        <img src="app/logo.png" alt="Benseno" style={{
-          height: isMobile ? 34 : 44, width: "auto", objectFit: "contain",
-          mixBlendMode: "multiply", flexShrink: 0,
-        }}/>
-      </a>
-
-      {/* Mobile: search icon (desktop'ta sidebar'da) */}
-      {isMobile && (
-        <button onClick={onOpenPalette} style={{
-          width: 36, height: 36, flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          border: "1px solid var(--line)", borderRadius: 8,
-          background: "var(--paper-2)", color: "var(--ink-4)", cursor: "pointer",
-        }}>
-          <I.Search size={15}/>
-        </button>
+      {/* Mobil alt-sayfa: logo yerine geri butonu + sayfa başlığı (referans) */}
+      {isSubPage ? (
+        <div style={{display:"flex", alignItems:"center", gap:8, minWidth:0}}>
+          <button onClick={() => onNav && onNav("overview")} aria-label="Geri" style={{
+            width:34, height:34, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center",
+            border:0, borderRadius:8, background:"transparent", color:"var(--ink-2)", cursor:"pointer",
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span style={{font:"600 19px/1.1 var(--font-sans)", color:"var(--ink)", letterSpacing:"-0.01em", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{pageTitle}</span>
+        </div>
+      ) : (
+        <a href="./index.html" title="Ana sayfa" style={{display:"flex", alignItems:"center", flexShrink:0, textDecoration:"none"}}>
+          <img src="app/logo.png?v=2" alt="Benseno" style={{
+            height: isMobile ? 34 : 44, width: "auto", objectFit: "contain",
+            mixBlendMode: "multiply", flexShrink: 0,
+          }}/>
+        </a>
       )}
 
-      <div style={{marginLeft: "auto", display: "flex", alignItems: "center", gap: isMobile ? 6 : 8}}>
-        {/* Sync pill */}
-        <span title="Slack Canvas senkron" style={{
-          display: "inline-flex", alignItems: "center", gap: 5,
-          padding: isMobile ? "4px 7px 4px 6px" : "4px 9px 4px 7px", borderRadius: 999,
-          background: "var(--ember-tint)", color: "var(--ember)",
-          font: `500 ${isMobile ? 10 : 11}px/1 var(--font-sans)`, flexShrink: 0,
-        }}>
-          <span style={{
-            width: 5, height: 5, borderRadius: 999, background: "var(--ember)",
-            animation: "bn-pulse 2.4s ease-in-out infinite", flexShrink: 0,
-          }}/>
-          {isMobile ? "Canlı" : `Canlı · ${syncSecs}sn`}
-        </span>
+      <div style={{marginLeft: "auto", display: "flex", alignItems: "center", gap: isMobile ? 8 : 8}}>
+        {/* Mobile: arama (hairline kutu) — referans header'da sağda */}
+        {isMobile && (
+          <button onClick={onOpenPalette} aria-label="Ara" style={{
+            width: 38, height: 38, flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: "1px solid var(--line)", borderRadius: 10,
+            background: "var(--surface)", color: "var(--ink-3)", cursor: "pointer",
+          }}>
+            <I.Search size={16}/>
+          </button>
+        )}
 
-        {/* Tarih aralığı filtresi — global, açılışta son 30 gün */}
+        {/* Sync pill — yalnız desktop (referans mobil header'da yok) */}
+        {!isMobile && (
+          <span title="Slack Canvas senkron" style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            color: "var(--ink-4)",
+            font: `500 11px/1 var(--font-sans)`, flexShrink: 0,
+          }}>
+            <span style={{
+              width: 6, height: 6, borderRadius: 999, background: "var(--ember)",
+              animation: "bn-pulse 2.4s ease-in-out infinite", flexShrink: 0,
+            }}/>
+            {`Canlı · ${syncSecs}sn`}
+          </span>
+        )}
+
+        {/* Tarih aralığı filtresi — global, açılışta son 30 gün (mobilde de korunur, ▾ kompakt) */}
         {dateRange && setDateRange && (
           <DateRangeControl range={dateRange} onChange={setDateRange}
             now={(window.BNS_DATA && window.BNS_DATA.NOW) || Date.now()} compact={isMobile}/>
@@ -758,66 +1175,67 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
 
         {/* View mode — hidden on mobile (bottom nav handles navigation) */}
         {!isMobile && (
-          <div style={{display: "inline-flex", padding: 2, background: "var(--paper-2)", borderRadius: 7, gap: 1}}>
+          <div style={{display: "inline-flex", padding: 2, border: "1px solid var(--line)", borderRadius: 6, gap: 1}}>
             {[["mine", "Ben"], ["dept", "Dept"], ["all", "Tümü"]].map(([k, v]) => (
               <button key={k} onClick={() => setViewMode(k)} style={{
-                font: "500 11px/1 var(--font-sans)", padding: "5px 9px",
-                border: 0, background: viewMode === k ? "var(--surface)" : "transparent",
-                color: viewMode === k ? "var(--ink)" : "var(--ink-3)",
-                borderRadius: 5, cursor: "pointer",
-                boxShadow: viewMode === k ? "0 1px 2px rgba(22,22,26,0.06)" : "none",
-                transition: "background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1), box-shadow 120ms cubic-bezier(0.2,0,0,1), transform 120ms cubic-bezier(0.2,0,0,1)",
+                font: `${viewMode === k ? 600 : 500} 11px/1 var(--font-sans)`, padding: "5px 10px",
+                border: 0, background: viewMode === k ? "var(--paper-2)" : "transparent",
+                color: viewMode === k ? "var(--ink)" : "var(--ink-4)",
+                borderRadius: 4, cursor: "pointer",
+                transition: "background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1)",
               }}>{v}</button>
             ))}
           </div>
         )}
 
-        {/* Theme toggle */}
-        <button title={theme === "dark" ? "Aydınlık mod" : "Karanlık mod"}
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          style={{
-            border: "1px solid var(--line)", background: "transparent",
-            padding: "5px 6px", borderRadius: 7, color: "var(--ink-3)", cursor: "pointer",
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            transition: "color 150ms, background 150ms",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ink-3)"; }}
-        >
-          {theme === "dark" ? <I.Sun size={14}/> : <I.Moon size={14}/>}
-        </button>
+        {/* Theme toggle — yalnız desktop (referans mobil header'da yok; mobilde Daha menüsünde) */}
+        {!isMobile && (
+          <button title={theme === "dark" ? "Aydınlık mod" : "Karanlık mod"}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            style={{
+              border: "1px solid var(--line)", background: "transparent",
+              padding: "5px 6px", borderRadius: 6, color: "var(--ink-3)", cursor: "pointer",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              transition: "color 150ms, background 150ms",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--paper-2)"; e.currentTarget.style.color = "var(--ink)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ink-3)"; }}
+          >
+            {theme === "dark" ? <I.Sun size={14}/> : <I.Moon size={14}/>}
+          </button>
+        )}
 
         {/* Bildirimler artık Ody'ye taşındı (sağ-alt maskot) — üst menüde çan yok. */}
 
-        {/* New brief — icon+text on desktop, icon-only on mobile */}
+        {/* New brief — mobil: accent dolgulu + butonu (referans); desktop: etiketli buton */}
         {isMobile ? (
-          <button onClick={onNewBrief} style={{
-            width: 36, height: 36, flexShrink: 0,
+          <button onClick={onNewBrief} aria-label="Yeni brief" style={{
+            width: 38, height: 38, flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center",
-            border: "1.5px solid var(--ember)", borderRadius: 8,
-            background: "transparent", color: "var(--ember)", cursor: "pointer",
+            border: 0, borderRadius: 10, background: "var(--ember)", color: "#fff",
+            cursor: "pointer", boxShadow: "0 2px 6px -2px rgba(20,38,92,.35)",
           }}>
-            <I.Plus size={16}/>
+            <I.Plus size={18}/>
           </button>
         ) : (
-          <Button kind="secondary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}
-            style={{borderColor:"var(--ember)", color:"var(--ember)", fontWeight:600}}>Yeni brief</Button>
+          <Button kind="primary" size="sm" icon={<I.Plus size={12}/>} onClick={onNewBrief}>Yeni brief</Button>
         )}
 
         {/* User avatar + menu */}
         <div style={{position: "relative"}}>
           <button onClick={() => setUserMenu(v => !v)} style={{
-            display: "inline-flex", alignItems: "center", gap: 7,
-            padding: "3px 8px 3px 3px", border: "1px solid var(--line)",
+            display: "inline-flex", alignItems: "center", gap: isMobile ? 0 : 7,
+            padding: isMobile ? 0 : "3px 8px 3px 3px",
+            border: isMobile ? 0 : "1px solid var(--line)",
             borderRadius: 999, background: "transparent", cursor: "pointer",
             transition: "background 120ms",
           }}
-            onMouseEnter={e => e.currentTarget.style.background = "var(--paper-2)"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            onMouseEnter={e => { if (!isMobile) e.currentTarget.style.background = "var(--paper-2)"; }}
+            onMouseLeave={e => { if (!isMobile) e.currentTarget.style.background = "transparent"; }}
           >
-            <Avatar user={user} size={22}/>
-            <span style={{font: "500 12px/1 var(--font-sans)", color: "var(--ink)"}}>{user.name.split(" ")[0]}</span>
-            <I.ChevronDown size={10} style={{color: "var(--ink-4)"}}/>
+            <Avatar user={user} size={isMobile ? 34 : 22}/>
+            {!isMobile && <span style={{font: "500 12px/1 var(--font-sans)", color: "var(--ink)"}}>{user.name.split(" ")[0]}</span>}
+            {!isMobile && <I.ChevronDown size={10} style={{color: "var(--ink-4)"}}/>}
           </button>
           {userMenu && (() => {
             const ROL_LABELS = { yonetici: "Yönetici", tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "Freelance", diger: "Diğer" };
@@ -911,15 +1329,18 @@ function Header({ user, viewMode, setViewMode, dateRange, setDateRange, theme, s
 }
 
 // ─── Mobile bottom navigation bar ────────────────────────────────────────
-function MobileNav({ active, onChange, data }) {
-  const [menuOpen, setMenuOpen] = React.useState(false);
+function MobileNav({ active, onChange, data, menuOpen: menuOpenProp, setMenuOpen: setMenuOpenProp }) {
+  const [menuOpenInner, setMenuOpenInner] = React.useState(false);
+  // menuOpen App'ten kontrol edilebilir (Ody'yi menü açıkken gizlemek için); yoksa iç state
+  const menuOpen = menuOpenProp !== undefined ? menuOpenProp : menuOpenInner;
+  const setMenuOpen = setMenuOpenProp || setMenuOpenInner;
   const alertCount = (data && data.briefs) ? data.briefs.filter(b => b.prio && (b.prio.code === "red" || b.prio.code === "over")).length : 0;
 
   const PRIMARY = [
-    { id: "overview",  label: "Özet",    icon: "Home" },
-    { id: "jobs",      label: "İşler",   icon: "Briefcase" },
-    { id: "kanban",    label: "Kanban",  icon: "Columns" },
-    { id: "profile",   label: "Profil",  icon: "User" },
+    { id: "overview",  label: "Özet",     icon: "Home" },
+    { id: "jobs",      label: "İşler",    icon: "Briefcase" },
+    { id: "profile",   label: "Profil",   icon: "User" },
+    { id: "brand",     label: "Markalar", icon: "Tag" },
   ];
 
   // All nav items for drawer
@@ -937,7 +1358,7 @@ function MobileNav({ active, onChange, data }) {
 
       {/* Slide-up drawer */}
       <div style={{
-        position: "fixed", left: 0, right: 0, bottom: menuOpen ? 60 : "-100%",
+        position: "fixed", left: 0, right: 0, bottom: menuOpen ? "calc(60px + env(safe-area-inset-bottom, 0px))" : "-100%",
         zIndex: 81, background: "var(--surface)",
         borderRadius: "16px 16px 0 0",
         border: "1px solid var(--line)", borderBottom: "none",
@@ -980,6 +1401,20 @@ function MobileNav({ active, onChange, data }) {
           </div>
         ))}
       </div>
+
+      {/* FAB — Yeni brief (mobil-only native aksiyon butonu) */}
+      <button onClick={() => window.openNewBriefModal && window.openNewBriefModal()}
+        aria-label="Yeni brief" className="bns-fab" style={{
+          position: "fixed", right: 16, zIndex: 79,
+          bottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 16px)",
+          width: 56, height: 56, borderRadius: "50%", border: "none",
+          background: "var(--ember)", color: "#fff",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 6px 16px -4px rgba(20,38,92,.45), 0 2px 6px rgba(0,0,0,.18)",
+          cursor: "pointer",
+        }}>
+        <I.Plus size={24}/>
+      </button>
 
       {/* Bottom tab bar */}
       <nav style={{
@@ -1038,10 +1473,10 @@ function MobileNav({ active, onChange, data }) {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
             {menuOpen
               ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
-              : <><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></>
+              : <><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></>
             }
           </svg>
-          <span style={{font:"400 9.5px/1 var(--font-sans)"}}>Menü</span>
+          <span style={{font:`${menuOpen ? 600 : 400} 9.5px/1 var(--font-sans)`}}>Daha</span>
         </button>
       </nav>
     </>
@@ -1249,6 +1684,145 @@ function Sidebar({ active, onChange, collapsed, expanded, pinned, onToggle, onHo
 // Backwards-compat exports (TabBar still referenced in old snapshots — no-op if unused)
 function TabBar() { return null; }
 
+// A2HS — "Ana ekrana ekle" banner'ı (mobil). Android: beforeinstallprompt. iOS Safari: ipucu.
+function InstallBanner() {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const [evt, setEvt] = React.useState(null);
+  const [show, setShow] = React.useState(false);
+  const [ios, setIos] = React.useState(false);
+  React.useEffect(() => {
+    try { if (localStorage.getItem("bns_a2hs") === "dismissed") return; } catch (e) {}
+    const standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone;
+    if (standalone) return;
+    const onBIP = (e) => { e.preventDefault(); setEvt(e); setShow(true); };
+    window.addEventListener("beforeinstallprompt", onBIP);
+    const ua = navigator.userAgent || "";
+    const isIOS = /iphone|ipad|ipod/i.test(ua);
+    const isSafari = /safari/i.test(ua) && !/crios|fxios|edgios|android/i.test(ua);
+    if (isIOS && isSafari) { setIos(true); setShow(true); }
+    return () => window.removeEventListener("beforeinstallprompt", onBIP);
+  }, []);
+  if (!isMobile || !show) return null;
+  const dismiss = () => { setShow(false); try { localStorage.setItem("bns_a2hs", "dismissed"); } catch (e) {} };
+  const install = async () => {
+    if (!evt) return;
+    evt.prompt();
+    try { const r = await evt.userChoice; if (r && r.outcome === "accepted") localStorage.setItem("bns_a2hs", "dismissed"); } catch (e) {}
+    setShow(false); setEvt(null);
+  };
+  return (
+    <div style={{
+      position: "fixed", left: 12, right: 12, zIndex: 78,
+      bottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 84px)",
+      background: "var(--surface)", border: "1px solid var(--line-strong)",
+      borderRadius: 14, boxShadow: "var(--shadow-lg)",
+      padding: "12px 14px", display: "flex", alignItems: "center", gap: 12,
+      animation: "bn-slide-up 260ms var(--ease-out-quart)",
+    }}>
+      <img src="app/icon-192.png" alt="" width="40" height="40" style={{ borderRadius: 9, flexShrink: 0 }}/>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ font: "600 13px/1.2 var(--font-sans)", color: "var(--ink)" }}>Benseno'yu ana ekrana ekle</div>
+        <div style={{ font: "400 11px/1.35 var(--font-sans)", color: "var(--ink-3)", marginTop: 2 }}>
+          {ios ? "Paylaş ⎙ → “Ana Ekrana Ekle”" : "Uygulama gibi tam ekran aç"}
+        </div>
+      </div>
+      {!ios && (
+        <button onClick={install} style={{
+          flexShrink: 0, font: "600 12px/1 var(--font-sans)", color: "#fff",
+          background: "var(--ember)", border: "none", borderRadius: 8, padding: "9px 14px", cursor: "pointer",
+        }}>Ekle</button>
+      )}
+      <button onClick={dismiss} aria-label="Kapat" style={{
+        flexShrink: 0, border: "none", background: "transparent", color: "var(--ink-4)",
+        cursor: "pointer", padding: 6, display: "flex",
+      }}><I.X size={16}/></button>
+    </div>
+  );
+}
+
+// Pull-to-refresh — sayfa tepesindeyken aşağı çek → window.bnsRefresh() (mobil)
+function PullToRefresh() {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const startY = React.useRef(null);
+  const pulling = React.useRef(false);
+  const distRef = React.useRef(0);
+  const refreshingRef = React.useRef(false);
+  const [dist, setDist] = React.useState(0);
+  const [refreshing, setRefreshing] = React.useState(false);
+  React.useEffect(() => {
+    if (!isMobile) return;
+    const TH = 70, MAX = 100;
+    const scroller = () => document.querySelector("main");
+    const main = () => document.querySelector(".bns-main-content");
+    const sTop = () => { const s = scroller(); return s ? s.scrollTop : 0; };
+    const onStart = (e) => {
+      if (refreshingRef.current || sTop() > 0) { startY.current = null; return; }
+      startY.current = e.touches[0].clientY; pulling.current = false;
+    };
+    const onMove = (e) => {
+      if (startY.current == null) return;
+      const dy = e.touches[0].clientY - startY.current;
+      if (dy > 4 && sTop() <= 0) {
+        pulling.current = true;
+        const d = Math.min(MAX, dy * 0.5);
+        distRef.current = d; setDist(d);
+        const m = main(); if (m) m.style.transform = `translateY(${d}px)`;
+        if (e.cancelable) e.preventDefault();
+      }
+    };
+    const reset = (anim) => {
+      const m = main();
+      if (m) { if (anim) { m.style.transition = "transform 220ms var(--ease-out-quart)"; setTimeout(() => { m.style.transition = ""; }, 240); } m.style.transform = ""; }
+      distRef.current = 0; setDist(0);
+    };
+    const onEnd = () => {
+      if (!pulling.current) { startY.current = null; return; }
+      if (distRef.current >= TH) {
+        refreshingRef.current = true; setRefreshing(true);
+        const m = main(); if (m) { m.style.transition = "transform 220ms var(--ease-out-quart)"; m.style.transform = "translateY(42px)"; }
+        try { if (window.bnsRefresh) window.bnsRefresh(); } catch (e) {}
+        setTimeout(() => { refreshingRef.current = false; setRefreshing(false); reset(true); }, 750);
+      } else { reset(true); }
+      startY.current = null; pulling.current = false;
+    };
+    document.addEventListener("touchstart", onStart, { passive: true });
+    document.addEventListener("touchmove", onMove, { passive: false });
+    document.addEventListener("touchend", onEnd, { passive: true });
+    document.addEventListener("touchcancel", onEnd, { passive: true });
+    return () => {
+      document.removeEventListener("touchstart", onStart);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", onEnd);
+      document.removeEventListener("touchcancel", onEnd);
+    };
+  }, [isMobile]);
+  if (!isMobile) return null;
+  const show = dist > 2 || refreshing;
+  return (
+    <div style={{
+      position: "fixed", top: "calc(50px + env(safe-area-inset-top, 0px))", left: 0, right: 0,
+      display: "flex", justifyContent: "center", pointerEvents: "none", zIndex: 25,
+      opacity: show ? 1 : 0, transition: "opacity 140ms",
+      transform: `translateY(${Math.min(dist, 56)}px)`,
+    }}>
+      <div style={{
+        width: 32, height: 32, borderRadius: "50%", background: "var(--surface)",
+        border: "1px solid var(--line)", boxShadow: "var(--shadow-1)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <div style={{
+          width: 16, height: 16, borderRadius: "50%",
+          border: "2px solid var(--line-strong)", borderTopColor: "var(--ember)",
+          animation: refreshing ? "spin 0.6s linear infinite" : "none",
+          transform: refreshing ? "none" : `rotate(${dist * 4}deg)`,
+        }}/>
+      </div>
+    </div>
+  );
+}
+
+window.PullToRefresh = PullToRefresh;
+window.InstallBanner = InstallBanner;
 window.Header = Header;
 window.Sidebar = Sidebar;
 window.MobileNav = MobileNav;

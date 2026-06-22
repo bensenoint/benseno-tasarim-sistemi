@@ -1,6 +1,7 @@
 // app/screens/Silinenler.jsx — Soft-deleted briefs with restore action.
 
 function SilinenlerScreen({ data, currentUser }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const items = data.deleted || [];
   const canRestore = currentUser?.role === 'admin';
 
@@ -65,10 +66,13 @@ function SilinenlerScreen({ data, currentUser }) {
               ? new Date(b.deleted_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })
               : '—';
             return (
-              <div key={b.id} style={{
+              <SwipeWrap key={b.id} enabled={isMobile && canRestore}
+                onRestore={() => handleRestore(b.id)}
+                onDelete={() => handlePermanentDelete(b.id, b.baslik, b.no)}>
+              <div style={{
                 background: 'var(--surface)', border: '1px solid var(--line)',
-                borderRadius: 12, padding: '14px 16px',
-                display: 'flex', alignItems: 'center', gap: 14,
+                borderRadius: 0, padding: '14px 16px',
+                display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 14, rowGap: 10,
                 opacity: 0.85,
               }}>
                 {/* Brief no */}
@@ -104,14 +108,15 @@ function SilinenlerScreen({ data, currentUser }) {
 
                 {/* Durum chip */}
                 <span style={{
-                  font: '500 11px var(--font-mono)', color: 'var(--ink-4)',
-                  background: 'var(--paper-2)', padding: '3px 8px', borderRadius: 20,
-                  flexShrink: 0,
-                }}>{b.durum || '—'}</span>
+                  display: 'inline-flex', alignItems: 'center', gap: 5, flexShrink: 0,
+                }}>
+                  <I.Dot size={6} color="var(--ink-4)"/>
+                  <span style={{ font: '500 12px/1 var(--font-sans)', color: 'var(--ink-2)' }}>{b.durum || '—'}</span>
+                </span>
 
                 {/* Aksiyon butonları — sadece admin */}
                 {canRestore && (
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                  <div className="bns-row-actions" style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                     <button
                       onClick={() => handleRestore(b.id)}
                       style={{
@@ -139,6 +144,7 @@ function SilinenlerScreen({ data, currentUser }) {
                   </div>
                 )}
               </div>
+              </SwipeWrap>
             );
           })}
         </div>
@@ -146,13 +152,55 @@ function SilinenlerScreen({ data, currentUser }) {
 
       {!canRestore && items.length > 0 && (
         <div style={{
-          marginTop: 20, padding: '10px 14px', borderRadius: 8,
+          marginTop: 20, padding: '10px 14px', borderRadius: 0,
+          border: '1px solid var(--line)',
           background: 'var(--paper-2)', color: 'var(--ink-4)',
           font: '400 12px/1.4 var(--font-sans)',
         }}>
           Geri alma yetkisi sadece adminlerde. Yöneticinize başvurun.
         </div>
       )}
+    </div>
+  );
+}
+
+// Sola kaydırınca aksiyon tepsisi açan satır sarmalayıcı (iOS Mail deseni — mobil)
+function SwipeWrap({ children, onRestore, onDelete, enabled }) {
+  const W = 152;
+  const [dx, setDx] = React.useState(0);
+  const startX = React.useRef(null);
+  const baseX = React.useRef(0);
+  const moved = React.useRef(false);
+  if (!enabled) return children;
+  return (
+    <div style={{ position: "relative", overflow: "hidden" }}>
+      {/* Aksiyon tepsisi (arkada) */}
+      <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: W, display: "flex" }}>
+        <button onClick={() => { onRestore && onRestore(); setDx(0); }} style={{
+          flex: 1, border: 0, cursor: "pointer", background: "var(--ink)", color: "#fff",
+          font: "600 12px/1 var(--font-sans)",
+        }}>↩ Geri al</button>
+        <button onClick={() => { onDelete && onDelete(); setDx(0); }} style={{
+          flex: 1, border: 0, cursor: "pointer", background: "var(--prio-red)", color: "#fff",
+          font: "600 12px/1 var(--font-sans)",
+        }}>🗑️ Sil</button>
+      </div>
+      {/* Kayan içerik katmanı */}
+      <div
+        onTouchStart={(e) => { startX.current = e.touches[0].clientX; baseX.current = dx; moved.current = false; }}
+        onTouchMove={(e) => {
+          if (startX.current == null) return;
+          const d = baseX.current + (e.touches[0].clientX - startX.current);
+          if (Math.abs(e.touches[0].clientX - startX.current) > 6) moved.current = true;
+          setDx(Math.max(-W, Math.min(0, d)));
+        }}
+        onTouchEnd={() => { setDx(dx < -W / 2 ? -W : 0); startX.current = null; }}
+        style={{
+          transform: `translateX(${dx}px)`,
+          transition: startX.current == null ? "transform 200ms var(--ease-out-quart)" : "none",
+          position: "relative", background: "var(--surface)",
+        }}
+      >{children}</div>
     </div>
   );
 }

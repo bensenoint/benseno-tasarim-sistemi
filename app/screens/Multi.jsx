@@ -60,7 +60,7 @@ function MultiScreen({ data, onOpenBrief }) {
       <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
         <Kpi label="Sıralı iş" value={sirali.length} sub="aktif onay zinciri" onClick={() => setFiltre("all")} active={filtre === "all"}/>
         <Kpi label="Gecikmiş" value={gecikmis.length} color={gecikmis.length ? "var(--prio-red)" : undefined} sub="termin geçti" onClick={() => tgl("gecikmis")} active={filtre === "gecikmis"}/>
-        <Kpi label="Müşteride" value={musteride.length} color="#7c5cff" sub="✈️ dönüş bekleniyor" onClick={() => tgl("musteride")} active={filtre === "musteride"}/>
+        <Kpi label="Müşteride" value={musteride.length} color="var(--musteride)" sub="✈️ dönüş bekleniyor" onClick={() => tgl("musteride")} active={filtre === "musteride"}/>
       </div>
 
       {/* List */}
@@ -89,7 +89,7 @@ function MultiCard({ brief: b, users, onClick }) {
 
   return (
     <div onClick={onClick} style={{
-      background:"var(--surface)", border:"1px solid var(--line)", borderRadius:10,
+      background:"var(--paper)", border:"1px solid var(--line)", borderRadius:0,
       padding:"14px 16px", cursor:"pointer",
       display:"grid", gridTemplateColumns:"1fr auto",
       gap:12, alignItems:"start"
@@ -100,11 +100,10 @@ function MultiCard({ brief: b, users, onClick }) {
       {/* Sol: başlık + tipler */}
       <div>
         <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:8}}>
-          <span style={{
-            font:"600 10px/1 var(--font-sans)", letterSpacing:"0.07em", textTransform:"uppercase",
-            color: typeColor, padding:"3px 7px", borderRadius:4,
-            background: type === "paralel" ? "rgba(59,130,246,0.08)" : type === "sirali" ? "rgba(245,158,11,0.1)" : "var(--paper-2)"
-          }}>{typeLabel}</span>
+          <span style={{display:"inline-flex", alignItems:"center", gap:5}}>
+            <I.Dot size={6} color={typeColor}/>
+            <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.07em", textTransform:"uppercase", color: typeColor}}>{typeLabel}</span>
+          </span>
           <BrandChip brand={b.brand} size="sm"/>
           <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{b.no}</span>
           {orderNum && (
@@ -124,9 +123,9 @@ function MultiCard({ brief: b, users, onClick }) {
             return (
               <div key={u.id} style={{
                 display:"inline-flex", alignItems:"center", gap:5,
-                padding:"4px 8px 4px 5px", borderRadius:20,
-                background: done ? "rgba(34,197,94,0.08)" : "var(--surface-sub)",
-                border: `1px solid ${done ? "rgba(34,197,94,0.25)" : "var(--line)"}`,
+                padding:"4px 8px 4px 5px", borderRadius:0,
+                background: "transparent",
+                border: `1px solid ${done ? "var(--prio-green)" : "var(--line)"}`,
               }}>
                 <Avatar user={u} size={18}/>
                 <span style={{font:"500 12px/1 var(--font-sans)", color: done ? "var(--prio-green)" : "var(--ink)"}}>

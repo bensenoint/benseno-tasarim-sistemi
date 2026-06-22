@@ -33,10 +33,9 @@ function PriorityBadge({ p, deltaH, compact }) {
   return (
     <span className="bn-prio" style={{
       display: "inline-flex", alignItems: "center", gap: 5,
-      padding: "3px 8px 3px 6px", borderRadius: 999,
       fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 600,
       letterSpacing: "0.04em", textTransform: "uppercase",
-      background: PRIO_BG[p.code], color: PRIO_FG[p.code], whiteSpace: "nowrap"
+      color: "var(--ink-2)", whiteSpace: "nowrap"
     }}>
       <span style={{display:"inline-flex", alignItems:"center", color: PRIO_FG[p.code]}}>
         {PRIO_GLYPH[p.code]}
@@ -55,13 +54,10 @@ function BrandChip({ brand, size = "md" }) {
     <span onClick={go} title={`${brand.name} marka detayını aç`} style={{
       cursor: "pointer",
       display: "inline-flex", alignItems: "center", gap: 6,
-      padding: small ? "2px 7px 2px 4px" : "3px 9px 3px 5px",
-      borderRadius: 999, background: "var(--surface)",
-      border: "1px solid var(--line)",
       fontFamily: "var(--font-sans)", fontSize: small ? 11 : 12, fontWeight: 500,
       color: "var(--ink)", whiteSpace: "nowrap", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis"
     }}>
-      <span style={{width:8, height:8, borderRadius:999, background: brand.color, flexShrink:0}}/>
+      <span style={{width:7, height:7, borderRadius:999, background: brand.color, flexShrink:0}}/>
       {brand.name}
     </span>
   );
@@ -125,7 +121,7 @@ function StatusPill({ status }) {
     incelemede:  { color: "var(--warning)",  label: "İnceleme",  full: "İncelemede" },
     beklemede:   { color: "var(--ink-3)",       label: "Bekliyor",  full: "Beklemede" },
     revizyon:    { color: "var(--prio-orange)", label: "Revizyon",  full: "Revizyon" },
-    musteride:   { color: "#7c5cff",            label: "Müşteride", full: "Müşteri Onayında — dönüş bekleniyor" },
+    musteride:   { color: "var(--musteride)",            label: "Müşteride", full: "Müşteri onayında · dönüş bekleniyor" },
     blokeli:     { color: "var(--danger)",   label: "Blokeli",   full: "Blokeli" },
     tamamlandi:  { color: "var(--success)",  label: "Tamam",     full: "Tamamlandı" }
   };
@@ -151,15 +147,12 @@ function Button({ children, kind = "secondary", icon, size = "md", onClick, styl
   const fs = size === "sm" ? 12 : 13;
   return (
     <button onClick={onClick}
-      onMouseDown={e => e.currentTarget.style.transform="scale(0.97)"}
-      onMouseUp={e => e.currentTarget.style.transform=""}
-      onMouseLeave={e => e.currentTarget.style.transform=""}
       style={{
         font: `600 ${fs}px/1 var(--font-sans)`,
         padding: pad, borderRadius: 6, border: `1px solid ${c.bd}`,
         background: c.bg, color: c.fg, cursor: "pointer",
         display: "inline-flex", alignItems: "center", gap: 6,
-        transition: "background 120ms cubic-bezier(0.2,0,0,1), transform 120ms cubic-bezier(0.2,0,0,1)", ...style
+        transition: "background 120ms cubic-bezier(0.2,0,0,1), border-color 120ms cubic-bezier(0.2,0,0,1)", ...style
       }}>
       {icon}{children}
     </button>

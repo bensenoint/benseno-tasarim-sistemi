@@ -48,7 +48,7 @@ function FilterPanel({ open, onClose, deptFilter, setDeptFilter, prioFilter, set
       <div style={{
         position:"absolute", top:"100%", right:0, marginTop:6, zIndex:89,
         background:"var(--surface)", border:"1px solid var(--line)",
-        borderRadius:12, boxShadow:"var(--shadow-2)", padding:16, minWidth:220,
+        borderRadius:8, boxShadow:"var(--shadow-1)", padding:16, minWidth:220,
         display:"flex", flexDirection:"column", gap:14
       }}>
         <div style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.07em", textTransform:"uppercase", color:"var(--ink-3)"}}>Filtrele</div>
@@ -117,7 +117,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
   const syncLabel = syncAgo < 60 ? `${syncAgo} sn önce` : syncAgo < 3600 ? `${Math.round(syncAgo/60)} dk önce` : `${Math.round(syncAgo/3600)} sa önce`;
 
   // Bu hafta özet
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
   const weekCutoff = nowTs - 7 * 24 * 3600 * 1000;
   const prevWeekCutoff = nowTs - 14 * 24 * 3600 * 1000;
   const thisWeek = allCompleted.filter(c => (c.bitis||0) >= weekCutoff);
@@ -183,14 +183,14 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
       {/* Geciken işler — tam genişlik */}
       <Card padding={0}>
         <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-          <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
+          <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"0"}}>Geciken işler</h2>
           <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline geçmiş · acil müdahale</div>
         </div>
         <BriefTable rows={allOverdue} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>
       </Card>
 
       {/* Stat kartları — 3 kolon */}
-      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
+      <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
         <Card>
           <CardHead title="Onay bekleyenler" sub={`${allReview.length} brief · rev tamamlandı`}/>
           {allReview.slice(0, 5).map((b, i) => (
@@ -269,12 +269,13 @@ function Rule({ name, status, hits, last }) {
     }}>
       <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)"}}>{name}</span>
       <div style={{display:"flex", alignItems:"center", gap: 8}}>
-        <span style={{
-          font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em",
-          padding:"3px 7px", borderRadius:999,
-          background: status === "ON" ? "var(--prio-green-bg)" : "var(--paper-2)",
-          color:      status === "ON" ? "var(--prio-green)"    : "var(--ink-4)"
-        }}>{status}</span>
+        <span style={{display:"inline-flex", alignItems:"center", gap:5}}>
+          <I.Dot size={6} color={status === "ON" ? "var(--prio-green)" : "var(--ink-4)"}/>
+          <span style={{
+            font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em",
+            color: status === "ON" ? "var(--prio-green)" : "var(--ink-4)"
+          }}>{status}</span>
+        </span>
         <span style={{font:"500 12px/1 var(--font-mono)", color: hits > 0 ? "var(--prio-red)" : "var(--ink-4)", minWidth: 30, textAlign:"right"}}>
           {hits} hit
         </span>
@@ -283,7 +284,8 @@ function Rule({ name, status, hits, last }) {
   );
 }
 
-function EditorialLayout({ data, musteride, user, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, onJumpJobs, onRefresh, onStatusChange, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   const avgCapPct = calcAvgCapPct(data);
@@ -302,59 +304,105 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
   const trendToday   = histTrend(hist, "today",   today.length)   || { dir:"flat", value:"=" };
   const trendReview  = histTrend(hist, "review",  review.length)  || { dir:"up",   value:"+3" };
 
+  // Firma yıldız rozeti — mobilde PageHead'e (boş başlık alanına) lead olarak, masaüstünde altta render edilir.
+  const ratingPill = (() => {
+    const R = window.BNS_DATA && window.BNS_DATA.ratings;
+    if (!R || !R.firma || !R.firma.cnt) return null;
+    return (
+      <div onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}
+        title="Yıldız Karnesi'ni aç"
+        style={{
+          display:"inline-flex", alignItems:"center", gap:8, marginTop: isMobile ? 0 : 12,
+          padding:"7px 12px", background:"var(--surface)", border:"1px solid var(--line)",
+          borderRadius:999, cursor: onSwitchTab ? "pointer" : "default",
+        }}>
+        <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--ink-3)"}}>Benseno</span>
+        <span style={{display:"inline-flex", gap:1}}>
+          {[1,2,3,4,5].map(i => <I.StarFill key={i} size={12} color={i <= Math.round(R.firma.avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
+        </span>
+        <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)"}}>{R.firma.avg}</span>
+        <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>({R.firma.cnt} iş)</span>
+      </div>
+    );
+  })();
+
+  // Mobil öncelik filtre çipleri (referans Overview) — prioFilter'ı sürer
+  const prioChips = [["all","Tümü",null],["over","Geçmiş","var(--prio-red)"],["org","Yüksek","var(--prio-orange)"],["ylw","Normal","var(--prio-yellow)"],["grn","Düşük","var(--prio-green)"]];
+
   return (
     <div className="bn-tab-in">
+      {/* Mobil: viewMode segmenti (referans) — desktop'ta header'da */}
+      {isMobile && setViewMode && (
+        <div style={{display:"flex", padding:3, background:"var(--paper-2)", borderRadius:11, gap:3, marginBottom:12}}>
+          {[["all","Tüm ekip"],["mine","Bana"],["dept","Departmanım"]].map(([k,v]) => (
+            <button key={k} onClick={() => setViewMode(k)} style={{
+              flex:1, padding:"9px 6px", border:0, borderRadius:8, cursor:"pointer",
+              font:`${viewMode===k?700:500} 13px/1 var(--font-sans)`,
+              background: viewMode===k ? "var(--surface)" : "transparent",
+              color: viewMode===k ? "var(--ink)" : "var(--ink-3)",
+              boxShadow: viewMode===k ? "0 1px 3px rgba(0,0,0,.08)" : "none",
+              transition:"all 150ms",
+            }}>{v}</button>
+          ))}
+        </div>
+      )}
+
       <PageHead
         eyebrow={data.fmtTr ? data.fmtTr(Date.now()) : `${greetingTimezone()}`}
         title={`${greeting}, ${firstName}.`}
-        subtitle={`bugün ${overdue.length} geciken, ${todayDue.length} bugün teslim. önce bunlar.`}
-        actions={<div style={{position:"relative",display:"flex",gap:6}}>
+        subtitle={<>bugün <strong style={{fontWeight:600, color: overdue.length ? "var(--prio-red)" : "var(--ink-2)"}}>{overdue.length} geciken</strong>, <strong style={{fontWeight:600, color:"var(--ink-2)"}}>{todayDue.length} bugün teslim</strong>. önce bunlar.</>}
+        lead={isMobile ? ratingPill : null}
+        actions={isMobile ? null : <div style={{position:"relative",display:"flex",gap:6}}>
           <Button kind={filterActive ? "primary" : "secondary"} icon={<I.Filter size={14}/>} onClick={() => setFilterOpen(o=>!o)}>
-            {filterActive ? "Filtre aktif" : "Filtrele"}
+            <span className="bns-btn-label">{filterActive ? "Filtre aktif" : "Filtrele"}</span>
           </Button>
           <FilterPanel open={filterOpen} onClose={() => setFilterOpen(false)} deptFilter={deptFilter} setDeptFilter={setDeptFilter} prioFilter={prioFilter} setPrioFilter={setPrioFilter} filterActive={filterActive}/>
-          <Button kind="ghost" icon={<I.Refresh size={14}/>} onClick={onRefresh}>Yenile</Button>
+          <Button kind="ghost" icon={<I.Refresh size={14}/>} onClick={onRefresh}><span className="bns-btn-label">Yenile</span></Button>
         </div>}
       />
 
-      {/* ⭐ Firma yıldızı — tıklayınca Karşılaştırma'daki Yıldız Karnesi'ne gider */}
-      {(() => {
-        const R = window.BNS_DATA && window.BNS_DATA.ratings;
-        if (!R || !R.firma || !R.firma.cnt) return null;
-        return (
-          <div onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}
-            title="Yıldız Karnesi'ni aç"
-            style={{
-              display:"inline-flex", alignItems:"center", gap:8, marginTop:12,
-              padding:"7px 12px", background:"var(--surface)", border:"1px solid var(--line)",
-              borderRadius:999, cursor: onSwitchTab ? "pointer" : "default",
-            }}>
-            <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--ink-3)"}}>Benseno</span>
-            <span style={{display:"inline-flex", gap:1}}>
-              {[1,2,3,4,5].map(i => <I.StarFill key={i} size={12} color={i <= Math.round(R.firma.avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
-            </span>
-            <span style={{font:"600 13px/1 var(--font-mono)", color:"var(--ink)"}}>{R.firma.avg}</span>
-            <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>({R.firma.cnt} iş)</span>
-          </div>
-        );
-      })()}
+      {/* ⭐ Firma yıldızı — masaüstünde altta; mobilde PageHead lead'inde (yukarıda) */}
+      {!isMobile && ratingPill}
+
+      {/* Mobil: öncelik filtre çipleri (yatay kaydırılır) — referans Overview */}
+      {isMobile && (
+        <div className="bns-chip-scroll" style={{display:"flex", gap:8, overflowX:"auto", padding:"12px 0 4px"}}>
+          {prioChips.map(([k,v,c]) => {
+            const on = prioFilter===k;
+            return (
+              <button key={k} onClick={() => setPrioFilter(on && k!=="all" ? "all" : k)} style={{
+                flexShrink:0, display:"inline-flex", alignItems:"center", gap:7,
+                padding:"8px 14px", borderRadius:999, cursor:"pointer", whiteSpace:"nowrap",
+                border:`1px solid ${on ? "var(--ember)" : "var(--line)"}`,
+                background: on ? "var(--ember-tint)" : "var(--surface)",
+                color: on ? "var(--ink)" : "var(--ink-2)",
+                font:`${on?600:500} 13px/1 var(--font-sans)`,
+              }}>
+                {c && <span style={{width:9,height:9,borderRadius:999,background:c,flexShrink:0}}/>}
+                {v}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* KPI grid */}
       <KpiGrid cols={7}>
         <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
-        <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"} onClick={onJumpJobs ? () => onJumpJobs("overdue") : undefined}/>
+        <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" emphasis={overdue.length > 0} tint="var(--prio-red-bg)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"} onClick={onJumpJobs ? () => onJumpJobs("overdue") : undefined}/>
         <Kpi label="Bugün teslim"  value={todayDue.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={sparkReview} trend={trendReview} sub={hist.length > 1 ? "son sync'e göre" : "dün 09:00'dan beri"} onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>
         <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={sparkStale} sub="24 iş saati hareket yok" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
-        <Kpi label="Müşteride"     value={musteride.length} color="#7c5cff" variant={kpiVariant} sub="✈️ dönüş bekleniyor" onClick={onSwitchTab ? () => onSwitchTab("musteride") : undefined}/>
+        <Kpi label="Müşteride"     value={musteride.length} color="var(--musteride)" variant={kpiVariant} sub="✈️ dönüş bekleniyor" onClick={onSwitchTab ? () => onSwitchTab("musteride") : undefined}/>
         <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması" onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}/>
       </KpiGrid>
+
 
       {/* Tablo — tam genişlik */}
       <Card padding={0} style={{marginTop:"var(--section-gap)"}}>
         <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line-soft)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <div>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.01em"}}>Bugün ve yarın</h2>
+            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"0"}}>Bugün ve yarın</h2>
             <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>
               {today.length + overdue.length} brief
               {overdue.length > 0 && <span style={{color:"var(--prio-red)", fontWeight:600, marginLeft:6}}>· {overdue.length} gecikmiş</span>}
@@ -368,27 +416,31 @@ function EditorialLayout({ data, musteride, user, active, overdue, today, todayD
         <BriefTable rows={today.concat(overdue).slice(0, 9)} onRowClick={onOpenBrief}/>
       </Card>
 
-      {/* Stat kartları — tablonun altında 3 kolon */}
-      <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"var(--grid-gap)", marginTop:"var(--grid-gap)"}}>
-        <Card>
-          <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
-          <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
-          <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"/>
-          <DeptRow s={data.deptStats.ai}        color="var(--bw-14)"/>
-          <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" last/>
-        </Card>
-        <Card>
-          <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
-          <ProblemBrands data={data}/>
-        </Card>
-        {/* Bu hafta parlayan — kişi performansı: sadece yöneticiler görür */}
-        {(typeof bnsGetStoredUser === "function" && bnsGetStoredUser()?.role === "admin") && (
-        <Card>
-          <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
-          <StarOfTheWeek data={data}/>
-        </Card>
-        )}
-      </div>
+      {/* Stat kartları — KPI gibi boşluksuz paylaşılan-hairline ızgara */}
+      {(() => {
+        const _admin = typeof bnsGetStoredUser === "function" && bnsGetStoredUser()?.role === "admin";
+        return (
+        <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:`repeat(${_admin?3:2}, 1fr)`, gap:"1px", background:"var(--line)", border:"1px solid var(--line)", marginTop:"var(--section-gap)"}}>
+          <Card style={{border:"none", background:"var(--paper)"}}>
+            <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
+            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
+            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"/>
+            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)"/>
+            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" last/>
+          </Card>
+          <Card style={{border:"none", background:"var(--paper)"}}>
+            <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
+            <ProblemBrands data={data}/>
+          </Card>
+          {_admin && (
+          <Card style={{border:"none", background:"var(--paper)"}}>
+            <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
+            <StarOfTheWeek data={data}/>
+          </Card>
+          )}
+        </div>
+        );
+      })()}
 
       <ManagerSection data={data} user={user} overdue={overdue} review={review} onOpenBrief={onOpenBrief} onSwitchTab={onSwitchTab} onStatusChange={onStatusChange}/>
     </div>
@@ -400,7 +452,7 @@ function DenseLayout({ data, musteride, active, overdue, today, todayDue, week, 
   const avgCapPct = calcAvgCapPct(data);
   // Bu hafta özet — canlı veriden
   const nowTs2 = data.NOW || Date.now();
-  const allComp2 = data._allCompleted || data.completed || [];
+  const allComp2 = data.completed || data._allCompleted || [];
   const wk2 = allComp2.filter(c => (c.bitis||0) >= nowTs2 - 7*24*3600*1000);
   const wkCount2 = wk2.length;
   const prevWk2 = allComp2.filter(c => { const t=c.bitis||0; return t>=nowTs2-14*24*3600*1000 && t<nowTs2-7*24*3600*1000; });
@@ -529,7 +581,7 @@ function StoryLayout({ data, musteride, active, overdue, today, todayDue, week, 
       <div style={{marginTop: "var(--section-gap)", display:"grid", gridTemplateColumns:"1.6fr 1fr", gap:"var(--grid-gap)"}} className="bn-grid-2">
         <Card padding={0}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Önümüzdeki 24 saat</h2>
+            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"0"}}>Önümüzdeki 24 saat</h2>
             <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{today.length} brief · öncelik sırasına göre</div>
           </div>
           <BriefTable rows={today.slice(0, 10)} onRowClick={onOpenBrief}/>
@@ -561,7 +613,9 @@ function KpiGrid({ children, cols = 6 }) {
     <div className={`bn-kpi-grid bns-kpi-${cols}`} style={{
       display:"grid",
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
-      gap: "var(--grid-gap)",
+      gap: 0,
+      borderTop: "1px solid var(--line)",
+      borderLeft: "1px solid var(--line)",
       marginTop: "var(--section-gap)"
     }}>
       {children}
@@ -672,7 +726,7 @@ function BrandRow({ name, note, color, v, last }) {
 function StarOfTheWeek({ data }) {
   const nowTs = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
   const cutoff = nowTs - 7 * 24 * 3600 * 1000;
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
   const thisWeek = allCompleted.filter(c => (c.bitis || 0) >= cutoff);
 
   if (thisWeek.length === 0) {
@@ -775,9 +829,6 @@ function WeekStat({ label, value, trend, good, bad, last }) {
   const trendColor = trend.dir === "flat" ? "var(--ink-4)" :
                 (good ? "var(--success)" : bad ? "var(--danger)" :
                   (trend.dir === "up" ? "var(--success)" : "var(--danger)"));
-  const trendBg = trend.dir === "flat" ? "var(--paper-2)" :
-                (good ? "var(--prio-green-bg)" : bad ? "var(--prio-red-bg)" :
-                  (trend.dir === "up" ? "var(--prio-green-bg)" : "var(--prio-red-bg)"));
   return (
     <div style={{
       display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0",
@@ -788,7 +839,6 @@ function WeekStat({ label, value, trend, good, bad, last }) {
         <span style={{font:"600 15px/1 var(--font-sans)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{value}</span>
         <span style={{
           font:"600 10px/1 var(--font-sans)", color:trendColor,
-          padding:"2px 6px", borderRadius:4, background:trendBg,
         }}>{trend.dir==="up"?"↑":trend.dir==="down"?"↓":"→"} {trend.value}</span>
       </span>
     </div>

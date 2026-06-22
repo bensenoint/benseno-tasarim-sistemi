@@ -10,14 +10,13 @@ const TIME_RANGES = [
 
 function TimeRangeToggle({ value, onChange }) {
   return (
-    <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8, gap:1}}>
+    <div style={{display:"inline-flex", padding:2, border:"1px solid var(--line)", borderRadius:6, gap:1}}>
       {TIME_RANGES.map(r => (
         <button key={r.key} onClick={() => onChange(r.key)} style={{
-          font:"500 11px/1 var(--font-sans)", padding:"5px 10px", border:0,
-          background: value === r.key ? "var(--surface)" : "transparent",
-          color: value === r.key ? "var(--ink)" : "var(--ink-3)",
-          borderRadius:5, cursor:"pointer",
-          boxShadow: value === r.key ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
+          font:`${value === r.key ? 600 : 500} 11px/1 var(--font-sans)`, padding:"5px 10px", border:0,
+          background: value === r.key ? "var(--paper-2)" : "transparent",
+          color: value === r.key ? "var(--ink)" : "var(--ink-4)",
+          borderRadius:4, cursor:"pointer"
         }}>{r.label}</button>
       ))}
     </div>
@@ -25,6 +24,7 @@ function TimeRangeToggle({ value, onChange }) {
 }
 
 function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [selectedUser, setSelectedUser] = React.useState(user);
   // Avatar tıklamasından gelen kişi (window.bnsOpenUser → App.jsx initialSel) — t damgası her tıklamada değişir
   React.useEffect(() => {
@@ -37,7 +37,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const [jobView, setJobView] = React.useState("aktif");   // ana iş tablosu görünümü (dropdown)
   const [markaSel, setMarkaSel] = React.useState("all");   // ana iş tablosu marka filtresi
   const allBriefs    = data._allBriefs    || data.briefs    || [];
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];
   const allUsers     = data.USERS || [];
 
   // Zaman filtresi — sadece tamamlananlara uygulanır, aktifler hep gösterilir
@@ -196,16 +196,61 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
 
   const roleLabel = { yonetici:"Yönetici", tasarim:"Tasarım", editor:"Editör", ai:"AI Operatör" }[u.rol] || u.rol;
 
+  // Dönemsel özet yalnız yöneticilere görünür (giriş yapan kullanıcıya göre).
+  const meRec = (data.USERS || []).find(x => x.id === (currentUser && (currentUser.slack_id || currentUser.id)));
+  const isManager = !!((currentUser && currentUser.role === "admin") || (meRec && meRec.rol === "yonetici"));
+
+  // ─── Performans özeti — üstte seçili GLOBAL tarih aralığına göre (data.completed zaten süzülü) ───
+  const RANGE_LABELS = { "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
+  const perfRangeLabel = RANGE_LABELS[(data.dateRange && data.dateRange.preset) || "all"] || "seçili aralık";
+  const perfDone = allCompleted.filter(b =>
+    (b.lead && b.lead.id === u.id) ||
+    (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
+  );
+  const perfN = perfDone.length;
+  const perfBrands = {};
+  perfDone.forEach(b => { if (b.marka) perfBrands[b.marka] = (perfBrands[b.marka] || 0) + 1; });
+  const perfBrandList = Object.entries(perfBrands).sort((a, b) => b[1] - a[1]);
+  const perfRevTotal = perfDone.reduce((s, b) => s + (parseInt(b.revision) || 0), 0);
+  const perfAvgRev = perfN ? (perfRevTotal / perfN).toFixed(1) : "—";
+  const perfSureArr = perfDone.map(b => b.sureH || 0).filter(h => h > 0);
+  const perfHours = perfSureArr.reduce((s, v) => s + v, 0);
+  const perfAvgSure = perfSureArr.length ? (perfHours / perfSureArr.length).toFixed(1) : "—";
+  const perfLead = perfDone.filter(b => b.lead && b.lead.id === u.id).length;
+  const perfContrib = perfN - perfLead;
+  const perfOnTime = perfDone.filter(b => (b.gecikmeH || 0) <= 0).length;
+  const perfLate = perfN - perfOnTime;
+  const perfOnTimePct = perfN ? Math.round(perfOnTime / perfN * 100) : null;
+  const perfRatingArr = perfDone.filter(b => b.rating > 0).map(b => b.rating);
+  const perfAvgRating = perfRatingArr.length ? (perfRatingArr.reduce((s, v) => s + v, 0) / perfRatingArr.length).toFixed(1) : "—";
+  const perfRows = [
+    ["Toplam tamamlanan iş", String(perfN)],
+    ["Lead / Katkı", `${perfLead} / ${perfContrib}`],
+    ["Teslim edilen iş", String(perfN)],
+    ["Zamanında teslim", perfOnTimePct != null ? `${perfOnTime} · %${perfOnTimePct}` : "—"],
+    ["Gecikmeli teslim", String(perfLate)],
+    ["Toplam revize", String(perfRevTotal)],
+    ["Ort. revize / iş", perfAvgRev],
+    ["Ort. tamamlama süresi", perfAvgSure !== "—" ? perfAvgSure + " sa" : "—"],
+    ["Toplam çalışma süresi", perfHours > 0 ? perfHours.toFixed(0) + " sa" : "—"],
+    ["Çalışılan marka", String(perfBrandList.length)],
+    ["Ort. puan", perfAvgRating !== "—" ? perfAvgRating + " ★" : "—"],
+  ];
+  const brandColorOf = (name) => (data.BRANDS || []).find(b => b.name === name)?.color
+    || (data.BR && data.BR[name] && data.BR[name].color)
+    || (perfDone.find(b => b.marka === name && b.brand && b.brand.color)?.brand.color)
+    || "var(--ink-4)";
+
   return (
     <div className="bn-tab-in">
 
       {/* ─── Kullanıcı seçici + hero ──────────────────────────── */}
-      <div style={{display:"flex", alignItems:"flex-start", gap:20, padding:"20px 0 4px", flexWrap:"wrap"}}>
-        <Avatar user={u} size={64}/>
-        <div style={{flex:1, minWidth:200}}>
-          <Eyebrow>{roleLabel}</Eyebrow>
-          <h1 style={{font:"600 26px/1.1 var(--font-sans)", color:"var(--ink)", margin:"5px 0 0", letterSpacing:"-0.01em"}}>{u.name}</h1>
-          <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:17, color:"var(--ink-3)", marginTop:6}}>
+      <div style={{display:"flex", alignItems:"center", gap: isMobile ? 12 : 20, padding: isMobile ? "4px 0 2px" : "20px 0 4px", flexWrap:"wrap"}}>
+        {!isMobile && <Avatar user={u} size={64}/>}
+        <div style={{flex: isMobile ? "1 1 100%" : 1, minWidth: isMobile ? 0 : 200}}>
+          {!isMobile && <Eyebrow>{roleLabel}</Eyebrow>}
+          <h1 style={{font:`italic 500 ${isMobile ? 20 : 30}px/1.05 var(--font-display)`, color:"var(--ink)", margin: isMobile ? 0 : "5px 0 0", letterSpacing:"0"}}>{u.name}</h1>
+          <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize: isMobile ? 13 : 17, color:"var(--ink-3)", marginTop: isMobile ? 2 : 6}}>
             {myActive.length} aktif{myMusteride.length > 0 ? ` · ${myMusteride.length} müşteride` : ""} · {myCompleted.length} tamamlandı · {totalRev} toplam revize
           </div>
           {/* ⭐ Kişi yıldız puanı + gün-sonu sebep açıklaması — sadece yöneticiler görür */}
@@ -224,14 +269,14 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
                   <span style={{font:"600 14px/1 var(--font-mono)", color:"var(--ink)"}}>{my.avg}</span>
                   <span style={{font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)"}}>({my.cnt} puanlı iş)</span>
                 </div>
-                {why && <div style={{marginTop:5, font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", maxWidth:520}}><Linkify text={why.sebep}/></div>}
+                {why && <div style={{marginTop:8}}><MobileAccordion title="Değerlendirme"><div style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", maxWidth:520}}><Linkify text={why.sebep}/></div></MobileAccordion></div>}
               </div>
             );
           })()}
         </div>
 
         {/* Zaman filtresi */}
-        <div style={{display:"flex", flexDirection:"column", alignItems:"flex-end", gap:8}}>
+        <div style={{display:"flex", flexDirection:"column", alignItems: isMobile ? "flex-start" : "flex-end", gap:8}}>
           <TimeRangeToggle value={timeRange} onChange={setTimeRange}/>
           <div style={{font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
             tamamlanan · {rangeDays ? `son ${rangeDays} gün` : "tüm zamanlar"}
@@ -254,7 +299,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
                 const nu = allUsers.find(x => x.id === e.target.value);
                 if (nu) setSelectedUser(nu);
               }} style={{
-                padding:"7px 10px", border:"1px solid var(--line)", borderRadius:8,
+                padding:"7px 10px", border:"1px solid var(--line)", borderRadius:6,
                 background:"var(--surface)", color:"var(--ink)",
                 font:"500 13px/1.2 var(--font-sans)", cursor:"pointer", outline:"none", minWidth:200,
               }}>
@@ -278,7 +323,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
       {/* ─── KPI şeridi ──────────────────────────────────────── */}
       <div className="bns-kpi-8" style={{display:"grid", gridAutoFlow:"column", gridAutoColumns:"minmax(0,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)", overflowX:"auto"}}>
         <Kpi label="Aktif iş"      value={myActive.length} color={myActive.length > CAP_LIMIT ? "var(--prio-red)" : undefined}/>
-        <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "#7c5cff" : undefined} sub="✈️ dönüş bekleniyor"/>
+        <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "var(--musteride)" : undefined} sub="✈️ dönüş bekleniyor"/>
         <Kpi label="Tamamlanan"    value={myCompleted.length} sub="kayıtlı"/>
         {isGorkem && <Kpi label="Çıktı hızı"    value={tp.lowSample ? "—" : tp.perWeek + "/hf"} sub={tp.lowSample ? `${tp.count} iş/4hf · veri ince` : `son 4 hafta · ${tp.count} iş`}/>}
         <Kpi label="Toplam revize" value={totalRev} sub={`ort. ${avgRev}/iş`}/>
@@ -292,13 +337,13 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
       {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
       <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
         <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center", gap:12, flexWrap:"wrap"}}>
-          <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap"}}>
+          <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap", flex: isMobile ? "1 1 100%" : undefined, width: isMobile ? "100%" : undefined}}>
             <select value={jobView} onChange={e => setJobView(e.target.value)} aria-label="İş görünümü"
-              style={{font:"600 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:8, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
+              style={{font:`600 13px/1 var(--font-sans)`, color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer", flex: isMobile ? "1 1 0" : undefined, minWidth: isMobile ? 0 : undefined}}>
               {JOB_VIEWS.map(v => <option key={v.key} value={v.key}>{v.label}</option>)}
             </select>
             <select value={markaActive ? markaSel : "all"} onChange={e => setMarkaSel(e.target.value)} aria-label="Marka filtresi"
-              style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:8, padding:"7px 28px 7px 10px", cursor:"pointer"}}>
+              style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer", flex: isMobile ? "1 1 0" : undefined, minWidth: isMobile ? 0 : undefined}}>
               <option value="all">Tüm markalar</option>
               {viewBrands.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
@@ -307,7 +352,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
               toplam {displayRows.length}{markaActive ? ` · ${markaSel}` : ""} · {curView.note}
             </div>
           </div>
-          <div style={{display:"flex", gap:6}}>
+          <div style={{display:"flex", gap:6, flexWrap:"wrap"}}>
             <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>lead: {asLead.length}</span>
             <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>contrib: {asContrib.length}</span>
             {asObserver.length > 0 && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>gözlemci: {asObserver.length}</span>}
@@ -371,7 +416,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         <Card padding={0}>
           <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
             <div>
-              <h2 style={{font:"600 14px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Tamamlanan işler</h2>
+              <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"0"}}>Tamamlanan işler</h2>
               <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)", marginTop:3}}>
                 {myCompleted.length} iş · {totalHours > 0 ? totalHours.toFixed(0)+"sa toplam" : "süre kaydı yok"}
               </div>
@@ -407,8 +452,11 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
                         </td>
                         <td style={{padding:"8px 12px", color:"var(--ink)", maxWidth:200, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{b.baslik || b.is || "—"}</td>
                         <td style={{padding:"8px 12px", whiteSpace:"nowrap"}}>
-                          <span style={{font:"600 10px/1 var(--font-sans)", padding:"2px 6px", borderRadius:4, background: isLead?"var(--ember-tint)":"var(--paper-2)", color: isLead?"var(--ember)":"var(--ink-4)"}}>
-                            {isLead ? "Lead" : "Contrib"}
+                          <span style={{display:"inline-flex", alignItems:"center", gap:5}}>
+                            <I.Dot size={6} color={isLead?"var(--ember)":"var(--ink-4)"}/>
+                            <span style={{font:"600 10px/1 var(--font-sans)", color: isLead?"var(--ember)":"var(--ink-4)"}}>
+                              {isLead ? "Lead" : "Contrib"}
+                            </span>
                           </span>
                         </td>
                         <td style={{padding:"8px 12px", color:"var(--ink-3)", textAlign:"center", fontVariantNumeric:"tabular-nums"}}>{b.revision || b.rev || 0}</td>
@@ -468,6 +516,50 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
         </Card>
       </div>
 
+      {/* ─── Dönemsel özet — yalnız yöneticilere, seçili tarih aralığına göre (sayfa altı) ─── */}
+      {isManager && (
+      <Card padding={0} style={{minWidth:0, marginTop:"var(--section-gap)"}}>
+        <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10, padding:"13px 16px", borderBottom:"1px solid var(--line-strong)", flexWrap:"wrap"}}>
+          <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>Dönemsel özet</span>
+          <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"4px 9px", border:"1px solid var(--line)", borderRadius:999}}>{perfRangeLabel}</span>
+        </div>
+        {perfN === 0 ? (
+          <div style={{padding:"20px 16px", font:"400 13px/1.5 var(--font-sans)", color:"var(--ink-4)"}}>
+            Seçili aralıkta ({perfRangeLabel.toLowerCase()}) {u.name.split(" ")[0]} için tamamlanan iş kaydı yok. Üstteki 📅 tarih aralığını genişletmeyi dene.
+          </div>
+        ) : (
+          <>
+            <div style={{overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
+              <table style={{width:"100%", borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)"}}>
+                <tbody>
+                  {perfRows.map(([label, val], i) => (
+                    <tr key={label} style={{background: i % 2 === 1 ? "var(--row-stripe)" : "transparent"}}>
+                      <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>{label}</td>
+                      <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", textAlign:"right", font:"500 13px/1.3 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{val}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {perfBrandList.length > 0 && (
+              <div style={{padding:"12px 16px", borderTop:"1px solid var(--line-strong)"}}>
+                <div style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", marginBottom:9}}>Çalışılan markalar ({perfBrandList.length})</div>
+                <div style={{display:"flex", flexWrap:"wrap", gap:7}}>
+                  {perfBrandList.map(([name, cnt]) => (
+                    <span key={name} style={{display:"inline-flex", alignItems:"center", gap:6, padding:"5px 10px", border:"1px solid var(--line)", borderRadius:999, background:"var(--surface)"}}>
+                      <span style={{width:8, height:8, borderRadius:999, background:brandColorOf(name), flexShrink:0}}/>
+                      <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-2)"}}>{name}</span>
+                      <span style={{font:"600 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>{cnt}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </Card>
+      )}
+
     </div>
   );
 }
@@ -519,7 +611,7 @@ function BrandBar({ name, v, color, last }) {
 
 function StatBox({ label, value }) {
   return (
-    <div style={{padding:"8px 10px", background:"var(--paper-2)", borderRadius:7, textAlign:"center"}}>
+    <div style={{padding:"8px 10px", background:"var(--paper-2)", borderRadius:0, textAlign:"center"}}>
       <div style={{font:"600 18px/1.15 var(--font-sans)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{value}</div>
       <div style={{font:"400 10px/1.3 var(--font-sans)", color:"var(--ink-4)", marginTop:4}}>{label}</div>
     </div>

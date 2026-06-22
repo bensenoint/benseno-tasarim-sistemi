@@ -3,7 +3,7 @@
 function HelpScreen() {
   const Section = ({ title, children, note }) => (
     <div style={{ marginBottom: 32 }}>
-      <div style={{ font: '700 16px/1 var(--font-sans)', color: 'var(--ink)', marginBottom: 12, paddingBottom: 10, borderBottom: '1px solid var(--line)' }}>{title}</div>
+      <div style={{ font: 'italic 500 18px/1.15 var(--font-display)', color: 'var(--ink)', marginBottom: 12, paddingBottom: 10, borderBottom: '1px solid var(--line)' }}>{title}</div>
       {note && <div style={{ font: '400 12px/1.5 var(--font-sans)', color: 'var(--ink-4)', marginBottom: 12 }}>{note}</div>}
       {children}
     </div>
@@ -11,7 +11,7 @@ function HelpScreen() {
 
   const Row = ({ left, right, sub }) => (
     <div style={{ display: 'flex', gap: 12, padding: '7px 0', borderBottom: '1px solid var(--paper-2)', alignItems: 'flex-start' }}>
-      <div style={{ minWidth: 150, font: '500 12px/1.4 var(--font-mono)', color: 'var(--ink)', background: 'var(--paper-2)', borderRadius: 5, padding: '4px 8px', flexShrink: 0 }}>{left}</div>
+      <div style={{ minWidth: 150, font: '500 12px/1.4 var(--font-mono)', color: 'var(--ink)', background: 'var(--paper-2)', borderRadius: 4, padding: '4px 8px', flexShrink: 0 }}>{left}</div>
       <div>
         <div style={{ font: '400 13px/1.4 var(--font-sans)', color: 'var(--ink-2)' }}>{right}</div>
         {sub && <div style={{ font: '400 11px/1.4 var(--font-sans)', color: 'var(--ink-4)', marginTop: 2 }}>{sub}</div>}
@@ -32,7 +32,7 @@ function HelpScreen() {
   return (
     <div style={{ maxWidth: 720 }}>
       <div style={{ marginBottom: 28 }}>
-        <div style={{ font: '700 20px/1 var(--font-sans)', color: 'var(--ink)' }}>Yardım</div>
+        <div style={{ font: 'italic 500 24px/1.15 var(--font-display)', color: 'var(--ink)' }}>Yardım</div>
         <div style={{ font: '400 13px/1 var(--font-sans)', color: 'var(--ink-3)', marginTop: 4 }}>Slack komutları, kısayollar ve brief yönetimi</div>
       </div>
 

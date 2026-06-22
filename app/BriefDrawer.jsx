@@ -5,8 +5,19 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
   const [saved, setSaved] = React.useState(false);
   const [assignedMe, setAssignedMe] = React.useState(false);
   const [inlineToast, setInlineToast] = React.useState(null); // ← hook'lar erken return'dan önce
-  React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); setInlineToast(null); }, [brief]);
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const [dragY, setDragY] = React.useState(0);            // mobil bottom-sheet sürükleme ofseti
+  const [dragging, setDragging] = React.useState(false);
+  const dragStartY = React.useRef(null);
+  React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); setInlineToast(null); setDragY(0); }, [brief]);
   if (!b) return null;
+
+  // Bottom-sheet aşağı sürükle-kapat (yalnız mobil, handle/başlık bölgesinden)
+  const sheetDrag = isMobile ? {
+    onTouchStart: (e) => { dragStartY.current = e.touches[0].clientY; setDragging(true); },
+    onTouchMove: (e) => { if (dragStartY.current == null) return; const dy = e.touches[0].clientY - dragStartY.current; if (dy > 0) setDragY(dy); },
+    onTouchEnd: () => { setDragging(false); if (dragY > 110) { onClose && onClose(); } else { setDragY(0); } dragStartY.current = null; },
+  } : {};
   const ro = !!b._readOnly;   // tamamlanan iş: akış görünür, güncelleme kapalı
 
   function set(patch) { if (ro) return; const next = { ...b, ...patch }; setB(next); setSaved(false); }
@@ -75,16 +86,34 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         position:"fixed", inset: 0, background:"var(--overlay)", zIndex: 80,
         animation: "bn-fade 200ms var(--ease-out-quart)"
       }}/>
-      <aside style={{
+      <div role="dialog" aria-modal="true" style={isMobile ? {
+        position:"fixed", left: 0, right: 0, bottom: 0,
+        maxHeight: "92vh", height: "92vh",
+        background: "var(--surface)",
+        borderTop: "1px solid var(--line)",
+        borderRadius: "18px 18px 0 0",
+        boxShadow: "var(--shadow-lg)",
+        zIndex: 81,
+        display:"flex", flexDirection:"column",
+        transform: `translateY(${dragY}px)`,
+        transition: dragging ? "none" : "transform 240ms var(--ease-out-quart)",
+        animation: dragY === 0 && !dragging ? "bn-slide-up 260ms var(--ease-out-quart)" : "none",
+        overflow: "hidden",
+      } : {
         position:"fixed", top: 0, right: 0, bottom: 0, width: 480,
         background: "var(--surface)",
         borderLeft: "1px solid var(--line)",
-        boxShadow: "var(--shadow-2)",
+        boxShadow: "var(--shadow-lg)",
         zIndex: 81,
         display:"flex", flexDirection:"column",
         animation: "bn-slide-r 220ms var(--ease-out-quart)"
       }}>
-        <div style={{padding:"14px 20px", borderBottom:"1px solid var(--line)", display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+        {isMobile && (
+          <div {...sheetDrag} style={{padding:"10px 0 4px", display:"flex", justifyContent:"center", flexShrink:0, cursor:"grab", touchAction:"none"}}>
+            <div style={{width:40, height:4, borderRadius:2, background:"var(--line-strong)"}}/>
+          </div>
+        )}
+        <div {...(isMobile ? sheetDrag : {})} style={{padding: isMobile ? "6px 16px 14px" : "14px 20px", borderBottom:"1px solid var(--line)", display:"flex", alignItems:"center", justifyContent:"space-between", touchAction: isMobile ? "none" : "auto"}}>
           <div style={{display:"flex", alignItems:"center", gap:10}}>
             <BrandChip brand={b.brand}/>
             <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{b.no}</span>
@@ -103,7 +132,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         <div style={{padding:"18px 20px", overflowY:"auto", flex: 1}}>
           {/* Title (editable — tamamlananlarda salt-okunur) */}
           {ro
-            ? <h2 style={{font:"600 20px/1.25 var(--font-sans)", color:"var(--ink)", margin:0, letterSpacing:"-0.005em", padding:"4px 0"}}>{b.baslik}</h2>
+            ? <h2 style={{font:"italic 500 23px/1.2 var(--font-display)", color:"var(--ink)", margin:0, letterSpacing:"-0.005em", padding:"4px 0"}}>{b.baslik}</h2>
             : <EditableTitle value={b.baslik} onChange={(v) => set({ baslik: v })}/>}
 
           <div style={{marginTop: 12, display:"flex", alignItems:"center", gap:8, flexWrap:"wrap"}}>
@@ -118,7 +147,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             </span>
             {b.musteri_bekliyor && !ro && (
               <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase",
-                color:"#7c5cff", background:"rgba(124,92,255,0.1)", padding:"4px 8px", borderRadius:999}}>
+                color:"var(--musteride)", background:"rgba(124,92,255,0.1)", padding:"4px 8px", borderRadius:999}}>
                 ✈️ müşteri dönüşü bekleniyor
               </span>
             )}
@@ -242,14 +271,16 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
           {b.insight && (
             <>
               <Hr/>
-              <Eyebrow>🔍 İş Insight</Eyebrow>
+              {!isMobile && <Eyebrow>🔍 İş Insight</Eyebrow>}
+              <MobileAccordion title="🔍 İş Insight">
               <div style={{
                 marginTop:10, padding:"12px 14px", background:"var(--paper-2)", borderRadius:8,
-                borderLeft:"3px solid var(--prio-green)",
+                border:"1px solid var(--line)",
                 font:"400 13px/1.6 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap"
               }}>
                 <Linkify text={b.insight}/>
               </div>
+              </MobileAccordion>
               <div style={{marginTop:6, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
                 Tamamlanma değerlendirmesi · marka/iş analizleri için arşivlenir
               </div>
@@ -310,7 +341,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             </Button>}
           </div>
         </footer>
-      </aside>
+      </div>
     </>
   );
 }
@@ -357,7 +388,7 @@ function EditableTitle({ value, onChange }) {
       }}/>
   ) : (
     <h2 onClick={() => setEdit(true)} style={{
-      font:"600 20px/1.25 var(--font-sans)", color:"var(--ink)",
+      font:"italic 500 23px/1.2 var(--font-display)", color:"var(--ink)",
       margin:0, letterSpacing:"-0.005em", cursor:"text",
       padding:"4px 0", borderRadius: 4
     }}>{value}</h2>

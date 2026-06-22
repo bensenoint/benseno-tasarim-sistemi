@@ -79,7 +79,7 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
         <Card padding={0}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
             <div>
-              <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
+              <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>Geciken işler</h2>
               <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>deadline {(() => { const d = new Date(nowTs); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); })()} öncesine düştü · acil müdahale</div>
             </div>
             <Button kind="ghost" size="sm" icon={<I.Move size={13}/>}>Yeniden ata</Button>
@@ -131,26 +131,27 @@ function ManagerScreen({ data, user, onOpenBrief, onSwitchTab, onStatusChange })
 }
 
 function Alert({ tone, Icon, title, body, action, metric }) {
-  const map = {
-    danger:  { bd:"rgba(215,38,61,0.30)",  bg:"rgba(215,38,61,0.05)",  fg:"var(--danger)" },
-    warn:    { bd:"rgba(224,122,31,0.30)", bg:"rgba(224,122,31,0.06)", fg:"var(--warning)" },
-    info:    { bd:"rgba(51,96,164,0.30)",  bg:"rgba(51,96,164,0.05)",  fg:"var(--info)" },
-    success: { bd:"rgba(46,143,102,0.30)", bg:"rgba(46,143,102,0.05)", fg:"var(--success)" }
-  };
-  const c = map[tone];
+  const fg = {
+    danger: "var(--danger)", warn: "var(--warning)",
+    info: "var(--info)", success: "var(--success)"
+  }[tone] || "var(--ink)";
+  // Editoryal: kare/hairline kalır; uzun sayfada kartları ayrıştırmak için
+  // her ton çok hafif renk yıkaması + soluk ton-kenarlık taşır (tehlike biraz daha belirgin).
+  const bg = `color-mix(in srgb, ${fg} ${tone === "danger" ? 10 : 8}%, var(--paper))`;
+  const bd = `color-mix(in srgb, ${fg} ${tone === "danger" ? 42 : 32}%, var(--line))`;
   return (
     <div style={{
       display:"flex", flexDirection:"column", gap: 12,
-      padding: 18, borderRadius: 10,
-      border: `1px solid ${c.bd}`, background: c.bg, position:"relative"
+      padding: 18, borderRadius: 0,
+      border: `1px solid ${bd}`, background: bg, position:"relative"
     }}>
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap: 8}}>
-        <div style={{display:"flex", alignItems:"center", gap: 8, color: c.fg}}>
+        <div style={{display:"flex", alignItems:"center", gap: 8, color: fg}}>
           <Icon size={16}/>
           <span style={{font:"600 13px/1 var(--font-sans)"}}>{title}</span>
         </div>
         {metric !== undefined && (
-          <span style={{font:"600 28px/1.15 var(--font-sans)", color: c.fg, letterSpacing:"-0.01em", fontVariantNumeric:"tabular-nums"}}>{metric}</span>
+          <span style={{font:"500 34px/1 var(--font-display)", color: fg, letterSpacing:"-0.01em", fontVariantNumeric:"tabular-nums"}}>{metric}</span>
         )}
       </div>
       <div style={{font:"400 13px/1.45 var(--font-sans)", color:"var(--ink-2)"}}>{body}</div>
@@ -167,12 +168,13 @@ function Rule({ name, status, hits, last }) {
     }}>
       <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)"}}>{name}</span>
       <div style={{display:"flex", alignItems:"center", gap: 8}}>
-        <span style={{
-          font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em",
-          padding:"3px 7px", borderRadius:999,
-          background: status === "ON" ? "var(--prio-green-bg)" : "var(--paper-2)",
-          color:      status === "ON" ? "var(--prio-green)"    : "var(--ink-4)"
-        }}>{status}</span>
+        <span style={{display:"inline-flex", alignItems:"center", gap:5}}>
+          <I.Dot size={6} color={status === "ON" ? "var(--prio-green)" : "var(--ink-5)"}/>
+          <span style={{
+            font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em",
+            color: status === "ON" ? "var(--prio-green)" : "var(--ink-4)"
+          }}>{status}</span>
+        </span>
         <span style={{font:"500 12px/1 var(--font-mono)", color: hits > 0 ? "var(--prio-red)" : "var(--ink-4)", minWidth: 30, textAlign:"right"}}>
           {hits} hit
         </span>

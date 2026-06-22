@@ -6,7 +6,7 @@
 /* ----- Fonts (Google Fonts CDN) ------------------------------ */
 /* If offline, drop WOFF2s in fonts/ and uncomment the @font-face
    block at the bottom of this file. */
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@300..700&family=Instrument+Serif:ital@0;1&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@300..700&family=Instrument+Serif:ital@0;1&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap");
 
 /* ------------------------------------------------------------ */
 /*  CORE TOKENS                                                 */
@@ -20,6 +20,7 @@
   --paper-2:      #F4F2EC;   /* secondary surface (toolbar fills) */
   --surface:      #FFFFFF;   /* card / panel */
   --surface-sub:  #FAF9F6;   /* inset / table-stripe */
+  --row-stripe:   #F8F6F0;   /* zebra: paper ile paper-2 arası ince ton */
   --surface-raised: #FFFFFF; /* elevated card (hover state) */
   --sidebar-bg:   #F7F5F0;   /* sidebar — slightly warmer than paper */
   --header-blur:  rgba(251, 250, 247, 0.88); /* header backdrop */
@@ -47,8 +48,8 @@
   --ember-muted:  rgba(36, 71, 158, 0.25);
 
   /* ---- Ody mascot accent (logo mavisi) --------------------- */
-  --ody:          #24479E;   /* benseno logo wordmark */
-  --ody-tint:     rgba(36, 71, 158, 0.12);
+  --ody:          var(--ember);   /* Ody maskotu = ember (Benseno logo mavisi) */
+  --ody-tint:     var(--ember-tint);
 
   /* ---- Semantic — priority (color-blind paired with glyph) -- */
   --prio-red:     #D7263D;   /* 🔴 Acil   — triangle glyph */
@@ -60,6 +61,10 @@
   --prio-orange-bg: rgba(226, 103, 10, 0.12);
   --prio-yellow-bg: rgba(181, 160, 19, 0.14);
   --prio-green-bg:  rgba(46, 143, 102, 0.12);
+
+  /* ---- Müşteride (müşteri onayı bekleyen) — anlamsal mor ---- */
+  --musteride:      #6E4FE0;   /* ✈️ dönüş bekleniyor — beyaz üstünde AA (~5:1) */
+  --musteride-tint: rgba(110, 79, 224, 0.12);
 
   /* ---- Semantic — system feedback -------------------------- */
   --success:      #2E8F66;
@@ -75,7 +80,7 @@
 
   /* ---- Type families --------------------------------------- */
   --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-display: "Fraunces", "Instrument Serif", "Iowan Old Style", Georgia, serif;
   --font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 
   /* ---- Type scale (px) ------------------------------------- */
@@ -132,15 +137,22 @@
 
   /* ---- Shadows --------------------------------------------- */
   --shadow-0: none;
-  --shadow-1:
-    0 1px 2px rgba(22, 22, 26, 0.05),
-    0 4px 16px rgba(22, 22, 26, 0.07);
-  --shadow-2:
-    0 2px 8px rgba(22, 22, 26, 0.07),
-    0 12px 32px rgba(22, 22, 26, 0.12);
+  /* Yükseklik merdiveni: card < 1(popover) < 2(hover) < lg(drawer/modal) < xl(palette) */
   --shadow-card:
     0 1px 2px rgba(22, 22, 26, 0.04),
-    0 4px 14px rgba(22, 22, 26, 0.06);
+    0 2px 8px rgba(22, 22, 26, 0.05);
+  --shadow-1:
+    0 2px 4px rgba(22, 22, 26, 0.06),
+    0 6px 16px rgba(22, 22, 26, 0.08);
+  --shadow-2:
+    0 2px 6px rgba(22, 22, 26, 0.06),
+    0 8px 20px rgba(22, 22, 26, 0.10);
+  --shadow-lg:
+    0 8px 16px rgba(22, 22, 26, 0.10),
+    0 16px 40px rgba(22, 22, 26, 0.14);
+  --shadow-xl:
+    0 12px 24px rgba(22, 22, 26, 0.12),
+    0 28px 60px rgba(22, 22, 26, 0.20);
   --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
 
   /* ---- Motion ---------------------------------------------- */
@@ -161,24 +173,26 @@
 /* ------------------------------------------------------------ */
 [data-theme="dark"] {
   color-scheme: dark;
-  --paper:        #0F0F12;
-  --paper-2:      #15151A;
-  --surface:      #18181D;
-  --surface-sub:  #1C1C22;
-  --surface-raised: #1E1E24;
-  --sidebar-bg:   #111116;
-  --header-blur:  rgba(15, 15, 18, 0.90);
-  --overlay:      rgba(0, 0, 0, 0.55);
+  /* Lacivert (navy) koyu tema — siyah değil, logo mavisi ailesinden mavi-tonlu koyu yüzeyler */
+  --paper:        #0B1326;   /* en koyu lacivert tuval */
+  --paper-2:      #111B33;
+  --surface:      #15203C;
+  --surface-sub:  #192645;
+  --row-stripe:   #0F1A30;   /* zebra: lacivertte ince ton */
+  --surface-raised: #1D2A4A;
+  --sidebar-bg:   #0D1528;
+  --header-blur:  rgba(11, 19, 38, 0.90);
+  --overlay:      rgba(3, 7, 18, 0.58);
 
-  --ink:          #F1EFE9;
-  --ink-2:        #C9C7C1;
-  --ink-3:        #8F8E8A;
-  --ink-4:        #6B6A67;
-  --ink-5:        #4B4A48;
+  --ink:          #EEF1F8;   /* metinler lacivertte hafif soğuk-beyaz */
+  --ink-2:        #C3C9D8;
+  --ink-3:        #8A92A6;
+  --ink-4:        #656D82;
+  --ink-5:        #495062;
 
-  --line:         #2A2A30;
-  --line-strong:  #36363E;
-  --line-soft:    #22222A;
+  --line:         #2A3759;   /* lacivert hairline — mavi-tonlu, okunur */
+  --line-strong:  #374669;
+  --line-soft:    #1F2B49;
 
   --ember:        #5B7BD4;   /* logo mavisi, koyu temada açıltılmış (birincil aksan) */
   --ember-hover:  #7491DD;
@@ -186,8 +200,11 @@
   --ember-tint:   rgba(91, 123, 212, 0.14);
   --ember-muted:  rgba(91, 123, 212, 0.30);
 
-  --ody:          #5B7BD4;   /* logo mavisi, koyu temada açıltılmış */
-  --ody-tint:     rgba(91, 123, 212, 0.16);
+  --ody:          var(--ember);   /* Ody = ember (koyu temada açıltılmış logo mavisi) */
+  --ody-tint:     var(--ember-tint);
+
+  --musteride:      #9B86F0;   /* koyu temada açıltılmış mor — koyu yüzeyde AA */
+  --musteride-tint: rgba(155, 134, 240, 0.18);
 
   --shadow-1:
     0 1px 2px rgba(0, 0, 0, 0.40),
@@ -198,6 +215,12 @@
   --shadow-card:
     0 1px 3px rgba(0, 0, 0, 0.30),
     0 6px 20px rgba(0, 0, 0, 0.36);
+  --shadow-lg:
+    0 8px 18px rgba(0, 0, 0, 0.45),
+    0 20px 48px rgba(0, 0, 0, 0.55);
+  --shadow-xl:
+    0 14px 28px rgba(0, 0, 0, 0.50),
+    0 32px 70px rgba(0, 0, 0, 0.65);
   --ring-focus: 0 0 0 2px var(--paper), 0 0 0 4px var(--ember);
 
   /* ---- Semantic — priority (dark mode: lighter for contrast) -- */
@@ -367,12 +390,12 @@ body {
 /*  Set on <html data-density="…"> via Tweaks.                  */
 /* ------------------------------------------------------------ */
 :root {
-  --row-h: 38px;         /* table row default */
-  --row-pad: 10px;
-  --card-pad: 16px;
-  --section-gap: 24px;
-  --grid-gap: 16px;
-  --kpi-fs: 36px;
+  --row-h: 44px;         /* editoryal: satır ferahlığı */
+  --row-pad: 13px;
+  --card-pad: 20px;      /* editoryal: kart içi nefes */
+  --section-gap: 36px;   /* editoryal: bantlar arası geniş boşluk */
+  --grid-gap: 18px;
+  --kpi-fs: 40px;        /* refactoring-ui: birincil metrik daha baskın */
 }
 html[data-density="compact"] {
   --row-h: 32px;
@@ -438,6 +461,17 @@ html[data-theme="dark"][data-noise="on"] body::before {
 }
 .bn-tab-in { animation: bn-tab-enter 180ms var(--ease-out-quart); }
 
+/* KPI kartları: amaçlı staggered giriş (ease-out, no bounce; reduced-motion guard aşağıda sıfırlar) */
+@keyframes bn-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.bn-kpi-grid > * { animation: bn-rise 360ms var(--ease-out-quart) both; }
+.bn-kpi-grid > *:nth-child(1) { animation-delay: 20ms; }
+.bn-kpi-grid > *:nth-child(2) { animation-delay: 55ms; }
+.bn-kpi-grid > *:nth-child(3) { animation-delay: 90ms; }
+.bn-kpi-grid > *:nth-child(4) { animation-delay: 125ms; }
+.bn-kpi-grid > *:nth-child(5) { animation-delay: 160ms; }
+.bn-kpi-grid > *:nth-child(6) { animation-delay: 195ms; }
+.bn-kpi-grid > *:nth-child(7) { animation-delay: 230ms; }
+
 /* ------------------------------------------------------------ */
 /*  PRESS FEEDBACK (Emil: every pressable must feel responsive) */
 /* ------------------------------------------------------------ */
@@ -488,6 +522,7 @@ button:active,
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
@@ -537,11 +572,54 @@ button:active,
   /* Footer: hidden on mobile */
   .bns-desktop-footer { display: none !important; }
 
-  /* Main content: extra bottom padding for bottom nav */
-  .bns-main-content { padding: 8px 14px 80px !important; }
+  /* Main content: bottom nav + safe-area için alt boşluk */
+  .bns-main-content { padding: 8px 14px calc(84px + env(safe-area-inset-bottom, 0px)) !important; }
 
-  /* Table: hide non-essential columns on mobile */
-  .bns-col-mobile-hide { display: none !important; }
+  /* Native dokunma hissi: tap-highlight kaldır + basılı (:active) geri bildirim */
+  button, a, [role="button"], summary { -webkit-tap-highlight-color: transparent; }
+  button:active, a:active, [role="button"]:active { opacity: .55; transition: opacity 60ms ease; }
+  .bns-fab:active { transform: scale(0.92); opacity: 1 !important; transition: transform 90ms ease; }
+  /* iOS momentum scroll + taşma sıçramasını sınırla */
+  html, body { overscroll-behavior-y: none; }
+
+  /* Sayfa geçişi: her sekme/ekran mount'ta hafif fade + yukarı kayma (native push hissi) */
+  .bn-tab-in { animation: bn-tab-enter 260ms cubic-bezier(0.2,0,0,1); }
+
+  /* PageHead mobilde: başlık + tarih + açıklama gizli (nav konumu gösterir, KPI'lar özeti verir) */
+  .bns-pagehead { padding: 0 0 6px !important; gap: 8px !important; border-bottom: none !important; margin-bottom: 0 !important; }
+  .bns-pagehead h1 { display: none !important; }
+  .bns-pagehead .bns-ph-eyebrow { display: none !important; }
+  .bns-pagehead .bns-ph-sub { display: none !important; }
+  .bns-pagehead > div:first-child { flex: 0 1 auto; }
+
+  /* Filtre satırı mobilde tek satır — yatay kaydırılır, dikeyde yer kaplamaz */
+  .bns-sticky-filters { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; padding-bottom: 10px; }
+  .bns-sticky-filters::-webkit-scrollbar { display: none; }
+  .bns-sticky-filters > * { flex-shrink: 0; }
+  .bns-hide-mobile { display: none !important; }
+  /* İkon-only butonlar: etiket gizli, sadece ikon (Filtrele/Yenile vb.) */
+  .bns-btn-label { display: none !important; }
+  /* Mobilde input/select/segment kompakt — dikeyde yer kaplamasın */
+  .bns-pagehead select, .bns-sticky-filters select, select.bns-compact { padding-top: 6px !important; padding-bottom: 6px !important; }
+
+  /* Sticky filtre/segment satırı: scroller <main> içinde, header zaten dışında → top:0 */
+  .bns-sticky-filters {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--paper);
+    padding: 8px 0 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  /* Yatay kaydırılır çip şeridi (öncelik/segment) — taşarsa native yan kaydırma */
+  .bns-chip-scroll {
+    display: flex; gap: 8px; overflow-x: auto; flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .bns-chip-scroll::-webkit-scrollbar { display: none; }
+  .bns-chip-scroll > * { flex-shrink: 0; }
+
+  /* Tablolar mobilde de TÜM sütunları gösterir — yatay kaydırma ile (referans).
+     Eskiden .bns-col-mobile-hide sütunları gizliyordu; artık tüm alanlar erişilebilir. */
 
   /* Overview 2-col grid → single col on mobile */
   .bn-grid-2 { grid-template-columns: 1fr !important; }
@@ -557,20 +635,52 @@ button:active,
     gap: 8px !important;
   }
 
-  /* All multi-col KPI grids → 2 col on mobile */
+  /* All multi-col KPI grids → 2 col on mobile.
+     NOT: bazı şeritler grid-auto-flow:column + grid-auto-columns kullanıyor
+     (template-columns değil) — onları da satır akışına + 2 sütuna zorla,
+     yoksa öğeler daralıp serif rakamlar üst üste biner. */
   .bns-kpi-8,
   .bns-kpi-6,
   .bns-kpi-5,
   .bns-kpi-4 {
+    grid-auto-flow: row !important;
     grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-columns: auto !important;
+    overflow-x: visible !important;
     gap: 8px !important;
   }
 
-  /* Kanban columns → horizontal scroll on mobile */
+  /* Kanban columns → mobilde geniş kolon + tek-tek snap kaydırma
+     (sabit 220px yerine ~82vw: kart başlıkları kırpılmaz, kolonlar teker teker oturur) */
   .bns-kanban-grid {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
+    grid-template-columns: none !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: 82vw !important;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 14px;
   }
+  .bns-kanban-grid > * { scroll-snap-align: start; }
+
+  /* Ekip matrisi: kişi sütununu daralt; rol etiketi isim ALTINA iner (mobilde de görünür) */
+  .bns-mtx-h {
+    min-width: 138px !important;
+    max-width: 138px !important;
+    width: 138px !important;
+    flex-wrap: wrap !important;
+    row-gap: 2px !important;
+  }
+  .bns-mtx-role {
+    display: block !important;
+    flex-basis: 100% !important;
+    margin-left: 28px !important;
+    text-align: left !important;
+  }
+  .bns-mtx-name { max-width: 96px !important; }
+
+  /* Swipe-to-action: mobilde inline aksiyon butonlarını gizle (sola kaydır → tepsi açılır) */
+  .bns-row-actions { display: none !important; }
 
   /* Deadlines 7-col grid → 2x4 on mobile */
   .bns-deadlines-grid {

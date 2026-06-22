@@ -1,0 +1,124 @@
+// calc.js — SAF HESAP FORMÜLLERİ (tek doğruluk kaynağı).
+// DOM/React/window bağımlılığı YOK → hem tarayıcıda (klasik script → global fonksiyonlar)
+// hem node'da (module.exports) çalışır. scripts/formula-test.js bunları node'da test eder.
+// index.html'de data.js'ten ÖNCE yüklenir; data.js ve bundle.js global olarak çağırır.
+//
+// KURAL: kapasite/süre/gecikme gibi metrikleri BAŞKA yerde yeniden tanımlama — buradan çağır.
+
+var BNS_H = 3600 * 1000; // 1 saat (ms)
+
+// ── Departman kapasite yüzdesi (active / capacity) ──────────────────────────
+function bnsCapPct(s) {
+  if (!s || !s.capacity) return 0;
+  if (s.capacity_pct != null) return s.capacity_pct;
+  return Math.min(100, Math.round((s.active / s.capacity) * 100));
+}
+
+// ── Yarım gün / part-time çalışanlar — kapasite çarpanı (1 = tam gün) ───────
+// Serhat Tokmak yarım gün çalışıyor (08:00-13:00) → kapasitesi 0.5. dept bilgisi
+// departman kapasite indiriminde kullanılır (roster sırasından bağımsız, deterministik).
+var BNS_PARTTIME = { 'U08HLMHTGEL': { factor: 0.5, dept: 'tasarim' } }; // Serhat Tokmak
+function bnsCapFactor(u) {
+  if (!u || !u.id) return 1;
+  var p = BNS_PARTTIME[u.id];
+  return (p && p.factor != null) ? p.factor : 1;
+}
+// Bir departmandaki part-time çalışanların eksik kapasitesi (kişi başı 6 slot bazında).
+function bnsDeptCapDeduction(deptKey) {
+  var ded = 0;
+  for (var id in BNS_PARTTIME) {
+    var p = BNS_PARTTIME[id];
+    if (p && p.dept === deptKey) ded += (1 - p.factor) * 6;
+  }
+  return ded;
+}
+
+// ── Kişi başı kapasite limiti (eşzamanlı taşınabilir aktif iş) ──────────────
+// Yöneticiler koordinasyon yükü için daha yüksek limitli. Profil + Departman AYNI çağırır.
+// Yarım gün çalışanlarda limit çarpanla küçülür (ör. tasarım 6 → 3).
+function bnsPersonCapLimit(u) {
+  if (!u) return 6;
+  var base;
+  if (u.yetki === "yonetici" || u.rol === "yonetici") base = 10;
+  else { var d = u.dept || u.rol || ""; base = ({ tasarim: 6, editor: 8, ai: 6, freelance: 6 })[d] || 6; }
+  return Math.max(1, Math.round(base * bnsCapFactor(u)));
+}
+function bnsPersonCapPct(u, activeCount) {
+  return Math.min(100, Math.round((activeCount / bnsPersonCapLimit(u)) * 100));
+}
+
+// ── Net süre (saat) — beklemede geçen süre DÜŞÜLÜR; negatif olamaz ──────────
+function bnsSureH(bitis, baslangic, beklemeMs) {
+  var bek = beklemeMs || 0;
+  if (!(bitis && baslangic) || isNaN(bitis) || isNaN(baslangic)) return null;
+  return Math.max(0, bitis - baslangic - bek) / BNS_H;
+}
+
+// ── Gecikme (saat) — yalnız NET bitiş (bekleme düşülmüş) deadline'ı aşınca >0 ─
+function bnsGecikmeH(bitis, beklemeMs, deadline) {
+  var bek = beklemeMs || 0;
+  if (bitis && deadline && (bitis - bek) > deadline) {
+    return Math.round((bitis - bek - deadline) / BNS_H * 10) / 10;
+  }
+  return 0;
+}
+
+// ── Termin riski — teslime az kaldı AMA iş hâlâ aktif (henüz inceleme/teslim değil) ─────
+// Hem dashboard rozeti hem scheduler thread-uyarısı AYNI kuralı kullanır (tek kaynak).
+var BNS_RISK_H = 24; // teslime kalan saat eşiği
+function bnsIsRisk(durum, deltaH) {
+  if (deltaH == null) return false;
+  // inceleme/müşteri/tamamlanan = riskli sayılmaz (iş esasen bitmiş/elimizde değil)
+  if (["incelemede", "musteride", "tamamlandi"].indexOf(durum) !== -1) return false;
+  return deltaH <= BNS_RISK_H; // 24sa içinde veya geçmiş, iş hâlâ devam ediyor
+}
+
+// ── Çıktı hızı — son N hafta tamamlanan iş / hafta (düşük örneklemde uyarır) ──────────
+// bitisListMs: tamamlanma zaman damgaları (ms, NORMALİZE edilmiş). nowMs: şimdi. weeks: pencere.
+// lowSample=true → örneklem küçük, sayı yanıltıcı olabilir (sistem yeni, veri ince).
+function bnsThroughput(bitisListMs, nowMs, weeks) {
+  weeks = weeks || 4;
+  var cutoff = nowMs - weeks * 7 * 24 * 3600 * 1000;
+  var n = 0;
+  for (var i = 0; i < (bitisListMs || []).length; i++) {
+    var t = bitisListMs[i];
+    if (t && t >= cutoff) n++;
+  }
+  return { count: n, perWeek: Math.round((n / weeks) * 10) / 10, weeks: weeks, lowSample: n < 3 };
+}
+
+// ── Deadline uzatma cezası (puan etkisi) ───────────────────────────────────
+// Uzatma, o an geçerli deadline'a NE KADAR yakın yapıldıysa o kadar çok ceza.
+// gapH = (eski_deadline - uzatma_anı) saat. Negatifse uzatma deadline GEÇTİKTEN sonra yapılmış.
+// Orta eğri: >48sa → 0.5 · 24-48sa → 1.0 · <24sa → 1.5 · deadline geçmiş → 2.0.
+function bnsUzatmaCeza(gapH) {
+  if (gapH == null || isNaN(gapH)) return 0;
+  if (gapH < 0) return 2.0;     // deadline geçtikten sonra uzatıldı
+  if (gapH <= 24) return 1.5;   // son 24 saat
+  if (gapH <= 48) return 1.0;   // 24-48 saat
+  return 0.5;                   // 48 saatten erken
+}
+// Zaman damgalarından ceza (uzatma anı + o an geçerli/eski deadline, ms).
+function bnsUzatmaCezaFromTimes(uzatmaAniMs, eskiDeadlineMs) {
+  if (!uzatmaAniMs || !eskiDeadlineMs) return 0;
+  return bnsUzatmaCeza((eskiDeadlineMs - uzatmaAniMs) / BNS_H);
+}
+// AI puanına uzatma cezasını uygula (1-5 arası kırp, 0.5 hassasiyet). Yönetici override'a uygulanmaz.
+function bnsRatingWithPenalty(aiRating, uzatmaCeza) {
+  if (aiRating == null) return null;
+  var r = aiRating - (uzatmaCeza || 0);
+  if (r < 1) r = 1; if (r > 5) r = 5;
+  return Math.round(r * 2) / 2;
+}
+// Teslim durumu: gecikmeli (en ağır) > uzatılarak teslim > zamanında.
+function bnsDeliveryStatus(bitisMs, deadlineMs, beklemeMs, uzatildi) {
+  if (!bitisMs || !deadlineMs) return null;
+  if (bnsGecikmeH(bitisMs, beklemeMs, deadlineMs) > 0) return 'gec';
+  if (uzatildi) return 'uzatildi';
+  return 'zamaninda';
+}
+
+// node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H };
+}

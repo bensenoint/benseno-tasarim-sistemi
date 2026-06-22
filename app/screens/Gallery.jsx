@@ -89,11 +89,11 @@ function GalleryTile({ c, idx }) {
   return (
     <div onClick={open} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
       style={{
-        border:"1px solid var(--line)", borderRadius: 10, background:"var(--surface)",
+        border:"1px solid var(--line)", borderRadius: 0, background:"var(--surface)",
         overflow:"hidden", cursor:"pointer",
         transform: hovered ? "translateY(-2px)" : "none",
-        boxShadow: hovered ? "var(--shadow-2)" : "none",
-        transition: "transform 120ms, box-shadow 120ms"
+        borderColor: hovered ? "var(--line-strong)" : "var(--line)",
+        transition: "transform 120ms, border-color 120ms"
       }}>
       <div style={{aspectRatio:"4/3", background:`linear-gradient(135deg, ${brandColor} 0%, ${shade(brandColor,-0.25)} 100%)`, position:"relative", overflow:"hidden"}}>
         {heroSrc && heroIsImage ? (

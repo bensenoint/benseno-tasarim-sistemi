@@ -1,6 +1,9 @@
 // app/screens/Department.jsx — reused for Tasarım / Editör / AI tabs.
 
-function DepartmentScreen({ data, role, onOpenBrief }) {
+function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
+  // Dönemsel özet yalnız yöneticilere görünür (giriş yapan kullanıcıya göre).
+  const meRec = (data.USERS || []).find(x => x.id === (currentUser && (currentUser.slack_id || currentUser.id)));
+  const isManager = !!((currentUser && currentUser.role === "admin") || (meRec && meRec.rol === "yonetici"));
   const roleMap = {
     tasarim:   { name: "Tasarım",   emoji: "🎨", stats: data.deptStats.tasarim,   accent: "var(--bw-1)" },
     editor:    { name: "Editör",    emoji: "✍️", stats: data.deptStats.editor,    accent: "var(--bw-4)" },
@@ -38,6 +41,49 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
     };
   });
 
+  // ─── Departman performans özeti — üstte seçili GLOBAL tarih aralığına göre (data.completed süzülü) ───
+  const RANGE_LABELS = { "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
+  const deptRangeLabel = RANGE_LABELS[(data.dateRange && data.dateRange.preset) || "all"] || "seçili aralık";
+  const allCompleted = data.completed || data._allCompleted || [];
+  const deptDone = allCompleted.filter(b =>
+    (b.lead && (b.lead.dept || b.lead.rol) === role) ||
+    (b.dept === role) ||
+    (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.dept || c.rol) === role))
+  );
+  const dN = deptDone.length;
+  const dBrands = {};
+  deptDone.forEach(b => { if (b.marka) dBrands[b.marka] = (dBrands[b.marka] || 0) + 1; });
+  const dBrandList = Object.entries(dBrands).sort((a, b) => b[1] - a[1]);
+  const dRevTotal = deptDone.reduce((s, b) => s + (parseInt(b.revision) || 0), 0);
+  const dAvgRev = dN ? (dRevTotal / dN).toFixed(1) : "—";
+  const dSureArr = deptDone.map(b => b.sureH || 0).filter(h => h > 0);
+  const dHours = dSureArr.reduce((s, v) => s + v, 0);
+  const dAvgSure = dSureArr.length ? (dHours / dSureArr.length).toFixed(1) : "—";
+  const dOnTime = deptDone.filter(b => (b.gecikmeH || 0) <= 0).length;
+  const dLate = dN - dOnTime;
+  const dOnTimePct = dN ? Math.round(dOnTime / dN * 100) : null;
+  const dRatingArr = deptDone.filter(b => b.rating > 0).map(b => b.rating);
+  const dAvgRating = dRatingArr.length ? (dRatingArr.reduce((s, v) => s + v, 0) / dRatingArr.length).toFixed(1) : "—";
+  const doneByPerson = people.map(p => ({
+    user: p,
+    done: deptDone.filter(b => (b.lead && b.lead.id === p.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id))).length
+  })).filter(x => x.done > 0).sort((a, b) => b.done - a.done);
+  const deptRows = [
+    ["Toplam tamamlanan iş", String(dN)],
+    ["Teslim edilen iş", String(dN)],
+    ["Zamanında teslim", dOnTimePct != null ? `${dOnTime} · %${dOnTimePct}` : "—"],
+    ["Gecikmeli teslim", String(dLate)],
+    ["Toplam revize", String(dRevTotal)],
+    ["Ort. revize / iş", dAvgRev],
+    ["Ort. tamamlama süresi", dAvgSure !== "—" ? dAvgSure + " sa" : "—"],
+    ["Toplam çalışma süresi", dHours > 0 ? dHours.toFixed(0) + " sa" : "—"],
+    ["Çalışılan marka", String(dBrandList.length)],
+    ["Departman kişi sayısı", String(people.length)],
+    ["Ort. puan", dAvgRating !== "—" ? dAvgRating + " ★" : "—"],
+  ];
+  const brandColorOf = (name) => (data.BRANDS || []).find(b => b.name === name)?.color
+    || (data.BR && data.BR[name] && data.BR[name].color) || "var(--ink-4)";
+
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -59,11 +105,22 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
         <Kpi label="Onay bekleyen" value={reviewCount} color="var(--warning)"/>
       </div>
 
-      <div style={{display:"grid", gridTemplateColumns:"1fr 1.6fr", gap:"var(--grid-gap)"}} className="bn-grid-2">
-        {/* People */}
+      <div style={{display:"flex", flexDirection:"column", gap:"var(--section-gap)"}}>
+        {/* İşler — tam genişlik (geniş tablo) */}
+        <Card padding={0} style={{minWidth:0}}>
+          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
+            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} işleri</h2>
+            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{rows.length} aktif</div>
+          </div>
+          <BriefTable rows={rows} onRowClick={onOpenBrief}/>
+        </Card>
+
+        {/* Ekip + Dönemsel özet yan yana (mobilde alt alta) — sayfa altı */}
+        <div className="bn-grid-2" style={{display:"grid", gridTemplateColumns: isManager ? "minmax(0,1fr) minmax(0,1fr)" : "1fr", gap:"var(--section-gap)", alignItems:"start"}}>
+        {/* Ekip */}
         <Card padding={0}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>{r.name} ekibi</h2>
+            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} ekibi</h2>
             <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{people.length} kişi · yüke göre sıralı</div>
           </div>
           <div>
@@ -93,14 +150,66 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
           </div>
         </Card>
 
-        {/* Briefs */}
+        {/* Dönemsel özet — Ekip ile yan yana (yalnız yöneticilere) */}
+        {isManager && (
         <Card padding={0} style={{minWidth:0}}>
-          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"600 15px/1.2 var(--font-sans)", color:"var(--ink)", margin:0}}>{r.name} işleri</h2>
-            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{rows.length} aktif</div>
+          <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10, padding:"13px 16px", borderBottom:"1px solid var(--line-strong)", flexWrap:"wrap"}}>
+            <span style={{font:"italic 500 18px/1.1 var(--font-display)", color:"var(--ink)"}}>Dönemsel özet</span>
+            <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"4px 9px", border:"1px solid var(--line)", borderRadius:999}}>{deptRangeLabel}</span>
           </div>
-          <BriefTable rows={rows} onRowClick={onOpenBrief}/>
+          {dN === 0 ? (
+            <div style={{padding:"20px 16px", font:"400 13px/1.5 var(--font-sans)", color:"var(--ink-4)"}}>
+              Seçili aralıkta ({deptRangeLabel.toLowerCase()}) {r.name} departmanı için tamamlanan iş kaydı yok. Üstteki 📅 tarih aralığını genişletmeyi dene.
+            </div>
+          ) : (
+            <>
+              <div style={{overflowX:"auto", WebkitOverflowScrolling:"touch"}}>
+                <table style={{width:"100%", borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)"}}>
+                  <tbody>
+                    {deptRows.map(([label, val], i) => (
+                      <tr key={label} style={{background: i % 2 === 1 ? "var(--row-stripe)" : "transparent"}}>
+                        <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>{label}</td>
+                        <td style={{padding:"9px 16px", borderBottom:"1px solid var(--line)", textAlign:"right", font:"500 13px/1.3 var(--font-mono)", color:"var(--ink)", fontVariantNumeric:"tabular-nums"}}>{val}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Kişi başına tamamlanan */}
+              {doneByPerson.length > 0 && (
+                <div style={{padding:"12px 16px", borderTop:"1px solid var(--line-strong)"}}>
+                  <div style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", marginBottom:9}}>Kişi başına tamamlanan</div>
+                  <div style={{display:"flex", flexDirection:"column", gap:6}}>
+                    {doneByPerson.map(({user, done}) => (
+                      <div key={user.id} style={{display:"flex", alignItems:"center", gap:8}}>
+                        <Avatar user={user} size={20}/>
+                        <span onClick={() => window.bnsOpenUser && window.bnsOpenUser(user)} style={{flex:1, font:"500 12.5px/1 var(--font-sans)", color:"var(--ink-2)", cursor:"pointer", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{user.name}</span>
+                        <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--ink)"}}>{done}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Çalışılan markalar */}
+              {dBrandList.length > 0 && (
+                <div style={{padding:"12px 16px", borderTop:"1px solid var(--line-strong)"}}>
+                  <div style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", marginBottom:9}}>Çalışılan markalar ({dBrandList.length})</div>
+                  <div style={{display:"flex", flexWrap:"wrap", gap:7}}>
+                    {dBrandList.map(([name, cnt]) => (
+                      <span key={name} style={{display:"inline-flex", alignItems:"center", gap:6, padding:"5px 10px", border:"1px solid var(--line)", borderRadius:999, background:"var(--surface)"}}>
+                        <span style={{width:8, height:8, borderRadius:999, background:brandColorOf(name), flexShrink:0}}/>
+                        <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-2)"}}>{name}</span>
+                        <span style={{font:"600 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>{cnt}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </Card>
+        )}
+        </div>
       </div>
     </div>
   );
@@ -108,11 +217,10 @@ function DepartmentScreen({ data, role, onOpenBrief }) {
 
 function Tag({ children }) {
   return (
-    <span style={{
-      font:"600 9px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase",
-      padding:"3px 6px", borderRadius: 999,
-      background: "var(--ember-tint)", color:"var(--ember)"
-    }}>{children}</span>
+    <span style={{display:"inline-flex", alignItems:"center", gap:5}}>
+      <I.Dot size={6} color="var(--ember)"/>
+      <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-2)"}}>{children}</span>
+    </span>
   );
 }
 

@@ -75,25 +75,25 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
 
   return (
     <div className="bns-table-wrap" style={{
-      background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10,
-      overflowX: "auto", WebkitOverflowScrolling: "touch"
+      background: "transparent", overflowX: "auto", WebkitOverflowScrolling: "touch"
     }}>
       <table style={{width:"100%", minWidth: 0, borderCollapse: "collapse", font:"400 13px/1.3 var(--font-sans)", color:"var(--ink)"}}>
         <thead>
-          <tr style={{background:"var(--surface-sub)"}}>
+          <tr style={{background:"var(--paper)"}}>
             {cols.map(c => (
               <th key={c.id} onClick={() => c.sort && sortable && toggle(c.id)}
                 className={c.mobileHide ? "bns-col-mobile-hide" : ""}
                 style={{
                   font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
-                  letterSpacing:"0.04em", textTransform:"uppercase",
+                  letterSpacing:"0.06em", textTransform:"uppercase",
                   textAlign: c.align === "right" ? "right" : "left",
                   width: c.width ? c.width : "auto",
                   padding:"10px 7px",
                   borderBottom:"1px solid var(--line-strong)",
                   whiteSpace:"nowrap", cursor: c.sort && sortable ? "pointer" : "default",
                   userSelect:"none", position:"sticky", top: 0, zIndex: 5,
-                  background:"var(--surface-sub)"
+                  background:"var(--paper)",
+                  boxShadow:"0 6px 6px -6px rgba(22,22,26,0.14)"
                 }}>
                 <span style={{display:"inline-flex", alignItems:"center", gap:4}}>
                   {c.label}
@@ -142,14 +142,14 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
     <tr onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
       style={{
         cursor:"pointer",
-        background: hover ? "var(--paper-2)" : (stripe ? "var(--surface-sub)" : "var(--surface)"),
+        background: hover ? "var(--paper-2)" : (stripe ? "var(--row-stripe)" : "transparent"),
         height: "var(--row-h)"
       }}>
       <td style={cellStyle(true, "right")}>{brief.no}</td>
       <td style={cellStyle()}><PriorityBadge p={brief.oncelik || { code: "ylw", label: "NORMAL" }}/></td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
-      <td style={{...cellStyle(), width: 340, minWidth: 240, maxWidth: 340, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)"}}>
+      <td style={{...cellStyle(), width: 340, minWidth: 240, maxWidth: 340, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)", fontWeight:500}}>
         {brief.baslik}
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle()}>
@@ -166,8 +166,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
         {formatDate(brief.deadline)}
         {brief.uzatildi && (
           <span title={`Deadline ${brief.uzatma_sayisi}× uzatıldı`}
-            style={{marginLeft:5, font:"600 9px/1 var(--font-sans)", color:"var(--prio-yellow)",
-              background:"rgba(224,169,43,.14)", padding:"2px 5px", borderRadius:4, whiteSpace:"nowrap"}}>
+            style={{marginLeft:6, font:"italic 500 10px/1 var(--font-display)", color:"var(--prio-yellow)", whiteSpace:"nowrap"}}>
             uzatıldı{brief.uzatma_sayisi > 1 ? ` ×${brief.uzatma_sayisi}` : ""}
           </span>
         )}
@@ -184,7 +183,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
         )}
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{(brief.rev_ic > 0 || brief.rev_musteri > 0)
-        ? <span title={`${brief.rev_ic||0} iç · ${brief.rev_musteri||0} müşteri revizyonu`}>{brief.rev_ic||0}<span style={{color:"var(--ink-5)"}}>/</span><span style={{color:"#7c5cff"}}>{brief.rev_musteri||0}</span></span>
+        ? <span title={`${brief.rev_ic||0} iç · ${brief.rev_musteri||0} müşteri revizyonu`}>{brief.rev_ic||0}<span style={{color:"var(--ink-5)"}}>/</span><span style={{color:"var(--musteride)"}}>{brief.rev_musteri||0}</span></span>
         : brief.revision > 0 ? brief.revision : <span style={{color:"var(--ink-5)"}}>—</span>}</td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title="İşin açıldığı tarih ve saat">
         {brief.acilma ? new Date(brief.acilma).toLocaleString("tr-TR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "—"}
