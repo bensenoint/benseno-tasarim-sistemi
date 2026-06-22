@@ -436,6 +436,23 @@ app.post('/api/notifications', writeGuard, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+// Ody öneri geri bildirimi (beğen/beğenme + sebep + yeniden-değerlendirme sonucu).
+// Giriş yapan kişiye bağlı; ileride Ody'nin öğrenmesi/raporlama için saklanır.
+app.post('/api/ody/advice-feedback', auth.authGuard, async (req, res) => {
+  try {
+    const { notifId, vote, reason, adviceText, outcome } = req.body || {};
+    if (vote !== 'up' && vote !== 'down') return res.status(400).json({ error: 'vote up|down olmalı' });
+    if (outcome && outcome !== 'kept' && outcome !== 'revised') return res.status(400).json({ error: 'outcome kept|revised olmalı' });
+    const r = await pool.query(
+      `INSERT INTO ody_advice_feedback (user_id, notif_id, advice_text, vote, reason, reevaluated, outcome)
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id`,
+      [req.user.slack_id, Number.isInteger(notifId) ? notifId : null,
+       adviceText ? String(adviceText).slice(0, 4000) : null, vote,
+       reason ? String(reason).slice(0, 1000) : null, !!outcome, outcome || null]);
+    res.json({ ok: true, id: r.rows[0].id });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // Yıldız karnesi sebep açıklaması (AI) — gün-sonu turu yazar. Sessiz upsert.
 app.post('/api/rating-sebep', writeGuard, async (req, res) => {
   try {

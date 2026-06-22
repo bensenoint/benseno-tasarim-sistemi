@@ -406,6 +406,7 @@ function ChatBot({ currentUser }) {
   const [tab, setTab] = React.useState("notif");   // panel sekmesi: "notif" (bildirim+öneri) | "chat" (sohbet)
   const [selId, setSelId] = React.useState(null);   // master-detail: seçili bildirim (mobilde liste→detay)
   const [notifFilter, setNotifFilter] = React.useState("all");   // liste filtresi: "all" | "unread"
+  const [fb, setFb] = React.useState({});   // öneri geri bildirimi: { [notifId]: {vote, reasonOpen, reason, busy, note} }
   const [mood, setMood] = React.useState('neseli');
   const blobRef = React.useRef(null);
   const [msgs, setMsgs] = React.useState([]);   // {role:'user'|'assistant', content}
@@ -750,6 +751,49 @@ function ChatBot({ currentUser }) {
   };
   // Marka adından kararlı renk (detayda marka noktası için).
   const brandColor = (s) => { let h = 0; for (let i = 0; i < (s || "").length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return `hsl(${h} 52% 46%)`; };
+
+  // ── Öneri geri bildirimi (beğen/beğenme + sebep + yeniden değerlendirme) ──
+  const setFbFor = (id, patch) => setFb(f => ({ ...f, [id]: { ...(f[id] || {}), ...patch } }));
+  const postFeedback = (notifId, vote, reason, adviceText, outcome) => {
+    if (!tok()) return;
+    fetch(`${API}/api/ody/advice-feedback`, {
+      method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
+      body: JSON.stringify({ notifId: Number.isInteger(notifId) ? notifId : null, vote, reason: reason || null, adviceText: adviceText || null, outcome: outcome || null }),
+    }).catch(() => {});
+  };
+  const likeAdvice = (n) => { setFbFor(n.id, { vote: "up", reasonOpen: false, note: "Teşekkürler — kaydedildi." }); postFeedback(n.id, "up", null, (advice[n.id] || {}).text); };
+  const dislikeAdvice = (n) => setFbFor(n.id, { vote: "down", reasonOpen: true, note: "" });
+  // Beğenilmedi → sebebi kaydet + Ody öneriyi eleştirel yeniden değerlendirsin (hâlâ doğruysa korusun, değilse revize etsin).
+  const submitDislike = async (n) => {
+    const reason = ((fb[n.id] || {}).reason || "").trim();
+    const prev = (advice[n.id] || {}).text || "";
+    setFbFor(n.id, { reasonOpen: false, busy: true, note: "" });
+    postFeedback(n.id, "down", reason, prev);
+    const c = bnsAdviceContext(n);
+    const PROMPT =
+      "Bir önceki ÖNERİN kullanıcı tarafından BEĞENİLMEDİ. Önerini eleştirel gözle yeniden değerlendir.\n\n" +
+      "Bildirim: \"" + (n.text || "") + "\"\n\nÖnceki önerin:\n" + prev + "\n\n" +
+      (reason ? "Kullanıcının beğenmeme nedeni: \"" + reason + "\"\n\n" : "") +
+      "BAĞLAM (öncelik sırasıyla):\n1) BU İŞE YAZILANLAR:\n" + c.jobCtx + "\n2) MARKA GEÇMİŞİ:\n" + c.brandCtx +
+      "\n3) BENZER İŞLER:\n" + c.simCtx + "\n4) KİŞİ DEĞERLENDİRMESİ:\n" + c.personCtx + "\n\n" +
+      "Önerin hâlâ DOĞRU, spesifik ve veriye dayalıysa SADECE tek kelime yaz: DOĞRU. " +
+      "Yanlış/eksik/genel ise DÜZELTİLMİŞ öneriyi yaz: EN FAZLA 3 madde (•), her madde tek kısa cümle, # numarası/markaya referans ver, giriş/selam yazma.";
+    try {
+      const r = await fetch(`${API}/api/chat`, { method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + tok() }, body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }] }) });
+      const j = await r.json().catch(() => ({}));
+      const rep = (r.ok && j.reply) ? String(j.reply).trim() : "";
+      if (!rep) { setFbFor(n.id, { busy: false, note: "Yeniden değerlendirme alınamadı, tekrar dene." }); return; }
+      if (/^doğru\.?$/i.test(rep)) {
+        setFbFor(n.id, { busy: false, note: "Ody önerisini gözden geçirdi ve hâlâ doğru buluyor — değiştirmedi." });
+        postFeedback(n.id, "down", reason, prev, "kept");
+      } else {
+        try { localStorage.setItem("bns_ody_advice2_" + n.id, rep); } catch (e) {}
+        setAdvice(a => ({ ...a, [n.id]: { state: "done", text: rep } }));
+        setFbFor(n.id, { busy: false, vote: null, note: "Ody önerisini güncelledi 👇" });
+        postFeedback(n.id, "down", reason, prev, "revised");
+      }
+    } catch (e) { setFbFor(n.id, { busy: false, note: "Bağlantı hatası, tekrar dene." }); }
+  };
   // Gün etiketi (Bugün / Dün / tarih) — bildirim listesini gruplamak için.
   const dayLabel = (iso) => {
     try { const d = new Date(iso); const t = new Date(); const y = new Date(Date.now() - 86400000);
@@ -979,6 +1023,32 @@ function ChatBot({ currentUser }) {
                               <span style={{ width: 16, height: 16, borderRadius: "55% 45% 58% 42% / 52% 48% 56% 44%", background: "var(--ody)", flex: "none" }}/> Ody'nin önerisi
                             </div>
                             <div style={{ font: "400 13px/1.6 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={adv.text}/></div>
+                            {(() => {
+                              const s = fb[sel.id] || {};
+                              const fbBtn = { border: "1px solid var(--line-strong)", background: "var(--surface)", borderRadius: 6, padding: "4px 9px", cursor: "pointer", font: "400 13px/1 var(--font-sans)" };
+                              return (
+                                <div style={{ marginTop: 12, paddingTop: 11, borderTop: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 8 }}>
+                                  {!s.vote && !s.busy && (
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                      <span style={{ font: "500 11px/1 var(--font-sans)", color: "var(--ink-4)" }}>Bu öneri yardımcı oldu mu?</span>
+                                      <button onClick={() => likeAdvice(sel)} title="Beğen" style={fbBtn}>👍</button>
+                                      <button onClick={() => dislikeAdvice(sel)} title="Beğenme" style={fbBtn}>👎</button>
+                                    </div>
+                                  )}
+                                  {s.reasonOpen && (
+                                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                                      <input value={s.reason || ""} onChange={e => setFbFor(sel.id, { reason: e.target.value })}
+                                        onKeyDown={e => { if (e.key === "Enter") submitDislike(sel); }}
+                                        placeholder="Neden beğenmedin? (opsiyonel)" autoFocus
+                                        style={{ flex: 1, minWidth: 160, padding: "7px 10px", border: "1px solid var(--line-strong)", borderRadius: 6, background: "var(--surface)", color: "var(--ink)", font: "400 12px var(--font-sans)", outline: "none" }}/>
+                                      <button onClick={() => submitDislike(sel)} style={{ border: 0, background: "var(--ody)", color: "#fff", borderRadius: 6, padding: "7px 13px", font: "600 12px var(--font-sans)", cursor: "pointer" }}>Gönder</button>
+                                    </div>
+                                  )}
+                                  {s.busy && <span style={{ font: "400 11px var(--font-sans)", color: "var(--ink-4)", fontStyle: "italic" }}>Ody yeniden değerlendiriyor…</span>}
+                                  {s.note && !s.busy && <span style={{ font: "500 11px/1.4 var(--font-sans)", color: "var(--ody)" }}>{s.note}</span>}
+                                </div>
+                              );
+                            })()}
                           </div>
                         ) : advNone ? (
                           <div style={{ padding: "13px 15px", border: "1px dashed var(--line-strong)", background: "var(--paper-2)", font: "400 12.5px/1.6 var(--font-sans)", color: "var(--ink-4)", fontStyle: "italic" }}>Bu bildirim için yeterli bağlam yok.</div>
