@@ -138,22 +138,21 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   const fromMs = from ? new Date(from + "T00:00:00").getTime() : null;
   const toMs = to ? new Date(to + "T23:59:59").getTime() : null;
   const inRange = ms => { if (ms == null) return !fromMs && !toMs ? true : false; if (fromMs && ms < fromMs) return false; if (toMs && ms > toMs) return false; return true; };
-  // "Yarın" sınırları — referans now'a göre yarın 00:00 → 23:59 (deadline yarın olanlar)
+  // "Yarın" (devam edecek): aktif işlerden bugün kapanmayacaklar — deadline yarın+sonrası
+  // VEYA gecikmiş (hâlâ aktif). Bugünün kalanında teslim edilecekler hariç. (now referans NOW)
   const _d = new Date(now);
   const startTom = new Date(_d.getFullYear(), _d.getMonth(), _d.getDate() + 1).getTime();
-  const endTom = startTom + 86400000 - 1;
-  const isTomorrow = ms => ms != null && ms >= startTom && ms <= endTom;
+  const continuesTomorrow = ms => ms != null && (ms >= startTom || ms < now);
 
   const filteredActive = active.filter(b => {
     if (person && !activeIds(b).includes(person)) return false;
     if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
-    if (tomorrowOnly && !isTomorrow(dlMs(b))) return false;
+    if (tomorrowOnly && !continuesTomorrow(dlMs(b))) return false;
     return true;
   });
   const filteredMusteride = musteride.filter(b => {
     if (person && !activeIds(b).includes(person)) return false;
     if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
-    if (tomorrowOnly && !isTomorrow(dlMs(b))) return false;
     return true;
   });
   const filteredDone = done.filter(c => {

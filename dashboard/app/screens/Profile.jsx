@@ -170,14 +170,15 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const viewBrands = [...new Set(tableRows.map(b => b.marka).filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
   const markaActive = markaSel !== "all" && viewBrands.includes(markaSel);
   const markaRows = markaActive ? tableRows.filter(b => b.marka === markaSel) : tableRows;
-  // "Yarın" filtresi — deadline'ı yarın (referans now'a göre) olan işler
+  // "Yarın" (devam edecek): aktif işlerden bugün kapanmayacaklar — deadline yarın+sonrası
+  // VEYA gecikmiş (hâlâ aktif). Tamamlanan görünümünde uygulanmaz.
   const _nowY = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
   const _dY = new Date(_nowY);
   const _startTomY = new Date(_dY.getFullYear(), _dY.getMonth(), _dY.getDate() + 1).getTime();
-  const _endTomY = _startTomY + 86400000 - 1;
   const _dlMsY = b => { const d = b.deadline; if (typeof d !== "number") return null; return d < 1e10 ? d * 1000 : d; };
-  const displayRows = tomorrowOnly
-    ? markaRows.filter(b => { const m = _dlMsY(b); return m != null && m >= _startTomY && m <= _endTomY; })
+  const _continuesTomorrow = b => { const m = _dlMsY(b); return m != null && (m >= _startTomY || m < _nowY); };
+  const displayRows = (tomorrowOnly && !curView.completed)
+    ? markaRows.filter(_continuesTomorrow)
     : markaRows;
 
   // ─── Durum dağılımı
