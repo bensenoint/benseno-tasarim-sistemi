@@ -181,6 +181,7 @@ const AI_ISIM = {
 
 const PRIORITY_REACTIONS = new Set([
   'red_circle', 'large_orange_circle', 'large_yellow_circle', 'large_green_circle',
+  'bso-acil', 'bso-yuksek', 'bso-normal', 'bso-dusuk',
 ]);
 
 const REACTION_EMOJI = {
@@ -188,6 +189,11 @@ const REACTION_EMOJI = {
   large_orange_circle: '🟠',
   large_yellow_circle: '🟡',
   large_green_circle:  '🟢',
+  // Benseno özel öncelik emojileri → kanonik renk karakterine eşlenir (dashboard aynı mantık).
+  'bso-acil':   '🔴',
+  'bso-yuksek': '🟠',
+  'bso-normal': '🟡',
+  'bso-dusuk':  '🟢',
 };
 
 // Slack'teki marka listesi (otomatik tamamlama için)
@@ -629,11 +635,11 @@ app.command('/yardim', async ({ command, ack, respond }) => {
       { type: 'section', text: { type: 'mrkdwn', text: '*Emoji kısayolları* — brief mesajına reaction ekle VEYA thread\'e tek emoji yaz' } },
       { type: 'section', fields: [
         { type: 'mrkdwn', text:
-          '*İş kabulü / başladım:*\n🎨 → Tasarım\n✍️ → Editör\n🤖 → AI\n🔄 → Devam Ediyor\n\n' +
-          '👀 → İncelemede\n⏸️ → Beklemede\n✏️ → Revizyon\n✈️ → Müşteriye Yollandı\n✅ → Tamamlandı\n🔃 → Yeniden Aç\n📎 → Final teslim (galeri)' },
-        { type: 'mrkdwn', text: '*Öncelik:*\n🔴 → Acil\n🟠 → Yüksek\n🟡 → Normal\n🟢 → Düşük' },
+          '*Durum:*\n:bso-calisiliyor: → Çalışılıyor\n:bso-devam: → Devam ediyor\n:bso-incelemede: → İncelemede\n:bso-beklemede: → Beklemede\n:bso-revizyon: → Revizyon\n:bso-musteriye: → Müşteriye\n:bso-tamamlandi: → Tamamlandı\n:bso-yeniden-acildi: → Yeniden aç\n:bso-galeri-muhru: → Final teslim (galeri)' },
+        { type: 'mrkdwn', text: '*Öncelik:*\n:bso-acil: → Acil\n:bso-yuksek: → Yüksek\n:bso-normal: → Normal\n:bso-dusuk: → Düşük' },
       ]},
-      { type: 'context', elements: [{ type: 'mrkdwn', text: '📎 *Final teslim:* dosya içeren bir mesaja 📎 koy → o mesajdaki tüm dosyalar (görsel/PDF/video) işin final teslimi olarak galeriye kaydedilir (✅ otomatik son-görselden farklı: hangi dosyaların gireceğini sen seçersin).' }] },
+      { type: 'context', elements: [{ type: 'mrkdwn', text: ':bso-galeri-muhru: *Final teslim:* dosya içeren bir mesaja koy → o mesajdaki tüm dosyalar (görsel/PDF/video) işin final teslimi olarak galeriye kaydedilir (✅/:bso-tamamlandi: otomatik son-görselden farklı: hangi dosyaların gireceğini sen seçersin). Çalışılıyor için departman ayrımı yok — sistem departmanı atananlardan alır.' }] },
+      { type: 'context', elements: [{ type: 'mrkdwn', text: 'ℹ️ Klasik emojiler de çalışmaya devam ediyor (✅ ✈️ 👀 ✏️ 🎨 ✍️ 🤖 🔄 🔃 🔴🟠🟡🟢).' }] },
       { type: 'context', elements: [{ type: 'mrkdwn', text: '⏰ *Deadline uzatma puanı düşürür:* terminine ne kadar yakın uzatırsan o kadar çok (>48sa -0.5 · 24-48sa -1.0 · <24sa -1.5 · termin geçmişse -2.0). Tamamlananlarda Zamanında/Uzatılarak/Gecikmeli olarak işaretlenir.' }] },
       { type: 'context', elements: [{ type: 'mrkdwn', text: '⛓️ *Sıralı iş:* brief "Sıralı" açıldıysa ✅ yalnızca SENİN halkanı onaylar; iş sıradaki kişiye geçer ve herkes onaylamadan kapanmaz. Sonraki halka ✏️ koyarsa iş bir önceki halkaya (veya `revize: @kişi` ile seçilen halkaya) geri döner.' }] },
 
@@ -886,7 +892,7 @@ app.event('reaction_added', async ({ event, client }) => {
 
   // ✅ Brief tamamlama (atanan/editör/yönetici — yetkiyi script kontrol eder).
   // Deterministik: brief'i bns_briefs→bns_completed taşır + push. MCP/claude gerektirmez.
-  if (event.reaction === 'white_check_mark') {
+  if (event.reaction === 'white_check_mark' || event.reaction === 'bso-tamamlandi') {
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
     log(`✅ tamamlama: ${briefTs} — ${event.user}`);
     // Thread'deki son görseli onay öncesi yakala → galeri için image_url'e kaydet
@@ -897,7 +903,7 @@ app.event('reaction_added', async ({ event, client }) => {
   }
 
   // 📎 Final teslim işareti: bu mesaja ekli TÜM dosyaları (resim+diğer) brief'in final teslimi yap → galeri.
-  if (event.reaction === 'paperclip') {
+  if (event.reaction === 'paperclip' || event.reaction === 'bso-galeri-muhru') {
     if (!briefTs) return;
     log(`📎 final teslim işareti: ${event.item.ts} @ ${briefTs} — ${event.user}`);
     captureFinalDeliverables(client, event.item.channel, event.item.ts, briefTs, event.user).catch(e => log(`final teslim hata: ${e.message}`));
@@ -917,6 +923,10 @@ app.event('reaction_added', async ({ event, client }) => {
     arrows_counterclockwise: 'calisiliyor',  // yeniden aç: tamamlandı → devam ediyor
     arrows_clockwise: 'calisiliyor',         // 🔄 devam ediyor (/yardim'da belgeli)
     airplane: 'musteride', small_airplane: 'musteride',  // ✈️ müşteriye yollandı (müşteri onayında)
+    // Benseno özel emoji seti (bso-) — departman ayrımı yok, tek "çalışılıyor"; dept atananlardan gelir.
+    'bso-calisiliyor': 'calisiliyor', 'bso-devam': 'calisiliyor', 'bso-yeniden-acildi': 'calisiliyor',
+    'bso-incelemede': 'incelemede', 'bso-beklemede': 'beklemede',
+    'bso-revizyon': 'revizyon', 'bso-musteriye': 'musteride',
   };
   if (reactionBase in DURUM_MAP) {
     const durum = DURUM_MAP[reactionBase];
@@ -1191,6 +1201,15 @@ app.event('message', async ({ event, client }) => {
       { emoji: '✈️', durum: 'musteride' },     // müşteriye yollandı (müşteri onayında)
       { emoji: '✈',  durum: 'musteride' },     // VS-16 olmadan
       { emoji: ':airplane:', durum: 'musteride' }, { emoji: ':small_airplane:', durum: 'musteride' },
+      // Benseno özel emoji seti (thread'e yazıyla girilirse de yakala)
+      { emoji: ':bso-calisiliyor:', durum: 'calisiliyor' },
+      { emoji: ':bso-devam:', durum: 'calisiliyor' },
+      { emoji: ':bso-yeniden-acildi:', durum: 'calisiliyor' },
+      { emoji: ':bso-incelemede:', durum: 'incelemede' },
+      { emoji: ':bso-beklemede:', durum: 'beklemede' },
+      { emoji: ':bso-revizyon:', durum: 'revizyon' },
+      { emoji: ':bso-musteriye:', durum: 'musteride' },
+      { emoji: ':bso-tamamlandi:', durum: 'tamamlandi' },
     ];
     const eMatch = EMOJI_DURUM.find(e => trimmed.startsWith(e.emoji));
     if (eMatch) {
