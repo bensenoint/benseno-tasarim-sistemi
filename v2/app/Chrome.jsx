@@ -403,6 +403,9 @@ function bnsAdviceContext(n) {
 function ChatBot({ currentUser }) {
   const uid = (currentUser && (currentUser.slack_id || currentUser.id)) || null;
   const [open, setOpen] = React.useState(false);
+  const [tab, setTab] = React.useState("notif");   // panel sekmesi: "notif" (bildirim+öneri) | "chat" (sohbet)
+  const [selId, setSelId] = React.useState(null);   // master-detail: seçili bildirim (mobilde liste→detay)
+  const [notifFilter, setNotifFilter] = React.useState("all");   // liste filtresi: "all" | "unread"
   const [mood, setMood] = React.useState('neseli');
   const blobRef = React.useRef(null);
   const [msgs, setMsgs] = React.useState([]);   // {role:'user'|'assistant', content}
@@ -733,6 +736,33 @@ function ChatBot({ currentUser }) {
     } finally { setBusy(false); }
   };
 
+  // Bildirimden detay-meta türet: metindeki #no eşleşen iş varsa marka/kişi/puan/durum döner; yoksa sade.
+  const notifMeta = (n) => {
+    const D = window.BNS_DATA || {};
+    const text = (n && n.text) || "";
+    const noM = text.match(/#(\d+)/); const no = noM ? parseInt(noM[1], 10) : null;
+    const briefs = D._allBriefs || D.briefs || [];
+    const completed = D._allCompleted || D.completed || [];
+    const job = no != null ? [...briefs, ...completed].find(b => b.no === no) : null;
+    const marka = (job && job.marka) || ((text.split("—")[0] || "").replace(/#\d+/, "").trim());
+    return { no, marka, lead: job && job.lead, rating: (job && job.rating) || 0,
+             durum: job && (job.durum || job.delivery_status), link: n && n.link };
+  };
+  // Marka adından kararlı renk (detayda marka noktası için).
+  const brandColor = (s) => { let h = 0; for (let i = 0; i < (s || "").length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return `hsl(${h} 52% 46%)`; };
+  // Gün etiketi (Bugün / Dün / tarih) — bildirim listesini gruplamak için.
+  const dayLabel = (iso) => {
+    try { const d = new Date(iso); const t = new Date(); const y = new Date(Date.now() - 86400000);
+      if (d.toDateString() === t.toDateString()) return "Bugün";
+      if (d.toDateString() === y.toDateString()) return "Dün";
+      return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long" }); } catch (e) { return ""; }
+  };
+  // Panel açılınca / sekme değişince masaüstünde ilk bildirimi otomatik seç (detay boş kalmasın).
+  React.useEffect(() => {
+    if (!open || tab !== "notif") return;
+    if (vw >= 768 && (!selId || !notifItems.some(n => n.id === selId)) && notifItems.length) setSelId(notifItems[0].id);
+  }, [open, tab, notifItems]);
+
   return (
     <>
       {/* Kapalıyken son bildirim balonu (soru ekranı dışında) — Ody'ye bağlı */}
@@ -760,7 +790,7 @@ function ChatBot({ currentUser }) {
       {!open && !notifPeek && advicePeek && (
         <button onClick={() => {
             adviceEngagedRef.current = true; setAdvicePeek(null);
-            setUnread(false); setOpen(true); setOpenAdvice(advicePeek.id); fetchAdvice(advicePeek);
+            setUnread(false); setOpen(true); setTab("notif"); setSelId(advicePeek.id); setOpenAdvice(advicePeek.id); fetchAdvice(advicePeek);
           }}
           title="Ody'nin önerisini aç"
           style={{
@@ -813,117 +843,198 @@ function ChatBot({ currentUser }) {
           }}>{notifCount > 9 ? "9+" : notifCount}</span>}
         </button>
       )}
-      {open && (
-        <div style={{
-          position: "fixed", left: panelLeft, top: panelTop, zIndex: 90,
-          width: 380, maxWidth: "calc(100vw - 32px)", height: 520, maxHeight: "calc(100vh - 80px)",
-          background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 14,
-          boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden",
-        }}>
-          <div onPointerDown={startDrag} title="Sürükleyerek taşı"
-            style={{ padding: "12px 14px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 8, cursor: "grab", touchAction: "none", userSelect: "none" }}>
-            <span style={{ position: "relative", width: 30, height: 30, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {open && (() => {
+        const isM = vw < 768;
+        const panelW = tab === "notif" ? 720 : 400;
+        const panelH = 560;
+        const left = Math.min(Math.max(8, pos.x), Math.max(8, vw - (panelW + 12)));
+        const top  = Math.min(Math.max(8, pos.y - (panelH - 52)), Math.max(8, vh - (panelH + 12)));
+        const shell = isM
+          ? { position: "fixed", inset: 0, width: "100vw", height: "100dvh", borderRadius: 0, border: "none" }
+          : { position: "fixed", left, top, width: panelW, height: panelH, maxWidth: "calc(100vw - 16px)", maxHeight: "calc(100vh - 16px)", borderRadius: 14, border: "1px solid var(--line-strong)" };
+        const sel = notifItems.find(n => n.id === selId) || null;
+        const showList = isM ? !sel : true;
+        const showDetail = isM ? !!sel : true;
+        const selectNotif = (n) => { setSelId(n.id); fetchAdvice(n); };
+        // SegBtn — Bildirimler/Sohbet segment kontrolü (v2: kenar, r6, aktifte mavi alt çizgi)
+        const segBtn = (key, label, badge) => (
+          <button onClick={() => setTab(key)} style={{
+            border: 0, borderRight: key === "notif" ? "1px solid var(--line)" : 0, background: tab === key ? "var(--paper-2)" : "transparent",
+            color: tab === key ? "var(--ink)" : "var(--ink-4)", padding: "8px 14px", cursor: "pointer",
+            font: "600 12px/1 var(--font-sans)", position: "relative", display: "inline-flex", alignItems: "center", gap: 6,
+          }}>
+            {label}{badge > 0 && <span style={{ color: "var(--ody)", font: "700 10px/1 var(--font-mono)" }}>{badge}</span>}
+            {tab === key && <span style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "var(--blue, #24479E)" }}/>}
+          </button>
+        );
+        return (
+        <div style={Object.assign({ zIndex: 90, background: "var(--surface)", boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden" }, shell)}>
+          {/* Başlık — Ody + segment + kapat (sürüklenebilir; mobilde sabit) */}
+          <div onPointerDown={isM ? undefined : startDrag} title={isM ? undefined : "Sürükleyerek taşı"}
+            style={{ padding: "12px 14px", borderBottom: "1px solid var(--line-strong)", display: "flex", alignItems: "center", gap: 10, cursor: isM ? "default" : "grab", touchAction: "none", userSelect: "none", background: "var(--paper)", flex: "none" }}>
+            <span style={{ position: "relative", width: 32, height: 32, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
             </span>
-            <div style={{ flex: 1 }}>
-              <div style={{ font: "600 13px/1 var(--font-sans)", color: "var(--ink)" }}>Ody</div>
-              <div style={{ font: "400 10px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>kullanım · marka/iş/kişi soruları · öneri</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ font: "600 14px/1 var(--font-sans)", color: "var(--ink)", display: "flex", alignItems: "center", gap: 7 }}>Ody <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--ok, #2E8F66)" }}/></div>
+              <div style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>bildirim · öneri · sohbet</div>
             </div>
-            {msgs.length > 0 && <button onClick={() => setMsgs([])} title="Sohbeti temizle" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>temizle</button>}
-            <button onClick={() => { setOpen(false); markNotifRead(); dismissBrief(); }} style={{ border: 0, background: "transparent", color: "var(--ink-3)", cursor: "pointer", padding: 4, display: "inline-flex" }}><I.X size={15}/></button>
+            <div style={{ display: "flex", border: "1px solid var(--line-strong)", borderRadius: 6, overflow: "hidden", flex: "none" }}>
+              {segBtn("notif", "Bildirimler", notifCount)}
+              {segBtn("chat", "Sohbet", 0)}
+            </div>
+            <button onClick={() => { setOpen(false); markNotifRead(); dismissBrief(); }} title="Kapat" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", padding: 5, display: "inline-flex" }}><I.X size={16}/></button>
           </div>
-          <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* Bildirimler — belirgin alan */}
-            {notifItems.length > 0 && (
-              <div style={{ border: "1px solid var(--line)", borderRadius: 12, overflow: "hidden", background: "var(--surface)", boxShadow: "var(--shadow-card)", flex: "none" }}>
-                <div style={{ padding: "9px 12px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 7, background: "var(--ody-tint)" }}>
-                  <span style={{ color: "var(--ody)", display: "inline-flex" }}><I.Bell size={13}/></span>
-                  <span style={{ flex: 1, font: "700 11px/1 var(--font-sans)", letterSpacing: ".06em", textTransform: "uppercase", color: "var(--ody)" }}>Bildirimler</span>
-                  {notifCount > 0 && <span style={{ minWidth: 18, height: 18, padding: "0 5px", borderRadius: 999, background: "#24479E", color: "#fff", font: "700 10px/18px var(--font-sans)", textAlign: "center" }}>{notifCount}</span>}
+
+          {/* GÖVDE */}
+          {tab === "notif" ? (
+            <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+              {/* SOL — bildirim listesi */}
+              {showList && (
+                <div style={{ width: isM ? "100%" : 312, flex: isM ? 1 : "none", borderRight: isM ? "none" : "1px solid var(--line-strong)", display: "flex", flexDirection: "column", minHeight: 0, background: "var(--paper)" }}>
+                  <div style={{ display: "flex", gap: 6, padding: 12, borderBottom: "1px solid var(--line)", flex: "none" }}>
+                    {[["all", "Tümü"], ["unread", "Okunmamış"]].map(([k, lbl]) => (
+                      <button key={k} onClick={() => setNotifFilter(k)} style={{
+                        border: "1px solid " + (notifFilter === k ? "var(--ody)" : "var(--line)"), background: "transparent",
+                        color: notifFilter === k ? "var(--ody)" : "var(--ink-3)", borderRadius: 999, padding: "6px 13px",
+                        font: "600 11px/1 var(--font-sans)", cursor: "pointer",
+                      }}>{lbl}</button>
+                    ))}
+                  </div>
+                  <div style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+                    {(() => {
+                      const list = notifItems.slice(0, 40).filter(n => notifFilter === "all" ? true : !n.read_at);
+                      if (!list.length) return <div style={{ padding: 24, textAlign: "center", font: "400 12px var(--font-sans)", color: "var(--ink-4)" }}>{notifFilter === "unread" ? "Okunmamış bildirim yok." : "Bildirim yok."}</div>;
+                      let lastDay = null;
+                      return list.map((n) => {
+                        const unread = !n.read_at;
+                        const active = n.id === selId;
+                        const dl = dayLabel(n.created_at);
+                        const head = dl !== lastDay ? (lastDay = dl, dl) : null;
+                        return (
+                          <React.Fragment key={n.id}>
+                            {head && <div style={{ padding: "10px 15px 6px", font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ink-4)", display: "flex", alignItems: "center", gap: 8 }}><span style={{ width: 14, height: 2, background: "var(--blue, #24479E)" }}/>{head}</div>}
+                            <div onClick={() => selectNotif(n)} style={{
+                              display: "flex", gap: 11, padding: "12px 15px", cursor: "pointer",
+                              borderBottom: "1px solid var(--line-soft)",
+                              borderLeft: "3px solid " + (active ? "var(--ody)" : unread ? "var(--blue, #24479E)" : "transparent"),
+                              background: active ? "var(--ody-tint)" : "transparent",
+                            }}>
+                              <span style={{ width: 24, height: 24, flex: "none", borderRadius: 4, border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: unread ? "var(--ody)" : "var(--ink-4)" }}><I.Bell size={12}/></span>
+                              <span style={{ flex: 1, minWidth: 0 }}>
+                                <span style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-2)" }}>{n.text}</span>
+                                <span style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 5, font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)" }}>
+                                  {fmtNotifT(n.created_at)}{n.link && <><span>·</span><span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}><I.Link size={10}/> Slack</span></>}
+                                </span>
+                              </span>
+                              {unread && <span style={{ width: 7, height: 7, flex: "none", marginTop: 7, borderRadius: "50%", background: "var(--blue, #24479E)" }}/>}
+                            </div>
+                          </React.Fragment>
+                        );
+                      });
+                    })()}
+                  </div>
                 </div>
-                <div style={{ maxHeight: msgs.length ? 150 : 300, overflowY: "auto" }}>
-                  {notifItems.slice(0, 30).map((n, idx) => {
-                    var unread = !n.read_at;
-                    var autoShow = idx < 3;   // en yeni 3 bildirimde öneri otomatik açık (toggle arkasında kaybolmasın)
-                    var adv = advice[n.id];
-                    var advMeaningful = adv && adv.state === "done" && (adv.text || "").trim();
-                    var advPending = adv && adv.state === "loading";
-                    var advNone = adv && adv.state === "none";   // yeterli bağlam yok → öneri gösterilmez
+              )}
+              {/* SAĞ — detay */}
+              {showDetail && (
+                <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "var(--surface)" }}>
+                  {!sel ? (
+                    <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, font: "400 13px var(--font-sans)", color: "var(--ink-4)", textAlign: "center" }}>Soldan bir bildirim seç.</div>
+                  ) : (() => {
+                    const m = notifMeta(sel);
+                    const adv = advice[sel.id];
+                    const advDone = adv && adv.state === "done" && (adv.text || "").trim();
+                    const advLoading = adv && adv.state === "loading";
+                    const advNone = adv && adv.state === "none";
+                    const bc = brandColor(m.marka);
+                    const initials = (m.lead && m.lead.name || "").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
                     return (
-                    <div key={n.id} style={{
-                      borderLeft: unread ? "3px solid var(--ody)" : "3px solid transparent",
-                      background: unread ? "var(--ody-tint)" : "transparent",
-                      borderBottom: "1px solid var(--line-soft)",
-                    }}>
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "9px 12px" }}>
-                        <span aria-hidden="true" style={{ marginTop: 5, flex: "none", width: 7, height: 7, borderRadius: "50%", background: unread ? "var(--ody)" : "transparent" }}/>
-                        <span style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ display: "block", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-4)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.text}</span>
-                          <span style={{ display: "block", font: "400 10px/1 var(--font-sans)", color: unread ? "var(--ink-3)" : "var(--ink-5)", marginTop: 3 }}>{fmtNotifT(n.created_at)}</span>
-                          <span style={{ display: "flex", gap: 14, marginTop: 6, alignItems: "center" }}>
-                            {(autoShow ? (advMeaningful || advPending) : !advNone) && (autoShow
-                              ? <span style={{ font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>💡 Ody'nin önerisi</span>
-                              : <button onClick={() => toggleAdvice(n)} style={{ border: 0, background: "transparent", cursor: "pointer", padding: 0, font: "600 11px/1 var(--font-sans)", color: "var(--ody)", display: "inline-flex", alignItems: "center", gap: 4 }}>
-                                  💡 Ody'nin önerisi <span style={{ display: "inline-flex", transform: openAdvice === n.id ? "rotate(180deg)" : "none", transition: "transform 160ms" }}><I.ChevronDown size={11}/></span>
-                                </button>)}
-                            {n.link && <a href={n.link} target="_blank" rel="noreferrer" style={{ font: "500 11px/1 var(--font-sans)", color: "var(--ink-4)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3 }}><I.Link size={11}/> Slack</a>}
-                          </span>
-                        </span>
-                      </div>
-                      {(autoShow || openAdvice === n.id) && (advMeaningful || advPending) && (
-                        <div style={{ padding: "0 12px 11px 27px" }}>
-                          <div style={{ background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 8, padding: "9px 11px", font: "400 12px/1.55 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                            {advPending
-                              ? <span style={{ color: "var(--ink-4)" }}>Ody düşünüyor…</span>
-                              : <Linkify text={(adv && adv.text) || ""}/>}
-                          </div>
+                      <div style={{ padding: "22px 24px 26px", display: "flex", flexDirection: "column", gap: 16 }}>
+                        {isM && <button onClick={() => setSelId(null)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", color: "var(--blue, #24479E)", cursor: "pointer", font: "600 13px/1 var(--font-sans)", padding: 0, display: "inline-flex", alignItems: "center", gap: 4 }}>‹ bildirimler</button>}
+                        <div style={{ font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--blue, #24479E)", display: "flex", alignItems: "center", gap: 6 }}><I.Bell size={12}/> {(m.marka || "Bildirim")}{m.no ? " · #" + m.no : ""}</div>
+                        <div style={{ font: "500 24px/1.2 var(--font-display)", fontStyle: "italic", color: "var(--ink)", letterSpacing: "-.01em" }}>{sel.text}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, font: "400 13px/1 var(--font-mono)", color: "var(--ink-3)", flexWrap: "wrap" }}>
+                          <span style={{ width: 9, height: 9, borderRadius: "50%", background: bc }}/>
+                          {m.marka && <span style={{ color: "var(--ink-2)", fontWeight: 600 }}>{m.marka}</span>}
+                          <span>· {fmtNotifT(sel.created_at)}</span>
+                          {initials && <span title={m.lead.name} style={{ width: 24, height: 24, borderRadius: "50%", background: bc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", font: "700 9px var(--font-sans)" }}>{initials}</span>}
                         </div>
-                      )}
+                        {/* Marka/iş bağlam şeridi — kare, mavi sol şerit (yalnız iş eşleştiyse) */}
+                        {(m.durum || m.rating > 0) && (
+                          <div style={{ display: "flex", gap: "8px 18px", flexWrap: "wrap", padding: "11px 13px", border: "1px solid var(--line)", borderLeft: "3px solid var(--blue, #24479E)", background: "var(--paper-2)", font: "600 11px/1.4 var(--font-mono)", color: "var(--ink-3)" }}>
+                            {m.durum && <span>durum <b style={{ color: "var(--ink)" }}>{m.durum}</b></span>}
+                            {m.rating > 0 && <span>puan <span style={{ color: "var(--gold, #E2A100)", letterSpacing: 1 }}>{"★".repeat(Math.round(m.rating))}<span style={{ color: "var(--line-strong)" }}>{"★".repeat(Math.max(0, 5 - Math.round(m.rating)))}</span></span></span>}
+                          </div>
+                        )}
+                        {/* Ody önerisi — kare, ember sol şerit */}
+                        {advLoading ? (
+                          <div style={{ padding: "13px 15px", border: "1px solid var(--line)", borderLeft: "3px solid var(--ody)", background: "var(--paper-2)", font: "400 12.5px var(--font-sans)", color: "var(--ink-4)", fontStyle: "italic" }}>Ody düşünüyor…</div>
+                        ) : advDone ? (
+                          <div style={{ padding: "15px 16px", border: "1px solid var(--line)", borderLeft: "3px solid var(--ody)", background: "var(--paper-2)" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 11 }}>
+                              <span style={{ width: 16, height: 16, borderRadius: "55% 45% 58% 42% / 52% 48% 56% 44%", background: "var(--ody)", flex: "none" }}/> Ody'nin önerisi
+                            </div>
+                            <div style={{ font: "400 13px/1.6 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={adv.text}/></div>
+                          </div>
+                        ) : advNone ? (
+                          <div style={{ padding: "13px 15px", border: "1px dashed var(--line-strong)", background: "var(--paper-2)", font: "400 12.5px/1.6 var(--font-sans)", color: "var(--ink-4)", fontStyle: "italic" }}>Bu bildirim için yeterli bağlam yok.</div>
+                        ) : null}
+                        {/* Aksiyonlar — v2 Button yapısı (r6, hairline, 600/13) */}
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
+                          {sel.link && <a href={sel.link} target="_blank" rel="noreferrer" style={{ textDecoration: "none", border: "1px solid var(--ody)", background: "var(--ody)", color: "#fff", borderRadius: 6, padding: "9px 14px", font: "600 13px/1 var(--font-sans)", display: "inline-flex", alignItems: "center", gap: 6 }}><I.Link size={14}/> Slack thread'inde aç</a>}
+                          <button onClick={() => setTab("chat")} style={{ border: "1px solid var(--line-strong)", background: "var(--surface)", color: "var(--ink)", borderRadius: 6, padding: "9px 14px", font: "600 13px/1 var(--font-sans)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}><I.Bell size={14}/> Ody'ye sor</button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          ) : (
+            /* SOHBET sekmesi */
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+              <div style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 10, minHeight: 0 }}>
+                {brief && (
+                  <div style={{ border: "1px solid var(--line)", borderLeft: "3px solid var(--ody)", background: "var(--paper-2)", padding: "11px 13px", flex: "none" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                      <span style={{ flex: 1, font: "700 10px/1 var(--font-sans)", letterSpacing: ".07em", textTransform: "uppercase", color: "var(--ody)" }}>Günlük özet</span>
+                      <button onClick={dismissBrief} title="Kapat" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", padding: 0, display: "inline-flex" }}><I.X size={13}/></button>
                     </div>
-                  );})}
-                </div>
-              </div>
-            )}
-            {/* Günlük iş özeti — görülünce (× veya panel kapanınca) otomatik kaybolur */}
-            {brief && (
-              <div style={{ border: "1px solid var(--ody-muted, var(--line))", borderRadius: 12, background: "var(--ody-tint)", padding: "11px 13px", flex: "none" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                  <span style={{ flex: 1, font: "700 10px/1 var(--font-sans)", letterSpacing: ".07em", textTransform: "uppercase", color: "var(--ody)" }}>Günlük özet</span>
-                  <button onClick={dismissBrief} title="Kapat" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", padding: 0, display: "inline-flex" }}><I.X size={13}/></button>
-                </div>
-                <div style={{ font: "400 12.5px/1.55 var(--font-sans)", color: "var(--ink)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={brief}/></div>
-              </div>
-            )}
-            {/* Sohbet — yalnız aktifken (soru sorulunca) açılır */}
-            {(msgs.length > 0 || busy) && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {msgs.map((m, i) => (
+                    <div style={{ font: "400 12.5px/1.55 var(--font-sans)", color: "var(--ink)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={brief}/></div>
+                  </div>
+                )}
+                {!msgs.length && !busy && !brief && <div style={{ margin: "auto", textAlign: "center", font: "400 13px/1.6 var(--font-sans)", color: "var(--ink-4)", maxWidth: 280 }}>Marka, iş veya kişi hakkında soru sor — Ody sistem verisiyle yanıtlar.</div>}
+                {msgs.map((mm, i) => (
                   <div key={i} style={{
-                    alignSelf: m.role === "user" ? "flex-end" : "stretch", maxWidth: m.role === "user" ? "85%" : "100%", width: m.role === "user" ? undefined : "100%",
-                    padding: "8px 11px", borderRadius: 10, boxSizing: "border-box",
-                    background: m.role === "user" ? "var(--ody)" : "var(--paper-2)",
-                    color: m.role === "user" ? "#fff" : "var(--ink)",
+                    alignSelf: mm.role === "user" ? "flex-end" : "stretch", maxWidth: mm.role === "user" ? "85%" : "100%", width: mm.role === "user" ? undefined : "100%",
+                    padding: "10px 13px", borderRadius: 10, boxSizing: "border-box",
+                    background: mm.role === "user" ? "var(--blue, #24479E)" : "var(--paper-2)",
+                    color: mm.role === "user" ? "#fff" : "var(--ink-2)",
+                    border: mm.role === "user" ? 0 : "1px solid var(--line)",
                     font: "400 13px/1.55 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word",
-                  }}>{m.role === "assistant" ? <Linkify text={m.content}/> : m.content}</div>
+                  }}>{mm.role === "assistant" ? <Linkify text={mm.content}/> : mm.content}</div>
                 ))}
-                {busy && <div style={{ alignSelf: "flex-start", padding: "8px 11px", borderRadius: 10, background: "var(--paper-2)", color: "var(--ink-4)", font: "400 13px/1 var(--font-sans)" }}>yazıyor…</div>}
+                {busy && <div style={{ alignSelf: "flex-start", padding: "10px 13px", borderRadius: 10, background: "var(--paper-2)", border: "1px solid var(--line)", color: "var(--ink-4)", font: "400 13px/1 var(--font-sans)" }}>yazıyor…</div>}
                 <div ref={endRef}/>
               </div>
-            )}
-          </div>
-          <div style={{ padding: 10, borderTop: "1px solid var(--line)", display: "flex", gap: 8 }}>
-            <input value={input} onChange={e => setInput(e.target.value)}
-              onKeyDown={e => { if (e.key === "Enter") send(); }}
-              placeholder="Soru yaz…" disabled={busy}
-              style={{ flex: 1, padding: "9px 11px", border: "1px solid var(--line)", borderRadius: 8,
-                background: "var(--surface-sub)", color: "var(--ink)", font: "400 13px/1.3 var(--font-sans)", outline: "none" }}/>
-            <button onClick={send} disabled={busy || !input.trim()} style={{
-              padding: "0 14px", border: 0, borderRadius: 8, background: "var(--ody)", color: "#fff",
-              font: "600 13px/1 var(--font-sans)", cursor: busy ? "default" : "pointer", opacity: busy || !input.trim() ? 0.5 : 1,
-            }}>Gönder</button>
-          </div>
+              {msgs.length > 0 && <div style={{ padding: "0 16px 10px", flex: "none" }}><button onClick={() => setMsgs([])} style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>sohbeti temizle</button></div>}
+              <div style={{ padding: 12, borderTop: "1px solid var(--line-strong)", display: "flex", gap: 9, background: "var(--paper)", flex: "none" }}>
+                <input value={input} onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") send(); }}
+                  placeholder="Soru yaz…" disabled={busy}
+                  style={{ flex: 1, padding: "11px 14px", border: "1px solid var(--line-strong)", borderRadius: 6,
+                    background: "var(--surface)", color: "var(--ink)", font: "400 13px/1.3 var(--font-sans)", outline: "none" }}/>
+                <button onClick={send} disabled={busy || !input.trim()} style={{
+                  padding: "0 18px", border: 0, borderRadius: 6, background: "var(--ody)", color: "#fff",
+                  font: "600 13px/1 var(--font-sans)", cursor: busy ? "default" : "pointer", opacity: busy || !input.trim() ? 0.5 : 1,
+                }}>Gönder</button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+        );
+      })()}
     </>
   );
 }
