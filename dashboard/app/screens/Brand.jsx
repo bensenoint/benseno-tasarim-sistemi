@@ -125,6 +125,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   const [from, setFrom] = React.useState("");
   const [to, setTo] = React.useState("");
   const [view, setView] = React.useState("active");   // active | done
+  const [tomorrowOnly, setTomorrowOnly] = React.useState(false);   // "Yarın" filtresi: deadline'ı yarın olan aktif işler
 
   // kişi seçenekleri (aktif lead+contributors ∪ tamamlanan lead+contrib)
   const people = React.useMemo(() => {
@@ -137,15 +138,22 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   const fromMs = from ? new Date(from + "T00:00:00").getTime() : null;
   const toMs = to ? new Date(to + "T23:59:59").getTime() : null;
   const inRange = ms => { if (ms == null) return !fromMs && !toMs ? true : false; if (fromMs && ms < fromMs) return false; if (toMs && ms > toMs) return false; return true; };
+  // "Yarın" sınırları — referans now'a göre yarın 00:00 → 23:59 (deadline yarın olanlar)
+  const _d = new Date(now);
+  const startTom = new Date(_d.getFullYear(), _d.getMonth(), _d.getDate() + 1).getTime();
+  const endTom = startTom + 86400000 - 1;
+  const isTomorrow = ms => ms != null && ms >= startTom && ms <= endTom;
 
   const filteredActive = active.filter(b => {
     if (person && !activeIds(b).includes(person)) return false;
     if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
+    if (tomorrowOnly && !isTomorrow(dlMs(b))) return false;
     return true;
   });
   const filteredMusteride = musteride.filter(b => {
     if (person && !activeIds(b).includes(person)) return false;
     if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
+    if (tomorrowOnly && !isTomorrow(dlMs(b))) return false;
     return true;
   });
   const filteredDone = done.filter(c => {
@@ -241,6 +249,13 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
             {seg("musteride", `✈️ Müşteri Onayında · ${filteredMusteride.length}`)}
             {seg("done", `Tamamlanan · ${filteredDone.length}`)}
           </div>
+          <button onClick={() => setTomorrowOnly(v => !v)} title="Yarın teslim edilecek / devam edecek işler"
+            style={{ ...fldStyle, cursor:"pointer",
+              background: tomorrowOnly ? "var(--ember-tint)" : "var(--surface)",
+              borderColor: tomorrowOnly ? "var(--ember)" : "var(--line)",
+              color: tomorrowOnly ? "var(--ember)" : "var(--ink-3)", fontWeight: tomorrowOnly ? 600 : 400 }}>
+            🌅 Yarın
+          </button>
           <select value={person} onChange={e => setPerson(e.target.value)} style={fldStyle}>
             <option value="">Herkes</option>
             {people.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}

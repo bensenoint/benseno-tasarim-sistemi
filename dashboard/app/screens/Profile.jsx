@@ -36,6 +36,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const [timeRange, setTimeRange] = React.useState("30");
   const [jobView, setJobView] = React.useState("aktif");   // ana iş tablosu görünümü (dropdown)
   const [markaSel, setMarkaSel] = React.useState("all");   // ana iş tablosu marka filtresi
+  const [tomorrowOnly, setTomorrowOnly] = React.useState(false);   // "Yarın" filtresi: deadline'ı yarın olan işler
   const allBriefs    = data._allBriefs    || data.briefs    || [];
   const allCompleted = data.completed || data._allCompleted || [];
   const allUsers     = data.USERS || [];
@@ -168,7 +169,16 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   // Marka filtresi — seçenekler aktif görünümün işlerinden; seçili marka görünümde yoksa "tümü" gibi davran
   const viewBrands = [...new Set(tableRows.map(b => b.marka).filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
   const markaActive = markaSel !== "all" && viewBrands.includes(markaSel);
-  const displayRows = markaActive ? tableRows.filter(b => b.marka === markaSel) : tableRows;
+  const markaRows = markaActive ? tableRows.filter(b => b.marka === markaSel) : tableRows;
+  // "Yarın" filtresi — deadline'ı yarın (referans now'a göre) olan işler
+  const _nowY = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
+  const _dY = new Date(_nowY);
+  const _startTomY = new Date(_dY.getFullYear(), _dY.getMonth(), _dY.getDate() + 1).getTime();
+  const _endTomY = _startTomY + 86400000 - 1;
+  const _dlMsY = b => { const d = b.deadline; if (typeof d !== "number") return null; return d < 1e10 ? d * 1000 : d; };
+  const displayRows = tomorrowOnly
+    ? markaRows.filter(b => { const m = _dlMsY(b); return m != null && m >= _startTomY && m <= _endTomY; })
+    : markaRows;
 
   // ─── Durum dağılımı
   const durumMap = {};
@@ -347,6 +357,13 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
               <option value="all">Tüm markalar</option>
               {viewBrands.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
+            <button onClick={() => setTomorrowOnly(v => !v)} title="Yarın teslim edilecek / devam edecek işler"
+              style={{font:"600 13px/1 var(--font-sans)", borderRadius:6, padding:"7px 12px", cursor:"pointer",
+                border:"1px solid " + (tomorrowOnly ? "var(--ember)" : "var(--line)"),
+                background: tomorrowOnly ? "var(--ember-tint)" : "var(--paper-2)",
+                color: tomorrowOnly ? "var(--ember)" : "var(--ink-3)", flex: isMobile ? "1 1 0" : undefined, minWidth: isMobile ? 0 : undefined}}>
+              🌅 Yarın
+            </button>
             <div style={{font:"400 11px/1.3 var(--font-sans)", color:"var(--ink-4)"}}>
               {curView.completed && (overdue.length || urgent.length) ? "" : (overdue.length > 0 && jobView==="aktif" && !markaActive && <span style={{color:"var(--prio-red)", fontWeight:600}}>{overdue.length} gecikmiş · </span>)}
               toplam {displayRows.length}{markaActive ? ` · ${markaSel}` : ""} · {curView.note}
