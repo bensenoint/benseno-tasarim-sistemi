@@ -364,6 +364,23 @@ async function chatContext() {
     L.push(`#${c.no} [${c.marka}] ${c.baslik} · bitiş:${dl(c.bitis)} · rev:${c.rev}${c.rating ? ` · puan:${c.rating}/5(${c.rating_by === 'ai' ? 'AI' : 'yönetici'})` : ''}${kisiler ? ' · ' + kisiler : ''}`);
     if (c.insight) L.push(`  insight: ${c.insight.slice(0, 300)}`);
   }
+  // Kişi bazlı tamamlanan-iş indeksi — Ody'nin 60 satırı tek tek tarayıp isim aramasını
+  // ortadan kaldırır (uzun listede isim gözden kaçıyordu, kişi performansı eksik çıkıyordu).
+  // Sadece iş numaraları; puanlar YILDIZ KARNESİ'nde (gizlilik kuralı korunur).
+  const _kisiIsleri = {};
+  for (const c of _completedRecent) {
+    for (const p of [...(c.workers || []), ...(c.leads || [])]) {
+      if (!p.id) continue;
+      (_kisiIsleri[p.id] = _kisiIsleri[p.id] || { name: p.name, nos: [] }).nos.push(c.no);
+    }
+  }
+  if (Object.keys(_kisiIsleri).length) {
+    L.push('\n## KİŞİ BAZLI TAMAMLANAN İŞ DÖKÜMÜ (yukarıdaki tamamlananlardan türetildi)');
+    for (const { name, nos } of Object.values(_kisiIsleri)) {
+      const uniq = [...new Set(nos)].sort((a, b) => a - b);
+      L.push(`${name}: ${uniq.length} tamamlanan — ${uniq.map(n => '#' + n).join(', ')}`);
+    }
+  }
   L.push('\n## MARKA KANAL ÖZETLERİ');
   for (const br of ed.bns_brands || []) {
     if (br.kanal_ozet) L.push(`[${br.name}] ${br.kanal_ozet.slice(0, 250)}`);
