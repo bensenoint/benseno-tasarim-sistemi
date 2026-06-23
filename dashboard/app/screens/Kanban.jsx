@@ -2,7 +2,14 @@
 
 function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   const [prioFilter, setPrioFilter] = React.useState("all");
+  const [markaFilter, setMarkaFilter] = React.useState("all");   // müşteri (marka) filtresi
   const [search, setSearch]         = React.useState("");
+
+  // Müşteri (marka) seçenekleri — aktif + tamamlanan brief'lerden, alfabetik.
+  const markaOpts = [...new Set([
+    ...(data._allBriefs || data.briefs || []).map(b => b.marka),
+    ...(data._allCompleted || data.completed || []).map(c => c.marka),
+  ].filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
 
   const cols = [
     { id: "yeni",        label: "Yeni",        Ic: I.Inbox,  accent: "var(--ink-3)" },
@@ -16,6 +23,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   // for the Tamamlandı column we use completed[]; map to active brief shape (lightly)
   // Arama filtresi tamamlananlara da uygulanır — slice'tan ÖNCE (yoksa filtre yalnız ilk 12'de arar)
   let allCompleted = data._allCompleted || data.completed || [];
+  if (markaFilter !== "all") allCompleted = allCompleted.filter(c => c.marka === markaFilter);
   if (search.trim()) {
     const cq = search.toLowerCase().trim();
     allCompleted = allCompleted.filter(c =>
@@ -42,6 +50,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
 
   // Filtrele — viewMode'dan bağımsız tüm brief'ler
   let allBriefs = data._allBriefs || data.briefs;
+  if (markaFilter !== "all") allBriefs = allBriefs.filter(b => b.marka === markaFilter);
   if (prioFilter !== "all") allBriefs = allBriefs.filter(b => b.priority.code === prioFilter);
   if (search.trim()) {
     const q = search.toLowerCase().trim();
@@ -58,6 +67,11 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
         title="Kanban"
         subtitle="durum bazlı kolonlar · drag yerine status menüsü"
         actions={<>
+          <select value={markaFilter} onChange={e => setMarkaFilter(e.target.value)} aria-label="Müşteri filtresi"
+            style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer", maxWidth:180}}>
+            <option value="all">Tüm müşteriler</option>
+            {markaOpts.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
           <PrioFilter value={prioFilter} onChange={setPrioFilter}/>
         </>}
       />
