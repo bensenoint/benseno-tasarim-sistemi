@@ -357,7 +357,8 @@ async function chatContext() {
   }
   L.push('\n## TAMAMLANANLAR (son 30 gün)');
   for (const c of (ed.bns_completed || []).slice(-40)) {
-    L.push(`#${c.no} [${c.marka}] ${c.baslik} · bitiş:${dl(c.bitis)} · rev:${c.rev}${c.rating ? ` · puan:${c.rating}/5(${c.rating_by === 'ai' ? 'AI' : 'yönetici'})` : ''}`);
+    const kisiler = [...(c.workers || []).map(w => w.name), ...(c.leads || []).map(x => x.name + '(lead)')].join(', ');
+    L.push(`#${c.no} [${c.marka}] ${c.baslik} · bitiş:${dl(c.bitis)} · rev:${c.rev}${c.rating ? ` · puan:${c.rating}/5(${c.rating_by === 'ai' ? 'AI' : 'yönetici'})` : ''}${kisiler ? ' · ' + kisiler : ''}`);
     if (c.insight) L.push(`  insight: ${c.insight.slice(0, 300)}`);
   }
   L.push('\n## MARKA KANAL ÖZETLERİ');
