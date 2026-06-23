@@ -73,7 +73,7 @@ function check(name, ok, detail) {
     SELECT br.name,
       count(b.id) FILTER (WHERE b.completed_at IS NULL),
       count(b.id) FILTER (WHERE b.completed_at IS NULL AND b.deadline<now()),
-      coalesce(round(avg(b.rating) FILTER (WHERE b.rating IS NOT NULL),1)::text,''),
+      coalesce(round(avg(b.rating) FILTER (WHERE b.rating IS NOT NULL)::numeric,1)::text,''),
       count(b.id) FILTER (WHERE b.rating IS NOT NULL)
     FROM brands br LEFT JOIN briefs b ON b.marka_id=br.id AND b.deleted_at IS NULL
     GROUP BY br.name`);
@@ -89,12 +89,12 @@ function check(name, ok, detail) {
   // ─────────────────────────────────────────────────────────────────────────
   console.log('③ YILDIZ karneleri (SQL ↔ API bns_ratings)');
   const r = emb.bns_ratings || {};
-  const [[favg, fcnt]] = sql(`SELECT coalesce(round(avg(rating),1)::text,''), count(*) FROM briefs WHERE rating IS NOT NULL AND deleted_at IS NULL`);
+  const [[favg, fcnt]] = sql(`SELECT coalesce(round(avg(rating)::numeric,1)::text,''), count(*) FROM briefs WHERE rating IS NOT NULL AND deleted_at IS NULL`);
   if (r.firma) {
     check('firma puan ort.', eq(favg, r.firma.avg, 0.05), `db=${favg} api=${r.firma.avg}`);
     check('firma puan sayısı', eq(fcnt, r.firma.cnt, 0), `db=${fcnt} api=${r.firma.cnt}`);
   } else check("firma rating API'de yok", false);
-  const kisiRows = sql(`SELECT a.user_id, round(avg(b.rating),1)::text, count(DISTINCT b.id)
+  const kisiRows = sql(`SELECT a.user_id, round(avg(b.rating)::numeric,1)::text, count(DISTINCT b.id)
     FROM brief_assignees a JOIN briefs b ON b.id=a.brief_id
     WHERE b.rating IS NOT NULL AND a.role IN ('contributor','lead') AND b.deleted_at IS NULL
     GROUP BY a.user_id`);
