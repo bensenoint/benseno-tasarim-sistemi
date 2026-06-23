@@ -59,6 +59,37 @@ defs.genel_ozet = {
   },
 };
 
+defs.brief_sorgula = {
+  description: 'Brief ara/filtrele. Filtreler: marka (kısmi), durum (yeni/calisiliyor/incelemede/musteride/blokeli), kisi (isim, atanan), gecikmis (true), tamamlandi (true→tamamlananlarda arar; aralık uygulanır). Eşleşen işlerin listesi + toplam sayı.',
+  input_schema: { type: 'object', properties: {
+    marka: { type: 'string' }, durum: { type: 'string' }, kisi: { type: 'string' },
+    gecikmis: { type: 'boolean' }, tamamlandi: { type: 'boolean' }, aralik: { type: 'string' },
+  } },
+  run(input, ctx) {
+    const range = normRange(ctx.range);
+    const now = Date.now();
+    const u = input.kisi ? _matchUser(ctx.ed, input.kisi) : null;
+    if (input.kisi && !u) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+    const hasPerson = (b) => !u || [...(b.workers || []), ...(b.leads || [])].some(p => p.id === u.id);
+    let rows;
+    if (input.tamamlandi) {
+      rows = (ctx.ed.bns_completed || []).filter(c => inRange(c.bitis, range) && hasPerson(c)
+        && (!input.marka || (c.marka || '').toLocaleLowerCase('tr').includes(input.marka.toLocaleLowerCase('tr'))));
+      rows = rows.map(c => ({ no: c.no, marka: c.marka, baslik: c.baslik, durum: 'tamamlandi', bitis: c.bitis, puan: c.rating ?? null,
+        kisiler: [...(c.workers || []).map(w => w.name), ...(c.leads || []).map(l => l.name + '(lead)')] }));
+    } else {
+      rows = (ctx.ed.bns_briefs || []).filter(b => hasPerson(b)
+        && (!input.durum || b.durum === input.durum)
+        && (!input.gecikmis || (b.deadline && b.deadline < now))
+        && (!input.marka || (b.marka || '').toLocaleLowerCase('tr').includes(input.marka.toLocaleLowerCase('tr'))));
+      rows = rows.map(b => ({ no: b.no, marka: b.marka, baslik: b.baslik, durum: b.durum, termin: b.deadline,
+        gecikmis: !!(b.deadline && b.deadline < now),
+        kisiler: [...(b.workers || []).map(w => w.name), ...(b.leads || []).map(l => l.name + '(lead)')] }));
+    }
+    return { toplam: rows.length, isler: rows.slice(0, 40), kirpildi: rows.length > 40 };
+  },
+};
+
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
 

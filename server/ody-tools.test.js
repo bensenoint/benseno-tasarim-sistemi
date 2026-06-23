@@ -23,3 +23,11 @@ test('TOOLS Anthropic şemasına uygun (name+description+input_schema)', () => {
     assert.equal(t.input_schema.type, 'object');
   }
 });
+
+test('brief_sorgula durum=tamamlandi + marka filtresi sayı döner', async () => {
+  const c = await ctx();
+  const r = await runTool('brief_sorgula', { tamamlandi: true, marka: 'Hasvet' }, c);
+  assert.equal(typeof r.toplam, 'number');
+  assert.ok(Array.isArray(r.isler));
+  assert.ok(r.isler.every(x => x.marka.toLowerCase().includes('hasvet')));
+});
