@@ -400,7 +400,9 @@ function bnsAdviceContext(n) {
   return { marka, jobCtx, brandCtx, simCtx, personCtx, weak };
 }
 
-function ChatBot({ currentUser }) {
+function ChatBot({ currentUser, dateRange }) {
+  // Dashboard'da seçili tarih aralığını /api/chat'e iletmek için (Ody o aralıktaki veriyi görür).
+  const _range = () => (dateRange && typeof dateRange.from === "number") ? { from: dateRange.from, to: dateRange.to } : undefined;
   const uid = (currentUser && (currentUser.slack_id || currentUser.id)) || null;
   const [open, setOpen] = React.useState(false);
   const [tab, setTab] = React.useState("notif");   // panel sekmesi: "notif" (bildirim+öneri) | "chat" (sohbet)
@@ -625,7 +627,7 @@ function ChatBot({ currentUser }) {
         const r = await fetch(`${API}/api/chat`, {
           method: "POST",
           headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
-          body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }] }),
+          body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }], range: _range() }),
         });
         const j = await r.json().catch(() => ({}));
         if (r.ok && j.reply) {
@@ -681,7 +683,7 @@ function ChatBot({ currentUser }) {
         const r = await fetch(`${API}/api/chat`, {
           method: "POST",
           headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
-          body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }] }),
+          body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }], range: _range() }),
         });
         const j = await r.json().catch(() => ({}));
         if (r.ok && j.reply) {
@@ -725,7 +727,7 @@ function ChatBot({ currentUser }) {
       const r = await fetch(`${API}/api/chat`, {
         method: "POST",
         headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
-        body: JSON.stringify({ messages: next.slice(-12) }),
+        body: JSON.stringify({ messages: next.slice(-12), range: _range() }),
       });
       const j = await r.json().catch(() => ({}));
       const okReply = r.ok && j.reply;
@@ -779,7 +781,7 @@ function ChatBot({ currentUser }) {
       "Önerin hâlâ DOĞRU, spesifik ve veriye dayalıysa SADECE tek kelime yaz: DOĞRU. " +
       "Yanlış/eksik/genel ise DÜZELTİLMİŞ öneriyi yaz: EN FAZLA 3 madde (•), her madde tek kısa cümle, # numarası/markaya referans ver, giriş/selam yazma.";
     try {
-      const r = await fetch(`${API}/api/chat`, { method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + tok() }, body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }] }) });
+      const r = await fetch(`${API}/api/chat`, { method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + tok() }, body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }], range: _range() }) });
       const j = await r.json().catch(() => ({}));
       const rep = (r.ok && j.reply) ? String(j.reply).trim() : "";
       if (!rep) { setFbFor(n.id, { busy: false, note: "Yeniden değerlendirme alınamadı, tekrar dene." }); return; }

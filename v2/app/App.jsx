@@ -653,7 +653,7 @@ function App({ currentUser, onLogout }) {
       {toast && <Toast msg={toast}/>}
       {/* 🤖 Sistem Asistanı — sağ alt yüzen sohbet */}
       {/* Ody — bir bottom-sheet/modal/menü açıkken gizle (üstüne binmesin, navigasyonu engellemesin) */}
-      {!(openBrief || newBrief || palette || mobileMenuOpen) && <ChatBot currentUser={currentUser}/>}
+      {!(openBrief || newBrief || palette || mobileMenuOpen) && <ChatBot currentUser={currentUser} dateRange={dateRange}/>}
 
       <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>
 
