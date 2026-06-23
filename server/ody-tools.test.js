@@ -31,3 +31,24 @@ test('brief_sorgula durum=tamamlandi + marka filtresi sayı döner', async () =>
   assert.ok(Array.isArray(r.isler));
   assert.ok(r.isler.every(x => x.marka.toLowerCase().includes('hasvet')));
 });
+
+test('kisi_dokumu İrem = 3 tamamlanan (#14,#15,#83)', async () => {
+  const c = await ctx();
+  const r = await runTool('kisi_dokumu', { kisi: 'U0AK8U7L57F' }, c);
+  assert.equal(r.tamamlanan.say, 3);
+  assert.deepEqual(r.tamamlanan.nos, [14, 15, 83]);
+});
+
+test('kisi_dokumu Pelin = 1 tamamlanan (#92), 7 aktif', async () => {
+  const c = await ctx();
+  const r = await runTool('kisi_dokumu', { kisi: 'U0B3K2WE7SB' }, c);
+  assert.equal(r.tamamlanan.say, 1);
+  assert.deepEqual(r.tamamlanan.nos, [92]);
+  assert.equal(r.aktif.say, 7);
+});
+
+test('kisi_dokumu admin değilse puan dönmez', async () => {
+  const c = await ctx({ isAdmin: false });
+  const r = await runTool('kisi_dokumu', { kisi: 'U0B3K2WE7SB' }, c);
+  assert.equal(r.puan, undefined);
+});

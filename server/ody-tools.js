@@ -90,6 +90,25 @@ defs.brief_sorgula = {
   },
 };
 
+defs.kisi_dokumu = {
+  description: 'Bir kişinin iş dökümü: tamamlanan (seçili aralık) ve aktif (her zaman) iş SAYILARI ve numaraları. Yönetici ise ortalama puan da döner. Kişi performansı/iş sayısı için YETKİLİ kaynak.',
+  input_schema: { type: 'object', required: ['kisi'], properties: { kisi: { type: 'string', description: 'kişi adı veya id' }, aralik: { type: 'string' } } },
+  run(input, ctx) {
+    const u = _matchUser(ctx.ed, input.kisi);
+    if (!u) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+    const range = normRange(ctx.range);
+    const on = (arr) => arr.some(p => p.id === u.id);
+    const tamam = (ctx.ed.bns_completed || []).filter(c => inRange(c.bitis, range) && on([...(c.workers || []), ...(c.leads || [])])).map(c => c.no).sort((a, b) => a - b);
+    const aktif = (ctx.ed.bns_briefs || []).filter(b => on([...(b.workers || []), ...(b.leads || [])])).map(b => b.no).sort((a, b) => a - b);
+    const out = { kisi: u.name, tamamlanan: { say: tamam.length, nos: tamam }, aktif: { say: aktif.length, nos: aktif } };
+    if (ctx.isAdmin) {
+      const p = ctx.ed.bns_ratings && ctx.ed.bns_ratings.users && ctx.ed.bns_ratings.users[u.id];
+      out.puan = p ? { avg: p.avg, cnt: p.cnt } : null;
+    }
+    return out;
+  },
+};
+
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
 
