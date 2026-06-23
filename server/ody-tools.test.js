@@ -83,3 +83,9 @@ test('kapasite kişi başına aktif yük döner', async () => {
   assert.ok(Array.isArray(r.kisiler));
   assert.ok(r.kisiler.every(k => typeof k.aktif === 'number'));
 });
+
+test('trend aktif metriği için zaman serisi özeti döner', async () => {
+  const c = await ctx();
+  const r = await runTool('trend', { metrik: 'aktif' }, c);
+  assert.ok('seri' in r || 'hata' in r || 'nokta' in r);
+});

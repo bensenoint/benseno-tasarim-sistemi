@@ -193,6 +193,21 @@ defs.kapasite = {
   },
 };
 
+defs.trend = {
+  description: 'Zaman içinde metrik trendi (kpi geçmişinden). metrik: aktif/gecikmis/bugun/musteride. Son ~48 ölçüm noktasının özeti (ilk, son, min, max).',
+  input_schema: { type: 'object', required: ['metrik'], properties: { metrik: { type: 'string', enum: ['aktif', 'gecikmis', 'bugun', 'musteride'] } } },
+  run(input, ctx) {
+    const map = { aktif: 'active', gecikmis: 'overdue', bugun: 'today', musteride: 'musteride' };
+    const field = map[input.metrik];
+    const hist = ctx.ed.bns_history || [];
+    if (!field || !hist.length) return { hata: 'trend verisi yok' };
+    const vals = hist.map(h => h[field]).filter(v => typeof v === 'number');
+    if (!vals.length) return { hata: 'metrik bulunamadı' };
+    // bns_history eskiden-yeniye sıralı: ilk = en eski, son = en güncel.
+    return { metrik: input.metrik, nokta: vals.length, ilk: vals[0], son: vals[vals.length - 1], min: Math.min(...vals), max: Math.max(...vals) };
+  },
+};
+
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
 
