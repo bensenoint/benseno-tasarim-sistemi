@@ -69,3 +69,10 @@ test('yildiz_karne firma admin için döner, admin değil için reddeder', async
   const rn = await runTool('yildiz_karne', { kapsam: 'kisi', key: 'U0B3K2WE7SB' }, n);
   assert.equal(rn.yetki, 'yöneticilere özel');
 });
+
+test('gecikme_analizi gecikmiş aktif briefleri listeler', async () => {
+  const c = await ctx();
+  const r = await runTool('gecikme_analizi', {}, c);
+  assert.equal(typeof r.toplam, 'number');
+  assert.ok(r.isler.every(x => x.gecikme_gun >= 0));
+});

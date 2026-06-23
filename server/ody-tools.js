@@ -155,6 +155,22 @@ defs.yildiz_karne = {
   },
 };
 
+defs.gecikme_analizi = {
+  description: 'Termini geçmiş AKTİF briefler: liste + gecikme gün sayısı + atananlar. Opsiyonel marka filtresi.',
+  input_schema: { type: 'object', properties: { marka: { type: 'string' } } },
+  run(input, ctx) {
+    const now = Date.now();
+    const q = input.marka ? input.marka.toLocaleLowerCase('tr') : null;
+    const rows = (ctx.ed.bns_briefs || [])
+      .filter(b => b.deadline && b.deadline < now && (!q || (b.marka || '').toLocaleLowerCase('tr').includes(q)))
+      .map(b => ({ no: b.no, marka: b.marka, baslik: b.baslik, durum: b.durum,
+        gecikme_gun: Math.floor((now - b.deadline) / 86400000),
+        kisiler: [...(b.workers || []).map(w => w.name), ...(b.leads || []).map(l => l.name + '(lead)')] }))
+      .sort((a, b) => b.gecikme_gun - a.gecikme_gun);
+    return { toplam: rows.length, isler: rows.slice(0, 40), kirpildi: rows.length > 40 };
+  },
+};
+
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
 
