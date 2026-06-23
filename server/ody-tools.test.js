@@ -52,3 +52,11 @@ test('kisi_dokumu admin değilse puan dönmez', async () => {
   const r = await runTool('kisi_dokumu', { kisi: 'U0B3K2WE7SB' }, c);
   assert.equal(r.puan, undefined);
 });
+
+test('marka_dokumu Hasvet için sayıları döner', async () => {
+  const c = await ctx();
+  const r = await runTool('marka_dokumu', { marka: 'Hasvet' }, c);
+  assert.equal(typeof r.aktif, 'number');
+  assert.equal(typeof r.tamamlanan, 'number');
+  assert.ok('marka' in r);
+});

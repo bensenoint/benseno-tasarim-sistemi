@@ -109,6 +109,34 @@ defs.kisi_dokumu = {
   },
 };
 
+defs.marka_dokumu = {
+  description: 'Bir markanın durumu: aktif/tamamlanan/gecikmiş iş SAYILARI, kanal özeti ve son gün-sonu insight. Yönetici ise ortalama puan da döner.',
+  input_schema: { type: 'object', required: ['marka'], properties: { marka: { type: 'string' }, aralik: { type: 'string' } } },
+  run(input, ctx) {
+    const range = normRange(ctx.range);
+    const now = Date.now();
+    const q = String(input.marka).toLocaleLowerCase('tr');
+    const match = (m) => (m || '').toLocaleLowerCase('tr').includes(q);
+    const br = (ctx.ed.bns_brands || []).find(b => match(b.name));
+    if (!br) return { bulunamadi: true, adaylar: (ctx.ed.bns_brands || []).map(b => b.name).filter(match).slice(0, 6) };
+    const aktifler = (ctx.ed.bns_briefs || []).filter(b => match(b.marka));
+    const out = {
+      marka: br.name,
+      aktif: aktifler.length,
+      gecikmis: aktifler.filter(b => b.deadline && b.deadline < now).length,
+      tamamlanan: (ctx.ed.bns_completed || []).filter(c => match(c.marka) && inRange(c.bitis, range)).length,
+      kanal_ozet: br.kanal_ozet ? br.kanal_ozet.slice(0, 300) : null,
+      son_insight: br.son_insight ? br.son_insight.slice(0, 300) : null,
+    };
+    if (ctx.isAdmin) {
+      // bns_ratings'te marka anahtarı yok (markalarda rating saklanmıyor); güvenli null.
+      const rb = ctx.ed.bns_ratings && ctx.ed.bns_ratings.marka && ctx.ed.bns_ratings.marka[br.name];
+      out.puan = rb ? { avg: rb.avg, cnt: rb.cnt } : null;
+    }
+    return out;
+  },
+};
+
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
 
