@@ -355,8 +355,11 @@ async function chatContext() {
     L.push(`#${b.no} [${b.marka}] ${b.baslik} · durum:${b.durum} · termin:${dl(b.deadline)} · ${kisiler}${b.stale ? ' · HAREKETSİZ' : ''}${b.notes ? ' · not:' + b.notes.slice(0, 80) : ''}`);
     if (b.thread_ozet) L.push(`  özet: ${b.thread_ozet.slice(0, 300)}`);
   }
-  L.push('\n## TAMAMLANANLAR (son 30 gün)');
-  for (const c of (ed.bns_completed || []).slice(-40)) {
+  L.push('\n## TAMAMLANANLAR (en son tamamlananlar)');
+  // Recency'ye göre sırala (bitiş tarihi desc) → en son 60. Eskiden numara sırasıyla slice(-40)
+  // yapılıyordu; düşük numaralı ama YENİ tamamlanan işler düşüyor, kişi performansı eksik kalıyordu.
+  const _completedRecent = (ed.bns_completed || []).slice().sort((a, b) => (b.bitis || 0) - (a.bitis || 0)).slice(0, 60);
+  for (const c of _completedRecent) {
     const kisiler = [...(c.workers || []).map(w => w.name), ...(c.leads || []).map(x => x.name + '(lead)')].join(', ');
     L.push(`#${c.no} [${c.marka}] ${c.baslik} · bitiş:${dl(c.bitis)} · rev:${c.rev}${c.rating ? ` · puan:${c.rating}/5(${c.rating_by === 'ai' ? 'AI' : 'yönetici'})` : ''}${kisiler ? ' · ' + kisiler : ''}`);
     if (c.insight) L.push(`  insight: ${c.insight.slice(0, 300)}`);
