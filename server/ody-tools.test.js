@@ -60,3 +60,12 @@ test('marka_dokumu Hasvet için sayıları döner', async () => {
   assert.equal(typeof r.tamamlanan, 'number');
   assert.ok('marka' in r);
 });
+
+test('yildiz_karne firma admin için döner, admin değil için reddeder', async () => {
+  const a = await ctx();
+  const ra = await runTool('yildiz_karne', { kapsam: 'firma' }, a);
+  assert.ok('firma' in ra || 'avg' in ra);
+  const n = await ctx({ isAdmin: false });
+  const rn = await runTool('yildiz_karne', { kapsam: 'kisi', key: 'U0B3K2WE7SB' }, n);
+  assert.equal(rn.yetki, 'yöneticilere özel');
+});

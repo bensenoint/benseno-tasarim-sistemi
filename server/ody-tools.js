@@ -137,6 +137,24 @@ defs.marka_dokumu = {
   },
 };
 
+defs.yildiz_karne = {
+  description: 'Yıldız puan ortalamaları. kapsam: firma (genel), dept (departman), kisi (bir kişi). dept ve kisi YALNIZ yöneticilere açıktır.',
+  input_schema: { type: 'object', required: ['kapsam'], properties: { kapsam: { type: 'string', enum: ['firma', 'dept', 'kisi'] }, key: { type: 'string' } } },
+  run(input, ctx) {
+    const R = ctx.ed.bns_ratings || {};
+    if (input.kapsam === 'firma') return R.firma || { avg: null, cnt: 0 };
+    if (!ctx.isAdmin) return { yetki: 'yöneticilere özel' };
+    if (input.kapsam === 'dept') return { dept: R.dept || {} };
+    if (input.kapsam === 'kisi') {
+      const u = _matchUser(ctx.ed, input.key);
+      if (!u) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.key) };
+      const p = R.users && R.users[u.id];
+      return { kisi: u.name, puan: p ? { avg: p.avg, cnt: p.cnt } : null };
+    }
+    return { error: 'geçersiz kapsam' };
+  },
+};
+
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
 
