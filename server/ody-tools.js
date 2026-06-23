@@ -171,6 +171,28 @@ defs.gecikme_analizi = {
   },
 };
 
+defs.kapasite = {
+  description: 'Kişi başına AKTİF iş yükü (kaç açık brief). Opsiyonel kisi parametresi tek kişiyi döner; yoksa tüm ekip azalan sırada.',
+  input_schema: { type: 'object', properties: { kisi: { type: 'string' } } },
+  run(input, ctx) {
+    const load = {};
+    for (const b of (ctx.ed.bns_briefs || [])) {
+      for (const p of [...(b.workers || []), ...(b.leads || [])]) {
+        if (!p.id) continue;
+        (load[p.id] = load[p.id] || { kisi: p.name, aktif: 0, nos: [] });
+        load[p.id].aktif++; load[p.id].nos.push(b.no);
+      }
+    }
+    let list = Object.values(load).sort((a, b) => b.aktif - a.aktif);
+    if (input.kisi) {
+      const u = _matchUser(ctx.ed, input.kisi);
+      if (!u) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+      list = list.filter(x => x.kisi === u.name);
+    }
+    return { kisiler: list };
+  },
+};
+
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
 

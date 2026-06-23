@@ -76,3 +76,10 @@ test('gecikme_analizi gecikmiş aktif briefleri listeler', async () => {
   assert.equal(typeof r.toplam, 'number');
   assert.ok(r.isler.every(x => x.gecikme_gun >= 0));
 });
+
+test('kapasite kişi başına aktif yük döner', async () => {
+  const c = await ctx();
+  const r = await runTool('kapasite', {}, c);
+  assert.ok(Array.isArray(r.kisiler));
+  assert.ok(r.kisiler.every(k => typeof k.aktif === 'number'));
+});
