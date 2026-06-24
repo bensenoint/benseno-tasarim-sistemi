@@ -1,9 +1,9 @@
 // app/screens/Kanban.jsx — full kanban with 5 columns (including tamamlandı).
 
 function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
-  const [prioFilter, setPrioFilter] = React.useState("all");
-  const [markaFilter, setMarkaFilter] = React.useState("all");   // müşteri (marka) filtresi
-  const [search, setSearch]         = React.useState("");
+  const [prioFilter, setPrioFilter] = useStickyState("kanban.prio", "all");
+  const [markaFilter, setMarkaFilter] = useStickyState("kanban.marka", "all");   // müşteri (marka) filtresi
+  const [search, setSearch]         = useStickyState("kanban.search", "");
 
   // Müşteri (marka) seçenekleri — aktif + tamamlanan brief'lerden, alfabetik.
   const markaOpts = [...new Set([

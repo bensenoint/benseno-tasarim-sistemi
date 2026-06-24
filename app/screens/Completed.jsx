@@ -1,9 +1,9 @@
 // app/screens/Completed.jsx — Tamamlananlar (12-col table).
 
 function CompletedScreen({ data, onOpenBrief, currentUser }) {
-  const [search, setSearch] = React.useState("");
-  const [deliveryFilter, setDeliveryFilter] = React.useState("all");   // teslim durumu (aktiflerdeki scope karşılığı)
-  const [person, setPerson] = React.useState("all");                   // kişi (lead+contributor) filtresi
+  const [search, setSearch] = useStickyState("completed.search", "");
+  const [deliveryFilter, setDeliveryFilter] = useStickyState("completed.delivery", "all");   // teslim durumu (aktiflerdeki scope karşılığı)
+  const [person, setPerson] = useStickyState("completed.person", "all");                     // kişi (lead+contributor) filtresi
   // Tarih aralığı GLOBAL başlık filtresinden gelir — data.completed App.jsx'te bitiş tarihine göre süzülür.
   // (Eski yerel 7/30/90 toggle'ı kaldırıldı; artık tek tarih kontrolü = global başlık. Çift-filtre yok.)
   const allCompleted = data.completed || data._allCompleted || [];

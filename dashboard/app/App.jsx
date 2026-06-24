@@ -127,6 +127,18 @@ function OfflineScreen({ onRetry }) {
 // türetilir (eski from/to bayatlamasın). custom/all'da saklanan from/to kullanılır.
 function bnsRangeKey(u) { return "bns_daterange_" + ((u && (u.slack_id || u.id)) || "anon"); }
 function bnsTabKey(u) { return "bns_tab_" + ((u && (u.slack_id || u.id)) || "anon"); }
+// Ekran-içi filtreleri kullanıcı başına kalıcı tutan useState türevi (localStorage).
+// Anahtar window.__BNS_UID'den türetilir (App render'da set edilir, ekranlar mount olmadan önce).
+function useStickyState(name, fallback) {
+  const key = "bns_f_" + ((typeof window !== "undefined" && window.__BNS_UID) || "anon") + "_" + name;
+  const [v, setV] = React.useState(() => {
+    try { const s = localStorage.getItem(key); return s != null ? JSON.parse(s) : fallback; } catch (e) { return fallback; }
+  });
+  React.useEffect(() => {
+    try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {}
+  }, [key, v]);
+  return [v, setV];
+}
 // Refresh'te son sekmeden devam — geçerli sekmeler (geçersiz/eski id "Not found" basmasın).
 const BNS_VALID_TABS = new Set(["overview","manager","jobs","profile","gantt","kanban","musteride","completed","dept-comp","design","editor","ai","freelance","gallery","multi","brand","team","history","help","users","silinenler"]);
 const BNS_ADMIN_TABS = new Set(["users","silinenler"]);
@@ -160,6 +172,8 @@ function bnsLoadRange(u) {
 
 function App({ currentUser, onLogout }) {
   const data = window.BNS_DATA;
+  // Ekran-içi filtre kalıcılığı (useStickyState) için aktif kullanıcı kimliği.
+  if (typeof window !== "undefined") window.__BNS_UID = (currentUser && (currentUser.slack_id || currentUser.id)) || "anon";
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
 
   // App state
@@ -172,7 +186,7 @@ function App({ currentUser, onLogout }) {
     try { localStorage.setItem(bnsTabKey(currentUser), tab); } catch (e) {}
   }, [tab, currentUser]);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false); // alt-nav "Menü" drawer'ı (Ody'yi gizlemek için App'te)
-  const [jobsScope, setJobsScope] = React.useState("all"); // Overview KPI → Jobs deep-link filtresi
+  const [jobsScope, setJobsScope] = React.useState(null); // Overview KPI → Jobs deep-link (null=refresh'te sticky scope korunur)
   const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
   // Normal navigasyon (sidebar/alt-nav/buton): Jobs'a giderken KPI deep-link filtresini sıfırla
   const navTo = (id) => {

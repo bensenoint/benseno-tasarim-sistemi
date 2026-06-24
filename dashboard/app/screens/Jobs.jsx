@@ -2,12 +2,12 @@
 
 function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope, onOpenBrief, onStatusChange }) {
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
-  const [scope, setScope] = React.useState(initialScope || "all");
-  // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle
+  const [scope, setScope] = useStickyState("jobs.scope", "all");
+  // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle (refresh'te initialScope=null → sticky korunur)
   React.useEffect(() => { if (initialScope) setScope(initialScope); }, [initialScope]);
-  const [search, setSearch] = React.useState("");
-  const [prioFilter, setPrioFilter] = React.useState("all");
-  const [person, setPerson] = React.useState("all");   // kişi (lead+contributor) filtresi
+  const [search, setSearch] = useStickyState("jobs.search", "");
+  const [prioFilter, setPrioFilter] = useStickyState("jobs.prio", "all");
+  const [person, setPerson] = useStickyState("jobs.person", "all");   // kişi (lead+contributor) filtresi
   // Mobil görünüm geçişi: tablo / liste / kanban (referans). Desktop tableMode prop'unu kullanır.
   const [mView, setMView] = React.useState("table");
   const view = isMobile ? mView : tableMode;
