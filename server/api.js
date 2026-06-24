@@ -233,8 +233,15 @@ app.post('/api/briefs/by-ts/:ts/restore', writeGuard, handleWrite(async req => w
 app.post('/api/users/:uid/queue', auth.authGuard, handleWrite(async req => {
   const uid = req.params.uid;
   const isSelf = req.user && (req.user.id === uid || req.user.slack_id === uid);
-  const isAdmin = req.user && req.user.role === 'admin';
-  if (!isSelf && !isAdmin) { const e = new Error('yetkisiz: yalnız kişinin kendisi veya yönetici'); e.name = 'ZodError'; e.issues = [{ path: ['yetki'], message: 'yetkisiz' }]; throw e; }
+  // Kapsam: actor.sched_scope === 'all' → herkes; '<dept>' → yalnız o departman üyeleri; ayrıca kişinin kendisi.
+  let allowed = !!isSelf;
+  if (!allowed && req.user) {
+    const me = await pool.query('SELECT sched_scope FROM users WHERE id=$1 OR id=$2 LIMIT 1', [req.user.id, req.user.slack_id || req.user.id]);
+    const scope = me.rows[0] && me.rows[0].sched_scope;
+    if (scope === 'all') allowed = true;
+    else if (scope) { const t = await pool.query('SELECT dept FROM users WHERE id=$1', [uid]); allowed = !!(t.rows[0] && t.rows[0].dept === scope); }
+  }
+  if (!allowed) { const e = new Error('yetkisiz: bu kişinin iş sırasını değiştirme yetkiniz yok'); e.name = 'ZodError'; e.issues = [{ path: ['yetki'], message: 'yetkisiz' }]; throw e; }
   return writes.setQueue(uid, { order: req.body?.order, by: req.user && req.user.id });
 }));
 

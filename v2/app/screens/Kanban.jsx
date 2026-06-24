@@ -120,7 +120,16 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
         minHeight: 540, overflowX:"auto", WebkitOverflowScrolling:"touch"
       }}>
         {cols.map(col => {
-          const items = col.id === "tamamlandi" ? completedAsBriefs : allBriefs.filter(b => b.durum === col.id);
+          let items = col.id === "tamamlandi" ? completedAsBriefs : allBriefs.filter(b => b.durum === col.id);
+          // İş-yapma sırası: müşteride/blokeli/tamamlandı dışındaki kolonlarda en üstte ilk yapılacak iş.
+          // Brief sırası = işi yapanların en küçük kisi_sira'sı (profildeki kuyruk sırası ile aynı kaynak).
+          if (!["musteride", "blokeli", "tamamlandi"].includes(col.id)) {
+            const rank = (b) => {
+              const ks = (b.contributors || []).map(c => (c && c.kisi_sira != null) ? c.kisi_sira : Infinity);
+              return ks.length ? Math.min(...ks) : Infinity;
+            };
+            items = [...items].sort((a, b) => (rank(a) - rank(b)) || ((a.no || 0) - (b.no || 0)));
+          }
           return (
             <div key={col.id}
               onDragOver={!isMobile ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (dragOverCol !== col.id) setDragOverCol(col.id); } : undefined}

@@ -167,8 +167,11 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   // ─── Kişisel iş kuyruğu (yalnız 'aktif' görünüm) — worker satırları sürükle-sırala
   // Viewed kişi bu briefte "worker" (contributor) mı? Lead/gözlemci → false → kilitli.
   const isWorker = (b) => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id);
-  // Aktör sıralayabilir mi? admin VEYA kendi profiline bakıyor.
-  const canReorder = (currentUser?.role === "admin") || (currentUser && (currentUser.slack_id === u.id || currentUser.id === u.id));
+  // Aktör sıralayabilir mi? sched_scope='all' → herkes; '<dept>' → yalnız o departman üyeleri; ayrıca kişinin kendisi.
+  const _meSched = (data.USERS || []).find(x => currentUser && (x.id === currentUser.slack_id || x.id === currentUser.id));
+  const _scope   = (_meSched && _meSched.sched_scope) || (currentUser?.role === "admin" ? "all" : null);
+  const _isSelf  = !!(currentUser && (currentUser.slack_id === u.id || currentUser.id === u.id));
+  const canReorder = _isSelf || _scope === "all" || (!!_scope && _scope === u.dept);
   // Sürükle-bırak yeniden sıralama. Filtreden bağımsız olsun diye TAM worker-kuyruğu (myActive
   // worker işleri, kisi_sira sırasında) üzerinde hesaplar; fromId'yi toId'nin önüne taşır → /queue.
   const reorderQueue = (fromId, toId) => {

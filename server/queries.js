@@ -45,7 +45,7 @@ async function allBriefsWithAssignees() {
 
 async function getState() {
   const [users, brands, all, dept, brand, events] = await Promise.all([
-    pool.query(`SELECT id,name,rol,dept,yetki,initials,color,title,active,avatar_url FROM users WHERE active ORDER BY rol,name`),
+    pool.query(`SELECT id,name,rol,dept,yetki,initials,color,title,active,avatar_url,sched_scope FROM users WHERE active ORDER BY rol,name`),
     pool.query(`SELECT id,name,color,wheel_idx,slack_channel FROM brands ORDER BY name`),
     allBriefsWithAssignees(),
     // departman yükü (aktif + gecikmiş), kişi sayısı
