@@ -13,6 +13,7 @@ const writes = require('./writes');
 const slack = require('./slack');
 const { pool } = require('./db');
 const calc = require('./calc-penalty.js'); // deadline uzatma cezası (API kökü server/; dashboard calc.js imajda yok)
+const odyTools = require('./ody-tools');
 
 const app = express();
 app.disable('x-powered-by');   // Express sürüm parmak izini gizle
@@ -343,106 +344,56 @@ const CHAT_BILGI = (() => {
   try { return require('fs').readFileSync(require('path').join(__dirname, 'chat-bilgi.md'), 'utf8'); }
   catch (e) { console.error('[chat] bilgi dosyası okunamadı:', e.message); return ''; }
 })();
-const _chatCtxCache = new Map();   // 60sn canlı-veri bağlam önbelleği (tarih aralığına göre anahtarlı)
-async function chatContext(range) {
-  // "Tüm zamanlar" preset'i (from<=0 & to>=maxMs) → filtre yok = tüm veri.
-  if (range && range.from <= 0 && range.to >= 8.64e15) range = null;
-  const key = range ? `${range.from}|${range.to}` : 'all';
-  const hit = _chatCtxCache.get(key);
-  if (hit && Date.now() - hit.at < 60000) return hit.data;
-  if (_chatCtxCache.size > 20) _chatCtxCache.clear();   // basit budama
-  const ed = await getEmbedded();
-  const L = [];
-  const dl = ms => ms ? new Date(ms).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
-  L.push('## AKTİF BRIEFLER');
-  for (const b of ed.bns_briefs || []) {
-    const kisiler = [...(b.workers || []).map(w => w.name), ...(b.leads || []).map(x => x.name + '(lead)')].join(', ');
-    L.push(`#${b.no} [${b.marka}] ${b.baslik} · durum:${b.durum} · termin:${dl(b.deadline)} · ${kisiler}${b.stale ? ' · HAREKETSİZ' : ''}${b.notes ? ' · not:' + b.notes.slice(0, 80) : ''}`);
-    if (b.thread_ozet) L.push(`  özet: ${b.thread_ozet.slice(0, 300)}`);
-  }
-  // Tamamlananlar: dashboard'da seçili aralığa göre (bitiş tarihi) filtrelenir; aralık yoksa TÜMÜ.
-  // ADET/TARİH sınırı YOK — dashboard ile birebir aynı kapsam (aktif işler her zaman dahil, completed aralıkla).
-  const _dlD = ms => ms ? new Date(ms).toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul', day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-  const _completedRecent = (ed.bns_completed || [])
-    .filter(c => !range || (c.bitis != null && c.bitis >= range.from && c.bitis <= range.to))
-    .sort((a, b) => (b.bitis || 0) - (a.bitis || 0));
-  L.push(`\n## TAMAMLANANLAR (${range ? `aralık: ${_dlD(range.from)} – ${_dlD(range.to)}` : 'tüm zamanlar'}) — ${_completedRecent.length} iş`);
-  for (const c of _completedRecent) {
-    const kisiler = [...(c.workers || []).map(w => w.name), ...(c.leads || []).map(x => x.name + '(lead)')].join(', ');
-    L.push(`#${c.no} [${c.marka}] ${c.baslik} · bitiş:${dl(c.bitis)} · rev:${c.rev}${c.rating ? ` · puan:${c.rating}/5(${c.rating_by === 'ai' ? 'AI' : 'yönetici'})` : ''}${kisiler ? ' · ' + kisiler : ''}`);
-    if (c.insight) L.push(`  insight: ${c.insight.slice(0, 300)}`);
-  }
-  // Kişi bazlı iş dökümü — kişi performansı/iş sayısı için YETKİLİ tek kaynak.
-  // Modelin 60 satırı tarayıp isim sayması (eksik) ya da aktif/tamamlanan karıştırması (fazla)
-  // hatalarını kökten önler. Tamamlanan = seçili aralık; aktif = her zaman (dashboard ile aynı).
-  // Sadece iş numaraları; puanlar YILDIZ KARNESİ'nde (gizlilik kuralı korunur).
-  const _kisi = {};
-  const _ekle = (p, no, key) => {
-    if (!p || !p.id) return;
-    const e = _kisi[p.id] = _kisi[p.id] || { name: p.name, tamam: [], aktif: [] };
-    e[key].push(no);
-  };
-  for (const c of _completedRecent) for (const p of [...(c.workers || []), ...(c.leads || [])]) _ekle(p, c.no, 'tamam');
-  for (const b of (ed.bns_briefs || [])) for (const p of [...(b.workers || []), ...(b.leads || [])]) _ekle(p, b.no, 'aktif');
-  if (Object.keys(_kisi).length) {
-    L.push('\n## KİŞİ BAZLI İŞ DÖKÜMÜ (kişi başına iş SAYISI için YETKİLİ KAYNAK — kendin sayma, bu satırları kullan)');
-    for (const e of Object.values(_kisi)) {
-      const t = [...new Set(e.tamam)].sort((a, b) => a - b);
-      const a = [...new Set(e.aktif)].sort((a, b) => a - b);
-      L.push(`${e.name}: ${t.length} tamamlanan${t.length ? ' (#' + t.join(', #') + ')' : ''} · ${a.length} aktif${a.length ? ' (#' + a.join(', #') + ')' : ''}`);
-    }
-  }
-  L.push('\n## MARKA KANAL ÖZETLERİ');
-  for (const br of ed.bns_brands || []) {
-    if (br.kanal_ozet) L.push(`[${br.name}] ${br.kanal_ozet.slice(0, 250)}`);
-    if (br.son_insight) L.push(`[${br.name}] gün-sonu: ${br.son_insight.slice(0, 250)}`);
-  }
-  L.push('\n## YILDIZ KARNESİ');
-  if (ed.bns_ratings) {
-    L.push(`Firma: ${ed.bns_ratings.firma?.avg ?? '—'}/5 (${ed.bns_ratings.firma?.cnt || 0} iş)`);
-    for (const [k, v] of Object.entries(ed.bns_ratings.dept || {})) L.push(`Dept ${k}: ${v.avg}/5 (${v.cnt})`);
-  }
-  for (const s of ed.bns_sebep || []) if (s.type !== 'kisi') L.push(`sebep[${s.type}/${s.key}]: ${s.sebep}`);
-  // Kişi puanları AYRI tutulur — sadece admin bağlamına eklenir
-  const kisiP = [];
-  if (ed.bns_ratings && ed.bns_ratings.users) {
-    const nameOf = id => (ed.bns_users || []).find(u => u.id === id)?.name || id;
-    for (const [id, v] of Object.entries(ed.bns_ratings.users)) kisiP.push(`${nameOf(id)}: ${v.avg}/5 (${v.cnt} iş)`);
-    for (const s of ed.bns_sebep || []) if (s.type === 'kisi') kisiP.push(`sebep[${nameOf(s.key)}]: ${s.sebep}`);
-  }
-  const data = { genel: L.join('\n'), kisiPuan: kisiP.join('\n') };
-  _chatCtxCache.set(key, { at: Date.now(), data });
-  return data;
-}
 app.post('/api/chat', auth.authGuard, async (req, res) => {
   try {
     const msgs = Array.isArray(req.body?.messages) ? req.body.messages.slice(-12) : [];
     if (!msgs.length) return res.status(400).json({ error: 'messages gerekli' });
     if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'asistan yapılandırılmamış' });
-    // Dashboard'da seçili tarih aralığı (varsa) → Ody yalnız o aralıktaki tamamlananları görür.
     const rb = req.body?.range;
     const range = (rb && typeof rb.from === 'number' && typeof rb.to === 'number') ? { from: rb.from, to: rb.to } : null;
-    const ctx = await chatContext(range);
     const isAdmin = req.user.role === 'admin';
-    const system = [
-      `Senin adın Ody — Benseno Tasarım Sistemi'nin asistanısın (Slack botunun adı WT'dir, sen dashboard asistanısın). Şu an seninle GİRİŞ YAPMIŞ kullanıcı konuşuyor: ${req.user.name}${isAdmin ? ' (yönetici)' : ''}. Cevaplarını bu kişiye göre KİŞİSELLEŞTİR: "benim işlerim", "bugün ne yapacağım", "bana atananlar", "işlerim gecikti mi" gibi sorularda CANLI VERİ'deki atananlar arasında "${req.user.name}" geçen işleri filtrele ve yalnız onları listele; kişiye adıyla hitap edebilirsin. Türkçe, kısa ve net cevap ver; gerektiğinde adım adım yönlendir, uygun yerde öneri sun. Verilerde OLMAYAN hiçbir şeyi uydurma — bilmiyorsan söyle. Kişi performans/puan bilgisi sadece yöneticilere verilir${isAdmin ? '' : ' — bu kullanıcı yönetici DEĞİL, kişi puanı/kıyası sorulursa "bu bilgi yöneticilere özeldir" de (kendi işlerini listelemek serbesttir)'}.`,
-      'ÖNEMLİ SAYIM KURALI: Bir kişinin kaç iş tamamladığı/yaptığı/aktif işi olduğu sorulduğunda CANLI VERİ içindeki "KİŞİ BAZLI İŞ DÖKÜMÜ" satırını BİREBİR kullan — oradaki sayı kesindir. Kendin satır sayma, tahmin etme, aktif ile tamamlananı karıştırma. Bir kişi dökümde yoksa o aralıkta işi yok demektir.',
-      '\n# SİSTEM KULLANIM BİLGİSİ\n' + CHAT_BILGI,
-      '\n# CANLI VERİ (şu anki durum)\n' + ctx.genel,
-      isAdmin && ctx.kisiPuan ? '\n# KİŞİ PUANLARI (yönetici-özel)\n' + ctx.kisiPuan : '',
-    ].join('\n');
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6', max_tokens: 900, system,   // Ody: Sonnet — çok-kayıtlı canlı veri filtrelemede daha güvenilir
-        messages: msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) })),
-      }),
-    });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok) { console.error('[chat] AI hata:', j.error?.message || r.status); return res.status(502).json({ error: 'asistan şu an yanıt veremiyor' }); }
-    const reply = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
-    res.json({ reply });
+    const ed = await getEmbedded();   // tek fetch; tüm tool çağrıları paylaşır
+    const ctx = { user: req.user, isAdmin, range, ed };
+
+    const system =
+      `Senin adın Ody — Benseno Tasarım Sistemi'nin asistanısın (Slack botunun adı WT'dir). Şu an seninle GİRİŞ YAPMIŞ kullanıcı: ${req.user.name}${isAdmin ? ' (yönetici)' : ''}. ` +
+      `Türkçe, kısa ve net konuş; gerektiğinde adım adım yönlendir, uygun yerde öneri sun. ` +
+      `\n\nÇOK ÖNEMLİ — VERİYE ERİŞİM: Sistem verisi (briefler, kişiler, markalar, puanlar, sayılar) SADECE sana verilen TOOL'lar üzerinden gelir. ` +
+      `Herhangi bir sayı, iş sayısı, liste veya olgu söylemeden ÖNCE ilgili tool'u çağır. Tool sonucundaki değerleri BİREBİR kullan; kendin sayma, tahmin etme, uydurma. ` +
+      `Tool boş/0 dönerse "yok" de. Kişiye özel sorularda ("benim işlerim", "bugün ne yapacağım") kisi olarak "${req.user.name}" ile tool çağır. ` +
+      (isAdmin ? '' : 'Bu kullanıcı yönetici DEĞİL: kişi/dept puanı veya performans kıyası sorulursa "bu bilgi yöneticilere özeldir" de (kendi işlerini listelemek serbesttir). ') +
+      `\n\n# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI;
+
+    const convo = msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) }));
+
+    let final = '';
+    for (let turn = 0; turn < 5; turn++) {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6', max_tokens: 1200, system,
+          thinking: { type: 'adaptive' },
+          tools: odyTools.TOOLS,
+          messages: convo,
+        }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { console.error('[chat] AI hata:', j.error?.message || r.status); return res.status(502).json({ error: 'asistan şu an yanıt veremiyor' }); }
+      const blocks = j.content || [];
+      final = blocks.filter(c => c.type === 'text').map(c => c.text).join('').trim();
+      if (j.stop_reason !== 'tool_use') break;
+      // Tool çağrılarını çalıştır, sonuçları konuşmaya ekle.
+      convo.push({ role: 'assistant', content: blocks });
+      const toolResults = [];
+      for (const b of blocks) {
+        if (b.type !== 'tool_use') continue;
+        const out = await odyTools.runTool(b.name, b.input, ctx);
+        toolResults.push({ type: 'tool_result', tool_use_id: b.id, content: JSON.stringify(out) });
+      }
+      convo.push({ role: 'user', content: toolResults });
+    }
+    res.json({ reply: final || 'İsteğini tam karşılayamadım, tekrar dener misin?' });
   } catch (e) { console.error('[chat] hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
