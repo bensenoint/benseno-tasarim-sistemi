@@ -14,6 +14,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   const cols = [
     { id: "yeni",        label: "Yeni",        Ic: I.Inbox,  accent: "var(--ink-3)" },
     { id: "calisiliyor", label: "Çalışılıyor", Ic: I.Pencil, accent: "var(--info)" },
+    { id: "basladi",     label: "İşe başlandı", Ic: I.Clock,  accent: "var(--ok, #2E8F66)" },
     { id: "incelemede",  label: "İncelemede",  Ic: I.User,   accent: "var(--warning)" },
     { id: "musteride",   label: "✈️ Müşteri Onayında", Ic: I.Clock, accent: "var(--musteride)" },
     { id: "blokeli",     label: "Blokeli",     Ic: I.Warn,   accent: "var(--danger)" },

@@ -16,7 +16,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
   let rows = data.briefs.filter(b => b.durum !== "musteride");
   if (scope === "overdue") rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
-  if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor");
+  if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor" || b.durum === "basladi");
   if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");
   if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
   if (person !== "all") rows = rows.filter(b => [b.lead, ...(b.contributors || [])].some(p => p && p.id === person));
@@ -80,7 +80,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
           value={scope} onChange={setScope}
           options={[
             ["all",     `Tümü · ${data.briefs.length}`],
-            ["open",    `Açık · ${data.briefs.filter(b => b.durum==="yeni"||b.durum==="calisiliyor").length}`],
+            ["open",    `Açık · ${data.briefs.filter(b => b.durum==="yeni"||b.durum==="calisiliyor"||b.durum==="basladi").length}`],
             ["review",  `İncelemede · ${data.briefs.filter(b => b.durum==="incelemede").length}`],
             ["overdue", `Geciken · ${data.briefs.filter(b => b.deltaH<=0 && b.durum!=="tamamlandi" && b.durum!=="musteride").length}`]
           ]}/>

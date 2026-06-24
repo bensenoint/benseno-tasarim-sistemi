@@ -210,6 +210,7 @@ function StatusMenu({ current, onPick, onClose }) {
   const opts = [
     ["yeni",        "Yeni"],
     ["calisiliyor", "Çalışılıyor"],
+    ["basladi",     "İşe başlandı"],
     ["incelemede",  "İncelemede"],
     ["blokeli",     "Blokeli"],
     ["tamamlandi",  "Tamamlandı"]
