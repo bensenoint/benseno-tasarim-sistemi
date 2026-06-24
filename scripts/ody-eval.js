@@ -26,12 +26,19 @@ async function checkExpectTool(reply, c) {
   const et = c.expectTool;
   const ed = await ensureEmbedded();
   if (!ed) { console.log(`   ⚠️  expectTool atlandı (DB yok): ${edErr ? edErr.message : 'getEmbedded boş'}`); return []; }
-  const ctx = { user: { id: 'eval', name: 'Eval', role: c.admin ? 'admin' : 'user', slack_id: 'eval' }, isAdmin: !!c.admin, range: null, ed };
+  const ctx = { user: { id: 'eval', name: 'Eval', role: c.admin ? 'admin' : 'user', slack_id: 'eval' }, isAdmin: !!c.admin, range: c.range || null, ed };
   const out = await ody.runTool(et.tool, et.input, ctx);
   const exp = resolvePath(out, et.path);
   if (exp == null) return [`expectTool: ${et.path} çözülemedi (out=${JSON.stringify(out).slice(0, 120)})`];
-  if (!new RegExp('(^|\\D)' + exp + '($|\\D)').test(reply)) {
-    return [`beklenen sayı yok: ${exp} (yanıt: ${reply.slice(0, 120)})`];
+  // Sayı → kelime-sınırlı sayı eşleşmesi; metin (örn. isim) → küçük-harf içerme.
+  if (typeof exp === 'number') {
+    if (!new RegExp('(^|\\D)' + exp + '($|\\D)').test(reply)) {
+      return [`beklenen sayı yok: ${exp} (yanıt: ${reply.slice(0, 120)})`];
+    }
+  } else {
+    if (!reply.toLocaleLowerCase('tr').includes(String(exp).toLocaleLowerCase('tr'))) {
+      return [`beklenen metin yok: "${exp}" (yanıt: ${reply.slice(0, 120)})`];
+    }
   }
   return [];
 }
@@ -55,7 +62,7 @@ function check(reply, expect) {
       const r = await fetch(`${BASE}/api/chat`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', Authorization: 'Bearer ' + token(t.admin) },
-        body: JSON.stringify({ messages: [{ role: 'user', content: t.q }] }),
+        body: JSON.stringify({ messages: [{ role: 'user', content: t.q }], ...(t.range ? { range: t.range } : {}) }),
       });
       const j = await r.json().catch(() => ({}));
       const reply = j.reply || '';
