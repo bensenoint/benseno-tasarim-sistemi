@@ -122,6 +122,31 @@ function OfflineScreen({ onRetry }) {
   );
 }
 
+// ─── Tarih aralığı kalıcılığı (kullanıcı başına, localStorage) ──────────────
+// Relative preset'ler (7d/30d/90d/today/yesterday/year) açılışta BUGÜNE göre yeniden
+// türetilir (eski from/to bayatlamasın). custom/all'da saklanan from/to kullanılır.
+function bnsRangeKey(u) { return "bns_daterange_" + ((u && (u.slack_id || u.id)) || "anon"); }
+function bnsDeriveRange(preset, now) {
+  const DAY = 86400000;
+  if (preset === "all") return { from: 0, to: 8.64e15, preset: "all" };
+  if (preset === "year") { const f = new Date(new Date(now).getFullYear(), 0, 1).getTime(); return { from: f, to: now, preset: "year" }; }
+  if (preset === "today") { const d = new Date(now); const s = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); return { from: s, to: now, preset: "today" }; }
+  if (preset === "yesterday") { const d = new Date(now); const s = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); return { from: s - DAY, to: s - 1, preset: "yesterday" }; }
+  const days = { "7d": 7, "30d": 30, "90d": 90 }[preset];
+  if (days) return { from: now - days * DAY, to: now, preset };
+  return null;   // custom / bilinmeyen
+}
+function bnsLoadRange(u) {
+  try {
+    const raw = localStorage.getItem(bnsRangeKey(u));
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !s.preset) return null;
+    if (s.preset === "custom") return (typeof s.from === "number" && typeof s.to === "number") ? { from: s.from, to: s.to, preset: "custom" } : null;
+    return bnsDeriveRange(s.preset, Date.now());
+  } catch (e) { return null; }
+}
+
 function App({ currentUser, onLogout }) {
   const data = window.BNS_DATA;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -187,9 +212,13 @@ function App({ currentUser, onLogout }) {
   const offlineFailsRef = React.useRef(0);             // ardışık başarısız poll sayısı
   // ─── Tarih aralığı filtresi (global) — açılışta son 30 gün ──────────────
   const [dateRange, setDateRange] = React.useState(() => {
-    // Varsayılan: Tümü → hiçbir şey daralmaz; kullanıcı aralık SEÇİNCE her yer süzülür.
-    return { from: 0, to: 8.64e15, preset: "all" };
+    // Kullanıcının son seçtiği aralık (kalıcı, kişiye özel). Yoksa varsayılan: Tümü.
+    return bnsLoadRange(currentUser) || { from: 0, to: 8.64e15, preset: "all" };
   });
+  // Aralık her değiştiğinde kullanıcı başına sakla → sonraki girişte aynı aralıktan devam.
+  React.useEffect(() => {
+    try { localStorage.setItem(bnsRangeKey(currentUser), JSON.stringify({ preset: dateRange.preset, from: dateRange.from, to: dateRange.to })); } catch (e) {}
+  }, [dateRange.preset, dateRange.from, dateRange.to, currentUser]);
   const everLoadedRef = React.useRef(false);           // en az bir kez canlı veri yüklendi mi
 
   // ─── viewMode filter (centralized — tüm screen'ler için) ──────────────
