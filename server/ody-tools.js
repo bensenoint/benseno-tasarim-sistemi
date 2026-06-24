@@ -72,7 +72,7 @@ defs.genel_ozet = {
 };
 
 defs.brief_sorgula = {
-  description: 'Brief ara/filtrele. Filtreler: marka (kısmi), durum (yeni/calisiliyor/incelemede/musteride/blokeli), kisi (isim, atanan), gecikmis (true), tamamlandi (true→tamamlananlarda arar; aralık uygulanır). Eşleşen işlerin listesi + toplam sayı.',
+  description: 'Brief ara/filtrele. Filtreler: marka (kısmi), durum (yeni/calisiliyor/basladi/incelemede/musteride/blokeli), kisi (isim, atanan), gecikmis (true), tamamlandi (true→tamamlananlarda arar; aralık uygulanır). Eşleşen işlerin listesi + toplam sayı.',
   input_schema: { type: 'object', properties: {
     marka: { type: 'string' }, durum: { type: 'string' }, kisi: { type: 'string' },
     gecikmis: { type: 'boolean' }, tamamlandi: { type: 'boolean' }, aralik: { type: 'string' },

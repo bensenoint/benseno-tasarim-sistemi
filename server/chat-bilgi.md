@@ -12,6 +12,7 @@ Slack botu (WT) + Railway API/Postgres + GitHub Pages dashboard. Briefler (işle
 ## Durum güncelleme (Slack)
 İki yol aynı sonucu verir: brief ana mesajına emoji reaction VEYA thread'e o emojiyi/kelimeyi yazmak.
 - 🎨/✍️/🤖 = iş kabulü, planıma aldım, çalışıyorum (🎨 tasarım, ✍️ editör, 🤖 AI). 🔄 = devam ediyor.
+- **basladi** (İşe başlandı): kişi işi kabul edip (çalışılıyor) gerçekten o iş üzerinde çalışmaya başladı. Çalışma süresi bu andan ölçülür.
 - 👀 incelemede · ⏸️ beklemede · ✏️ revizyon · ✅ tamamlandı (thread'deki son görsel galeriye kaydedilir) · 🔃 yeniden aç.
 - ✈️ = müşteriye yollandı (kelime: "müşteriye yollandı"). İş "Müşteri Onayı" sayfasına taşınır; aktif yük/kapasite/hareketsizlikten çıkar. KURAL: ✈️ sonrası İLK ✏️ müşteri revizyonu, diğerleri iç revizyon. Müşteri revizyonuyla iş otomatik aktif listeye döner. Revizyonlar tablolarda iç/müşteri ayrı gösterilir.
 - Kelimeler (tam eşleşme): "devam et", "iş incelemede", "iş beklemede", "bekle", "revizyon var", "revize et", "müşteriye yollandı", "iş tamamlandı", "yeniden aç", "geri aç", "bloke et".
