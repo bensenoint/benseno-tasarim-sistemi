@@ -1,7 +1,7 @@
 // app/screens/Profile.jsx — Kişisel performans dashboardı v2
 // Aktif işler · tamamlanan · revize · saat · marka · iş tipi · verilen/alınan görevler
 
-function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
+function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, initialSel }) {
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [selectedUser, setSelectedUser] = React.useState(user);
   // Avatar tıklamasından gelen kişi (window.bnsOpenUser → App.jsx initialSel) — t damgası her tıklamada değişir
@@ -350,7 +350,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
           </div>
         </div>
         {displayRows.length > 0
-          ? <BriefTable rows={displayRows} onRowClick={onOpenBrief}/>
+          ? <BriefTable rows={displayRows} onRowClick={curView.completed && onOpenCompleted ? onOpenCompleted : onOpenBrief}/>
           : <div style={{padding:32, textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>{markaActive ? `${markaSel} markasında bu görünümde iş yok.` : "Bu görünümde iş yok."}</div>
         }
       </Card>
@@ -430,10 +430,11 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
                   {myCompleted.slice(0,12).map((b,i) => {
                     const isLead = b.lead && b.lead.id === u.id;
                     return (
-                      <tr key={b.id} style={{borderTop:"1px solid var(--line-soft)", cursor: b.slack_url && b.slack_url !== "#" ? "pointer" : "default"}}
+                      <tr key={b.id} style={{borderTop:"1px solid var(--line-soft)", cursor:"pointer"}}
+                        title="İşin detayını aç"
                         onMouseEnter={e=>e.currentTarget.style.background="var(--surface-sub)"}
                         onMouseLeave={e=>e.currentTarget.style.background=""}
-                        onClick={() => b.slack_url && b.slack_url !== "#" && window.open(b.slack_url, "_blank")}>
+                        onClick={() => onOpenCompleted ? onOpenCompleted(b) : (onOpenBrief && onOpenBrief(b))}>
                         <td style={{padding:"8px 12px", whiteSpace:"nowrap"}}>
                           <div style={{display:"flex", alignItems:"center", gap:6}}>
                             <span style={{width:7,height:7,borderRadius:999,background:(data.BRANDS||[]).find(br=>br.name===b.marka)?.color||"#888",flexShrink:0}}/>
