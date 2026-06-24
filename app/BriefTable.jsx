@@ -209,7 +209,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
 function StatusMenu({ current, onPick, onClose }) {
   const opts = [
     ["yeni",        "Yeni"],
-    ["calisiliyor", "Çalışılıyor"],
+    ["calisiliyor", "İş planında"],
     ["basladi",     "İşe başlandı"],
     ["incelemede",  "İncelemede"],
     ["blokeli",     "Blokeli"],

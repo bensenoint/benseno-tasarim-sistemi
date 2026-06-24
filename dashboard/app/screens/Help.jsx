@@ -45,7 +45,7 @@ function HelpScreen() {
       </Section>
 
       <Section title="📌 Brief Durum Emojileri" note="Brief thread'ine emoji reaction olarak ekleyin VEYA thread'e o emojiyle başlayan bir mesaj yazın — ikisi de aynı sonucu verir.">
-        <EmojiRow emoji="🎨 ✍️ 🤖" label="İş Kabulü / Çalışılıyor" desc="İşi kabul ettim, başladım (🎨 tasarım · ✍️ editör · 🤖 AI). 🔄 de devam ediyor demektir."/>
+        <EmojiRow emoji="🎨 ✍️ 🤖" label="İş Kabulü / İş planında" desc="İşi kabul ettim, başladım (🎨 tasarım · ✍️ editör · 🤖 AI). 🔄 de devam ediyor demektir."/>
         <EmojiRow emoji="👀" label="İncelemede" desc="İş gözden geçiriliyor / revize sunuldu."/>
         <EmojiRow emoji="⏸️" label="Beklemede" desc="Müşteri / onay / materyal bekleniyor."/>
         <EmojiRow emoji="✏️" label="Revizyon" desc="Düzeltme isteği geldi. ✈️'dan sonraki İLK ✏️ müşteri revizyonu, diğerleri iç revizyon sayılır."/>
@@ -63,7 +63,7 @@ function HelpScreen() {
       </Section>
 
       <Section title="⌨️ Kelime Kısayolları" note="Brief thread'ine TAM olarak şu kelimeyi yazın (içinde geçmesi yetmez — birebir eşleşme gerekir).">
-        <Row left="devam et · devam ediyor" right="Çalışılıyor"/>
+        <Row left="devam et · devam ediyor" right="İş planında"/>
         <Row left="iş incelemede" right="İncelemede"/>
         <Row left="iş beklemede · bekle" right="Beklemede"/>
         <Row left="revizyon var · revize et" right="Revizyon"/>

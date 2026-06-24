@@ -181,7 +181,7 @@ function LabQuality({ completed }) {
 
 // ── ⑥ Durum akış hunisi ────────────────────────────────────────────
 function LabFunnel({ briefs, completedCount }) {
-  const order = [["yeni", "Yeni", "var(--ink-3)"], ["calisiliyor", "Çalışılıyor", "var(--prio-orange)"],
+  const order = [["yeni", "Yeni", "var(--ink-3)"], ["calisiliyor", "İş planında", "var(--prio-orange)"],
     ["incelemede", "İncelemede", "var(--prio-yellow)"], ["blokeli", "Blokeli", "var(--prio-red)"],
     ["musteride", "Müşteride", "var(--musteride)"], ["tamamlandi", "Tamamlandı", "var(--prio-green)"]];
   const counts = {};

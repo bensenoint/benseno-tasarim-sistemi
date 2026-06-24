@@ -398,7 +398,7 @@ function EditableTitle({ value, onChange }) {
 function StatusEditor({ current, onPick }) {
   const [open, setOpen] = React.useState(false);
   const opts = [
-    ["yeni","Yeni"],["calisiliyor","Çalışılıyor"],
+    ["yeni","Yeni"],["calisiliyor","İş planında"],
     ["incelemede","İncelemede"],["beklemede","Beklemede"],["revizyon","Revizyon"],
     ["musteride","✈️ Müşteri Onayında"],["blokeli","Blokeli"],["tamamlandi","Tamamlandı"]
   ];
@@ -684,7 +684,7 @@ function buildActivity(b) {
   // ─── Mevcut durum (en yeni, üstte) ───
   const durumLabel = {
     yeni:        "⏳ Sırada",
-    calisiliyor: "🎨 Çalışılıyor",
+    calisiliyor: "🎨 İş planında",
     incelemede:  "👀 İncelemede",
     blokeli:     "⛔ Blokeli",
     tamamlandi:  "✅ Tamamlandı",

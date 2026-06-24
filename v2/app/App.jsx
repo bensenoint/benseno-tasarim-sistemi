@@ -849,7 +849,7 @@ function Short({ k, l }) {
 }
 
 function labelForStatus(s) {
-  return {yeni:"Yeni", calisiliyor:"Çalışılıyor", incelemede:"İncelemede", beklemede:"Beklemede", revizyon:"Revizyon", musteride:"✈️ Müşteri Onayında", blokeli:"Blokeli", tamamlandi:"Tamamlandı"}[s] || s;
+  return {yeni:"Yeni", calisiliyor:"İş planında", incelemede:"İncelemede", beklemede:"Beklemede", revizyon:"Revizyon", musteride:"✈️ Müşteri Onayında", blokeli:"Blokeli", tamamlandi:"Tamamlandı"}[s] || s;
 }
 
 function darken(hex, amt) {

@@ -173,7 +173,7 @@ function SearchBox({ value, onChange }) {
 function KanbanView({ rows, onOpenBrief }) {
   const cols = [
     { id: "yeni",        label: "Yeni",        Ic: I.Inbox },
-    { id: "calisiliyor", label: "Çalışılıyor", Ic: I.Pencil },
+    { id: "calisiliyor", label: "İş planında", Ic: I.Pencil },
     { id: "incelemede",  label: "İncelemede",  Ic: I.User },
     { id: "blokeli",     label: "Blokeli",     Ic: I.Warn }
   ];

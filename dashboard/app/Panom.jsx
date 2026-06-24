@@ -11,7 +11,7 @@ var PB_DEFS = {
   mine:      { title: "İşlerim",        desc: "Bana atanmış tüm aktif işler",           grp: "Kişisel", w: 4, h: 4, dot: "var(--info, #3B82C4)" },
   // ── İş listeleri (Aktif işler / Kanban / Plan sayfalarındaki tablolar) ──
   allactive: { title: "Tüm aktif işler",desc: "Müşteride hariç tüm açık işler",         grp: "İşler", w: 6, h: 5, dot: "var(--ink-3)" },
-  working:   { title: "Çalışılıyor",    desc: "Durumu 'çalışılıyor' olanlar",           grp: "İşler", w: 6, h: 4, dot: "var(--info, #3B82C4)" },
+  working:   { title: "İş planında",    desc: "Durumu 'iş planında' olanlar",           grp: "İşler", w: 6, h: 4, dot: "var(--info, #3B82C4)" },
   review:    { title: "İncelemede",     desc: "Durumu 'incelemede' olanlar",            grp: "İşler", w: 4, h: 3, dot: "var(--prio-yellow)" },
   blocked:   { title: "Blokeli işler",  desc: "Durumu 'blokeli' olanlar",               grp: "İşler", w: 4, h: 3, dot: "var(--prio-red)" },
   stale:     { title: "Hareketsiz",     desc: "Uzun süredir dokunulmamış işler",        grp: "İşler", w: 4, h: 3, dot: "var(--ink-4)" },
