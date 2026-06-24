@@ -268,8 +268,8 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
           <div style={{font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>tamamlanan · üstteki global filtreden ayarla</div>
         </div>
 
-        {/* Kullanıcı değiştir — sadece admin görür; departmana göre gruplu dropdown */}
-        {currentUser?.role === 'admin' && (() => {
+        {/* Kullanıcı değiştir — yöneticiler + adminler görür; departmana göre gruplu dropdown */}
+        {isManager && (() => {
           const DEPT_LABEL = { tasarim: "Tasarım", editor: "Editör", ai: "AI", freelance: "Freelance" };
           const ORDER = ["tasarim", "editor", "ai", "freelance", "_other"];
           const grouped = {};
