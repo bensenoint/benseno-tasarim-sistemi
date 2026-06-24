@@ -446,7 +446,12 @@ function bnsHydrateBrief(raw, idx) {
   };
   const liveUsers = (window.BNS_DATA && window.BNS_DATA.USERS) || USERS;
   // Yeni shape: workers/leads/observers (embedded). Yoksa eski format (escape-hatch live-data.json).
-  const resolveU = (x) => liveUsers.find(u => u.id === (x && x.id ? x.id : x)) || (x && x.name ? x : null);
+  const resolveU = (x) => {
+    const base = liveUsers.find(u => u.id === (x && x.id ? x.id : x)) || (x && x.name ? x : null);
+    if (!base) return null;
+    // Atanan-özel alanları (kisi_sira/sira) koru — kullanıcı kaydına çözerken düşmesin.
+    return (x && typeof x === "object") ? { ...base, kisi_sira: x.kisi_sira ?? null, sira: x.sira ?? (base.sira ?? null) } : base;
+  };
   let workers, leads, observers;
   if (raw.workers || raw.leads || raw.observers) {
     workers   = (raw.workers   || []).map(resolveU).filter(Boolean);
