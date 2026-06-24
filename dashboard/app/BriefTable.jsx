@@ -15,9 +15,9 @@ function FlagCell({ on, label }) {
 
 function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false, rowDraggable, onRowReorder }) {
   const [dragId, setDragId] = React.useState(null);   // satır sürükle-bırak (opsiyonel; yalnız onRowReorder verilince)
-  // Varsayılan öncelik ("Kalan"). Bir iş sürüklenince sıralama kuyruk moduna (col:null →
-  // Profile'dan gelen kisi_sira sırası) geçer, böylece taşınan iş yukarıda kalır.
-  const [sort, setSort] = React.useState({ col: "deltaH", dir: "asc" });
+  // Kuyruk modunda (onRowReorder) varsayılan = iş yapma sırası (col:null → gelen kisi_sira
+  // sırası korunur). Diğer tablolarda varsayılan öncelik ("Kalan"). Başlık tıklamasıyla değişir.
+  const [sort, setSort] = React.useState({ col: onRowReorder ? null : "deltaH", dir: "asc" });
   const sorted = React.useMemo(() => {
     if (!sortable || !sort.col) return rows;
     const copy = [...rows];

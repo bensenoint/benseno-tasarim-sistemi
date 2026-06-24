@@ -398,7 +398,7 @@ function EditableTitle({ value, onChange }) {
 function StatusEditor({ current, onPick }) {
   const [open, setOpen] = React.useState(false);
   const opts = [
-    ["yeni","Yeni"],["calisiliyor","İş planında"],
+    ["yeni","Yeni"],["calisiliyor","İş planında"],["basladi","🚀 İşe başlandı"],
     ["incelemede","İncelemede"],["beklemede","Beklemede"],["revizyon","Revizyon"],
     ["musteride","✈️ Müşteri Onayında"],["blokeli","Blokeli"],["tamamlandi","Tamamlandı"]
   ];

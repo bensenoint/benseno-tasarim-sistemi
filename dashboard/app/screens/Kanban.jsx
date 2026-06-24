@@ -24,6 +24,8 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     { id: "calisiliyor", label: "İş planında", Ic: I.Pencil, accent: "var(--info)" },
     { id: "basladi",     label: "İşe başlandı", Ic: I.Clock,  accent: "var(--ok, #2E8F66)" },
     { id: "incelemede",  label: "İncelemede",  Ic: I.User,   accent: "var(--warning)" },
+    { id: "beklemede",   label: "Bekliyor",    Ic: I.Clock,  accent: "var(--ink-3)" },
+    { id: "revizyon",    label: "Revizyon",    Ic: I.Pencil, accent: "var(--warning)" },
     { id: "musteride",   label: "✈️ Müşteri Onayında", Ic: I.Clock, accent: "var(--musteride)" },
     { id: "blokeli",     label: "Blokeli",     Ic: I.Warn,   accent: "var(--danger)" },
     { id: "tamamlandi",  label: "Tamamlandı",  Ic: I.Check,  accent: "var(--success)" }
