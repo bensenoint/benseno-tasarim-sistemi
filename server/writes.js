@@ -584,17 +584,22 @@ async function setQueue(uid, raw) {
   // Geçiş başarısız olursa sıra yine de kaydedildi; durum bir sonraki sıralamada userActiveBriefId'den
   // yeniden hesaplanır (self-heal). Bu yüzden geçiş hatasını loglayıp yutuyoruz, sıralamayı 400'e çevirmiyoruz.
   try {
-    if (newActive && newActive !== oldActive) {
-      // Yeni aktif işi aktive et (geçiş tablosu)
+    // Kuyruk başı = "işe başlandı": ön-çalışma durumundaysa (yeni/calisiliyor/beklemede) başlandı yap.
+    // Aktif DEĞİŞMESE bile çalışır — iş zaten en üstte ama beklemede ise sürükleyince başlandı olsun.
+    // incelemede/revizyon/blokeli gibi bilinçli durumlara dokunma (yalnız sıralama yüzünden geri almayalım).
+    if (newActive) {
       const cur = await pool.query('SELECT durum FROM briefs WHERE id=$1', [newActive]);
-      if (cur.rows[0]) await setStatus(newActive, { durum: activateTarget(cur.rows[0].durum), by, source: 'dashboard' });
-      // Önceki aktif → başka aktif contributor yoksa beklemede
-      if (oldActive) {
-        const o = await pool.query('SELECT durum FROM briefs WHERE id=$1', [oldActive]);
-        if (o.rows[0] && o.rows[0].durum === 'basladi') {
-          const hasOther = await (async () => { const c = await pool.connect(); try { return await briefHasOtherActive(c, oldActive, uid); } finally { c.release(); } })();
-          if (!hasOther) await setStatus(oldActive, { durum: 'beklemede', by, source: 'system' });
-        }
+      const d = cur.rows[0] && cur.rows[0].durum;
+      if (['yeni', 'calisiliyor', 'beklemede'].includes(d)) {
+        await setStatus(newActive, { durum: 'basladi', by, source: 'dashboard' });
+      }
+    }
+    // Aktif değişti → önceki başlandı işi, başka aktif contributor yoksa beklemeye çek.
+    if (oldActive && oldActive !== newActive) {
+      const o = await pool.query('SELECT durum FROM briefs WHERE id=$1', [oldActive]);
+      if (o.rows[0] && o.rows[0].durum === 'basladi') {
+        const hasOther = await (async () => { const c = await pool.connect(); try { return await briefHasOtherActive(c, oldActive, uid); } finally { c.release(); } })();
+        if (!hasOther) await setStatus(oldActive, { durum: 'beklemede', by, source: 'system' });
       }
     }
   } catch (e) {
