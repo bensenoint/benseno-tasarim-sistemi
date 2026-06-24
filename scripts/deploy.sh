@@ -66,7 +66,14 @@ fi
 
 if [ "$do_api" -eq 1 ]; then
   echo "🤖 Ody eval (canlı /api/chat)"
-  API_BASE=https://benseno-api-production.up.railway.app node scripts/ody-eval.js \
-    || echo "  ⚠️ Ody eval'da başarısız vaka var — yukarıyı incele (deploy bloklanmadı)."
+  # Eval, canlı API'nin secret'ıyla imzalı JWT gerektirir → Railway'den çek.
+  # (DATABASE_URL gerekmez: db.js, expectTool/getEmbedded için data/.db-url'e fallback yapar.)
+  EVAL_SECRET="$(railway variables --service benseno-api --kv 2>/dev/null | grep '^BNS_JWT_SECRET=' | head -1 | cut -d= -f2-)"
+  if [ -n "$EVAL_SECRET" ]; then
+    BNS_JWT_SECRET="$EVAL_SECRET" API_BASE=https://benseno-api-production.up.railway.app node scripts/ody-eval.js \
+      || echo "  ⚠️ Ody eval'da başarısız vaka var — yukarıyı incele (deploy bloklanmadı)."
+  else
+    echo "  (BNS_JWT_SECRET Railway'den alınamadı — eval atlandı, deploy bloklanmadı)"
+  fi
 fi
 echo "🟢 deploy.sh tamam ($TARGET)"
