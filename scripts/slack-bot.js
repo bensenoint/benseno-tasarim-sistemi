@@ -635,7 +635,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
       { type: 'section', text: { type: 'mrkdwn', text: '*Emoji kısayolları* — brief mesajına reaction ekle VEYA thread\'e tek emoji yaz' } },
       { type: 'section', fields: [
         { type: 'mrkdwn', text:
-          '*Durum:*\n:bso-calisiliyor: → Çalışılıyor\n:bso-devam: → Devam ediyor\n:bso-incelemede: → İncelemede\n:bso-beklemede: → Beklemede\n:bso-revizyon: → Revizyon\n:bso-musteriye: → Müşteriye\n:bso-tamamlandi: → Tamamlandı\n:bso-yeniden-acildi: → Yeniden aç\n:bso-galeri-muhru: → Final teslim (galeri)' },
+          '*Durum:*\n:bso-calisiliyor: → Çalışılıyor\n🚀 → İşe başlandı\n:bso-devam: → Devam ediyor\n:bso-incelemede: → İncelemede\n:bso-beklemede: → Beklemede\n:bso-revizyon: → Revizyon\n:bso-musteriye: → Müşteriye\n:bso-tamamlandi: → Tamamlandı\n:bso-yeniden-acildi: → Yeniden aç\n:bso-galeri-muhru: → Final teslim (galeri)' },
         { type: 'mrkdwn', text: '*Öncelik:*\n:bso-acil: → Acil\n:bso-yuksek: → Yüksek\n:bso-normal: → Normal\n:bso-dusuk: → Düşük' },
       ]},
       { type: 'context', elements: [{ type: 'mrkdwn', text: ':bso-galeri-muhru: *Final teslim:* dosya içeren bir mesaja koy → o mesajdaki tüm dosyalar (görsel/PDF/video) işin final teslimi olarak galeriye kaydedilir (✅/:bso-tamamlandi: otomatik son-görselden farklı: hangi dosyaların gireceğini sen seçersin). Çalışılıyor için departman ayrımı yok — sistem departmanı atananlardan alır.' }] },
@@ -917,6 +917,7 @@ app.event('reaction_added', async ({ event, client }) => {
   const reactionBase = event.reaction.replace(/::skin-tone-\d+$/, '');
   const DURUM_MAP = {
     art: 'calisiliyor', writing_hand: 'calisiliyor', robot_face: 'calisiliyor',
+    rocket: 'basladi',
     eyes: 'incelemede',
     double_vertical_bar: 'beklemede',
     pencil2: 'revizyon', pencil: 'revizyon',
@@ -1187,6 +1188,7 @@ app.event('message', async ({ event, client }) => {
       { emoji: '✍',  durum: 'calisiliyor' },   // VS-16 olmadan yazılabilir
       { emoji: ':writing_hand:', durum: 'calisiliyor' },
       { emoji: '🤖', durum: 'calisiliyor' }, { emoji: ':robot_face:', durum: 'calisiliyor' },
+      { emoji: '🚀', durum: 'basladi' }, { emoji: ':rocket:', durum: 'basladi' },
       { emoji: '✅', durum: 'tamamlandi'  }, { emoji: ':white_check_mark:', durum: 'tamamlandi' },
       { emoji: '⏸️', durum: 'beklemede'   },
       { emoji: '⏸',  durum: 'beklemede'   },   // VS-16 olmadan
