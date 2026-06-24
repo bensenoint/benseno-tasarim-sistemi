@@ -2,7 +2,36 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 const { getEmbedded } = require('./queries');
-const { TOOLS, runTool, _matchUser } = require('./ody-tools');
+const { TOOLS, runTool, _matchUser, resolvePerson } = require('./ody-tools');
+
+// Belirsiz isim eşleştirme — saf fonksiyon, DB gerektirmez (sahte ed).
+const fakeEd = { bns_users: [
+  { id: 'u1', name: 'Mehmet Yılmaz' },
+  { id: 'u2', name: 'Mehmet Kaya' },
+  { id: 'u3', name: 'Ayşe Demir' },
+] };
+
+test('resolvePerson: id ile kesin çözer', () => {
+  assert.equal(resolvePerson(fakeEd, 'u2').user.id, 'u2');
+});
+test('resolvePerson: tam ad ile kesin çözer (birden çok "Mehmet" olsa bile)', () => {
+  assert.equal(resolvePerson(fakeEd, 'Mehmet Kaya').user.id, 'u2');
+});
+test('resolvePerson: tek alt-dize eşleşmesi çözer', () => {
+  assert.equal(resolvePerson(fakeEd, 'Ayşe').user.id, 'u3');
+});
+test('resolvePerson: birden çok eşleşme → belirsiz (sessiz seçim YOK)', () => {
+  const r = resolvePerson(fakeEd, 'Mehmet');
+  assert.equal(r.belirsiz, true);
+  assert.equal(r.user, undefined);
+  assert.deepEqual(r.adaylar.sort(), ['Mehmet Kaya', 'Mehmet Yılmaz']);
+});
+test('resolvePerson: eşleşme yok → bulunamadi', () => {
+  assert.equal(resolvePerson(fakeEd, 'Zzqq').bulunamadi, true);
+});
+test('_matchUser belirsizlikte null döner (geriye dönük güvenli)', () => {
+  assert.equal(_matchUser(fakeEd, 'Mehmet'), null);
+});
 
 async function ctx(extra = {}) {
   const ed = await getEmbedded();

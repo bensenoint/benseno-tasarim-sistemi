@@ -18,15 +18,27 @@ function inRange(bitis, range) {
 }
 
 // İsimden kullanıcı eşleştir (Türkçe-güvenli, id üzerinden). Bulunamazsa null.
-function _matchUser(ed, kisi) {
-  if (!kisi) return null;
+// Kişi çözümleyici — ayrımlı sonuç: {user} | {bulunamadi,adaylar} | {belirsiz,adaylar}.
+// id → tam ad → tek alt-dize eşleşmesi çözülür; BİRDEN ÇOK alt-dize eşleşmesi (tam eşleşme yoksa)
+// SESSİZCE ilk kişiyi SEÇMEZ → {belirsiz} döner ki Ody hangisini kastettiğini sorsun (yanlış kişi sayma riski yok).
+function resolvePerson(ed, kisi) {
+  if (!kisi) return { bulunamadi: true, adaylar: [] };
   const users = ed.bns_users || [];
   const byId = users.find(u => u.id === kisi);
-  if (byId) return byId;
+  if (byId) return { user: byId };
   const q = String(kisi).toLocaleLowerCase('tr');
   const exact = users.find(u => (u.name || '').toLocaleLowerCase('tr') === q);
-  if (exact) return exact;
-  return users.find(u => (u.name || '').toLocaleLowerCase('tr').includes(q)) || null;
+  if (exact) return { user: exact };
+  const subs = users.filter(u => (u.name || '').toLocaleLowerCase('tr').includes(q));
+  if (subs.length === 1) return { user: subs[0] };
+  if (subs.length > 1) return { belirsiz: true, adaylar: subs.map(u => u.name).slice(0, 8) };
+  return { bulunamadi: true, adaylar: [] };
+}
+
+// Geriye dönük uyumluluk: user|null. Belirsizlikte null döner (sessiz yanlış seçim YOK).
+function _matchUser(ed, kisi) {
+  const r = resolvePerson(ed, kisi);
+  return r.user || null;
 }
 
 function _userCandidates(ed, kisi) {
@@ -68,8 +80,13 @@ defs.brief_sorgula = {
   run(input, ctx) {
     const range = normRange(ctx.range);
     const now = Date.now();
-    const u = input.kisi ? _matchUser(ctx.ed, input.kisi) : null;
-    if (input.kisi && !u) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+    let u = null;
+    if (input.kisi) {
+      const pr = resolvePerson(ctx.ed, input.kisi);
+      if (pr.belirsiz) return { belirsiz: true, adaylar: pr.adaylar };
+      if (!pr.user) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+      u = pr.user;
+    }
     const hasPerson = (b) => !u || [...(b.workers || []), ...(b.leads || [])].some(p => p.id === u.id);
     let rows;
     if (input.tamamlandi) {
@@ -94,8 +111,10 @@ defs.kisi_dokumu = {
   description: 'Bir kişinin iş dökümü: tamamlanan (seçili aralık) ve aktif (her zaman) iş SAYILARI ve numaraları. Yönetici ise ortalama puan da döner. Kişi performansı/iş sayısı için YETKİLİ kaynak.',
   input_schema: { type: 'object', required: ['kisi'], properties: { kisi: { type: 'string', description: 'kişi adı veya id' }, aralik: { type: 'string' } } },
   run(input, ctx) {
-    const u = _matchUser(ctx.ed, input.kisi);
-    if (!u) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+    const pr = resolvePerson(ctx.ed, input.kisi);
+    if (pr.belirsiz) return { belirsiz: true, adaylar: pr.adaylar };
+    if (!pr.user) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+    const u = pr.user;
     const range = normRange(ctx.range);
     const on = (arr) => arr.some(p => p.id === u.id);
     const tamam = (ctx.ed.bns_completed || []).filter(c => inRange(c.bitis, range) && on([...(c.workers || []), ...(c.leads || [])])).map(c => c.no).sort((a, b) => a - b);
@@ -146,8 +165,10 @@ defs.yildiz_karne = {
     if (!ctx.isAdmin) return { yetki: 'yöneticilere özel' };
     if (input.kapsam === 'dept') return { dept: R.dept || {} };
     if (input.kapsam === 'kisi') {
-      const u = _matchUser(ctx.ed, input.key);
-      if (!u) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.key) };
+      const pr = resolvePerson(ctx.ed, input.key);
+      if (pr.belirsiz) return { belirsiz: true, adaylar: pr.adaylar };
+      if (!pr.user) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.key) };
+      const u = pr.user;
       const p = R.users && R.users[u.id];
       return { kisi: u.name, puan: p ? { avg: p.avg, cnt: p.cnt } : null };
     }
@@ -185,9 +206,10 @@ defs.kapasite = {
     }
     let list = Object.values(load).sort((a, b) => b.aktif - a.aktif);
     if (input.kisi) {
-      const u = _matchUser(ctx.ed, input.kisi);
-      if (!u) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
-      list = list.filter(x => x.kisi === u.name);
+      const pr = resolvePerson(ctx.ed, input.kisi);
+      if (pr.belirsiz) return { belirsiz: true, adaylar: pr.adaylar };
+      if (!pr.user) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+      list = list.filter(x => x.kisi === pr.user.name);
     }
     return { kisiler: list };
   },
@@ -218,4 +240,4 @@ async function runTool(name, input, ctx) {
   catch (e) { return { error: e.message }; }
 }
 
-module.exports = { TOOLS, runTool, defs, _matchUser, _userCandidates, normRange, inRange };
+module.exports = { TOOLS, runTool, defs, _matchUser, resolvePerson, _userCandidates, normRange, inRange };

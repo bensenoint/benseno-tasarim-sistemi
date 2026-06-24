@@ -360,7 +360,7 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
       `Türkçe, kısa ve net konuş; gerektiğinde adım adım yönlendir, uygun yerde öneri sun. ` +
       `\n\nÇOK ÖNEMLİ — VERİYE ERİŞİM: Sistem verisi (briefler, kişiler, markalar, puanlar, sayılar) SADECE sana verilen TOOL'lar üzerinden gelir. ` +
       `Herhangi bir sayı, iş sayısı, liste veya olgu söylemeden ÖNCE ilgili tool'u çağır. Tool sonucundaki değerleri BİREBİR kullan; kendin sayma, tahmin etme, uydurma. ` +
-      `Tool boş/0 dönerse "yok" de. Kişiye özel sorularda ("benim işlerim", "bugün ne yapacağım") kisi olarak "${req.user.name}" ile tool çağır. ` +
+      `Tool boş/0 dönerse "yok" de. Bir tool {belirsiz:true, adaylar:[...]} dönerse kendin seçme — kullanıcıya adaylardan hangisini kastettiğini SOR. Kişiye özel sorularda ("benim işlerim", "bugün ne yapacağım") kisi olarak "${req.user.name}" ile tool çağır. ` +
       (isAdmin ? '' : 'Bu kullanıcı yönetici DEĞİL: kişi/dept puanı veya performans kıyası sorulursa "bu bilgi yöneticilere özeldir" de (kendi işlerini listelemek serbesttir). ') +
       `\n\n# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI;
 
