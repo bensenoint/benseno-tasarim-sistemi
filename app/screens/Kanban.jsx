@@ -1,6 +1,9 @@
 // app/screens/Kanban.jsx — full kanban with 5 columns (including tamamlandı).
 
 function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
+  const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
+  const [dragId, setDragId] = React.useState(null);          // sürüklenen kart id
+  const [dragOverCol, setDragOverCol] = React.useState(null); // üzerine gelinen kolon id
   const [prioFilter, setPrioFilter] = useStickyState("kanban.prio", "all");
   const [markaFilter, setMarkaFilter] = useStickyState("kanban.marka", "all");   // müşteri (marka) filtresi
   const [search, setSearch]         = useStickyState("kanban.search", "");
@@ -62,11 +65,26 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     );
   }
 
+  // Sürükle-bırak: hedef kolon = yeni durum. Yan etkili kolonlarda (tamamlandi/musteride) onay sor.
+  const SIDE_EFFECT = { tamamlandi: "Tamamlandı", musteride: "Müşteri Onayında" };
+  const handleDrop = (colId, e) => {
+    if (e) e.preventDefault();
+    let payload = null;
+    try { payload = JSON.parse(e.dataTransfer.getData("text/bns")); } catch (_) {}
+    const id = (payload && payload.id != null) ? payload.id : dragId;
+    setDragOverCol(null); setDragId(null);
+    if (id == null) return;
+    const brief = allBriefs.find(b => b.id === id) || completedAsBriefs.find(c => c.id === id);
+    if (!brief || brief.durum === colId) return;   // bulunamadı veya aynı kolon → işlem yok
+    if (SIDE_EFFECT[colId] && !window.confirm(`#${brief.no} işini '${SIDE_EFFECT[colId]}' olarak işaretle?`)) return;
+    if (typeof onStatusChange === "function") onStatusChange(brief, colId);
+  };
+
   return (
     <div className="bn-tab-in">
       <PageHead
         title="Kanban"
-        subtitle="durum bazlı kolonlar · drag yerine status menüsü"
+        subtitle="durum bazlı kolonlar · sürükle-bırak ile statü değiştir (mobilde karta dokun)"
         actions={<>
           <select value={markaFilter} onChange={e => setMarkaFilter(e.target.value)} aria-label="Müşteri filtresi"
             style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer", maxWidth:180}}>
@@ -94,11 +112,17 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
         {cols.map(col => {
           const items = col.id === "tamamlandi" ? completedAsBriefs : allBriefs.filter(b => b.durum === col.id);
           return (
-            <div key={col.id} style={{
-              background:"transparent", border:"1px solid var(--line)",
+            <div key={col.id}
+              onDragOver={!isMobile ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (dragOverCol !== col.id) setDragOverCol(col.id); } : undefined}
+              onDragLeave={!isMobile ? (e) => { if (e.currentTarget === e.target) setDragOverCol(c => (c === col.id ? null : c)); } : undefined}
+              onDrop={!isMobile ? (e) => handleDrop(col.id, e) : undefined}
+              style={{
+              background: dragOverCol === col.id ? "var(--ember-tint)" : "transparent",
+              border:"1px solid var(--line)",
+              outline: dragOverCol === col.id ? "2px dashed var(--ody)" : "none", outlineOffset: -2,
               borderRadius: 0, padding: 10,
               display:"flex", flexDirection:"column", gap: 8,
-              minWidth: 0, overflow:"hidden"
+              minWidth: 0, overflow:"hidden", transition:"background 120ms"
             }}>
               <div style={{
                 display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -114,7 +138,12 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
                 }}>{items.length}</span>
               </div>
               <div style={{display:"flex", flexDirection:"column", gap: 8, flex:1, overflowY:"auto", overflowX:"hidden", maxHeight: "60vh", minWidth:0}}>
-                {items.map(b => <KanbanCard key={b.id} brief={b} onClick={() => onOpenBrief(b)}/>)}
+                {items.map(b => <KanbanCard key={b.id} brief={b} onClick={() => onOpenBrief(b)}
+                  draggable={!isMobile}
+                  dragging={dragId === b.id}
+                  onDragStartCard={(e) => { try { e.dataTransfer.setData("text/bns", JSON.stringify({ id: b.id, from: b.durum })); } catch (_) {} e.dataTransfer.effectAllowed = "move"; setDragId(b.id); }}
+                  onDragEndCard={() => { setDragId(null); setDragOverCol(null); }}
+                />)}
                 {items.length === 0 && (
                   <div style={{padding: 20, textAlign:"center", color:"var(--ink-4)", font:"400 12px/1.4 var(--font-sans)"}}>
                     boş.
@@ -129,13 +158,18 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   );
 }
 
-function KanbanCard({ brief, onClick }) {
+function KanbanCard({ brief, onClick, draggable, dragging, onDragStartCard, onDragEndCard }) {
   return (
-    <button onClick={onClick} style={{
+    <button onClick={onClick}
+      draggable={draggable || undefined}
+      onDragStart={draggable ? onDragStartCard : undefined}
+      onDragEnd={draggable ? onDragEndCard : undefined}
+      style={{
       display:"flex", flexDirection:"column", gap: 6, padding: "10px 10px 8px",
       background:"var(--paper)", border:"1px solid var(--line)", borderRadius: 0,
-      cursor:"pointer", textAlign:"left", color:"var(--ink)",
-      width:"100%", minWidth:0, boxSizing:"border-box"
+      cursor: draggable ? "grab" : "pointer", textAlign:"left", color:"var(--ink)",
+      width:"100%", minWidth:0, boxSizing:"border-box",
+      opacity: dragging ? 0.4 : 1, transition:"opacity 120ms"
     }}>
       {/* Üst satır: marka chip + numara */}
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:4, minWidth:0}}>
