@@ -32,19 +32,38 @@ test('brief_sorgula durum=tamamlandi + marka filtresi sayı döner', async () =>
   assert.ok(r.isler.every(x => x.marka.toLowerCase().includes('hasvet')));
 });
 
-test('kisi_dokumu İrem = 3 tamamlanan (#14,#15,#83)', async () => {
+test('kisi_dokumu İrem sayıları ed ile tutarlı', async () => {
   const c = await ctx();
-  const r = await runTool('kisi_dokumu', { kisi: 'U0AK8U7L57F' }, c);
-  assert.equal(r.tamamlanan.say, 3);
-  assert.deepEqual(r.tamamlanan.nos, [14, 15, 83]);
+  const id = 'U0AK8U7L57F';
+  const expTamam = [...new Set((c.ed.bns_completed||[])
+    .filter(x => [...(x.workers||[]),...(x.leads||[])].some(p => p.id===id))
+    .map(x => x.no))].sort((a,b)=>a-b);
+  const expAktif = [...new Set((c.ed.bns_briefs||[])
+    .filter(x => [...(x.workers||[]),...(x.leads||[])].some(p => p.id===id))
+    .map(x => x.no))].sort((a,b)=>a-b);
+  const r = await runTool('kisi_dokumu', { kisi: id }, c);
+  assert.equal(r.tamamlanan.say, expTamam.length);
+  assert.deepEqual(r.tamamlanan.nos, expTamam);
+  assert.equal(r.aktif.say, expAktif.length);
+  assert.deepEqual(r.aktif.nos, expAktif);
+  assert.ok(expTamam.length >= 1, 'İrem en az 1 tamamlanan işe sahip olmalı (veri sağlık kontrolü)');
 });
 
-test('kisi_dokumu Pelin = 1 tamamlanan (#92), 7 aktif', async () => {
+test('kisi_dokumu Pelin sayıları ed ile tutarlı', async () => {
   const c = await ctx();
-  const r = await runTool('kisi_dokumu', { kisi: 'U0B3K2WE7SB' }, c);
-  assert.equal(r.tamamlanan.say, 1);
-  assert.deepEqual(r.tamamlanan.nos, [92]);
-  assert.equal(r.aktif.say, 7);
+  const id = 'U0B3K2WE7SB';
+  const expTamam = [...new Set((c.ed.bns_completed||[])
+    .filter(x => [...(x.workers||[]),...(x.leads||[])].some(p => p.id===id))
+    .map(x => x.no))].sort((a,b)=>a-b);
+  const expAktif = [...new Set((c.ed.bns_briefs||[])
+    .filter(x => [...(x.workers||[]),...(x.leads||[])].some(p => p.id===id))
+    .map(x => x.no))].sort((a,b)=>a-b);
+  const r = await runTool('kisi_dokumu', { kisi: id }, c);
+  assert.equal(r.tamamlanan.say, expTamam.length);
+  assert.deepEqual(r.tamamlanan.nos, expTamam);
+  assert.equal(r.aktif.say, expAktif.length);
+  assert.deepEqual(r.aktif.nos, expAktif);
+  assert.ok(expTamam.length >= 1, 'Pelin en az 1 tamamlanan işe sahip olmalı (veri sağlık kontrolü)');
 });
 
 test('kisi_dokumu admin değilse puan dönmez', async () => {
