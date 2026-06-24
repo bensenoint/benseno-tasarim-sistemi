@@ -1,28 +1,6 @@
 // app/screens/Profile.jsx — Kişisel performans dashboardı v2
 // Aktif işler · tamamlanan · revize · saat · marka · iş tipi · verilen/alınan görevler
 
-const TIME_RANGES = [
-  { key: "7",   label: "7 gün",  days: 7   },
-  { key: "30",  label: "30 gün", days: 30  },
-  { key: "90",  label: "90 gün", days: 90  },
-  { key: "all", label: "Tümü",   days: null },
-];
-
-function TimeRangeToggle({ value, onChange }) {
-  return (
-    <div style={{display:"inline-flex", padding:2, border:"1px solid var(--line)", borderRadius:6, gap:1}}>
-      {TIME_RANGES.map(r => (
-        <button key={r.key} onClick={() => onChange(r.key)} style={{
-          font:`${value === r.key ? 600 : 500} 11px/1 var(--font-sans)`, padding:"5px 10px", border:0,
-          background: value === r.key ? "var(--paper-2)" : "transparent",
-          color: value === r.key ? "var(--ink)" : "var(--ink-4)",
-          borderRadius:4, cursor:"pointer"
-        }}>{r.label}</button>
-      ))}
-    </div>
-  );
-}
-
 function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [selectedUser, setSelectedUser] = React.useState(user);
@@ -33,17 +11,17 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
     const found = (data.USERS || []).find(x => x.id === initialSel.id) || initialSel.user || null;
     if (found) setSelectedUser(found);
   }, [initialSel ? initialSel.t : null, initialSel ? initialSel.id : null]);
-  const [timeRange, setTimeRange] = React.useState("30");
   const [jobView, setJobView] = React.useState("aktif");   // ana iş tablosu görünümü (dropdown)
   const [markaSel, setMarkaSel] = React.useState("all");   // ana iş tablosu marka filtresi
   const [tomorrowOnly, setTomorrowOnly] = React.useState(false);   // "Yarın" filtresi: deadline'ı yarın olan işler
   const allBriefs    = data._allBriefs    || data.briefs    || [];
+  // Tarih aralığı GLOBAL başlık filtresinden gelir — data.completed App.jsx'te bitiş tarihine göre süzülür.
+  // (Eski yerel 7/30/90 toggle'ı kaldırıldı; tek tarih kontrolü = global başlık. Çift-filtre yok.)
   const allCompleted = data.completed || data._allCompleted || [];
+  // Çıktı hızı (throughput) kendi 4-haftalık penceresini kullanır → tarih aralığından BAĞIMSIZ ham veri.
+  const allCompletedRaw = data._allCompleted || data.completed || [];
   const allUsers     = data.USERS || [];
-
-  // Zaman filtresi — sadece tamamlananlara uygulanır, aktifler hep gösterilir
-  const rangeDays = TIME_RANGES.find(r => r.key === timeRange)?.days;
-  const cutoff = rangeDays ? (Date.now() - rangeDays * 86400000) : 0;
+  const drLabel = rangeLabelOf(data.dateRange);
 
   const u = selectedUser;
 
@@ -63,14 +41,11 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const overdue      = myActive.filter(b => b.deltaH <= 0);
   const urgent       = myActive.filter(b => b.deltaH > 0 && b.deltaH <= 24);
 
-  // ─── Tamamlanan (zaman filtresiyle)
-  const myCompleted  = allCompleted.filter(b => {
-    const inRange = !cutoff || ((b.bitis || b.deadline || 0) * (b.bitis < 1e10 ? 1000 : 1)) >= cutoff;
-    return inRange && (
-      (b.lead && b.lead.id === u.id) ||
-      (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
-    );
-  });
+  // ─── Tamamlanan (global tarih aralığında — data.completed zaten süzülü)
+  const myCompleted  = allCompleted.filter(b =>
+    (b.lead && b.lead.id === u.id) ||
+    (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
+  );
   const completedAsLead   = myCompleted.filter(b => b.lead && b.lead.id === u.id);
   const completedAsContrib= myCompleted.filter(b => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id));
 
@@ -196,7 +171,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   // ─── Çıktı hızı (son 4 hafta tamamlanan/hafta) — calc.js bnsThroughput, düşük örneklemde uyarır.
   //     Zaman filtresinden BAĞIMSIZ: kendi 4 haftalık penceresini kullanır.
   const nowMsTP = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
-  const myDoneTs = allCompleted
+  const myDoneTs = allCompletedRaw
     .filter(b => (b.lead && b.lead.id === u.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id)))
     .map(b => (b.bitis || 0) * (b.bitis && b.bitis < 1e10 ? 1000 : 1))
     .filter(Boolean);
@@ -212,8 +187,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
   const isManager = !!((currentUser && currentUser.role === "admin") || (meRec && meRec.rol === "yonetici"));
 
   // ─── Performans özeti — üstte seçili GLOBAL tarih aralığına göre (data.completed zaten süzülü) ───
-  const RANGE_LABELS = { "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
-  const perfRangeLabel = RANGE_LABELS[(data.dateRange && data.dateRange.preset) || "all"] || "seçili aralık";
+  const perfRangeLabel = drLabel;
   const perfDone = allCompleted.filter(b =>
     (b.lead && b.lead.id === u.id) ||
     (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
@@ -286,12 +260,10 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
           })()}
         </div>
 
-        {/* Zaman filtresi */}
-        <div style={{display:"flex", flexDirection:"column", alignItems: isMobile ? "flex-start" : "flex-end", gap:8}}>
-          <TimeRangeToggle value={timeRange} onChange={setTimeRange}/>
-          <div style={{font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
-            tamamlanan · {rangeDays ? `son ${rangeDays} gün` : "tüm zamanlar"}
-          </div>
+        {/* Tarih aralığı — global başlık filtresinden (yerel toggle kaldırıldı) */}
+        <div style={{display:"flex", flexDirection:"column", alignItems: isMobile ? "flex-start" : "flex-end", gap:4}}>
+          <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"5px 10px", border:"1px solid var(--line)", borderRadius:999}}>📅 {drLabel}</span>
+          <div style={{font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>tamamlanan · üstteki global filtreden ayarla</div>
         </div>
 
         {/* Kullanıcı değiştir — sadece admin görür; departmana göre gruplu dropdown */}
@@ -374,7 +346,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
             <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>lead: {asLead.length}</span>
             <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>contrib: {asContrib.length}</span>
             {asObserver.length > 0 && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>gözlemci: {asObserver.length}</span>}
-            {curView.completed && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>aralık: {timeRange === "all" ? "tümü" : timeRange + "g"}</span>}
+            {curView.completed && <span style={{font:"500 10px/1 var(--font-mono)", padding:"3px 7px", borderRadius:4, background:"var(--paper-2)", color:"var(--ink-4)"}}>aralık: {drLabel}</span>}
           </div>
         </div>
         {displayRows.length > 0
@@ -388,7 +360,7 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
 
         {/* İş tipi */}
         <Card>
-          <CardHead title="İş tipi dağılımı" sub="tüm zamanlar · anahtar kelimeden"/>
+          <CardHead title="İş tipi dağılımı" sub={`aktif + ${drLabel} · anahtar kelimeden`}/>
           {typeData.length > 0 ? (
             <div style={{marginTop:8}}>
               {typeData.map((t,i) => {
