@@ -2,15 +2,35 @@
 
 function CompletedScreen({ data, onOpenBrief, currentUser }) {
   const [range, setRange] = React.useState("30");
+  const [search, setSearch] = React.useState("");
+  const [deliveryFilter, setDeliveryFilter] = React.useState("all");   // teslim durumu (aktiflerdeki scope karşılığı)
+  const [person, setPerson] = React.useState("all");                   // kişi (lead+contributor) filtresi
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
   const allCompleted = data.completed || data._allCompleted || [];
 
   // Range filtresi
   const cutoff = now - parseInt(range) * 24 * 3600 * 1000;
-  const rows = allCompleted.filter(c => {
+  const rangeRows = allCompleted.filter(c => {
     const ts = c.bitis || c.deadline || 0;
     return ts >= cutoff;
   });
+
+  // Kişi seçenekleri — tüm tamamlananlardan (range'ten bağımsız ki liste boş kalmasın).
+  const personOpts = peopleOf(allCompleted);
+
+  // Filtreler (AND): teslim durumu + kişi + arama. Tamamlananlarda öncelik verisi yok (priority:null).
+  let rows = rangeRows;
+  if (deliveryFilter !== "all") rows = rows.filter(c => c.delivery_status === deliveryFilter);
+  if (person !== "all") rows = rows.filter(c => [c.lead, ...(c.contributors || [])].some(p => p && p.id === person));
+  if (search.trim()) {
+    const q = search.toLowerCase().trim();
+    rows = rows.filter(c =>
+      (c.baslik || "").toLowerCase().includes(q) ||
+      (c.marka  || "").toLowerCase().includes(q) ||
+      (c.lead?.name || "").toLowerCase().includes(q) ||
+      (c.contributors || []).some(u => (u?.name || "").toLowerCase().includes(q))
+    );
+  }
 
   // KPI hesaplamaları gerçek veriden (sureH, gecikmeH alanları kullan)
   const withSure   = rows.filter(c => c.sureH > 0);
@@ -59,6 +79,24 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
             ))}
           </div>
         }/>
+
+      {/* Filtre çubuğu — aktif işlerdekiyle aynı: teslim durumu segmenti + kişi + arama */}
+      <div className="bns-sticky-filters" style={{display:"flex", alignItems:"center", gap: 12, marginBottom: 14, flexWrap:"wrap"}}>
+        <Segment
+          value={deliveryFilter} onChange={setDeliveryFilter}
+          options={[
+            ["all",       `Tümü · ${rangeRows.length}`],
+            ["zamaninda", `Zamanında · ${rangeRows.filter(c => c.delivery_status === "zamaninda").length}`],
+            ["uzatildi",  `Uzatıldı · ${rangeRows.filter(c => c.delivery_status === "uzatildi").length}`],
+            ["gec",       `Geciken · ${rangeRows.filter(c => c.delivery_status === "gec").length}`]
+          ]}/>
+
+        <PersonFilter value={person} onChange={setPerson} people={personOpts}/>
+
+        <div className="bns-hide-mobile" style={{marginLeft:"auto", display:"flex", gap: 8, alignItems:"center"}}>
+          <SearchBox value={search} onChange={setSearch}/>
+        </div>
+      </div>
 
       <div className="bns-kpi-5" style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 12, marginBottom: 16}}>
         <Kpi label="Tamamlanan" value={rows.length} sub={`son ${range} gün`}/>

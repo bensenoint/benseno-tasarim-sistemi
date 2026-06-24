@@ -7,6 +7,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   React.useEffect(() => { if (initialScope) setScope(initialScope); }, [initialScope]);
   const [search, setSearch] = React.useState("");
   const [prioFilter, setPrioFilter] = React.useState("all");
+  const [person, setPerson] = React.useState("all");   // kişi (lead+contributor) filtresi
   // Mobil görünüm geçişi: tablo / liste / kanban (referans). Desktop tableMode prop'unu kullanır.
   const [mView, setMView] = React.useState("table");
   const view = isMobile ? mView : tableMode;
@@ -18,6 +19,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor");
   if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");
   if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
+  if (person !== "all") rows = rows.filter(b => [b.lead, ...(b.contributors || [])].some(p => p && p.id === person));
   if (search.trim()) {
     const q = search.toLowerCase().trim();
     rows = rows.filter(b =>
@@ -27,6 +29,9 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       (b.contributors || []).some(u => (u?.name || "").toLowerCase().includes(q))
     );
   }
+
+  // Kişi seçenekleri — aktif işlerdeki lead+contributor'lardan (alfabetik, Türkçe).
+  const personOpts = peopleOf(data.briefs.filter(b => b.durum !== "musteride"));
 
   return (
     <div className="bn-tab-in">
@@ -84,6 +89,8 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
           <span style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-4)", letterSpacing:"0.06em", textTransform:"uppercase"}}>Öncelik</span>
           <PrioFilter value={prioFilter} onChange={setPrioFilter}/>
         </div>
+
+        <PersonFilter value={person} onChange={setPerson} people={personOpts}/>
 
         <span className="bns-hide-mobile" style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
           Kapsam: <span style={{color:"var(--ink)"}}>{viewMode==="mine" ? "bana atanmış" : viewMode==="dept" ? "departmanım" : "tüm ekip"}</span>
@@ -281,6 +288,30 @@ function CardsView({ rows, onOpenBrief }) {
         </button>
       ))}
     </div>
+  );
+}
+
+// Bir brief listesinden benzersiz kişiler (lead + contributors), alfabetik (Türkçe).
+// Hem aktif (Jobs) hem tamamlanan (Completed) ekranlarda kişi filtresi için kullanılır.
+function peopleOf(rows) {
+  const m = new Map();
+  for (const b of (rows || [])) {
+    for (const p of [b.lead, ...(b.contributors || [])]) {
+      if (p && p.id && !m.has(p.id)) m.set(p.id, { id: p.id, name: p.name });
+    }
+  }
+  return [...m.values()].sort((a, b) => (a.name || "").localeCompare(b.name || "", "tr"));
+}
+
+// Kişi filtresi dropdown'u — Kanban'daki müşteri filtresiyle aynı stil.
+function PersonFilter({ value, onChange, people }) {
+  return (
+    <select value={value} onChange={e => onChange(e.target.value)} aria-label="Kişi filtresi"
+      style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink)", background:"var(--surface)",
+        border:"1px solid var(--line)", borderRadius:6, padding:"6px 26px 6px 10px", cursor:"pointer", maxWidth:170}}>
+      <option value="all">Tüm kişiler</option>
+      {(people || []).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+    </select>
   );
 }
 
