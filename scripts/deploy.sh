@@ -63,4 +63,10 @@ if [ -f data/.db-url ]; then
 else
   echo "  (data/.db-url yok — denetim atlandı)"
 fi
+
+if [ "$do_api" -eq 1 ]; then
+  echo "🤖 Ody eval (canlı /api/chat)"
+  API_BASE=https://benseno-api-production.up.railway.app node scripts/ody-eval.js \
+    || echo "  ⚠️ Ody eval'da başarısız vaka var — yukarıyı incele (deploy bloklanmadı)."
+fi
 echo "🟢 deploy.sh tamam ($TARGET)"

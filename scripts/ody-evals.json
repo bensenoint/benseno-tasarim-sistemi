@@ -1,0 +1,7 @@
+[
+  { "q": "İrem kaç iş tamamladı?", "admin": true, "expect": { "regex": "\\b3\\b", "contains": ["tamamlan"] } },
+  { "q": "Pelin kaç iş tamamladı?", "admin": true, "expect": { "regex": "\\b1\\b" } },
+  { "q": "Pelin'in kaç aktif işi var?", "admin": true, "expect": { "regex": "\\b7\\b" } },
+  { "q": "Şu an kaç gecikmiş iş var?", "admin": true, "expect": { "regex": "\\d" } },
+  { "q": "Hasvet markasında kaç tamamlanan iş var?", "admin": true, "expect": { "regex": "\\d" } }
+]
