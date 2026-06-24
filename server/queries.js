@@ -14,7 +14,7 @@ async function allBriefsWithAssignees() {
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
            b.rating, b.rating_by, b.rating_sebep,
            b.deadline_orig, b.uzatma_sayisi, b.uzatma_ceza, b.deadline_history,
-           b.image_url, b.started_at,
+           b.image_url, b.started_at, b.basladi_at,
            b.rev_ic, b.rev_musteri, b.gonderim_sayisi, b.son_gonderim_at, b.musteri_bekliyor,
            COALESCE(json_agg(
              json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color,'sira',a.sira,'onay_at',a.onay_at,'onay_by',a.onay_by)
@@ -170,7 +170,7 @@ async function getEmbedded() {
     leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
     workers: b.workers.map(w => ({ id: w.id, name: w.name, sira: w.sira ?? null, onay: !!w.onay_at })),
     akis: b.akis || 'paralel',
-    deadline: ms(b.deadline), baslangic: ms(b.started_at), bitis: ms(b.completed_at),
+    deadline: ms(b.deadline), baslangic: ms(b.basladi_at || b.started_at), bitis: ms(b.completed_at),
     deadline_orig: ms(b.deadline_orig), uzatma_sayisi: b.uzatma_sayisi || 0, deadline_history: b.deadline_history || [],
     bekleme_ms: pauseByBrief[b.id] || 0,   // süre/gecikme hesabından düşülür
     rev: b.rev || 0,
