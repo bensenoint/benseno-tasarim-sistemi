@@ -15,8 +15,9 @@ function FlagCell({ on, label }) {
 
 function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false, rowDraggable, onRowReorder }) {
   const [dragId, setDragId] = React.useState(null);   // satır sürükle-bırak (opsiyonel; yalnız onRowReorder verilince)
-  // Kuyruk (sürükle-bırak) modunda gelen sırayı (kisi_sira) koru; aksi halde "Kalan"a göre sırala.
-  const [sort, setSort] = React.useState({ col: onRowReorder ? null : "deltaH", dir: "asc" });
+  // Varsayılan öncelik ("Kalan"). Bir iş sürüklenince sıralama kuyruk moduna (col:null →
+  // Profile'dan gelen kisi_sira sırası) geçer, böylece taşınan iş yukarıda kalır.
+  const [sort, setSort] = React.useState({ col: "deltaH", dir: "asc" });
   const sorted = React.useMemo(() => {
     if (!sortable || !sort.col) return rows;
     const copy = [...rows];
@@ -122,7 +123,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
               draggable={rowDraggable ? !!rowDraggable(b) : false}
               onDragStartRow={() => setDragId(b.id)}
               onDragOverRow={onRowReorder ? (e) => e.preventDefault() : undefined}
-              onDropRow={onRowReorder ? (e) => { e.preventDefault(); if (dragId != null && dragId !== b.id) onRowReorder(dragId, b.id); setDragId(null); } : undefined}/>
+              onDropRow={onRowReorder ? (e) => { e.preventDefault(); if (dragId != null && dragId !== b.id) { setSort({ col: null, dir: "asc" }); onRowReorder(dragId, b.id); } setDragId(null); } : undefined}/>
           ))}
         </tbody>
         {financeCols && sorted.length > 0 && (
