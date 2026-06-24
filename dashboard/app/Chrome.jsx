@@ -446,9 +446,55 @@ function ChatBot({ currentUser, dateRange }) {
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
   };
+  // ─── Sohbet penceresi: bağımsız konum + boyut (Ody butonundan ayrı), kalıcı ───
+  const [panelBox, setPanelBox] = React.useState(() => {
+    try { const s = JSON.parse(localStorage.getItem("bns_ody_panel") || "null"); if (s && typeof s.w === "number" && typeof s.h === "number") return s; } catch (e) {}
+    return null;
+  });
+  const panelBoxRef = React.useRef(panelBox); panelBoxRef.current = panelBox;
+  const PANEL_MIN_W = 340, PANEL_MIN_H = 380;
+  const savePanel = (b) => { try { localStorage.setItem("bns_ody_panel", JSON.stringify(b)); } catch (e) {} };
+  // Başlıktan tutup pencereyi taşı (mascot'tan bağımsız). Butona basınca sürükleme başlamaz.
+  const startPanelDrag = (e) => {
+    if (e.target.closest && e.target.closest("button, input")) return;
+    const b = panelBoxRef.current; if (!b) return;
+    e.preventDefault();
+    const sx = e.clientX, sy = e.clientY, ox = b.x, oy = b.y;
+    const move = (ev) => {
+      const W = window.innerWidth, H = window.innerHeight, cur = panelBoxRef.current || b;
+      const nx = Math.min(Math.max(8, ox + ev.clientX - sx), Math.max(8, W - cur.w - 8));
+      const ny = Math.min(Math.max(8, oy + ev.clientY - sy), Math.max(8, H - cur.h - 8));
+      setPanelBox({ ...cur, x: nx, y: ny });
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); if (panelBoxRef.current) savePanel(panelBoxRef.current); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  };
+  // Sağ-alt köşeden boyutlandır (min/max ekran sınırına kıstırılır).
+  const startPanelResize = (e) => {
+    const b = panelBoxRef.current; if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    const sx = e.clientX, sy = e.clientY, ow = b.w, oh = b.h;
+    const move = (ev) => {
+      const W = window.innerWidth, H = window.innerHeight, cur = panelBoxRef.current || b;
+      const nw = Math.min(Math.max(PANEL_MIN_W, ow + ev.clientX - sx), W - cur.x - 8);
+      const nh = Math.min(Math.max(PANEL_MIN_H, oh + ev.clientY - sy), H - cur.y - 8);
+      setPanelBox({ ...cur, w: nw, h: nh });
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); if (panelBoxRef.current) savePanel(panelBoxRef.current); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  };
+
   // Panel pos'tan açılır ama ekrana sığacak şekilde kıstırılır (alt/sağ taşma olmaz)
   const vw = typeof window !== "undefined" ? window.innerWidth : 1200;
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+  // İlk açılışta panel kutusu yoksa mascot konumuna göre varsayılan ata (masaüstü).
+  React.useEffect(() => {
+    if (!open || panelBoxRef.current || vw < 768) return;
+    const defW = tab === "notif" ? 720 : 400, defH = 560;
+    const x = Math.min(Math.max(8, pos.x), Math.max(8, vw - (defW + 12)));
+    const y = Math.min(Math.max(8, pos.y - (defH - 52)), Math.max(8, vh - (defH + 12)));
+    setPanelBox({ x, y, w: defW, h: defH });
+  }, [open]);
   const panelLeft = Math.min(Math.max(8, pos.x), Math.max(8, vw - 392));
   const panelTop  = Math.min(Math.max(8, pos.y - 468), Math.max(8, vh - 532));
   const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
@@ -891,13 +937,18 @@ function ChatBot({ currentUser, dateRange }) {
       )}
       {open && (() => {
         const isM = vw < 768;
-        const panelW = tab === "notif" ? 720 : 400;
-        const panelH = 560;
-        const left = Math.min(Math.max(8, pos.x), Math.max(8, vw - (panelW + 12)));
-        const top  = Math.min(Math.max(8, pos.y - (panelH - 52)), Math.max(8, vh - (panelH + 12)));
+        const defW = tab === "notif" ? 720 : 400;
+        const _b = panelBox || {
+          x: Math.min(Math.max(8, pos.x), Math.max(8, vw - (defW + 12))),
+          y: Math.min(Math.max(8, pos.y - 508), Math.max(8, vh - 572)), w: defW, h: 560,
+        };
+        // Ekran sınırlarına kıstır (pencere küçüldüyse/taşarsa düzelt)
+        const _w = Math.min(_b.w, vw - 16), _h = Math.min(_b.h, vh - 16);
+        const _x = Math.min(Math.max(8, _b.x), Math.max(8, vw - _w - 8));
+        const _y = Math.min(Math.max(8, _b.y), Math.max(8, vh - _h - 8));
         const shell = isM
           ? { position: "fixed", inset: 0, width: "100vw", height: "100dvh", borderRadius: 0, border: "none" }
-          : { position: "fixed", left, top, width: panelW, height: panelH, maxWidth: "calc(100vw - 16px)", maxHeight: "calc(100vh - 16px)", borderRadius: 14, border: "1px solid var(--line-strong)" };
+          : { position: "fixed", left: _x, top: _y, width: _w, height: _h, maxWidth: "calc(100vw - 16px)", maxHeight: "calc(100vh - 16px)", borderRadius: 14, border: "1px solid var(--line-strong)" };
         const sel = notifItems.find(n => n.id === selId) || null;
         const showList = isM ? !sel : true;
         const showDetail = isM ? !!sel : true;
@@ -916,7 +967,7 @@ function ChatBot({ currentUser, dateRange }) {
         return (
         <div style={Object.assign({ zIndex: 90, background: "var(--surface)", boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden" }, shell)}>
           {/* Başlık — Ody + segment + kapat (sürüklenebilir; mobilde sabit) */}
-          <div onPointerDown={isM ? undefined : startDrag} title={isM ? undefined : "Sürükleyerek taşı"}
+          <div onPointerDown={isM ? undefined : startPanelDrag} title={isM ? undefined : "Sürükleyerek taşı"}
             style={{ padding: "12px 14px", borderBottom: "1px solid var(--line-strong)", display: "flex", alignItems: "center", gap: 10, cursor: isM ? "default" : "grab", touchAction: "none", userSelect: "none", background: "var(--paper)", flex: "none" }}>
             <span style={{ position: "relative", width: 32, height: 32, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
@@ -1107,6 +1158,9 @@ function ChatBot({ currentUser, dateRange }) {
               </div>
             </div>
           )}
+          {!isM && <div onPointerDown={startPanelResize} title="Boyutlandır"
+            style={{ position: "absolute", right: 0, bottom: 0, width: 18, height: 18, cursor: "nwse-resize", zIndex: 6, touchAction: "none",
+              background: "linear-gradient(135deg, transparent 0 50%, var(--ink-4) 50% 100%)", opacity: 0.45, borderBottomRightRadius: 14 }}/>}
         </div>
         );
       })()}
