@@ -169,19 +169,20 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   const isWorker = (b) => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id);
   // Aktör sıralayabilir mi? admin VEYA kendi profiline bakıyor.
   const canReorder = (currentUser?.role === "admin") || (currentUser && (currentUser.slack_id === u.id || currentUser.id === u.id));
-  const [qDragId, setQDragId] = React.useState(null);
+  // Sürükle-bırak yeniden sıralama. Filtreden bağımsız olsun diye TAM worker-kuyruğu (myActive
+  // worker işleri, kisi_sira sırasında) üzerinde hesaplar; fromId'yi toId'nin önüne taşır → /queue.
   const reorderQueue = (fromId, toId) => {
-    if (fromId == null || toId == null || fromId === toId) return;
-    const ids = displayRows.map(b => b.id);
-    const fi = ids.indexOf(fromId), ti = ids.indexOf(toId);
-    if (fi < 0 || ti < 0 || fi === ti) return;
-    ids.splice(ti, 0, ids.splice(fi, 1)[0]);
+    if (fromId == null || fromId === toId) return;
+    const queue = myActive.filter(isWorker).map(b => b.id);
+    const without = queue.filter(id => id !== fromId);
+    const ti = without.indexOf(toId);
+    without.splice(ti < 0 ? without.length : ti, 0, fromId);
     const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
     const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
     fetch(`${API}/api/users/${u.id}/queue`, {
       method: "POST",
       headers: { "content-type": "application/json", Authorization: "Bearer " + tok },
-      body: JSON.stringify({ order: ids }),
+      body: JSON.stringify({ order: without }),
     }).then(r => { if (r.ok && typeof window.bnsRefresh === "function") window.bnsRefresh(); }).catch(() => {});
   };
 
@@ -379,12 +380,10 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
           </div>
         </div>
         {displayRows.length > 0
-          ? (jobView === "aktif"
-              ? <QueueList rows={displayRows} u={u} isMobile={isMobile} data={data}
-                  draggable={!isMobile && canReorder}
-                  isWorker={isWorker} qDragId={qDragId} setQDragId={setQDragId}
-                  reorderQueue={reorderQueue} onOpenBrief={onOpenBrief}/>
-              : <BriefTable rows={displayRows} onRowClick={curView.completed && onOpenCompleted ? onOpenCompleted : onOpenBrief}/>)
+          ? <BriefTable rows={displayRows}
+              onRowClick={curView.completed && onOpenCompleted ? onOpenCompleted : onOpenBrief}
+              rowDraggable={(b) => !isMobile && canReorder && !curView.completed && isWorker(b)}
+              onRowReorder={reorderQueue}/>
           : <div style={{padding:32, textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>{markaActive ? `${markaSel} markasında bu görünümde iş yok.` : "Bu görünümde iş yok."}</div>
         }
       </Card>
@@ -620,61 +619,6 @@ function DelegateRow({ brief: b, mode, uid, onOpen, last }) {
   );
 }
 
-// ─── Kişisel iş kuyruğu listesi — 'aktif' görünümde sürükle-sırala (worker-only) ───
-function QueueList({ rows, u, isMobile, data, draggable, isWorker, qDragId, setQDragId, reorderQueue, onOpenBrief }) {
-  // İlk worker satırı = kuyruk başı = "● şu an" rozeti. (Lead/gözlemci satırları atlanır.)
-  const firstWorkerId = (rows.find(b => isWorker(b)) || {}).id;
-  return (
-    <div>
-      {rows.map((b, i) => {
-        const worker = isWorker(b);
-        const canDrag = draggable && worker;
-        const dragging = qDragId === b.id;
-        return (
-          <div key={b.id}
-            draggable={canDrag}
-            onDragStart={canDrag ? (e) => { setQDragId(b.id); try { e.dataTransfer.setData("text/plain", String(b.id)); } catch (_) {} } : undefined}
-            onDragEnd={canDrag ? () => setQDragId(null) : undefined}
-            onDragOver={draggable ? (e) => e.preventDefault() : undefined}
-            onDrop={draggable ? (e) => { e.preventDefault(); reorderQueue(qDragId, b.id); setQDragId(null); } : undefined}
-            onClick={() => onOpenBrief && onOpenBrief(b)}
-            title={canDrag ? "Sürükleyerek sıranı değiştir — en üst = aktif iş" : "İşin detayını aç"}
-            style={{
-              display:"flex", alignItems:"center", gap:10, padding:"10px 16px",
-              borderBottom: i === rows.length - 1 ? "none" : "1px solid var(--line-soft)",
-              cursor: canDrag ? "grab" : "pointer",
-              opacity: dragging ? 0.4 : 1,
-              background: dragging ? "var(--surface-sub)" : "",
-              transition:"background 100ms",
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = "var(--surface-sub)"}
-            onMouseLeave={e => e.currentTarget.style.background = dragging ? "var(--surface-sub)" : ""}>
-            {canDrag && <span style={{color:"var(--ink-5)", font:"600 13px/1 var(--font-mono)", cursor:"grab", flexShrink:0}} aria-hidden="true">⠿</span>}
-            <PriorityBadge p={b.oncelik || {code:"ylw", label:"NORMAL"}}/>
-            <div style={{flex:1, minWidth:0}}>
-              <div style={{display:"flex", alignItems:"center", gap:8, flexWrap:"wrap"}}>
-                <span style={{font:"500 13px/1.35 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>
-                  {b.marka} · {b.baslik || b.is || "—"}
-                </span>
-                {worker && b.id === firstWorkerId && (
-                  <span style={{font:"600 10px/1 var(--font-sans)", color:"var(--ok,#2E8F66)", whiteSpace:"nowrap"}}>● şu an</span>
-                )}
-                {!worker && (
-                  <span style={{font:"600 10px/1 var(--font-sans)", color:"var(--ink-5)", whiteSpace:"nowrap"}}>🔒</span>
-                )}
-              </div>
-              {b.durum && (
-                <div style={{font:"400 11px/1.2 var(--font-sans)", color:"var(--ink-4)", marginTop:2}}>
-                  {(b.durum + "").split(" ")[0]}{b.deltaH != null ? ` · ${b.deltaH <= 0 ? "gecikmiş" : Math.round(b.deltaH) + "sa kalan"}` : ""}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 // ─── Yardımcı bileşenler ─────────────────────────────────────────────────────
 function BrandBar({ name, v, color, last }) {

@@ -13,7 +13,8 @@ function FlagCell({ on, label }) {
     : <span style={{ color: "var(--ink-5)" }}>—</span>;
 }
 
-function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false }) {
+function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false, rowDraggable, onRowReorder }) {
+  const [dragId, setDragId] = React.useState(null);   // satır sürükle-bırak (opsiyonel; yalnız onRowReorder verilince)
   const [sort, setSort] = React.useState({ col: "deltaH", dir: "asc" });
   const sorted = React.useMemo(() => {
     if (!sortable) return rows;
@@ -116,7 +117,11 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
               onClick={() => onRowClick && onRowClick(b)}
               onStatusChange={onStatusChange}
               financeCols={financeCols}
-              stripe={idx % 2 === 1}/>
+              stripe={idx % 2 === 1}
+              draggable={rowDraggable ? !!rowDraggable(b) : false}
+              onDragStartRow={() => setDragId(b.id)}
+              onDragOverRow={onRowReorder ? (e) => e.preventDefault() : undefined}
+              onDropRow={onRowReorder ? (e) => { e.preventDefault(); if (dragId != null && dragId !== b.id) onRowReorder(dragId, b.id); setDragId(null); } : undefined}/>
           ))}
         </tbody>
         {financeCols && sorted.length > 0 && (
@@ -135,13 +140,17 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
   );
 }
 
-function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols }) {
+function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, draggable, onDragStartRow, onDragOverRow, onDropRow }) {
   const [hover, setHover] = React.useState(false);
   const [menu, setMenu] = React.useState(false);
   return (
     <tr onClick={onClick} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      draggable={draggable || undefined}
+      onDragStart={draggable ? (e) => { try { e.dataTransfer.setData("text/plain", String(brief.no)); } catch (_) {} e.dataTransfer.effectAllowed = "move"; onDragStartRow && onDragStartRow(); } : undefined}
+      onDragOver={onDragOverRow}
+      onDrop={onDropRow}
       style={{
-        cursor:"pointer",
+        cursor: draggable ? "grab" : "pointer",
         background: hover ? "var(--paper-2)" : (stripe ? "var(--row-stripe)" : "transparent"),
         height: "var(--row-h)"
       }}>
