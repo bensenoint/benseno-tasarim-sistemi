@@ -23,7 +23,9 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   const allUsers     = data.USERS || [];
   const drLabel = rangeLabelOf(data.dateRange);
 
-  const u = selectedUser;
+  // Gösterilecek kullanıcıyı her zaman data.USERS'tan id ile TAM kayda eşle — Department'tan
+  // gelen kısmi obje (avatar/rol/kapasite eksik) ilk render'da %100/fotosuz görünmesin.
+  const u = (data.USERS || []).find(x => x.id === (selectedUser && selectedUser.id)) || selectedUser;
 
   // ─── Aktif brief'ler (bu kişiyle ilişkili)
   const isRelated = (b, uid) =>
