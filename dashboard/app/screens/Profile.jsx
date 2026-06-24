@@ -36,7 +36,13 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   // Müşteri onayındaki işler aktif yük/kapasite SAYILMAZ — ayrı KPI kartında gösterilir
   const myAll        = allBriefs.filter(b => isRelated(b, u.id));
   const myMusteride  = myAll.filter(b => b.durum === "musteride");
-  const myActive     = myAll.filter(b => b.durum !== "musteride");
+  // Görüntülenen kişinin bu brief'teki kişisel kuyruk sırası (yoksa sona).
+  const myKisiSira = (b) => {
+    const c = (b.contributors || []).find(x => x && x.id === u.id);
+    return (c && c.kisi_sira != null) ? c.kisi_sira : Infinity;
+  };
+  const myActive     = myAll.filter(b => b.durum !== "musteride")
+    .sort((a, b) => (myKisiSira(a) - myKisiSira(b)) || ((a.no || 0) - (b.no || 0)));
   const asLead       = allBriefs.filter(b => b.lead && b.lead.id === u.id);
   const asContrib    = allBriefs.filter(b => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id));
   const asReviewer   = allBriefs.filter(b => b.reviewer && b.reviewer.id === u.id);
