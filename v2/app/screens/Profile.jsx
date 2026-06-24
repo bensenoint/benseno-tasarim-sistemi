@@ -11,9 +11,9 @@ function ProfileScreen({ data, user, onOpenBrief, currentUser, initialSel }) {
     const found = (data.USERS || []).find(x => x.id === initialSel.id) || initialSel.user || null;
     if (found) setSelectedUser(found);
   }, [initialSel ? initialSel.t : null, initialSel ? initialSel.id : null]);
-  const [jobView, setJobView] = React.useState("aktif");   // ana iş tablosu görünümü (dropdown)
-  const [markaSel, setMarkaSel] = React.useState("all");   // ana iş tablosu marka filtresi
-  const [tomorrowOnly, setTomorrowOnly] = React.useState(false);   // "Yarın" filtresi: deadline'ı yarın olan işler
+  const [jobView, setJobView] = useStickyState("profile.jobView", "aktif");   // ana iş tablosu görünümü (dropdown)
+  const [markaSel, setMarkaSel] = useStickyState("profile.marka", "all");     // ana iş tablosu marka filtresi
+  const [tomorrowOnly, setTomorrowOnly] = useStickyState("profile.tomorrow", false);   // "Yarın" filtresi: deadline'ı yarın olan işler
   const allBriefs    = data._allBriefs    || data.briefs    || [];
   // Tarih aralığı GLOBAL başlık filtresinden gelir — data.completed App.jsx'te bitiş tarihine göre süzülür.
   // (Eski yerel 7/30/90 toggle'ı kaldırıldı; tek tarih kontrolü = global başlık. Çift-filtre yok.)
