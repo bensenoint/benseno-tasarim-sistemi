@@ -118,6 +118,7 @@ function StatusPill({ status }) {
   const map = {
     yeni:        { color: "var(--ink-4)",    label: "Yeni",     full: "Yeni" },
     calisiliyor: { color: "var(--info)",     label: "Çalışıyor", full: "Çalışılıyor" },
+    basladi:     { color: "var(--ok, #2E8F66)", label: "Başladı", full: "İşe başlandı · şu an çalışılıyor" },
     incelemede:  { color: "var(--warning)",  label: "İnceleme",  full: "İncelemede" },
     beklemede:   { color: "var(--ink-3)",       label: "Bekliyor",  full: "Beklemede" },
     revizyon:    { color: "var(--prio-orange)", label: "Revizyon",  full: "Revizyon" },
