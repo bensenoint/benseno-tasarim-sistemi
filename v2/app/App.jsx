@@ -126,6 +126,17 @@ function OfflineScreen({ onRetry }) {
 // Relative preset'ler (7d/30d/90d/today/yesterday/year) açılışta BUGÜNE göre yeniden
 // türetilir (eski from/to bayatlamasın). custom/all'da saklanan from/to kullanılır.
 function bnsRangeKey(u) { return "bns_daterange_" + ((u && (u.slack_id || u.id)) || "anon"); }
+function bnsTabKey(u) { return "bns_tab_" + ((u && (u.slack_id || u.id)) || "anon"); }
+// Refresh'te son sekmeden devam — geçerli sekmeler (geçersiz/eski id "Not found" basmasın).
+const BNS_VALID_TABS = new Set(["overview","manager","jobs","profile","gantt","kanban","musteride","completed","dept-comp","design","editor","ai","freelance","gallery","multi","brand","team","history","help","users","silinenler"]);
+const BNS_ADMIN_TABS = new Set(["users","silinenler"]);
+function bnsLoadTab(u) {
+  try {
+    const s = localStorage.getItem(bnsTabKey(u));
+    if (s && BNS_VALID_TABS.has(s) && ((u && u.role === "admin") || !BNS_ADMIN_TABS.has(s))) return s;
+  } catch (e) {}
+  return null;
+}
 function bnsDeriveRange(preset, now) {
   const DAY = 86400000;
   if (preset === "all") return { from: 0, to: 8.64e15, preset: "all" };
@@ -155,7 +166,11 @@ function App({ currentUser, onLogout }) {
   // Varsayılan görünüm = giriş yapan kişi (slack_id eşleşmesi); bulunamazsa eski ME fallback'i
   const [user, setUser] = React.useState(
     () => data.USERS.find(u => u.id === currentUser?.slack_id) || data.ME);
-  const [tab, setTab] = React.useState("overview");
+  const [tab, setTab] = React.useState(() => bnsLoadTab(currentUser) || "overview");
+  // Aktif sekmeyi kullanıcı başına sakla → refresh'te son sayfadan devam.
+  React.useEffect(() => {
+    try { localStorage.setItem(bnsTabKey(currentUser), tab); } catch (e) {}
+  }, [tab, currentUser]);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false); // alt-nav "Menü" drawer'ı (Ody'yi gizlemek için App'te)
   const [jobsScope, setJobsScope] = React.useState("all"); // Overview KPI → Jobs deep-link filtresi
   const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
