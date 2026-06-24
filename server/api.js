@@ -229,6 +229,15 @@ app.delete('/api/briefs/by-ts/:ts',    writeGuard, handleWrite(async req => writ
 app.post('/api/briefs/:id/restore',    writeGuard, handleWrite(req => writes.restoreBrief(+req.params.id, req.body?.by)));
 app.post('/api/briefs/by-ts/:ts/restore', writeGuard, handleWrite(async req => writes.restoreBrief(await writes.tsToId(req.params.ts), req.body?.by)));
 
+// Kişisel iş kuyruğu sırası — yalnız kişinin kendisi veya admin. Body: { order: [briefId,...] }.
+app.post('/api/users/:uid/queue', writeGuard, handleWrite(async req => {
+  const uid = req.params.uid;
+  const isSelf = req.user && (req.user.id === uid || req.user.slack_id === uid);
+  const isAdmin = req.user && req.user.role === 'admin';
+  if (!isSelf && !isAdmin) { const e = new Error('yetkisiz: yalnız kişinin kendisi veya yönetici'); e.name = 'ZodError'; e.issues = [{ path: ['yetki'], message: 'yetkisiz' }]; throw e; }
+  return writes.setQueue(uid, { order: req.body?.order, by: req.user && req.user.id });
+}));
+
 // Onay anındaki son görseli kaydet (Slack bot ✅ handler'ından çağrılır, best-effort)
 app.patch('/api/briefs/by-ts/:ts/set-image', writeGuard, async (req, res) => {
   try {
