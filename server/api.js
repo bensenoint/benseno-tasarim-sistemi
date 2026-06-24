@@ -230,7 +230,7 @@ app.post('/api/briefs/:id/restore',    writeGuard, handleWrite(req => writes.res
 app.post('/api/briefs/by-ts/:ts/restore', writeGuard, handleWrite(async req => writes.restoreBrief(await writes.tsToId(req.params.ts), req.body?.by)));
 
 // Kişisel iş kuyruğu sırası — yalnız kişinin kendisi veya admin. Body: { order: [briefId,...] }.
-app.post('/api/users/:uid/queue', writeGuard, handleWrite(async req => {
+app.post('/api/users/:uid/queue', auth.authGuard, handleWrite(async req => {
   const uid = req.params.uid;
   const isSelf = req.user && (req.user.id === uid || req.user.slack_id === uid);
   const isAdmin = req.user && req.user.role === 'admin';

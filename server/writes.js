@@ -580,18 +580,25 @@ async function setQueue(uid, raw) {
     const newActive = await userActiveBriefId(client, uid);
     return { oldActive, newActive };
   });
-  if (newActive && newActive !== oldActive) {
-    // Yeni aktif işi aktive et (geçiş tablosu)
-    const cur = await pool.query('SELECT durum FROM briefs WHERE id=$1', [newActive]);
-    if (cur.rows[0]) await setStatus(newActive, { durum: activateTarget(cur.rows[0].durum), by, source: 'dashboard' });
-    // Önceki aktif → başka aktif contributor yoksa beklemede
-    if (oldActive) {
-      const o = await pool.query('SELECT durum FROM briefs WHERE id=$1', [oldActive]);
-      if (o.rows[0] && o.rows[0].durum === 'basladi') {
-        const hasOther = await (async () => { const c = await pool.connect(); try { return await briefHasOtherActive(c, oldActive, uid); } finally { c.release(); } })();
-        if (!hasOther) await setStatus(oldActive, { durum: 'beklemede', by, source: 'system' });
+  // kişi_sira commit'i ile durum geçişleri AYRI tx'lerde (setStatus kendi tx+reflectChange'ini yönetir).
+  // Geçiş başarısız olursa sıra yine de kaydedildi; durum bir sonraki sıralamada userActiveBriefId'den
+  // yeniden hesaplanır (self-heal). Bu yüzden geçiş hatasını loglayıp yutuyoruz, sıralamayı 400'e çevirmiyoruz.
+  try {
+    if (newActive && newActive !== oldActive) {
+      // Yeni aktif işi aktive et (geçiş tablosu)
+      const cur = await pool.query('SELECT durum FROM briefs WHERE id=$1', [newActive]);
+      if (cur.rows[0]) await setStatus(newActive, { durum: activateTarget(cur.rows[0].durum), by, source: 'dashboard' });
+      // Önceki aktif → başka aktif contributor yoksa beklemede
+      if (oldActive) {
+        const o = await pool.query('SELECT durum FROM briefs WHERE id=$1', [oldActive]);
+        if (o.rows[0] && o.rows[0].durum === 'basladi') {
+          const hasOther = await (async () => { const c = await pool.connect(); try { return await briefHasOtherActive(c, oldActive, uid); } finally { c.release(); } })();
+          if (!hasOther) await setStatus(oldActive, { durum: 'beklemede', by, source: 'system' });
+        }
       }
     }
+  } catch (e) {
+    console.error('[setQueue] durum geçişi başarısız (sıra kaydedildi, self-heal):', e.message);
   }
   return { ok: true, oldActive, newActive };
 }
