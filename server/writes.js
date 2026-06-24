@@ -512,7 +512,88 @@ async function setStatus(id, raw) {
         `İşi planına almak için thread'e emoji bırak (🎨/✍️/🤖)${b.slack_url && b.slack_url !== '#' ? ` — <${b.slack_url}|thread'i aç>` : ''}.`);
     } catch (e) { console.error('[writes] zincir DM hata:', e.message); }
   }
+  // Otomatik ilerleme: bu brief tamamlandi/musteride olduysa, onu aktif işi yapan
+  // contributor'lar için sıradaki kuyruk işini aktive et. source:'system' → echo/loop koruması.
+  if ((d.durum === 'tamamlandi' || d.durum === 'musteride') && d.source !== 'system') {
+    const cont = await pool.query(
+      `SELECT user_id FROM brief_assignees WHERE brief_id=$1 AND role='contributor'`, [id]);
+    for (const row of cont.rows) {
+      const nextId = await (async () => { const c = await pool.connect(); try { return await userActiveBriefId(c, row.user_id); } finally { c.release(); } })();
+      if (nextId && nextId !== id) {
+        const nb = await pool.query('SELECT durum FROM briefs WHERE id=$1', [nextId]);
+        if (nb.rows[0] && nb.rows[0].durum !== 'basladi') {
+          await setStatus(nextId, { durum: activateTarget(nb.rows[0].durum), by: d.by, source: 'system' });
+        }
+      }
+    }
+  }
   return res;
+}
+
+// ── Kişisel iş kuyruğu ───────────────────────────────────────
+// Bir kullanıcının AKTİF brief'i = contributor olduğu, durumu kuyruk-uygun (tamamlandi/musteride
+// DEĞİL) briefler içinde en küçük kisi_sira'lı olan. Yoksa null.
+async function userActiveBriefId(client, uid) {
+  const r = await client.query(
+    `SELECT b.id FROM brief_assignees a JOIN briefs b ON b.id = a.brief_id
+     WHERE a.user_id = $1 AND a.role = 'contributor' AND b.deleted_at IS NULL
+       AND b.durum NOT IN ('tamamlandi','musteride')
+     ORDER BY a.kisi_sira NULLS LAST, b.id LIMIT 1`, [uid]);
+  return r.rows[0] ? r.rows[0].id : null;
+}
+
+// briefId, exceptUid DIŞINDA bir contributor için aktif (kuyruk başı) mı?
+async function briefHasOtherActive(client, briefId, exceptUid) {
+  const r = await client.query(
+    `SELECT a.user_id FROM brief_assignees a
+     WHERE a.brief_id = $1 AND a.role = 'contributor' AND a.user_id <> $2`, [briefId, exceptUid]);
+  for (const row of r.rows) {
+    if (await userActiveBriefId(client, row.user_id) === briefId) return true;
+  }
+  return false;
+}
+
+// Aktive etme: mevcut duruma göre hedef durum (geçiş tablosu).
+function activateTarget(durum) {
+  if (durum === 'incelemede' || durum === 'musteride') return 'revizyon';
+  return 'basladi'; // yeni/calisiliyor/beklemede/blokeli/tamamlandi → basladi (tamamlandi reopen)
+}
+
+// Bir kullanıcının kuyruğunu yeniden sırala + aktif/demote hesapla.
+// order: briefId dizisi (yalnız uid'in contributor olduğu işler dikkate alınır). by: işlemi yapan.
+async function setQueue(uid, raw) {
+  const order = Array.isArray(raw.order) ? raw.order.map(Number).filter(Boolean) : [];
+  const by = raw.by || null;
+  const { oldActive, newActive } = await tx(async (client) => {
+    const owned = await client.query(
+      `SELECT a.brief_id FROM brief_assignees a JOIN briefs b ON b.id = a.brief_id
+       WHERE a.user_id = $1 AND a.role = 'contributor' AND b.deleted_at IS NULL`, [uid]);
+    const ownedIds = new Set(owned.rows.map(r => r.brief_id));
+    const oldActive = await userActiveBriefId(client, uid);
+    let i = 0;
+    for (const bid of order) {
+      if (!ownedIds.has(bid)) continue;
+      await client.query(
+        `UPDATE brief_assignees SET kisi_sira = $1 WHERE user_id = $2 AND brief_id = $3 AND role = 'contributor'`,
+        [i++, uid, bid]);
+    }
+    const newActive = await userActiveBriefId(client, uid);
+    return { oldActive, newActive };
+  });
+  if (newActive && newActive !== oldActive) {
+    // Yeni aktif işi aktive et (geçiş tablosu)
+    const cur = await pool.query('SELECT durum FROM briefs WHERE id=$1', [newActive]);
+    if (cur.rows[0]) await setStatus(newActive, { durum: activateTarget(cur.rows[0].durum), by, source: 'dashboard' });
+    // Önceki aktif → başka aktif contributor yoksa beklemede
+    if (oldActive) {
+      const o = await pool.query('SELECT durum FROM briefs WHERE id=$1', [oldActive]);
+      if (o.rows[0] && o.rows[0].durum === 'basladi') {
+        const hasOther = await (async () => { const c = await pool.connect(); try { return await briefHasOtherActive(c, oldActive, uid); } finally { c.release(); } })();
+        if (!hasOther) await setStatus(oldActive, { durum: 'beklemede', by, source: 'system' });
+      }
+    }
+  }
+  return { ok: true, oldActive, newActive };
 }
 
 async function setFinancials(id, raw) {
@@ -696,4 +777,4 @@ async function restoreBrief(id, by) {
   return { id, no: r.rows[0].no };
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, setQueue, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };
