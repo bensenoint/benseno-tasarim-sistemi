@@ -57,7 +57,7 @@ function check(name, ok, detail) {
         AND (a.onay_at IS NOT NULL OR EXISTS (SELECT 1 FROM brief_assignees a2
           WHERE a2.brief_id=b.id AND a2.role='contributor' AND a2.onay_at IS NULL
             AND COALESCE(a2.sira,999999) < COALESCE(a.sira,999999))))
-    WHERE u.dept IS NOT NULL GROUP BY u.dept`);
+    WHERE u.dept IS NOT NULL AND u.active GROUP BY u.dept`);
   const ds = emb.bns_dept_stats || {};
   for (const [dept, people, active, overdue, musteride, c30] of deptRows) {
     const a = ds[dept]; if (!a) { check(`dept ${dept} API'de yok`, false); continue; }
