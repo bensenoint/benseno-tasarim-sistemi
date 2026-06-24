@@ -7,12 +7,17 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   const [prioFilter, setPrioFilter] = useStickyState("kanban.prio", "all");
   const [markaFilter, setMarkaFilter] = useStickyState("kanban.marka", "all");   // müşteri (marka) filtresi
   const [search, setSearch]         = useStickyState("kanban.search", "");
+  const [person, setPerson]         = useStickyState("kanban.person", "all");   // çalışan (lead+contributor) filtresi
 
   // Müşteri (marka) seçenekleri — aktif + tamamlanan brief'lerden, alfabetik.
   const markaOpts = [...new Set([
     ...(data._allBriefs || data.briefs || []).map(b => b.marka),
     ...(data._allCompleted || data.completed || []).map(c => c.marka),
   ].filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
+
+  // Çalışan seçenekleri — aktif + tamamlanan brief'lerdeki lead+contributor'lardan.
+  const personOpts = peopleOf([...(data._allBriefs || data.briefs || []), ...(data._allCompleted || data.completed || [])]);
+  const onPerson = (b) => person === "all" || [b.lead, ...(b.contributors || [])].some(p => p && p.id === person);
 
   const cols = [
     { id: "yeni",        label: "Yeni",        Ic: I.Inbox,  accent: "var(--ink-3)" },
@@ -28,6 +33,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   // Arama filtresi tamamlananlara da uygulanır — slice'tan ÖNCE (yoksa filtre yalnız ilk 12'de arar)
   let allCompleted = data._allCompleted || data.completed || [];
   if (markaFilter !== "all") allCompleted = allCompleted.filter(c => c.marka === markaFilter);
+  if (person !== "all") allCompleted = allCompleted.filter(onPerson);
   if (search.trim()) {
     const cq = search.toLowerCase().trim();
     allCompleted = allCompleted.filter(c =>
@@ -55,6 +61,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   // Filtrele — viewMode'dan bağımsız tüm brief'ler
   let allBriefs = data._allBriefs || data.briefs;
   if (markaFilter !== "all") allBriefs = allBriefs.filter(b => b.marka === markaFilter);
+  if (person !== "all") allBriefs = allBriefs.filter(onPerson);
   if (prioFilter !== "all") allBriefs = allBriefs.filter(b => b.priority.code === prioFilter);
   if (search.trim()) {
     const q = search.toLowerCase().trim();
@@ -91,6 +98,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
             <option value="all">Tüm müşteriler</option>
             {markaOpts.map(m => <option key={m} value={m}>{m}</option>)}
           </select>
+          <PersonFilter value={person} onChange={setPerson} people={personOpts}/>
           <PrioFilter value={prioFilter} onChange={setPrioFilter}/>
         </>}
       />
