@@ -603,6 +603,36 @@ async function setQueue(uid, raw) {
   return { ok: true, oldActive, newActive };
 }
 
+// ── Kanban kolon içi iş-sırası ───────────────────────────────────────────────
+// Bir kolondaki (durum) brief'leri verilen order'a göre sıralar: her brief'in TÜM
+// contributor'larına pozisyonu kisi_sira olarak yazar → profil kuyruğuna da yansır.
+// actor.scope: 'all' → her brief; '<dept>' → yalnız o departmanı içeren brief'ler; yoksa hiçbiri.
+async function briefInScope(client, briefId, scope) {
+  if (scope === 'all') return true;
+  if (!scope) return false;
+  const r = await client.query(
+    `SELECT 1 FROM briefs b
+       LEFT JOIN brief_assignees a ON a.brief_id = b.id
+       LEFT JOIN users u ON u.id = a.user_id
+      WHERE b.id = $1 AND (b.dept = $2 OR u.dept = $2) LIMIT 1`, [briefId, scope]);
+  return !!r.rows[0];
+}
+async function setKanbanOrder(rawOrder, actor) {
+  const ids = (Array.isArray(rawOrder) ? rawOrder : []).map(Number).filter(Boolean);
+  const scope = actor && actor.scope;
+  await tx(async (client) => {
+    let pos = 0;
+    for (const bid of ids) {
+      if (!(await briefInScope(client, bid, scope))) continue;
+      await client.query(
+        `UPDATE brief_assignees SET kisi_sira = $1 WHERE brief_id = $2 AND role = 'contributor'`,
+        [pos, bid]);
+      pos++;
+    }
+  });
+  return { ok: true };
+}
+
 async function setFinancials(id, raw) {
   const d = financialsBody.parse(raw);
   const res = await tx(async (client) => {
@@ -784,4 +814,4 @@ async function restoreBrief(id, by) {
   return { id, no: r.rows[0].no };
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, setQueue, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, setQueue, setKanbanOrder, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };

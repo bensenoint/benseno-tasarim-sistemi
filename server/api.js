@@ -245,6 +245,16 @@ app.post('/api/users/:uid/queue', auth.authGuard, handleWrite(async req => {
   return writes.setQueue(uid, { order: req.body?.order, by: req.user && req.user.id });
 }));
 
+// Kanban kolon içi iş-sırası. Kapsam backend'de uygulanır: yalnız actor'ün yetkili olduğu brief'ler yazılır.
+app.post('/api/kanban/reorder', auth.authGuard, handleWrite(async req => {
+  let scope = null;
+  if (req.user) {
+    const me = await pool.query('SELECT sched_scope FROM users WHERE id=$1 OR id=$2 LIMIT 1', [req.user.id, req.user.slack_id || req.user.id]);
+    scope = me.rows[0] && me.rows[0].sched_scope;
+  }
+  return writes.setKanbanOrder(req.body?.order, { id: req.user && req.user.id, scope });
+}));
+
 // Onay anındaki son görseli kaydet (Slack bot ✅ handler'ından çağrılır, best-effort)
 app.patch('/api/briefs/by-ts/:ts/set-image', writeGuard, async (req, res) => {
   try {

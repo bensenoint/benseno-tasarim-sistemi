@@ -89,6 +89,17 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     if (typeof onStatusChange === "function") onStatusChange(brief, colId);
   };
 
+  // Kolon içi iş-sırası: order = brief id dizisi. Backend kapsamı (departman) uygular.
+  const reorderKanban = (orderIds) => {
+    const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+    const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+    fetch(`${API}/api/kanban/reorder`, {
+      method: "POST",
+      headers: { "content-type": "application/json", Authorization: "Bearer " + tok },
+      body: JSON.stringify({ order: orderIds }),
+    }).then(r => { if (r.ok && typeof window.bnsRefresh === "function") window.bnsRefresh(); }).catch(() => {});
+  };
+
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -157,12 +168,29 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
                 }}>{items.length}</span>
               </div>
               <div style={{display:"flex", flexDirection:"column", gap: 8, flex:1, overflowY:"auto", overflowX:"hidden", maxHeight: "60vh", minWidth:0}}>
-                {items.map(b => <KanbanCard key={b.id} brief={b} onClick={() => onOpenBrief(b)}
+                {items.map(b => {
+                  // Aynı kolondaki başka kartın üstüne bırakınca sıralama (yalnız iş-sırası kolonlarında).
+                  const orderable = !["musteride", "blokeli", "tamamlandi"].includes(col.id);
+                  const sameCol = (id) => items.some(x => x.id === id);
+                  return <KanbanCard key={b.id} brief={b} onClick={() => onOpenBrief(b)}
                   draggable={!isMobile}
                   dragging={dragId === b.id}
                   onDragStartCard={(e) => { try { e.dataTransfer.setData("text/bns", JSON.stringify({ id: b.id, from: b.durum })); } catch (_) {} e.dataTransfer.effectAllowed = "move"; setDragId(b.id); }}
                   onDragEndCard={() => { setDragId(null); setDragOverCol(null); }}
-                />)}
+                  onDragOverCard={(orderable && !isMobile) ? (e) => { if (dragId != null && sameCol(dragId)) { e.preventDefault(); e.stopPropagation(); } } : undefined}
+                  onDropCard={(orderable && !isMobile) ? (e) => {
+                    if (dragId == null || !sameCol(dragId)) return;   // farklı kolon → kolona bubble (statü değişir)
+                    e.preventDefault(); e.stopPropagation();
+                    if (dragId !== b.id) {
+                      const ids = items.map(x => x.id).filter(id => id !== dragId);
+                      const ti = ids.indexOf(b.id);
+                      ids.splice(ti < 0 ? ids.length : ti, 0, dragId);
+                      reorderKanban(ids);
+                    }
+                    setDragId(null); setDragOverCol(null);
+                  } : undefined}
+                />;
+                })}
                 {items.length === 0 && (
                   <div style={{padding: 20, textAlign:"center", color:"var(--ink-4)", font:"400 12px/1.4 var(--font-sans)"}}>
                     boş.
@@ -177,12 +205,14 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   );
 }
 
-function KanbanCard({ brief, onClick, draggable, dragging, onDragStartCard, onDragEndCard }) {
+function KanbanCard({ brief, onClick, draggable, dragging, onDragStartCard, onDragEndCard, onDragOverCard, onDropCard }) {
   return (
     <button onClick={onClick}
       draggable={draggable || undefined}
       onDragStart={draggable ? onDragStartCard : undefined}
       onDragEnd={draggable ? onDragEndCard : undefined}
+      onDragOver={onDragOverCard}
+      onDrop={onDropCard}
       style={{
       display:"flex", flexDirection:"column", gap: 6, padding: "10px 10px 8px",
       background:"var(--paper)", border:"1px solid var(--line)", borderRadius: 0,
