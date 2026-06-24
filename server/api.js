@@ -367,14 +367,15 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
     const convo = msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) }));
 
     let final = '';
-    for (let turn = 0; turn < 5; turn++) {
+    const MAX_TURNS = 5;
+    for (let turn = 0; turn < MAX_TURNS; turn++) {
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6', max_tokens: 1200, system,
           thinking: { type: 'adaptive' },
-          tools: odyTools.TOOLS,
+          ...(turn < MAX_TURNS - 1 ? { tools: odyTools.TOOLS } : {}),
           messages: convo,
         }),
       });
