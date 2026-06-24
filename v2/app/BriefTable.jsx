@@ -15,9 +15,10 @@ function FlagCell({ on, label }) {
 
 function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false, rowDraggable, onRowReorder }) {
   const [dragId, setDragId] = React.useState(null);   // satır sürükle-bırak (opsiyonel; yalnız onRowReorder verilince)
-  const [sort, setSort] = React.useState({ col: "deltaH", dir: "asc" });
+  // Kuyruk (sürükle-bırak) modunda gelen sırayı (kisi_sira) koru; aksi halde "Kalan"a göre sırala.
+  const [sort, setSort] = React.useState({ col: onRowReorder ? null : "deltaH", dir: "asc" });
   const sorted = React.useMemo(() => {
-    if (!sortable) return rows;
+    if (!sortable || !sort.col) return rows;
     const copy = [...rows];
     const { col, dir } = sort;
     copy.sort((a, b) => {
