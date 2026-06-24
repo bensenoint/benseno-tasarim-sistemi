@@ -13,7 +13,7 @@ const { pool, tx } = require('./db');
 const slack = require('./slack');
 const calc = require('./calc-penalty.js'); // deadline uzatma cezası (API kökü server/; dashboard calc.js imajda yok)
 
-const DURUMLAR = ['yeni', 'calisiliyor', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'musteride', 'tamamlandi'];
+const DURUMLAR = ['yeni', 'calisiliyor', 'basladi', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'musteride', 'tamamlandi'];
 
 // ── Zod şemaları ─────────────────────────────────────────────
 // U... = Slack kullanıcısı, FR... = freelancer (Slack'te yok, sadece takip için sentetik id)
@@ -471,6 +471,7 @@ async function setStatus(id, raw) {
       `UPDATE briefs SET durum=$1,
          completed_at = CASE WHEN $2 THEN COALESCE(completed_at, now()) ELSE NULL END,
          started_at   = CASE WHEN $1='calisiliyor' THEN COALESCE(started_at, now()) ELSE started_at END,
+         basladi_at   = CASE WHEN $1='basladi' THEN COALESCE(basladi_at, now()) ELSE basladi_at END,
          gonderim_sayisi = gonderim_sayisi + CASE WHEN $1='musteride' THEN 1 ELSE 0 END,
          son_gonderim_at = CASE WHEN $1='musteride' THEN now() ELSE son_gonderim_at END,
          rev_musteri = rev_musteri + CASE WHEN $1='revizyon' AND musteri_bekliyor     THEN 1 ELSE 0 END,
