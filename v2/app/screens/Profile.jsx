@@ -172,14 +172,17 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   const _scope   = (_meSched && _meSched.sched_scope) || (currentUser?.role === "admin" ? "all" : null);
   const _isSelf  = !!(currentUser && (currentUser.slack_id === u.id || currentUser.id === u.id));
   const canReorder = _isSelf || _scope === "all" || (!!_scope && _scope === u.dept);
-  // Sürükle-bırak yeniden sıralama. Filtreden bağımsız olsun diye TAM worker-kuyruğu (myActive
-  // worker işleri, kisi_sira sırasında) üzerinde hesaplar; fromId'yi toId'nin önüne taşır → /queue.
+  // Sürükle-bırak yeniden sıralama. fromId'yi TAM görünen sıra (myActive: worker + lead/gözlemci,
+  // iş-yapma sırasında) içinde toId'nin önüne taşır; sonra worker-only alt diziyi /queue'ya gönderir.
+  // Böylece worker OLMAYAN bir satırın (lead/gözlemci) üstüne bırakınca da iş doğru konuma (örn. en
+  // üste → başlandı) taşınır; eskiden toId worker değilse iş sona düşüyordu.
   const reorderQueue = (fromId, toId) => {
     if (fromId == null || fromId === toId) return;
-    const queue = myActive.filter(isWorker).map(b => b.id);
-    const without = queue.filter(id => id !== fromId);
-    const ti = without.indexOf(toId);
-    without.splice(ti < 0 ? without.length : ti, 0, fromId);
+    const full = myActive.map(b => b.id).filter(id => id !== fromId);
+    const ti = full.indexOf(toId);
+    full.splice(ti < 0 ? full.length : ti, 0, fromId);
+    const workerIds = new Set(myActive.filter(isWorker).map(b => b.id));
+    const without = full.filter(id => workerIds.has(id));
     const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
     const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
     fetch(`${API}/api/users/${u.id}/queue`, {
