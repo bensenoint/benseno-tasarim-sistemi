@@ -367,8 +367,11 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
     const convo = msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) }));
 
     let final = '';
+    const toolsUsed = [];   // sohbet logu için çağrılan tool adları (sırayla)
+    let turnsUsed = 0;
     const MAX_TURNS = 5;
     for (let turn = 0; turn < MAX_TURNS; turn++) {
+      turnsUsed = turn + 1;
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
@@ -389,12 +392,22 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
       const toolResults = [];
       for (const b of blocks) {
         if (b.type !== 'tool_use') continue;
+        toolsUsed.push(b.name);
         const out = await odyTools.runTool(b.name, b.input, ctx);
         toolResults.push({ type: 'tool_result', tool_use_id: b.id, content: JSON.stringify(out) });
       }
       convo.push({ role: 'user', content: toolResults });
     }
-    res.json({ reply: final || 'İsteğini tam karşılayamadım, tekrar dener misin?' });
+    const reply = final || 'İsteğini tam karşılayamadım, tekrar dener misin?';
+    res.json({ reply });
+    // Sohbet logu — best-effort, yanıtı bloklamaz (doğruluk gözlemlenebilirliği; tool çağrılmayanları yakalamak için).
+    const soru = String(msgs[msgs.length - 1]?.content || '').slice(0, 2000);
+    pool.query(
+      `INSERT INTO ody_chat_log(user_id, user_name, role, soru, tools, tool_sayisi, turlar, yanit)
+       VALUES ($1,$2,$3,$4,$5::jsonb,$6,$7,$8)`,
+      [req.user.id || req.user.slack_id || null, req.user.name || null, req.user.role || null,
+       soru, JSON.stringify(toolsUsed), toolsUsed.length, turnsUsed, reply.slice(0, 4000)]
+    ).catch(e => console.error('[chat] log yazılamadı:', e.message));
   } catch (e) { console.error('[chat] hata:', e.message); res.status(500).json({ error: e.message }); }
 });
 
