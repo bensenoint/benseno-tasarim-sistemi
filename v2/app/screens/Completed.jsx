@@ -1,25 +1,19 @@
 // app/screens/Completed.jsx — Tamamlananlar (12-col table).
 
 function CompletedScreen({ data, onOpenBrief, currentUser }) {
-  const [range, setRange] = React.useState("30");
   const [search, setSearch] = React.useState("");
   const [deliveryFilter, setDeliveryFilter] = React.useState("all");   // teslim durumu (aktiflerdeki scope karşılığı)
   const [person, setPerson] = React.useState("all");                   // kişi (lead+contributor) filtresi
-  const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
+  // Tarih aralığı GLOBAL başlık filtresinden gelir — data.completed App.jsx'te bitiş tarihine göre süzülür.
+  // (Eski yerel 7/30/90 toggle'ı kaldırıldı; artık tek tarih kontrolü = global başlık. Çift-filtre yok.)
   const allCompleted = data.completed || data._allCompleted || [];
+  const drLabel = rangeLabelOf(data.dateRange);
 
-  // Range filtresi
-  const cutoff = now - parseInt(range) * 24 * 3600 * 1000;
-  const rangeRows = allCompleted.filter(c => {
-    const ts = c.bitis || c.deadline || 0;
-    return ts >= cutoff;
-  });
-
-  // Kişi seçenekleri — tüm tamamlananlardan (range'ten bağımsız ki liste boş kalmasın).
+  // Kişi seçenekleri — görünür (global aralıkça süzülmüş) tamamlananlardan.
   const personOpts = peopleOf(allCompleted);
 
   // Filtreler (AND): teslim durumu + kişi + arama. Tamamlananlarda öncelik verisi yok (priority:null).
-  let rows = rangeRows;
+  let rows = allCompleted;
   if (deliveryFilter !== "all") rows = rows.filter(c => c.delivery_status === deliveryFilter);
   if (person !== "all") rows = rows.filter(c => [c.lead, ...(c.contributors || [])].some(p => p && p.id === person));
   if (search.trim()) {
@@ -65,30 +59,17 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
     <div className="bn-tab-in">
       <PageHead
         title="Tamamlananlar"
-        subtitle="12 sütun · post-completion rating ile"
-        actions={
-          <div style={{display:"inline-flex", padding:2, border:"1px solid var(--line)", borderRadius:6}}>
-            {[["7","Son 7 gün"],["30","30 gün"],["90","90 gün"]].map(([k,v]) => (
-              <button key={k} onClick={() => setRange(k)} style={{
-                font:`${range===k?600:500} 12px/1 var(--font-sans)`, padding:"6px 11px",
-                border:0, borderRadius:4, cursor:"pointer",
-                background: range===k ? "var(--paper-2)" : "transparent",
-                color: range===k ? "var(--ink)" : "var(--ink-4)",
-                transition:"background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1)"
-              }}>{v}</button>
-            ))}
-          </div>
-        }/>
+        subtitle={`12 sütun · ${drLabel} · tarih aralığını üstteki global filtreden ayarla`}/>
 
       {/* Filtre çubuğu — aktif işlerdekiyle aynı: teslim durumu segmenti + kişi + arama */}
       <div className="bns-sticky-filters" style={{display:"flex", alignItems:"center", gap: 12, marginBottom: 14, flexWrap:"wrap"}}>
         <Segment
           value={deliveryFilter} onChange={setDeliveryFilter}
           options={[
-            ["all",       `Tümü · ${rangeRows.length}`],
-            ["zamaninda", `Zamanında · ${rangeRows.filter(c => c.delivery_status === "zamaninda").length}`],
-            ["uzatildi",  `Uzatıldı · ${rangeRows.filter(c => c.delivery_status === "uzatildi").length}`],
-            ["gec",       `Geciken · ${rangeRows.filter(c => c.delivery_status === "gec").length}`]
+            ["all",       `Tümü · ${allCompleted.length}`],
+            ["zamaninda", `Zamanında · ${allCompleted.filter(c => c.delivery_status === "zamaninda").length}`],
+            ["uzatildi",  `Uzatıldı · ${allCompleted.filter(c => c.delivery_status === "uzatildi").length}`],
+            ["gec",       `Geciken · ${allCompleted.filter(c => c.delivery_status === "gec").length}`]
           ]}/>
 
         <PersonFilter value={person} onChange={setPerson} people={personOpts}/>
@@ -99,7 +80,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
       </div>
 
       <div className="bns-kpi-5" style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 12, marginBottom: 16}}>
-        <Kpi label="Tamamlanan" value={rows.length} sub={`son ${range} gün`}/>
+        <Kpi label="Tamamlanan" value={rows.length} sub={drLabel}/>
         <Kpi label="Ort. süre"    value={rows.length ? fmtNum(avgSure) + " sa"  : "—"}/>
         <Kpi label="Ort. gecikme" value={rows.length ? fmtNum(avgGecikme) + " sa" : "—"}/>
         <Kpi label="Ort. revize"  value={rows.length ? fmtNum(avgRev)    : "—"}/>
@@ -126,7 +107,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
           <tbody>
             {rows.length === 0 && (
               <tr><td colSpan={13} style={{padding:"32px 16px", textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>
-                Son {range} günde tamamlanan brief bulunamadı.
+                Seçili tarih aralığında ({drLabel}) tamamlanan brief bulunamadı.
               </td></tr>
             )}
             {rows.map((c, idx) => (
@@ -234,6 +215,13 @@ function fmt(ts) {
   const d = new Date(ts);
   const months = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
   return `${d.getDate()} ${months[d.getMonth()]} · ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+
+// Global tarih aralığı preset'inden okunur etiket (KPI/altyazı/boş-durum için).
+function rangeLabelOf(dr) {
+  if (!dr) return "seçili aralık";
+  const M = { today:"bugün", yesterday:"dün", "7d":"son 7 gün", "30d":"son 30 gün", "90d":"son 90 gün", year:"bu yıl", all:"tüm zamanlar", custom:"özel aralık" };
+  return M[dr.preset] || "seçili aralık";
 }
 
 window.CompletedScreen = CompletedScreen;
