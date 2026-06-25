@@ -1,6 +1,6 @@
 // app/screens/Jobs.jsx — Aktif İşler tab. Supports table / kanban / cards view.
 
-function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope, onOpenBrief, onStatusChange }) {
+function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope, onOpenBrief, onOpenCompleted, onStatusChange }) {
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [scope, setScope] = useStickyState("jobs.scope", "all");
   // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle (refresh'te initialScope=null → sticky korunur)
@@ -15,12 +15,23 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
   // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
   const base = data.briefs.filter(b => b.durum !== "musteride");   // müşteride hariç aktif yük
-  let rows = base;
-  if (scope === "overdue")      rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
-  else if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor" || b.durum === "basladi");  // geriye uyum (Overview deep-link)
-  else if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");                                                  // geriye uyum
-  else if (scope !== "all")     rows = rows.filter(b => b.durum === scope);                                                         // belirli statü kartı
-  if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
+  const comp = data.completed || [];                                // seçili tarih aralığındaki tamamlananlar
+  const isCompletedScope = scope === "tamamlandi";
+  let rows;
+  if (isCompletedScope) {
+    // Tamamlandı kartı → liste tamamlananlara döner (BriefTable için güvenli default'larla normalize)
+    rows = comp.map(c => ({ ...c, durum: "tamamlandi",
+      priority: c.priority || { code: "grn", label: "—" },
+      oncelik: c.oncelik || { code: "ylw", label: "NORMAL" },
+      deltaH: c.deltaH != null ? c.deltaH : null }));
+  } else {
+    rows = base;
+    if (scope === "overdue")      rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
+    else if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor" || b.durum === "basladi");  // geriye uyum (Overview deep-link)
+    else if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");                                                  // geriye uyum
+    else if (scope !== "all")     rows = rows.filter(b => b.durum === scope);                                                         // belirli statü kartı
+    if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
+  }
   if (person !== "all") rows = rows.filter(b => [b.lead, ...(b.contributors || [])].some(p => p && p.id === person));
   if (search.trim()) {
     const q = search.toLowerCase().trim();
@@ -47,8 +58,56 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     { key: "revizyon",    label: "Revizyon",     value: cnt("revizyon"),    color: "var(--warning)" },
     { key: "blokeli",     label: "Blokeli",      value: cnt("blokeli"),     color: "var(--danger)" },
     { key: "overdue",     label: "Geciken",      value: base.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length, color: "var(--prio-red)" },
+    { key: "tamamlandi",  label: "Tamamlandı",   value: comp.length,        color: "var(--success, #2E8F66)" },
   ];
-  const activeKey = scope === "review" ? "incelemede" : scope;   // KPI vurgusu (legacy review→incelemede)
+  const activeKey = scope === "review" ? "incelemede" : scope === "open" ? "all" : scope;   // KPI vurgusu (legacy review→incelemede)
+
+  // ── İkinci satır: seçili karta özel DETAY KPI'lar ──
+  const NOW = data.NOW || Date.now();
+  const _d = new Date(NOW); const dayEnd = new Date(_d.getFullYear(), _d.getMonth(), _d.getDate(), 23, 59, 59).getTime();
+  const weekEnd = NOW + 7 * 24 * 3600 * 1000;
+  const avg = (arr, f) => arr.length ? arr.reduce((s, x) => s + f(x), 0) / arr.length : 0;
+  let detailKpis;
+  if (isCompletedScope) {
+    const n = comp.length, wS = comp.filter(c => c.sureH > 0), ds = (k) => comp.filter(c => c.delivery_status === k).length;
+    const rated = comp.filter(c => c.rating > 0);
+    detailKpis = [
+      { label: "Adet", value: n },
+      { label: "Ort. süre", value: wS.length ? avg(wS, c => c.sureH).toFixed(1) + " sa" : "—" },
+      { label: "Toplam saat", value: wS.length ? Math.round(wS.reduce((s, c) => s + c.sureH, 0)) + " sa" : "—" },
+      { label: "Ort. gecikme", value: n ? avg(comp, c => c.gecikmeH || 0).toFixed(1) + " sa" : "—" },
+      { label: "Ort. revize", value: n ? avg(comp, c => c.revision || 0).toFixed(1) : "—" },
+      { label: "Ort. puan", value: rated.length ? avg(rated, c => c.rating).toFixed(1) + " / 5" : "—", color: "var(--warning)" },
+      { label: "Zamanında", value: n ? "%" + Math.round(ds("zamaninda") / n * 100) : "—", color: "var(--success, #2E8F66)" },
+      { label: "Uzatılarak", value: n ? "%" + Math.round(ds("uzatildi") / n * 100) : "—", color: "var(--warning)" },
+      { label: "Geciken", value: n ? "%" + Math.round(ds("gec") / n * 100) : "—", color: "var(--prio-red)" },
+    ];
+  } else {
+    const n = rows.length;
+    const overdue = rows.filter(b => b.deltaH <= 0).length;
+    const risk = rows.filter(b => typeof bnsIsRisk === "function" && bnsIsRisk(b.durum, b.deltaH)).length;
+    const today = rows.filter(b => b.deadline && b.deadline <= dayEnd && b.deltaH > 0).length;
+    const week = rows.filter(b => b.deadline && b.deadline <= weekEnd && b.deltaH > 0).length;
+    const acil = rows.filter(b => b.priority && b.priority.code === "red").length;
+    const yuksek = rows.filter(b => b.priority && b.priority.code === "org").length;
+    const nonOver = rows.filter(b => b.deltaH > 0);
+    const uzat = rows.filter(b => (b.uzatma_sayisi || 0) > 0).length;
+    const rev = rows.reduce((s, b) => s + (b.revision || b.rev || 0), 0);
+    const kisi = new Set(rows.flatMap(b => [b.lead, ...(b.contributors || [])].filter(Boolean).map(p => p.id))).size;
+    detailKpis = [
+      { label: "Adet", value: n },
+      { label: "Geciken", value: overdue, color: overdue ? "var(--prio-red)" : undefined },
+      { label: "Termin riski", value: risk, color: risk ? "var(--prio-orange)" : undefined },
+      { label: "Bugün teslim", value: today },
+      { label: "Bu hafta", value: week },
+      { label: "Acil", value: acil, color: acil ? "var(--prio-red)" : undefined },
+      { label: "Yüksek", value: yuksek, color: yuksek ? "var(--prio-orange)" : undefined },
+      { label: "Ort. kalan", value: nonOver.length ? Math.round(avg(nonOver, b => b.deltaH)) + " sa" : "—" },
+      { label: "Uzatılmış", value: uzat },
+      { label: "Toplam revize", value: rev },
+      { label: "Kişi", value: kisi },
+    ];
+  }
 
   return (
     <div className="bn-tab-in">
@@ -99,6 +158,20 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
         </KpiGrid>
       )}
 
+      {/* İkinci satır: seçili karta özel detay KPI'lar (desktop) */}
+      {!isMobile && (
+        <>
+          <div style={{margin:"14px 0 -6px", font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-4)"}}>
+            {(statusCards.find(c => c.key === activeKey) || { label: "Tümü" }).label} · detay
+          </div>
+          <KpiGrid cols={detailKpis.length}>
+            {detailKpis.map((d, i) => (
+              <Kpi key={i} label={d.label} value={d.value} color={d.color}/>
+            ))}
+          </KpiGrid>
+        </>
+      )}
+
       {/* Filter row */}
       <div className="bns-sticky-filters" style={{
         display:"flex", alignItems:"center", gap: 12, marginBottom: 14, flexWrap:"wrap"
@@ -125,9 +198,9 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
         </div>
       </div>
 
-      {view === "kanban" ? <KanbanView rows={rows} onOpenBrief={onOpenBrief}/> :
-       view === "cards" || view === "list" ? <CardsView rows={rows} onOpenBrief={onOpenBrief}/> :
-       <BriefTable rows={rows} onRowClick={onOpenBrief} onStatusChange={onStatusChange}/>}
+      {!isCompletedScope && view === "kanban" ? <KanbanView rows={rows} onOpenBrief={onOpenBrief}/> :
+       !isCompletedScope && (view === "cards" || view === "list") ? <CardsView rows={rows} onOpenBrief={onOpenBrief}/> :
+       <BriefTable rows={rows} onRowClick={isCompletedScope ? (onOpenCompleted || onOpenBrief) : onOpenBrief} onStatusChange={isCompletedScope ? undefined : onStatusChange}/>}
 
       <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop: 14, font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", flexWrap:"wrap", gap:8}}>
         <span>{rows.length} satır · son senkron {(() => { const d = new Date(data.NOW); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); })()}</span>
