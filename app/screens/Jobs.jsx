@@ -17,12 +17,11 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
   // Marka filtresi KAYNAKTA uygulanır → hem liste hem statü-KPI sayıları markayla daralır.
   const mf = (arr) => markaFilter === "all" ? arr : arr.filter(b => b.marka === markaFilter);
-  const base = mf(data.briefs.filter(b => b.durum !== "musteride"));   // müşteride hariç aktif yük (markalı)
   const comp = mf(data.completed || []);                                // seçili aralık tamamlananlar (markalı)
 
-  // ── Tarih filtresi (üst global) → statü KPI kartları OLAY-BAZLI ──
-  // Her statü kartı = seçili aralıkta o statüye GİRMİŞ farklı iş sayısı (müşteri onayı dahil).
-  // Sayım/küme havuzu: TÜM aktif + TÜM tamamlanmış (tarihten bağımsız ham), markayla daraltılmış.
+  // ── Tarih filtresi (üst global) → TÜM KPI kartları + listeler DÖNEM/OLAY-BAZLI (rapor/arşiv mantığı) ──
+  // Bir iş, ilgili olayın GERÇEKLEŞTİĞİ an aralıkta ise sayılır: statüye girdiği / açıldığı /
+  // gecikmeye düştüğü (=deadline anı) / tamamlandığı an. Havuz: TÜM aktif + TÜM tamamlanmış (markalı).
   const _dr = data.dateRange || {};
   const winFrom = typeof _dr.from === "number" ? _dr.from : -Infinity;
   const winTo   = typeof _dr.to   === "number" ? _dr.to   :  Infinity;
@@ -30,31 +29,42 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   const evPool = mf([...(data._allBriefs || data.briefs || []), ...(data._allCompleted || data.completed || [])]);
   const enteredIn = (b, durum) => Array.isArray(b.durum_olaylari) && b.durum_olaylari.some(e => e.durum === durum && inWin(e.ts));
   const cntEv = (durum) => evPool.filter(b => enteredIn(b, durum)).length;
-  const EV_STATUS = new Set(["yeni", "calisiliyor", "basladi", "incelemede", "beklemede", "revizyon", "blokeli", "musteride"]);
+  const EV_STATUS = new Set(["calisiliyor", "basladi", "incelemede", "beklemede", "revizyon", "blokeli", "musteride"]);
+  // Açılış anı: created_at (aktif) ya da en erken statü olayı (tamamlanan created_at taşımaz).
+  const openTs = (b) => {
+    if (typeof b.created_at === "number") return b.created_at;
+    const ev = (b.durum_olaylari || []).map(e => e.ts).filter(Number.isFinite);
+    return ev.length ? Math.min(...ev) : null;
+  };
+  const openedIn = (b) => inWin(openTs(b));
+  // Gecikme başlangıcı = deadline anı. Aralıkta gecikmeye düşmüş + gerçekten gecikmiş işler.
+  // Aktif: şu an geciken (müşteride hariç — iş kuralı). Tamamlanan: geç teslim edilmiş.
+  const overdueInRange = (b) => typeof b.deadline === "number" && inWin(b.deadline) &&
+    (b.bitis ? (b.delivery_status === "gec")
+             : (b.durum !== "musteride" && typeof b.deltaH === "number" && b.deltaH <= 0));
+  // Tümü = aralıkta herhangi bir hareketi olan farklı iş (açılış / statü olayı / tamamlanış).
+  const touchedIn = (b) => openedIn(b) ||
+    (Array.isArray(b.durum_olaylari) && b.durum_olaylari.some(e => inWin(e.ts))) ||
+    (typeof b.bitis === "number" && inWin(b.bitis));
 
-  // Tamamlanmış brief'i BriefTable için güvenli default'larla normalize et (deltaH null kalır → detay metriklerinde sayısal-guard'la elenir).
+  // Tamamlanmış brief'i BriefTable için güvenli default'larla normalize et (deltaH null → detayda sayısal-guard'la elenir).
   const normComp = (c) => ({ ...c,
     priority: c.priority || { code: "grn", label: "—" },
     oncelik: c.oncelik || { code: "ylw", label: "NORMAL" },
     deltaH: c.deltaH != null ? c.deltaH : null });
+  const norm = (b) => b.bitis ? normComp(b) : b;   // tamamlanmışsa normalize; devam eden iş olduğu gibi (satır-içi düzenlenebilir kalır)
 
   const isCompletedScope = scope === "tamamlandi";
-  let rows, rowsAreEventScope = false;
-  if (isCompletedScope) {
-    // Tamamlandı kartı → liste tamamlananlara döner (seçili aralık)
-    rows = comp.map(c => normComp({ ...c, durum: "tamamlandi" }));
-  } else if (EV_STATUS.has(scope)) {
-    // Olay-bazlı statü kartı: aralıkta bu statüye girmiş işler (aktif + tamamlanmış havuzdan), salt-okunur.
-    rowsAreEventScope = true;
-    rows = evPool.filter(b => enteredIn(b, scope)).map(b => b.bitis ? normComp(b) : b);
-    if (prioFilter !== "all" && prioFilter !== "over") rows = rows.filter(b => b.priority && b.priority.code === prioFilter);
-  } else {
-    rows = base;
-    if (scope === "overdue")      rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && inWin(b.deadline));
-    else if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor" || b.durum === "basladi");  // geriye uyum (Overview deep-link)
-    else if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");                                                  // geriye uyum
-    if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
-  }
+  let rows;
+  if (isCompletedScope)            rows = comp.map(c => normComp({ ...c, durum: "tamamlandi" }));  // aralıkta tamamlananlar
+  else if (scope === "yeni")       rows = evPool.filter(openedIn).map(norm);                       // aralıkta açılan işler
+  else if (scope === "overdue")    rows = evPool.filter(overdueInRange).map(norm);                 // aralıkta gecikmeye düşen işler
+  else if (EV_STATUS.has(scope))   rows = evPool.filter(b => enteredIn(b, scope)).map(norm);       // aralıkta o statüye giren işler
+  else if (scope === "review")     rows = evPool.filter(b => enteredIn(b, "incelemede")).map(norm); // geriye uyum (Overview deep-link)
+  else                             rows = evPool.filter(touchedIn).map(norm);                       // "all" (Tümü) + "open" → aralıkta hareketi olan işler
+  // Öncelik filtresi (tüm scope'larda): "over" = geçmiş/geciken, diğerleri renk kodu
+  if (prioFilter === "over")       rows = rows.filter(b => typeof b.deltaH === "number" && b.deltaH <= 0);
+  else if (prioFilter !== "all")   rows = rows.filter(b => b.priority && b.priority.code === prioFilter);
   if (person !== "all") rows = rows.filter(b => [b.lead, ...(b.contributors || [])].some(p => p && p.id === person));
   if (search.trim()) {
     const q = search.toLowerCase().trim();
@@ -71,13 +81,14 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   // Marka seçenekleri — HAM veriden (markaFilter'dan bağımsız; aksi halde seçince liste daralırdı), alfabetik.
   const markaOpts = [...new Set([...(data.briefs || []), ...(data.completed || [])].map(b => b.marka).filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
 
-  // Statü KPI kartları — değerler OLAY-BAZLI: seçili tarih aralığında o statüye girmiş iş sayısı.
-  // Tümü = anlık aktif yük (canlı çalışma listesi); Geciken = anlık geciken; Tamamlandı = aralıkta biten.
-  const cntTumuEv = evPool.filter(b => Array.isArray(b.durum_olaylari) && b.durum_olaylari.some(e => inWin(e.ts))).length;
-  const cntOverdueEv = base.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && inWin(b.deadline)).length;
+  // Statü KPI kartları — TÜMÜ DÖNEM/OLAY-BAZLI: seçili tarih aralığında ilgili olay gerçekleşen iş sayısı.
+  // Tümü=hareketi olan; Yeni=açılan; Geciken=gecikmeye düşen; Tamamlandı=biten; statüler=o statüye giren.
+  const cntTumu = evPool.filter(touchedIn).length;
+  const cntYeni = evPool.filter(openedIn).length;
+  const cntOverdue = evPool.filter(overdueInRange).length;
   const statusCards = [
-    { key: "all",         label: "Tümü",         value: cntTumuEv },
-    { key: "yeni",        label: "Yeni",         value: cntEv("yeni"),        color: "var(--ink-3)" },
+    { key: "all",         label: "Tümü",         value: cntTumu },
+    { key: "yeni",        label: "Yeni",         value: cntYeni,              color: "var(--ink-3)" },
     { key: "calisiliyor", label: "İş planında",  value: cntEv("calisiliyor"), color: "var(--info)" },
     { key: "basladi",     label: "İşe başlandı", value: cntEv("basladi"),     color: "var(--ok, #2E8F66)" },
     { key: "incelemede",  label: "İncelemede",   value: cntEv("incelemede"),  color: "var(--warning)" },
@@ -85,7 +96,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     { key: "revizyon",    label: "Revizyon",     value: cntEv("revizyon"),    color: "var(--warning)" },
     { key: "blokeli",     label: "Blokeli",      value: cntEv("blokeli"),     color: "var(--danger)" },
     { key: "musteride",   label: "Müşteri onayı",value: cntEv("musteride"),   color: "var(--musteride)" },
-    { key: "overdue",     label: "Geciken",      value: cntOverdueEv, color: "var(--prio-red)" },
+    { key: "overdue",     label: "Geciken",      value: cntOverdue, color: "var(--prio-red)" },
     { key: "tamamlandi",  label: "Tamamlandı",   value: comp.length,        color: "var(--success, #2E8F66)" },
   ];
   const activeKey = scope === "review" ? "incelemede" : scope === "open" ? "all" : scope;   // KPI vurgusu (legacy review→incelemede)
@@ -253,9 +264,8 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
        !isCompletedScope && (view === "cards" || view === "list") ? <CardsView rows={rows} onOpenBrief={onOpenBrief}/> :
        <BriefTable rows={rows}
          onRowClick={isCompletedScope ? (onOpenCompleted || onOpenBrief)
-           : rowsAreEventScope ? (b => (b.bitis ? (onOpenCompleted || onOpenBrief) : onOpenBrief)(b))
-           : onOpenBrief}
-         onStatusChange={(isCompletedScope || rowsAreEventScope) ? undefined : onStatusChange}/>}
+           : (b => (b.bitis ? (onOpenCompleted || onOpenBrief) : onOpenBrief)(b))}
+         onStatusChange={isCompletedScope ? undefined : onStatusChange}/>}
 
       <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop: 14, font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", flexWrap:"wrap", gap:8}}>
         <span>{rows.length} satır · son senkron {(() => { const d = new Date(data.NOW); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); })()}</span>

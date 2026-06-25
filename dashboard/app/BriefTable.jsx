@@ -183,12 +183,12 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, draggab
         )}
       </td>
       <td className="bns-col-mobile-hide" style={{...cellStyle(), position:"relative"}}>
-        <span onClick={(e) => { e.stopPropagation(); if (onStatusChange) setMenu(v => !v); }}
+        <span onClick={(e) => { e.stopPropagation(); if (onStatusChange && !brief.bitis && brief.durum !== "tamamlandi") setMenu(v => !v); }}
           style={{display:"inline-flex", padding:"4px 6px", borderRadius: 6,
             background: menu ? "var(--paper-2)" : "transparent"}}>
           <StatusPill status={brief.durum}/>
         </span>
-        {menu && onStatusChange && (
+        {menu && onStatusChange && !brief.bitis && brief.durum !== "tamamlandi" && (
           <StatusMenu current={brief.durum} onPick={(s) => { setMenu(false); onStatusChange(brief, s); }}
             onClose={() => setMenu(false)}/>
         )}
