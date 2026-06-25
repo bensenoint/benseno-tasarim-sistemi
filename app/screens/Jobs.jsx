@@ -226,15 +226,6 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
 
         <PersonFilter value={person} onChange={setPerson} people={personOpts}/>
 
-        {/* KAPSAM — satır içi segment (tasarım örneğindeki gibi); renkler mevcut Segment ile aynı */}
-        {!isMobile && setViewMode && (
-          <div className="bns-hide-mobile" style={{display:"inline-flex", gap: 6, alignItems:"center"}}>
-            <span style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-4)", letterSpacing:"0.06em", textTransform:"uppercase"}}>Kapsam</span>
-            <Segment value={viewMode} onChange={setViewMode}
-              options={[["mine", "Ben"], ["dept", "Departman"], ["all", "Tüm ekip"]]}/>
-          </div>
-        )}
-
         <div className="bns-hide-mobile" style={{marginLeft:"auto", display:"flex", gap: 8, alignItems:"center"}}>
           <SearchBox value={search} onChange={setSearch}/>
         </div>
