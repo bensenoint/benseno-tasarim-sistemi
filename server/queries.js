@@ -177,6 +177,8 @@ async function getEmbedded() {
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at || null, thread_ozet_ts: b.thread_ozet_ts || null,
     stale: !!b.stale, created_at: ms(b.created_at), updated_at: ms(b.updated_at), uyari_at: ms(b.uyari_at), uyari2_at: ms(b.uyari2_at),
     attachments: attByBrief[b.id] || [],
+    // Statü-giriş olayları (tarih-bazlı KPI: aralıkta o statüye girmiş iş sayımı için)
+    durum_olaylari: eventsByBrief[b.id] || [],
   }));
 
   const bns_completed = all.filter(b => b.completed_at && !b.deleted_at).map(b => { const cyc = cycleOf(b); return ({
@@ -200,6 +202,7 @@ async function getEmbedded() {
     image_url: b.image_url || null,
     notes: b.musteri_notu || '',
     attachments: attByBrief[b.id] || [],
+    durum_olaylari: eventsByBrief[b.id] || [],
   }); });
 
   const bns_deleted = all.filter(b => b.deleted_at).map(b => ({

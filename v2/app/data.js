@@ -518,6 +518,7 @@ function bnsHydrateBrief(raw, idx) {
     termin_oneri_ms: raw.termin_oneri_ms != null ? raw.termin_oneri_ms : null,  // önerilen uzatma miktarı (ms)
     deadline_orig: raw.deadline_orig != null ? raw.deadline_orig : null,   // ilk konan deadline
     deadline_history: Array.isArray(raw.deadline_history) ? raw.deadline_history : [],  // [{eski,yeni,at,by}]
+    durum_olaylari: Array.isArray(raw.durum_olaylari) ? raw.durum_olaylari : [],  // [{ts,durum}] statü-giriş olayları (tarih-bazlı KPI sayımı)
     _kimden_id:   raw._kimden_id || null
   };
 }
@@ -557,6 +558,7 @@ function bnsHydrateCompleted(raw, idx) {
     bitis,
     sureH,
     sure_cycles: Array.isArray(raw.sure_cycles) ? raw.sure_cycles : null,  // [{n,basladi,bitis,sureH}] döngü kırılımı
+    durum_olaylari: Array.isArray(raw.durum_olaylari) ? raw.durum_olaylari : [],  // [{ts,durum}] statü-giriş olayları (tarih-bazlı KPI sayımı)
     sureH_son: raw.sureH_son != null ? raw.sureH_son : null,
     sureH_toplam: raw.sureH_toplam != null ? raw.sureH_toplam : (raw.sureH != null ? raw.sureH : null),
     revision: raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
