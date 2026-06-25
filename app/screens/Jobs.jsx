@@ -202,9 +202,9 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
         </>
       )}
 
-      {/* Filter row */}
+      {/* Filter row — kartlar ile liste arasında ferah bir bant (tasarım örneği ritmi) */}
       <div className="bns-sticky-filters" style={{
-        display:"flex", alignItems:"center", gap: 12, marginBottom: 14, flexWrap:"wrap"
+        display:"flex", alignItems:"center", gap: 14, margin:"22px 0 16px", flexWrap:"wrap"
       }}>
         {/* Mobil: statü filtresi segment (desktop'ta KPI kartları kullanılır) */}
         {isMobile && (
@@ -226,9 +226,14 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
 
         <PersonFilter value={person} onChange={setPerson} people={personOpts}/>
 
-        <span className="bns-hide-mobile" style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
-          Kapsam: <span style={{color:"var(--ink)"}}>{viewMode==="mine" ? "bana atanmış" : viewMode==="dept" ? "departmanım" : "tüm ekip"}</span>
-        </span>
+        {/* KAPSAM — satır içi segment (tasarım örneğindeki gibi); renkler mevcut Segment ile aynı */}
+        {!isMobile && setViewMode && (
+          <div className="bns-hide-mobile" style={{display:"inline-flex", gap: 6, alignItems:"center"}}>
+            <span style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-4)", letterSpacing:"0.06em", textTransform:"uppercase"}}>Kapsam</span>
+            <Segment value={viewMode} onChange={setViewMode}
+              options={[["mine", "Ben"], ["dept", "Departman"], ["all", "Tüm ekip"]]}/>
+          </div>
+        )}
 
         <div className="bns-hide-mobile" style={{marginLeft:"auto", display:"flex", gap: 8, alignItems:"center"}}>
           <SearchBox value={search} onChange={setSearch}/>
