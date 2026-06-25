@@ -24,6 +24,10 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       priority: c.priority || { code: "grn", label: "—" },
       oncelik: c.oncelik || { code: "ylw", label: "NORMAL" },
       deltaH: c.deltaH != null ? c.deltaH : null }));
+  } else if (scope === "musteride") {
+    // Müşteri Onayında — base bunu hariç tutar; tüm aktif briefler'den müşteride olanları al.
+    rows = data.briefs.filter(b => b.durum === "musteride");
+    if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
   } else {
     rows = base;
     if (scope === "overdue")      rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
@@ -57,6 +61,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     { key: "beklemede",   label: "Bekliyor",     value: cnt("beklemede"),   color: "var(--ink-3)" },
     { key: "revizyon",    label: "Revizyon",     value: cnt("revizyon"),    color: "var(--warning)" },
     { key: "blokeli",     label: "Blokeli",      value: cnt("blokeli"),     color: "var(--danger)" },
+    { key: "musteride",   label: "Müşteri onayı",value: data.briefs.filter(b => b.durum === "musteride").length, color: "var(--musteride)" },
     { key: "overdue",     label: "Geciken",      value: base.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length, color: "var(--prio-red)" },
     { key: "tamamlandi",  label: "Tamamlandı",   value: comp.length,        color: "var(--success, #2E8F66)" },
   ];
@@ -110,6 +115,9 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       stale:     C("Hareketsiz", rows.filter(b => b.stale).length, "var(--prio-orange)"),
       ortYas:    C("Ort. açık yaş", (() => { const a = rows.filter(b => b.created_at); return a.length ? fmtH(avg(a, b => (NOW - b.created_at) / 3600000)) : "—"; })()),
       ortAtil:   C("Ort. süredir", (() => { const a = rows.filter(b => b.updated_at); return a.length ? fmtH(avg(a, b => (NOW - b.updated_at) / 3600000)) : "—"; })()),
+      ortMus:    C("Ort. müşteride", (() => { const a = rows.filter(b => b.son_gonderim_at); return a.length ? fmtH(avg(a, b => (NOW - b.son_gonderim_at) / 3600000)) : "—"; })(), "var(--musteride)"),
+      enUzunMus: C("En uzun bekleyen", (() => { const a = rows.filter(b => b.son_gonderim_at); return a.length ? fmtH(Math.max(...a.map(b => (NOW - b.son_gonderim_at) / 3600000))) : "—"; })(), "var(--musteride)"),
+      gonderim:  C("Toplam gönderim", rows.reduce((s, b) => s + (b.gonderim_sayisi || 0), 0)),
     };
     const SETS = {
       all:        ["adet", "geciken", "risk", "bugun", "hafta", "acil", "ortKalan", "uzat", "kisi", "marka"],
@@ -119,6 +127,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       incelemede: ["adet", "ortAtil", "bugun", "geciken", "revTop"],
       beklemede:  ["adet", "ortAtil", "stale", "geciken", "acil"],
       revizyon:   ["adet", "revIc", "revMus", "revTop", "musBekle", "geciken"],
+      musteride:  ["adet", "ortMus", "enUzunMus", "gonderim", "musBekle", "geciken"],
       blokeli:    ["adet", "ortAtil", "geciken", "acil", "kisi"],
       overdue:    ["adet", "ortGecikme", "enCokGec", "acil", "risk", "uzat"],
     };
