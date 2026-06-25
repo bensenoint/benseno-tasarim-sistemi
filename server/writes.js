@@ -590,7 +590,9 @@ async function setQueue(uid, raw) {
     if (newActive) {
       const cur = await pool.query('SELECT durum FROM briefs WHERE id=$1', [newActive]);
       const d = cur.rows[0] && cur.rows[0].durum;
-      if (['yeni', 'calisiliyor', 'beklemede'].includes(d)) {
+      // Kuyruk başı = aktif çalışılan iş → başlandı (yeni/iş-planında/beklemede/revizyon/blokeli).
+      // 'basladi' zaten doğru; 'incelemede' ve 'musteride' bilinçli devir durumları → dokunma.
+      if (d && !['basladi', 'incelemede', 'musteride'].includes(d)) {
         await setStatus(newActive, { durum: 'basladi', by, source: 'dashboard' });
       }
     }
