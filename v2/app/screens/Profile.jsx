@@ -160,9 +160,15 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   const _startTomY = new Date(_dY.getFullYear(), _dY.getMonth(), _dY.getDate() + 1).getTime();
   const _dlMsY = b => { const d = b.deadline; if (typeof d !== "number") return null; return d < 1e10 ? d * 1000 : d; };
   const _continuesTomorrow = b => { const m = _dlMsY(b); return m != null && m >= _startTomY; };
-  const displayRows = (tomorrowOnly && !curView.completed)
+  const _displayRaw = (tomorrowOnly && !curView.completed)
     ? markaRows.filter(_continuesTomorrow)
     : markaRows;
+  // Reorder edilebilir (tamamlanmamış) görünümlerde kisi_sira (iş-yapma) sırasına göre sırala —
+  // yalnız "Aktif işler" değil, "Aldığım/yapacağım" gibi worker satırı içeren tüm görünümlerde
+  // sürükle-bırak ekranda da yansısın (worker olmayanlar Infinity → iş-no'ya düşer).
+  const displayRows = curView.completed
+    ? _displayRaw
+    : [..._displayRaw].sort((a, b) => (myKisiSira(a) - myKisiSira(b)) || ((a.no || 0) - (b.no || 0)));
 
   // ─── Kişisel iş kuyruğu (yalnız 'aktif' görünüm) — worker satırları sürükle-sırala
   // Viewed kişi bu briefte "worker" (contributor) mı? Lead/gözlemci → false → kilitli.
