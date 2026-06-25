@@ -49,6 +49,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
 
   // Tamamlanmış brief'i BriefTable için güvenli default'larla normalize et (deltaH null → detayda sayısal-guard'la elenir).
   const normComp = (c) => ({ ...c,
+    durum: c.durum || "tamamlandi",   // tamamlanan brief'lerde durum yok → statü pill'i "Tamamlandı" gösterir
     priority: c.priority || { code: "grn", label: "—" },
     oncelik: c.oncelik || { code: "ylw", label: "NORMAL" },
     deltaH: c.deltaH != null ? c.deltaH : null });
