@@ -73,9 +73,9 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     const rated = comp.filter(c => c.rating > 0);
     detailKpis = [
       { label: "Adet", value: n },
-      { label: "Ort. süre", value: wS.length ? avg(wS, c => c.sureH).toFixed(1) + " sa" : "—" },
-      { label: "Toplam saat", value: wS.length ? Math.round(wS.reduce((s, c) => s + c.sureH, 0)) + " sa" : "—" },
-      { label: "Ort. gecikme", value: n ? avg(comp, c => c.gecikmeH || 0).toFixed(1) + " sa" : "—" },
+      { label: "Ort. süre · saat", value: wS.length ? avg(wS, c => c.sureH).toFixed(1) : "—" },
+      { label: "Toplam · saat", value: wS.length ? Math.round(wS.reduce((s, c) => s + c.sureH, 0)) : "—" },
+      { label: "Ort. gecikme · saat", value: n ? avg(comp, c => c.gecikmeH || 0).toFixed(1) : "—" },
       { label: "Ort. revize", value: n ? avg(comp, c => c.revision || 0).toFixed(1) : "—" },
       { label: "Ort. puan", value: rated.length ? avg(rated, c => c.rating).toFixed(1) + " / 5" : "—", color: "var(--warning)" },
       { label: "Zamanında", value: n ? "%" + Math.round(ds("zamaninda") / n * 100) : "—", color: "var(--success, #2E8F66)" },
