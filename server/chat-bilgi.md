@@ -11,12 +11,18 @@ Slack botu (WT) + Railway API/Postgres + GitHub Pages dashboard. Briefler (işle
 
 ## Durum güncelleme (Slack)
 İki yol aynı sonucu verir: brief ana mesajına emoji reaction VEYA thread'e o emojiyi/kelimeyi yazmak.
-- 🎨/✍️/🤖 = iş kabulü, planıma aldım, çalışıyorum (🎨 tasarım, ✍️ editör, 🤖 AI). 🔄 = devam ediyor.
-- **basladi** (İşe başlandı): kişi işi kabul edip (çalışılıyor) gerçekten o iş üzerinde çalışmaya başladı. Çalışma süresi bu andan ölçülür.
+- 🎨/✍️/🤖 = işi kabul → **"İş planında"** statüsü (planıma aldım) (🎨 tasarım, ✍️ editör, 🤖 AI). 🔄 = devam ediyor. NOT: "Çalışılıyor" eski etiketti; artık her yerde **"İş planında"** denir.
+- 🚀 **"İşe başlandı"**: kişi planladığı işe GERÇEKTEN başladı (İş planında'dan sonraki adım; çalışma süresi buradan işler). Statü sırası: Yeni → İş planında → İşe başlandı → İncelemede → (Beklemede / Revizyon / Müşteride / Blokeli) → Tamamlandı.
 - 👀 incelemede · ⏸️ beklemede · ✏️ revizyon · ✅ tamamlandı (thread'deki son görsel galeriye kaydedilir) · 🔃 yeniden aç.
 - ✈️ = müşteriye yollandı (kelime: "müşteriye yollandı"). İş "Müşteri Onayı" sayfasına taşınır; aktif yük/kapasite/hareketsizlikten çıkar. KURAL: ✈️ sonrası İLK ✏️ müşteri revizyonu, diğerleri iç revizyon. Müşteri revizyonuyla iş otomatik aktif listeye döner. Revizyonlar tablolarda iç/müşteri ayrı gösterilir.
 - Kelimeler (tam eşleşme): "devam et", "iş incelemede", "iş beklemede", "bekle", "revizyon var", "revize et", "müşteriye yollandı", "iş tamamlandı", "yeniden aç", "geri aç", "bloke et".
 - Öncelik: 🔴 acil · 🟠 yüksek · 🟡 normal · 🟢 düşük (reaction veya "acil öncelik" gibi yazı; atanan veya yönetici).
+
+## Kişisel iş sırası (iş kuyruğu)
+Profilde ve Kanban'da işler sürükle-bırakla sıralanır = kişinin "önce hangisini yapacağı" sırası. En üstteki iş otomatik **"İşe başlandı"** olur; bir iş başa alınınca önceki başlandı işi (başka aktif çalışan yoksa) **beklemeye** düşer. Birden fazla kişi çalışıyorsa, biri aşağı çekse de başka aktif çalışan varsa iş başladı kalır. Sıralamayı kimler yapabilir: **Görkem / Reyhan / Cansu** tüm departmanlar; **İpek** yalnız tasarım, **Erdem** yalnız editör işleri (başka departmanla ortak iş olsa bile); ayrıca herkes **kendi** kuyruğunu sıralayabilir. Profilde varsayılan sıralama bu iş-yapma sırasıdır. Kanban'da kart sürükleyerek hem sıralama hem statü değişimi yapılır (kolonlar arası = statü; Müşteri Onayında/Blokeli/Tamamlandı kolonları iş-sırasına göre sıralanmaz).
+
+## Çalışma süresi (döngü-bazlı)
+Bir işe harcanan süre statü geçmişinden (events) hesaplanır. **Sayılan** (çalışma) statüler: İşe başlandı + İnceleme + Revizyon. **Sayılmayan / düşülen** (saat durur): Yeni, İş planında, Beklemede, **Müşteride**, **Blokeli**. "İşe başlandı" girilmemişse ilk anlamlı statü değişimi başlangıç sayılır (başladı'yı unutmak süreyi bozmaz). Bir iş **Tamamlandı**'dan sonra tekrar açılırsa AYRI bir döngü sayılır; her döngünün süresi ayrı tutulur, toplam da hesaplanır (iş detayında "⏱ Çalışma Süresi" bloğu — her döngü ayrı + Toplam; tablolarda süre = toplam, çok-döngülü işte `·N🔁` işareti). Müşteriye yollanan iş (✈️) süreden ve aktif yükten düşülür ama aynı döngü devam eder (müşteri revizyonu gelince).
 
 ## Sıralı onay zinciri (⛓️)
 Brief açarken (Slack formu veya dashboard) "Sıralı" seçilirse işi yapanlar SEÇİM SIRASINA göre zincir olur (ör. Melis → İpek → Levent). ✅ yalnızca sıradaki halkayı onaylar; iş otomatik sonraki kişiye geçer (DM gider) ve HERKES onaylamadan tamamlanmaz. ✏️ zinciri bir önceki onaylı halkaya geri sarar; "revize: @kişi" yazılırsa o halkaya döner (o halka ve sonrasının onayı düşer). Freelance halkası yerine brief'teki herhangi biri onay verebilir (vekâleten not düşülür). Sıralı işte cevapsız uyarısı ve kapasite yükü yalnız sırası gelen halkaya işler. Seçim yapılmaz veya "Paralel" seçilirse her şey bugünkü gibi çalışır. Bu akış yalnızca yeni açılan brieflerde geçerlidir. Brief detayında ⛓️ zincir şeridi halkaların durumunu gösterir (✓ onaylı, ▶ sırada).
