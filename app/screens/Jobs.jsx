@@ -52,7 +52,10 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     durum: c.durum || "tamamlandi",   // tamamlanan brief'lerde durum yok → statü pill'i "Tamamlandı" gösterir
     priority: c.priority || { code: "grn", label: "—" },
     oncelik: c.oncelik || { code: "ylw", label: "NORMAL" },
-    deltaH: c.deltaH != null ? c.deltaH : null });
+    // Gecikme sütunu deltaH'tan hesaplanır; tamamlananda deltaH yok → geç teslimi gecikmeH'ten türet
+    // (geç teslim → negatif "X GECİKTİ"; zamanında → null/nötr). Detay metrikleri de bununla tutarlı olur.
+    deltaH: c.deltaH != null ? c.deltaH
+      : (typeof c.gecikmeH === "number" && c.gecikmeH > 0 ? -c.gecikmeH : null) });
   const norm = (b) => b.bitis ? normComp(b) : b;   // tamamlanmışsa normalize; devam eden iş olduğu gibi (satır-içi düzenlenebilir kalır)
 
   const isCompletedScope = scope === "tamamlandi";
