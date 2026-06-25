@@ -521,7 +521,7 @@ async function setStatus(id, raw) {
   }
   if (resumeMs != null) {
     const saat = Math.round(resumeMs / 3600000);
-    note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin …\` yaz; bu uzatma **gecikme sayılmaz**. (Dashboard'da tek tıkla "bekleme kadar uzat" var.)`;
+    note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin uzat\` yaz (bekleme kadar uzatır) ya da \`termin 15.06 17:00\` ile tarih ver; bu uzatma **gecikme sayılmaz**. (Dashboard'da da tek tıkla var.)`;
   }
   await reflectChange(id, note, d.source, { by: d.by });
   // Dashboard çanı: işe dönüş hatırlatıcısını atananlara da düşür (brief açmadan görsün).
@@ -895,4 +895,17 @@ async function clearTerminOneri(id) {
   return { ok: true };
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, setQueue, setKanbanOrder, clearTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };
+// "Bekleme kadar uzat": hatırlatıcı açıksa termini önerilen miktar (termin_oneri_ms) kadar ileri taşır.
+// patchBrief üzerinden gider → hatırlatıcı açık olduğu için MUAF uygulanır + hatırlatıcı kapanır.
+async function applyTerminOneri(id, by, source) {
+  const r = await pool.query('SELECT deadline, termin_oneri_at, termin_oneri_ms FROM briefs WHERE id = $1', [id]);
+  const row = r.rows[0];
+  if (!row) throw new Error('brief bulunamadı: ' + id);
+  if (!row.termin_oneri_at || !row.termin_oneri_ms) throw new Error('uzatma hatırlatıcısı açık değil');
+  const base = row.deadline ? new Date(row.deadline).getTime() : Date.now();
+  const yeni = new Date(base + Number(row.termin_oneri_ms)).toISOString();
+  await patchBrief(id, { deadline: yeni, by, source: source || 'system' });
+  return { ok: true, yeni_deadline: yeni };
+}
+
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };

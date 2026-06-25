@@ -1278,6 +1278,18 @@ app.event('message', async ({ event, client }) => {
       return;
     }
 
+    // "termin uzat" / "bekleme kadar uzat" — işe-dönüş hatırlatıcısı açıksa bekleme süresi kadar MUAF uzatır.
+    if (/^(?:termin(?:i|ı)?\s+uzat|bekleme\s+kadar\s+uzat)$/i.test(trimmed)) {
+      const briefTs = event.thread_ts;
+      log(`termin uzat (muaf): ${briefTs} — ${event.user}`);
+      const ok = await dbWrite('POST', `/api/briefs/by-ts/${briefTs}/termin-oneri-uzat`, { by: event.user });
+      try {
+        const msg = ok ? '✅ Termin bekleme süresi kadar uzatıldı — bu uzatma *gecikme sayılmaz*.'
+          : 'ℹ️ Uzatma hatırlatıcısı açık değil (iş beklemede/müşterideden yeni dönmemiş). Belirli bir tarihe almak için: `termin 15.06 17:00`.';
+        await client.chat.postMessage({ channel: event.channel, thread_ts: briefTs, text: msg, username: BOT_NAME });
+      } catch {}
+      return;
+    }
     // "termin 15.06 17:00" / "deadline yarın 14:30" — termini günceller (saat yoksa 18:00)
     const tMatch = trimmed.match(/^(?:termin|deadline)\s*:?\s+(.+)$/i);
     if (tMatch) {

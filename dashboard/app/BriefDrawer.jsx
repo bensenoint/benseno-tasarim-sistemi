@@ -87,10 +87,8 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
     const hdr = { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) };
     try {
       if (action === 'uzat') {
-        const base = b.deadline || Date.now();
-        const yeni = base + (b.termin_oneri_ms || 0);
-        // Hatırlatıcı açıkken yapılan uzatma backend'de otomatik MUAF (gecikme/ceza sayılmaz).
-        const res = await fetch(`${apiBase}/api/briefs/${b.id}`, { method: 'PATCH', headers: hdr, body: JSON.stringify({ deadline: yeni, by: currentUser?.slack_id }) });
+        // Backend bekleme kadar MUAF uzatır (gecikme/ceza sayılmaz) + hatırlatıcıyı kapatır.
+        const res = await fetch(`${apiBase}/api/briefs/${b.id}/termin-oneri-uzat`, { method: 'POST', headers: hdr, body: JSON.stringify({ by: currentUser?.slack_id }) });
         if (!res.ok) { const j = await res.json().catch(() => ({})); return alert('Uzatma başarısız: ' + (j.error || res.status)); }
       } else {
         const res = await fetch(`${apiBase}/api/briefs/${b.id}/termin-oneri-kapat`, { method: 'POST', headers: hdr, body: JSON.stringify({ by: currentUser?.slack_id }) });
