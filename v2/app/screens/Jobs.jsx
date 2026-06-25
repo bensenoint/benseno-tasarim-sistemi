@@ -14,10 +14,12 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
 
   // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
   // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
-  let rows = data.briefs.filter(b => b.durum !== "musteride");
-  if (scope === "overdue") rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
-  if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor" || b.durum === "basladi");
-  if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");
+  const base = data.briefs.filter(b => b.durum !== "musteride");   // müşteride hariç aktif yük
+  let rows = base;
+  if (scope === "overdue")      rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
+  else if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor" || b.durum === "basladi");  // geriye uyum (Overview deep-link)
+  else if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");                                                  // geriye uyum
+  else if (scope !== "all")     rows = rows.filter(b => b.durum === scope);                                                         // belirli statü kartı
   if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
   if (person !== "all") rows = rows.filter(b => [b.lead, ...(b.contributors || [])].some(p => p && p.id === person));
   if (search.trim()) {
@@ -32,6 +34,21 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
 
   // Kişi seçenekleri — aktif işlerdeki lead+contributor'lardan (alfabetik, Türkçe).
   const personOpts = peopleOf(data.briefs.filter(b => b.durum !== "musteride"));
+
+  // Statü KPI kartları — her statü + Tümü + Geciken; tıklanınca o statüye filtreler.
+  const cnt = (d) => base.filter(b => b.durum === d).length;
+  const statusCards = [
+    { key: "all",         label: "Tümü",         value: base.length },
+    { key: "yeni",        label: "Yeni",         value: cnt("yeni"),        color: "var(--ink-3)" },
+    { key: "calisiliyor", label: "İş planında",  value: cnt("calisiliyor"), color: "var(--info)" },
+    { key: "basladi",     label: "İşe başlandı", value: cnt("basladi"),     color: "var(--ok, #2E8F66)" },
+    { key: "incelemede",  label: "İncelemede",   value: cnt("incelemede"),  color: "var(--warning)" },
+    { key: "beklemede",   label: "Bekliyor",     value: cnt("beklemede"),   color: "var(--ink-3)" },
+    { key: "revizyon",    label: "Revizyon",     value: cnt("revizyon"),    color: "var(--warning)" },
+    { key: "blokeli",     label: "Blokeli",      value: cnt("blokeli"),     color: "var(--danger)" },
+    { key: "overdue",     label: "Geciken",      value: base.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length, color: "var(--prio-red)" },
+  ];
+  const activeKey = scope === "review" ? "incelemede" : scope;   // KPI vurgusu (legacy review→incelemede)
 
   return (
     <div className="bn-tab-in">
@@ -72,18 +89,25 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
         </div>
       )}
 
+      {/* Statü KPI kartları (desktop) — tıklanınca o statüye filtreler */}
+      {!isMobile && (
+        <KpiGrid cols={statusCards.length}>
+          {statusCards.map(c => (
+            <Kpi key={c.key} label={c.label} value={c.value} color={c.color}
+              active={activeKey === c.key} onClick={() => setScope(c.key)}/>
+          ))}
+        </KpiGrid>
+      )}
+
       {/* Filter row */}
       <div className="bns-sticky-filters" style={{
         display:"flex", alignItems:"center", gap: 12, marginBottom: 14, flexWrap:"wrap"
       }}>
-        <Segment
-          value={scope} onChange={setScope}
-          options={[
-            ["all",     `Tümü · ${data.briefs.length}`],
-            ["open",    `Açık · ${data.briefs.filter(b => b.durum==="yeni"||b.durum==="calisiliyor"||b.durum==="basladi").length}`],
-            ["review",  `İncelemede · ${data.briefs.filter(b => b.durum==="incelemede").length}`],
-            ["overdue", `Geciken · ${data.briefs.filter(b => b.deltaH<=0 && b.durum!=="tamamlandi" && b.durum!=="musteride").length}`]
-          ]}/>
+        {/* Mobil: statü filtresi segment (desktop'ta KPI kartları kullanılır) */}
+        {isMobile && (
+          <Segment value={activeKey} onChange={setScope}
+            options={statusCards.map(c => [c.key, `${c.label} · ${c.value}`])}/>
+        )}
 
         <div style={{display:"inline-flex", gap: 6, alignItems:"center"}}>
           <span style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-4)", letterSpacing:"0.06em", textTransform:"uppercase"}}>Öncelik</span>

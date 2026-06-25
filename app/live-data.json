@@ -984,7 +984,8 @@
     { "ts": 1782308700, "date": "2026-06-24", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true },
     { "ts": 1782369900, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true },
     { "ts": 1782373615, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1782375300, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true }
+    { "ts": 1782375300, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true },
+    { "ts": 1782377100, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true }
   ],
   "bns_activity": [
     { "t": 1780557144061, "who": "U055EDESLSE", "verb": "yeni brief açtı", "target": "KMR Amos · deneme 3", "meta": "#37" },
@@ -1005,7 +1006,7 @@
     { "t": 1779447600000, "who": "U09BFPBKQG7", "verb": "tamamladı", "target": "Bauhaus · Bahçe Düzen / 22 Mayıs (batch ", "meta": "rev:0" },
     { "t": 1779447600000, "who": "U08HLMHTGEL", "verb": "tamamladı", "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması ", "meta": "rev:0" }
   ],
-  "last_sync": "2026-06-25T11:15:00+03:00",
-  "sync_ts": 1782375300,
+  "last_sync": "2026-06-25T11:45:00+03:00",
+  "sync_ts": 1782377100,
   "source": "benseno-brief-sync"
 }
