@@ -191,7 +191,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       {/* İkinci satır: seçili karta özel detay KPI'lar (desktop) */}
       {!isMobile && (
         <>
-          <div style={{margin:"14px 0 -6px", font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-4)"}}>
+          <div style={{margin:"24px 0 -16px", font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-4)"}}>
             {(statusCards.find(c => c.key === activeKey) || { label: "Tümü" }).label} · detay
           </div>
           <KpiGrid key={scope} cols={detailKpis.length}>
