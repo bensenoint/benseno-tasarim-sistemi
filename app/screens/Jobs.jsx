@@ -8,14 +8,18 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   const [search, setSearch] = useStickyState("jobs.search", "");
   const [prioFilter, setPrioFilter] = useStickyState("jobs.prio", "all");
   const [person, setPerson] = useStickyState("jobs.person", "all");   // kişi (lead+contributor) filtresi
+  const [markaFilter, setMarkaFilter] = useStickyState("jobs.marka", "all");   // marka filtresi
   // Mobil görünüm geçişi: tablo / liste / kanban (referans). Desktop tableMode prop'unu kullanır.
   const [mView, setMView] = React.useState("table");
   const view = isMobile ? mView : tableMode;
 
   // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
   // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
-  const base = data.briefs.filter(b => b.durum !== "musteride");   // müşteride hariç aktif yük
-  const comp = data.completed || [];                                // seçili tarih aralığındaki tamamlananlar
+  // Marka filtresi KAYNAKTA uygulanır → hem liste hem statü-KPI sayıları markayla daralır.
+  const mf = (arr) => markaFilter === "all" ? arr : arr.filter(b => b.marka === markaFilter);
+  const base = mf(data.briefs.filter(b => b.durum !== "musteride"));   // müşteride hariç aktif yük (markalı)
+  const comp = mf(data.completed || []);                                // seçili aralık tamamlananlar (markalı)
+  const musteriAll = mf(data.briefs.filter(b => b.durum === "musteride"));
   const isCompletedScope = scope === "tamamlandi";
   let rows;
   if (isCompletedScope) {
@@ -25,8 +29,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       oncelik: c.oncelik || { code: "ylw", label: "NORMAL" },
       deltaH: c.deltaH != null ? c.deltaH : null }));
   } else if (scope === "musteride") {
-    // Müşteri Onayında — base bunu hariç tutar; tüm aktif briefler'den müşteride olanları al.
-    rows = data.briefs.filter(b => b.durum === "musteride");
+    rows = musteriAll;
     if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
   } else {
     rows = base;
@@ -49,6 +52,8 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
 
   // Kişi seçenekleri — aktif işlerdeki lead+contributor'lardan (alfabetik, Türkçe).
   const personOpts = peopleOf(data.briefs.filter(b => b.durum !== "musteride"));
+  // Marka seçenekleri — HAM veriden (markaFilter'dan bağımsız; aksi halde seçince liste daralırdı), alfabetik.
+  const markaOpts = [...new Set([...(data.briefs || []), ...(data.completed || [])].map(b => b.marka).filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
 
   // Statü KPI kartları — her statü + Tümü + Geciken; tıklanınca o statüye filtreler.
   const cnt = (d) => base.filter(b => b.durum === d).length;
@@ -61,7 +66,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     { key: "beklemede",   label: "Bekliyor",     value: cnt("beklemede"),   color: "var(--ink-3)" },
     { key: "revizyon",    label: "Revizyon",     value: cnt("revizyon"),    color: "var(--warning)" },
     { key: "blokeli",     label: "Blokeli",      value: cnt("blokeli"),     color: "var(--danger)" },
-    { key: "musteride",   label: "Müşteri onayı",value: data.briefs.filter(b => b.durum === "musteride").length, color: "var(--musteride)" },
+    { key: "musteride",   label: "Müşteri onayı",value: musteriAll.length, color: "var(--musteride)" },
     { key: "overdue",     label: "Geciken",      value: base.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length, color: "var(--prio-red)" },
     { key: "tamamlandi",  label: "Tamamlandı",   value: comp.length,        color: "var(--success, #2E8F66)" },
   ];
@@ -211,6 +216,13 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
           <span style={{font:"500 11px/1 var(--font-sans)", color:"var(--ink-4)", letterSpacing:"0.06em", textTransform:"uppercase"}}>Öncelik</span>
           <PrioFilter value={prioFilter} onChange={setPrioFilter}/>
         </div>
+
+        <select value={markaFilter} onChange={e => setMarkaFilter(e.target.value)} aria-label="Marka filtresi"
+          style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink)", background:"var(--surface)",
+            border:"1px solid var(--line)", borderRadius:6, padding:"6px 26px 6px 10px", cursor:"pointer", maxWidth:180}}>
+          <option value="all">Tüm markalar</option>
+          {markaOpts.map(m => <option key={m} value={m}>{m}</option>)}
+        </select>
 
         <PersonFilter value={person} onChange={setPerson} people={personOpts}/>
 
