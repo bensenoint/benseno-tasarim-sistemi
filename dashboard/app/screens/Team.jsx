@@ -1,5 +1,30 @@
 // app/screens/Team.jsx — 17 kişi × 39 marka heatmap matrix.
 
+// Yerel zaman aralığı toggle'ı (Profil global tarih filtresine geçince buradan kaldırılmıştı;
+// Ekip matrisi hâlâ kullandığı için burada tutuluyor — tek tüketici burası).
+const TIME_RANGES = [
+  { key: "7",   label: "7 gün",  days: 7   },
+  { key: "30",  label: "30 gün", days: 30  },
+  { key: "90",  label: "90 gün", days: 90  },
+  { key: "all", label: "Tümü",   days: null },
+];
+
+function TimeRangeToggle({ value, onChange }) {
+  return (
+    <div style={{display:"inline-flex", padding:3, background:"var(--paper-2)", borderRadius:8, gap:1}}>
+      {TIME_RANGES.map(r => (
+        <button key={r.key} onClick={() => onChange(r.key)} style={{
+          font:"500 11px/1 var(--font-sans)", padding:"5px 10px", border:0,
+          background: value === r.key ? "var(--surface)" : "transparent",
+          color: value === r.key ? "var(--ink)" : "var(--ink-3)",
+          borderRadius:5, cursor:"pointer",
+          boxShadow: value === r.key ? "0 1px 2px rgba(22,22,26,0.06)" : "none"
+        }}>{r.label}</button>
+      ))}
+    </div>
+  );
+}
+
 function TeamScreen({ data }) {
   const [timeRange, setTimeRange] = React.useState("all");
   const allUsers  = data.USERS  || [];
