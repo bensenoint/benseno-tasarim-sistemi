@@ -102,7 +102,7 @@ async function getEmbedded() {
   const [all, brands, users, dept] = await Promise.all([
     allBriefsWithAssignees(),
     pool.query(`SELECT name, color, wheel_idx FROM brands ORDER BY name`),
-    pool.query(`SELECT id,name,rol,dept,yetki,initials,color,avatar_url FROM users WHERE active ORDER BY rol,name`),
+    pool.query(`SELECT id,name,rol,dept,yetki,initials,color,avatar_url,sched_scope FROM users WHERE active ORDER BY rol,name`),
     pool.query(`
       SELECT u.dept,
         count(DISTINCT u.id)::int people,
