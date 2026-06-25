@@ -624,19 +624,49 @@ async function briefInScope(client, briefId, scope) {
       WHERE b.id = $1 AND (b.dept = $2 OR u.dept = $2) LIMIT 1`, [briefId, scope]);
   return !!r.rows[0];
 }
+// Bir kullanıcının kuyruk-başını başladı'ya çek + eski başladı işini (başka aktif yoksa) beklemeye al.
+// kisi_sira değiştiren her yol (setQueue/setKanbanOrder) bunu çağırarak "kuyruk başı = başladı" tutarlılığını korur.
+async function reconcileUserHead(uid, by) {
+  try {
+    const head = await (async () => { const c = await pool.connect(); try { return await userActiveBriefId(c, uid); } finally { c.release(); } })();
+    if (head) {
+      const cur = await pool.query('SELECT durum FROM briefs WHERE id=$1', [head]);
+      const d = cur.rows[0] && cur.rows[0].durum;
+      if (d && !['basladi', 'incelemede', 'musteride'].includes(d)) {
+        await setStatus(head, { durum: 'basladi', by, source: 'dashboard' });
+      }
+    }
+    // Bu kullanıcının başka başladı işleri: kuyruk başı değilse ve başka aktif contributor yoksa beklemeye.
+    const others = await pool.query(
+      `SELECT b.id FROM brief_assignees a JOIN briefs b ON b.id=a.brief_id
+       WHERE a.user_id=$1 AND a.role='contributor' AND b.deleted_at IS NULL AND b.durum='basladi' AND b.id<>$2`,
+      [uid, head || 0]);
+    for (const row of others.rows) {
+      const hasOther = await (async () => { const c = await pool.connect(); try { return await briefHasOtherActive(c, row.id, uid); } finally { c.release(); } })();
+      if (!hasOther) await setStatus(row.id, { durum: 'beklemede', by, source: 'system' });
+    }
+  } catch (e) {
+    console.error('[reconcileUserHead] hata (sıra kaydedildi, self-heal):', e.message);
+  }
+}
+
 async function setKanbanOrder(rawOrder, actor) {
   const ids = (Array.isArray(rawOrder) ? rawOrder : []).map(Number).filter(Boolean);
   const scope = actor && actor.scope;
+  const affected = new Set();
   await tx(async (client) => {
     let pos = 0;
     for (const bid of ids) {
       if (!(await briefInScope(client, bid, scope))) continue;
-      await client.query(
-        `UPDATE brief_assignees SET kisi_sira = $1 WHERE brief_id = $2 AND role = 'contributor'`,
+      const c = await client.query(
+        `UPDATE brief_assignees SET kisi_sira = $1 WHERE brief_id = $2 AND role = 'contributor' RETURNING user_id`,
         [pos, bid]);
+      c.rows.forEach(r => affected.add(r.user_id));
       pos++;
     }
   });
+  // kisi_sira commit'inden sonra: etkilenen her kişinin kuyruk-başını başladı'ya reconcile et (ayrı tx).
+  for (const uid of affected) await reconcileUserHead(uid, actor && actor.id);
   return { ok: true };
 }
 
