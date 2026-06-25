@@ -551,6 +551,9 @@ function bnsHydrateCompleted(raw, idx) {
     baslangic,
     bitis,
     sureH,
+    sure_cycles: Array.isArray(raw.sure_cycles) ? raw.sure_cycles : null,  // [{n,basladi,bitis,sureH}] döngü kırılımı
+    sureH_son: raw.sureH_son != null ? raw.sureH_son : null,
+    sureH_toplam: raw.sureH_toplam != null ? raw.sureH_toplam : (raw.sureH != null ? raw.sureH : null),
     revision: raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
     rev_ic: raw.rev_ic || 0, rev_musteri: raw.rev_musteri || 0,
     gecikme,

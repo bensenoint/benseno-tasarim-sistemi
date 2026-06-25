@@ -496,7 +496,10 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
                           </span>
                         </td>
                         <td style={{padding:"8px 12px", color:"var(--ink-3)", textAlign:"center", fontVariantNumeric:"tabular-nums"}}>{b.revision || b.rev || 0}</td>
-                        <td style={{padding:"8px 12px", color:"var(--ink-3)", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums"}}>{b.sureH ? b.sureH.toFixed(1)+"sa" : "—"}</td>
+                        <td title={Array.isArray(b.sure_cycles) && b.sure_cycles.length > 1 ? b.sure_cycles.map(c => `Döngü ${c.n}: ${(c.sureH||0).toFixed(1)}sa`).join("  ·  ") : undefined}
+                            style={{padding:"8px 12px", color:"var(--ink-3)", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums"}}>
+                          {b.sureH ? b.sureH.toFixed(1)+"sa" : "—"}{Array.isArray(b.sure_cycles) && b.sure_cycles.length > 1 ? <span style={{color:"var(--ink-4)", marginLeft:4}}>·{b.sure_cycles.length}🔁</span> : null}
+                        </td>
                         <td style={{padding:"8px 12px", whiteSpace:"nowrap", color: b.gecikme && b.gecikme !== "—" ? "var(--prio-orange)" : "var(--ink-4)"}}>{b.gecikme || "—"}</td>
                       </tr>
                     );

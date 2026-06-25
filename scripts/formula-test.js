@@ -70,5 +70,27 @@ t('çıktı: <3 düşük örneklem', C.bnsThroughput([wk(0), wk(1)], NOW_T, 4).l
 t('çıktı: ≥3 örneklem yeterli', C.bnsThroughput([wk(0), wk(1), wk(2)], NOW_T, 4).lowSample, false);
 t('çıktı: boş liste = 0', C.bnsThroughput([], NOW_T, 4).count, 0);
 
+// ── Döngü-bazlı süre (bnsCycleSure) ──
+const hh = (n) => n * H; // n saat → ms
+t('döngü: planlama hariç (basladi+incelemede=3sa)',
+  C.bnsCycleSure([{ts:hh(0),durum:'yeni'},{ts:hh(1),durum:'calisiliyor'},{ts:hh(2),durum:'basladi'},{ts:hh(4),durum:'incelemede'},{ts:hh(5),durum:'tamamlandi'}], hh(99)).toplamH, 3);
+t('döngü: başladı atlanmış → ilk değişim başlangıç (4sa)',
+  C.bnsCycleSure([{ts:hh(0),durum:'yeni'},{ts:hh(1),durum:'calisiliyor'},{ts:hh(3),durum:'incelemede'},{ts:hh(5),durum:'tamamlandi'}], hh(99)).toplamH, 4);
+t('döngü: ölü statüler düşülür (basladi+revizyon=2sa)',
+  C.bnsCycleSure([{ts:hh(0),durum:'basladi'},{ts:hh(1),durum:'beklemede'},{ts:hh(3),durum:'musteride'},{ts:hh(5),durum:'revizyon'},{ts:hh(6),durum:'tamamlandi'}], hh(99)).toplamH, 2);
+const reopen = C.bnsCycleSure([
+  {ts:hh(0),durum:'basladi'},{ts:hh(2),durum:'tamamlandi'},
+  {ts:hh(10),durum:'basladi'},{ts:hh(13),durum:'tamamlandi'}
+], hh(99));
+t('döngü: reopen → 2 döngü', reopen.cycles.length, 2);
+t('döngü: reopen döngü1=2sa', reopen.cycles[0].sureH, 2);
+t('döngü: reopen döngü2=3sa', reopen.cycles[1].sureH, 3);
+t('döngü: reopen toplam=5sa', reopen.toplamH, 5);
+t('döngü: reopen son=3sa', reopen.sonH, 3);
+t('döngü: açık iş now()a kadar (basladi 3sa önce)',
+  C.bnsCycleSure([{ts:hh(0),durum:'basladi'}], hh(3)).sonH, 3);
+t('döngü: event yoksa fallback',
+  C.bnsCycleSure([], hh(99), { baslangic: hh(1), bitis: hh(5), beklemeMs: 0 }).toplamH, 4);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);

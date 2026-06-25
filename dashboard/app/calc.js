@@ -54,6 +54,52 @@ function bnsSureH(bitis, baslangic, beklemeMs) {
   return Math.max(0, bitis - baslangic - bek) / BNS_H;
 }
 
+// ── Döngü-bazlı iş süresi (saat) — statü geçmişinden (events) net çalışma ──────
+// Çalışma sayılan statüler: basladi, incelemede, revizyon. Ölü (sayılmayan): yeni,
+// calisiliyor, beklemede, musteride, blokeli. "İşe başlandı" atlanmışsa o döngüde
+// calisiliyor da çalışma sayılır (de-facto başlangıç). Her 'tamamlandi' bir döngüyü
+// kapatır; tamamlandı'dan tekrar dönüş YENİ döngüdür (her döngü ayrı, + toplam).
+// events: [{ts(ms), durum}]; nowMs: açık döngüyü kapatır; fallback:{baslangic,bitis,beklemeMs}.
+function bnsCycleSure(events, nowMs, fallback) {
+  var ACTIVE = { basladi: 1, incelemede: 1, revizyon: 1 };
+  var ev = (events || []).filter(function (e) { return e && e.ts != null && e.durum; })
+    .slice().sort(function (a, b) { return a.ts - b.ts; });
+  if (!ev.length) {
+    var fb = fallback || {};
+    var h = bnsSureH(fb.bitis, fb.baslangic, fb.beklemeMs || 0);
+    var c0 = (h != null) ? [{ n: 1, basladi: fb.baslangic || null, bitis: fb.bitis || null, sureH: h }] : [];
+    return { cycles: c0, sonH: h, toplamH: h };
+  }
+  var now = nowMs || 0;
+  var segs = [], seg = [];
+  for (var i = 0; i < ev.length; i++) {
+    seg.push(ev[i]);
+    if (ev[i].durum === 'tamamlandi') { segs.push(seg); seg = []; }
+  }
+  if (seg.length) segs.push(seg);
+  var out = [];
+  for (var c = 0; c < segs.length; c++) {
+    var s = segs[c];
+    var hasBasladi = s.some(function (e) { return e.durum === 'basladi'; });
+    var isActive = function (d) { return !!ACTIVE[d] || (!hasBasladi && d === 'calisiliyor'); };
+    var startTs = null, endTs = null, netMs = 0;
+    for (var j = 0; j < s.length; j++) {
+      var e = s[j];
+      var nextTs = (j + 1 < s.length) ? s[j + 1].ts : (e.durum === 'tamamlandi' ? e.ts : now);
+      if (startTs == null) {
+        if (e.durum === 'basladi') startTs = e.ts;
+        else if (!hasBasladi && e.durum !== 'yeni') startTs = e.ts;
+      }
+      if (isActive(e.durum)) netMs += Math.max(0, nextTs - e.ts);
+      if (e.durum === 'tamamlandi') endTs = e.ts;
+    }
+    if (startTs == null) startTs = s[0].ts;
+    out.push({ n: c + 1, basladi: startTs, bitis: endTs, sureH: Math.max(0, netMs) / BNS_H });
+  }
+  var toplamH = out.reduce(function (a, x) { return a + (x.sureH || 0); }, 0);
+  return { cycles: out, sonH: out.length ? out[out.length - 1].sureH : null, toplamH: toplamH };
+}
+
 // ── Gecikme (saat) — yalnız NET bitiş (bekleme düşülmüş) deadline'ı aşınca >0 ─
 function bnsGecikmeH(bitis, beklemeMs, deadline) {
   var bek = beklemeMs || 0;
@@ -120,5 +166,5 @@ function bnsDeliveryStatus(bitisMs, deadlineMs, beklemeMs, uzatildi) {
 
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H };
+  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H };
 }

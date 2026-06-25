@@ -2,6 +2,7 @@
 
 /** DB → dashboard için hazır JSON (SQL ile; LLM toplama yok). */
 const { pool } = require('./db');
+const calc = require('./calc-penalty');   // bnsCycleSure (döngü-bazlı süre)
 
 // Tüm brief'ler + atananları (json_agg ile tek sorgu) → hidratlanmış shape
 async function allBriefsWithAssignees() {
@@ -139,6 +140,17 @@ async function getEmbedded() {
   const pauseByBrief = {};
   for (const r of pse.rows) pauseByBrief[r.brief_id] = Math.max(0, Math.round(+r.ms));
 
+  // Statü geçmişi (döngü-bazlı süre için): brief başına sıralı durum event'leri.
+  const dse = await pool.query(
+    `SELECT brief_id, EXTRACT(EPOCH FROM ts) * 1000 AS ts, substring(verb from 7) AS durum
+     FROM events WHERE verb LIKE 'durum:%' ORDER BY brief_id, ts`);
+  const eventsByBrief = {};
+  for (const r of dse.rows) (eventsByBrief[r.brief_id] ||= []).push({ ts: Math.round(+r.ts), durum: r.durum });
+  const NOW_MS = Date.now();
+  // Bir brief için döngü-bazlı süre özeti (events yoksa baslangic/bitis fallback).
+  const cycleOf = (b) => calc.bnsCycleSure(eventsByBrief[b.id] || [], NOW_MS,
+    { baslangic: ms(b.basladi_at || b.started_at), bitis: ms(b.completed_at), beklemeMs: pauseByBrief[b.id] || 0 });
+
   // Marka → renk (silinenler ekranı marka_color bekliyor)
   const brandColor = {};
   for (const br of brands.rows) brandColor[br.name] = br.color;
@@ -165,14 +177,16 @@ async function getEmbedded() {
     attachments: attByBrief[b.id] || [],
   }));
 
-  const bns_completed = all.filter(b => b.completed_at && !b.deleted_at).map(b => ({
+  const bns_completed = all.filter(b => b.completed_at && !b.deleted_at).map(b => { const cyc = cycleOf(b); return ({
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik,
     leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
     workers: b.workers.map(w => ({ id: w.id, name: w.name, sira: w.sira ?? null, kisi_sira: w.kisi_sira ?? null, onay: !!w.onay_at })),
     akis: b.akis || 'paralel',
     deadline: ms(b.deadline), baslangic: ms(b.basladi_at || b.started_at), bitis: ms(b.completed_at),
     deadline_orig: ms(b.deadline_orig), uzatma_sayisi: b.uzatma_sayisi || 0, deadline_history: b.deadline_history || [],
-    bekleme_ms: pauseByBrief[b.id] || 0,   // süre/gecikme hesabından düşülür
+    bekleme_ms: pauseByBrief[b.id] || 0,   // süre/gecikme hesabından düşülür (geriye uyum)
+    // Döngü-bazlı süre: her açılış→tamamlanış döngüsü ayrı; sureH = toplam (headline), kırılım sure_cycles.
+    sure_cycles: cyc.cycles, sureH: cyc.toplamH, sureH_son: cyc.sonH, sureH_toplam: cyc.toplamH,
     rev: b.rev || 0,
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
@@ -184,7 +198,7 @@ async function getEmbedded() {
     image_url: b.image_url || null,
     notes: b.musteri_notu || '',
     attachments: attByBrief[b.id] || [],
-  }));
+  }); });
 
   const bns_deleted = all.filter(b => b.deleted_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, marka_color: brandColor[b.marka] || null,

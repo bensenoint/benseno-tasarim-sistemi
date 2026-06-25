@@ -24,4 +24,40 @@ function bnsRatingWithPenalty(aiRating, uzatmaCeza) {
   return Math.round(r * 2) / 2;
 }
 
-module.exports = { bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, BNS_H };
+// Döngü-bazlı iş süresi — dashboard/app/calc.js'teki bnsCycleSure'ün AYNASIDIR.
+// DEĞİŞİRSE iki dosyayı da güncelle (formula-test.js dashboard sürümünü kilitler).
+function bnsCycleSure(events, nowMs, fallback) {
+  var ACTIVE = { basladi: 1, incelemede: 1, revizyon: 1 };
+  var ev = (events || []).filter(function (e) { return e && e.ts != null && e.durum; })
+    .slice().sort(function (a, b) { return a.ts - b.ts; });
+  if (!ev.length) {
+    var fb = fallback || {};
+    var h = (fb.bitis && fb.baslangic) ? Math.max(0, fb.bitis - fb.baslangic - (fb.beklemeMs || 0)) / BNS_H : null;
+    var c0 = (h != null) ? [{ n: 1, basladi: fb.baslangic || null, bitis: fb.bitis || null, sureH: h }] : [];
+    return { cycles: c0, sonH: h, toplamH: h };
+  }
+  var now = nowMs || 0;
+  var segs = [], seg = [];
+  for (var i = 0; i < ev.length; i++) { seg.push(ev[i]); if (ev[i].durum === 'tamamlandi') { segs.push(seg); seg = []; } }
+  if (seg.length) segs.push(seg);
+  var out = [];
+  for (var c = 0; c < segs.length; c++) {
+    var s = segs[c];
+    var hasBasladi = s.some(function (e) { return e.durum === 'basladi'; });
+    var isActive = function (d) { return !!ACTIVE[d] || (!hasBasladi && d === 'calisiliyor'); };
+    var startTs = null, endTs = null, netMs = 0;
+    for (var j = 0; j < s.length; j++) {
+      var e = s[j];
+      var nextTs = (j + 1 < s.length) ? s[j + 1].ts : (e.durum === 'tamamlandi' ? e.ts : now);
+      if (startTs == null) { if (e.durum === 'basladi') startTs = e.ts; else if (!hasBasladi && e.durum !== 'yeni') startTs = e.ts; }
+      if (isActive(e.durum)) netMs += Math.max(0, nextTs - e.ts);
+      if (e.durum === 'tamamlandi') endTs = e.ts;
+    }
+    if (startTs == null) startTs = s[0].ts;
+    out.push({ n: c + 1, basladi: startTs, bitis: endTs, sureH: Math.max(0, netMs) / BNS_H });
+  }
+  var toplamH = out.reduce(function (a, x) { return a + (x.sureH || 0); }, 0);
+  return { cycles: out, sonH: out.length ? out[out.length - 1].sureH : null, toplamH: toplamH };
+}
+
+module.exports = { bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsCycleSure, BNS_H };

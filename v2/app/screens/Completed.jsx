@@ -120,7 +120,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
                 <td style={cs(true)}>{fmt(c.deadline)}</td>
                 <td className="bns-col-mobile-hide" style={cs(true)}>{c.baslangic ? fmt(c.baslangic) : "—"}</td>
                 <td className="bns-col-mobile-hide" style={cs(true)}>{c.bitis ? fmt(c.bitis) : "—"}</td>
-                <td style={cs(true, "right")}>{c.sureH != null && c.sureH > 0 ? c.sureH.toFixed(1) + " sa" : "—"}</td>
+                <td title={Array.isArray(c.sure_cycles) && c.sure_cycles.length > 1 ? c.sure_cycles.map(x => `Döngü ${x.n}: ${(x.sureH||0).toFixed(1)}sa`).join("  ·  ") : undefined} style={cs(true, "right")}>{c.sureH != null && c.sureH > 0 ? c.sureH.toFixed(1) + " sa" : "—"}{Array.isArray(c.sure_cycles) && c.sure_cycles.length > 1 ? <span style={{color:"var(--ink-4)", marginLeft:4}}>·{c.sure_cycles.length}🔁</span> : null}</td>
                 <td className="bns-col-mobile-hide" style={cs(true, "right")}>{String(c.revision || 0).padStart(2,"0")}</td>
                 <td style={{...cs(true, "right"), color: c.gecikmeH > 0 ? "var(--prio-red)" : "var(--ink-4)"}}>
                   {c.gecikmeH > 0 ? c.gecikmeH.toFixed(1) + " sa" : "—"}

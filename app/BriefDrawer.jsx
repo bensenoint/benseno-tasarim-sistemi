@@ -267,6 +267,28 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             </>
           )}
 
+          {/* Çalışma süresi — döngü-bazlı (her açılış→tamamlanış ayrı; tekrar açılan iş yeni döngü) */}
+          {Array.isArray(b.sure_cycles) && b.sure_cycles.length > 0 && (
+            <>
+              <Hr/>
+              {!isMobile && <Eyebrow>⏱ Çalışma Süresi</Eyebrow>}
+              <div style={{marginTop:10, padding:"12px 14px", background:"var(--paper-2)", borderRadius:8, font:"400 13px/1.7 var(--font-sans)", color:"var(--ink-2)"}}>
+                {b.sure_cycles.map((c) => (
+                  <div key={c.n} style={{display:"flex", justifyContent:"space-between", gap:12}}>
+                    <span>{b.sure_cycles.length > 1 ? `Döngü ${c.n}` : "Süre"}{c.bitis ? "" : " · sürüyor"}</span>
+                    <span style={{fontVariantNumeric:"tabular-nums", fontWeight:500}}>{(c.sureH||0).toFixed(1)} sa</span>
+                  </div>
+                ))}
+                {b.sure_cycles.length > 1 && (
+                  <div style={{display:"flex", justifyContent:"space-between", gap:12, marginTop:6, paddingTop:6, borderTop:"1px solid var(--line)", fontWeight:600, color:"var(--ink)"}}>
+                    <span>Toplam</span>
+                    <span style={{fontVariantNumeric:"tabular-nums"}}>{(b.sureH_toplam != null ? b.sureH_toplam : (b.sureH||0)).toFixed(1)} sa</span>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
           {/* İş insight'ı — tamamlanma sonrası AI değerlendirmesi (süreç, revize, öğrenimler) */}
           {b.insight && (
             <>
