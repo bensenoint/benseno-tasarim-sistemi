@@ -214,6 +214,7 @@ app.post('/api/briefs', writeGuard, handleWrite(req => writes.createBrief(req.bo
 app.patch('/api/briefs/:id', writeGuard, handleWrite(req => writes.patchBrief(+req.params.id, req.body)));
 app.post('/api/briefs/:id/status', writeGuard, handleWrite(req => writes.setStatus(+req.params.id, req.body)));
 app.post('/api/briefs/:id/financials', writeGuard, handleWrite(req => writes.setFinancials(+req.params.id, req.body)));
+app.post('/api/briefs/:id/termin-oneri-kapat', writeGuard, handleWrite(req => writes.clearTerminOneri(+req.params.id)));   // işe-dönüş hatırlatıcısını uzatmadan kapat
 
 // Slack tarafı için: brief'i no / slack_ts ile hedefle (b3/cutover bot bunları çağırır).
 app.post('/api/briefs/by-no/:no/status', writeGuard, handleWrite(async req => writes.setStatus(await writes.noToId(+req.params.no), req.body)));

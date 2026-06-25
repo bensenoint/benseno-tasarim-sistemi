@@ -80,6 +80,27 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
     } catch (e) { alert('Hata: ' + e.message); }
   }
 
+  // İşe-dönüş termin hatırlatıcısı: "Bekleme kadar uzat" (muaf uzatma) / "Kapat".
+  async function terminOneri(action) {
+    const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
+    const tok = localStorage.getItem('bns_token');
+    const hdr = { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) };
+    try {
+      if (action === 'uzat') {
+        const base = b.deadline || Date.now();
+        const yeni = base + (b.termin_oneri_ms || 0);
+        // Hatırlatıcı açıkken yapılan uzatma backend'de otomatik MUAF (gecikme/ceza sayılmaz).
+        const res = await fetch(`${apiBase}/api/briefs/${b.id}`, { method: 'PATCH', headers: hdr, body: JSON.stringify({ deadline: yeni, by: currentUser?.slack_id }) });
+        if (!res.ok) { const j = await res.json().catch(() => ({})); return alert('Uzatma başarısız: ' + (j.error || res.status)); }
+      } else {
+        const res = await fetch(`${apiBase}/api/briefs/${b.id}/termin-oneri-kapat`, { method: 'POST', headers: hdr, body: JSON.stringify({ by: currentUser?.slack_id }) });
+        if (!res.ok) { const j = await res.json().catch(() => ({})); return alert('Kapatma başarısız: ' + (j.error || res.status)); }
+      }
+      set({ termin_oneri_at: null });   // anında gizle
+      if (typeof window.bnsRefresh === 'function') window.bnsRefresh();
+    } catch (e) { alert('Hata: ' + e.message); }
+  }
+
   return (
     <>
       <div onClick={onClose} style={{
@@ -170,6 +191,24 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
                   </span>
                 );
               })}
+            </div>
+          )}
+
+          {/* İşe-dönüş termin hatırlatıcısı — beklemede/müşterideden tamamlanmadan dönülünce */}
+          {b.termin_oneri_at && !ro && (
+            <div style={{marginTop:12, padding:"12px 14px", background:"var(--ember-tint, rgba(194,74,44,0.08))", border:"1px solid var(--ember, #c24a2c)", borderRadius:10}}>
+              <div style={{font:"600 13px/1.4 var(--font-sans)", color:"var(--ink)"}}>↩️ İşe geri dönüldü — termini uzatmak ister misin?</div>
+              <div style={{marginTop:4, font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}>
+                Bu iş bir süre beklemede/müşterideydi. Uzatırsan <b>gecikme sayılmaz</b> (puanı etkilemez).
+              </div>
+              <div style={{marginTop:10, display:"flex", gap:8, flexWrap:"wrap"}}>
+                <button onClick={() => terminOneri('uzat')} style={{font:"600 12px/1 var(--font-sans)", padding:"8px 12px", border:0, borderRadius:8, background:"var(--ember, #c24a2c)", color:"#fff", cursor:"pointer"}}>
+                  Bekleme kadar uzat{b.termin_oneri_ms ? ` (${Math.max(1, Math.round(b.termin_oneri_ms/3600000))} sa)` : ""}
+                </button>
+                <button onClick={() => terminOneri('kapat')} style={{font:"500 12px/1 var(--font-sans)", padding:"8px 12px", border:"1px solid var(--line-strong)", borderRadius:8, background:"var(--surface)", color:"var(--ink-2)", cursor:"pointer"}}>
+                  Kapat
+                </button>
+              </div>
             </div>
           )}
 

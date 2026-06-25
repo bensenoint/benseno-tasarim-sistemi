@@ -277,22 +277,28 @@ async function patchBrief(id, raw) {
     if (d.baslik !== undefined) put('baslik', d.baslik);
     if (d.deadline !== undefined) {
       // Uzatma takibi: eski deadline'ı al; orijinali bir kez sabitle; daha GEÇ tarihe taşıma = uzatma → ceza.
-      const cur = await client.query('SELECT deadline, deadline_orig FROM briefs WHERE id=$1', [id]);
+      const cur = await client.query('SELECT deadline, deadline_orig, termin_oneri_at FROM briefs WHERE id=$1', [id]);
       const oldRow = cur.rows[0] || {};
       const oldMs = oldRow.deadline ? new Date(oldRow.deadline).getTime() : null;
       const newDl = toTs(d.deadline);
       const newMs = newDl ? new Date(newDl).getTime() : null;
+      const muaf = !!oldRow.termin_oneri_at;            // işe-dönüş hatırlatıcısı AÇIK → bu uzatma muaf (gecikme/ceza sayılmaz)
       if (!oldRow.deadline_orig && oldRow.deadline) put('deadline_orig', oldRow.deadline);
       put('deadline', newDl);
       if (oldMs && newMs && newMs > oldMs) {            // deadline ileri taşındı → uzatma
-        const ceza = calc.bnsUzatmaCezaFromTimes(Date.now(), oldMs);
-        sets.push('uzatma_sayisi = uzatma_sayisi + 1');
-        vals.push(ceza); sets.push(`uzatma_ceza = GREATEST(uzatma_ceza, $${vals.length})`);
+        if (muaf) {                                     // MUAF: ceza yok, uzatıldı rozeti tetiklenmez; izi uzatma_muaf'ta
+          sets.push('uzatma_muaf = uzatma_muaf + 1');
+          sets.push('termin_oneri_at = NULL'); sets.push('termin_oneri_ms = NULL');  // hatırlatıcı kapanır
+        } else {
+          const ceza = calc.bnsUzatmaCezaFromTimes(Date.now(), oldMs);
+          sets.push('uzatma_sayisi = uzatma_sayisi + 1');
+          vals.push(ceza); sets.push(`uzatma_ceza = GREATEST(uzatma_ceza, $${vals.length})`);
+        }
       }
       if (oldMs && newMs && newMs !== oldMs) {          // her deadline değişimini geçmişe yaz (eski→yeni)
-        const hist = JSON.stringify({ eski: oldRow.deadline, yeni: newDl, at: new Date().toISOString(), by: d.by || null, ileri: newMs > oldMs });
+        const hist = JSON.stringify({ eski: oldRow.deadline, yeni: newDl, at: new Date().toISOString(), by: d.by || null, ileri: newMs > oldMs, muaf: muaf && newMs > oldMs });
         vals.push(hist); sets.push(`deadline_history = COALESCE(deadline_history,'[]'::jsonb) || $${vals.length}::jsonb`);
-        deadlineChange = { eski: oldRow.deadline, yeni: newDl, ileri: newMs > oldMs };  // thread notu için
+        deadlineChange = { eski: oldRow.deadline, yeni: newDl, ileri: newMs > oldMs, muaf: muaf && newMs > oldMs };  // thread notu için
       }
     }
     if (d.priority !== undefined) put('priority', d.priority);
@@ -332,7 +338,7 @@ async function patchBrief(id, raw) {
   let summary = `✏️ güncellendi: ${friendly}`;
   if (deadlineChange) {   // termin değiştiyse thread'e eski→yeni'yi açıkça yaz
     const f = (x) => { try { return new Date(x).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); } catch (e) { return '—'; } };
-    const yon = deadlineChange.ileri ? 'uzatıldı' : 'öne çekildi';
+    const yon = deadlineChange.ileri ? (deadlineChange.muaf ? 'uzatıldı (gecikme sayılmaz)' : 'uzatıldı') : 'öne çekildi';
     const dlNote = `📅 Termin ${yon}: ${f(deadlineChange.eski)} → ${f(deadlineChange.yeni)}`;
     const other = fields.filter(k => k !== 'deadline' && !roleKeys.includes(k));
     summary = other.length ? `✏️ güncellendi: ${other.map(k => FIELD_TR[k] || k).join(', ')}\n${dlNote}` : dlNote;
@@ -392,10 +398,12 @@ async function zincirCtx(client, id) {
 
 async function setStatus(id, raw) {
   const d = statusBody.parse(raw);
-  let zincirNote = null, dmNext = null;
+  let zincirNote = null, dmNext = null, resumeMs = null;   // resumeMs: işe-dönüş hatırlatıcısı için bekleme süresi
   const res = await tx(async (client) => {
     const ctx = await zincirCtx(client, id);
     if (!ctx) throw new Error('brief bulunamadı: ' + id);
+    const prevRow = await client.query('SELECT durum FROM briefs WHERE id=$1', [id]);
+    const prevDurum = prevRow.rows[0] && prevRow.rows[0].durum;
     // Idempotency: aynı Slack olayı (slack_ts) daha önce durum değiştirmişse tekrar uygulama
     // (kuyruk replay'inde sayaç/zincir mükerrer ilerlemesini önler)
     if (d.slack_ts) {
@@ -485,6 +493,18 @@ async function setStatus(id, raw) {
     if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'durum:' + durum,
       detail: { durum, istenen: d.durum, hedef: d.hedef }, source: d.source, slack_ts: d.slack_ts });
+    // İşe dönüş hatırlatıcısı: beklemede/müşteride → aktif (tamamlanma değil) ise termin uzatma öner.
+    const RESUME_ACTIVE = ['basladi', 'calisiliyor', 'incelemede', 'revizyon'];
+    if (['beklemede', 'musteride'].includes(prevDurum) && RESUME_ACTIVE.includes(durum)) {
+      const pe = await client.query(
+        `SELECT EXTRACT(EPOCH FROM max(ts)) * 1000 AS ts FROM events
+         WHERE brief_id=$1 AND verb IN ('durum:beklemede','durum:musteride')`, [id]);
+      const ps = pe.rows[0] && pe.rows[0].ts ? Math.round(+pe.rows[0].ts) : null;
+      resumeMs = ps ? Math.max(0, Date.now() - ps) : 0;
+      await client.query('UPDATE briefs SET termin_oneri_at = now(), termin_oneri_ms = $2 WHERE id=$1', [id, resumeMs]);
+    } else if (['tamamlandi', 'beklemede', 'musteride'].includes(durum)) {
+      await client.query('UPDATE briefs SET termin_oneri_at = NULL, termin_oneri_ms = NULL WHERE id=$1', [id]);
+    }
     return r.rows[0];
   });
   // Thread notu — müşteri akışına özel, anlaşılır metinler
@@ -499,7 +519,25 @@ async function setStatus(id, raw) {
   } else {
     note = `🔄 durum güncellendi: *${d.durum}*`;
   }
+  if (resumeMs != null) {
+    const saat = Math.round(resumeMs / 3600000);
+    note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin …\` yaz; bu uzatma **gecikme sayılmaz**. (Dashboard'da tek tıkla "bekleme kadar uzat" var.)`;
+  }
   await reflectChange(id, note, d.source, { by: d.by });
+  // Dashboard çanı: işe dönüş hatırlatıcısını atananlara da düşür (brief açmadan görsün).
+  if (resumeMs != null) {
+    try {
+      const a = await pool.query(
+        `SELECT DISTINCT a.user_id FROM brief_assignees a WHERE a.brief_id=$1 AND a.role IN ('contributor','lead')`, [id]);
+      const b = await pool.query(`SELECT no, baslik, slack_url FROM briefs WHERE id=$1`, [id]);
+      const bi = b.rows[0] || {};
+      for (const row of a.rows) {
+        if (!row.user_id) continue;
+        await pool.query('INSERT INTO notifications (user_id, text, link) VALUES ($1,$2,$3)',
+          [row.user_id, `↩️ #${bi.no} ${bi.baslik || ''} işine geri dönüldü — termin uzatmak ister misin? (uzatma gecikme sayılmaz)`, bi.slack_url || null]);
+      }
+    } catch (e) { console.error('[setStatus] işe-dönüş bildirimi:', e.message); }
+  }
   // Zincir el değişimi: sıradaki halkaya DM (best-effort)
   if (dmNext && slack.hasToken()) {
     try {
@@ -851,4 +889,10 @@ async function restoreBrief(id, by) {
   return { id, no: r.rows[0].no };
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, setQueue, setKanbanOrder, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };
+// İşe-dönüş termin hatırlatıcısını kapat (dashboard "Kapat" → uzatmadan kapatır).
+async function clearTerminOneri(id) {
+  await pool.query('UPDATE briefs SET termin_oneri_at = NULL, termin_oneri_ms = NULL WHERE id = $1', [id]);
+  return { ok: true };
+}
+
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, setQueue, setKanbanOrder, clearTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };

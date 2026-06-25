@@ -509,8 +509,11 @@ function bnsHydrateBrief(raw, idx) {
     gonderim_sayisi: raw.gonderim_sayisi || 0,
     son_gonderim_at: raw.son_gonderim_at || null,
     musteri_bekliyor: !!raw.musteri_bekliyor,
-    uzatma_sayisi: raw.uzatma_sayisi || 0,           // deadline kaç kez uzatıldı
-    uzatildi:      (raw.uzatma_sayisi || 0) > 0,     // aktif iş rozeti
+    uzatma_sayisi: raw.uzatma_sayisi || 0,           // deadline kaç kez uzatıldı (cezalı)
+    uzatma_muaf:   raw.uzatma_muaf || 0,             // muaf (gecikme sayılmayan) uzatma
+    uzatildi:      (raw.uzatma_sayisi || 0) > 0,     // aktif iş rozeti (yalnız cezalı uzatma)
+    termin_oneri_at: raw.termin_oneri_at != null ? raw.termin_oneri_at : null,  // işe-dönüş hatırlatıcısı açık mı
+    termin_oneri_ms: raw.termin_oneri_ms != null ? raw.termin_oneri_ms : null,  // önerilen uzatma miktarı (ms)
     deadline_orig: raw.deadline_orig != null ? raw.deadline_orig : null,   // ilk konan deadline
     deadline_history: Array.isArray(raw.deadline_history) ? raw.deadline_history : [],  // [{eski,yeni,at,by}]
     _kimden_id:   raw._kimden_id || null
