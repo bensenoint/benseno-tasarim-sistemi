@@ -50,7 +50,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     if (prioFilter !== "all" && prioFilter !== "over") rows = rows.filter(b => b.priority && b.priority.code === prioFilter);
   } else {
     rows = base;
-    if (scope === "overdue")      rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi");
+    if (scope === "overdue")      rows = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && inWin(b.deadline));
     else if (scope === "open")    rows = rows.filter(b => b.durum === "yeni" || b.durum === "calisiliyor" || b.durum === "basladi");  // geriye uyum (Overview deep-link)
     else if (scope === "review")  rows = rows.filter(b => b.durum === "incelemede");                                                  // geriye uyum
     if (prioFilter !== "all") rows = rows.filter(b => b.priority.code === prioFilter);
@@ -73,8 +73,10 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
 
   // Statü KPI kartları — değerler OLAY-BAZLI: seçili tarih aralığında o statüye girmiş iş sayısı.
   // Tümü = anlık aktif yük (canlı çalışma listesi); Geciken = anlık geciken; Tamamlandı = aralıkta biten.
+  const cntTumuEv = evPool.filter(b => Array.isArray(b.durum_olaylari) && b.durum_olaylari.some(e => inWin(e.ts))).length;
+  const cntOverdueEv = base.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && inWin(b.deadline)).length;
   const statusCards = [
-    { key: "all",         label: "Tümü",         value: base.length },
+    { key: "all",         label: "Tümü",         value: cntTumuEv },
     { key: "yeni",        label: "Yeni",         value: cntEv("yeni"),        color: "var(--ink-3)" },
     { key: "calisiliyor", label: "İş planında",  value: cntEv("calisiliyor"), color: "var(--info)" },
     { key: "basladi",     label: "İşe başlandı", value: cntEv("basladi"),     color: "var(--ok, #2E8F66)" },
@@ -83,7 +85,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     { key: "revizyon",    label: "Revizyon",     value: cntEv("revizyon"),    color: "var(--warning)" },
     { key: "blokeli",     label: "Blokeli",      value: cntEv("blokeli"),     color: "var(--danger)" },
     { key: "musteride",   label: "Müşteri onayı",value: cntEv("musteride"),   color: "var(--musteride)" },
-    { key: "overdue",     label: "Geciken",      value: base.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length, color: "var(--prio-red)" },
+    { key: "overdue",     label: "Geciken",      value: cntOverdueEv, color: "var(--prio-red)" },
     { key: "tamamlandi",  label: "Tamamlandı",   value: comp.length,        color: "var(--success, #2E8F66)" },
   ];
   const activeKey = scope === "review" ? "incelemede" : scope === "open" ? "all" : scope;   // KPI vurgusu (legacy review→incelemede)

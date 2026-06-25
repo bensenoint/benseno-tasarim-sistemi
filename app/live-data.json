@@ -17,8 +17,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779109200000,
-      "deadline_str": "18 Mayıs 2026 16:00 TR ⚠️ GEÇMİŞ 37g 18sa 46dk geride · 🔴 Blokeli",
-      "delta_h": -906.8,
+      "deadline_str": "18 Mayıs 2026 16:00 TR ⚠️ GEÇMİŞ 38g 0sa 48dk geride · 🔴 Blokeli",
+      "delta_h": -912.8,
       "gecmis": true,
       "blokeli": true,
       "durum": "👀 Revize bekliyor (v2 teslim · bakanlık geri dönüşü) · 🔴 Blokeli",
@@ -42,8 +42,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779260400000,
-      "deadline_str": "20 Mayıs 2026 10:00 TR ⚠️ GEÇMİŞ 36g 0sa 46dk geride · 🔴 Blokeli",
-      "delta_h": -864.8,
+      "deadline_str": "20 Mayıs 2026 10:00 TR ⚠️ GEÇMİŞ 36g 6sa 48dk geride · 🔴 Blokeli",
+      "delta_h": -870.8,
       "gecmis": true,
       "blokeli": true,
       "durum": "6g+ pasif · 🔴 Blokeli · Aykut > Eda T pasif",
@@ -67,8 +67,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779357600000,
-      "deadline_str": "21 Mayıs 2026 13:00 TR ⚠️ GEÇMİŞ 34g 21sa 46dk geride · 🔴 Blokeli",
-      "delta_h": -837.8,
+      "deadline_str": "21 Mayıs 2026 13:00 TR ⚠️ GEÇMİŞ 35g 3sa 48dk geride · 🔴 Blokeli",
+      "delta_h": -843.8,
       "gecmis": true,
       "blokeli": true,
       "durum": "tasarımcı yok · İpek dispatch > Görkem · 8g eşiği AŞILDI · 🔴 Blokeli",
@@ -91,8 +91,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779360120000,
-      "deadline_str": "21 Mayıs 2026 13:42 TR ⚠️ GEÇMİŞ 34g 21sa 4dk geride · 🔴 Blokeli",
-      "delta_h": -837.1,
+      "deadline_str": "21 Mayıs 2026 13:42 TR ⚠️ GEÇMİŞ 35g 3sa 6dk geride · 🔴 Blokeli",
+      "delta_h": -843.1,
       "gecmis": true,
       "blokeli": true,
       "durum": "🚨 v1 yok · Eren · 8g eşiği AŞILDI · 🔴 Blokeli",
@@ -115,8 +115,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779289200000,
-      "deadline_str": "20 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ 35g 16sa 46dk geride · 🔴 Blokeli",
-      "delta_h": -856.8,
+      "deadline_str": "20 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ 35g 22sa 48dk geride · 🔴 Blokeli",
+      "delta_h": -862.8,
       "gecmis": true,
       "blokeli": true,
       "durum": "v1 yok · Arda hafta sonu pasif · 🔴 Blokeli",
@@ -139,8 +139,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1782050400000,
-      "deadline_str": "21 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 3g 17sa 46dk geride",
-      "delta_h": -89.8,
+      "deadline_str": "21 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 3g 23sa 48dk geride",
+      "delta_h": -95.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "uzun lead · İpek",
@@ -163,8 +163,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779359040000,
-      "deadline_str": "21 Mayıs 2026 13:24 TR ⚠️ GEÇMİŞ 34g 21sa 22dk geride · 🔴 Blokeli",
-      "delta_h": -837.4,
+      "deadline_str": "21 Mayıs 2026 13:24 TR ⚠️ GEÇMİŞ 35g 3sa 24dk geride · 🔴 Blokeli",
+      "delta_h": -843.4,
       "gecmis": true,
       "blokeli": true,
       "durum": "🚨 dept ambiguity · Arda dispatch sırada · 8g eşiği AŞILDI · 🔴 Blokeli",
@@ -187,8 +187,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779483540000,
-      "deadline_str": "22 Mayıs 2026 23:59 TR ⚠️ GEÇMİŞ 33g 10sa 47dk geride · 🔴 Blokeli",
-      "delta_h": -802.8,
+      "deadline_str": "22 Mayıs 2026 23:59 TR ⚠️ GEÇMİŞ 33g 16sa 49dk geride · 🔴 Blokeli",
+      "delta_h": -808.8,
       "gecmis": true,
       "blokeli": true,
       "durum": "🔴 Blokeli · 72sa AÇILDI · Şablon 29 DM → Eren (26May09:33) · v1 yok",
@@ -212,8 +212,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779447600000,
-      "deadline_str": "22 Mayıs 2026 14:00 TR ⚠️ GEÇMİŞ 33g 20sa 46dk geride · 🔴 Blokeli",
-      "delta_h": -812.8,
+      "deadline_str": "22 Mayıs 2026 14:00 TR ⚠️ GEÇMİŞ 34g 2sa 48dk geride · 🔴 Blokeli",
+      "delta_h": -818.8,
       "gecmis": true,
       "blokeli": true,
       "durum": "🎨 v1 13:28 🌸 · Eda T 14:04 yarı kabul · 5g+ onay pasif · 7g eşiği AŞILDI · 🔴 Blokeli",
@@ -237,8 +237,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779458400000,
-      "deadline_str": "22 Mayıs 2026 17:00 TR ⚠️ GEÇMİŞ 33g 17sa 46dk geride · 🔴 Blokeli",
-      "delta_h": -809.8,
+      "deadline_str": "22 Mayıs 2026 17:00 TR ⚠️ GEÇMİŞ 33g 23sa 48dk geride · 🔴 Blokeli",
+      "delta_h": -815.8,
       "gecmis": true,
       "blokeli": true,
       "durum": "🎨 v1 14:40 🌸 · Eda T 14:50 ellerine sağlıkk · 3g+ pasif onay yok · 🔴 Blokeli",
@@ -262,8 +262,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779428760000,
-      "deadline_str": "22 Mayıs 2026 08:46 TR ⚠️ GEÇMİŞ 34g 2sa 0dk geride · 🔴 Blokeli",
-      "delta_h": -818.0,
+      "deadline_str": "22 Mayıs 2026 08:46 TR ⚠️ GEÇMİŞ 34g 8sa 2dk geride · 🔴 Blokeli",
+      "delta_h": -824.0,
       "gecmis": true,
       "blokeli": true,
       "durum": "🚨 v1 yok · Görkem DM Cuma 16:45 · 72sa + 8g eşiği AŞILDI · 🔴 Blokeli",
@@ -287,8 +287,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780306260000,
-      "deadline_str": "1 Haziran 2026 12:31 TR ⚠️ GEÇMİŞ 23g 22sa 15dk geride",
-      "delta_h": -574.3,
+      "deadline_str": "1 Haziran 2026 12:31 TR ⚠️ GEÇMİŞ 24g 4sa 17dk geride",
+      "delta_h": -580.3,
       "gecmis": true,
       "blokeli": false,
       "durum": "yeni · Eren+Görkem · 72sa eşik geçişi · Normal öncelik",
@@ -313,8 +313,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779536520000,
-      "deadline_str": "23 Mayıs 2026 14:42 TR ⚠️ GEÇMİŞ 32g 20sa 4dk geride · 🔴 Blokeli",
-      "delta_h": -788.1,
+      "deadline_str": "23 Mayıs 2026 14:42 TR ⚠️ GEÇMİŞ 33g 2sa 6dk geride · 🔴 Blokeli",
+      "delta_h": -794.1,
       "gecmis": true,
       "blokeli": true,
       "durum": "🚨 GEÇMİŞ · Şablon 24+25+29 gönderildi (29→Eren 26May14:46) · 72sa AŞILDI · 6g eşiği AÇILDI · 🔴 Blokeli",
@@ -339,8 +339,8 @@
       "oncelik": "🟢",
       "oncelik_label": "ERTELENDİ",
       "deadline": 1780816697000,
-      "deadline_str": "17:00 TR ↻ Ertelendi (bayram sonrası)",
-      "delta_h": 999,
+      "deadline_str": "17:00 TR ↺ Ertelendi (bayram sonrası)",
+      "delta_h": 0,
       "gecmis": false,
       "blokeli": false,
       "durum": "⏸ Cansu Direktör onayı · erdem copy edit tamamlandı · bayram sonrası devam",
@@ -364,8 +364,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1779462000000,
-      "deadline_str": "22 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ 33g 16sa 46dk geride · 🔴 Blokeli",
-      "delta_h": -808.8,
+      "deadline_str": "22 Mayıs 2026 18:00 TR ⚠️ GEÇMİŞ 33g 22sa 48dk geride · 🔴 Blokeli",
+      "delta_h": -814.8,
       "gecmis": true,
       "blokeli": true,
       "durum": "⚠️ GEÇMİŞ · Aykut yarı onay Cuma 17:35 · Arda kısmı belirsiz · 🔴 Blokeli",
@@ -389,8 +389,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780383600000,
-      "deadline_str": "2 Haziran 2026 10:00 TR ⚠️ GEÇMİŞ 23g 0sa 46dk geride",
-      "delta_h": -552.8,
+      "deadline_str": "2 Haziran 2026 10:00 TR ⚠️ GEÇMİŞ 23g 6sa 48dk geride",
+      "delta_h": -558.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "yeni · Cansu+Görkem · ⚠️ test içeriği (İş='test')",
@@ -414,8 +414,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780401300000,
-      "deadline_str": "2 Haziran 2026 14:55 TR ⚠️ GEÇMİŞ 22g 19sa 51dk geride",
-      "delta_h": -547.9,
+      "deadline_str": "2 Haziran 2026 14:55 TR ⚠️ GEÇMİŞ 23g 1sa 53dk geride",
+      "delta_h": -553.9,
       "gecmis": true,
       "blokeli": false,
       "durum": "🎨 Tasarımda · rev 1",
@@ -439,8 +439,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780394400000,
-      "deadline_str": "2 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 22g 21sa 46dk geride",
-      "delta_h": -549.8,
+      "deadline_str": "2 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 23g 3sa 48dk geride",
+      "delta_h": -555.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "yeni · Hasan Serdar+Aykut · Sosyal Medya Post · Paralel akış · 💬 video içeriği",
@@ -464,8 +464,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780480800000,
-      "deadline_str": "3 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 21g 21sa 46dk geride",
-      "delta_h": -525.8,
+      "deadline_str": "3 Haziran 2026 13:00 TR ⚠️ GEÇMİŞ 22g 3sa 48dk geride",
+      "delta_h": -531.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
@@ -489,8 +489,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780408800000,
-      "deadline_str": "2 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 22g 17sa 46dk geride",
-      "delta_h": -545.8,
+      "deadline_str": "2 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 22g 23sa 48dk geride",
+      "delta_h": -551.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "yeni · Aykut+Hasan Serdar · Sosyal Medya Post · Paralel akış",
@@ -514,8 +514,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780477200000,
-      "deadline_str": "3 Haziran 2026 12:00 TR ⚠️ GEÇMİŞ 21g 22sa 46dk geride",
-      "delta_h": -526.8,
+      "deadline_str": "3 Haziran 2026 12:00 TR ⚠️ GEÇMİŞ 22g 4sa 48dk geride",
+      "delta_h": -532.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "🎨 Tasarımda · rev 1",
@@ -538,8 +538,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780476720000,
-      "deadline_str": "3 Haziran 2026 11:52 TR ⚠️ GEÇMİŞ 21g 22sa 54dk geride",
-      "delta_h": -526.9,
+      "deadline_str": "3 Haziran 2026 11:52 TR ⚠️ GEÇMİŞ 22g 4sa 56dk geride",
+      "delta_h": -532.9,
       "gecmis": true,
       "blokeli": false,
       "durum": "yeni · Serhat · Print / Broşür",
@@ -562,8 +562,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780485240000,
-      "deadline_str": "3 Haziran 2026 14:14 TR ⚠️ GEÇMİŞ 21g 20sa 32dk geride",
-      "delta_h": -524.5,
+      "deadline_str": "3 Haziran 2026 14:14 TR ⚠️ GEÇMİŞ 22g 2sa 34dk geride",
+      "delta_h": -530.6,
       "gecmis": true,
       "blokeli": false,
       "durum": "👀 Revizede",
@@ -587,8 +587,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1781086140000,
-      "deadline_str": "10 Haziran 2026 13:09 TR ⚠️ GEÇMİŞ 14g 21sa 37dk geride",
-      "delta_h": -357.6,
+      "deadline_str": "10 Haziran 2026 13:09 TR ⚠️ GEÇMİŞ 15g 3sa 39dk geride",
+      "delta_h": -363.7,
       "gecmis": true,
       "blokeli": false,
       "durum": "🎨 Tasarımda",
@@ -613,8 +613,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780581600000,
-      "deadline_str": "4 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 20g 17sa 46dk geride",
-      "delta_h": -497.8,
+      "deadline_str": "4 Haziran 2026 17:00 TR ⚠️ GEÇMİŞ 20g 23sa 48dk geride",
+      "delta_h": -503.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "Açık",
@@ -638,8 +638,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780592400000,
-      "deadline_str": "4 Haziran 2026 20:00 TR ⚠️ GEÇMİŞ 20g 14sa 46dk geride",
-      "delta_h": -494.8,
+      "deadline_str": "4 Haziran 2026 20:00 TR ⚠️ GEÇMİŞ 20g 20sa 48dk geride",
+      "delta_h": -500.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "Açık",
@@ -662,8 +662,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780678800000,
-      "deadline_str": "5 Haziran 2026 20:00 TR ⚠️ GEÇMİŞ 19g 14sa 46dk geride",
-      "delta_h": -470.8,
+      "deadline_str": "5 Haziran 2026 20:00 TR ⚠️ GEÇMİŞ 19g 20sa 48dk geride",
+      "delta_h": -476.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "Açık",
@@ -686,8 +686,8 @@
       "oncelik": "🔴",
       "oncelik_label": "GEÇMİŞ",
       "deadline": 1780574400000,
-      "deadline_str": "4 Haziran 2026 15:00 TR ⚠️ GEÇMİŞ 20g 19sa 46dk geride",
-      "delta_h": -499.8,
+      "deadline_str": "4 Haziran 2026 15:00 TR ⚠️ GEÇMİŞ 21g 1sa 48dk geride",
+      "delta_h": -505.8,
       "gecmis": true,
       "blokeli": false,
       "durum": "Açık",
@@ -893,38 +893,194 @@
     }
   ],
   "bns_brands": [
-    { "marka": "JNJ Vision TR", "active": 1, "overdue": 1 },
-    { "marka": "Bauhaus", "active": 13, "overdue": 13 },
-    { "marka": "KMR Serve", "active": 1, "overdue": 1 },
-    { "marka": "VDM Petdent", "active": 5, "overdue": 5 },
-    { "marka": "Tour2America", "active": 1, "overdue": 1 },
-    { "marka": "Splenda", "active": 1, "overdue": 0 },
-    { "marka": "KZY Supreme", "active": 1, "overdue": 1 },
-    { "marka": "Hasvet", "active": 1, "overdue": 1 },
-    { "marka": "KMR Panfix", "active": 1, "overdue": 1 },
-    { "marka": "Cimporglobal", "active": 1, "overdue": 1 },
-    { "marka": "KMR Amos", "active": 1, "overdue": 1 },
-    { "marka": "Kuzeypet", "active": 1, "overdue": 1 }
+    {
+      "marka": "JNJ Vision TR",
+      "active": 1,
+      "overdue": 1
+    },
+    {
+      "marka": "Bauhaus",
+      "active": 13,
+      "overdue": 13
+    },
+    {
+      "marka": "KMR Serve",
+      "active": 1,
+      "overdue": 1
+    },
+    {
+      "marka": "VDM Petdent",
+      "active": 5,
+      "overdue": 5
+    },
+    {
+      "marka": "Tour2America",
+      "active": 1,
+      "overdue": 1
+    },
+    {
+      "marka": "Splenda",
+      "active": 1,
+      "overdue": 0
+    },
+    {
+      "marka": "KZY Supreme",
+      "active": 1,
+      "overdue": 1
+    },
+    {
+      "marka": "Hasvet",
+      "active": 1,
+      "overdue": 1
+    },
+    {
+      "marka": "KMR Panfix",
+      "active": 1,
+      "overdue": 1
+    },
+    {
+      "marka": "Cimporglobal",
+      "active": 1,
+      "overdue": 1
+    },
+    {
+      "marka": "KMR Amos",
+      "active": 1,
+      "overdue": 1
+    },
+    {
+      "marka": "Kuzeypet",
+      "active": 1,
+      "overdue": 1
+    }
   ],
   "bns_users": [
-    { "id": "U030C48PL23", "name": "Görkem Kaya", "rol": "yonetici", "initials": "GK", "color": "#7C3AED" },
-    { "id": "UD96GH76E", "name": "Reyhan Nur Pınar", "rol": "yonetici", "initials": "RP", "color": "#7C3AED" },
-    { "id": "U4XCE3532", "name": "Cansu Kazgan", "rol": "editor", "initials": "CK", "color": "#10B981" },
-    { "id": "U055EDESLSE", "name": "İpek Akdeniz", "rol": "tasarim", "initials": "İA", "color": "#6366F1" },
-    { "id": "U02SZQDAFPF", "name": "Erdem Akoğlu", "rol": "editor", "initials": "EA", "color": "#10B981" },
-    { "id": "U0AN6DD79M0", "name": "Aylin Tozkoparan", "rol": "tasarim", "initials": "AT", "color": "#6366F1" },
-    { "id": "U06J26R1XCJ", "name": "Aykut Arslan", "rol": "tasarim", "initials": "AA", "color": "#6366F1" },
-    { "id": "U09BFPBKQG7", "name": "Hasan Serdar Arda", "rol": "tasarim", "initials": "HA", "color": "#6366F1" },
-    { "id": "U0B3K2WE7SB", "name": "Pelin Özdemir", "rol": "tasarim", "initials": "PÖ", "color": "#6366F1" },
-    { "id": "U0AK8U7L57F", "name": "İrem Özkan", "rol": "tasarim", "initials": "İÖ", "color": "#6366F1" },
-    { "id": "U08HLMHTGEL", "name": "Serhat Yıldız", "rol": "tasarim", "initials": "SY", "color": "#6366F1" },
-    { "id": "U09BZHR25NG", "name": "Eda Tireli", "rol": "editor", "initials": "ET", "color": "#10B981" },
-    { "id": "U07PV0RA9L2", "name": "Eda Ayral", "rol": "editor", "initials": "EY", "color": "#10B981" },
-    { "id": "U08NQJ27G5S", "name": "Melis Can", "rol": "editor", "initials": "MC", "color": "#10B981" },
-    { "id": "U05PP70GQTX", "name": "Aylin Canel", "rol": "editor", "initials": "AC", "color": "#10B981" },
-    { "id": "U063T8M5HL4", "name": "Buse Gürbüzer", "rol": "editor", "initials": "BG", "color": "#10B981" },
-    { "id": "U0AAC3YK20G", "name": "Simge Acar", "rol": "editor", "initials": "SA", "color": "#10B981" },
-    { "id": "U0AP31SAA1W", "name": "Eren Mahzunlar", "rol": "ai", "initials": "EM", "color": "#F59E0B" }
+    {
+      "id": "U030C48PL23",
+      "name": "Görkem Kaya",
+      "rol": "yonetici",
+      "initials": "GK",
+      "color": "#7C3AED"
+    },
+    {
+      "id": "UD96GH76E",
+      "name": "Reyhan Nur Pınar",
+      "rol": "yonetici",
+      "initials": "RP",
+      "color": "#7C3AED"
+    },
+    {
+      "id": "U4XCE3532",
+      "name": "Cansu Kazgan",
+      "rol": "editor",
+      "initials": "CK",
+      "color": "#10B981"
+    },
+    {
+      "id": "U055EDESLSE",
+      "name": "İpek Akdeniz",
+      "rol": "tasarim",
+      "initials": "İA",
+      "color": "#6366F1"
+    },
+    {
+      "id": "U02SZQDAFPF",
+      "name": "Erdem Akoğlu",
+      "rol": "editor",
+      "initials": "EA",
+      "color": "#10B981"
+    },
+    {
+      "id": "U0AN6DD79M0",
+      "name": "Aylin Tozkoparan",
+      "rol": "tasarim",
+      "initials": "AT",
+      "color": "#6366F1"
+    },
+    {
+      "id": "U06J26R1XCJ",
+      "name": "Aykut Arslan",
+      "rol": "tasarim",
+      "initials": "AA",
+      "color": "#6366F1"
+    },
+    {
+      "id": "U09BFPBKQG7",
+      "name": "Hasan Serdar Arda",
+      "rol": "tasarim",
+      "initials": "HA",
+      "color": "#6366F1"
+    },
+    {
+      "id": "U0B3K2WE7SB",
+      "name": "Pelin Özdemir",
+      "rol": "tasarim",
+      "initials": "PÖ",
+      "color": "#6366F1"
+    },
+    {
+      "id": "U0AK8U7L57F",
+      "name": "İrem Özkan",
+      "rol": "tasarim",
+      "initials": "İÖ",
+      "color": "#6366F1"
+    },
+    {
+      "id": "U08HLMHTGEL",
+      "name": "Serhat Yıldız",
+      "rol": "tasarim",
+      "initials": "SY",
+      "color": "#6366F1"
+    },
+    {
+      "id": "U09BZHR25NG",
+      "name": "Eda Tireli",
+      "rol": "editor",
+      "initials": "ET",
+      "color": "#10B981"
+    },
+    {
+      "id": "U07PV0RA9L2",
+      "name": "Eda Ayral",
+      "rol": "editor",
+      "initials": "EY",
+      "color": "#10B981"
+    },
+    {
+      "id": "U08NQJ27G5S",
+      "name": "Melis Can",
+      "rol": "editor",
+      "initials": "MC",
+      "color": "#10B981"
+    },
+    {
+      "id": "U05PP70GQTX",
+      "name": "Aylin Canel",
+      "rol": "editor",
+      "initials": "AC",
+      "color": "#10B981"
+    },
+    {
+      "id": "U063T8M5HL4",
+      "name": "Buse Gürbüzer",
+      "rol": "editor",
+      "initials": "BG",
+      "color": "#10B981"
+    },
+    {
+      "id": "U0AAC3YK20G",
+      "name": "Simge Acar",
+      "rol": "editor",
+      "initials": "SA",
+      "color": "#10B981"
+    },
+    {
+      "id": "U0AP31SAA1W",
+      "name": "Eren Mahzunlar",
+      "rol": "ai",
+      "initials": "EM",
+      "color": "#F59E0B"
+    }
   ],
   "bns_dept_stats": {
     "tasarim": {
@@ -959,54 +1115,320 @@
     }
   },
   "bns_brand_stats": [
-    { "marka": "JNJ Vision TR", "active": 1, "overdue": 1, "completed": 0 },
-    { "marka": "Bauhaus", "active": 13, "overdue": 13, "completed": 6 },
-    { "marka": "KMR Serve", "active": 1, "overdue": 1, "completed": 0 },
-    { "marka": "VDM Petdent", "active": 5, "overdue": 5, "completed": 0 },
-    { "marka": "Tour2America", "active": 1, "overdue": 1, "completed": 0 },
-    { "marka": "Splenda", "active": 1, "overdue": 0, "completed": 0 },
-    { "marka": "KZY Supreme", "active": 1, "overdue": 1, "completed": 0 },
-    { "marka": "Hasvet", "active": 1, "overdue": 1, "completed": 1 },
-    { "marka": "KMR Panfix", "active": 1, "overdue": 1, "completed": 0 },
-    { "marka": "Cimporglobal", "active": 1, "overdue": 1, "completed": 0 },
-    { "marka": "KMR Amos", "active": 1, "overdue": 1, "completed": 0 },
-    { "marka": "Kuzeypet", "active": 1, "overdue": 1, "completed": 2 }
+    {
+      "marka": "JNJ Vision TR",
+      "active": 1,
+      "overdue": 1,
+      "completed": 0
+    },
+    {
+      "marka": "Bauhaus",
+      "active": 13,
+      "overdue": 13,
+      "completed": 6
+    },
+    {
+      "marka": "KMR Serve",
+      "active": 1,
+      "overdue": 1,
+      "completed": 0
+    },
+    {
+      "marka": "VDM Petdent",
+      "active": 5,
+      "overdue": 5,
+      "completed": 0
+    },
+    {
+      "marka": "Tour2America",
+      "active": 1,
+      "overdue": 1,
+      "completed": 0
+    },
+    {
+      "marka": "Splenda",
+      "active": 1,
+      "overdue": 0,
+      "completed": 0
+    },
+    {
+      "marka": "KZY Supreme",
+      "active": 1,
+      "overdue": 1,
+      "completed": 0
+    },
+    {
+      "marka": "Hasvet",
+      "active": 1,
+      "overdue": 1,
+      "completed": 1
+    },
+    {
+      "marka": "KMR Panfix",
+      "active": 1,
+      "overdue": 1,
+      "completed": 0
+    },
+    {
+      "marka": "Cimporglobal",
+      "active": 1,
+      "overdue": 1,
+      "completed": 0
+    },
+    {
+      "marka": "KMR Amos",
+      "active": 1,
+      "overdue": 1,
+      "completed": 0
+    },
+    {
+      "marka": "Kuzeypet",
+      "active": 1,
+      "overdue": 1,
+      "completed": 2
+    }
   ],
   "bns_history": [
-    { "ts": 1779864420, "date": "2026-05-27", "active": 16, "overdue": 13, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1779970836, "date": "2026-05-28", "active": 16, "overdue": 13, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1780051500, "date": "2026-05-29", "active": 16, "overdue": 13, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1780127280, "date": "2026-05-30", "active": 16, "overdue": 13, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1780316113, "date": "2026-06-01", "active": 18, "overdue": 14, "dm_sent": 2, "errors": 0, "ok": true },
-    { "ts": 1780402512, "date": "2026-06-02", "active": 24, "overdue": 16, "dm_sent": 8, "errors": 0, "ok": true },
-    { "ts": 1780494420, "date": "2026-06-03", "active": 24, "overdue": 21, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1780550654, "date": "2026-06-04", "active": 24, "overdue": 21, "dm_sent": 1, "errors": 0, "ok": true },
-    { "ts": 1782308700, "date": "2026-06-24", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1782369900, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1782373615, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1782375300, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true },
-    { "ts": 1782377100, "date": "2026-06-25", "active": 28, "overdue": 27, "dm_sent": 0, "errors": 0, "ok": true }
+    {
+      "ts": 1779864420,
+      "date": "2026-05-27",
+      "active": 16,
+      "overdue": 13,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1779970836,
+      "date": "2026-05-28",
+      "active": 16,
+      "overdue": 13,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1780051500,
+      "date": "2026-05-29",
+      "active": 16,
+      "overdue": 13,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1780127280,
+      "date": "2026-05-30",
+      "active": 16,
+      "overdue": 13,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1780316113,
+      "date": "2026-06-01",
+      "active": 18,
+      "overdue": 14,
+      "dm_sent": 2,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1780402512,
+      "date": "2026-06-02",
+      "active": 24,
+      "overdue": 16,
+      "dm_sent": 8,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1780494420,
+      "date": "2026-06-03",
+      "active": 24,
+      "overdue": 21,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1780550654,
+      "date": "2026-06-04",
+      "active": 24,
+      "overdue": 21,
+      "dm_sent": 1,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1782308700,
+      "date": "2026-06-24",
+      "active": 28,
+      "overdue": 27,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1782369900,
+      "date": "2026-06-25",
+      "active": 28,
+      "overdue": 27,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1782373615,
+      "date": "2026-06-25",
+      "active": 28,
+      "overdue": 27,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1782375300,
+      "date": "2026-06-25",
+      "active": 28,
+      "overdue": 27,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    },
+    {
+      "ts": 1782377100,
+      "date": "2026-06-25",
+      "active": 28,
+      "overdue": 27,
+      "dm_sent": 0,
+      "errors": 0,
+      "ok": true
+    }
   ],
   "bns_activity": [
-    { "t": 1780557144061, "who": "U055EDESLSE", "verb": "yeni brief açtı", "target": "KMR Amos · deneme 3", "meta": "#37" },
-    { "t": 1780557039483, "who": "U4XCE3532", "verb": "yeni brief açtı", "target": "Cimporglobal · deneme 2", "meta": "#36" },
-    { "t": 1780556954402, "who": "U06J26R1XCJ", "verb": "yeni brief açtı", "target": "Bauhaus · deneme", "meta": "#35" },
-    { "t": 1780555379691, "who": "U08HLMHTGEL", "verb": "yeni brief açtı", "target": "Kuzeypet · Ever Clean / Supreme Mekanik - HAZİRAN", "meta": "#38" },
-    { "t": 1780472940000, "who": "U02SZQDAFPF", "verb": "tamamladı", "target": "Egosport · test editör (Senaryo · ⚠️ test", "meta": "rev:0" },
-    { "t": 1780471318000, "who": "U02SZQDAFPF", "verb": "tamamladı", "target": "Egosport · test editör (Senaryo · ⚠️ test brief'i)", "meta": "#32" },
-    { "t": 1780471318000, "who": "U4XCE3532", "verb": "tamamladı", "target": "Hasvet · MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME", "meta": "#2" },
-    { "t": 1780471318000, "who": "U09BFPBKQG7", "verb": "tamamladı", "target": "Bauhaus · Bahçe Düzen / 22 Mayıs (batch 1/7)", "meta": "#10" },
-    { "t": 1780471318000, "who": "U08HLMHTGEL", "verb": "tamamladı", "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması [İPTAL · D", "meta": "#18" },
-    { "t": 1780471318000, "who": "UD96GH76E", "verb": "tamamladı", "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması (TR çeviri", "meta": "#19" },
-    { "t": 1780386000000, "who": "U4XCE3532", "verb": "tamamladı", "target": "Hasvet · MENTEŞE VETERİNER KLİNİĞİ CAM ", "meta": "rev:0" },
-    { "t": 1779461160000, "who": "U09BFPBKQG7", "verb": "tamamladı", "target": "Bauhaus · Kaçırılmayacak Fırsatlar!", "meta": "rev:1" },
-    { "t": 1779448200000, "who": "U09BFPBKQG7", "verb": "tamamladı", "target": "Bauhaus · Güneşli Günler / 26 Mayıs (bat", "meta": "rev:2" },
-    { "t": 1779448200000, "who": "UD96GH76E", "verb": "tamamladı", "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması ", "meta": "rev:0" },
-    { "t": 1779447900000, "who": "U09BFPBKQG7", "verb": "tamamladı", "target": "Bauhaus · Düzenli Alanlar / 24 Mayıs (ba", "meta": "rev:0" },
-    { "t": 1779447600000, "who": "U09BFPBKQG7", "verb": "tamamladı", "target": "Bauhaus · Bahçe Düzen / 22 Mayıs (batch ", "meta": "rev:0" },
-    { "t": 1779447600000, "who": "U08HLMHTGEL", "verb": "tamamladı", "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması ", "meta": "rev:0" }
+    {
+      "t": 1780557144061,
+      "who": "U055EDESLSE",
+      "verb": "yeni brief açtı",
+      "target": "KMR Amos · deneme 3",
+      "meta": "#37"
+    },
+    {
+      "t": 1780557039483,
+      "who": "U4XCE3532",
+      "verb": "yeni brief açtı",
+      "target": "Cimporglobal · deneme 2",
+      "meta": "#36"
+    },
+    {
+      "t": 1780556954402,
+      "who": "U06J26R1XCJ",
+      "verb": "yeni brief açtı",
+      "target": "Bauhaus · deneme",
+      "meta": "#35"
+    },
+    {
+      "t": 1780555379691,
+      "who": "U08HLMHTGEL",
+      "verb": "yeni brief açtı",
+      "target": "Kuzeypet · Ever Clean / Supreme Mekanik - HAZİRAN",
+      "meta": "#38"
+    },
+    {
+      "t": 1780472940000,
+      "who": "U02SZQDAFPF",
+      "verb": "tamamladı",
+      "target": "Egosport · test editör (Senaryo · ⚠️ test",
+      "meta": "rev:0"
+    },
+    {
+      "t": 1780471318000,
+      "who": "U02SZQDAFPF",
+      "verb": "tamamladı",
+      "target": "Egosport · test editör (Senaryo · ⚠️ test brief'i)",
+      "meta": "#32"
+    },
+    {
+      "t": 1780471318000,
+      "who": "U4XCE3532",
+      "verb": "tamamladı",
+      "target": "Hasvet · MENTEŞE VETERİNER KLİNİĞİ CAM GİYDİRME",
+      "meta": "#2"
+    },
+    {
+      "t": 1780471318000,
+      "who": "U09BFPBKQG7",
+      "verb": "tamamladı",
+      "target": "Bauhaus · Bahçe Düzen / 22 Mayıs (batch 1/7)",
+      "meta": "#10"
+    },
+    {
+      "t": 1780471318000,
+      "who": "U08HLMHTGEL",
+      "verb": "tamamladı",
+      "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması [İPTAL · D",
+      "meta": "#18"
+    },
+    {
+      "t": 1780471318000,
+      "who": "UD96GH76E",
+      "verb": "tamamladı",
+      "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması (TR çeviri",
+      "meta": "#19"
+    },
+    {
+      "t": 1780386000000,
+      "who": "U4XCE3532",
+      "verb": "tamamladı",
+      "target": "Hasvet · MENTEŞE VETERİNER KLİNİĞİ CAM ",
+      "meta": "rev:0"
+    },
+    {
+      "t": 1779461160000,
+      "who": "U09BFPBKQG7",
+      "verb": "tamamladı",
+      "target": "Bauhaus · Kaçırılmayacak Fırsatlar!",
+      "meta": "rev:1"
+    },
+    {
+      "t": 1779448200000,
+      "who": "U09BFPBKQG7",
+      "verb": "tamamladı",
+      "target": "Bauhaus · Güneşli Günler / 26 Mayıs (bat",
+      "meta": "rev:2"
+    },
+    {
+      "t": 1779448200000,
+      "who": "UD96GH76E",
+      "verb": "tamamladı",
+      "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması ",
+      "meta": "rev:0"
+    },
+    {
+      "t": 1779447900000,
+      "who": "U09BFPBKQG7",
+      "verb": "tamamladı",
+      "target": "Bauhaus · Düzenli Alanlar / 24 Mayıs (ba",
+      "meta": "rev:0"
+    },
+    {
+      "t": 1779447600000,
+      "who": "U09BFPBKQG7",
+      "verb": "tamamladı",
+      "target": "Bauhaus · Bahçe Düzen / 22 Mayıs (batch ",
+      "meta": "rev:0"
+    },
+    {
+      "t": 1779447600000,
+      "who": "U08HLMHTGEL",
+      "verb": "tamamladı",
+      "target": "Kuzeypet · Kuzey Pet Organizasyon Şeması ",
+      "meta": "rev:0"
+    }
   ],
-  "last_sync": "2026-06-25T11:45:00+03:00",
-  "sync_ts": 1782377100,
+  "last_sync": "25 Haz 2026 Per 16:48 TR",
+  "sync_ts": 1782395285,
   "source": "benseno-brief-sync"
 }
