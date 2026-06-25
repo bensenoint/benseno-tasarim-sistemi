@@ -83,30 +83,46 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       { label: "Geciken", value: n ? "%" + Math.round(ds("gec") / n * 100) : "—", color: "var(--prio-red)" },
     ];
   } else {
+    // Aday metrikler — seçili statünün alt kümesi (rows) üzerinden. Her statü kendi anlamlı setini seçer.
+    const fmtH = (h) => !h ? "—" : h >= 48 ? Math.round(h / 24) + " gün" : Math.round(h) + " sa";
     const n = rows.length;
-    const overdue = rows.filter(b => b.deltaH <= 0).length;
-    const risk = rows.filter(b => typeof bnsIsRisk === "function" && bnsIsRisk(b.durum, b.deltaH)).length;
-    const today = rows.filter(b => b.deadline && b.deadline <= dayEnd && b.deltaH > 0).length;
-    const week = rows.filter(b => b.deadline && b.deadline <= weekEnd && b.deltaH > 0).length;
-    const acil = rows.filter(b => b.priority && b.priority.code === "red").length;
-    const yuksek = rows.filter(b => b.priority && b.priority.code === "org").length;
+    const overdueArr = rows.filter(b => b.deltaH <= 0);
     const nonOver = rows.filter(b => b.deltaH > 0);
-    const uzat = rows.filter(b => (b.uzatma_sayisi || 0) > 0).length;
-    const rev = rows.reduce((s, b) => s + (b.revision || b.rev || 0), 0);
-    const kisi = new Set(rows.flatMap(b => [b.lead, ...(b.contributors || [])].filter(Boolean).map(p => p.id))).size;
-    detailKpis = [
-      { label: "Adet", value: n },
-      { label: "Geciken", value: overdue, color: overdue ? "var(--prio-red)" : undefined },
-      { label: "Termin riski", value: risk, color: risk ? "var(--prio-orange)" : undefined },
-      { label: "Bugün teslim", value: today },
-      { label: "Bu hafta", value: week },
-      { label: "Acil", value: acil, color: acil ? "var(--prio-red)" : undefined },
-      { label: "Yüksek", value: yuksek, color: yuksek ? "var(--prio-orange)" : undefined },
-      { label: "Ort. kalan", value: nonOver.length ? Math.round(avg(nonOver, b => b.deltaH)) + " sa" : "—" },
-      { label: "Uzatılmış", value: uzat },
-      { label: "Toplam revize", value: rev },
-      { label: "Kişi", value: kisi },
-    ];
+    const C = (label, value, color) => ({ label, value, color });
+    const cand = {
+      adet:      C("Adet", n),
+      geciken:   C("Geciken", overdueArr.length, overdueArr.length ? "var(--prio-red)" : undefined),
+      ortGecikme:C("Ort. gecikme", overdueArr.length ? fmtH(avg(overdueArr, b => -b.deltaH)) : "—", "var(--prio-red)"),
+      enCokGec:  C("En çok geciken", overdueArr.length ? fmtH(Math.max(...overdueArr.map(b => -b.deltaH))) : "—", "var(--prio-red)"),
+      risk:      C("Termin riski", rows.filter(b => typeof bnsIsRisk === "function" && bnsIsRisk(b.durum, b.deltaH)).length, "var(--prio-orange)"),
+      bugun:     C("Bugün teslim", rows.filter(b => b.deadline && b.deadline <= dayEnd && b.deltaH > 0).length),
+      hafta:     C("Bu hafta", rows.filter(b => b.deadline && b.deadline <= weekEnd && b.deltaH > 0).length),
+      acil:      C("Acil", rows.filter(b => b.priority && b.priority.code === "red").length, "var(--prio-red)"),
+      yuksek:    C("Yüksek", rows.filter(b => b.priority && b.priority.code === "org").length, "var(--prio-orange)"),
+      ortKalan:  C("Ort. kalan", nonOver.length ? fmtH(avg(nonOver, b => b.deltaH)) : "—"),
+      uzat:      C("Uzatılmış", rows.filter(b => (b.uzatma_sayisi || 0) > 0).length),
+      revTop:    C("Toplam revize", rows.reduce((s, b) => s + (b.revision || b.rev || 0), 0)),
+      revIc:     C("İç revize", rows.reduce((s, b) => s + (b.rev_ic || 0), 0)),
+      revMus:    C("Müşteri revize", rows.reduce((s, b) => s + (b.rev_musteri || 0), 0), "var(--musteride)"),
+      musBekle:  C("Müşteri dönüşü", rows.filter(b => b.musteri_bekliyor).length, "var(--musteride)"),
+      kisi:      C("Kişi", new Set(rows.flatMap(b => [b.lead, ...(b.contributors || [])].filter(Boolean).map(p => p.id))).size),
+      marka:     C("Marka", new Set(rows.map(b => b.marka).filter(Boolean)).size),
+      stale:     C("Hareketsiz", rows.filter(b => b.stale).length, "var(--prio-orange)"),
+      ortYas:    C("Ort. açık yaş", (() => { const a = rows.filter(b => b.created_at); return a.length ? fmtH(avg(a, b => (NOW - b.created_at) / 3600000)) : "—"; })()),
+      ortAtil:   C("Ort. süredir", (() => { const a = rows.filter(b => b.updated_at); return a.length ? fmtH(avg(a, b => (NOW - b.updated_at) / 3600000)) : "—"; })()),
+    };
+    const SETS = {
+      all:        ["adet", "geciken", "risk", "bugun", "hafta", "acil", "ortKalan", "uzat", "kisi", "marka"],
+      yeni:       ["adet", "ortYas", "stale", "bugun", "geciken", "acil"],
+      calisiliyor:["adet", "bugun", "hafta", "geciken", "ortKalan", "acil", "uzat"],
+      basladi:    ["adet", "risk", "bugun", "geciken", "ortKalan", "kisi"],
+      incelemede: ["adet", "ortAtil", "bugun", "geciken", "revTop"],
+      beklemede:  ["adet", "ortAtil", "stale", "geciken", "acil"],
+      revizyon:   ["adet", "revIc", "revMus", "revTop", "musBekle", "geciken"],
+      blokeli:    ["adet", "ortAtil", "geciken", "acil", "kisi"],
+      overdue:    ["adet", "ortGecikme", "enCokGec", "acil", "risk", "uzat"],
+    };
+    detailKpis = (SETS[activeKey] || SETS.all).map(k => cand[k]).filter(Boolean);
   }
 
   return (
@@ -164,7 +180,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
           <div style={{margin:"14px 0 -6px", font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-4)"}}>
             {(statusCards.find(c => c.key === activeKey) || { label: "Tümü" }).label} · detay
           </div>
-          <KpiGrid cols={detailKpis.length}>
+          <KpiGrid key={scope} cols={detailKpis.length}>
             {detailKpis.map((d, i) => (
               <Kpi key={i} label={d.label} value={d.value} color={d.color}/>
             ))}
