@@ -242,7 +242,8 @@ app.post('/api/users/:uid/queue', auth.authGuard, handleWrite(async req => {
     else if (scope) { const t = await pool.query('SELECT dept FROM users WHERE id=$1', [uid]); allowed = !!(t.rows[0] && t.rows[0].dept === scope); }
   }
   if (!allowed) { const e = new Error('yetkisiz: bu kişinin iş sırasını değiştirme yetkiniz yok'); e.name = 'ZodError'; e.issues = [{ path: ['yetki'], message: 'yetkisiz' }]; throw e; }
-  return writes.setQueue(uid, { order: req.body?.order, by: req.user && req.user.id });
+  // by: setStatus şema STRING bekler; JWT'de id numerik (dashboard PK) olabilir → geçerli string users.id (slack_id) kullan.
+  return writes.setQueue(uid, { order: req.body?.order, by: req.user && (req.user.slack_id || String(req.user.id)) });
 }));
 
 // Kanban kolon içi iş-sırası. Kapsam backend'de uygulanır: yalnız actor'ün yetkili olduğu brief'ler yazılır.
@@ -252,7 +253,7 @@ app.post('/api/kanban/reorder', auth.authGuard, handleWrite(async req => {
     const me = await pool.query('SELECT sched_scope FROM users WHERE id=$1 OR id=$2 LIMIT 1', [req.user.id, req.user.slack_id || req.user.id]);
     scope = me.rows[0] && me.rows[0].sched_scope;
   }
-  return writes.setKanbanOrder(req.body?.order, { id: req.user && req.user.id, scope });
+  return writes.setKanbanOrder(req.body?.order, { id: req.user && (req.user.slack_id || String(req.user.id)), scope });
 }));
 
 // Onay anındaki son görseli kaydet (Slack bot ✅ handler'ından çağrılır, best-effort)
