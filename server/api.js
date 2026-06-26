@@ -401,6 +401,30 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
     const ed = await getEmbedded();   // tek fetch; tüm tool çağrıları paylaşır
     const ctx = { user: req.user, isAdmin, range, ed };
 
+    // ── KİŞİ-BAZLI ÖĞRENME ─────────────────────────────────────────────
+    // Bu kişinin geçmiş soruları (sık ilgilendiği konular) + olumsuz geri bildirim dersleri →
+    // prompt'a beslenir ki kendine has tekrar eden sorulara daha hızlı/isabetli yardım edilsin.
+    // YALNIZ kendi geçmişi (çapraz kişi sızıntısı yok; hiyerarşiyle uyumlu).
+    let userMemory = '';
+    try {
+      const [lg, fb] = await Promise.all([
+        pool.query(`SELECT soru FROM ody_chat_log WHERE (user_id=$1 OR user_id=$2 OR user_name=$3) AND soru IS NOT NULL
+                    ORDER BY created_at DESC LIMIT 20`, [String(req.user.id || ''), req.user.slack_id || '', req.user.name || '']),
+        pool.query(`SELECT reason FROM ody_advice_feedback WHERE user_id=$1 AND vote='down' AND reason IS NOT NULL
+                    ORDER BY created_at DESC LIMIT 3`, [req.user.slack_id || '']),
+      ]);
+      const sorular = [...new Set(lg.rows.map(r => String(r.soru).trim()).filter(Boolean))].slice(0, 10);
+      if (sorular.length) {
+        userMemory += `\n\n## BU KİŞİYE ÖZEL ÖĞRENME (gizli, ${req.user.name})\n` +
+          `${req.user.name} geçmişte şunları sordu — sık ilgilendiği konuları TANI; bunlardan birine benzer bir soru gelirse hızlı ve isabetli davran, doğru tool'u doğrudan çağır, gereksiz soru sorma:\n- ` +
+          sorular.join('\n- ');
+      }
+      if (fb.rows.length) {
+        userMemory += `\nGeçmiş olumsuz geri bildirimden DERS (tekrarlama, daha iyisini yap):\n- ` +
+          fb.rows.map(r => String(r.reason).slice(0, 160)).join('\n- ');
+      }
+    } catch (e) { /* öğrenme bağlamı best-effort; başarısızsa sessiz geç */ }
+
     const system =
       `Senin adın Ody. Sadece bir yapay zekâ asistanı değil; aynı zamanda Benseno Tasarım Sistemi'nin bir ÇALIŞANI ve DANIŞMANISIN. (Slack botunun adı WT'dir.) ` +
       `Şu an seninle GİRİŞ YAPMIŞ kişi: ${req.user.name}${isAdmin ? ' (yönetici)' : ''}. Onunla bu kişiye özel, ismiyle, sıcak ve yardımsever konuş — kiminle konuştuğunu bil ve ona göre cevap ver. ` +
@@ -416,27 +440,46 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
       `Kişiye özel sorularda ("benim işlerim", "bugün ne yapmalıyım") kisi olarak "${req.user.name}" ile tool çağır. Genel soruları ("kaç iş gecikti") genel tool'larla yanıtla.\n\n` +
       `## BELİRSİZLİK & YARDIM EDEMEME\n` +
       `Bir tool {belirsiz:true, adaylar:[...]} dönerse kendin seçme — hangisini kastettiğini SOR. Bir isteği karşılayamıyorsan (veri yok / yetki yok / kapsam dışı), "karşılayamadım" gibi BOŞ bir cevap verme; NEDENİNİ net söyle ve mümkünse alternatif/yapabileceğini öner. Her zaman yardımcı olmaya çalış.\n\n` +
-      `# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI;
+      `# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI + userMemory;
 
     const convo = msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) }));
+
+    // ── NİYET-BAZLI MODEL SEÇİMİ ───────────────────────────────────────
+    // Rutin/sayısal sorular → Sonnet (hızlı/ucuz). Sentez-ağır (analiz/değerlendir/öneri/özet/
+    // karşılaştır/strateji/neden) → Opus (daha zengin yorum). Sayılar her iki halde de tool'dan = aynı doğruluk.
+    const SONNET = 'claude-sonnet-4-6';
+    const OPUS = process.env.ODY_OPUS_MODEL || 'claude-opus-4-7';   // thread-ozet.js'te kullanılan, hesapta erişilebilir Opus
+    const lastUserMsg = String([...msgs].reverse().find(m => m.role !== 'assistant')?.content || '');
+    const SYNTH_RE = /(analiz|değerlendir|degerlendir|yorumla|\byorum\b|öner|oner|tavsiye|özetle|ozetle|\bözet\b|\bozet\b|strateji|karşılaştır|karsilastir|kıyas|kiyas|sentez|neden|niçin|nicin|niye|durumu.*(özetle|degerlendir|değerlendir|yorumla))/i;
+    let model = SYNTH_RE.test(lastUserMsg) ? OPUS : SONNET;
+    let modelUsed = model;
 
     let final = '';
     const toolsUsed = [];   // sohbet logu için çağrılan tool adları (sırayla)
     let turnsUsed = 0;
     const MAX_TURNS = 5;
+    const aiCall = (mdl, withTools) => fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: mdl, max_tokens: 1500, system,
+        thinking: { type: 'adaptive' },
+        ...(withTools ? { tools: odyTools.TOOLS } : {}),
+        messages: convo,
+      }),
+    });
     for (let turn = 0; turn < MAX_TURNS; turn++) {
       turnsUsed = turn + 1;
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6', max_tokens: 1500, system,
-          thinking: { type: 'adaptive' },
-          ...(turn < MAX_TURNS - 1 ? { tools: odyTools.TOOLS } : {}),
-          messages: convo,
-        }),
-      });
-      const j = await r.json().catch(() => ({}));
+      const withTools = turn < MAX_TURNS - 1;
+      let r = await aiCall(model, withTools);
+      let j = await r.json().catch(() => ({}));
+      // Opus erişilemez/hatalıysa Sonnet'e GÜVENLİ DÜŞÜŞ (kullanıcı yine cevap alsın).
+      if (!r.ok && model !== SONNET) {
+        console.warn('[chat] opus(' + model + ') düştü → sonnet:', j.error?.message || r.status);
+        model = SONNET; modelUsed = SONNET;
+        r = await aiCall(model, withTools);
+        j = await r.json().catch(() => ({}));
+      }
       if (!r.ok) { console.error('[chat] AI hata:', j.error?.message || r.status); return res.status(502).json({ error: 'asistan şu an yanıt veremiyor' }); }
       const blocks = j.content || [];
       final = blocks.filter(c => c.type === 'text').map(c => c.text).join('').trim();
