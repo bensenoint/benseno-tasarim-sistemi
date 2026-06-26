@@ -28,7 +28,7 @@ const NAV_SECTIONS = [
     items: [
       // { id: "gantt",   label: "Plan / Gantt",  icon: "Calendar" },   // GİZLİ (deneme — kullanılmıyor; gerekmezse kaldır)
       { id: "kanban",  label: "Kanban",         icon: "Columns" },
-      { id: "musteride", label: "Müşteri Onayı", icon: "Clock" },
+      // { id: "musteride", label: "Müşteri Onayı", icon: "Clock" },   // GİZLİ — Detay bakış'ta 'Müşteri onayı' filtresi var
     ]
   },
   {
@@ -1171,8 +1171,9 @@ try { window.BnsChatBot = ChatBot; } catch (e) {}
 
 
 // Global tarih aralığı filtresi — preset'ler + özel aralık. Açılış default'u son 30 gün.
-function DateRangeControl({ range, onChange, now, compact }) {
+function DateRangeControl({ range, onChange, now, compact, disabled }) {
   const [open, setOpen] = React.useState(false);
+  React.useEffect(() => { if (disabled) setOpen(false); }, [disabled]);
   const DAY = 86400000;
   const PRESETS = [["today","Bugün",null],["yesterday","Dün",null],["7d","Son 7 gün",7],["30d","Son 30 gün",30],["90d","Son 90 gün",90],["year","Bu yıl",null],["all","Tümü",null]];
   function apply(code, days) {
@@ -1191,11 +1192,14 @@ function DateRangeControl({ range, onChange, now, compact }) {
   React.useEffect(() => { if (open) { const t = toYMD(now); setCFrom(t); setCTo(t); } }, [open]);
   return (
     <div style={{ position: "relative", flexShrink: 0 }}>
-      <button onClick={() => setOpen(o => !o)} title="Tarih aralığı"
+      <button onClick={() => { if (!disabled) setOpen(o => !o); }} disabled={disabled}
+        title={disabled ? "Bu sayfada tarih filtresi uygulanmaz" : "Tarih aralığı"}
         style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: compact ? "5px 7px" : "5px 9px",
-          border: "1px solid var(--line)", borderRadius: 6, background: range.preset === "30d" ? "var(--paper-2)" : "var(--ember-tint)",
-          color: range.preset === "30d" ? "var(--ink-3)" : "var(--ember)", font: "500 11px/1 var(--font-sans)", cursor: "pointer" }}>
-        <span>📅</span>{!compact && <span>{label}</span>}<span style={{ color: "var(--ink-4)" }}>▾</span>
+          border: "1px solid var(--line)", borderRadius: 6,
+          background: disabled ? "var(--paper-2)" : (range.preset === "30d" ? "var(--paper-2)" : "var(--ember-tint)"),
+          color: disabled ? "var(--ink-5)" : (range.preset === "30d" ? "var(--ink-3)" : "var(--ember)"),
+          font: "500 11px/1 var(--font-sans)", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.55 : 1 }}>
+        <span>📅</span>{!compact && <span>{disabled ? "Tarih" : label}</span>}<span style={{ color: "var(--ink-4)" }}>▾</span>
       </button>
       {open && (
         <div onMouseLeave={() => setOpen(false)} style={{ position: "absolute", top: "100%", right: 0, marginTop: 6, zIndex: 80,
@@ -1298,10 +1302,11 @@ function Header({ user, tab, onNav, viewMode, setViewMode, dateRange, setDateRan
           </span>
         )}
 
-        {/* Tarih aralığı filtresi — global, açılışta son 30 gün (mobilde de korunur, ▾ kompakt) */}
+        {/* Tarih aralığı filtresi — global. Kanban'da tarih filtresi anlamsız → pasif. */}
         {dateRange && setDateRange && (
           <DateRangeControl range={dateRange} onChange={setDateRange}
-            now={(window.BNS_DATA && window.BNS_DATA.NOW) || Date.now()} compact={isMobile}/>
+            now={(window.BNS_DATA && window.BNS_DATA.NOW) || Date.now()} compact={isMobile}
+            disabled={tab === "kanban"}/>
         )}
 
         {/* Kapsam (Ben/Dept/Tümü) kaldırıldı — kişi filtresi (profil/kişi) ve departman sayfası bu işi görüyor */}
