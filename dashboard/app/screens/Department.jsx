@@ -103,10 +103,17 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
       />
 
       <div style={{display:"flex", flexDirection:"column", gap:"var(--section-gap)"}}>
-        {/* ⭐ Yıldız karnesi — bu departman (Departmanlar özet ile aynı bileşen, tarihe duyarlı) */}
+        {/* 1) İŞ LİSTESİ (Detay bakış) — EN BAŞTA */}
+        <div>
+          <div style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:"0 0 12px"}}>{r.name} · detay bakış</div>
+          <JobsScreen data={data} dept={role} hideHead
+            onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={tableMode}/>
+        </div>
+
+        {/* 2) ⭐ Yıldız karnesi — Departmanlar özet sayfasıyla AYNI bileşen (accordion'lu), tarihe duyarlı */}
         <StarReport data={data} depts={[role]}/>
 
-        {/* Ekip + Dönemsel özet yan yana (mobilde alt alta) — departman özeti */}
+        {/* 3) Ekip + Dönemsel özet yan yana (mobilde alt alta) — departman özeti */}
         <div className="bn-grid-2" style={{display:"grid", gridTemplateColumns: isManager ? "minmax(0,1fr) minmax(0,1fr)" : "1fr", gap:"var(--section-gap)", alignItems:"start"}}>
         {/* Ekip */}
         <Card padding={0}>
@@ -201,13 +208,6 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
         </Card>
         )}
         </div>
-      </div>
-
-      {/* Detay bakış — bu departmana süzülü (Detay bakış sayfasıyla aynı kartlar + liste + sayfalama) */}
-      <div style={{marginTop:"var(--section-gap)"}}>
-        <div style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:"0 0 12px"}}>{r.name} · detay bakış</div>
-        <JobsScreen data={data} dept={role} hideHead
-          onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={tableMode}/>
       </div>
     </div>
   );
