@@ -410,6 +410,10 @@ function bnsHydrateBrief(raw, idx) {
       }
     }
   }
+  // Canlı veride raw.acilma/gecmis yok ama created_at (DB açılış zamanı) gelir → asıl kaynak bu.
+  if (!acilma && raw.created_at != null) {
+    acilma = typeof raw.created_at === "string" ? Date.parse(raw.created_at) : raw.created_at;
+  }
   // deadline: "18 May 2026", "1 Haziran 2026", ISO veya ms — hepsini destekle
   let deadlineRaw = raw.deadline || raw.deadlineISO;
   let deadline = 0;

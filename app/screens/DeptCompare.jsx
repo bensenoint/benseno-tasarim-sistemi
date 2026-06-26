@@ -36,20 +36,25 @@ function PeriodSebep({ type, skey, range }) {
   };
   const toggle = () => { const n = !open; setOpen(n); if (n) load(); };
 
+  // Fragment: toggle satırın SAĞINA yaslanır (marginLeft:auto), açılan panel ise
+  // flex-basis:100% ile ALT satıra tam genişlik düşer — editoryal yıldız karnesi düzeni.
   return (
-    <div style={{flex:"1 1 100%", minWidth:0, marginTop:2}}>
-      <button onClick={toggle} style={{display:"inline-flex", alignItems:"center", gap:5, background:"none", border:"none", padding:0, cursor:"pointer", font:"500 11.5px/1 var(--font-sans)", color:"var(--ink-4)"}}>
-        <span style={{display:"inline-block", transition:"transform .15s", transform:open?"rotate(90deg)":"none"}}>▸</span>
-        Değerlendirme {open ? "" : "(aç)"}
+    <React.Fragment>
+      <button onClick={toggle} title={open ? "Kapat" : "Döneme özel değerlendirmeyi aç"}
+        style={{marginLeft:"auto", display:"inline-flex", alignItems:"center", gap:6, background:"none", border:"none", padding:"2px 0", cursor:"pointer",
+          font:`${open?600:500} 11px/1 var(--font-sans)`, letterSpacing:".02em", color: open ? "var(--ink-2)" : "var(--ink-4)", flexShrink:0}}>
+        <span style={{display:"inline-block", fontSize:9, transition:"transform .15s", transform:open?"rotate(90deg)":"none", color:"var(--ink-4)"}}>▸</span>
+        Değerlendirme
       </button>
-      {open && <div style={{marginTop:6, font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", overflowWrap:"anywhere"}}>
-        {st.loading ? <span style={{color:"var(--ink-4)"}}>değerlendirme hazırlanıyor…</span>
+      {open && <div style={{flexBasis:"100%", width:"100%", marginTop:4, paddingLeft:13, borderLeft:"2px solid var(--line-strong)",
+        font:"400 12.5px/1.6 var(--font-sans)", color:"var(--ink-2)", overflowWrap:"anywhere"}}>
+        {st.loading ? <span style={{color:"var(--ink-4)", fontStyle:"italic"}}>değerlendirme hazırlanıyor…</span>
          : st.err ? <span style={{color:"var(--ink-4)"}}>{st.err}</span>
          : st.bos ? <span style={{color:"var(--ink-4)"}}>Bu dönemde değerlendirilecek tamamlanan iş yok.</span>
          : st.text ? <Linkify text={st.text}/>
          : <span style={{color:"var(--ink-4)"}}>—</span>}
       </div>}
-    </div>
+    </React.Fragment>
   );
 }
 
