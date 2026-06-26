@@ -57,6 +57,7 @@ function PeriodSebep({ type, skey, range }) {
     </React.Fragment>
   );
 }
+window.PeriodSebep = PeriodSebep;  // Marka detay gibi diğer ekranlar da lazy dönem-yorumunu kullanabilsin.
 
 function StarReport({ data, depts }) {
   const list = depts || BNS_DEPTS;

@@ -224,23 +224,6 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
         <Kpi label="Ort. revize" value={stats.avgRev != null ? stats.avgRev : "—"} sub={stats.rating != null ? "puan " + stats.rating : undefined}/>
       </div>
 
-      {/* ⭐ Marka yıldız puanı + sebep açıklaması */}
-      {(() => {
-        const why = (typeof window.bnsSebepFor === "function" && window.bnsSebepFor("marka", brand, data.dateRange))
-          || (typeof window.bnsSebep === "function" ? window.bnsSebep("marka", brand) : null);
-        if (!stats.rating && !why) return null;
-        return (
-          <div style={{display:"flex", flexWrap:"wrap", alignItems:"flex-start", gap:10, rowGap:8, marginBottom:"var(--section-gap)", padding:"10px 14px", background:"var(--surface)", border:"1px solid var(--line)", borderRadius:0}}>
-            <span style={{display:"inline-flex", gap:1, paddingTop:2}}>
-              {[1,2,3,4,5].map(i => <I.StarFill key={i} size={13} color={i <= Math.round(why?.rating_avg || stats.rating || 0) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
-            </span>
-            <span style={{font:"600 14px/1.4 var(--font-mono)", color:"var(--ink)"}}>{why?.rating_avg || stats.rating}</span>
-            {why?.rating_count != null && <span style={{font:"400 11px/1.5 var(--font-sans)", color:"var(--ink-4)"}}>({why.rating_count} iş)</span>}
-            {why && <MobileAccordion title="Değerlendirme"><span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}><Linkify text={why.sebep}/></span></MobileAccordion>}
-          </div>
-        );
-      })()}
-
       {/* Filtreler */}
       <Card style={{ marginBottom:"var(--section-gap)" }}>
         <div className="bns-chip-scroll" style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
@@ -347,6 +330,30 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
           </div>
         </Card>
       )}
+
+      {/* ⭐ Marka yıldız karnesi — LİSTENİN ALTINDA, döneme özel lazy değerlendirme */}
+      {(() => {
+        const rated = done.filter(c => c.rating > 0);
+        const avg = rated.length ? +(rated.reduce((s, c) => s + c.rating, 0) / rated.length).toFixed(1) : 0;
+        const PS = window.PeriodSebep;
+        return (
+          <Card style={{ marginTop:"var(--section-gap)" }}>
+            <div style={{ font:"600 9.5px/1 var(--font-sans)", color:"var(--ink-4)", textTransform:"uppercase", letterSpacing:"0.07em" }}>⭐ Yıldız Karnesi</div>
+            <div style={{ display:"flex", flexWrap:"wrap", alignItems:"flex-start", gap:12, rowGap:6, marginTop:10 }}>
+              <span style={{ font:"600 13px/1.3 var(--font-sans)", color:"var(--ink)", minWidth:120, flexShrink:0 }}>{brand}</span>
+              <span style={{ display:"inline-flex", gap:1, flexShrink:0, paddingTop:1 }}>
+                {[1,2,3,4,5].map(i => <I.StarFill key={i} size={12} color={i <= Math.round(avg) ? "var(--prio-yellow)" : "var(--line-strong)"}/>)}
+              </span>
+              <span style={{ font:"600 13px/1.3 var(--font-mono)", color:"var(--ink)", flexShrink:0 }}>{rated.length ? avg : "—"}</span>
+              <span style={{ font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)", flexShrink:0 }}>({rated.length} iş)</span>
+              {PS && <PS type="marka" skey={brand} range={data.dateRange}/>}
+            </div>
+            <div style={{ marginTop:8, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)" }}>
+              Puan ortalaması seçili tarih aralığındaki tamamlanan işlerden · Değerlendirmeyi açtığında o döneme özel yorum üretilir
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* 📡 Kanal Özeti & 🌙 Gün Sonu Insight — günlük arşiv + tarih filtresi */}
       <BrandDailyPanel brand={brand}/>

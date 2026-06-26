@@ -101,6 +101,7 @@ app.get('/api/sebep-period', readGuard, async (req, res) => {
     let comp = (ed.bns_completed || []).filter(c => typeof c.bitis === 'number' && c.bitis >= fromMs && c.bitis <= toMs);
     if (type === 'dept') comp = comp.filter(onDept);
     else if (type === 'kisi') comp = comp.filter(onKisi);
+    else if (type === 'marka') comp = comp.filter(c => c.marka === key);
     if (!comp.length) return res.json({ sebep: null, bos: true });
 
     // Deterministik özet (DB) — model SAYI uydurmaz, yalnız ifadelendirir.

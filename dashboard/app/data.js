@@ -601,21 +601,22 @@ function bnsMapEvent(e) {
   const det = e.detail || {};
   const raw = e.verb || "";
   let kind, action, tag = null;
+  // Her satırda NET action (ne yapıldı) + SAĞDA uygun etiket (hangi sonuç/alan).
   if (raw.indexOf("durum:") === 0) {
     const st = raw.slice(6) || det.durum || det.yeni_durum || "";
-    kind = (st === "tamamlandi") ? "done" : "status";
-    action = (st === "tamamlandi") ? "İşi tamamladı" : ('Durumu "' + (STATUS_TR[st] || st) + '" yaptı');
-  } else if (raw === "olusturuldu") { kind = "open"; action = "İşi açtı"; }
+    if (st === "tamamlandi") { kind = "done"; action = "İşi tamamladı"; tag = "Tamamlandı"; }
+    else { kind = "status"; action = "Durumu güncelledi"; tag = STATUS_TR[st] || st || "Durum"; }
+  } else if (raw === "olusturuldu") { kind = "open"; action = "Yeni brief açtı"; tag = "Yeni"; }
   else if (raw === "düzenlendi") {
     const al = Array.isArray(det.alanlar) ? det.alanlar : [];
     kind = (al.indexOf("işi yapanlar") >= 0) ? "assign" : "edit";
-    action = "düzenledi";
+    action = "Düzenledi";
     // Satır sonundaki etiket: hangi alan(lar) düzenlendi (termin / işi yapanlar …)
-    tag = al.length ? al.map(a => String(a).charAt(0).toLocaleUpperCase("tr") + String(a).slice(1)).join(", ") : null;
-  } else if (raw === "silindi") { kind = "delete"; action = "İşi sildi"; }
-  else if (raw === "geri alındı") { kind = "delete"; action = "İşi geri aldı"; }
-  else if (raw === "finans") { kind = "finance"; action = "Finans bilgisini güncelledi"; }
-  else { kind = "other"; action = raw || "işlem yaptı"; }
+    tag = al.length ? al.map(a => String(a).charAt(0).toLocaleUpperCase("tr") + String(a).slice(1)).join(", ") : "Düzenleme";
+  } else if (raw === "silindi") { kind = "delete"; action = "İşi sildi"; tag = "Silindi"; }
+  else if (raw === "geri alındı") { kind = "delete"; action = "İşi geri aldı"; tag = "Geri alındı"; }
+  else if (raw === "finans") { kind = "finance"; action = "Finans güncelledi"; tag = "Finans"; }
+  else { kind = "other"; action = raw || "İşlem yaptı"; tag = null; }
   return {
     t: e.t, who: e.who || "system",
     no: e.no || null,   // tıklayınca iş detayını açmak için
