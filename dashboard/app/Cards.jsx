@@ -65,14 +65,105 @@ function CountUp({ value }) {
   return disp == null ? value : disp;
 }
 
+// KPI kartları için merkezi açıklama sözlüğü — fareyle üzerine gelince "neyi gösteriyor" tooltip'i.
+// Açık `title` prop'u verilirse o öncelikli; yoksa label'a göre (gerekirse " · " ekinden arındırılmış) eşleşir.
+const KPI_HINTS = {
+  // Durum / sayım kartları
+  "Aktif brief": "Şu an aktif olan brief sayısı (anlık; müşteride ve tamamlanmış hariç).",
+  "Aktif iş": "Seçili dönemde aktif olmuş benzersiz iş.",
+  "Aktif işler": "Seçili tarih aralığında bir an aktif olmuş benzersiz iş (dönemsel; müşteride + tamamlanmış hariç).",
+  "Aktif": "Aktif (devam eden) iş sayısı.",
+  "Müşteride": "Müşteri onayında bekleyen işler.",
+  "Müşteriye Yollandı": "Müşteriye gönderilip onay bekleyen işler.",
+  "Onay bekleyen": "Müşteri onayı bekleyen işler.",
+  "Geciken": "Teslim tarihi geçmiş (geciken) işler.",
+  "Gecikmiş": "Teslim tarihi geçmiş işler.",
+  "Bugün teslim": "Teslim tarihi bugün olan işler.",
+  "Bugün": "Bugüne ait / bugün teslimi olan işler.",
+  "Bu hafta": "Bu hafta teslimi olan işler.",
+  "İncelemede": "İnceleme aşamasındaki işler.",
+  "İş Kabulü / İş planında": "İş planına alınmış, henüz başlanmamış işler.",
+  "İş planında": "İş planına alınmış, henüz başlanmamış işler.",
+  "Beklemede": "Beklemeye alınmış işler.",
+  "Blokeli": "Engellenmiş (blokeli) işler.",
+  "Revizyon": "Revizyon aşamasındaki işler.",
+  "Yeni": "Yeni açılmış, henüz işlenmemiş işler.",
+  "İşe başlandı": "Üzerinde çalışılmaya başlanan işler.",
+  "Yeniden açıldı": "Tamamlandıktan sonra yeniden açılan işler.",
+  "Tamamlandı": "Seçili dönemde tamamlanan işler.",
+  "Tamamlanan": "Seçili dönemde tamamlanan işler.",
+  "Hareketsiz": "Uzun süredir hareket görmeyen (atıl) işler.",
+  "Hareketsiz brief": "Uzun süredir hareket görmeyen (atıl) brief'ler.",
+  "Acil": "Önceliği ACİL olan işler.",
+  "Acil / geçmiş": "Acil veya teslim tarihi geçmiş işler.",
+  "Yüksek": "Önceliği YÜKSEK olan işler.",
+  "Normal": "Önceliği NORMAL olan işler.",
+  "Düşük": "Önceliği DÜŞÜK olan işler.",
+  "Termin riski": "Teslime az kalmış, gecikme riski taşıyan işler.",
+  "Müşteri dönüşü": "Müşteri dönüşü bekleyen işler.",
+  // Kişi / kapasite
+  "Kapasite": "Doluluk oranı (%) — aktif yük / kapasite.",
+  "En yoğun": "En çok aktif işi olan kişi/departman.",
+  "Kişi": "Bu gruptaki farklı kişi sayısı.",
+  "Contributor": "Katkı veren (contributor) olarak yer alınan işler.",
+  "Lead olarak": "Lead (sorumlu) olarak yürütülen işler.",
+  // Marka
+  "Marka": "Bu gruptaki farklı marka sayısı.",
+  "Toplam marka": "Toplam marka sayısı.",
+  "Sorunlu marka": "En çok geciken / sorunlu marka.",
+  "Ort. brief/marka": "Marka başına ortalama brief sayısı.",
+  // Süre / ortalama
+  "Ort. süre": "İş başına ortalama çalışma süresi.",
+  "Ort. tamamlama": "Ortalama tamamlanma süresi.",
+  "Ortalama tamamlama": "Ortalama tamamlanma süresi.",
+  "Ort. gecikme": "Geciken işlerde ortalama gecikme.",
+  "Ort. bekleme": "Ortalama bekleme (müşteride/duraklatma) süresi.",
+  "Ort. puan": "Tamamlanan işlerin ortalama puanı (1–5).",
+  "Ort. revize": "İş başına ortalama revize sayısı.",
+  "Ort. revize/iş": "İş başına ortalama revize sayısı.",
+  "Ort. açık yaş": "İşlerin açılışından bu yana geçen ortalama süre.",
+  "Ort. süredir": "İşlerin mevcut durumda kalma süresi (ortalama).",
+  "Ort. müşteride": "Müşteride ortalama bekleme süresi.",
+  "Ort. kalan": "Teslime ortalama kalan süre.",
+  "En çok geciken": "En fazla geciken işin gecikme süresi.",
+  "En uzun bekleyen": "Müşteride en uzun süredir bekleyen iş.",
+  "Çıktı hızı": "Birim zamanda tamamlanan iş (üretim hızı).",
+  // Revize / gönderim / toplam
+  "Toplam revize": "Toplam revize sayısı.",
+  "Tamamlanan rev.": "Tamamlanan işlerdeki toplam revize.",
+  "Aktif iş rev.": "Aktif işlerdeki toplam revize.",
+  "İç revize": "Müşteriye gitmeden yapılan revizeler.",
+  "Müşteri revize": "Müşteri dönüşüyle yapılan revizeler.",
+  "Revize oranı": "Revize alan işlerin oranı.",
+  "Toplam gönderim": "Müşteriye toplam gönderim sayısı.",
+  "Toplam saat": "Toplam çalışma saati.",
+  "Toplam": "Toplam (saat).",
+  "Adet": "Bu gruptaki iş sayısı.",
+  "Uzatılmış": "Termini uzatılmış işler.",
+  "Uzatılarak": "Termini uzatılarak teslim edilen işlerin oranı.",
+  "Zamanında": "Zamanında teslim edilen işlerin oranı.",
+  // Finans / teslim
+  "Fatura kesildi": "Faturası kesilen işler.",
+  "Ödeme yapıldı": "Ödemesi yapılan işler.",
+  "Final teslim (galeri)": "Galeriye final teslim edilen işler.",
+  "Sıralı iş": "Sıralı (zincir) akışlı işler.",
+  "Benseno (tüm firma)": "Tüm firma geneli özet.",
+};
+try { window.BNS_KPI_HINTS = KPI_HINTS; } catch (e) {}
+function kpiHint(label) {
+  if (!label) return undefined;
+  return KPI_HINTS[label] || KPI_HINTS[String(label).split(" · ")[0].trim()] || undefined;
+}
+
 // Kpi has three variants: "plain" | "trendchart" | "hero"
 function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, accent, onClick, active, emphasis, tint, title }) {
   const [hov, setHov] = React.useState(false);
   // Determine left-border accent color from color prop or trend
   const borderAccent = accent || color || null;
+  const tip = title || kpiHint(label);
   return (
     <div
-      title={title || undefined}
+      title={tip || undefined}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       onClick={onClick}
