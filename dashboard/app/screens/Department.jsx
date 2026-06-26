@@ -17,23 +17,32 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
   const people = data.USERS.filter(u => (u.dept || u.rol) === role);
   // Department her zaman bu rolün tüm briefler'ini gösterir — viewMode (mine/dept/all) etkilemez.
   const allBriefs = (data._allBriefs || data.briefs).filter(b => b.durum !== "musteride"); // müşteridekiler yük sayılmaz
+  // Kapasite/kişi yükü tarihe duyarlı: seçili aralığın SONU geçmişteyse o tarihte açık
+  // olan işleri zaman damgalarından geri-hesapla; bugünü kapsıyorsa güncel küme.
+  const _now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
+  const _dr = data.dateRange || {};
+  const _cutoff = (typeof _dr.to === "number" && _dr.to < _now) ? _dr.to : null;
+  const _allCompleted = data._allCompleted || data.completed || [];
+  const capBriefs = bnsBriefsAsOf((data._allBriefs || data.briefs), _allCompleted, _cutoff).filter(b => b.durum !== "musteride");
   // TEK KURAL: aktif iş kümesi ve kapasite, Genel bakış'la AYNI bnsDeptActive/bnsDeptCapPct üzerinden hesaplanır.
+  // İş LİSTESİ (rows) her zaman güncel; kapasite/yük tarihe duyarlı (capBriefs).
   const rows = bnsDeptActive(allBriefs, role);
   const overdueCount = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length;
-  const capPct = (r.stats && r.stats.capacity) ? bnsDeptCapPct(allBriefs, r.stats, role) : _capPctFromStats;
+  const capPct = (r.stats && r.stats.capacity) ? bnsDeptCapPct(capBriefs, r.stats, role) : _capPctFromStats;
   const reviewCount = rows.filter(b => b.durum === "incelemede").length;
   const thisWeek = rows.filter(b => b.deltaH > 0 && b.deltaH <= 168).length;
 
-  // Load per person
+  // Load per person — tarihe duyarlı küme (capBriefs) üzerinden.
   const loadByPerson = people.map(p => {
-    const my = allBriefs.filter(b => (b.lead && b.lead.id === p.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id)));
-    const myOverdue = my.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length;
+    const my = capBriefs.filter(b => (b.lead && b.lead.id === p.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id)));
+    const myOverdue = my.filter(b => _cutoff ? (typeof b.deadline === "number" && b.deadline < _cutoff) : (b.deltaH <= 0 && b.durum !== "tamamlandi")).length;
     return {
       user: p,
       active: my.length,
       overdue: myOverdue,
-      // Profil ekranıyla AYNI kapasite hesabı (data.js bnsPersonCapPct) — tutarlılık şart.
-      load: Math.max(0, bnsPersonCapPct(p, my.length) + (p.isNew ? -10 : 0))
+      // Profil ekranıyla AYNI kapasite hesabı — rol ağırlıklı (işçi 5/lead 2/gözlemci 1),
+      // işçi-eşdeğerine çevrilip (yük/5) limite bölünür. bnsPersonLoad gözlemcileri de sayar.
+      load: Math.max(0, bnsPersonCapPct(p, bnsPersonLoad(capBriefs, p.id) / 5) + (p.isNew ? -10 : 0))
     };
   });
 

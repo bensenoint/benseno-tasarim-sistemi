@@ -158,7 +158,9 @@ function PanomScreen(props) {
       var over = act.filter(function (b) { return b.deltaH != null && b.deltaH <= 0; });
       var cli = briefs.filter(function (b) { return b.durum === "musteride"; });
       var aktifMine = briefs.filter(function (b) { return mine(b) && b.durum !== "musteride" && b.durum !== "tamamlandi"; }).length;
-      var pct = window.bnsPersonCapPct ? window.bnsPersonCapPct(me, aktifMine) : 0;
+      // Rol ağırlıklı yük (işçi 5/lead 2/gözlemci 1) → işçi-eşdeğeri (yük/5) → kapasite %.
+      var loadMine = (window.bnsPersonLoad && me) ? window.bnsPersonLoad(briefs, me.id) / 5 : aktifMine;
+      var pct = window.bnsPersonCapPct ? window.bnsPersonCapPct(me, loadMine) : 0;
       var cell = function (v, lbl, col) { return h("div", { style: { flex: 1, textAlign: "center" } }, h("div", { style: { font: "600 30px/1 var(--font-display, serif)", color: col || "var(--ink)" } }, v), h("div", { style: { font: "400 10.5px/1 var(--font-sans)", color: "var(--ink-4)", marginTop: 5, textTransform: "uppercase", letterSpacing: ".05em" } }, lbl)); };
       return h("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 8 } },
         cell(act.length, "aktif"), cell(over.length, "geciken", over.length ? "var(--prio-red)" : null), cell(cli.length, "müşteride", "var(--ember)"), cell("%" + pct, "kapasiten", pct >= 90 ? "var(--prio-red)" : pct >= 70 ? "var(--prio-orange)" : "var(--prio-green)"));
@@ -176,7 +178,9 @@ function PanomScreen(props) {
     if (type === "capacity") {
       var aktif = briefs.filter(function (b) { return mine(b) && b.durum !== "musteride" && b.durum !== "tamamlandi"; }).length;
       var limit = window.bnsPersonCapLimit ? window.bnsPersonCapLimit(me) : 6;
-      var p2 = window.bnsPersonCapPct ? window.bnsPersonCapPct(me, aktif) : 0;
+      // Rol ağırlıklı yük (işçi 5/lead 2/gözlemci 1) → işçi-eşdeğeri (yük/5) → kapasite %.
+      var loadEq = (window.bnsPersonLoad && me) ? window.bnsPersonLoad(briefs, me.id) / 5 : aktif;
+      var p2 = window.bnsPersonCapPct ? window.bnsPersonCapPct(me, loadEq) : 0;
       var col = p2 >= 90 ? "var(--prio-red)" : p2 >= 70 ? "var(--prio-orange)" : "var(--prio-green)";
       return h(React.Fragment, null,
         h("div", { style: { display: "flex", alignItems: "baseline", gap: 10 } }, h("div", { style: { font: "500 48px/0.9 var(--font-display, serif)", color: col } }, "%" + p2), h("div", { style: { font: "400 13px/1 var(--font-mono)", color: "var(--ink-4)" } }, aktif + "/" + limit)),

@@ -455,6 +455,7 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
     let modelUsed = model;
 
     let final = '';
+    let blocks = [];        // son AI yanıt blokları (döngü sonrası boş-cevap güvenliği için kapsam dışına taşındı)
     const toolsUsed = [];   // sohbet logu için çağrılan tool adları (sırayla)
     let turnsUsed = 0;
     const MAX_TURNS = 5;
@@ -462,7 +463,7 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: mdl, max_tokens: 1500, system,
+        model: mdl, max_tokens: 4000, system,
         thinking: { type: 'adaptive' },
         ...(withTools ? { tools: odyTools.TOOLS } : {}),
         messages: convo,
@@ -481,7 +482,7 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
         j = await r.json().catch(() => ({}));
       }
       if (!r.ok) { console.error('[chat] AI hata:', j.error?.message || r.status); return res.status(502).json({ error: 'asistan şu an yanıt veremiyor' }); }
-      const blocks = j.content || [];
+      blocks = j.content || [];
       final = blocks.filter(c => c.type === 'text').map(c => c.text).join('').trim();
       if (j.stop_reason !== 'tool_use') break;
       // Tool çağrılarını çalıştır, sonuçları konuşmaya ekle.
@@ -494,6 +495,17 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
         toolResults.push({ type: 'tool_result', tool_use_id: b.id, content: JSON.stringify(out) });
       }
       convo.push({ role: 'user', content: toolResults });
+    }
+    // Boş-cevap güvenliği: tool döngüsü/düşünme bütçesi metni yutmuşsa, toplanan
+    // veriyle bir kez daha — metni ZORLA (tool yok, Sonnet metni güvenilir döndürür).
+    if (!final && Array.isArray(blocks) && !blocks.some(c => c.type === 'tool_use')) {
+      try {
+        convo.push({ role: 'assistant', content: blocks.length ? blocks : [{ type: 'text', text: '...' }] });
+        convo.push({ role: 'user', content: 'Yukarıda topladığın verilerle kullanıcının son sorusunu ŞİMDİ net ve doğrudan yanıtla. Tool çağırma; sadece cevabı yaz.' });
+        const r2 = await aiCall(SONNET, false);
+        const j2 = await r2.json().catch(() => ({}));
+        if (r2.ok) { final = (j2.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim(); modelUsed = SONNET; }
+      } catch (e) { console.error('[chat] boş-cevap retry hata:', e.message); }
     }
     const reply = final || 'İsteğini tam karşılayamadım, tekrar dener misin?';
     res.json({ reply });

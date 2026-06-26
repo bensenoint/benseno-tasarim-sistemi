@@ -220,18 +220,23 @@ defs.gecikme_analizi = {
 };
 
 defs.kapasite = {
-  description: 'Kişi başına AKTİF iş yükü (kaç açık brief). Opsiyonel kisi parametresi tek kişiyi döner; yoksa tüm ekip azalan sırada.',
+  description: 'Kişi başına AKTİF iş yükü. Yük ROL AĞIRLIKLI: işi yapan=5, lead=2, gözlemci=1. "yuk" = ağırlıklı toplam, "aktif" = işçi+lead iş sayısı (gözlemci hariç). Liste yük\'e göre azalan. Opsiyonel kisi parametresi tek kişiyi döner.',
   input_schema: { type: 'object', properties: { kisi: { type: 'string' } } },
   run(input, ctx) {
+    const W = { worker: 5, lead: 2, observer: 1 };
     const load = {};
+    const bump = (p, w, no, isAktif) => {
+      if (!p || !p.id) return;
+      const e = (load[p.id] = load[p.id] || { kisi: p.name, aktif: 0, yuk: 0, nos: [] });
+      e.yuk += w;
+      if (isAktif) { e.aktif++; e.nos.push(no); }
+    };
     for (const b of (ctx.ed.bns_briefs || [])) {
-      for (const p of [...(b.workers || []), ...(b.leads || [])]) {
-        if (!p.id) continue;
-        (load[p.id] = load[p.id] || { kisi: p.name, aktif: 0, nos: [] });
-        load[p.id].aktif++; load[p.id].nos.push(b.no);
-      }
+      for (const p of (b.workers || [])) bump(p, W.worker, b.no, true);
+      for (const p of (b.leads || [])) bump(p, W.lead, b.no, true);
+      for (const p of (b.observers || [])) bump(p, W.observer, b.no, false);
     }
-    let list = Object.values(load).sort((a, b) => b.aktif - a.aktif);
+    let list = Object.values(load).sort((a, b) => b.yuk - a.yuk);
     if (input.kisi) {
       const pr = resolvePerson(ctx.ed, input.kisi);
       if (pr.belirsiz) return { belirsiz: true, adaylar: pr.adaylar };

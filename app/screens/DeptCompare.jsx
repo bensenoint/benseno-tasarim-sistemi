@@ -63,30 +63,42 @@ function DeptCompareScreen({ data }) {
   };
   const allBriefs    = data._allBriefs    || data.briefs    || [];
   const allCompleted = data.completed || data._allCompleted || [];   // seçili tarih aralığına süzülü
+  const _allCompleted = data._allCompleted || data.completed || []; // TÜM tamamlananlar (geri-hesaplama için)
   const RANGE_LABELS = { today:"Bugün", yesterday:"Dün", "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Seçili aralık" };
   const rangeLabel = RANGE_LABELS[(data.dateRange || {}).preset] || "Seçili aralık";
+
+  // Aktif yük / kapasite tarihe duyarlı: seçili aralığın SONU geçmişteyse, o tarihte
+  // açık olan iş kümesini zaman damgalarından geri-hesapla; bugünü kapsıyorsa güncel.
+  const _now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
+  const _dr = data.dateRange || {};
+  const cutoff = (typeof _dr.to === "number" && _dr.to < _now) ? _dr.to : null;
+  const asOfBriefs = bnsBriefsAsOf(allBriefs, _allCompleted, cutoff);
 
   function deptCompleted(role) { return allCompleted.filter(c => bnsCompletedInDept(c, role)); }
 
   const d = {};
   for (const role of BNS_DEPTS) {
-    const active = bnsDeptActive(allBriefs, role);
+    const active = bnsDeptActive(asOfBriefs, role);
     const doneR = deptCompleted(role);                              // aralıkta tamamlanan
     const sures = doneR.filter(c => c.sureH > 0).map(c => c.sureH);
     const avgH  = sures.length ? Math.round(sures.reduce((a,v)=>a+v,0)/sures.length) : 0;
     const revs  = doneR.map(c => c.revision || 0);
     const avgRev = revs.length ? parseFloat((revs.reduce((a,v)=>a+v,0)/revs.length).toFixed(2)) : 0;
     const stat = { ...DEPT_DEF[role], ...(raw[role] || {}) };
+    // Geciken: geçmiş modda o tarihte deadline geçmiş açık işler; bugünde mevcut delta.
+    const overdue = cutoff
+      ? active.filter(b => typeof b.deadline === "number" && b.deadline < cutoff).length
+      : active.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length;
     d[role] = {
       name: stat.name || (BNS_DEPT_TR[role]),
       people: stat.people || 0,
       capacity: stat.capacity || 0,
       active: active.length,
-      overdue: active.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length,
+      overdue,
       completed: doneR.length,                                     // aralıkta tamamlanan
       avgComplete: avgH,
       revRate: avgRev,
-      capacity_pct: (stat.capacity > 0) ? bnsDeptCapPct(allBriefs, stat, role) : 0,
+      capacity_pct: (stat.capacity > 0) ? bnsDeptCapPct(asOfBriefs, stat, role) : 0,
     };
   }
 

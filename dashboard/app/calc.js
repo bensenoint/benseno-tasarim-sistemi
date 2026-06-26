@@ -26,10 +26,78 @@ function bnsDeptActive(briefs, deptKey) {
     return Array.isArray(b.contributors) && b.contributors.some(function (c) { return c && (c.dept || c.rol) === deptKey; });
   });
 }
-// Departman kapasite yüzdesi — pay: bnsDeptActive sayısı, payda: stats.capacity. Her iki sayfa da bunu çağırır.
+// ── Rol bazlı iş yükü katsayıları ───────────────────────────────────────────
+// Bir işte: işi yapan (worker/contributor)=5, lead=2, gözlemci=1. Yük bu ağırlıkların
+// toplamıdır. Kapasite yüzdesinde ağırlıklı yük "işçi-eşdeğeri iş sayısına" çevrilir
+// (yük/5): saf işçi N iş = N (eski davranışla birebir), lead N iş = 0.4N, gözlemci = 0.2N.
+var BNS_ROLE_W = { worker: 5, lead: 2, observer: 1 };
+// Bir kişinin tek bir briefteki rol ağırlığı (en yüksek rol geçerli: işçi > lead > gözlemci).
+function bnsBriefLoadWeight(b, userId) {
+  if (!b || !userId) return 0;
+  var has = function (arr) { return Array.isArray(arr) && arr.some(function (p) { return p && p.id === userId; }); };
+  if (has(b.workers || b.contributors)) return BNS_ROLE_W.worker;
+  if (has(b.leads) || (b.lead && b.lead.id === userId)) return BNS_ROLE_W.lead;
+  if (has(b.observers)) return BNS_ROLE_W.observer;
+  return 0;
+}
+// Kişinin verilen briefler üzerindeki AĞIRLIKLI yükü (müşteride/tamamlandı hariç).
+function bnsPersonLoad(briefs, userId) {
+  if (!Array.isArray(briefs) || !userId) return 0;
+  var sum = 0;
+  for (var i = 0; i < briefs.length; i++) {
+    var b = briefs[i];
+    if (!b || b.durum === 'musteride' || b.durum === 'tamamlandi') continue;
+    sum += bnsBriefLoadWeight(b, userId);
+  }
+  return sum;
+}
+// Departmanın AĞIRLIKLI yükü — her aktif briefte o departmana ait tüm atananların
+// rol ağırlıkları toplanır (işçi 5 + lead 2 + gözlemci 1).
+function bnsDeptLoad(briefs, deptKey) {
+  if (!Array.isArray(briefs) || !deptKey) return 0;
+  var inDept = function (p) { return p && (p.dept || p.rol) === deptKey; };
+  var sum = 0;
+  briefs.forEach(function (b) {
+    if (!b || b.durum === 'musteride' || b.durum === 'tamamlandi') return;
+    (b.workers || b.contributors || []).forEach(function (p) { if (inDept(p)) sum += BNS_ROLE_W.worker; });
+    (b.leads || (b.lead ? [b.lead] : [])).forEach(function (p) { if (inDept(p)) sum += BNS_ROLE_W.lead; });
+    (b.observers || []).forEach(function (p) { if (inDept(p)) sum += BNS_ROLE_W.observer; });
+  });
+  return sum;
+}
+// Departman kapasite yüzdesi — pay: ağırlıklı yükün işçi-eşdeğeri (bnsDeptLoad/5),
+// payda: stats.capacity. Her iki sayfa da bunu çağırır.
 function bnsDeptCapPct(briefs, s, deptKey) {
   if (!s || !s.capacity) return 0;
-  return Math.min(100, Math.round((bnsDeptActive(briefs, deptKey).length / s.capacity) * 100));
+  return Math.min(100, Math.round(((bnsDeptLoad(briefs, deptKey) / 5) / s.capacity) * 100));
+}
+
+// ── Tarihe duyarlı "o gün açık olan işler" (geri-hesaplama) ─────────────────
+// cutoffMs anında AÇIK olan brief kümesini zaman damgalarından üretir:
+//   • Halen aktif briefler: oluşturma ≤ cutoff (cutoff'tan sonra açılanlar hariç).
+//   • O tarihte açıkken sonradan tamamlananlar: doğum ≤ cutoff VE bitiş > cutoff
+//     → bunlar durum:'devam' klonuyla döner ki dept/yük guard'ları saysın.
+// Yaklaşıktır: geçmiş departman/rol ataması yerine GÜNCEL atama kullanılır,
+// durum geçmişi yoktur (güncel müşteride/tamamlandı durumu uygulanır).
+function bnsBriefsAsOf(briefs, completed, cutoffMs) {
+  if (cutoffMs == null) return briefs || [];
+  var out = [];
+  var bornOf = function (x) { return (x && x.created_at != null) ? x.created_at : (x && x.baslangic != null ? x.baslangic : null); };
+  (briefs || []).forEach(function (b) {
+    if (!b) return;
+    var born = bornOf(b);
+    if (born == null || born <= cutoffMs) out.push(b);
+  });
+  (completed || []).forEach(function (c) {
+    if (!c || typeof c.bitis !== 'number') return;
+    var born = bornOf(c);
+    if ((born == null || born <= cutoffMs) && c.bitis > cutoffMs) {
+      // tamamlanmış kaydı "o gün açık iş" gibi say: terminal durumu nötrle.
+      var clone = {}; for (var k in c) clone[k] = c[k]; clone.durum = 'devam';
+      out.push(clone);
+    }
+  });
+  return out;
 }
 
 // ── Yarım gün / part-time çalışanlar — kapasite çarpanı (1 = tam gün) ───────
@@ -184,5 +252,5 @@ function bnsDeliveryStatus(bitisMs, deadlineMs, beklemeMs, uzatildi) {
 
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H };
 }
