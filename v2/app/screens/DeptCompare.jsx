@@ -12,13 +12,15 @@ function bnsCompletedInDept(c, role) {
 }
 
 // ⭐ Yıldız Karnesi — ORTAK bileşen. Puan ortalamaları SEÇİLİ TARİH ARALIĞINDAKİ tamamlanan işlerin
-// rating'lerinden hesaplanır (tarihe duyarlı). Sebep açıklamaları (AI) günlük anlık snapshot'tan gelir.
+// rating'lerinden hesaplanır. AI sebep açıklamaları da tarihe duyarlı: seçili aralığın
+// sonunda yürürlükte olan dönem yorumu gösterilir (bnsSebepFor → tarihli arşiv).
 function StarReport({ data, depts }) {
   const list = depts || BNS_DEPTS;
   const comp = data.completed || [];           // üst global tarih aralığına süzülü
   const rated = comp.filter(c => c.rating > 0);
   const avgOf = (arr) => arr.length ? arr.reduce((s, c) => s + c.rating, 0) / arr.length : 0;
-  const sebep = (t, k) => (typeof window.bnsSebep === "function" && window.bnsSebep(t, k)) || null;
+  const sebep = (t, k) => (typeof window.bnsSebepFor === "function" && window.bnsSebepFor(t, k, data.dateRange))
+    || (typeof window.bnsSebep === "function" && window.bnsSebep(t, k)) || null;
   const firmaAvg = +avgOf(rated).toFixed(1), firmaCnt = rated.length;
 
   const Row = ({ label, avg, cnt, why, big }) => (
@@ -44,7 +46,7 @@ function StarReport({ data, depts }) {
         })}
       </div>
       <div style={{marginTop:8, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
-        Puan ortalamaları seçili tarih aralığındaki tamamlanan işlerden · AI sebep açıklamaları her gün 18:45'te güncellenir
+        Puan ortalamaları seçili tarih aralığındaki tamamlanan işlerden · AI sebep açıklamaları o döneme ait (her gün 18:45'te arşivlenir)
       </div>
     </Card>
   );

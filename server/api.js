@@ -402,13 +402,21 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
     const ctx = { user: req.user, isAdmin, range, ed };
 
     const system =
-      `Senin adın Ody — Benseno Tasarım Sistemi'nin asistanısın (Slack botunun adı WT'dir). Şu an seninle GİRİŞ YAPMIŞ kullanıcı: ${req.user.name}${isAdmin ? ' (yönetici)' : ''}. ` +
-      `Türkçe, kısa ve net konuş; gerektiğinde adım adım yönlendir, uygun yerde öneri sun. ` +
-      `\n\nÇOK ÖNEMLİ — VERİYE ERİŞİM: Sistem verisi (briefler, kişiler, markalar, puanlar, sayılar) SADECE sana verilen TOOL'lar üzerinden gelir. ` +
-      `Herhangi bir sayı, iş sayısı, liste veya olgu söylemeden ÖNCE ilgili tool'u çağır. Tool sonucundaki değerleri BİREBİR kullan; kendin sayma, tahmin etme, uydurma. ` +
-      `Tool boş/0 dönerse "yok" de. Bir tool {belirsiz:true, adaylar:[...]} dönerse kendin seçme — kullanıcıya adaylardan hangisini kastettiğini SOR. Kişiye özel sorularda ("benim işlerim", "bugün ne yapacağım") kisi olarak "${req.user.name}" ile tool çağır. ` +
-      (isAdmin ? '' : 'Bu kullanıcı yönetici DEĞİL: kişi/dept puanı veya performans kıyası sorulursa "bu bilgi yöneticilere özeldir" de (kendi işlerini listelemek serbesttir). ') +
-      `\n\n# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI;
+      `Senin adın Ody. Sadece bir yapay zekâ asistanı değil; aynı zamanda Benseno Tasarım Sistemi'nin bir ÇALIŞANI ve DANIŞMANISIN. (Slack botunun adı WT'dir.) ` +
+      `Şu an seninle GİRİŞ YAPMIŞ kişi: ${req.user.name}${isAdmin ? ' (yönetici)' : ''}. Onunla bu kişiye özel, ismiyle, sıcak ve yardımsever konuş — kiminle konuştuğunu bil ve ona göre cevap ver. ` +
+      `Türkçe, net ve öz konuş; gerektiğinde adım adım yönlendir, fırsat varsa proaktif öneri sun. İnsanlara yardım etmeye isteklisin.\n\n` +
+      `## SAYILAR DAİMA VERİTABANINDAN\n` +
+      `Sayısal her şey (iş sayıları, listeler, puanlar, kapasite, gecikme, olgular) SADECE sana verilen TOOL'lardan gelir. Bir sayı/olgu söylemeden ÖNCE ilgili tool'u çağır; sonucu BİREBİR kullan — asla kendin sayma, tahmin etme, uydurma. Tool boş/0 dönerse açıkça "yok" de.\n\n` +
+      `## YORUM/ÖNERİ İÇİN NİTEL VERİYİ HARMANLA\n` +
+      `Özet, öneri, yorum, değerlendirme istendiğinde sadece kuru sayı verme. Nitel tool'ları (is_detay → thread özeti/insight/puan sebebi; insightlar → işlerin özet/insight metinleri; yildiz_karne → puan + yorum; marka_dokumu → kanal özeti/son insight/yorum) çağır ve bunları sayısal verilerle HARMANLA: bağlam kat, neden-sonuç kur, somut öneri sun. Sayısal kısım hep DB'den; yorum kısmı bu nitel kaynaklardan beslenir. Bir işi/markayı/kişiyi değerlendirirken önce ilgili nitel tool'u çağırmayı düşün.\n\n` +
+      `## HİYERARŞİ AMA BİLGİSİZ BIRAKMA\n` +
+      (isAdmin
+        ? `Bu kişi yönetici: tüm kişi/departman/marka puanlarına ve kıyaslara erişebilir.\n`
+        : `Bu kişi yönetici DEĞİL: başka kişilerin puanı, performans kıyası gibi yönetici-özel bilgileri PAYLAŞMA. Ama kişiyi bilgisiz bırakma — kendi işlerini, kapasitesini, genel durumu ve genel bilgileri serbestçe ver. Veremediğinde "bu bilgi yöneticilere özel" diye NEDENİYLE açıkla, sonra yapabileceğini öner.\n`) +
+      `Kişiye özel sorularda ("benim işlerim", "bugün ne yapmalıyım") kisi olarak "${req.user.name}" ile tool çağır. Genel soruları ("kaç iş gecikti") genel tool'larla yanıtla.\n\n` +
+      `## BELİRSİZLİK & YARDIM EDEMEME\n` +
+      `Bir tool {belirsiz:true, adaylar:[...]} dönerse kendin seçme — hangisini kastettiğini SOR. Bir isteği karşılayamıyorsan (veri yok / yetki yok / kapsam dışı), "karşılayamadım" gibi BOŞ bir cevap verme; NEDENİNİ net söyle ve mümkünse alternatif/yapabileceğini öner. Her zaman yardımcı olmaya çalış.\n\n` +
+      `# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI;
 
     const convo = msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) }));
 
@@ -422,7 +430,7 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6', max_tokens: 1200, system,
+          model: 'claude-sonnet-4-6', max_tokens: 1500, system,
           thinking: { type: 'adaptive' },
           ...(turn < MAX_TURNS - 1 ? { tools: odyTools.TOOLS } : {}),
           messages: convo,
@@ -506,11 +514,19 @@ app.post('/api/rating-sebep', writeGuard, async (req, res) => {
   try {
     const { type, key, sebep, rating_avg, rating_count } = req.body || {};
     if (!type || !key || !sebep) return res.status(400).json({ error: 'type, key, sebep gerekli' });
+    const s = String(sebep).slice(0, 1000);
+    // En güncel snapshot (geriye uyum).
     await pool.query(`
       INSERT INTO entity_sebep (type, key, sebep, rating_avg, rating_count, updated_at)
       VALUES ($1,$2,$3,$4,$5,now())
       ON CONFLICT (type, key) DO UPDATE SET sebep=$3, rating_avg=$4, rating_count=$5, updated_at=now()`,
-      [type, key, String(sebep).slice(0, 1000), rating_avg ?? null, rating_count ?? null]);
+      [type, key, s, rating_avg ?? null, rating_count ?? null]);
+    // Tarihli arşiv — bugünün (TR) satırı; gün içinde tekrar üretilirse son hali kalır.
+    await pool.query(`
+      INSERT INTO entity_sebep_history (type, key, gun, sebep, rating_avg, rating_count)
+      VALUES ($1,$2,(now() AT TIME ZONE 'Europe/Istanbul')::date,$3,$4,$5)
+      ON CONFLICT (type, key, gun) DO UPDATE SET sebep=$3, rating_avg=$4, rating_count=$5, created_at=now()`,
+      [type, key, s, rating_avg ?? null, rating_count ?? null]);
     res.json({ ok: true });
   } catch (e) { console.error('[api] rating-sebep hata:', e.message); res.status(500).json({ error: e.message }); }
 });

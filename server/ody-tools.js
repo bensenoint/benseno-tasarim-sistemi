@@ -48,6 +48,18 @@ function _userCandidates(ed, kisi) {
     .map(u => u.name).slice(0, 6);
 }
 
+// Entity sebep (AI yorum metni) — type: firma|dept|kisi|marka, key: benseno|deptKey|userId/ad|markaAdı.
+function sebepFor(ed, type, ...keys) {
+  const list = ed.bns_sebep || [];
+  for (const key of keys) {
+    if (key == null) continue;
+    const k = String(key).toLocaleLowerCase('tr');
+    const row = list.find(s => s.type === type && String(s.key || '').toLocaleLowerCase('tr') === k);
+    if (row && row.sebep) return row.sebep;
+  }
+  return null;
+}
+
 // ── Tool tanımları ───────────────────────────────────────────────────────────
 const defs = {};
 
@@ -146,6 +158,7 @@ defs.marka_dokumu = {
       tamamlanan: (ctx.ed.bns_completed || []).filter(c => match(c.marka) && inRange(c.bitis, range)).length,
       kanal_ozet: br.kanal_ozet ? br.kanal_ozet.slice(0, 300) : null,
       son_insight: br.son_insight ? br.son_insight.slice(0, 300) : null,
+      yorum: sebepFor(ctx.ed, 'marka', br.name),
     };
     if (ctx.isAdmin) {
       // bns_ratings'te marka anahtarı yok (markalarda rating saklanmıyor); güvenli null.
@@ -161,16 +174,21 @@ defs.yildiz_karne = {
   input_schema: { type: 'object', required: ['kapsam'], properties: { kapsam: { type: 'string', enum: ['firma', 'dept', 'kisi'] }, key: { type: 'string' } } },
   run(input, ctx) {
     const R = ctx.ed.bns_ratings || {};
-    if (input.kapsam === 'firma') return R.firma || { avg: null, cnt: 0 };
+    if (input.kapsam === 'firma') return { ...(R.firma || { avg: null, cnt: 0 }), yorum: sebepFor(ctx.ed, 'firma', 'benseno') };
     if (!ctx.isAdmin) return { yetki: 'yöneticilere özel' };
-    if (input.kapsam === 'dept') return { dept: R.dept || {} };
+    if (input.kapsam === 'dept') {
+      const dept = R.dept || {};
+      const yorumlar = {};
+      for (const k of Object.keys(dept)) yorumlar[k] = sebepFor(ctx.ed, 'dept', k);
+      return { dept, yorumlar };
+    }
     if (input.kapsam === 'kisi') {
       const pr = resolvePerson(ctx.ed, input.key);
       if (pr.belirsiz) return { belirsiz: true, adaylar: pr.adaylar };
       if (!pr.user) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.key) };
       const u = pr.user;
       const p = R.users && R.users[u.id];
-      return { kisi: u.name, puan: p ? { avg: p.avg, cnt: p.cnt } : null };
+      return { kisi: u.name, puan: p ? { avg: p.avg, cnt: p.cnt } : null, yorum: sebepFor(ctx.ed, 'kisi', u.id, u.name) };
     }
     return { error: 'geçersiz kapsam' };
   },
@@ -227,6 +245,59 @@ defs.trend = {
     if (!vals.length) return { hata: 'metrik bulunamadı' };
     // bns_history eskiden-yeniye sıralı: ilk = en eski, son = en güncel.
     return { metrik: input.metrik, nokta: vals.length, ilk: vals[0], son: vals[vals.length - 1], min: Math.min(...vals), max: Math.max(...vals) };
+  },
+};
+
+defs.is_detay = {
+  description: 'Tek bir işin (#no) DETAYI + NİTEL bağlam: marka, başlık, durum, termin, atananlar, gecikme; ayrıca thread özeti (thread_ozet), tamamlandıysa insight ve (yöneticiye) puan + puan sebebi. Bir işi özetlemek/yorumlamak/öneri vermek için bunu çağır.',
+  input_schema: { type: 'object', required: ['no'], properties: { no: { type: 'number', description: 'iş numarası (#no)' } } },
+  run(input, ctx) {
+    const no = +input.no;
+    const act = (ctx.ed.bns_briefs || []).find(b => b.no === no);
+    const done = (ctx.ed.bns_completed || []).find(c => c.no === no);
+    const b = act || done;
+    if (!b) return { bulunamadi: true };
+    const now = Date.now();
+    const out = {
+      no: b.no, marka: b.marka, baslik: b.baslik,
+      durum: act ? b.durum : 'tamamlandi',
+      termin: b.deadline || null,
+      gecikmis: act ? !!(b.deadline && b.deadline < now) : null,
+      atananlar: [...(b.workers || []).map(w => w.name), ...(b.leads || []).map(l => l.name + '(lead)')],
+      thread_ozet: b.thread_ozet || null,
+      insight: done ? (b.insight || null) : null,
+    };
+    if (ctx.isAdmin && done) { out.puan = b.rating ?? null; out.puan_sebep = b.rating_sebep || null; }
+    return out;
+  },
+};
+
+defs.insightlar = {
+  description: 'İşlerin NİTEL özet/insight metinleri — ÖZET, ÖNERİ, YORUM üretmek için (sayı/olgu için DEĞİL). Filtre: marka, kisi, tamamlandi(true→tamamlanan insight\'ları; yoksa aktif thread özetleri), aralik. Her kayıt: no, marka, başlık + özet/insight metni. Sayılar için diğer tool\'ları kullan; bu tool yorumu zenginleştirir.',
+  input_schema: { type: 'object', properties: { marka: { type: 'string' }, kisi: { type: 'string' }, tamamlandi: { type: 'boolean' }, aralik: { type: 'string' } } },
+  run(input, ctx) {
+    const range = normRange(ctx.range);
+    let u = null;
+    if (input.kisi) {
+      const pr = resolvePerson(ctx.ed, input.kisi);
+      if (pr.belirsiz) return { belirsiz: true, adaylar: pr.adaylar };
+      if (!pr.user) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.kisi) };
+      u = pr.user;
+    }
+    const mq = input.marka ? input.marka.toLocaleLowerCase('tr') : null;
+    const onPerson = (b) => !u || [...(b.workers || []), ...(b.leads || [])].some(p => p.id === u.id);
+    const onMarka = (b) => !mq || (b.marka || '').toLocaleLowerCase('tr').includes(mq);
+    let rows;
+    if (input.tamamlandi) {
+      rows = (ctx.ed.bns_completed || []).filter(c => inRange(c.bitis, range) && onPerson(c) && onMarka(c))
+        .map(c => ({ no: c.no, marka: c.marka, baslik: c.baslik, insight: (c.insight || '').slice(0, 500) || null, ozet: (c.thread_ozet || '').slice(0, 350) || null }))
+        .filter(r => r.insight || r.ozet);
+    } else {
+      rows = (ctx.ed.bns_briefs || []).filter(b => onPerson(b) && onMarka(b))
+        .map(b => ({ no: b.no, marka: b.marka, baslik: b.baslik, durum: b.durum, ozet: (b.thread_ozet || '').slice(0, 350) || null }))
+        .filter(r => r.ozet);
+    }
+    return { toplam: rows.length, kayitlar: rows.slice(0, 25), kirpildi: rows.length > 25 };
   },
 };
 

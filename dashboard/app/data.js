@@ -630,12 +630,37 @@ function bnsApplyExtras(ed) {
   // ⭐ Yıldız karnesi: canlı ortalamalar + AI sebep açıklamaları
   window.BNS_DATA.ratings = ed.bns_ratings || null;
   window.BNS_DATA.sebepList = Array.isArray(ed.bns_sebep) ? ed.bns_sebep : [];
+  // Tarihli sebep arşivi — seçili tarih aralığına göre dönem yorumu için (bnsSebepFor).
+  window.BNS_DATA.sebepHistory = Array.isArray(ed.bns_sebep_history) ? ed.bns_sebep_history : [];
   // KPI history (Overview spark grafikleri)
   if (Array.isArray(ed.bns_history) && ed.bns_history.length > 0) {
     window.BNS_DATA.history = ed.bns_history;
   }
 }
 window.bnsSebep = (type, key) => (window.BNS_DATA.sebepList || []).find(s => s.type === type && s.key === key) || null;
+// ms (epoch) → "YYYY-MM-DD" (Europe/Istanbul). gun string'leri kronolojik=leksikografik.
+function bnsMsToTRDate(ms) {
+  try { return new Date(ms).toLocaleDateString("sv-SE", { timeZone: "Europe/Istanbul" }); }
+  catch (e) { return null; }
+}
+// Tarihe duyarlı sebep çözümleyici: seçili aralığın SONUNDA geçerli olan yorum.
+// range = { from, to } (ms). Arşiv yoksa veya range yoksa en güncel snapshot'a düşer.
+window.bnsSebepFor = function (type, key, range) {
+  var hist = (window.BNS_DATA.sebepHistory || []).filter(function (s) { return s.type === type && s.key === key; });
+  if (!hist.length) return window.bnsSebep(type, key);              // arşiv yok → eski davranış
+  hist = hist.slice().sort(function (a, b) { return a.gun < b.gun ? -1 : a.gun > b.gun ? 1 : 0; });
+  var toStr = range && typeof range.to === "number" ? bnsMsToTRDate(range.to) : null;
+  if (!toStr) return hist[hist.length - 1];                        // range yok → en güncel arşiv
+  var fromStr = range && typeof range.from === "number" ? bnsMsToTRDate(range.from) : null;
+  // 1) Aralık İÇİNDE üretilmiş yorumların en günceli.
+  var inRange = hist.filter(function (s) { return s.gun <= toStr && (!fromStr || s.gun >= fromStr); });
+  if (inRange.length) return inRange[inRange.length - 1];
+  // 2) Aralıkta üretim yoksa: aralık sonunda yürürlükte olan (to'dan önceki en güncel) yorum.
+  var before = hist.filter(function (s) { return s.gun <= toStr; });
+  if (before.length) return before[before.length - 1];
+  // 3) Aralık tüm arşivden eskiyse: en eski mevcut yorum.
+  return hist[0];
+};
 window.bnsApplyExtras = bnsApplyExtras;
 
 // Polling için window'a expose et
