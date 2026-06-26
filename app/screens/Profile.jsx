@@ -236,8 +236,11 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
     (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
   );
   const perfN = perfDone.length;
+  // Çalışılan markalar: yalnız tamamlananlar DEĞİL — kişinin DAHİL OLDUĞU tüm işlerden
+  // (mevcut aktif/müşteride briefler ∪ dönemde tamamlananlar). Aktif çalıştığı markalar da görünür.
+  const perfInvolved = [...myAll, ...perfDone];
   const perfBrands = {};
-  perfDone.forEach(b => { if (b.marka) perfBrands[b.marka] = (perfBrands[b.marka] || 0) + 1; });
+  perfInvolved.forEach(b => { if (b.marka) perfBrands[b.marka] = (perfBrands[b.marka] || 0) + 1; });
   const perfBrandList = Object.entries(perfBrands).sort((a, b) => b[1] - a[1]);
   const perfRevTotal = perfDone.reduce((s, b) => s + (parseInt(b.revision) || 0), 0);
   const perfAvgRev = perfN ? (perfRevTotal / perfN).toFixed(1) : "—";
@@ -266,7 +269,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   ];
   const brandColorOf = (name) => (data.BRANDS || []).find(b => b.name === name)?.color
     || (data.BR && data.BR[name] && data.BR[name].color)
-    || (perfDone.find(b => b.marka === name && b.brand && b.brand.color)?.brand.color)
+    || (perfInvolved.find(b => b.marka === name && b.brand && b.brand.color)?.brand.color)
     || "var(--ink-4)";
 
   return (
