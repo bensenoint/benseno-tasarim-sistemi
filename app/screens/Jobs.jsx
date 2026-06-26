@@ -112,7 +112,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   const cntYeni = evPool.filter(b => inStatusDuring(b, "yeni")).length;
   const cntOverdue = evPool.filter(overdueDuring).length;
   const statusCards = [
-    { key: "all",         label: "Aktif işler",  value: cntAktif },
+    { key: "all",         label: "Aktif işler",  value: cntAktif, hint: "Seçili tarih aralığında bir an AKTİF OLMUŞ benzersiz iş (dönemsel; müşteride+tamamlanmış hariç). Overview 'Aktif brief' ise ŞU AN aktif olanı sayar (anlık) — bu yüzden farklı olabilir." },
     { key: "yeni",        label: "Yeni",         value: cntYeni,                 color: "var(--ink-3)" },
     { key: "calisiliyor", label: "İş planında",  value: cntStatus("calisiliyor"), color: "var(--info)" },
     { key: "basladi",     label: "İşe başlandı", value: cntStatus("basladi"),     color: "var(--ok, #2E8F66)" },
@@ -214,7 +214,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
     <div className="bn-tab-in">
       <PageHead
         title="Aktif işler"
-        subtitle="11 sütun · sırala · filtrele · drawer'da düzenle"
+        subtitle="Seçili tarih aralığı özeti (dönemsel) · sırala · filtrele · drawer'da düzenle"
         actions={isMobile ? null : <>
           {setDateRange && (
             <div style={{display:"inline-flex", gap:4, marginRight:4}}>
@@ -250,7 +250,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
       {!isMobile && (
         <KpiGrid cols={statusCards.length}>
           {statusCards.map(c => (
-            <Kpi key={c.key} label={c.label} value={c.value} color={c.color}
+            <Kpi key={c.key} label={c.label} value={c.value} color={c.color} title={c.hint}
               active={activeKey === c.key} onClick={() => onCardClick(c.key)}/>
           ))}
         </KpiGrid>

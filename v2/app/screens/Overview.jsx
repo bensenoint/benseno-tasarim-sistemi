@@ -374,7 +374,7 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
 
       {/* KPI grid */}
       <KpiGrid cols={7}>
-        <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} title="ŞU AN aktif olan brief (anlık, müşteride hariç). Aktif işler sayfası seçili tarih aralığında AKTİF OLMUŞ işleri sayar — bu yüzden sayılar farklı olabilir." onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" emphasis={overdue.length > 0} tint="var(--prio-red-bg)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"} onClick={onJumpJobs ? () => onJumpJobs("overdue") : undefined}/>
         <Kpi label="Bugün teslim"  value={todayDue.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={sparkReview} trend={trendReview} sub={hist.length > 1 ? "son sync'e göre" : "dün 09:00'dan beri"} onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>

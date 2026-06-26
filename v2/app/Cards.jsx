@@ -66,12 +66,13 @@ function CountUp({ value }) {
 }
 
 // Kpi has three variants: "plain" | "trendchart" | "hero"
-function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, accent, onClick, active, emphasis, tint }) {
+function Kpi({ label, value, color, trend, sub, variant = "trendchart", spark, accent, onClick, active, emphasis, tint, title }) {
   const [hov, setHov] = React.useState(false);
   // Determine left-border accent color from color prop or trend
   const borderAccent = accent || color || null;
   return (
     <div
+      title={title || undefined}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       onClick={onClick}
