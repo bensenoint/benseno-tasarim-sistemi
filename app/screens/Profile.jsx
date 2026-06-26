@@ -286,7 +286,8 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
             const R = window.BNS_DATA && window.BNS_DATA.ratings;
             const my = R && R.users && R.users[u.id];
             if (!my || !my.cnt) return null;
-            const why = typeof window.bnsSebep === "function" ? window.bnsSebep("kisi", u.id) : null;
+            const why = (typeof window.bnsSebepFor === "function" && window.bnsSebepFor("kisi", u.id, data.dateRange))
+              || (typeof window.bnsSebep === "function" ? window.bnsSebep("kisi", u.id) : null);
             return (
               <div style={{marginTop:8}}>
                 <div style={{display:"flex", alignItems:"center", gap:8}}>

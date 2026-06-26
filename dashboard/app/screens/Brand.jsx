@@ -228,7 +228,8 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
 
       {/* ⭐ Marka yıldız puanı + sebep açıklaması */}
       {(() => {
-        const why = typeof window.bnsSebep === "function" ? window.bnsSebep("marka", brand) : null;
+        const why = (typeof window.bnsSebepFor === "function" && window.bnsSebepFor("marka", brand, data.dateRange))
+          || (typeof window.bnsSebep === "function" ? window.bnsSebep("marka", brand) : null);
         if (!stats.rating && !why) return null;
         return (
           <div style={{display:"flex", flexWrap:"wrap", alignItems:"flex-start", gap:10, rowGap:8, marginBottom:"var(--section-gap)", padding:"10px 14px", background:"var(--surface)", border:"1px solid var(--line)", borderRadius:0}}>
