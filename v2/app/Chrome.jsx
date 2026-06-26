@@ -26,7 +26,7 @@ const NAV_SECTIONS = [
     id: "planlama",
     label: "Planlama",
     items: [
-      { id: "gantt",   label: "Plan / Gantt",  icon: "Calendar" },
+      // { id: "gantt",   label: "Plan / Gantt",  icon: "Calendar" },   // GİZLİ (deneme — kullanılmıyor; gerekmezse kaldır)
       { id: "kanban",  label: "Kanban",         icon: "Columns" },
       { id: "musteride", label: "Müşteri Onayı", icon: "Clock" },
     ]
@@ -35,7 +35,7 @@ const NAV_SECTIONS = [
     id: "raporlar",
     label: "Raporlar",
     items: [
-      { id: "completed", label: "Tamamlananlar",  icon: "CheckSquare" },
+      // { id: "completed", label: "Tamamlananlar",  icon: "CheckSquare" },  // GİZLİ (deneme — kullanılmıyor; gerekmezse kaldır)
       { id: "dept-comp", label: "Karşılaştırma",  icon: "BarChart2" },
       { id: "history",   label: "Geçmiş",          icon: "Archive" },
     ]
@@ -1304,20 +1304,7 @@ function Header({ user, tab, onNav, viewMode, setViewMode, dateRange, setDateRan
             now={(window.BNS_DATA && window.BNS_DATA.NOW) || Date.now()} compact={isMobile}/>
         )}
 
-        {/* View mode — hidden on mobile (bottom nav handles navigation) */}
-        {!isMobile && (
-          <div style={{display: "inline-flex", padding: 2, border: "1px solid var(--line)", borderRadius: 6, gap: 1}}>
-            {[["mine", "Ben"], ["dept", "Dept"], ["all", "Tümü"]].map(([k, v]) => (
-              <button key={k} onClick={() => setViewMode(k)} style={{
-                font: `${viewMode === k ? 600 : 500} 11px/1 var(--font-sans)`, padding: "5px 10px",
-                border: 0, background: viewMode === k ? "var(--paper-2)" : "transparent",
-                color: viewMode === k ? "var(--ink)" : "var(--ink-4)",
-                borderRadius: 4, cursor: "pointer",
-                transition: "background 120ms cubic-bezier(0.2,0,0,1), color 120ms cubic-bezier(0.2,0,0,1)",
-              }}>{v}</button>
-            ))}
-          </div>
-        )}
+        {/* Kapsam (Ben/Dept/Tümü) kaldırıldı — kişi filtresi (profil/kişi) ve departman sayfası bu işi görüyor */}
 
         {/* Theme toggle — yalnız desktop (referans mobil header'da yok; mobilde Daha menüsünde) */}
         {!isMobile && (

@@ -584,7 +584,7 @@ function App({ currentUser, onLogout }) {
                             Screen = <OverviewScreen   data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode}
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
                                        onOpenBrief={onOpenBrief} onSwitchTab={navTo} onJumpJobs={jumpToJobs} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
-  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} viewMode={viewMode} setViewMode={setViewMode} initialScope={jobsScope} tableMode={t.tableMode} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange}/>;
+  else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} initialScope={jobsScope} tableMode={t.tableMode} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} setDateRange={setDateRange}/>;
   else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} currentUser={currentUser} initialSel={profileSel}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
@@ -738,13 +738,6 @@ function BenseoTweaks({ t, setTweak }) {
       <TweakRadio  label="Görünüm" value={t.tableMode}
         options={["table", "kanban", "cards"]}
         onChange={(v) => setTweak("tableMode", v)}/>
-      <TweakSelect label="Varsayılan kapsam" value={t.defaultView}
-        options={[
-          {value:"mine", label:"Bana atanmış"},
-          {value:"dept", label:"Departmanım"},
-          {value:"all",  label:"Tüm ekip"}
-        ]}
-        onChange={(v) => setTweak("defaultView", v)}/>
 
       <TweakSection label="KPI kartları"/>
       <TweakRadio  label="Varyant" value={t.kpiVariant}

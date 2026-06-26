@@ -1,10 +1,12 @@
 // app/screens/Jobs.jsx — Aktif İşler tab. Supports table / kanban / cards view.
 
-function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope, onOpenBrief, onOpenCompleted, onStatusChange }) {
+function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCompleted, onStatusChange, setDateRange }) {
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [scope, setScope] = useStickyState("jobs.scope", "all");
+  // İkinci sıra (detay) KPI kartları varsayılan KAPALI; bir statü kartına basınca açılır, tekrar basınca kapanır.
+  const [detailOpen, setDetailOpen] = React.useState(false);
   // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle (refresh'te initialScope=null → sticky korunur)
-  React.useEffect(() => { if (initialScope) setScope(initialScope); }, [initialScope]);
+  React.useEffect(() => { if (initialScope) { setScope(initialScope); setDetailOpen(true); } }, [initialScope]);
   const [search, setSearch] = useStickyState("jobs.search", "");
   const [prioFilter, setPrioFilter] = useStickyState("jobs.prio", "all");
   const [person, setPerson] = useStickyState("jobs.person", "all");   // kişi (lead+contributor) filtresi
@@ -190,30 +192,45 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
     detailKpis = (SETS[activeKey] || SETS.all).map(k => cand[k]).filter(Boolean);
   }
 
+  // Kart tıklama: aynı karta (açıkken) basınca detayı kapat; farklı/kapalıyken o statüyü seç + detayı aç.
+  const onCardClick = (key) => {
+    if (key === scope && detailOpen) setDetailOpen(false);
+    else { setScope(key); setDetailOpen(true); }
+  };
+  // Tarih kısayolları (üst global tarih filtresiyle çalışır; preset kodları DateRangeControl ile aynı).
+  const DAY = 86400000;
+  const _today0 = (() => { const d = new Date(NOW); return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); })();
+  const setPreset = (code) => {
+    if (!setDateRange) return;
+    if (code === "today")          setDateRange({ from: _today0, to: NOW, preset: "today" });
+    else if (code === "yesterday") setDateRange({ from: _today0 - DAY, to: _today0 - 1, preset: "yesterday" });
+    else if (code === "7d")        setDateRange({ from: NOW - 7 * DAY, to: NOW, preset: "7d" });
+    else if (code === "30d")       setDateRange({ from: NOW - 30 * DAY, to: NOW, preset: "30d" });
+  };
+  const curPreset = (data.dateRange || {}).preset;
+  const SHORTCUTS = [["today", "Bugün"], ["yesterday", "Dün"], ["7d", "7 gün"], ["30d", "30 gün"]];
+
   return (
     <div className="bn-tab-in">
       <PageHead
         title="Aktif işler"
         subtitle="11 sütun · sırala · filtrele · drawer'da düzenle"
         actions={isMobile ? null : <>
+          {setDateRange && (
+            <div style={{display:"inline-flex", gap:4, marginRight:4}}>
+              {SHORTCUTS.map(([code, lbl]) => (
+                <button key={code} onClick={() => setPreset(code)} title={`Tarih: ${lbl}`} style={{
+                  font:`${curPreset===code?600:500} 11px/1 var(--font-sans)`, padding:"6px 10px",
+                  border:"1px solid " + (curPreset===code ? "var(--ember)" : "var(--line)"), borderRadius:6, cursor:"pointer",
+                  background: curPreset===code ? "var(--ember-tint)" : "var(--surface)",
+                  color: curPreset===code ? "var(--ember)" : "var(--ink-3)", transition:"all 120ms",
+                }}>{lbl}</button>
+              ))}
+            </div>
+          )}
           <Button kind="ghost" size="sm" icon={<I.Refresh size={13}/>}>Yenile</Button>
         </>}
       />
-
-      {/* Mobil: viewMode segmenti (referans) */}
-      {isMobile && setViewMode && (
-        <div style={{display:"flex", padding:3, background:"var(--paper-2)", borderRadius:11, gap:3, marginBottom:12}}>
-          {[["all","Tüm ekip"],["mine","Bana atanan"],["dept","Departmanım"]].map(([k,v]) => (
-            <button key={k} onClick={() => setViewMode(k)} style={{
-              flex:1, padding:"9px 6px", border:0, borderRadius:8, cursor:"pointer",
-              font:`${viewMode===k?700:500} 12.5px/1 var(--font-sans)`,
-              background: viewMode===k ? "var(--surface)" : "transparent",
-              color: viewMode===k ? "var(--ink)" : "var(--ink-3)",
-              boxShadow: viewMode===k ? "0 1px 3px rgba(0,0,0,.08)" : "none", transition:"all 150ms",
-            }}>{v}</button>
-          ))}
-        </div>
-      )}
 
       {/* Mobil: görünüm geçişi (tablo / liste / kanban) — referans ikon segment */}
       {isMobile && (
@@ -234,13 +251,13 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
         <KpiGrid cols={statusCards.length}>
           {statusCards.map(c => (
             <Kpi key={c.key} label={c.label} value={c.value} color={c.color}
-              active={activeKey === c.key} onClick={() => setScope(c.key)}/>
+              active={activeKey === c.key} onClick={() => onCardClick(c.key)}/>
           ))}
         </KpiGrid>
       )}
 
-      {/* İkinci satır: seçili karta özel detay KPI'lar (desktop) */}
-      {!isMobile && (
+      {/* İkinci satır: seçili karta özel detay KPI'lar (desktop) — varsayılan kapalı; karta basınca efektle açılır */}
+      {!isMobile && detailOpen && (
         <>
           <div style={{margin:"24px 0 -16px", font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-4)"}}>
             {(statusCards.find(c => c.key === activeKey) || { label: "Aktif işler" }).label} · detay

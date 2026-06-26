@@ -331,21 +331,7 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
 
   return (
     <div className="bn-tab-in">
-      {/* Mobil: viewMode segmenti (referans) — desktop'ta header'da */}
-      {isMobile && setViewMode && (
-        <div style={{display:"flex", padding:3, background:"var(--paper-2)", borderRadius:11, gap:3, marginBottom:12}}>
-          {[["all","Tüm ekip"],["mine","Bana"],["dept","Departmanım"]].map(([k,v]) => (
-            <button key={k} onClick={() => setViewMode(k)} style={{
-              flex:1, padding:"9px 6px", border:0, borderRadius:8, cursor:"pointer",
-              font:`${viewMode===k?700:500} 13px/1 var(--font-sans)`,
-              background: viewMode===k ? "var(--surface)" : "transparent",
-              color: viewMode===k ? "var(--ink)" : "var(--ink-3)",
-              boxShadow: viewMode===k ? "0 1px 3px rgba(0,0,0,.08)" : "none",
-              transition:"all 150ms",
-            }}>{v}</button>
-          ))}
-        </div>
-      )}
+      {/* Kapsam (Ben/Dept/Tümü) kaldırıldı — kişi/departman filtreleri bu işi görüyor */}
 
       <PageHead
         eyebrow={data.fmtTr ? data.fmtTr(Date.now()) : `${greetingTimezone()}`}
