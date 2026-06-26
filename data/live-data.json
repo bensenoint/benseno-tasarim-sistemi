@@ -1,6 +1,6 @@
 {
-  "last_sync": "2026-06-26T10:15:00+03:00",
-  "now": "2026-06-26T10:15:00+03:00",
+  "last_sync": "2026-06-26T11:45:00+03:00",
+  "now": "2026-06-26T11:45:00+03:00",
   "bns_dept_stats": {
     "tasarim": { "people": 7, "active": 25, "overdue": 25, "capacity": 42, "completed30": 7, "avgComplete": 24.3, "revRate": 14 },
     "editor":  { "people": 8, "active": 2,  "overdue": 1,  "capacity": 48, "completed30": 2, "avgComplete": 31.5, "revRate": 20 },
