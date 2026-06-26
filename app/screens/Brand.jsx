@@ -122,11 +122,9 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   const activeIds = rowIds;
 
   const [person, setPerson] = React.useState("");
-  const [from, setFrom] = React.useState("");
-  const [to, setTo] = React.useState("");
-  const [view, setView] = React.useState("active");   // active | done
-  const [tomorrowOnly, setTomorrowOnly] = React.useState(false);   // "Yarın" filtresi: deadline'ı yarın olan aktif işler
-  const [statusSel, setStatusSel] = React.useState("");   // aktif görünümde statüye göre filtre ("" = tüm statüler)
+  const [view, setView] = React.useState("active");   // active | musteride | done
+  const [tomorrowOnly, setTomorrowOnly] = React.useState(false);   // "Yarın": yarın ve sonrası devam edecek aktif işler
+  const [statusSel, setStatusSel] = React.useState("");   // aktif görünümde statüye göre filtre ("" = tüm aktif)
 
   // kişi seçenekleri (aktif lead+contributors ∪ tamamlanan lead+contrib)
   const people = React.useMemo(() => {
@@ -136,9 +134,6 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
     return Object.entries(seen).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, "tr"));
   }, [active, done]);
 
-  const fromMs = from ? new Date(from + "T00:00:00").getTime() : null;
-  const toMs = to ? new Date(to + "T23:59:59").getTime() : null;
-  const inRange = ms => { if (ms == null) return !fromMs && !toMs ? true : false; if (fromMs && ms < fromMs) return false; if (toMs && ms > toMs) return false; return true; };
   // "Yarın" (devam edecek): deadline'ı yarın 00:00 ve sonrası olan aktif işler.
   // Gecikmiş (bugün bitecek varsayılır) ve bugün teslim edilecekler HARİÇ. (now referans NOW)
   const _d = new Date(now);
@@ -148,18 +143,15 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   const filteredActive = active.filter(b => {
     if (person && !activeIds(b).includes(person)) return false;
     if (statusSel && b.durum !== statusSel) return false;
-    if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
     if (tomorrowOnly && !continuesTomorrow(dlMs(b))) return false;
     return true;
   });
   const filteredMusteride = musteride.filter(b => {
     if (person && !activeIds(b).includes(person)) return false;
-    if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
     return true;
   });
   const filteredDone = done.filter(c => {
     if (person && !rowIds(c).includes(person)) return false;
-    if ((fromMs || toMs) && !inRange(c.deadline || null)) return false;
     return true;
   });
 
@@ -191,9 +183,15 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   }
 
   const fldStyle = { padding:"6px 9px", border:"1px solid var(--line)", borderRadius:6, background:"var(--surface)", color:"var(--ink)", font:"400 12px/1.2 var(--font-sans)" };
-  const seg = (id, label) => (
-    <button key={id} onClick={() => setView(id)} style={{ padding:"6px 9px", border:0, borderRadius:4, cursor:"pointer", font:"400 12px/1.2 var(--font-sans)", background: view === id ? "var(--paper-2)" : "transparent", color: view === id ? "var(--ink)" : "var(--ink-4)", fontWeight: view === id ? 600 : 400 }}>{label}</button>
-  );
+  // TEK durum filtresi — aktif alt-statüler + Müşteri Onayında + Tamamlanan tek dropdownda.
+  const ACTIVE_STATUSES = [["yeni","Yeni"],["calisiliyor","İş planında"],["basladi","İşe başlandı"],["incelemede","İncelemede"],["beklemede","Beklemede"],["revizyon","Revizyon"],["blokeli","Blokeli"]];
+  const durumVal = view === "active" ? ("active" + (statusSel ? ":" + statusSel : "")) : view;
+  const pickDurum = (val) => {
+    setTomorrowOnly(false);
+    if (val === "musteride" || val === "done") { setView(val); setStatusSel(""); }
+    else if (val.indexOf("active:") === 0) { setView("active"); setStatusSel(val.slice(7)); }
+    else { setView("active"); setStatusSel(""); }
+  };
 
   return (
     <div className="bn-tab-in">
@@ -246,38 +244,37 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
       {/* Filtreler */}
       <Card style={{ marginBottom:"var(--section-gap)" }}>
         <div className="bns-chip-scroll" style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:10 }}>
-          <div style={{ display:"inline-flex", border:"1px solid var(--line)", borderRadius:6, padding:2 }}>
-            {seg("active", `Aktif · ${filteredActive.length}`)}
-            {seg("musteride", `✈️ Müşteri Onayında · ${filteredMusteride.length}`)}
-            {seg("done", `Tamamlanan · ${filteredDone.length}`)}
-          </div>
-          <button onClick={() => setTomorrowOnly(v => !v)} title="Yarın teslim edilecek / devam edecek işler"
-            style={{ ...fldStyle, cursor:"pointer",
-              background: tomorrowOnly ? "var(--ember-tint)" : "var(--surface)",
-              borderColor: tomorrowOnly ? "var(--ember)" : "var(--line)",
-              color: tomorrowOnly ? "var(--ember)" : "var(--ink-3)", fontWeight: tomorrowOnly ? 600 : 400 }}>
-            🌅 Yarın
-          </button>
-          <select value={person} onChange={e => setPerson(e.target.value)} style={fldStyle}>
-            <option value="">Herkes</option>
+          {/* TEK durum filtresi: aktif alt-statüler + Müşteri Onayında + Tamamlanan, sayılarıyla */}
+          <label style={{ display:"inline-flex", alignItems:"center", gap:6, font:"400 12px/1.2 var(--font-sans)", color:"var(--ink-4)" }}>
+            <span style={{ font:"600 10px/1 var(--font-sans)", textTransform:"uppercase", letterSpacing:"0.05em" }}>Durum</span>
+            <select value={durumVal} onChange={e => pickDurum(e.target.value)} style={{ ...fldStyle, fontWeight:600, color:"var(--ink)" }} title="Statüye göre filtrele">
+              <optgroup label="Aktif işler">
+                <option value="active">Tüm aktif ({active.length})</option>
+                {ACTIVE_STATUSES.map(([v,l]) => (
+                  <option key={v} value={"active:"+v}>{l} ({active.filter(b => b.durum === v).length})</option>
+                ))}
+              </optgroup>
+              <optgroup label="Diğer">
+                <option value="musteride">✈️ Müşteri Onayında ({musteride.length})</option>
+                <option value="done">✓ Tamamlanan ({done.length})</option>
+              </optgroup>
+            </select>
+          </label>
+          <select value={person} onChange={e => setPerson(e.target.value)} style={fldStyle} title="Kişiye göre filtrele">
+            <option value="">👤 Herkes</option>
             {people.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
           {view === "active" && (
-            <select value={statusSel} onChange={e => setStatusSel(e.target.value)} style={fldStyle} title="Statüye göre filtrele">
-              <option value="">Tüm statüler</option>
-              {[["yeni","Yeni"],["calisiliyor","İş planında"],["basladi","İşe başlandı"],["incelemede","İncelemede"],["beklemede","Beklemede"],["revizyon","Revizyon"],["blokeli","Blokeli"]].map(([v,l]) => (
-                <option key={v} value={v}>{l} ({active.filter(b => b.durum === v).length})</option>
-              ))}
-            </select>
+            <button onClick={() => setTomorrowOnly(v => !v)} title="Yarın ve sonrası devam edecek aktif işler"
+              style={{ ...fldStyle, cursor:"pointer",
+                background: tomorrowOnly ? "var(--ember-tint)" : "var(--surface)",
+                borderColor: tomorrowOnly ? "var(--ember)" : "var(--line)",
+                color: tomorrowOnly ? "var(--ember)" : "var(--ink-3)", fontWeight: tomorrowOnly ? 600 : 400 }}>
+              🌅 Yarın{tomorrowOnly ? " ✓" : ""}
+            </button>
           )}
-          <label style={{ font:"400 12px/1.2 var(--font-sans)", color:"var(--ink-3)", display:"inline-flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
-            <I.Calendar size={13}/> Deadline:
-            <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={fldStyle}/>
-            <span style={{ color:"var(--ink-4)" }}>→</span>
-            <input type="date" value={to} onChange={e => setTo(e.target.value)} style={fldStyle}/>
-          </label>
-          {(person || from || to || statusSel) &&
-            <button onClick={() => { setPerson(""); setFrom(""); setTo(""); setStatusSel(""); }} style={{ ...fldStyle, cursor:"pointer", color:"var(--ink-3)" }}>Temizle</button>}
+          {(person || statusSel || tomorrowOnly) &&
+            <button onClick={() => { setPerson(""); setStatusSel(""); setTomorrowOnly(false); }} style={{ ...fldStyle, cursor:"pointer", color:"var(--ink-3)" }}>Temizle</button>}
           <span style={{ marginLeft:"auto", font:"500 12px/1 var(--font-mono)", color:"var(--ink-3)" }}>{shown} kayıt</span>
         </div>
       </Card>
