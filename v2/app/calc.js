@@ -14,6 +14,24 @@ function bnsCapPct(s) {
   return Math.min(100, Math.round((s.active / s.capacity) * 100));
 }
 
+// ── Bir departmanın AKTİF brief'leri — TEK KURAL (Genel bakış ↔ Departman sayfası aynı) ──
+// Aktif (müşteride + tamamlanmış hariç) ve lead.dept / brief.dept / herhangi bir contributor.dept eşleşen briefler.
+// deptKey: 'tasarim' | 'editor' | 'ai' | 'freelance'. (u.dept yoksa u.rol'e düşer — eski davranışla uyumlu.)
+function bnsDeptActive(briefs, deptKey) {
+  if (!Array.isArray(briefs) || !deptKey) return [];
+  return briefs.filter(function (b) {
+    if (!b || b.durum === 'musteride' || b.durum === 'tamamlandi') return false;
+    if (b.lead && (b.lead.dept || b.lead.rol) === deptKey) return true;
+    if (b.dept === deptKey) return true;
+    return Array.isArray(b.contributors) && b.contributors.some(function (c) { return c && (c.dept || c.rol) === deptKey; });
+  });
+}
+// Departman kapasite yüzdesi — pay: bnsDeptActive sayısı, payda: stats.capacity. Her iki sayfa da bunu çağırır.
+function bnsDeptCapPct(briefs, s, deptKey) {
+  if (!s || !s.capacity) return 0;
+  return Math.min(100, Math.round((bnsDeptActive(briefs, deptKey).length / s.capacity) * 100));
+}
+
 // ── Yarım gün / part-time çalışanlar — kapasite çarpanı (1 = tam gün) ───────
 // Serhat Tokmak yarım gün çalışıyor (08:00-13:00) → kapasitesi 0.5. dept bilgisi
 // departman kapasite indiriminde kullanılır (roster sırasından bağımsız, deterministik).

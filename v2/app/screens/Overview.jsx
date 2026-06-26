@@ -84,7 +84,8 @@ function FilterPanel({ open, onClose, deptFilter, setDeptFilter, prioFilter, set
 // ─── EDITORIAL ──────────────────────────────────────────────────────────────
 function calcAvgCapPct(data) {
   const ds = data.deptStats || {};
-  const vals = Object.values(ds).map(s => s.capacity_pct != null ? s.capacity_pct : bnsCapPct(s)).filter(v => v > 0);
+  const briefs = data._allBriefs || data.briefs || [];
+  const vals = Object.values(ds).map(s => bnsDeptCapPct(briefs, s, s.dept)).filter(v => v > 0);
   return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : null;
 }
 
@@ -135,7 +136,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
 
   // Kapasite
   const ds = data.deptStats || {};
-  const tasarimCap = ds.tasarim ? (ds.tasarim.capacity_pct != null ? ds.tasarim.capacity_pct : bnsCapPct(ds.tasarim)) : null;
+  const tasarimCap = ds.tasarim ? bnsDeptCapPct(data._allBriefs || data.briefs || [], ds.tasarim, 'tasarim') : null;
   const capTone = tasarimCap != null && tasarimCap > 85 ? "warn" : "info";
   const capLabel = tasarimCap != null ? `Tasarım kapasitesi %${tasarimCap}` : "Tasarım kapasitesi";
   const capMetric = tasarimCap != null ? `%${tasarimCap}` : "—";
@@ -611,7 +612,11 @@ function KpiGrid({ children, cols = 6 }) {
 
 function DeptRow({ s, color, last, compact }) {
   if (!s) return null;
-  const capPct = s.capacity_pct ?? bnsCapPct(s) ?? 0;
+  // TEK KURAL: aktif sayısı ve kapasite, Departman sayfasıyla aynı bnsDeptActive üzerinden hesaplanır.
+  const _briefs = (typeof window !== "undefined" && window.BNS_DATA && window.BNS_DATA.briefs) || [];
+  const _key = s.dept;
+  const active = (_key && typeof bnsDeptActive === "function") ? bnsDeptActive(_briefs, _key).length : s.active;
+  const capPct = (_key && typeof bnsDeptCapPct === "function") ? bnsDeptCapPct(_briefs, s, _key) : (s.capacity_pct ?? bnsCapPct(s) ?? 0);
   const capColor = capPct > 85 ? "var(--warning)" : capPct > 60 ? color || "var(--info)" : "var(--success)";
   return (
     <div style={{padding: compact ? "8px 0" : "11px 0", borderBottom: last ? "0" : "1px solid var(--line-soft)"}}>
@@ -619,7 +624,7 @@ function DeptRow({ s, color, last, compact }) {
       <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:6}}>
         <span style={{width:8, height:8, borderRadius:2, background:color, flexShrink:0}}/>
         <span style={{font:"600 12px/1 var(--font-sans)", color:"var(--ink)", flex:1}}>{s.name}</span>
-        <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--ink)"}}>{s.active}</span>
+        <span style={{font:"600 12px/1 var(--font-mono)", color:"var(--ink)"}}>{active}</span>
         {s.overdue > 0 && <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--prio-red)"}}>· {s.overdue}g</span>}
       </div>
       {/* Progress bar + % */}

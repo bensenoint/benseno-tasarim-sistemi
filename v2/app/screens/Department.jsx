@@ -17,14 +17,10 @@ function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
   const people = data.USERS.filter(u => (u.dept || u.rol) === role);
   // Department her zaman bu rolün tüm briefler'ini gösterir — viewMode (mine/dept/all) etkilemez.
   const allBriefs = (data._allBriefs || data.briefs).filter(b => b.durum !== "musteride"); // müşteridekiler yük sayılmaz
-  const rows = allBriefs.filter(b =>
-    (b.lead && (b.lead.dept || b.lead.rol) === role) ||
-    (b.dept === role) ||
-    (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.dept || c.rol) === role))
-  );
+  // TEK KURAL: aktif iş kümesi ve kapasite, Genel bakış'la AYNI bnsDeptActive/bnsDeptCapPct üzerinden hesaplanır.
+  const rows = bnsDeptActive(allBriefs, role);
   const overdueCount = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length;
-  // Kapasite: rows.length / (people × 6 slot) — deptStats.active yerine gerçek satır sayısı
-  const capPct = r.stats && r.stats.capacity ? Math.min(100, Math.round((rows.length / r.stats.capacity) * 100)) : _capPctFromStats;
+  const capPct = (r.stats && r.stats.capacity) ? bnsDeptCapPct(allBriefs, r.stats, role) : _capPctFromStats;
   const reviewCount = rows.filter(b => b.durum === "incelemede").length;
   const thisWeek = rows.filter(b => b.deltaH > 0 && b.deltaH <= 168).length;
 
