@@ -111,6 +111,10 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
   const briefs = data._allBriefs || data.briefs;
   const allOverdue  = briefs.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && b.durum !== "musteride");
   const allReview   = briefs.filter(b => b.durum === "incelemede");
+  // Risk radarı — "tıkanan" işler: çok revize turuna girmiş aktif briefler (kapsam/iletişim sinyali).
+  const STUCK_REV = 3;
+  const stuck = briefs.filter(b => b.durum !== "musteride" && b.durum !== "tamamlandi"
+    && Math.max(b.revision || 0, (b.rev_ic || 0) + (b.rev_musteri || 0)) >= STUCK_REV);
 
   // Senkron zamanı
   const nowTs = data.NOW || Date.now();
@@ -174,11 +178,13 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
           body={tasarimCap > 85 ? "Eşik %85 aşıldı. Yeni atama önerilmez." : tasarimCap != null ? `Eşik %85. Kapasite müsait (%${tasarimCap}).` : "Kapasite verisi bekleniyor."}
           action={<Button kind="secondary" size="sm" onClick={() => onSwitchTab("design")}>Tasarım sekmesi</Button>}
           metric={capMetric}/>
-        <Alert tone="info" Icon={I.Check}
-          title={`${allReview.length} brief onay bekliyor`}
-          body="rev tamamlandı · yöneticiler gözden geçirmeli. Tıkla, drawer'da hızlıca onayla."
-          action={<Button kind="secondary" size="sm" onClick={() => onSwitchTab("jobs")}>Onay kuyruğu</Button>}
-          metric={allReview.length}/>
+        <Alert tone={stuck.length > 0 ? "warn" : "info"} Icon={I.Warn}
+          title={`${stuck.length} iş ${STUCK_REV}+ revizyonda`}
+          body={stuck.length > 0
+            ? "Tıkanan işler — kapsam/iletişim sorunu olabilir. İncele, gerekirse brief'i netleştir."
+            : "Çok revize alan iş yok — revize turları kontrol altında."}
+          action={<Button kind="secondary" size="sm" onClick={() => onSwitchTab("jobs")}>İncele</Button>}
+          metric={stuck.length}/>
       </div>
 
       {/* Geciken işler — tam genişlik */}
