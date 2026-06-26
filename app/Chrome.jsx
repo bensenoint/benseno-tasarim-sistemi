@@ -411,7 +411,11 @@ function ChatBot({ currentUser, dateRange }) {
   const [fb, setFb] = React.useState({});   // öneri geri bildirimi: { [notifId]: {vote, reasonOpen, reason, busy, note} }
   const [mood, setMood] = React.useState('neseli');
   const blobRef = React.useRef(null);
-  const [msgs, setMsgs] = React.useState([]);   // {role:'user'|'assistant', content}
+  // Sohbet OTURUM boyunca korunur: paneli kapatıp/başka işe geçip dönünce kaldığı yerden devam
+  // (sessionStorage → sekme kapanınca temizlenir; "kısa süreliğine kapat, geri dön" senaryosu).
+  const [msgs, setMsgs] = React.useState(() => {
+    try { const s = JSON.parse(sessionStorage.getItem("bns_ody_chat_" + (uid || "x")) || "[]"); return Array.isArray(s) ? s : []; } catch (e) { return []; }
+  });   // {role:'user'|'assistant', content}
   const [input, setInput] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const endRef = React.useRef(null);
@@ -508,6 +512,8 @@ function ChatBot({ currentUser, dateRange }) {
   const [advicePeek, setAdvicePeek] = React.useState(null); // boştayken dönüşümlü gösterilen öneri-balonu bildirimi
   const [brief, setBrief] = React.useState(null);         // günlük iş özeti (msgs'ten ayrı kart; görülünce kaybolur)
   React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
+  // Sohbeti oturuma yaz (son 30 mesaj) → unmount/kapanmada kaybolmaz, geri dönünce yüklenir.
+  React.useEffect(() => { try { sessionStorage.setItem("bns_ody_chat_" + (uid || "x"), JSON.stringify(msgs.slice(-30))); } catch (e) {} }, [msgs, uid]);
 
   // Ody ruh hâli: değişince fx partikülü; kapalıyken periyodik bildirim ifadesi + okunmadı işareti
   React.useEffect(() => { odyFxProd(blobRef.current, mood); }, [mood]);
