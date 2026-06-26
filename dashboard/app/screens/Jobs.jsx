@@ -6,7 +6,13 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   // İkinci sıra (detay) KPI kartları varsayılan KAPALI; bir statü kartına basınca açılır, tekrar basınca kapanır.
   const [detailOpen, setDetailOpen] = React.useState(false);
   // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle (refresh'te initialScope=null → sticky korunur)
-  React.useEffect(() => { if (initialScope) { setScope(initialScope); setDetailOpen(true); } }, [initialScope]);
+  React.useEffect(() => {
+    if (!initialScope) return;
+    setScope(initialScope);
+    // "all"/"open" = genel liste (düz sekme açılışı ya da Aktif brief deep-link) → 2. satır KAPALI, çerçeve YOK.
+    // Belirli statü deep-link'i (overdue/review/incelemede…) → detay açık + çerçeveli.
+    setDetailOpen(initialScope !== "all" && initialScope !== "open");
+  }, [initialScope]);
   const [search, setSearch] = useStickyState("jobs.search", "");
   const [prioFilter, setPrioFilter] = useStickyState("jobs.prio", "all");
   const [person, setPerson] = useStickyState("jobs.person", "all");   // kişi (lead+contributor) filtresi
