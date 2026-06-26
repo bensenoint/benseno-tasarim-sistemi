@@ -17,7 +17,7 @@ function CommandPalette({ open, onClose, onOpenBrief, onNavigate, onTheme, onNew
   const actions = [
     { kind: "action", id: "act-new",    label: "Yeni brief oluştur",            hint: "N", icon: <I.Plus size={14}/>,  run: onNewBrief },
     { kind: "action", id: "act-theme",  label: `Tema: ${currentTheme === "dark" ? "Aydınlık'a geç" : "Karanlık'a geç"}`, hint: "T", icon: currentTheme === "dark" ? <I.Sun size={14}/> : <I.Moon size={14}/>, run: () => onTheme(currentTheme === "dark" ? "light" : "dark") },
-    { kind: "action", id: "act-jobs",   label: "Aktif işler tablosuna git",     hint: "A", icon: <I.Grid size={14}/>, run: () => onNavigate("jobs") },
+    { kind: "action", id: "act-jobs",   label: "Detay bakış tablosuna git",     hint: "A", icon: <I.Grid size={14}/>, run: () => onNavigate("jobs") },
     { kind: "action", id: "act-mgr",    label: "Yönetici komuta merkezi",       hint: "Y", icon: <I.Warn size={14}/>, run: () => onNavigate("manager") },
     { kind: "action", id: "act-plan",   label: "Plan görünümü (gantt)",         hint: "P", icon: <I.Calendar size={14}/>, run: () => onNavigate("gantt") },
     { kind: "action", id: "act-kanban", label: "Kanban'a geç",                  hint: "K", icon: <I.Layers size={14}/>, run: () => onNavigate("kanban") },

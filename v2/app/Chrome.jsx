@@ -19,7 +19,7 @@ const NAV_SECTIONS = [
     label: "Ana",
     items: [
       { id: "overview",  label: "Genel bakış",   icon: "Home" },
-      { id: "jobs",      label: "Aktif işler",    icon: "Briefcase" },
+      { id: "jobs",      label: "Detay bakış",    icon: "Briefcase" },
     ]
   },
   {
@@ -1456,7 +1456,7 @@ function MobileNav({ active, onChange, data, menuOpen: menuOpenProp, setMenuOpen
 
   const PRIMARY = [
     { id: "overview",  label: "Özet",     icon: "Home" },
-    { id: "jobs",      label: "İşler",    icon: "Briefcase" },
+    { id: "jobs",      label: "Detay",    icon: "Briefcase" },
     { id: "profile",   label: "Profil",   icon: "User" },
     { id: "brand",     label: "Markalar", icon: "Tag" },
   ];

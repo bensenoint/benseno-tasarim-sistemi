@@ -92,6 +92,11 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   else if (scope === "overdue")    rows = evPool.filter(overdueDuring).map(norm);                      // aralıkta gecikme döneminde olan işler
   else if (EV_STATUS.has(scope))   rows = evPool.filter(b => inStatusDuring(b, scope)).map(norm);      // aralıkta o statüde bulunan işler
   else if (scope === "review")     rows = evPool.filter(b => inStatusDuring(b, "incelemede")).map(norm); // geriye uyum (Overview deep-link)
+  // Overview KPI deep-link'leri — anlık (şu an) kümeler: bugün teslim / hareketsiz / tıkanan (çok revize)
+  else if (scope === "today")  { const ds = (() => { const x = new Date(NOW); return new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime(); })(); const de = ds + 86400000 - 1;
+                                 rows = evPool.filter(b => !b.bitis && b.durum !== "musteride" && typeof b.deadline === "number" && b.deadline >= ds && b.deadline <= de).map(norm); }
+  else if (scope === "stale")      rows = evPool.filter(b => !b.bitis && b.durum !== "musteride" && b.stale).map(norm);
+  else if (scope === "stuck")      rows = evPool.filter(b => !b.bitis && b.durum !== "musteride" && Math.max(b.revision || 0, (b.rev_ic || 0) + (b.rev_musteri || 0)) >= 3).map(norm);
   else                             rows = evPool.filter(activeDuring).map(norm);                        // "all" (Aktif işler) + "open" → dönemde aktif statüde bulunan işler
   // Öncelik filtresi (tüm scope'larda): "over" = geçmiş/geciken, diğerleri renk kodu
   if (prioFilter === "over")       rows = rows.filter(b => typeof b.deltaH === "number" && b.deltaH <= 0);
@@ -219,7 +224,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   return (
     <div className="bn-tab-in">
       <PageHead
-        title="Aktif işler"
+        title="Detay bakış"
         subtitle="Seçili tarih aralığı özeti (dönemsel) · sırala · filtrele · drawer'da düzenle"
         actions={isMobile ? null : <>
           {setDateRange && (

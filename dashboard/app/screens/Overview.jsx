@@ -107,7 +107,8 @@ function histTrend(history, field, currentVal) {
 }
 
 // ─── MANAGER SECTION (embedded in Editorial) ─────────────────────────────────
-function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab, onStatusChange }) {
+function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab, onStatusChange, onJumpJobs }) {
+  const jump = onJumpJobs || (() => onSwitchTab("jobs"));
   const briefs = data._allBriefs || data.briefs;
   const allOverdue  = briefs.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi" && b.durum !== "musteride");
   const allReview   = briefs.filter(b => b.durum === "incelemede");
@@ -171,7 +172,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
         <Alert tone="danger" Icon={I.Warn}
           title={`${allOverdue.length} iş gecikti`}
           body="Şu an deadline'ı geçmiş aktif brief'ler. İlk eylem: yeniden ata veya Slack thread'ini aç."
-          action={<Button kind="ink" size="sm" onClick={() => onSwitchTab("jobs")}>Listeyi aç</Button>}
+          action={<Button kind="ink" size="sm" onClick={() => jump("overdue")}>Listeyi aç</Button>}
           metric={allOverdue.length}/>
         <Alert tone={capTone} Icon={I.Info}
           title={capLabel}
@@ -183,7 +184,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
           body={stuck.length > 0
             ? "Tıkanan işler — kapsam/iletişim sorunu olabilir. İncele, gerekirse brief'i netleştir."
             : "Çok revize alan iş yok — revize turları kontrol altında."}
-          action={<Button kind="secondary" size="sm" onClick={() => onSwitchTab("jobs")}>İncele</Button>}
+          action={<Button kind="secondary" size="sm" onClick={() => jump("stuck")}>İncele</Button>}
           metric={stuck.length}/>
       </div>
 
@@ -383,9 +384,9 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
       <KpiGrid cols={7}>
         <Kpi label="Aktif brief"   value={active.length}  variant={kpiVariant} spark={sparkActive}  trend={{...trendActive,  bad: trendActive.dir==="up"}}  sub={hist.length > 1 ? "son sync'e göre" : "geçen haftaya göre"} title="ŞU AN aktif olan brief (anlık, müşteride hariç). Aktif işler sayfası seçili tarih aralığında AKTİF OLMUŞ işleri sayar — bu yüzden sayılar farklı olabilir." onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
         <Kpi label="Geciken"       value={overdue.length} color="var(--prio-red)" emphasis={overdue.length > 0} tint="var(--prio-red-bg)" variant={kpiVariant} spark={sparkOverdue} trend={{...trendOverdue, bad: trendOverdue.dir==="up"}} sub={hist.length > 1 ? "son sync'e göre" : "dün gece"} onClick={onJumpJobs ? () => onJumpJobs("overdue") : undefined}/>
-        <Kpi label="Bugün teslim"  value={todayDue.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Bugün teslim"  value={todayDue.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("today") : undefined}/>
         <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={sparkReview} trend={trendReview} sub={hist.length > 1 ? "son sync'e göre" : "dün 09:00'dan beri"} onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>
-        <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={sparkStale} sub="24 iş saati hareket yok" onClick={onJumpJobs ? () => onJumpJobs("all") : undefined}/>
+        <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={sparkStale} sub="24 iş saati hareket yok" onClick={onJumpJobs ? () => onJumpJobs("stale") : undefined}/>
         <Kpi label="Müşteride"     value={musteride.length} color="var(--musteride)" variant={kpiVariant} sub="✈️ dönüş bekleniyor" onClick={onSwitchTab ? () => onSwitchTab("musteride") : undefined}/>
         <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması" onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}/>
       </KpiGrid>
@@ -435,7 +436,7 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
         );
       })()}
 
-      <ManagerSection data={data} user={user} overdue={overdue} review={review} onOpenBrief={onOpenBrief} onSwitchTab={onSwitchTab} onStatusChange={onStatusChange}/>
+      <ManagerSection data={data} user={user} overdue={overdue} review={review} onOpenBrief={onOpenBrief} onSwitchTab={onSwitchTab} onStatusChange={onStatusChange} onJumpJobs={onJumpJobs}/>
     </div>
   );
 }
