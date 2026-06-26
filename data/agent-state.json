@@ -1,11 +1,11 @@
 {
   "last_run": {
     "skill": "benseno-brief-sync",
-    "ts": 1782465408,
-    "ts_str": "26 Haz 2026 Cum 12:15 TR",
+    "ts": 1782467208,
+    "ts_str": "26 Haz 2026 Cum 12:45 TR",
     "result": "ok",
     "canvas_updated": true,
-    "live_data_updated": true,
+    "live_data_updated": false,
     "github_pushed": false,
     "new_briefs": 0,
     "completed": 0,
@@ -13,6 +13,6 @@
     "blokeli": 12,
     "threshold_crossings": 0,
     "dms_sent": 0,
-    "note": "Timestamp + deadline delta refresh. No brief changes. GITHUB_PAT not available, push skipped."
+    "note": "Timestamp + deadline delta refresh. No brief changes. GITHUB_PAT not available, push skipped. SKILL.md not found in repo — ran from context."
   }
 }
