@@ -14,16 +14,53 @@ function bnsCompletedInDept(c, role) {
 // ⭐ Yıldız Karnesi — ORTAK bileşen. Puan ortalamaları SEÇİLİ TARİH ARALIĞINDAKİ tamamlanan işlerin
 // rating'lerinden hesaplanır. AI sebep açıklamaları da tarihe duyarlı: seçili aralığın
 // sonunda yürürlükte olan dönem yorumu gösterilir (bnsSebepFor → tarihli arşiv).
+// Döneme özel AI değerlendirmesi — LAZY: accordion AÇILDIĞINDA seçili [from,to]
+// için /api/sebep-period'tan getirilir (sayfa/tarih değişiminde otomatik çalışmaz).
+// Tarih aralığı değişirse açık accordion yeniden yükler; kapalıysa hiçbir maliyet yok.
+function PeriodSebep({ type, skey, range }) {
+  const [open, setOpen] = React.useState(false);
+  const [st, setSt] = React.useState({ loading: false, text: null, bos: false, err: null, loaded: false });
+  const from = (range && typeof range.from === "number") ? range.from : 0;
+  const to   = (range && typeof range.to   === "number") ? range.to   : Date.now();
+  const rk = type + ":" + skey + ":" + from + ":" + to;
+  const prev = React.useRef(rk);
+  if (prev.current !== rk) { prev.current = rk; if (st.loaded || st.loading) setSt({ loading: false, text: null, bos: false, err: null, loaded: false }); }
+
+  const load = () => {
+    if (st.loaded || st.loading) return;
+    if (typeof window.bnsApiGet !== "function") { setSt({ loading: false, text: null, bos: false, err: "Değerlendirme yalnız canlı (API) modda üretilir.", loaded: true }); return; }
+    setSt(s => ({ ...s, loading: true }));
+    window.bnsApiGet(`/api/sebep-period?type=${encodeURIComponent(type)}&key=${encodeURIComponent(skey)}&from=${from}&to=${to}`)
+      .then(j => setSt({ loading: false, text: j && j.sebep ? j.sebep : null, bos: !!(j && j.bos), err: null, loaded: true }))
+      .catch(() => setSt({ loading: false, text: null, bos: false, err: "Değerlendirme yüklenemedi.", loaded: true }));
+  };
+  const toggle = () => { const n = !open; setOpen(n); if (n) load(); };
+
+  return (
+    <div style={{flex:"1 1 100%", minWidth:0, marginTop:2}}>
+      <button onClick={toggle} style={{display:"inline-flex", alignItems:"center", gap:5, background:"none", border:"none", padding:0, cursor:"pointer", font:"500 11.5px/1 var(--font-sans)", color:"var(--ink-4)"}}>
+        <span style={{display:"inline-block", transition:"transform .15s", transform:open?"rotate(90deg)":"none"}}>▸</span>
+        Değerlendirme {open ? "" : "(aç)"}
+      </button>
+      {open && <div style={{marginTop:6, font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", overflowWrap:"anywhere"}}>
+        {st.loading ? <span style={{color:"var(--ink-4)"}}>değerlendirme hazırlanıyor…</span>
+         : st.err ? <span style={{color:"var(--ink-4)"}}>{st.err}</span>
+         : st.bos ? <span style={{color:"var(--ink-4)"}}>Bu dönemde değerlendirilecek tamamlanan iş yok.</span>
+         : st.text ? <Linkify text={st.text}/>
+         : <span style={{color:"var(--ink-4)"}}>—</span>}
+      </div>}
+    </div>
+  );
+}
+
 function StarReport({ data, depts }) {
   const list = depts || BNS_DEPTS;
   const comp = data.completed || [];           // üst global tarih aralığına süzülü
   const rated = comp.filter(c => c.rating > 0);
   const avgOf = (arr) => arr.length ? arr.reduce((s, c) => s + c.rating, 0) / arr.length : 0;
-  const sebep = (t, k) => (typeof window.bnsSebepFor === "function" && window.bnsSebepFor(t, k, data.dateRange))
-    || (typeof window.bnsSebep === "function" && window.bnsSebep(t, k)) || null;
   const firmaAvg = +avgOf(rated).toFixed(1), firmaCnt = rated.length;
 
-  const Row = ({ label, avg, cnt, why, big }) => (
+  const Row = ({ label, avg, cnt, stype, skey, big }) => (
     <div style={{display:"flex", flexWrap:"wrap", alignItems:"flex-start", gap:12, rowGap:6, padding:"9px 0", borderBottom:"1px solid var(--line-soft)"}}>
       <span style={{font:`${big?600:500} 13px/1.3 var(--font-sans)`, color:"var(--ink)", minWidth:150, flexShrink:0}}>{label}</span>
       <span style={{display:"inline-flex", gap:1, flexShrink:0, paddingTop:1}}>
@@ -31,7 +68,7 @@ function StarReport({ data, depts }) {
       </span>
       <span style={{font:"600 13px/1.3 var(--font-mono)", color:"var(--ink)", flexShrink:0}}>{cnt ? avg : "—"}</span>
       <span style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)", flexShrink:0}}>({cnt} iş)</span>
-      {why && <MobileAccordion title="Değerlendirme"><span style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)", flex:"1 1 220px", minWidth:0, overflowWrap:"anywhere"}}><Linkify text={why.sebep}/></span></MobileAccordion>}
+      <PeriodSebep type={stype} skey={skey} range={data.dateRange}/>
     </div>
   );
 
@@ -39,14 +76,14 @@ function StarReport({ data, depts }) {
     <Card style={{marginBottom:"var(--section-gap)"}}>
       <Eyebrow>⭐ Yıldız Karnesi</Eyebrow>
       <div style={{marginTop:6}}>
-        {list.length > 1 && <Row label="Benseno (tüm firma)" avg={firmaAvg} cnt={firmaCnt} why={sebep("firma","benseno")} big/>}
+        {list.length > 1 && <Row label="Benseno (tüm firma)" avg={firmaAvg} cnt={firmaCnt} stype="firma" skey="benseno" big/>}
         {list.map(role => {
           const dr = rated.filter(c => bnsCompletedInDept(c, role));
-          return <Row key={role} label={BNS_DEPT_TR[role] || role} avg={+avgOf(dr).toFixed(1)} cnt={dr.length} why={sebep("dept", role)} big={list.length === 1}/>;
+          return <Row key={role} label={BNS_DEPT_TR[role] || role} avg={+avgOf(dr).toFixed(1)} cnt={dr.length} stype="dept" skey={role} big={list.length === 1}/>;
         })}
       </div>
       <div style={{marginTop:8, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
-        Puan ortalamaları seçili tarih aralığındaki tamamlanan işlerden · AI sebep açıklamaları o döneme ait (her gün 18:45'te arşivlenir)
+        Puan ortalamaları seçili tarih aralığındaki tamamlanan işlerden · Değerlendirmeyi açtığında o döneme özel yorum üretilir (tarih değişince yeniden)
       </div>
     </Card>
   );

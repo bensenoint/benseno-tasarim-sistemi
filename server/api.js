@@ -77,6 +77,64 @@ app.get('/api/events', readGuard, async (req, res) => {
   }
 });
 
+// ── Döneme özel yıldız değerlendirmesi (LAZY) ───────────────────────────────
+// Yıldız karnesi accordion'u AÇILDIĞINDA çağrılır (sayfa/tarih değişiminde DEĞİL).
+// Seçili [from,to] dönemindeki TAMAMLANAN işlerin DB verisinden (sayılar deterministik)
+// kısa bir değerlendirme üretir; aynı dönem için 6 saat bellek-içi cache'lenir.
+const _sebepPeriodCache = new Map();
+app.get('/api/sebep-period', readGuard, async (req, res) => {
+  try {
+    const type = String(req.query.type || 'firma');
+    const key = String(req.query.key || '');
+    const fromMs = Number(req.query.from) || 0;
+    const toMs = Number(req.query.to) || Date.now();
+    const ck = `${type}:${key}:${Math.floor(fromMs / 864e5)}:${Math.floor(toMs / 864e5)}`;
+    const hit = _sebepPeriodCache.get(ck);
+    if (hit && (Date.now() - hit.ts) < 6 * 3600 * 1000) return res.json({ sebep: hit.text, cached: true });
+
+    const ed = await getEmbedded();
+    const deptOf = {};
+    for (const u of (ed.bns_users || [])) deptOf[u.id] = u.dept || u.rol || '';
+    const people = (c) => [...(c.leads || []), ...(c.workers || []), ...(c.lead ? [c.lead] : []), ...(c.contributors || [])];
+    const onDept = (c) => people(c).some(p => p && deptOf[p.id] === key);
+    const onKisi = (c) => people(c).some(p => p && (p.id === key || p.name === key));
+    let comp = (ed.bns_completed || []).filter(c => typeof c.bitis === 'number' && c.bitis >= fromMs && c.bitis <= toMs);
+    if (type === 'dept') comp = comp.filter(onDept);
+    else if (type === 'kisi') comp = comp.filter(onKisi);
+    if (!comp.length) return res.json({ sebep: null, bos: true });
+
+    // Deterministik özet (DB) — model SAYI uydurmaz, yalnız ifadelendirir.
+    const rated = comp.filter(c => c.rating > 0);
+    const avg = rated.length ? (rated.reduce((s, c) => s + c.rating, 0) / rated.length).toFixed(2) : null;
+    const revOf = (c) => (typeof c.rev_ic === 'number' || typeof c.rev_musteri === 'number') ? (c.rev_ic || 0) + (c.rev_musteri || 0) : (c.rev || c.revision || 0);
+    const revs = comp.map(revOf);
+    const avgRev = revs.length ? (revs.reduce((a, v) => a + v, 0) / revs.length).toFixed(2) : '0';
+    const markaSay = {}; comp.forEach(c => { if (c.marka) markaSay[c.marka] = (markaSay[c.marka] || 0) + 1; });
+    const topMarka = Object.entries(markaSay).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([m, n]) => `${m}(${n})`).join(', ');
+    const sebepOrnek = comp.map(c => c.rating_sebep).filter(Boolean).slice(0, 6);
+    const insightOrnek = comp.map(c => c.insight).filter(Boolean).slice(0, 4);
+
+    const etiket = type === 'firma' ? 'tüm firma (Benseno)' : type === 'dept' ? (key + ' departmanı') : key;
+    const fmt = (m) => { try { return new Date(m).toLocaleDateString('tr-TR'); } catch (e) { return '' + m; } };
+    const prompt = `Aşağıda ${etiket} için ${fmt(fromMs)}–${fmt(toMs)} döneminde TAMAMLANAN işlerin verisi var. Bu verilere dayanarak 2-3 cümlelik, somut ve yapıcı bir performans değerlendirmesi yaz. SADECE verilen sayıları kullan, YENİ sayı uydurma. Türkçe, akıcı, abartısız yönetici diliyle.\n\nVERİ:\n- Tamamlanan iş: ${comp.length}\n- Puanlı iş: ${rated.length}, ortalama puan: ${avg ?? 'yok'} / 5\n- Ortalama revize: ${avgRev}\n- En çok çalışılan markalar: ${topMarka || '—'}\n- Yıldız yorum örnekleri: ${sebepOrnek.join(' | ') || 'yok'}\n- İş insight örnekleri: ${insightOrnek.join(' | ') || 'yok'}`;
+
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6', max_tokens: 400,
+        system: 'Sen Benseno tasarım stüdyosunun veri-temelli değerlendirme yazarısın. Kısa, somut, abartısız yaz. Verilmeyen sayıyı kullanma.',
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { console.error('[sebep-period] AI hata:', j.error?.message || r.status); return res.status(502).json({ error: 'değerlendirme üretilemedi' }); }
+    const text = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+    if (text) _sebepPeriodCache.set(ck, { text, ts: Date.now() });
+    res.json({ sebep: text || null, adet: comp.length });
+  } catch (e) { console.error('[sebep-period] hata:', e.message); res.status(500).json({ error: e.message }); }
+});
+
 // ── Yazma yolu (Faz 3) ───────────────────────────────────────
 // Opsiyonel guard: BNS_WRITE_TOKEN set ise x-bns-token eşleşmeli. Set değilse açık (staging).
 function writeGuard(req, res, next) {

@@ -231,6 +231,16 @@ function App({ currentUser, onLogout }) {
     window.openNewBriefModal = () => setNewBrief(true);
     window.bnsRefresh = () => setPollTick(x => x + 1);   // yazma sonrası anlık poll (NewBrief formu çağırır)
     window.bnsToast = (msg) => setToast(msg);            // başarı/hata bildirimi
+    // Authlı GET helper — lazy ekranlar (ör. dönem değerlendirmesi) API'den veri çeker.
+    window.bnsApiGet = async (path) => {
+      const base = (typeof window.BNS_API_BASE === "string" && window.BNS_API_BASE)
+        ? window.BNS_API_BASE.replace(/\/+$/, "")
+        : "https://benseno-api-production.up.railway.app";
+      const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+      const r = await fetch(base + path, { headers: tok ? { Authorization: "Bearer " + tok } : {} });
+      if (!r.ok) throw new Error("api " + r.status);
+      return r.json();
+    };
   }, []);
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
