@@ -220,10 +220,10 @@ defs.gecikme_analizi = {
 };
 
 defs.kapasite = {
-  description: 'Kişi başına AKTİF iş yükü. Yük ROL AĞIRLIKLI: işi yapan=5, lead=2, gözlemci=1. "yuk" = ağırlıklı toplam, "aktif" = işçi+lead iş sayısı (gözlemci hariç). Liste yük\'e göre azalan. Opsiyonel kisi parametresi tek kişiyi döner.',
+  description: 'Kişi başına AKTİF iş yükü. Yük ROL AĞIRLIKLI: işi yapan=5, lead=2, gözlemci=0 (gözlemcilik gözetimdir, kapasiteye katılmaz — Genel bakış/Departman ile aynı). "yuk" = ağırlıklı toplam, "aktif" = işçi+lead iş sayısı. Liste yük\'e göre azalan. Opsiyonel kisi parametresi tek kişiyi döner.',
   input_schema: { type: 'object', properties: { kisi: { type: 'string' } } },
   run(input, ctx) {
-    const W = { worker: 5, lead: 2, observer: 1 };
+    const W = { worker: 5, lead: 2, observer: 0 };
     const load = {};
     const bump = (p, w, no, isAktif) => {
       if (!p || !p.id) return;

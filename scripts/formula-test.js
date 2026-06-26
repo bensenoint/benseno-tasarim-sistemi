@@ -36,7 +36,7 @@ t('0 iş = %0',         C.bnsPersonCapPct({ dept: 'ai' }, 0), 0);
 const _wA = { id: 'A' }, _wB = { id: 'B' }, _wC = { id: 'C' };
 t('yük: işçi=5', C.bnsBriefLoadWeight({ workers: [_wA] }, 'A'), 5);
 t('yük: lead=2', C.bnsBriefLoadWeight({ leads: [_wB] }, 'B'), 2);
-t('yük: gözlemci=1', C.bnsBriefLoadWeight({ observers: [_wC] }, 'C'), 1);
+t('yük: gözlemci=0 (kapasiteye katılmaz)', C.bnsBriefLoadWeight({ observers: [_wC] }, 'C'), 0);
 t('yük: rol yoksa 0', C.bnsBriefLoadWeight({ workers: [_wA] }, 'Z'), 0);
 t('yük: en yüksek rol (işçi>lead)', C.bnsBriefLoadWeight({ workers: [_wA], leads: [_wA] }, 'A'), 5);
 const _briefs = [
@@ -45,10 +45,10 @@ const _briefs = [
   { durum: 'tamamlandi', workers: [_wA] },   // sayılmaz
   { durum: 'musteride', workers: [_wA] },     // sayılmaz
 ];
-t('personLoad A = 5+1 = 6', C.bnsPersonLoad(_briefs, 'A'), 6);
+t('personLoad A = 5+0(gözlemci) = 5', C.bnsPersonLoad(_briefs, 'A'), 5);
 t('personLoad B = 2+5 = 7', C.bnsPersonLoad(_briefs, 'B'), 7);
-// kapasite %: işçi-eşdeğeri = yük/5. A: 6/5=1.2 iş-eşdeğeri, ai limiti 6 → %20
-t('capPct A (rol ağırlıklı)', C.bnsPersonCapPct({ dept: 'ai' }, C.bnsPersonLoad(_briefs, 'A') / 5), 20);
+// kapasite %: işçi-eşdeğeri = yük/5. A: 5/5=1 iş-eşdeğeri, ai limiti 6 → %17
+t('capPct A (rol ağırlıklı, gözlemci hariç)', C.bnsPersonCapPct({ dept: 'ai' }, C.bnsPersonLoad(_briefs, 'A') / 5), 17);
 // dept yükü: tasarım üyeleri — A,B tasarımcı say → dept yük; capacity 6 → (yük/5)/6
 const _dBriefs = [{ durum: 'devam', workers: [{ id: 'A', dept: 'tasarim' }], leads: [{ id: 'B', dept: 'tasarim' }] }];
 t('deptLoad tasarim = 5+2 = 7', C.bnsDeptLoad(_dBriefs, 'tasarim'), 7);

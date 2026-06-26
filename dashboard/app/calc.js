@@ -30,7 +30,10 @@ function bnsDeptActive(briefs, deptKey) {
 // Bir işte: işi yapan (worker/contributor)=5, lead=2, gözlemci=1. Yük bu ağırlıkların
 // toplamıdır. Kapasite yüzdesinde ağırlıklı yük "işçi-eşdeğeri iş sayısına" çevrilir
 // (yük/5): saf işçi N iş = N (eski davranışla birebir), lead N iş = 0.4N, gözlemci = 0.2N.
-var BNS_ROLE_W = { worker: 5, lead: 2, observer: 1 };
+// NOT: gözlemci=0 — gözlemcilik gözetimdir, ÜRETİM yükü değil. Genel bakış/Departman
+// kapasitesi de gözlemcileri dışlar (bnsDeptActive + sunucu a.role<>'gozlemci'); kişi
+// kapasitesi de aynı olsun ki yöneticiler "her işe gözlemci" diye %100 görünmesin.
+var BNS_ROLE_W = { worker: 5, lead: 2, observer: 0 };
 // Bir kişinin tek bir briefteki rol ağırlığı (en yüksek rol geçerli: işçi > lead > gözlemci).
 function bnsBriefLoadWeight(b, userId) {
   if (!b || !userId) return 0;
