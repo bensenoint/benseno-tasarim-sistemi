@@ -49,12 +49,20 @@ function _userCandidates(ed, kisi) {
 }
 
 // Entity sebep (AI yorum metni) — type: firma|dept|kisi|marka, key: benseno|deptKey|userId/ad|markaAdı.
-function sebepFor(ed, type, ...keys) {
-  const list = ed.bns_sebep || [];
+// range verilirse (tarihli arşiv): aralığın SONUNDA (<=to) yürürlükteki yorum; yoksa güncel snapshot.
+function sebepFor(ed, range, type, ...keys) {
+  const norm = (k) => String(k == null ? '' : k).toLocaleLowerCase('tr');
+  const cur = ed.bns_sebep || [];
+  const hist = ed.bns_sebep_history || [];
+  const toStr = (range && typeof range.to === 'number') ? new Date(range.to).toISOString().slice(0, 10) : null;
   for (const key of keys) {
     if (key == null) continue;
-    const k = String(key).toLocaleLowerCase('tr');
-    const row = list.find(s => s.type === type && String(s.key || '').toLocaleLowerCase('tr') === k);
+    const k = norm(key);
+    if (toStr) {
+      const cands = hist.filter(s => s.type === type && norm(s.key) === k && s.gun <= toStr);
+      if (cands.length) { cands.sort((a, b) => (a.gun < b.gun ? 1 : -1)); if (cands[0].sebep) return cands[0].sebep; }
+    }
+    const row = cur.find(s => s.type === type && norm(s.key) === k);
     if (row && row.sebep) return row.sebep;
   }
   return null;
@@ -158,7 +166,7 @@ defs.marka_dokumu = {
       tamamlanan: (ctx.ed.bns_completed || []).filter(c => match(c.marka) && inRange(c.bitis, range)).length,
       kanal_ozet: br.kanal_ozet ? br.kanal_ozet.slice(0, 300) : null,
       son_insight: br.son_insight ? br.son_insight.slice(0, 300) : null,
-      yorum: sebepFor(ctx.ed, 'marka', br.name),
+      yorum: sebepFor(ctx.ed, normRange(ctx.range), 'marka', br.name),
     };
     if (ctx.isAdmin) {
       // bns_ratings'te marka anahtarı yok (markalarda rating saklanmıyor); güvenli null.
@@ -174,12 +182,13 @@ defs.yildiz_karne = {
   input_schema: { type: 'object', required: ['kapsam'], properties: { kapsam: { type: 'string', enum: ['firma', 'dept', 'kisi'] }, key: { type: 'string' } } },
   run(input, ctx) {
     const R = ctx.ed.bns_ratings || {};
-    if (input.kapsam === 'firma') return { ...(R.firma || { avg: null, cnt: 0 }), yorum: sebepFor(ctx.ed, 'firma', 'benseno') };
+    const rg = normRange(ctx.range);
+    if (input.kapsam === 'firma') return { ...(R.firma || { avg: null, cnt: 0 }), yorum: sebepFor(ctx.ed, rg, 'firma', 'benseno') };
     if (!ctx.isAdmin) return { yetki: 'yöneticilere özel' };
     if (input.kapsam === 'dept') {
       const dept = R.dept || {};
       const yorumlar = {};
-      for (const k of Object.keys(dept)) yorumlar[k] = sebepFor(ctx.ed, 'dept', k);
+      for (const k of Object.keys(dept)) yorumlar[k] = sebepFor(ctx.ed, rg, 'dept', k);
       return { dept, yorumlar };
     }
     if (input.kapsam === 'kisi') {
@@ -188,7 +197,7 @@ defs.yildiz_karne = {
       if (!pr.user) return { bulunamadi: true, adaylar: _userCandidates(ctx.ed, input.key) };
       const u = pr.user;
       const p = R.users && R.users[u.id];
-      return { kisi: u.name, puan: p ? { avg: p.avg, cnt: p.cnt } : null, yorum: sebepFor(ctx.ed, 'kisi', u.id, u.name) };
+      return { kisi: u.name, puan: p ? { avg: p.avg, cnt: p.cnt } : null, yorum: sebepFor(ctx.ed, rg, 'kisi', u.id, u.name) };
     }
     return { error: 'geçersiz kapsam' };
   },
