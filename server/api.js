@@ -123,7 +123,7 @@ app.get('/api/sebep-period', readGuard, async (req, res) => {
       headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6', max_tokens: 400,
-        system: 'Sen Benseno tasarım stüdyosunun veri-temelli değerlendirme yazarısın. Kısa, somut, abartısız yaz. Verilmeyen sayıyı kullanma.',
+        system: 'Sen Benseno tasarım stüdyosunun veri-temelli değerlendirme yazarısın. Kısa, somut, abartısız yaz. Verilmeyen sayıyı kullanma. DÜZ METİN yaz: Markdown KULLANMA — başlık (#), kalın (**), madde işareti veya liste YOK; tek akıcı paragraf (2-3 cümle).',
         messages: [{ role: 'user', content: prompt }],
       }),
     });
