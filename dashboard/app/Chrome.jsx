@@ -1192,39 +1192,82 @@ function DateRangeControl({ range, onChange, now, compact, disabled }) {
   const label = (PRESETS.find(p => p[0] === range.preset) || [null, "Özel aralık"])[1];
   const toYMD = (ms) => { const d = new Date(ms); return isNaN(d.getTime()) ? "" : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
   const parseYMD = (s, end) => { const p = (s||"").split("-").map(Number); if (!p[0]) return null; return new Date(p[0], p[1]-1, p[2], end?23:0, end?59:0, end?59:0).getTime(); };
-  // Özel aralık inputları: her açılışta başlangıç ve bitiş bugüne sıfırlanır.
+  // Çözülmüş aralık etiketi — "12 Haz – 26 Haz" (gerek varsa yıl). Kullanıcı tam ne seçtiğini görür.
+  const AY = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+  const fmtG = (ms) => { const d = new Date(ms); const yıl = d.getFullYear() !== new Date(now).getFullYear() ? " " + d.getFullYear() : ""; return `${d.getDate()} ${AY[d.getMonth()]}${yıl}`; };
+  const span = range.preset === "all" ? "Tüm zamanlar"
+    : (typeof range.from === "number" && typeof range.to === "number" && range.to < 8e15)
+      ? (toYMD(range.from) === toYMD(range.to) ? fmtG(range.from) : `${fmtG(range.from)} – ${fmtG(range.to)}`)
+      : "";
+  const isDefault = range.preset === "30d";
+  // Özel aralık inputları: her açılışta mevcut aralığı yansıtır (yoksa bugüne).
   const [cFrom, setCFrom] = React.useState("");
   const [cTo, setCTo] = React.useState("");
-  React.useEffect(() => { if (open) { const t = toYMD(now); setCFrom(t); setCTo(t); } }, [open]);
+  React.useEffect(() => { if (open) { const tn = toYMD(now); setCFrom(typeof range.from === "number" && range.from > 0 ? toYMD(range.from) : tn); setCTo(typeof range.to === "number" && range.to < 8e15 ? toYMD(range.to) : tn); } }, [open]);
+  // Tıkla-dışarı + Escape ile kapan.
+  const wrapRef = React.useRef(null);
+  React.useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDoc); document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onKey); };
+  }, [open]);
+  const QUICK = PRESETS.filter(p => p[0] !== "all");
   return (
-    <div style={{ position: "relative", flexShrink: 0 }}>
+    <div ref={wrapRef} style={{ position: "relative", flexShrink: 0 }}>
       <button onClick={() => { if (!disabled) setOpen(o => !o); }} disabled={disabled}
-        title={disabled ? "Bu sayfada tarih filtresi uygulanmaz" : "Tarih aralığı"}
-        style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: compact ? "5px 7px" : "5px 9px",
-          border: "1px solid var(--line)", borderRadius: 6,
-          background: disabled ? "var(--paper-2)" : (range.preset === "30d" ? "var(--paper-2)" : "var(--ember-tint)"),
-          color: disabled ? "var(--ink-5)" : (range.preset === "30d" ? "var(--ink-3)" : "var(--ember)"),
-          font: "500 11px/1 var(--font-sans)", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.55 : 1 }}>
-        <span>📅</span>{!compact && <span>{disabled ? "Tarih" : label}</span>}<span style={{ color: "var(--ink-4)" }}>▾</span>
+        title={disabled ? "Bu sayfada tarih filtresi uygulanmaz" : (span || "Tarih aralığı")}
+        style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: compact ? "6px 9px" : "6px 12px",
+          border: "1px solid " + (open ? "var(--ink-3)" : "var(--line)"), borderRadius: 8,
+          background: disabled ? "var(--paper-2)" : "var(--surface)",
+          color: disabled ? "var(--ink-5)" : "var(--ink-2)",
+          font: "500 12px/1 var(--font-sans)", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.55 : 1,
+          transition: "border-color .15s" }}>
+        <span style={{ display: "inline-flex", color: disabled ? "var(--ink-5)" : (isDefault ? "var(--ink-4)" : "var(--ember)") }}><I.Calendar size={13}/></span>
+        {!compact && <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-start", gap: 2, lineHeight: 1 }}>
+          <span style={{ font: "600 12px/1 var(--font-sans)", color: disabled ? "var(--ink-5)" : "var(--ink)" }}>{disabled ? "Tarih" : label}</span>
+          {!disabled && span && <span style={{ font: "400 9.5px/1 var(--font-mono)", color: "var(--ink-4)", letterSpacing: ".01em" }}>{span}</span>}
+        </span>}
+        {compact && !isDefault && !disabled && <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--ember)", flex: "none" }}/>}
+        <span style={{ color: "var(--ink-4)", fontSize: 9, transition: "transform .15s", transform: open ? "rotate(180deg)" : "none" }}>▾</span>
       </button>
       {open && (
-        <div onMouseLeave={() => setOpen(false)} style={{ position: "absolute", top: "100%", right: 0, marginTop: 6, zIndex: 80,
-          background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 10, padding: 6, boxShadow: "var(--shadow-1)", minWidth: 184 }}>
-          {PRESETS.map(([code, lbl, days]) => (
-            <button key={code} onClick={() => apply(code, days)} style={{ display: "flex", width: "100%", textAlign: "left",
-              padding: "7px 9px", border: 0, borderRadius: 6, cursor: "pointer",
-              background: range.preset === code ? "var(--paper-2)" : "transparent",
-              font: `${range.preset === code ? 600 : 500} 12px/1 var(--font-sans)`, color: "var(--ink)" }}>{lbl}</button>
-          ))}
-          <div style={{ borderTop: "1px solid var(--line)", margin: "5px 4px", paddingTop: 6 }}>
-            <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ink-4)", textTransform: "uppercase", letterSpacing: "0.04em", padding: "0 5px 6px" }}>Özel aralık</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5, padding: "0 4px 2px" }}>
-              <input type="date" value={cFrom} onChange={e => { setCFrom(e.target.value); const v = parseYMD(e.target.value, false); if (v != null) onChange({ ...range, from: v, preset: "custom" }); }}
-                style={{ font: "500 12px/1 var(--font-sans)", padding: "5px 7px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)" }}/>
-              <input type="date" value={cTo} onChange={e => { setCTo(e.target.value); const v = parseYMD(e.target.value, true); if (v != null) onChange({ ...range, to: v, preset: "custom" }); }}
-                style={{ font: "500 12px/1 var(--font-sans)", padding: "5px 7px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)" }}/>
+        <div style={{ position: "absolute", top: "calc(100% + 7px)", right: 0, zIndex: 80,
+          background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 12, padding: 12,
+          boxShadow: "var(--shadow-2, var(--shadow-1))", width: 248 }}>
+          <div style={{ font: "600 9.5px/1 var(--font-sans)", color: "var(--ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 9 }}>Tarih aralığı</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+            {QUICK.map(([code, lbl, days]) => {
+              const sel = range.preset === code;
+              return (
+                <button key={code} onClick={() => apply(code, days)} style={{ textAlign: "left",
+                  padding: "8px 10px", border: "1px solid " + (sel ? "var(--ink)" : "var(--line)"), borderRadius: 8, cursor: "pointer",
+                  background: sel ? "var(--ink)" : "var(--surface)",
+                  color: sel ? "var(--paper)" : "var(--ink-2)",
+                  font: `${sel ? 600 : 500} 12px/1 var(--font-sans)`, transition: "all .12s" }}>{lbl}</button>
+              );
+            })}
+            {(() => { const sel = range.preset === "all"; return (
+              <button onClick={() => apply("all")} style={{ gridColumn: "1 / -1", textAlign: "center",
+                padding: "8px 10px", border: "1px solid " + (sel ? "var(--ink)" : "var(--line)"), borderRadius: 8, cursor: "pointer",
+                background: sel ? "var(--ink)" : "var(--surface)", color: sel ? "var(--paper)" : "var(--ink-3)",
+                font: `${sel ? 600 : 500} 12px/1 var(--font-sans)`, transition: "all .12s" }}>Tüm zamanlar</button>
+            ); })()}
+          </div>
+          <div style={{ borderTop: "1px solid var(--line-soft)", marginTop: 11, paddingTop: 10 }}>
+            <div style={{ font: "600 9.5px/1 var(--font-sans)", color: "var(--ink-4)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>Özel aralık</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+              <input type="date" value={cFrom} max={cTo || toYMD(now)} aria-label="Başlangıç"
+                onChange={e => { setCFrom(e.target.value); const v = parseYMD(e.target.value, false); if (v != null) onChange({ ...range, from: v, preset: "custom" }); }}
+                style={{ flex: 1, minWidth: 0, font: "500 11.5px/1 var(--font-sans)", padding: "7px 8px", border: "1px solid var(--line)", borderRadius: 7, background: "var(--paper-2)", color: "var(--ink)" }}/>
+              <span style={{ color: "var(--ink-4)", font: "500 12px/1 var(--font-sans)", flex: "none" }}>–</span>
+              <input type="date" value={cTo} min={cFrom} max={toYMD(now)} aria-label="Bitiş"
+                onChange={e => { setCTo(e.target.value); const v = parseYMD(e.target.value, true); if (v != null) onChange({ ...range, to: v, preset: "custom" }); }}
+                style={{ flex: 1, minWidth: 0, font: "500 11.5px/1 var(--font-sans)", padding: "7px 8px", border: "1px solid var(--line)", borderRadius: 7, background: "var(--paper-2)", color: "var(--ink)" }}/>
             </div>
           </div>
+          {span && <div style={{ marginTop: 10, font: "400 10.5px/1.3 var(--font-sans)", color: "var(--ink-4)" }}>Seçili: <span style={{ color: "var(--ink-2)", fontWeight: 600 }}>{span}</span></div>}
         </div>
       )}
     </div>
