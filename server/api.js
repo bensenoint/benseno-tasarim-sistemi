@@ -8,7 +8,7 @@
  */
 
 const express = require('express');
-const { getState, getEmbedded } = require('./queries');
+const { getState, getEmbedded, getEvents } = require('./queries');
 const writes = require('./writes');
 const slack = require('./slack');
 const { pool } = require('./db');
@@ -57,6 +57,20 @@ app.get('/api/embedded', readGuard, async (req, res) => {
     res.json(await getEmbedded());
   } catch (e) {
     console.error('[api] /api/embedded hata:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Geçmiş (aktivite log) — sayfalı. ?limit=100&before=<ts>&archive=0|1. Varsayılan son 30 gün.
+app.get('/api/events', readGuard, async (req, res) => {
+  try {
+    res.json(await getEvents({
+      before: req.query.before,
+      limit: req.query.limit,
+      archive: req.query.archive === '1' || req.query.archive === 'true',
+    }));
+  } catch (e) {
+    console.error('[api] /api/events hata:', e.message);
     res.status(500).json({ error: e.message });
   }
 });

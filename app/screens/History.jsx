@@ -1,17 +1,70 @@
-// app/screens/History.jsx — sistem aktivite log'u.
+// app/screens/History.jsx — sistem aktivite log'u (sayfalı: 100/sayfa, varsayılan son 1 ay, eskisi arşivden).
+
+// API base'i App.jsx'teki resolveDataUrl ile aynı önceliklerle çözer. null → statik/snapshot (API yok).
+function bnsHistApiBase() {
+  const DEFAULT_API = "https://benseno-api-production.up.railway.app";
+  try {
+    if (window.BNS_SNAPSHOT) return null;
+    const p = new URLSearchParams(window.location.search).get("api");
+    if (p === "0" || p === "false") return null;
+    if (p && /^https?:\/\//.test(p)) return p.replace(/\/+$/, "");
+    const ls = window.localStorage.getItem("bns_api");
+    if (ls === "0") return null;
+    if (ls && ls !== "1") return ls.replace(/\/+$/, "");
+    return window.BNS_API_BASE ? String(window.BNS_API_BASE).replace(/\/+$/, "") : DEFAULT_API;
+  } catch (e) { return DEFAULT_API; }
+}
+async function bnsFetchEvents({ before, archive }) {
+  const base = bnsHistApiBase();
+  if (!base) return null;   // statik/snapshot → fallback (data.activity)
+  try {
+    const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+    const qs = new URLSearchParams({ limit: "100" });
+    if (before != null) qs.set("before", String(before));
+    if (archive) qs.set("archive", "1");
+    const r = await fetch(base + "/api/events?" + qs.toString(), { cache: "no-store", headers: tok ? { Authorization: "Bearer " + tok } : {} });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) { return null; }
+}
 
 function HistoryScreen({ data, onOpenByNo }) {
   const [filter, setFilter] = React.useState("all");
-  // viewMode'dan bağımsız: her zaman TÜM brief ve tamamlananları kullan
-  const allBriefs    = data._allBriefs    || data.briefs    || [];
-  const allCompleted = data._allCompleted || data.completed || [];
+  const [items, setItems] = React.useState(null);        // null → API'den henüz yüklenmedi
+  const [hasMore, setHasMore] = React.useState(false);
+  const [archiveOn, setArchiveOn] = React.useState(false); // 1 ay sınırı aşıldı (arşiv yüklendi)
+  const [loading, setLoading] = React.useState(false);
+  const [apiOk, setApiOk] = React.useState(true);
 
-  // Yalnız gerçek olay akışı (events tablosu). Brieflerden sentetik "açtı" satırı
-  // ÜRETİLMEZ — eski sürüm lead'i açan sayıyordu (yanlış kişi) ve mükerrer satır yaratıyordu.
-  let all = data.activity
-    .map(a => ({ ...a, _type: typeFromVerb(a.verb) }))
-    .sort((a, b) => b.t - a.t).slice(0, 80);
+  // İlk yükleme: sayfalı /api/events (son 30 gün). API yoksa data.activity'ye düş.
+  React.useEffect(() => {
+    let cancel = false;
+    (async () => {
+      setLoading(true);
+      const res = await bnsFetchEvents({});
+      if (cancel) return;
+      if (res && Array.isArray(res.events)) { setItems(res.events.map(window.bnsMapEvent)); setHasMore(!!res.hasMore); setApiOk(true); }
+      else setApiOk(false);
+      setLoading(false);
+    })();
+    return () => { cancel = true; };
+  }, []);
 
+  const loadMore = async (archive) => {
+    setLoading(true);
+    const before = items && items.length ? items[items.length - 1].t : undefined;
+    const res = await bnsFetchEvents({ before, archive });
+    if (res && Array.isArray(res.events)) {
+      setItems(prev => [...(prev || []), ...res.events.map(window.bnsMapEvent)]);
+      setHasMore(!!res.hasMore);
+      if (archive) setArchiveOn(true);
+    }
+    setLoading(false);
+  };
+
+  // Kaynak: API çalışıyorsa sayfalı items; değilse eski data.activity (fallback, ~son 80).
+  const source = (apiOk && items) ? items : (data.activity || []);
+  let all = source.map(a => ({ ...a, _type: typeFromVerb(a.verb) })).sort((a, b) => b.t - a.t);
   if (filter !== "all") all = all.filter(a => a._type === filter);
 
   // Group by day
@@ -95,6 +148,20 @@ function HistoryScreen({ data, onOpenByNo }) {
           </div>
         ))}
       </Card>
+
+      {/* Sayfalama — 100/sayfa, varsayılan son 1 ay; eskisi arşivden. (API yoksa gizli) */}
+      {apiOk && (() => {
+        const btn = { font:"600 12px/1 var(--font-sans)", padding:"9px 16px", border:"1px solid var(--line)",
+          borderRadius:8, background:"var(--surface)", color:"var(--ink)", cursor: loading ? "default" : "pointer", opacity: loading ? 0.6 : 1 };
+        return (
+          <div style={{display:"flex", justifyContent:"center", alignItems:"center", gap:12, padding:"18px 0 6px", flexWrap:"wrap"}}>
+            <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-4)"}}>{all.length} kayıt · {archiveOn ? "arşiv dahil" : "son 1 ay"}</span>
+            {hasMore && <button onClick={() => loadMore(archiveOn)} disabled={loading} style={btn}>{loading ? "Yükleniyor…" : "Daha fazla yükle (+100)"}</button>}
+            {!hasMore && !archiveOn && <button onClick={() => loadMore(true)} disabled={loading} style={btn}>{loading ? "Yükleniyor…" : "Arşivden daha eski göster"}</button>}
+            {!hasMore && archiveOn && <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-5)"}}>tüm geçmiş yüklendi</span>}
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -194,7 +194,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
 
   // Kart tıklama: aynı karta (açıkken) basınca detayı kapat; farklı/kapalıyken o statüyü seç + detayı aç.
   const onCardClick = (key) => {
-    if (key === scope && detailOpen) setDetailOpen(false);
+    if (key === scope && detailOpen) { setDetailOpen(false); setScope("all"); }  // tekrar tık → kapan + varsayılana dön
     else { setScope(key); setDetailOpen(true); }
   };
   // Tarih kısayolları (üst global tarih filtresiyle çalışır; preset kodları DateRangeControl ile aynı).
@@ -251,7 +251,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
         <KpiGrid cols={statusCards.length}>
           {statusCards.map(c => (
             <Kpi key={c.key} label={c.label} value={c.value} color={c.color} title={c.hint}
-              active={activeKey === c.key} onClick={() => onCardClick(c.key)}/>
+              active={detailOpen && activeKey === c.key} onClick={() => onCardClick(c.key)}/>
           ))}
         </KpiGrid>
       )}

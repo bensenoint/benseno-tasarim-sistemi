@@ -285,4 +285,30 @@ async function getEmbedded() {
   };
 }
 
-module.exports = { getState, getEmbedded, allBriefsWithAssignees };
+// Geçmiş (aktivite log) — sayfalı. Varsayılan: son 30 gün (archive=false). archive=true → daha eski (arşiv).
+// before: ts (ms) imleci → bu andan ESKİ olaylar (sayfalama). limit: maks 100.
+async function getEvents({ before, limit, archive } = {}) {
+  const lim = Math.min(100, Math.max(1, parseInt(limit, 10) || 100));
+  const params = [];
+  const conds = [`e.verb NOT LIKE 'slack:%'`];
+  if (!archive) conds.push(`e.ts >= now() - interval '30 days'`);   // 1 ay penceresi (arşiv hariç)
+  const beforeMs = Number(before);
+  if (Number.isFinite(beforeMs) && beforeMs > 0) { params.push(new Date(beforeMs)); conds.push(`e.ts < $${params.length}`); }
+  params.push(lim + 1);   // hasMore tespiti için 1 fazla çek
+  const sql = `
+    SELECT e.ts, e.user_id, e.verb, e.detail, b.no, b.baslik, br.name AS marka
+    FROM events e
+    LEFT JOIN briefs b ON b.id = e.brief_id
+    LEFT JOIN brands br ON br.id = b.marka_id
+    WHERE ${conds.join(' AND ')}
+    ORDER BY e.ts DESC
+    LIMIT $${params.length}`;
+  const r = await pool.query(sql, params);
+  const toMs = (d) => (d ? new Date(d).getTime() : null);
+  let rows = r.rows.map(e => ({ t: toMs(e.ts), who: e.user_id, verb: e.verb, detail: e.detail, no: e.no, baslik: e.baslik, marka: e.marka }));
+  const hasMore = rows.length > lim;
+  if (hasMore) rows = rows.slice(0, lim);
+  return { events: rows, hasMore, oldestTs: rows.length ? rows[rows.length - 1].t : null, archive: !!archive };
+}
+
+module.exports = { getState, getEmbedded, allBriefsWithAssignees, getEvents };
