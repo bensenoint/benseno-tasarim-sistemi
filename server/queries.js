@@ -287,11 +287,16 @@ async function getEmbedded() {
 
 // Geçmiş (aktivite log) — sayfalı. Varsayılan: son 30 gün (archive=false). archive=true → daha eski (arşiv).
 // before: ts (ms) imleci → bu andan ESKİ olaylar (sayfalama). limit: maks 100.
-async function getEvents({ before, limit, archive } = {}) {
+async function getEvents({ before, limit, archive, from, to } = {}) {
   const lim = Math.min(100, Math.max(1, parseInt(limit, 10) || 100));
   const params = [];
   const conds = [`e.verb NOT LIKE 'slack:%'`];
-  if (!archive) conds.push(`e.ts >= now() - interval '30 days'`);   // 1 ay penceresi (arşiv hariç)
+  const hasFrom = from != null && from !== '' && Number.isFinite(Number(from));
+  const hasTo   = to   != null && to   !== '' && Number.isFinite(Number(to));
+  if (hasFrom) { params.push(new Date(Number(from))); conds.push(`e.ts >= $${params.length}`); }
+  if (hasTo)   { params.push(new Date(Number(to)));   conds.push(`e.ts <= $${params.length}`); }
+  // Tarih aralığı verilmemişse 1 ay penceresi (arşiv hariç). from/to verilirse onlar yönetir.
+  if (!archive && !hasFrom && !hasTo) conds.push(`e.ts >= now() - interval '30 days'`);
   const beforeMs = Number(before);
   if (Number.isFinite(beforeMs) && beforeMs > 0) { params.push(new Date(beforeMs)); conds.push(`e.ts < $${params.length}`); }
   params.push(lim + 1);   // hasMore tespiti için 1 fazla çek

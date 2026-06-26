@@ -1,4 +1,4 @@
-// app/screens/History.jsx — sistem aktivite log'u (sayfalı: 100/sayfa, varsayılan son 1 ay, eskisi arşivden).
+// app/screens/History.jsx — sistem aktivite log'u (takvim filtresine bağlı · 100/sayfa · tür filtresi).
 
 // API base'i App.jsx'teki resolveDataUrl ile aynı önceliklerle çözer. null → statik/snapshot (API yok).
 function bnsHistApiBase() {
@@ -14,58 +14,69 @@ function bnsHistApiBase() {
     return window.BNS_API_BASE ? String(window.BNS_API_BASE).replace(/\/+$/, "") : DEFAULT_API;
   } catch (e) { return DEFAULT_API; }
 }
-async function bnsFetchEvents({ before, archive }) {
+async function bnsFetchEvents({ before, from, to }) {
   const base = bnsHistApiBase();
   if (!base) return null;   // statik/snapshot → fallback (data.activity)
   try {
     const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
     const qs = new URLSearchParams({ limit: "100" });
     if (before != null) qs.set("before", String(before));
-    if (archive) qs.set("archive", "1");
+    if (typeof from === "number") qs.set("from", String(from));
+    if (typeof to === "number") qs.set("to", String(to));
     const r = await fetch(base + "/api/events?" + qs.toString(), { cache: "no-store", headers: tok ? { Authorization: "Bearer " + tok } : {} });
     if (!r.ok) return null;
     return await r.json();
   } catch (e) { return null; }
 }
 
+// Aktivite türleri — TÜM yapılanları kapsar (kind alanı bnsMapEvent'ten gelir).
+var BNS_HIST_KINDS = [
+  ["all", "Tümü"], ["open", "Açılan"], ["status", "Durum"], ["done", "Tamamlanan"],
+  ["assign", "Atama"], ["edit", "Düzenleme"], ["finance", "Finans"], ["delete", "Silme"],
+];
+
 function HistoryScreen({ data, onOpenByNo }) {
   const [filter, setFilter] = React.useState("all");
-  const [items, setItems] = React.useState(null);        // null → API'den henüz yüklenmedi
+  const [items, setItems] = React.useState(null);   // null → API'den henüz yüklenmedi
   const [hasMore, setHasMore] = React.useState(false);
-  const [archiveOn, setArchiveOn] = React.useState(false); // 1 ay sınırı aşıldı (arşiv yüklendi)
   const [loading, setLoading] = React.useState(false);
   const [apiOk, setApiOk] = React.useState(true);
 
-  // İlk yükleme: sayfalı /api/events (son 30 gün). API yoksa data.activity'ye düş.
+  // Üst global takvim filtresi → Geçmiş'i de süzer.
+  const dr = data.dateRange || {};
+  const from = typeof dr.from === "number" ? dr.from : null;
+  const to = typeof dr.to === "number" ? dr.to : null;
+  const rangeLabel = ({ today:"Bugün", yesterday:"Dün", "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Seçili aralık" })[dr.preset] || "Seçili aralık";
+
+  // İlk sayfa — tarih aralığı değişince yeniden yükle.
   React.useEffect(() => {
     let cancel = false;
     (async () => {
       setLoading(true);
-      const res = await bnsFetchEvents({});
+      const res = await bnsFetchEvents({ from, to });
       if (cancel) return;
       if (res && Array.isArray(res.events)) { setItems(res.events.map(window.bnsMapEvent)); setHasMore(!!res.hasMore); setApiOk(true); }
-      else setApiOk(false);
+      else { setApiOk(false); setItems(null); }
       setLoading(false);
     })();
     return () => { cancel = true; };
-  }, []);
+  }, [from, to]);
 
-  const loadMore = async (archive) => {
+  const loadMore = async () => {
     setLoading(true);
     const before = items && items.length ? items[items.length - 1].t : undefined;
-    const res = await bnsFetchEvents({ before, archive });
+    const res = await bnsFetchEvents({ from, to, before });
     if (res && Array.isArray(res.events)) {
       setItems(prev => [...(prev || []), ...res.events.map(window.bnsMapEvent)]);
       setHasMore(!!res.hasMore);
-      if (archive) setArchiveOn(true);
     }
     setLoading(false);
   };
 
-  // Kaynak: API çalışıyorsa sayfalı items; değilse eski data.activity (fallback, ~son 80).
+  // Kaynak: API çalışıyorsa sayfalı items; değilse eski data.activity (fallback). Her iki halde de a.kind/a.action mevcut.
   const source = (apiOk && items) ? items : (data.activity || []);
-  let all = source.map(a => ({ ...a, _type: typeFromVerb(a.verb) })).sort((a, b) => b.t - a.t);
-  if (filter !== "all") all = all.filter(a => a._type === filter);
+  let all = source.slice().sort((a, b) => b.t - a.t);
+  if (filter !== "all") all = all.filter(a => a.kind === filter);
 
   // Group by day
   const groups = [];
@@ -82,16 +93,10 @@ function HistoryScreen({ data, onOpenByNo }) {
     <div className="bn-tab-in">
       <PageHead
         title="Geçmiş"
-        subtitle="sistem aktivite log'u · brief açıldı / atandı / durumu değişti / tamamlandı"
+        subtitle={`sistem aktivite log'u · ${rangeLabel} · açıldı / durum / atama / düzenleme / tamamlandı`}
         actions={
-          <div style={{display:"inline-flex", padding:2, background:"transparent", border:"1px solid var(--line)", borderRadius:6}}>
-            {[
-              ["all", "Tümü"],
-              ["open", "Açıldı"],
-              ["status", "Durum"],
-              ["assign", "Atama"],
-              ["done", "Tamamlandı"]
-            ].map(([k, v]) => (
+          <div style={{display:"inline-flex", flexWrap:"wrap", gap:2, padding:2, background:"transparent", border:"1px solid var(--line)", borderRadius:6}}>
+            {BNS_HIST_KINDS.map(([k, v]) => (
               <button key={k} onClick={() => setFilter(k)} style={{
                 font: filter === k ? "600 12px/1 var(--font-sans)" : "500 12px/1 var(--font-sans)", padding:"6px 10px",
                 border:0, background: filter === k ? "var(--paper-2)" : "transparent",
@@ -103,6 +108,11 @@ function HistoryScreen({ data, onOpenByNo }) {
         }/>
 
       <Card padding={0}>
+        {groups.length === 0 && (
+          <div style={{padding:"28px 16px", textAlign:"center", font:"400 13px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>
+            {loading ? "Yükleniyor…" : "Bu aralıkta kayıt yok."}
+          </div>
+        )}
         {groups.map((g, gi) => (
           <div key={g.key}>
             <div style={{
@@ -129,19 +139,14 @@ function HistoryScreen({ data, onOpenByNo }) {
                   borderBottom: i === g.items.length - 1 ? 0 : "1px solid var(--line-soft)"
                 }}>
                   <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", minWidth: 44}}>{time}</span>
-                  <VerbDot type={a._type}/>
+                  <VerbDot kind={a.kind}/>
                   <Avatar user={u} size={20}/>
                   <span style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", whiteSpace:"nowrap"}}>{u.name.split(" ")[0]}</span>
-                  <span style={{font:"400 13px/1 var(--font-sans)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>{a.verb}</span>
+                  <span style={{font:"400 13px/1.3 var(--font-sans)", color:"var(--ink-3)", whiteSpace:"nowrap"}}>{a.action || a.verb}</span>
                   {a.brand && <BrandChip brand={a.brand} size="sm"/>}
                   <span style={{font:"500 13px/1.3 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex: 1, minWidth: 0}}>
                     {a.target}
                   </span>
-                  {a.meta && (
-                    <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", padding:"3px 7px", background:"var(--paper-2)", borderRadius: 4, whiteSpace:"nowrap"}}>
-                      {a.meta}
-                    </span>
-                  )}
                 </div>
               );
             })}
@@ -149,16 +154,15 @@ function HistoryScreen({ data, onOpenByNo }) {
         ))}
       </Card>
 
-      {/* Sayfalama — 100/sayfa, varsayılan son 1 ay; eskisi arşivden. (API yoksa gizli) */}
+      {/* Sayfalama — 100/sayfa, seçili tarih aralığında. (API yoksa gizli) */}
       {apiOk && (() => {
         const btn = { font:"600 12px/1 var(--font-sans)", padding:"9px 16px", border:"1px solid var(--line)",
           borderRadius:8, background:"var(--surface)", color:"var(--ink)", cursor: loading ? "default" : "pointer", opacity: loading ? 0.6 : 1 };
         return (
           <div style={{display:"flex", justifyContent:"center", alignItems:"center", gap:12, padding:"18px 0 6px", flexWrap:"wrap"}}>
-            <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-4)"}}>{all.length} kayıt · {archiveOn ? "arşiv dahil" : "son 1 ay"}</span>
-            {hasMore && <button onClick={() => loadMore(archiveOn)} disabled={loading} style={btn}>{loading ? "Yükleniyor…" : "Daha fazla yükle (+100)"}</button>}
-            {!hasMore && !archiveOn && <button onClick={() => loadMore(true)} disabled={loading} style={btn}>{loading ? "Yükleniyor…" : "Arşivden daha eski göster"}</button>}
-            {!hasMore && archiveOn && <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-5)"}}>tüm geçmiş yüklendi</span>}
+            <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-4)"}}>{all.length} kayıt · {rangeLabel}</span>
+            {hasMore && <button onClick={loadMore} disabled={loading} style={btn}>{loading ? "Yükleniyor…" : "Daha fazla yükle (+100)"}</button>}
+            {!hasMore && all.length > 0 && <span style={{font:"400 12px/1 var(--font-sans)", color:"var(--ink-5)"}}>bu aralıktaki tüm kayıtlar yüklendi</span>}
           </div>
         );
       })()}
@@ -166,36 +170,24 @@ function HistoryScreen({ data, onOpenByNo }) {
   );
 }
 
-function VerbDot({ type }) {
+function VerbDot({ kind }) {
   const map = {
-    open:   "var(--ink-3)",
-    status: "var(--info)",
-    assign: "var(--ember)",
-    done:   "var(--success)",
-    comment:"var(--ink-4)",
-    reject: "var(--danger)",
-    update: "var(--warning)"
+    open:    "var(--ink-3)",
+    status:  "var(--info)",
+    done:    "var(--success)",
+    assign:  "var(--ember)",
+    edit:    "var(--warning)",
+    finance: "var(--musteride)",
+    delete:  "var(--danger)",
+    other:   "var(--ink-4)",
   };
   return (
     <span style={{
       width: 8, height: 8, borderRadius: 999,
-      background: map[type] || "var(--ink-3)",
+      background: map[kind] || "var(--ink-3)",
       flexShrink: 0
     }}/>
   );
-}
-
-function typeFromVerb(v) {
-  if (v.includes("açtı"))          return "open";
-  if (v.includes("değişt"))         return "status";
-  if (v.includes("atadı") || v.includes("contributor")) return "assign";
-  if (v.includes("tamamladı"))      return "done";
-  if (v.includes("onayladı"))       return "done";
-  if (v.includes("yorum"))          return "comment";
-  if (v.includes("reddetti"))       return "reject";
-  if (v.includes("deadline"))       return "update";
-  if (v.includes("rev"))            return "update";
-  return "open";
 }
 
 window.HistoryScreen = HistoryScreen;

@@ -593,16 +593,32 @@ function bnsHydrateCompleted(raw, idx) {
 // Tek bir ham olayı (bns_events / /api/events shape) Geçmiş ekranının beklediği görüntü shape'ine çevirir.
 // Hem ilk yükleme (bnsApplyExtras) hem sayfalı /api/events (History) AYNI dönüşümü kullanır → tutarlı.
 function bnsMapEvent(e) {
-  const VERB_TR = { olusturuldu: "açtı", "düzenlendi": "düzenledi", silindi: "sildi", "geri alındı": "geri aldı" };
+  const STATUS_TR = { yeni:"Yeni", calisiliyor:"İş planında", basladi:"İşe başlandı", incelemede:"İncelemede", beklemede:"Beklemede", revizyon:"Revizyon", musteride:"Müşteri onayı", blokeli:"Blokeli", tamamlandi:"Tamamlandı" };
   const det = e.detail || {};
-  const durum = det.durum || det.yeni_durum;
+  const raw = e.verb || "";
+  let kind, action;
+  if (raw.indexOf("durum:") === 0) {
+    const st = raw.slice(6) || det.durum || det.yeni_durum || "";
+    kind = (st === "tamamlandi") ? "done" : "status";
+    action = (st === "tamamlandi") ? "İşi tamamladı" : ('Durumu "' + (STATUS_TR[st] || st) + '" yaptı');
+  } else if (raw === "olusturuldu") { kind = "open"; action = "İşi açtı"; }
+  else if (raw === "düzenlendi") {
+    const al = Array.isArray(det.alanlar) ? det.alanlar : [];
+    kind = (al.indexOf("işi yapanlar") >= 0) ? "assign" : "edit";
+    const labels = al.map(a => String(a).charAt(0).toLocaleUpperCase("tr") + String(a).slice(1));
+    action = labels.length ? (labels.join(", ") + " düzenledi") : "Bilgileri düzenledi";
+  } else if (raw === "silindi") { kind = "delete"; action = "İşi sildi"; }
+  else if (raw === "geri alındı") { kind = "delete"; action = "İşi geri aldı"; }
+  else if (raw === "finans") { kind = "finance"; action = "Finans bilgisini güncelledi"; }
+  else { kind = "other"; action = raw || "işlem yaptı"; }
   return {
     t: e.t, who: e.who || "system",
     no: e.no || null,   // tıklayınca iş detayını açmak için
-    verb: durum ? "durumu değiştirdi" : (VERB_TR[e.verb] || e.verb),
+    kind, action,
+    verb: action,        // geriye uyum
     target: e.baslik ? `#${e.no} ${e.baslik}` : (det.baslik || ""),
     brand: e.marka && window.BNS_DATA.BR ? window.BNS_DATA.BR[e.marka] : null,
-    meta: durum || (Array.isArray(det.alanlar) ? det.alanlar.join(", ") : ""),
+    meta: "",
   };
 }
 window.bnsMapEvent = bnsMapEvent;

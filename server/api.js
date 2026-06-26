@@ -68,6 +68,8 @@ app.get('/api/events', readGuard, async (req, res) => {
       before: req.query.before,
       limit: req.query.limit,
       archive: req.query.archive === '1' || req.query.archive === 'true',
+      from: req.query.from,
+      to: req.query.to,
     }));
   } catch (e) {
     console.error('[api] /api/events hata:', e.message);
