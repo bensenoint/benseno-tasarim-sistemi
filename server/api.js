@@ -131,7 +131,13 @@ app.get('/api/sebep-period', readGuard, async (req, res) => {
     const j = await r.json().catch(() => ({}));
     if (!r.ok) { console.error('[sebep-period] AI hata:', j.error?.message || r.status); return res.status(502).json({ error: 'değerlendirme üretilemedi' }); }
     const text = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
-    if (text) _sebepPeriodCache.set(ck, { text, ts: Date.now() });
+    if (text) {
+      // OOM koruması: süresi geçenleri at + en fazla 300 girdi (en eskiyi düşür).
+      const _now2 = Date.now();
+      for (const [k, v] of _sebepPeriodCache) { if (_now2 - v.ts > 6 * 3600 * 1000) _sebepPeriodCache.delete(k); }
+      while (_sebepPeriodCache.size >= 300) _sebepPeriodCache.delete(_sebepPeriodCache.keys().next().value);
+      _sebepPeriodCache.set(ck, { text, ts: _now2 });
+    }
     res.json({ sebep: text || null, adet: comp.length });
   } catch (e) { console.error('[sebep-period] hata:', e.message); res.status(500).json({ error: e.message }); }
 });
@@ -518,12 +524,13 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
     const toolsUsed = [];   // sohbet logu için çağrılan tool adları (sırayla)
     let turnsUsed = 0;
     const MAX_TURNS = 5;
-    const aiCall = (mdl, withTools) => fetch('https://api.anthropic.com/v1/messages', {
+    // think === false → düşünme KAPALI (boş-cevap retry'ında metni zorlamak için).
+    const aiCall = (mdl, withTools, think) => fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: mdl, max_tokens: 4000, system,
-        thinking: { type: 'adaptive' },
+        ...(think === false ? {} : { thinking: { type: 'adaptive' } }),
         ...(withTools ? { tools: odyTools.TOOLS } : {}),
         messages: convo,
       }),
@@ -555,15 +562,16 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
       }
       convo.push({ role: 'user', content: toolResults });
     }
-    // Boş-cevap güvenliği: tool döngüsü/düşünme bütçesi metni yutmuşsa, toplanan
-    // veriyle bir kez daha — metni ZORLA (tool yok, Sonnet metni güvenilir döndürür).
-    if (!final && Array.isArray(blocks) && !blocks.some(c => c.type === 'tool_use')) {
+    // Boş-cevap güvenliği: model yalnız düşünme bloğu döndürüp metin vermediyse (final boş),
+    // convo zaten 'user' ile biter (kırılan tur asistanı convo'ya eklenmez) → asistan/thinking
+    // bloğu GERİ GÖNDERME (signature uyuşmazlığı 400'e yol açardı). Düşünme KAPALI + tool yok
+    // ile bir kez daha çağır → model metni üretmek ZORUNDA.
+    if (!final) {
       try {
-        convo.push({ role: 'assistant', content: blocks.length ? blocks : [{ type: 'text', text: '...' }] });
-        convo.push({ role: 'user', content: 'Yukarıda topladığın verilerle kullanıcının son sorusunu ŞİMDİ net ve doğrudan yanıtla. Tool çağırma; sadece cevabı yaz.' });
-        const r2 = await aiCall(SONNET, false);
+        const r2 = await aiCall(SONNET, false, false);
         const j2 = await r2.json().catch(() => ({}));
         if (r2.ok) { final = (j2.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim(); modelUsed = SONNET; }
+        else console.error('[chat] boş-cevap retry başarısız:', j2.error?.message || r2.status);
       } catch (e) { console.error('[chat] boş-cevap retry hata:', e.message); }
     }
     const reply = final || 'İsteğini tam karşılayamadım, tekrar dener misin?';

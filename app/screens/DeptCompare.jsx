@@ -59,14 +59,11 @@ function PeriodSebep({ type, skey, range }) {
 }
 window.PeriodSebep = PeriodSebep;  // Marka detay gibi diğer ekranlar da lazy dönem-yorumunu kullanabilsin.
 
-function StarReport({ data, depts }) {
-  const list = depts || BNS_DEPTS;
-  const comp = data.completed || [];           // üst global tarih aralığına süzülü
-  const rated = comp.filter(c => c.rating > 0);
-  const avgOf = (arr) => arr.length ? arr.reduce((s, c) => s + c.rating, 0) / arr.length : 0;
-  const firmaAvg = +avgOf(rated).toFixed(1), firmaCnt = rated.length;
-
-  const Row = ({ label, avg, cnt, stype, skey, big }) => (
+// Modül kapsamında — StarReport içinde TANIMLANMAZ. (İçeride tanımlansaydı her parent
+// re-render'da yeni bileşen kimliği oluşur, PeriodSebep remount olur, açık accordion +
+// yüklenen yorum kaybolurdu.) range, PeriodSebep'e geçer.
+function StarRow({ label, avg, cnt, stype, skey, big, range }) {
+  return (
     <div style={{display:"flex", flexWrap:"wrap", alignItems:"flex-start", gap:12, rowGap:6, padding:"9px 0", borderBottom:"1px solid var(--line-soft)"}}>
       <span style={{font:`${big?600:500} 13px/1.3 var(--font-sans)`, color:"var(--ink)", minWidth:150, flexShrink:0}}>{label}</span>
       <span style={{display:"inline-flex", gap:1, flexShrink:0, paddingTop:1}}>
@@ -74,18 +71,27 @@ function StarReport({ data, depts }) {
       </span>
       <span style={{font:"600 13px/1.3 var(--font-mono)", color:"var(--ink)", flexShrink:0}}>{cnt ? avg : "—"}</span>
       <span style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)", flexShrink:0}}>({cnt} iş)</span>
-      <PeriodSebep type={stype} skey={skey} range={data.dateRange}/>
+      <PeriodSebep type={stype} skey={skey} range={range}/>
     </div>
   );
+}
+
+function StarReport({ data, depts }) {
+  const list = depts || BNS_DEPTS;
+  const comp = data.completed || [];           // üst global tarih aralığına süzülü
+  const rated = comp.filter(c => c.rating > 0);
+  const avgOf = (arr) => arr.length ? arr.reduce((s, c) => s + c.rating, 0) / arr.length : 0;
+  const firmaAvg = +avgOf(rated).toFixed(1), firmaCnt = rated.length;
+  const range = data.dateRange;
 
   return (
     <Card style={{marginBottom:"var(--section-gap)"}}>
       <Eyebrow>⭐ Yıldız Karnesi</Eyebrow>
       <div style={{marginTop:6}}>
-        {list.length > 1 && <Row label="Benseno (tüm firma)" avg={firmaAvg} cnt={firmaCnt} stype="firma" skey="benseno" big/>}
+        {list.length > 1 && <StarRow label="Benseno (tüm firma)" avg={firmaAvg} cnt={firmaCnt} stype="firma" skey="benseno" range={range} big/>}
         {list.map(role => {
           const dr = rated.filter(c => bnsCompletedInDept(c, role));
-          return <Row key={role} label={BNS_DEPT_TR[role] || role} avg={+avgOf(dr).toFixed(1)} cnt={dr.length} stype="dept" skey={role} big={list.length === 1}/>;
+          return <StarRow key={role} label={BNS_DEPT_TR[role] || role} avg={+avgOf(dr).toFixed(1)} cnt={dr.length} stype="dept" skey={role} range={range} big={list.length === 1}/>;
         })}
       </div>
       <div style={{marginTop:8, font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>
