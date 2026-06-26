@@ -1,6 +1,6 @@
 // app/screens/Department.jsx — reused for Tasarım / Editör / AI tabs.
 
-function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
+function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusChange, currentUser, tableMode }) {
   // Dönemsel özet yalnız yöneticilere görünür (giriş yapan kullanıcıya göre).
   const meRec = (data.USERS || []).find(x => x.id === (currentUser && (currentUser.slack_id || currentUser.id)));
   const isManager = !!((currentUser && currentUser.role === "admin") || (meRec && meRec.rol === "yonetici"));
@@ -93,25 +93,11 @@ function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
         actions={null}
       />
 
-      <div className="bns-kpi-5" style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)"}}>
-        <Kpi label="Aktif iş"     value={rows.length} accent={r.accent}/>
-        <Kpi label="Bu hafta"     value={thisWeek}/>
-        <Kpi label="Kapasite"     value={`%${capPct}`} color={capPct > 85 ? "var(--warning)" : "var(--ink)"}/>
-        <Kpi label="Geciken"      value={overdueCount} color="var(--prio-red)"/>
-        <Kpi label="Onay bekleyen" value={reviewCount} color="var(--warning)"/>
-      </div>
-
       <div style={{display:"flex", flexDirection:"column", gap:"var(--section-gap)"}}>
-        {/* İşler — tam genişlik (geniş tablo) */}
-        <Card padding={0} style={{minWidth:0}}>
-          <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
-            <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} işleri</h2>
-            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{rows.length} aktif</div>
-          </div>
-          <BriefTable rows={rows} onRowClick={onOpenBrief}/>
-        </Card>
+        {/* ⭐ Yıldız karnesi — bu departman (Departmanlar özet ile aynı bileşen, tarihe duyarlı) */}
+        <StarReport data={data} depts={[role]}/>
 
-        {/* Ekip + Dönemsel özet yan yana (mobilde alt alta) — sayfa altı */}
+        {/* Ekip + Dönemsel özet yan yana (mobilde alt alta) — departman özeti */}
         <div className="bn-grid-2" style={{display:"grid", gridTemplateColumns: isManager ? "minmax(0,1fr) minmax(0,1fr)" : "1fr", gap:"var(--section-gap)", alignItems:"start"}}>
         {/* Ekip */}
         <Card padding={0}>
@@ -206,6 +192,13 @@ function DepartmentScreen({ data, role, onOpenBrief, currentUser }) {
         </Card>
         )}
         </div>
+      </div>
+
+      {/* Detay bakış — bu departmana süzülü (Detay bakış sayfasıyla aynı kartlar + liste + sayfalama) */}
+      <div style={{marginTop:"var(--section-gap)"}}>
+        <div style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:"0 0 12px"}}>{r.name} · detay bakış</div>
+        <JobsScreen data={data} dept={role} hideHead
+          onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={tableMode}/>
       </div>
     </div>
   );

@@ -1,8 +1,13 @@
 // app/screens/Jobs.jsx — Aktif İşler tab. Supports table / kanban / cards view.
 
-function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCompleted, onStatusChange, setDateRange }) {
+function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCompleted, onStatusChange, setDateRange, dept, hideHead }) {
+  // Departman sayfasına gömülünce (dept set) tüm kaynak yalnız o departmanın işlerine süzülür.
+  const inDept = dept ? (b) => (b && ((b.lead && (b.lead.dept || b.lead.rol) === dept) || b.dept === dept
+    || (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.dept || c.rol) === dept)))) : null;
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
-  const [scope, setScope] = useStickyState("jobs.scope", "all");
+  // Sticky anahtarlar dept'e göre ad-uzaylanır → departman sayfasındaki gömülü Detay bakış, ana sayfayı kirletmez.
+  const _ns = dept ? ("jobs." + dept + ".") : "jobs.";
+  const [scope, setScope] = useStickyState(_ns + "scope", "all");
   // İkinci sıra (detay) KPI kartları varsayılan KAPALI; bir statü kartına basınca açılır, tekrar basınca kapanır.
   const [detailOpen, setDetailOpen] = React.useState(false);
   // Overview KPI'dan deep-link ile gelindiğinde filtreyi güncelle (refresh'te initialScope=null → sticky korunur)
@@ -13,10 +18,10 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
     // Belirli statü deep-link'i (overdue/review/incelemede…) → detay açık + çerçeveli.
     setDetailOpen(initialScope !== "all" && initialScope !== "open");
   }, [initialScope]);
-  const [search, setSearch] = useStickyState("jobs.search", "");
-  const [prioFilter, setPrioFilter] = useStickyState("jobs.prio", "all");
-  const [person, setPerson] = useStickyState("jobs.person", "all");   // kişi (lead+contributor) filtresi
-  const [markaFilter, setMarkaFilter] = useStickyState("jobs.marka", "all");   // marka filtresi
+  const [search, setSearch] = useStickyState(_ns + "search", "");
+  const [prioFilter, setPrioFilter] = useStickyState(_ns + "prio", "all");
+  const [person, setPerson] = useStickyState(_ns + "person", "all");   // kişi (lead+contributor) filtresi
+  const [markaFilter, setMarkaFilter] = useStickyState(_ns + "marka", "all");   // marka filtresi
   const [page, setPage] = React.useState(0);   // sayfalama (maks 100 satır/sayfa)
   // Filtre/scope/aralık değişince sayfayı başa al
   React.useEffect(() => { setPage(0); }, [scope, search, prioFilter, person, markaFilter, (data.dateRange || {}).preset, (data.dateRange || {}).from, (data.dateRange || {}).to]);
@@ -27,8 +32,9 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   // viewMode (mine/dept/all) filtresi App.jsx'te merkezi uygulanır — data.briefs zaten filtered.
   // Müşteri onayında bekleyenler aktif listeden çıkar — kendi sayfaları var (revize dönünce otomatik geri gelir)
   // Marka filtresi KAYNAKTA uygulanır → hem liste hem statü-KPI sayıları markayla daralır.
-  const mf = (arr) => markaFilter === "all" ? arr : arr.filter(b => b.marka === markaFilter);
-  const comp = mf(data.completed || []);                                // seçili aralık tamamlananlar (markalı)
+  const mfBase = (arr) => markaFilter === "all" ? arr : arr.filter(b => b.marka === markaFilter);
+  const mf = inDept ? (arr) => mfBase(arr).filter(inDept) : mfBase;   // dept gömülüyse kaynağı departmana da süz
+  const comp = mf(data.completed || []);                                // seçili aralık tamamlananlar (markalı, dept-süzülü)
 
   // ── Tarih filtresi (üst global) → TÜM KPI kartları + listeler DURUM-ARALIĞI çakışması (rapor/arşiv) ──
   // Bir iş, ilgili DURUMDA seçili aralık boyunca BULUNDUYSA sayılır (geçiş anı değil). Dün bir statüye
@@ -231,8 +237,8 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   const SHORTCUTS = [["today", "Bugün"], ["yesterday", "Dün"], ["7d", "7 gün"], ["30d", "30 gün"]];
 
   return (
-    <div className="bn-tab-in">
-      <PageHead
+    <div className={hideHead ? "" : "bn-tab-in"}>
+      {!hideHead && <PageHead
         title="Detay bakış"
         subtitle="Seçili tarih aralığı özeti (dönemsel) · sırala · filtrele · drawer'da düzenle"
         actions={isMobile ? null : <>
@@ -250,7 +256,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
           )}
           <Button kind="ghost" size="sm" icon={<I.Refresh size={13}/>}>Yenile</Button>
         </>}
-      />
+      />}
 
       {/* Mobil: görünüm geçişi (tablo / liste / kanban) — referans ikon segment */}
       {isMobile && (

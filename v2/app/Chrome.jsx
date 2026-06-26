@@ -36,7 +36,7 @@ const NAV_SECTIONS = [
     label: "Raporlar",
     items: [
       // { id: "completed", label: "Tamamlananlar",  icon: "CheckSquare" },  // GİZLİ (deneme — kullanılmıyor; gerekmezse kaldır)
-      { id: "dept-comp", label: "Karşılaştırma",  icon: "BarChart2" },
+      { id: "dept-comp", label: "Departmanlar özet",  icon: "BarChart2" },
       { id: "history",   label: "Geçmiş",          icon: "Archive" },
     ]
   },
@@ -1240,7 +1240,7 @@ function Header({ user, tab, onNav, viewMode, setViewMode, dateRange, setDateRan
   const PRIMARY_TABS = ["overview", "jobs", "profile", "brand"];
   const SUB_TITLES = {};
   (NAV_SECTIONS || []).forEach(s => (s.items || []).forEach(it => { SUB_TITLES[it.id] = it.label; }));
-  Object.assign(SUB_TITLES, { completed:"Tamamlanan", musteride:"Müşteride", "dept-comp":"Karşılaştırma", team:"Ekip", multi:"Sıralı işler" });
+  Object.assign(SUB_TITLES, { completed:"Tamamlanan", musteride:"Müşteride", "dept-comp":"Departmanlar özet", team:"Ekip", multi:"Sıralı işler" });
   const isSubPage = isMobile && tab && !PRIMARY_TABS.includes(tab);
   const pageTitle = SUB_TITLES[tab] || "";
 
