@@ -230,7 +230,7 @@ async function getEmbedded() {
   // ⭐ Yıldız karnesi — puanlı tamamlanan işlerden canlı ortalamalar (firma/dept/kişi/marka)
   let bns_ratings = null, bns_sebep = [], bns_sebep_history = [];
   try {
-    const [firma, deptR, userR, sebep, sebepHist] = await Promise.all([
+    const [firma, deptR, userR, sebep] = await Promise.all([
       pool.query(`SELECT round(avg(rating)::numeric,1)::float avg, count(*)::int cnt FROM briefs WHERE rating IS NOT NULL`),
       // Dept ortalaması katılımcıların departmanından: çok departmanlı işte (örn. tasarım+editör)
       // puan HER İKİ departmana da işler — briefs.dept tek etiketi bunu kaçırıyordu.
@@ -244,11 +244,6 @@ async function getEmbedded() {
                   FROM briefs b JOIN brief_assignees a ON a.brief_id=b.id AND a.role IN ('contributor','lead')
                   WHERE b.rating IS NOT NULL GROUP BY a.user_id`),
       pool.query(`SELECT type, key, sebep, rating_avg::float, rating_count, updated_at FROM entity_sebep`),
-      // Tarihli arşiv — son 1 yıl (client seçili aralığa göre yorumu kendisi seçer).
-      // gun temiz string ("YYYY-MM-DD") olarak gelsin: DATE'in TZ kayması riskini kapatır.
-      pool.query(`SELECT type, key, to_char(gun,'YYYY-MM-DD') AS gun, sebep, rating_avg::float, rating_count
-                  FROM entity_sebep_history WHERE gun >= (now() - interval '1 year')::date
-                  ORDER BY gun`),
     ]);
     bns_ratings = {
       firma: firma.rows[0] || { avg: null, cnt: 0 },
@@ -256,8 +251,14 @@ async function getEmbedded() {
       users: Object.fromEntries(userR.rows.map(r => [r.id, { avg: r.avg, cnt: r.cnt }])),
     };
     bns_sebep = sebep.rows;
-    bns_sebep_history = sebepHist.rows;
   } catch (e) { console.error('[queries] ratings okunamadı:', e.message); }
+  // Tarihli sebep arşivi AYRI try/catch — tablo henüz yoksa (migration uygulanmadıysa)
+  // ratings/sebep akışını ÇÖKERTMESİN (regresyon koruması).
+  try {
+    const sebepHist = await pool.query(`SELECT type, key, to_char(gun,'YYYY-MM-DD') AS gun, sebep, rating_avg::float, rating_count
+                  FROM entity_sebep_history WHERE gun >= (now() - interval '1 year')::date ORDER BY gun`);
+    bns_sebep_history = sebepHist.rows;
+  } catch (e) { /* entity_sebep_history yoksa sessiz geç — güncel sebep zaten bns_sebep'te */ }
 
   // KPI geçmişi (Overview spark grafikleri) — son 48 anlık görüntü, eskiden yeniye
   let bns_history = [];
