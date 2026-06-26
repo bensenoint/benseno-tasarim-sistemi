@@ -30,7 +30,7 @@ function TeamScreen({ data }) {
   const allUsers  = data.USERS  || [];
   const allBrands = data.BRANDS || [];
   const allBriefs    = data._allBriefs    || data.briefs    || [];
-  const allCompleted = data._allCompleted || data.completed || [];
+  const allCompleted = data.completed || data._allCompleted || [];   // üst takvim filtresine süzülü tamamlananlar
 
   // Zaman filtresiyle matrix hesapla
   const rangeDays = TIME_RANGES.find(r => r.key === timeRange)?.days;

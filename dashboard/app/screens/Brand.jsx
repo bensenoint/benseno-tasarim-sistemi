@@ -126,6 +126,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   const [to, setTo] = React.useState("");
   const [view, setView] = React.useState("active");   // active | done
   const [tomorrowOnly, setTomorrowOnly] = React.useState(false);   // "Yarın" filtresi: deadline'ı yarın olan aktif işler
+  const [statusSel, setStatusSel] = React.useState("");   // aktif görünümde statüye göre filtre ("" = tüm statüler)
 
   // kişi seçenekleri (aktif lead+contributors ∪ tamamlanan lead+contrib)
   const people = React.useMemo(() => {
@@ -146,6 +147,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
 
   const filteredActive = active.filter(b => {
     if (person && !activeIds(b).includes(person)) return false;
+    if (statusSel && b.durum !== statusSel) return false;
     if ((fromMs || toMs) && !inRange(dlMs(b))) return false;
     if (tomorrowOnly && !continuesTomorrow(dlMs(b))) return false;
     return true;
@@ -259,14 +261,22 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
             <option value="">Herkes</option>
             {people.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
+          {view === "active" && (
+            <select value={statusSel} onChange={e => setStatusSel(e.target.value)} style={fldStyle} title="Statüye göre filtrele">
+              <option value="">Tüm statüler</option>
+              {[["yeni","Yeni"],["calisiliyor","İş planında"],["basladi","İşe başlandı"],["incelemede","İncelemede"],["beklemede","Beklemede"],["revizyon","Revizyon"],["blokeli","Blokeli"]].map(([v,l]) => (
+                <option key={v} value={v}>{l} ({active.filter(b => b.durum === v).length})</option>
+              ))}
+            </select>
+          )}
           <label style={{ font:"400 12px/1.2 var(--font-sans)", color:"var(--ink-3)", display:"inline-flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
             <I.Calendar size={13}/> Deadline:
             <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={fldStyle}/>
             <span style={{ color:"var(--ink-4)" }}>→</span>
             <input type="date" value={to} onChange={e => setTo(e.target.value)} style={fldStyle}/>
           </label>
-          {(person || from || to) &&
-            <button onClick={() => { setPerson(""); setFrom(""); setTo(""); }} style={{ ...fldStyle, cursor:"pointer", color:"var(--ink-3)" }}>Temizle</button>}
+          {(person || from || to || statusSel) &&
+            <button onClick={() => { setPerson(""); setFrom(""); setTo(""); setStatusSel(""); }} style={{ ...fldStyle, cursor:"pointer", color:"var(--ink-3)" }}>Temizle</button>}
           <span style={{ marginLeft:"auto", font:"500 12px/1 var(--font-mono)", color:"var(--ink-3)" }}>{shown} kayıt</span>
         </div>
       </Card>

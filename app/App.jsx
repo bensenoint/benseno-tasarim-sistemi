@@ -595,7 +595,7 @@ function App({ currentUser, onLogout }) {
   else if (tab === "editor")   Screen = <DepartmentScreen data={liveData} role="editor"  currentUser={currentUser} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={t.tableMode}/>;
   else if (tab === "ai")       Screen = <DepartmentScreen data={liveData} role="ai"      currentUser={currentUser} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={t.tableMode}/>;
   else if (tab === "freelance") Screen = <DepartmentScreen data={liveData} role="freelance" currentUser={currentUser} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={t.tableMode}/>;
-  else if (tab === "gallery")  Screen = <GalleryScreen  data={liveData}/>;
+  else if (tab === "gallery")  Screen = <GalleryScreen  data={liveData} onOpenCompleted={onOpenCompleted}/>;
   else if (tab === "multi")    Screen = <MultiScreen    data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "brand")    Screen = <BrandScreen    data={liveData} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} initialSel={brandSel}/>;
   else if (tab === "team")     Screen = <TeamScreen     data={liveData}/>;

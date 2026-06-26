@@ -147,6 +147,11 @@ function HistoryScreen({ data, onOpenByNo }) {
                   <span style={{font:"500 13px/1.3 var(--font-sans)", color:"var(--ink)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex: 1, minWidth: 0}}>
                     {a.target}
                   </span>
+                  {a.tag && (
+                    <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", padding:"3px 7px", background:"var(--paper-2)", borderRadius:4, whiteSpace:"nowrap", flexShrink:0}}>
+                      {a.tag}
+                    </span>
+                  )}
                 </div>
               );
             })}

@@ -596,7 +596,7 @@ function bnsMapEvent(e) {
   const STATUS_TR = { yeni:"Yeni", calisiliyor:"İş planında", basladi:"İşe başlandı", incelemede:"İncelemede", beklemede:"Beklemede", revizyon:"Revizyon", musteride:"Müşteri onayı", blokeli:"Blokeli", tamamlandi:"Tamamlandı" };
   const det = e.detail || {};
   const raw = e.verb || "";
-  let kind, action;
+  let kind, action, tag = null;
   if (raw.indexOf("durum:") === 0) {
     const st = raw.slice(6) || det.durum || det.yeni_durum || "";
     kind = (st === "tamamlandi") ? "done" : "status";
@@ -605,8 +605,9 @@ function bnsMapEvent(e) {
   else if (raw === "düzenlendi") {
     const al = Array.isArray(det.alanlar) ? det.alanlar : [];
     kind = (al.indexOf("işi yapanlar") >= 0) ? "assign" : "edit";
-    const labels = al.map(a => String(a).charAt(0).toLocaleUpperCase("tr") + String(a).slice(1));
-    action = labels.length ? (labels.join(", ") + " düzenledi") : "Bilgileri düzenledi";
+    action = "düzenledi";
+    // Satır sonundaki etiket: hangi alan(lar) düzenlendi (termin / işi yapanlar …)
+    tag = al.length ? al.map(a => String(a).charAt(0).toLocaleUpperCase("tr") + String(a).slice(1)).join(", ") : null;
   } else if (raw === "silindi") { kind = "delete"; action = "İşi sildi"; }
   else if (raw === "geri alındı") { kind = "delete"; action = "İşi geri aldı"; }
   else if (raw === "finans") { kind = "finance"; action = "Finans bilgisini güncelledi"; }
@@ -614,7 +615,7 @@ function bnsMapEvent(e) {
   return {
     t: e.t, who: e.who || "system",
     no: e.no || null,   // tıklayınca iş detayını açmak için
-    kind, action,
+    kind, action, tag,
     verb: action,        // geriye uyum
     target: e.baslik ? `#${e.no} ${e.baslik}` : (det.baslik || ""),
     brand: e.marka && window.BNS_DATA.BR ? window.BNS_DATA.BR[e.marka] : null,
