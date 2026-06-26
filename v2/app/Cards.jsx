@@ -85,6 +85,8 @@ const KPI_HINTS = {
   "İş Kabulü / İş planında": "İş planına alınmış, henüz başlanmamış işler.",
   "İş planında": "İş planına alınmış, henüz başlanmamış işler.",
   "Beklemede": "Beklemeye alınmış işler.",
+  "Bekliyor": "Beklemeye alınmış işler.",
+  "Müşteri onayı": "Müşteri onayında bekleyen işler.",
   "Blokeli": "Engellenmiş (blokeli) işler.",
   "Revizyon": "Revizyon aşamasındaki işler.",
   "Yeni": "Yeni açılmış, henüz işlenmemiş işler.",
