@@ -17,6 +17,9 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   const [prioFilter, setPrioFilter] = useStickyState("jobs.prio", "all");
   const [person, setPerson] = useStickyState("jobs.person", "all");   // kişi (lead+contributor) filtresi
   const [markaFilter, setMarkaFilter] = useStickyState("jobs.marka", "all");   // marka filtresi
+  const [page, setPage] = React.useState(0);   // sayfalama (maks 100 satır/sayfa)
+  // Filtre/scope/aralık değişince sayfayı başa al
+  React.useEffect(() => { setPage(0); }, [scope, search, prioFilter, person, markaFilter, (data.dateRange || {}).preset, (data.dateRange || {}).from, (data.dateRange || {}).to]);
   // Mobil görünüm geçişi: tablo / liste / kanban (referans). Desktop tableMode prop'unu kullanır.
   const [mView, setMView] = React.useState("table");
   const view = isMobile ? mView : tableMode;
@@ -111,6 +114,12 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
       (b.contributors || []).some(u => (u?.name || "").toLowerCase().includes(q))
     );
   }
+  // Sayfalama — maks 100 satır/sayfa; fazlası pager ile gelir.
+  const PAGE_SIZE = 100;
+  const totalRows = rows.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / PAGE_SIZE));
+  const curPage = Math.min(page, totalPages - 1);
+  const pagedRows = totalRows > PAGE_SIZE ? rows.slice(curPage * PAGE_SIZE, curPage * PAGE_SIZE + PAGE_SIZE) : rows;
 
   // Kişi seçenekleri — aktif işlerdeki lead+contributor'lardan (alfabetik, Türkçe).
   const personOpts = peopleOf(data.briefs.filter(b => b.durum !== "musteride"));
@@ -310,15 +319,30 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
         </div>
       </div>
 
-      {!isCompletedScope && view === "kanban" ? <KanbanView rows={rows} onOpenBrief={onOpenBrief}/> :
-       !isCompletedScope && (view === "cards" || view === "list") ? <CardsView rows={rows} onOpenBrief={onOpenBrief}/> :
-       <BriefTable rows={rows}
+      {!isCompletedScope && view === "kanban" ? <KanbanView rows={pagedRows} onOpenBrief={onOpenBrief}/> :
+       !isCompletedScope && (view === "cards" || view === "list") ? <CardsView rows={pagedRows} onOpenBrief={onOpenBrief}/> :
+       <BriefTable rows={pagedRows}
          onRowClick={isCompletedScope ? (onOpenCompleted || onOpenBrief)
            : (b => (b.bitis ? (onOpenCompleted || onOpenBrief) : onOpenBrief)(b))}
          onStatusChange={isCompletedScope ? undefined : onStatusChange}/>}
 
+      {/* Sayfalama — 100 satır/sayfa; fazlası varsa ileri/geri */}
+      {totalPages > 1 && (() => {
+        const pbtn = (on) => ({ font:"600 12px/1 var(--font-sans)", padding:"7px 12px", border:"1px solid var(--line)",
+          borderRadius:7, background:"var(--surface)", color: on ? "var(--ink)" : "var(--ink-5)", cursor: on ? "pointer" : "default" });
+        return (
+          <div style={{display:"flex", justifyContent:"center", alignItems:"center", gap:10, marginTop:14}}>
+            <button onClick={() => curPage > 0 && setPage(curPage - 1)} disabled={curPage === 0} style={pbtn(curPage > 0)}>‹ Önceki</button>
+            <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}>
+              Sayfa {curPage + 1}/{totalPages} · {curPage * PAGE_SIZE + 1}–{Math.min(totalRows, (curPage + 1) * PAGE_SIZE)} / {totalRows}
+            </span>
+            <button onClick={() => curPage < totalPages - 1 && setPage(curPage + 1)} disabled={curPage >= totalPages - 1} style={pbtn(curPage < totalPages - 1)}>Sonraki ›</button>
+          </div>
+        );
+      })()}
+
       <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginTop: 14, font:"400 12px/1 var(--font-sans)", color:"var(--ink-3)", flexWrap:"wrap", gap:8}}>
-        <span>{rows.length} satır · son senkron {(() => { const d = new Date(data.NOW); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); })()}</span>
+        <span>{totalRows} satır{totalPages > 1 ? ` · ${pagedRows.length} gösteriliyor` : ""} · son senkron {(() => { const d = new Date(data.NOW); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); })()}</span>
         <span>Slack Canvas <span style={{fontFamily:"var(--font-mono)", color:"var(--ink-4)"}}>F0B1B6XUD44</span></span>
       </div>
     </div>

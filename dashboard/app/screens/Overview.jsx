@@ -387,7 +387,7 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
         <Kpi label="Bugün teslim"  value={todayDue.length}   variant={kpiVariant} spark={sparkToday} trend={trendToday} sub={hist.length > 1 ? "son sync'e göre" : "stabil"} onClick={onJumpJobs ? () => onJumpJobs("today") : undefined}/>
         <Kpi label="Onay bekleyen" value={review.length}  color="var(--warning)" variant={kpiVariant} spark={sparkReview} trend={trendReview} sub={hist.length > 1 ? "son sync'e göre" : "dün 09:00'dan beri"} onClick={onJumpJobs ? () => onJumpJobs("review") : undefined}/>
         <Kpi label="Hareketsiz"    value={stale.length}   variant={kpiVariant} spark={sparkStale} sub="24 iş saati hareket yok" onClick={onJumpJobs ? () => onJumpJobs("stale") : undefined}/>
-        <Kpi label="Müşteride"     value={musteride.length} color="var(--musteride)" variant={kpiVariant} sub="✈️ dönüş bekleniyor" onClick={onSwitchTab ? () => onSwitchTab("musteride") : undefined}/>
+        <Kpi label="Müşteride"     value={musteride.length} color="var(--musteride)" variant={kpiVariant} sub="✈️ dönüş bekleniyor" onClick={onJumpJobs ? () => onJumpJobs("musteride") : undefined}/>
         <Kpi label="Kapasite"      value={avgCapPct!=null?"%"+avgCapPct:"—"} variant={kpiVariant} trend={{dir:"up", value:"+%5", bad:avgCapPct>85}} sub="ekip ortalaması" onClick={onSwitchTab ? () => onSwitchTab("dept-comp") : undefined}/>
       </KpiGrid>
 
