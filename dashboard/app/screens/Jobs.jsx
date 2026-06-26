@@ -61,8 +61,9 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
                          : (typeof b.deltaH === "number" && b.deltaH <= 0 && b.durum !== "musteride");
     return late && overlaps(b.deadline, end);
   };
-  // Tümü = ömrü [açılış, bitis|NOW] aralıkla çakışan iş (dönemde "hayatta" olan tüm işler).
-  const aliveDuring = (b) => { const s = openTs(b); if (s == null) return false; const e = (typeof b.bitis === "number") ? b.bitis : NOW; return overlaps(s, e); };
+  // Aktif işler = dönemde bir an AKTİF statüde bulunmuş iş (müşteride + tamamlanmış HARİÇ; onların kendi kartı var).
+  const ACTIVE_SET = new Set(["yeni", "calisiliyor", "basladi", "incelemede", "beklemede", "revizyon", "blokeli"]);
+  const activeDuring = (b) => statusIntervals(b).some(iv => ACTIVE_SET.has(iv.durum) && overlaps(iv.start, iv.end));
   const cntStatus = (durum) => evPool.filter(b => inStatusDuring(b, durum)).length;
 
   // Tamamlanmış brief'i BriefTable için güvenli default'larla normalize et (deltaH null → detayda sayısal-guard'la elenir).
@@ -83,7 +84,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   else if (scope === "overdue")    rows = evPool.filter(overdueDuring).map(norm);                      // aralıkta gecikme döneminde olan işler
   else if (EV_STATUS.has(scope))   rows = evPool.filter(b => inStatusDuring(b, scope)).map(norm);      // aralıkta o statüde bulunan işler
   else if (scope === "review")     rows = evPool.filter(b => inStatusDuring(b, "incelemede")).map(norm); // geriye uyum (Overview deep-link)
-  else                             rows = evPool.filter(aliveDuring).map(norm);                         // "all" (Tümü) + "open" → aralıkta hayatta olan işler
+  else                             rows = evPool.filter(activeDuring).map(norm);                        // "all" (Aktif işler) + "open" → dönemde aktif statüde bulunan işler
   // Öncelik filtresi (tüm scope'larda): "over" = geçmiş/geciken, diğerleri renk kodu
   if (prioFilter === "over")       rows = rows.filter(b => typeof b.deltaH === "number" && b.deltaH <= 0);
   else if (prioFilter !== "all")   rows = rows.filter(b => b.priority && b.priority.code === prioFilter);
@@ -103,13 +104,13 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
   // Marka seçenekleri — HAM veriden (markaFilter'dan bağımsız; aksi halde seçince liste daralırdı), alfabetik.
   const markaOpts = [...new Set([...(data.briefs || []), ...(data.completed || [])].map(b => b.marka).filter(Boolean))].sort((a, b) => a.localeCompare(b, "tr"));
 
-  // Statü KPI kartları — DURUM-ARALIĞI çakışması: aralık boyunca ilgili durumda BULUNAN iş sayısı.
-  // Tümü=hayatta olan; Yeni/statüler=o durumda bulunan; Geciken=gecikme döneminde olan; Tamamlandı=aralıkta biten.
-  const cntTumu = evPool.filter(aliveDuring).length;
+  // Statü KPI kartları — DURUM-ARALIĞI çakışması: aralık boyunca ilgili durumda BULUNAN benzersiz iş sayısı.
+  // Aktif işler=dönemde aktif statüde bulunan; statüler=o durumda bulunan; Geciken=gecikme döneminde; Tamamlandı=aralıkta biten.
+  const cntAktif = evPool.filter(activeDuring).length;
   const cntYeni = evPool.filter(b => inStatusDuring(b, "yeni")).length;
   const cntOverdue = evPool.filter(overdueDuring).length;
   const statusCards = [
-    { key: "all",         label: "Tümü",         value: cntTumu },
+    { key: "all",         label: "Aktif işler",  value: cntAktif },
     { key: "yeni",        label: "Yeni",         value: cntYeni,                 color: "var(--ink-3)" },
     { key: "calisiliyor", label: "İş planında",  value: cntStatus("calisiliyor"), color: "var(--info)" },
     { key: "basladi",     label: "İşe başlandı", value: cntStatus("basladi"),     color: "var(--ok, #2E8F66)" },
@@ -242,7 +243,7 @@ function JobsScreen({ data, user, viewMode, setViewMode, tableMode, initialScope
       {!isMobile && (
         <>
           <div style={{margin:"24px 0 -16px", font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-4)"}}>
-            {(statusCards.find(c => c.key === activeKey) || { label: "Tümü" }).label} · detay
+            {(statusCards.find(c => c.key === activeKey) || { label: "Aktif işler" }).label} · detay
           </div>
           <KpiGrid key={scope} cols={detailKpis.length}>
             {detailKpis.map((d, i) => (
