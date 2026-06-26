@@ -420,7 +420,7 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
           </Card>
           {_admin && (
           <Card style={{border:"none", background:"var(--paper)"}}>
-            <CardHead title="Bu hafta · parlayan" sub="tamamlanan brief'lerden"/>
+            <CardHead title={`${bnsRangeLabel(data.dateRange)} · parlayan`} sub="tamamlanan brief'lerden"/>
             <StarOfTheWeek data={data}/>
           </Card>
           )}
@@ -709,14 +709,17 @@ function BrandRow({ name, note, color, v, last }) {
 }
 
 // ─── StarOfTheWeek — son 7 günde en çok iş tamamlayan ───────────────────────
+// Seçili tarih aralığının kısa etiketi (başlıklarda "X · parlayan" gibi kullanılır).
+function bnsRangeLabel(dr) {
+  const m = { today:"Bugün", yesterday:"Dün", "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Seçili aralık" };
+  return m[(dr || {}).preset] || "Seçili aralık";
+}
 function StarOfTheWeek({ data }) {
-  const nowTs = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
-  const cutoff = nowTs - 7 * 24 * 3600 * 1000;
-  const allCompleted = data.completed || data._allCompleted || [];
-  const thisWeek = allCompleted.filter(c => (c.bitis || 0) >= cutoff);
+  // Seçili global tarih aralığına göre (data.completed zaten o aralığa süzülü). Sabit "son 7 gün" kesimi YOK.
+  const thisWeek = data.completed || [];
 
   if (thisWeek.length === 0) {
-    return <div style={{padding:"12px 4px", font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>Bu hafta henüz tamamlanan brief yok.</div>;
+    return <div style={{padding:"12px 4px", font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>Bu aralıkta henüz tamamlanan brief yok.</div>;
   }
 
   // Kişi başına istatistik hesapla
