@@ -640,5 +640,15 @@
     "sent_at": "2026-06-04T10:26:10+03:00",
     "user_id": "skip-consolidated",
     "notes": "4Haz 10:22 TR sync · 4 yeni brief (Bauhaus#35, Cimporglobal#36, KMR Amos#37, Kuzeypet#38) · Şablon1 x4 DM · Şablon31 x3 (İpek: #28,#30,#31 atlanmış escalation) · 21 GEÇMİŞ (pre-history 100-400h skip) · 12 blokeli · Calendar: skipped (headless)"
+  },
+  {
+    "brief_no": "22",
+    "brief_ts": "1779439428.236359",
+    "template": "deadline_uyari_25h_cansu_onay_bekliyor",
+    "sent_at": "2026-06-29T15:15:00+03:00",
+    "user_id": "U4XCE3532",
+    "channel_id": "D030L2UD7KQ",
+    "message_ts": "1782737682.046009",
+    "notes": "#22 Splenda SPLENDA UK Summer Newsletter · deadline yarın 30Haz17:00 (~25sa 44dk) · 🟡→🟠 geçişi ~17:00 bugün · Cansu Direktör'e onay uyarısı DM gönderildi · erdem copy edit tamamlandı · Aykut hazır · son DM 22May (37g önce) · benseno-brief-sync 15:15 run"
   }
 ]
