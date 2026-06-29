@@ -1,18 +1,18 @@
 {
   "last_run": {
     "skill": "benseno-brief-sync",
-    "ts": 1782735300,
-    "ts_str": "29 Haz 2026 Pzt 15:15 TR",
+    "ts": 1782737100,
+    "ts_str": "29 Haz 2026 Pzt 15:45 TR",
     "result": "ok",
     "canvas_updated": true,
     "live_data_updated": true,
-    "github_pushed": false,
+    "github_pushed": true,
     "new_briefs": 0,
     "completed": 0,
     "gecmis": 27,
     "blokeli": 12,
     "threshold_crossings": 0,
-    "dms_sent": 1,
-    "note": "Delta refresh (+26dk). Splenda #22 🟡 (25sa 44dk kaldı) · 🟡→🟠 geçişi ~17:00 TR bugün. Cansu Direktör'e onay uyarısı DM gönderildi (D030L2UD7KQ · 1782737682.046009). SKILL.md yok — canvas doğrudan güncellendi. GitHub PAT yok — push atlandı."
+    "dms_sent": 0,
+    "note": "Delta refresh (+30dk). Splenda #22 🟡 (25sa 15dk kaldı) · 🟡→🟠 geçişi ~17:00 TR bugün. DM gönderilmedi (önceki run'da 15:15'te Cansu'ya gönderilmişti). SKILL.md yok — canvas doğrudan güncellendi. GitHub MCP ile push edildi."
   }
 }
