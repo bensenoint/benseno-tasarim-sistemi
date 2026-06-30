@@ -117,7 +117,7 @@ function HelpScreen() {
 
       <Section title="⭐ Yıldız Puanlama & Karne" note="Her tamamlanan işe AI, thread'inden 1-5 kalite puanı verir (5=pürüzsüz/zamanında, 1=ciddi sorun).">
         <Row left="AI puanı" right="İş tamamlanınca otomatik verilir — Tamamlananlar'da yıldızların yanında 'AI' rozeti görünür"/>
-        <Row left="Deadline uzatma cezası" right="Bir işin deadline'ı ileri tarihe alınırsa AI puanından otomatik düşülür — deadline'a ne kadar YAKIN uzatılırsa o kadar çok" sub="48sa+ kala -0.5 · 24-48sa -1.0 · <24sa -1.5 · deadline GEÇTİKTEN sonra -2.0. Birden fazla uzatmada en kötüsü sayılır. Yönetici override'ı etkilenmez."/>
+        <Row left="Deadline uzatma cezası" right="Bir işin deadline'ı ileri tarihe alınırsa AI puanından otomatik düşülür — deadline'a ne kadar YAKIN uzatılırsa o kadar çok" sub="48sa'dan fazla kala -0.5 · 24-48sa arası (48 dahil) -1.0 · 24sa ve altı -1.5 · deadline GEÇTİKTEN sonra -2.0. Birden fazla uzatmada en kötüsü sayılır. Yönetici override'ı etkilenmez."/>
         <Row left="Teslim durumu" right="Tamamlananlar'da 'Teslim' kolonu: 🟢 Zamanında · 🟡 Uzatılarak teslim · 🔴 Gecikmeli"/>
         <Row left="Yönetici override" right="Tamamlananlar'daki yıldızlara tıklayarak puanı değiştir (yönetici)" sub="Override sonrası AI o işe bir daha dokunmaz."/>
         <Row left="Yıldız Karnesi" right="Departmanlar özet sayfasında + her departman sayfasında: firma & departman puan ortalamaları (seçili tarih aralığına göre)" sub="Genel Bakış'taki 'BENSENO ⭐' rozeti de Departmanlar özet'e götürür. Marka puanı Marka detayında; kişi puanı sadece yöneticiye, Profil'de."/>
@@ -127,7 +127,7 @@ function HelpScreen() {
 
       <Section title="📡 Marka Günlük Takibi" note="Marka detay sayfasında, tabloların altında.">
         <Row left="Kanal Özeti" right="Marka kanalının tüm akışının (thread'ler dahil) AI özeti — saatte bir güncellenir"/>
-        <Row left="Gün Sonu Insight" right="Her gün 18:45'te günün değerlendirmesi (tempo, sürtünme, müşteri sinyalleri) arşive yazılır"/>
+        <Row left="Gün Sonu Insight" right="Hafta içi 18:45'te günün değerlendirmesi (tempo, sürtünme, müşteri sinyalleri) arşive yazılır"/>
         <Row left="Tarih filtresi" right="'Şu an (canlı)' veya geçmiş bir günü seç → o günün özeti + insight'ı" sub="Günlük kayıtlar bir önceki günle ilişkilendirilir — dünden sarkan konuların bugünkü durumu belirtilir."/>
       </Section>
 

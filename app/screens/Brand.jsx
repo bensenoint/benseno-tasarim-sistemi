@@ -391,7 +391,7 @@ function BrandDailyPanel({ brand }) {
     ? (bm.kanal_ozet_at ? `canlı · ${fmtAt(bm.kanal_ozet_at)} itibarıyla · saatte bir güncellenir` : "saatte bir güncellenir")
     : `${fmtTarih(selDay && selDay.tarih)} arşivi`;
   const insSub = sel === "live"
-    ? (bm.son_insight_tarih ? `en son: ${fmtTarih(bm.son_insight_tarih)} · her gün 18:45'te üretilir` : "her gün 18:45'te üretilir")
+    ? (bm.son_insight_tarih ? `en son: ${fmtTarih(bm.son_insight_tarih)} · hafta içi 18:45'te üretilir` : "hafta içi 18:45'te üretilir")
     : `${fmtTarih(selDay && selDay.tarih)} arşivi`;
 
   if (!bm.kanal_ozet && !bm.son_insight && daily.length === 0) return null;
@@ -425,7 +425,7 @@ function BrandDailyPanel({ brand }) {
           })}
         </select>
         <span style={{ font:"400 11px/1 var(--font-sans)", color:"var(--ink-4)" }}>
-          {daily.length > 0 ? `${daily.length} günlük arşiv` : "arşiv her gün 18:45'te birikir"}
+          {daily.length > 0 ? `${daily.length} günlük arşiv` : "arşiv hafta içi 18:45'te birikir"}
         </span>
       </div>
       <div style={{ display:"flex", flexWrap:"wrap", gap:"var(--grid-gap)" }}>
