@@ -305,11 +305,33 @@ app.post('/api/briefs/by-no/:no/financials', writeGuard, handleWrite(async req =
 app.patch('/api/briefs/by-no/:no', writeGuard, handleWrite(async req => writes.patchBrief(await writes.noToId(+req.params.no), req.body)));
 app.post('/api/briefs/by-ts/:ts/status', writeGuard, handleWrite(async req => writes.setStatus(await writes.tsToId(req.params.ts), req.body)));
 app.post('/api/briefs/by-ts/:ts/financials', writeGuard, handleWrite(async req => writes.setFinancials(await writes.tsToId(req.params.ts), req.body)));
+// Soft-delete yetkisi: admin + yönetici + işin LEAD'i (dashboard butonuyla aynı kural).
+// Slack'in ana mesaj silme sinyali (by:'slack:deleted') Slack'in kendi yetkisiyle gelir → kabul.
+// İki yol: dashboard JWT (req.user) veya Slack bot token (actor = body.by, ör. event.user).
+async function assertCanDeleteBrief(req, briefId) {
+  if (req.user && req.user.role === 'admin') return;             // JWT admin
+  const by = req.body && req.body.by;
+  if (by === 'slack:deleted') return;                            // Slack ana mesaj silindi (Slack gated)
+  const actor = (req.user && (req.user.slack_id || req.user.id)) || by;
+  if (actor) {
+    const u = await pool.query("SELECT rol, yetki FROM users WHERE id=$1 LIMIT 1", [actor]);
+    const r = u.rows[0];
+    if (r && (r.rol === 'yonetici' || r.yetki === 'yonetici')) return;   // yönetici
+    if (briefId) {
+      const l = await pool.query("SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND user_id=$2 AND role='lead' LIMIT 1", [briefId, actor]);
+      if (l.rowCount > 0) return;                                // işin lead'i
+    }
+  }
+  const e = new Error('yetkisiz: bu işi silme yetkiniz yok (yalnız yönetici veya işin lead\'i)');
+  e.name = 'ZodError'; e.issues = [{ path: ['yetki'], message: 'yetkisiz' }];
+  throw e;
+}
+
 // Soft delete + geri alma + kalıcı silme
 // Kalıcı silme geri alınamaz → writeGuard JWT'yi doğrular, adminGuard rol=admin şartı koyar (bot token'ı yetmez)
 app.delete('/api/briefs/:id/permanent', writeGuard, auth.adminGuard, handleWrite(req => writes.permanentDeleteBrief(+req.params.id, req.body?.by)));
-app.delete('/api/briefs/:id',          writeGuard, handleWrite(req => writes.deleteBrief(+req.params.id, req.body?.by)));
-app.delete('/api/briefs/by-ts/:ts',    writeGuard, handleWrite(async req => writes.deleteBrief(await writes.tsToId(req.params.ts), req.body?.by)));
+app.delete('/api/briefs/:id',          writeGuard, handleWrite(async req => { await assertCanDeleteBrief(req, +req.params.id); return writes.deleteBrief(+req.params.id, req.body?.by); }));
+app.delete('/api/briefs/by-ts/:ts',    writeGuard, handleWrite(async req => { const id = await writes.tsToId(req.params.ts); await assertCanDeleteBrief(req, id); return writes.deleteBrief(id, req.body?.by); }));
 app.post('/api/briefs/:id/restore',    writeGuard, handleWrite(req => writes.restoreBrief(+req.params.id, req.body?.by)));
 app.post('/api/briefs/by-ts/:ts/restore', writeGuard, handleWrite(async req => writes.restoreBrief(await writes.tsToId(req.params.ts), req.body?.by)));
 
