@@ -48,6 +48,7 @@ const USERS = [
   { id: "U05PP70GQTX", name: "Aylin Canel",       mono: "AC", rol: "editor" },
   { id: "U063T8M5HL4", name: "Buse Gürbüzer",     mono: "BG", rol: "editor" },
   { id: "U0AAC3YK20G", name: "Simge Acar",        mono: "SA", rol: "editor" },
+  { id: "U0BDQ1MKXRB", name: "Serra Kibar",       mono: "SK", rol: "editor" },
   // AI (1)
   { id: "U0AP31SAA1W", name: "Eren Mahzunlar",    mono: "EM", rol: "ai",     title: "AI Operatör" }
 ];
