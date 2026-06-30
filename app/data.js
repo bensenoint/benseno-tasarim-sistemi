@@ -502,6 +502,7 @@ function bnsHydrateBrief(raw, idx) {
     stale:        !!raw.stale || /stale|pasif|hareketsiz|\*\*\d+g.*pasif/i.test(raw.durum || raw.status || ""),
     updated_at:   raw.updated_at != null ? raw.updated_at : null,   // son hareket (KPI: ort. süredir bu durumda ~ atıl)
     created_at:   raw.created_at != null ? raw.created_at : (typeof acilma === "number" ? acilma : null),
+    created_by:   raw.created_by || null,   // işi açan kişi (silme yetkisi: açan her zaman silebilir)
     slack_url:    raw.link ? raw.link.replace(/^\[link\]\((.+)\)$/, "$1") : (raw.slack_url || "#"),
     notes:        raw.notes || raw.saat || "",
     gecmis:       typeof raw.gecmis === "string" ? raw.gecmis : "",   // boolean/null gelebilir → string garanti

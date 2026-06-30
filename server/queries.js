@@ -11,7 +11,7 @@ async function allBriefsWithAssignees() {
            br.name AS marka, br.color AS marka_color,
            b.baslik, b.dept, b.deadline, b.saat, b.durum, b.priority, b.priority_label,
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
-           b.akis, b.stale, b.created_at, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
+           b.akis, b.stale, b.created_at, b.created_by, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
            b.rating, b.rating_by, b.rating_sebep,
            b.deadline_orig, b.uzatma_sayisi, b.uzatma_ceza, b.uzatma_muaf, b.deadline_history,
@@ -175,7 +175,7 @@ async function getEmbedded() {
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at || null, thread_ozet_ts: b.thread_ozet_ts || null,
-    stale: !!b.stale, created_at: ms(b.created_at), updated_at: ms(b.updated_at), uyari_at: ms(b.uyari_at), uyari2_at: ms(b.uyari2_at),
+    stale: !!b.stale, created_at: ms(b.created_at), created_by: b.created_by || null, updated_at: ms(b.updated_at), uyari_at: ms(b.uyari_at), uyari2_at: ms(b.uyari2_at),
     attachments: attByBrief[b.id] || [],
     // Statü-giriş olayları (tarih-bazlı KPI: aralıkta o statüye girmiş iş sayımı için)
     durum_olaylari: eventsByBrief[b.id] || [],

@@ -193,15 +193,16 @@ async function createBrief(raw) {
       const r = await client.query(`SELECT COALESCE(max(no),0)+1 AS n FROM briefs`);
       no = r.rows[0].n;
     }
-    // lead default = oluşturan; dept işi yapanlardan türetilir
-    const leadIds = (d.lead_ids && d.lead_ids.length) ? d.lead_ids : (d.by ? [d.by] : []);
+    // İşi açan HER ZAMAN lead'dir (co-lead) — ayrıca seçilen lead'ler de eklenir.
+    // Böylece açan, başkasını lead yapsa bile lead kalır ve silme yetkisi korunur.
+    const leadIds = [...new Set([...(d.lead_ids || []), ...(d.by ? [d.by] : [])])];
     const dept = await deriveDept(client, d.worker_ids, d.by);
     const r = await client.query(
-      `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,deadline_orig,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url)
-       VALUES ($1,$2,$3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
+      `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,deadline_orig,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url,created_by)
+       VALUES ($1,$2,$3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`,
       [no, markaId, d.baslik, dept, toTs(d.deadline), d.priority || null,
        d.akis || 'paralel', d.maliyet ?? null, d.satis ?? null, d.musteri_notu || null,
-       d.slack_ts || null, null]);
+       d.slack_ts || null, null, d.by || null]);
     const id = r.rows[0].id;
     // gözlemci = manuel seçilenler ∪ ilgili dept yöneticileri (her zaman)
     // Auto-yöneticiler: zaten işi yapan/lead olanları gözlemciye ekleme (tek kişi iki listede görünmesin).
@@ -220,7 +221,7 @@ async function createBrief(raw) {
   // Slack-kökenli (source='slack') olanlarda ECHO yapma. Best-effort: hata create'i bozmaz.
   if (d.source !== 'slack' && slack.hasToken()) {
     try {
-      const leadIdsForPost = (d.lead_ids && d.lead_ids.length) ? d.lead_ids : (d.by ? [d.by] : []);
+      const leadIdsForPost = [...new Set([...(d.lead_ids || []), ...(d.by ? [d.by] : [])])];  // açan her zaman lead
       const workerIds = (d.worker_ids || []).filter(Boolean);
       // Gözlemciler (manuel + otomatik dept yöneticileri) — brief'teki HERKES mention'lansın
       const obsQ = await pool.query(

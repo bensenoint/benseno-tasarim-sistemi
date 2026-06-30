@@ -320,9 +320,11 @@ async function assertCanDeleteBrief(req, briefId) {
     if (briefId) {
       const l = await pool.query("SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND user_id=$2 AND role='lead' LIMIT 1", [briefId, actor]);
       if (l.rowCount > 0) return;                                // işin lead'i
+      const c = await pool.query("SELECT 1 FROM briefs WHERE id=$1 AND created_by=$2 LIMIT 1", [briefId, actor]);
+      if (c.rowCount > 0) return;                                // işi açan (created_by)
     }
   }
-  const e = new Error('yetkisiz: bu işi silme yetkiniz yok (yalnız yönetici veya işin lead\'i)');
+  const e = new Error('yetkisiz: bu işi silme yetkiniz yok (yalnız yönetici, işin lead\'i veya işi açan)');
   e.name = 'ZodError'; e.issues = [{ path: ['yetki'], message: 'yetkisiz' }];
   throw e;
 }

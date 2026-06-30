@@ -18,7 +18,8 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
   const _meRec  = (allUsers || []).find(u => u && u.id === _meId);
   const _isMgr  = currentUser?.role === 'admin' || (_meRec && _meRec.rol === 'yonetici');
   const _isLead = !!(_meId && b.lead && b.lead.id === _meId);
-  const canDeleteRole = _isMgr || _isLead;
+  const _isCreator = !!(_meId && b.created_by && b.created_by === _meId);  // işi açan her zaman silebilir
+  const canDeleteRole = _isMgr || _isLead || _isCreator;
 
   // Bottom-sheet aşağı sürükle-kapat (yalnız mobil, handle/başlık bölgesinden)
   const sheetDrag = isMobile ? {
