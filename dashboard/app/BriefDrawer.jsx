@@ -12,6 +12,14 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
   React.useEffect(() => { setB(brief); setSaved(false); setAssignedMe(false); setInlineToast(null); setDragY(0); }, [brief]);
   if (!b) return null;
 
+  // Silme yetkisi: admin + yönetici + işin LEAD'i (lead varsayılanı = işi açan; ayrı "açan" alanı saklanmaz,
+  // bu yüzden açan kişi normalde lead olarak görünür ve kapsanır).
+  const _meId   = currentUser && (currentUser.slack_id || currentUser.id);
+  const _meRec  = (allUsers || []).find(u => u && u.id === _meId);
+  const _isMgr  = currentUser?.role === 'admin' || (_meRec && _meRec.rol === 'yonetici');
+  const _isLead = !!(_meId && b.lead && b.lead.id === _meId);
+  const canDeleteRole = _isMgr || _isLead;
+
   // Bottom-sheet aşağı sürükle-kapat (yalnız mobil, handle/başlık bölgesinden)
   const sheetDrag = isMobile ? {
     onTouchStart: (e) => { dragStartY.current = e.touches[0].clientY; setDragging(true); },
@@ -379,7 +387,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <div>
-            {!ro && currentUser?.role === 'admin' && (
+            {!ro && canDeleteRole && (
               <button onClick={handleDelete} style={{
                 padding:'6px 12px', borderRadius:6,
                 border:'1px solid var(--prio-red, #e54d2e)',
