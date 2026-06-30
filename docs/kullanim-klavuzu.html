@@ -837,9 +837,9 @@
           <thead><tr><th>Departman</th><th>Kişiler</th></tr></thead>
           <tbody>
             <tr><td>🎨 Tasarım (7 kişi)</td><td>Aykut Arslan, Aylin Tozkoparan, Hasan Serdar Arda, İrem Özkan, Pelin Özdemir, Serhat Tokmak + <strong>İpek Akdeniz</strong> (yönetici)</td></tr>
-            <tr><td>✍️ Editör (8 kişi)</td><td>Aylin Canel, Buse Gürbüzer, Eda Ayral, Eda Tireli, Melis Genç, Simge Acar + <strong>Cansu Kazgan, Erdem Akoğlu</strong> (yönetici)</td></tr>
+            <tr><td>✍️ Editör (8 kişi)</td><td>Aylin Canel, Buse Gürbüzer, Eda Ayral, Melis Genç, Simge Acar, Serra Kibar + <strong>Cansu Kazgan, Erdem Akoğlu</strong> (yönetici)</td></tr>
             <tr><td>🤖 AI (4 kişi)</td><td>Eren Mahzunlar, Uras Aydınlıoğlu + <strong>Görkem Kaya, Reyhan Nur Pınar</strong> (yönetici)</td></tr>
-            <tr><td>🤝 Freelance (6 kişi)</td><td>Arda Gündoğdu (tasarım), Berke Çırakman (web/teknik), Duru Can (web/reklam/SEO), Enes Çınar (yazılım), Levent Tütüncü (matbaa/promosyon), Mehmet Filiz (yazılım) — Slack'te yoklar; brieflerini içeriden biri açar ve yönetir, sadece süreç takip edilir. DM/uyarı almazlar.</td></tr>
+            <tr><td>🤝 Freelance (9 kişi)</td><td>Arda Gündoğdu (tasarım), Berke Çırakman (web/teknik), Duru Can (web/reklam/SEO), Enes Çınar (yazılım), Levent Tütüncü (matbaa/promosyon), Mehmet Filiz (yazılım), Hamza Altun (AR çevirmen), Ahmet Demir (AR çevirmen), Aygül Saraç — Slack'te yoklar; brieflerini içeriden biri açar ve yönetir, sadece süreç takip edilir. DM/uyarı almazlar.</td></tr>
           </tbody>
         </table>
       </div>
@@ -998,52 +998,62 @@
       <p>Brief durumu iki şekilde güncellenir ve <strong>ikisi de aynı sonucu verir</strong>: (1) brief'in <strong>ana mesajına emoji reaction</strong> eklemek, ya da (2) brief <strong>thread'ine</strong> o emojiyle başlayan veya bir durum kelimesi içeren bir mesaj yazmak. Uzun thread'lerde ana mesaja kaydırmadan thread'e yazmak pratiktir.</p>
 
       <h3>3.1 Durum Emojileri</h3>
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <span>Hem <strong>klasik emojiler</strong> hem <strong>Benseno özel emojileri</strong> (<code>:bso-…:</code>) çalışır — ikisi de aynı sonucu verir. İstediğinizi kullanın.</span>
+      </div>
       <div class="reaction-grid">
         <div class="reaction-card">
           <div class="reaction-emoji">🎨 ✍️ 🤖</div>
-          <div class="reaction-name">İş Kabulü / Çalışılıyor</div>
-          <div class="reaction-desc">İşi kabul ettim, planıma aldım, başladım. Tasarım 🎨 · Editör ✍️ · AI 🤖. 🔄 de "devam ediyor" demektir.</div>
+          <div class="reaction-name">İş Kabulü / İş planında</div>
+          <div class="reaction-desc">İşi planıma aldım (Tasarım 🎨 · Editör ✍️ · AI 🤖). Açıldıktan sonra 1 saat içinde bu emojiyi koyman beklenir. 🔄 = devam ediyor. Benseno: <code>:bso-calisiliyor:</code> · <code>:bso-devam:</code></div>
+        </div>
+        <div class="reaction-card">
+          <div class="reaction-emoji">🚀</div>
+          <div class="reaction-name">İşe Başlandı</div>
+          <div class="reaction-desc">Fiilen çalışmaya başladım.</div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">👀</div>
           <div class="reaction-name">İncelemede</div>
-          <div class="reaction-desc">İş gözden geçiriliyor / revize sunuldu.</div>
+          <div class="reaction-desc">İş gözden geçiriliyor / revize sunuldu. Benseno: <code>:bso-incelemede:</code></div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">⏸️</div>
           <div class="reaction-name">Beklemede</div>
-          <div class="reaction-desc">Müşteri / onay / materyal bekleniyor.</div>
+          <div class="reaction-desc">Müşteri / onay / materyal bekleniyor. Benseno: <code>:bso-beklemede:</code></div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">✏️</div>
           <div class="reaction-name">Revizyon</div>
-          <div class="reaction-desc">Düzeltme isteği geldi.</div>
+          <div class="reaction-desc">Düzeltme isteği geldi. ✈️'dan sonraki İLK ✏️ müşteri revizyonu, diğerleri iç revizyon sayılır. Benseno: <code>:bso-revizyon:</code></div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">✈️</div>
           <div class="reaction-name">Müşteriye Yollandı</div>
-          <div class="reaction-desc">İş müşteri onayına gönderildi — dashboard'da "Müşteri Onayı" sayfasına taşınır, aktif yükten düşer. ✈️ sonrası İLK ✏️ müşteri revizyonu sayılır.</div>
+          <div class="reaction-desc">İş müşteri onayına gönderildi → <strong>"Müşteride"</strong> durumuna geçer; aktif yük/kapasite ve hareketsizlik hesabından çıkar. (Detay bakış'ta "Müşteride" filtresinde görünür.) ✈️ sonrası İLK ✏️ müşteri revizyonu sayılır. Benseno: <code>:bso-musteriye:</code></div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">✅</div>
           <div class="reaction-name">Tamamlandı</div>
-          <div class="reaction-desc">İş bitti. Thread'deki son görsel otomatik galeriye kaydedilir.</div>
+          <div class="reaction-desc">İş bitti. Thread'deki son görsel otomatik galeriye kaydedilir. Benseno: <code>:bso-tamamlandi:</code></div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">📎</div>
           <div class="reaction-name">Final Teslim (Galeri)</div>
-          <div class="reaction-desc">Dosya içeren bir mesaja 📎 koy → o mesajdaki TÜM dosyalar (görsel + PDF/video/diğer tipler) işin final teslimi olarak galeriye kaydedilir. ✅'in otomatik "son görsel"inden farkı: hangi dosyaların galeriye gireceğini SEN seçersin. Dosyasız mesaja koyarsan bot uyarır.</div>
+          <div class="reaction-desc">Dosya içeren bir mesaja 📎 koy → o mesajdaki TÜM dosyalar (görsel + PDF/video/diğer tipler) işin final teslimi olarak galeriye kaydedilir. ✅'in otomatik "son görsel"inden farkı: hangi dosyaların galeriye gireceğini SEN seçersin. Dosyasız mesaja koyarsan bot uyarır. Benseno: <code>:bso-galeri-muhru:</code></div>
         </div>
         <div class="reaction-card">
           <div class="reaction-emoji">🔃</div>
           <div class="reaction-name">Yeniden Aç</div>
-          <div class="reaction-desc">Tamamlanmış brief'i tekrar çalışılıyor durumuna çeker.</div>
+          <div class="reaction-desc">Tamamlanmış brief'i tekrar "devam ediyor" durumuna çeker. Benseno: <code>:bso-yeniden-acildi:</code></div>
         </div>
       </div>
 
       <h3>3.2 Öncelik (Reaction)</h3>
       <p>Brief'e öncelik vermek için ana mesaja şu reaction'lardan biri eklenir (atanan veya yönetici):
-        <span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> <span class="prio prio-yellow">🟡 Normal</span> <span class="prio prio-green">🟢 Düşük</span></p>
+        <span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> <span class="prio prio-yellow">🟡 Normal</span> <span class="prio prio-green">🟢 Düşük</span>.
+        Benseno özel emojileri de çalışır: <code>:bso-acil:</code> · <code>:bso-yuksek:</code> · <code>:bso-normal:</code> · <code>:bso-dusuk:</code></p>
 
       <h3>3.3 Kelime Kısayolları</h3>
       <p>Brief thread'ine <strong>tam olarak</strong> şu kelimeyi yazın (içinde geçmesi yetmez — birebir eşleşme gerekir):</p>
@@ -1085,7 +1095,7 @@
           <tbody>
             <tr><td>Thread'e <code>brief sil</code> yaz</td><td>Brief Silinenler'e taşınır, bot onay mesajı düşer</td></tr>
             <tr><td>Brief ana mesajını Slack'te sil</td><td>Brief otomatik olarak Silinenler'e taşınır</td></tr>
-            <tr><td>Dashboard → brief detayında 🗑️ Sil</td><td>Silinenler'e taşır (yönetici)</td></tr>
+            <tr><td>Dashboard → brief detayında 🗑️ Sil</td><td>Silinenler'e taşır (yönetici veya işin lead'i)</td></tr>
             <tr><td>Silinenler → ↩ Geri al</td><td>Brief'i aktif listeye geri getirir (yönetici)</td></tr>
             <tr><td>Silinenler → 🗑️ Kalıcı sil</td><td>Tamamen siler — GERİ ALINAMAZ (yönetici)</td></tr>
           </tbody>
@@ -1196,16 +1206,16 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
       <p>Sonraki bir halka sorun görürse ✏️ koyar → zincir bir önceki onaylı halkaya geri sarar; <code>revize: @kişi</code> yazarsa belirli bir halkaya döner (o halka ve sonrasının onayları düşer, iş oradan yeniden akar). Freelance halkası yerine brief'teki herhangi biri vekâleten onay verebilir. Cevapsız uyarıları ve kapasite yükü yalnız <em>sırası gelen</em> kişiye işler — sırası gelmemiş kişi ne uyarı alır ne yüklü görünür. Seçim yapılmazsa ("Paralel") her şey eskisi gibi çalışır; bu akış yalnızca yeni açılan brieflerde geçerlidir.</p>
 
       <h3>✈️ Müşteri Onayı Akışı & İç/Müşteri Revizyon Ayrımı</h3>
-      <p>İş müşteriye gönderilmeye hazır olduğunda thread'e <strong>✈️</strong> konur (veya "müşteriye yollandı" yazılır). İş dashboard'da <strong>"Müşteri Onayı"</strong> sayfasına taşınır (Planlama menüsünde); aktif iş listesi, departman yükü, kapasite ve hareketsizlik hesaplarından çıkar — ekip o iş için gerçekten müsait görünür. Kanban'da kendi kolonu vardır.</p>
+      <p>İş müşteriye gönderilmeye hazır olduğunda thread'e <strong>✈️</strong> konur (veya "müşteriye yollandı" yazılır). İş dashboard'da <strong>"Müşteride"</strong> durumuna geçer; aktif iş listesi, departman yükü, kapasite ve hareketsizlik hesaplarından çıkar — ekip o iş için gerçekten müsait görünür. (Ayrı "Müşteri Onayı" sayfası menüden kaldırıldı; bu işler <strong>Detay bakış</strong>'taki "Müşteride" filtresinde ve Kanban'daki kendi kolonunda görünür.)</p>
       <p><strong>Revizyon ayrımı kuralı:</strong> ✈️'dan sonraki <strong>İLK ✏️ müşteri revizyonudur</strong>; diğer tüm ✏️'ler iç revizyondur. Müşteri revizyonu gelince iş otomatik "çalışılıyor"a döner ve aktif listelere geri gelir; tekrar hazır olunca yine ✈️ atılır — her döngüde aynı kural işler. Tablolarda revizyon "iç/müşteri" olarak ayrı gösterilir; bekleme süreleri marka değerlendirmelerine veri sağlar.</p>
 
       <h3>⭐ Yıldız Puanlama & Karne</h3>
       <p>Her tamamlanan işe AI, thread değerlendirmesinden <strong>1-5 kalite puanı</strong> verir (5 = pürüzsüz/zamanında, 3 = normal sürtünme, 1 = ciddi sorun). Yönetici, Tamamlananlar'daki yıldızlara tıklayarak puanı değiştirebilir — override sonrası AI o işe dokunamaz (AI puanları küçük "AI" rozetiyle ayırt edilir). Yıldızların üzerine gelince işin <strong>neden o puanı aldığını anlatan tek cümlelik gerekçe</strong> görünür.</p>
       <p><strong>Deadline uzatma cezası.</strong> Bir işin deadline'ı ileri tarihe alınırsa AI puanından otomatik düşülür — uzatma o an geçerli deadline'a <strong>ne kadar yakın</strong> yapıldıysa o kadar çok: 48 saatten erken kala <strong>-0.5</strong> · 24-48 saat kala <strong>-1.0</strong> · son 24 saat <strong>-1.5</strong> · deadline <strong>geçtikten sonra -2.0</strong>. Birden fazla uzatmada en kötüsü sayılır (toplanmaz); yarım yıldız çıkabilir. Yönetici override'ı bu cezadan etkilenmez. Tamamlananlar'da <strong>"Teslim"</strong> kolonu durumu gösterir: 🟢 Zamanında · 🟡 Uzatılarak teslim · 🔴 Gecikmeli. Aktif işlerde deadline uzatılmışsa Teslim sütununda <strong>"uzatıldı ×N"</strong> rozeti görünür.</p>
-      <p>Puanlar dört seviyede karneye dönüşür: <strong>Firma + Departman</strong> → Karşılaştırma ekranındaki "⭐ Yıldız Karnesi" kartı (Genel Bakış'taki BENSENO ⭐ rozeti de oraya götürür) · <strong>Marka</strong> → Marka detayındaki yıldız şeridi · <strong>Kişi</strong> → Profil'de, <em>sadece yöneticiler görür</em>. Çok departmanlı işin puanı ilgili tüm departmanlara işler. "Neden bu ortalama" sebep açıklamaları her gün 18:45'te iş insight'larından üretilir.</p>
+      <p>Puanlar dört seviyede karneye dönüşür: <strong>Firma + Departman</strong> → <strong>Departmanlar özet</strong> ekranındaki ve her departman sayfasındaki "⭐ Yıldız Karnesi" (Genel Bakış'taki BENSENO ⭐ rozeti de oraya götürür) · <strong>Marka</strong> → Marka detayındaki yıldız şeridi (listenin altında) · <strong>Kişi</strong> → Profil'de, <em>sadece yöneticiler görür</em>. Çok departmanlı işin puanı ilgili tüm departmanlara işler. Puan ortalamaları üstteki 📅 tarih aralığına göre değişir. Karnedeki <strong>"Değerlendirme"</strong> satırını açtığında, seçili döneme özel AI yorumu o an üretilir (sayfa/tarih değişiminde otomatik çalışmaz; sayısal veriler her zaman DB'den).</p>
 
       <h3>📡 Marka Günlük Takibi</h3>
-      <p>Marka detay sayfasında, iş tablolarının altında <strong>"Günlük Kanal Takibi"</strong> paneli: marka kanalının tüm akışının (thread'ler dahil) AI özeti saatte bir güncellenir; her gün 18:45'te günün <strong>kanal özeti + gün-sonu insight'ı</strong> tarihli arşive yazılır. Paneldeki tarih seçiciyle geçmiş bir günün kaydına dönülebilir. Günlük kayıtlar bir önceki günle ilişkilendirilir — dünden sarkan konuların bugünkü durumu (çözüldü/sürüyor) belirtilir.</p>
+      <p>Marka detay sayfasında, iş tablolarının altında <strong>"Günlük Kanal Takibi"</strong> paneli: marka kanalının tüm akışının (thread'ler dahil) AI özeti hafta içi saatte bir güncellenir; hafta içi 18:45'te günün <strong>kanal özeti + gün-sonu insight'ı</strong> tarihli arşive yazılır. Paneldeki tarih seçiciyle geçmiş bir günün kaydına dönülebilir. Günlük kayıtlar bir önceki günle ilişkilendirilir — dünden sarkan konuların bugünkü durumu (çözüldü/sürüyor) belirtilir.</p>
 
       <h3>🤖 Ody — Sistem Asistanı, Bildirimler & Ruh Halleri</h3>
       <p>Dashboard'da sağ alttaki yüzen maskot — adı <strong>Ody</strong>. Sistemin nasıl kullanılacağına dair her soru + canlı veriden marka/iş/kişi soruları ("Bauhaus'ta neler var?", "geciken iş var mı?") + öneri/yönlendirme. Kiminle konuştuğunu bilir: "bugün hangi işlerim var?" dediğinizde giriş yaptığınız hesaba göre <strong>sizin</strong> işlerinizi listeler. Kişi puanlarını yalnızca yöneticilere söyler. Ody'yi sürükleyerek istediğiniz yere taşıyabilirsiniz; pencere küçülünce kendini görünür alana çeker.</p>
@@ -1268,6 +1278,9 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
           </tbody>
         </table>
       </div>
+
+      <h3>🗓️ Tarih Aralığı Filtresi</h3>
+      <p>Üstteki <strong>📅</strong> düğmesi tüm raporlama ekranlarını seçili döneme göre süzer. Hazır aralıklar: <strong>Bugün · Dün · Son 7/30/90 gün · Bu yıl · Tüm zamanlar</strong>; ayrıca özel başlangıç–bitiş tarihi seçilebilir. Etkilediği yerler: tamamlanan işler, yıldız ortalamaları, dönemsel özet, geçmiş, galeri, marka detayı ve departman karnesi. <strong>Aktif iş listeleri her zaman güncel kalır</strong> (tarihten bağımsız). Geçmiş bir aralık seçilirse kapasite/aktif yük o tarihte açık olan işlerden geri-hesaplanır. Kanban'da tarih filtresi pasiftir (anlık akış gösterir).</p>
     </section>
 
     <!-- ─────────────────────────────────────────── -->
@@ -1278,28 +1291,28 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         <div class="section-num">6</div>
         <div class="section-title-wrap">
           <h2 class="section-title">Dashboard — Ekranlar Rehberi</h2>
-          <div class="section-tag">14 ekran · Sütun açıklamaları · KPI rehberi</div>
+          <div class="section-tag">Ekranlar · Sütun açıklamaları · KPI rehberi</div>
         </div>
       </div>
 
       <div class="screen-grid">
         <div class="screen-card"><div class="screen-num">6.1</div><div class="screen-name">Genel Bakış</div><div class="screen-desc">6 KPI kartı, bugün & yarın tablosu, departman özeti, sorunlu markalar</div></div>
         <div class="screen-card"><div class="screen-num">6.2</div><div class="screen-name">Yönetici</div><div class="screen-desc">Kritik liste — geçmiş tarih, blokeli, stale, marka yoğunluğu</div></div>
-        <div class="screen-card"><div class="screen-num">6.3</div><div class="screen-name">Aktif İşler</div><div class="screen-desc">Tüm brief'ler tablo formatında, detay çekmecesi</div></div>
-        <div class="screen-card"><div class="screen-num">6.4</div><div class="screen-name">Plan / Gantt</div><div class="screen-desc">Brief'lerin zaman ekseninde görünümü</div></div>
+        <div class="screen-card"><div class="screen-num">6.3</div><div class="screen-name">Detay bakış</div><div class="screen-desc">Tüm işlerin filtrelenebilir listesi (statü/kişi/marka) + 100 satır/sayfa, detay çekmecesi. "Müşteride" işler de burada bir filtre. (Eski adı "Aktif işler".)</div></div>
+        <div class="screen-card"><div class="screen-num">6.4</div><div class="screen-name">Plan / Gantt</div><div class="screen-desc">Brief'lerin zaman ekseninde görünümü (şu an menüde gizli)</div></div>
         <div class="screen-card"><div class="screen-num">6.5</div><div class="screen-name">Kanban</div><div class="screen-desc">Durum sütunlarına göre gruplandırılmış</div></div>
-        <div class="screen-card"><div class="screen-num">6.6</div><div class="screen-name">Tamamlananlar</div><div class="screen-desc">Satıra tıkla → salt-okunur detay (thread özeti, insight); yıldız puanlama (yönetici)</div></div>
-        <div class="screen-card"><div class="screen-num">6.7</div><div class="screen-name">Karşılaştırma</div><div class="screen-desc">⭐ Yıldız Karnesi (firma+departman) + departman kıyası</div></div>
+        <div class="screen-card"><div class="screen-num">6.6</div><div class="screen-name">Tamamlananlar</div><div class="screen-desc">Tamamlanan işler — salt-okunur detay (thread özeti, insight), yıldız puanlama (yönetici). Menüde gizli; Detay bakış "Tamamlanan" ve Marka detayından erişilir.</div></div>
+        <div class="screen-card"><div class="screen-num">6.7</div><div class="screen-name">Departmanlar özet</div><div class="screen-desc">⭐ Yıldız Karnesi (firma+departman) + 4 departman kıyası (tarihe duyarlı). (Eski adı "Karşılaştırma".)</div></div>
         <div class="screen-card"><div class="screen-num">6.8</div><div class="screen-name">Geçmiş</div><div class="screen-desc">Gerçek olay akışı — satıra tıkla → işin detayı</div></div>
         <div class="screen-card"><div class="screen-num">6.9</div><div class="screen-name">Galeri</div><div class="screen-desc">Tamamlanan işlerin marka bazlı galerisi</div></div>
         <div class="screen-card"><div class="screen-num">6.10</div><div class="screen-name">Multi-Atama</div><div class="screen-desc">Paralel/sıralı akış yönetim görünümü</div></div>
-        <div class="screen-card"><div class="screen-num">6.11</div><div class="screen-name">Marka</div><div class="screen-desc">İstatistik + yıldız + günlük kanal takibi (özet/insight arşivi, tarih filtreli)</div></div>
+        <div class="screen-card"><div class="screen-num">6.11</div><div class="screen-name">Marka</div><div class="screen-desc">İstatistik + tek "Durum" filtresi (aktif alt-statüler + Müşteride + Tamamlanan); Yıldız Karnesi ve günlük kanal takibi (özet/insight arşivi, tarih filtreli) listenin altında</div></div>
         <div class="screen-card"><div class="screen-num">6.12</div><div class="screen-name">Ekip Matrisi</div><div class="screen-desc">Kişi × marka uzmanlık haritası</div></div>
-        <div class="screen-card"><div class="screen-num">6.13</div><div class="screen-name">Tasarım/Editör/AI/Freelance</div><div class="screen-desc">Departman detay ekranı — kişi bazlı istatistikler</div></div>
+        <div class="screen-card"><div class="screen-num">6.13</div><div class="screen-name">Tasarım/Editör/AI/Freelance</div><div class="screen-desc">Departman detayı — sıra: iş listesi → Yıldız Karnesi → Departman ekibi (yük sıralı) + Dönemsel özet</div></div>
         <div class="screen-card"><div class="screen-num">6.14</div><div class="screen-name">Profil</div><div class="screen-desc">Kişisel istatistikler, tamamlanan işler, puan geçmişi</div></div>
         <div class="screen-card"><div class="screen-num">6.15</div><div class="screen-name">Silinenler</div><div class="screen-desc">Silinmiş brief'ler — geri al / kalıcı sil (yönetici)</div></div>
         <div class="screen-card"><div class="screen-num">6.16</div><div class="screen-name">Yardım</div><div class="screen-desc">Komut, emoji ve kısayol referansı</div></div>
-        <div class="screen-card"><div class="screen-num">6.17</div><div class="screen-name">✈️ Müşteri Onayı</div><div class="screen-desc">Müşteri dönüşü bekleyen işler — bekleme süresi, gönderim sayısı, iç/müşteri revize; en uzun bekleyen üstte</div></div>
+        <div class="screen-card"><div class="screen-num">6.17</div><div class="screen-name">✈️ Müşteride</div><div class="screen-desc">Müşteri dönüşü bekleyen işler. Ayrı sayfa menüden kaldırıldı — Detay bakış'taki "Müşteride" filtresinde görünür</div></div>
       </div>
 
       <h3>6.1 Genel Bakış — KPI Kartları</h3>
@@ -1312,31 +1325,32 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
             <tr><td><strong>Bugün Teslim</strong></td><td>Bugün teslim edilmesi gereken brief'ler</td><td>Bilgilendirici</td></tr>
             <tr><td><strong>Onay Bekleyen</strong></td><td>İncelemede (👀) durumundaki brief'ler</td><td>Bilgilendirici</td></tr>
             <tr><td><strong>Hareketsiz</strong></td><td>24 iş saati (Cmt/Paz + TR resmî tatilleri hariç) boyunca ne durum değişikliği ne thread mesajı olan brief'ler. Hareket gelince işaret otomatik kalkar. Tüm atananlar tatildeyse (Slack 🌴/izin/OOO) süre işlemez.</td><td>↑ Kırmızı</td></tr>
-            <tr><td><strong>Kapasite</strong></td><td>Ekip doluluk oranı: aktif iş ÷ (kişi × 6 slot)</td><td>↑ Yeşil (artış iyi)</td></tr>
+            <tr><td><strong>Kapasite</strong></td><td>Ekip doluluk oranı — ROL AĞIRLIKLI yük: işi yapan 5 · lead 2 · gözlemci 0 (gözlemcilik kapasiteye katılmaz). Kişi limiti: yönetici 10 · editör 8 · tasarım/AI/freelance 6 (yarım gün çalışanda yarıya iner)</td><td>↑ Yeşil (artış iyi)</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3>6.3 Aktif İşler — Sütunlar</h3>
+      <h3>6.3 Detay bakış — Sütunlar</h3>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Sütun</th><th>İçerik</th></tr></thead>
           <tbody>
-            <tr><td>No</td><td>Brief numarası</td></tr>
-            <tr><td>Dept</td><td>Departman (🎨 ✍️ 🤖)</td></tr>
+            <tr><td>#</td><td>Brief numarası</td></tr>
+            <tr><td>Öncelik</td><td><span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> <span class="prio prio-yellow">🟡 Normal</span> <span class="prio prio-green">🟢 Düşük</span></td></tr>
+            <tr><td>Kalan</td><td>Teslime kalan süre (geciktiyse negatif/kırmızı)</td></tr>
             <tr><td>Marka</td><td>Marka adı</td></tr>
             <tr><td>İş</td><td>Brief başlığı (tıklanınca detay çekmecesi açılır)</td></tr>
-            <tr><td>Atanan</td><td>Tasarımcı</td></tr>
-            <tr><td>Editör</td><td>Sorumlu editör</td></tr>
-            <tr><td>Öncelik</td><td><span class="prio prio-red">🔴 Acil</span> <span class="prio prio-orange">🟠 Yüksek</span> + kalan süre</td></tr>
-            <tr><td>Deadline</td><td>Teslim tarihi/saati</td></tr>
-            <tr><td>Durum</td><td>Yeni / Çalışılıyor / İncelemede / Blokeli</td></tr>
-            <tr><td>Rev</td><td>Revizyon sayısı</td></tr>
-            <tr><td>Geçmiş</td><td>Yönetici override geçmişi (<code>🔴Yön14:23</code>)</td></tr>
-            <tr><td>Link</td><td>Slack mesajına git</td></tr>
+            <tr><td>Atanan</td><td>İşi yapan(lar) + lead — avatarlar</td></tr>
+            <tr><td>Teslim</td><td>Deadline tarihi/saati</td></tr>
+            <tr><td>Durum</td><td>Yeni / İş planında / İncelemede / Beklemede / Revizyon / Blokeli / Müşteride</td></tr>
+            <tr><td>Rev#</td><td>Revizyon sayısı</td></tr>
+            <tr><td>Açıldı</td><td>İşin açıldığı tarih/saat</td></tr>
+            <tr><td>Gecikme</td><td>Varsa gecikme süresi</td></tr>
+            <tr><td>🔗</td><td>Slack mesajına git</td></tr>
           </tbody>
         </table>
       </div>
+      <p>Marka detayında bu sütunlara ek olarak <strong>Maliyet · Satış · Fatura · Ödeme</strong> finans sütunları da görünür.</p>
       <p>İşe tıklayınca açılan detay panelinde ayrıca <strong>💬 Thread Özeti</strong> bölümü vardır: Slack thread'indeki yazışmaların AI özeti (hafta içi saatte bir güncellenir), atama/zaman bilgileri, aktivite geçmişi ve not alanı.</p>
     </section>
 
@@ -1353,7 +1367,7 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
       </div>
 
       <h3>7.1 Öncelik Override — Reaction ile</h3>
-      <p><strong>Yetkili kişiler:</strong> Görkem, Reyhan, Cansu, İpek, erdem</p>
+      <p><strong>Yetkili kişiler:</strong> Görkem, Reyhan, Cansu, İpek, Erdem</p>
       <div class="flow">
         <div class="flow-step">
           <div class="flow-dot">1</div>
@@ -1428,20 +1442,20 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
 
       <div class="schedule-grid">
         <div class="schedule-row">
-          <div class="schedule-time">☀️ Her gün 07:50</div>
+          <div class="schedule-time">☀️ Hafta içi 07:50</div>
           <div class="schedule-task"><strong>Sabah Raporu</strong> — #benseno-grafik + 5 yönetici DM · <strong>07:55</strong>'te aktif işi olan her çalışana kişisel özet DM</div>
         </div>
         <div class="schedule-row">
-          <div class="schedule-time">📊 Cuma 17:00</div>
+          <div class="schedule-time">📊 Cuma 17:10</div>
           <div class="schedule-task"><strong>Haftalık Retrospektif</strong> — Haftanın özeti ve yıldızlar</div>
         </div>
         <div class="schedule-row">
-          <div class="schedule-time">📋 Ay sonu 17:00</div>
+          <div class="schedule-time">📋 Ayın 25–31'i 17:15</div>
           <div class="schedule-task"><strong>Aylık Stratejik Özet</strong> — Aylık tamamlanan, top 3 marka/tasarımcı/editör, strateji önerileri</div>
         </div>
         <div class="schedule-row">
-          <div class="schedule-time">🔍 Her gün 17:00</div>
-          <div class="schedule-task"><strong>Günlük Sistem Özeti</strong> — Kaç run yapıldı, timeout/hata, Slack Bot durumu</div>
+          <div class="schedule-time">🔍 Hafta içi 17:05</div>
+          <div class="schedule-task"><strong>Günlük Sistem Özeti</strong> — Kaç run yapıldı, timeout/hata, Slack Bot durumu (yalnız Görkem'e)</div>
         </div>
       </div>
 
@@ -1480,7 +1494,7 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
           <tbody>
             <tr><td>Slack erişimi</td><td>Marka kanallarına ve <code>#benseno-grafik</code> ekip kanalına ekle</td></tr>
             <tr><td>Dashboard girişi</td><td>Kişiye özel kullanıcı adı + şifre oluştur (yönetici, Kullanıcılar ekranından)</td></tr>
-            <tr><td>Rol & departman</td><td>Kullanıcının departmanını (Tasarım / Editör / AI) tanımla</td></tr>
+            <tr><td>Rol & departman</td><td>Kullanıcının departmanını (Tasarım / Editör / AI / Freelance) tanımla</td></tr>
             <tr><td>Sistem turu</td><td>Dashboard ekranları + Yardım sekmesi + bu Kullanım Kılavuzu</td></tr>
             <tr><td>Slack akışı</td><td><code>/yeni-brief</code> ile brief açma, durum emojileri ve kelime kısayolları</td></tr>
           </tbody>
