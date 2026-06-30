@@ -29,7 +29,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
 
   // ─── Aktif brief'ler (bu kişiyle ilişkili)
   const isRelated = (b, uid) =>
-    (b.lead && b.lead.id === uid) ||
+    window.bnsIsLead(b, uid) ||
     (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === uid)) ||
     (b.reviewer && b.reviewer.id === uid);
 
@@ -43,7 +43,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   };
   const myActive     = myAll.filter(b => b.durum !== "musteride")
     .sort((a, b) => (myKisiSira(a) - myKisiSira(b)) || ((a.no || 0) - (b.no || 0)));
-  const asLead       = allBriefs.filter(b => b.lead && b.lead.id === u.id);
+  const asLead       = allBriefs.filter(b => window.bnsIsLead(b, u.id));
   const asContrib    = allBriefs.filter(b => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id));
   const asReviewer   = allBriefs.filter(b => b.reviewer && b.reviewer.id === u.id);
   const overdue      = myActive.filter(b => b.deltaH <= 0);
@@ -51,10 +51,10 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
 
   // ─── Tamamlanan (global tarih aralığında — data.completed zaten süzülü)
   const myCompleted  = allCompleted.filter(b =>
-    (b.lead && b.lead.id === u.id) ||
+    (window.bnsIsLead(b, u.id)) ||
     (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
   );
-  const completedAsLead   = myCompleted.filter(b => b.lead && b.lead.id === u.id);
+  const completedAsLead   = myCompleted.filter(b => window.bnsIsLead(b, u.id));
   const completedAsContrib= myCompleted.filter(b => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id));
 
   // ─── Revize istatistikleri
@@ -116,13 +116,13 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   // ─── Verdiğim işler (bu kişi başka birine iş atamışsa — atanan_ids ikinci kişi)
   // "Verdiğim" = bu kişi lead, başka biri contributor
   const delegated = myActive.filter(b =>
-    b.lead && b.lead.id === u.id &&
+    window.bnsIsLead(b, u.id) &&
     Array.isArray(b.contributors) && b.contributors.length > 0
   );
 
   // ─── Aldığım işler (başkası lead, bu kişi contributor)
   const assigned = myActive.filter(b =>
-    b.lead && b.lead.id !== u.id &&
+    !window.bnsIsLead(b, u.id) &&
     Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id)
   );
 
@@ -215,7 +215,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   //     Zaman filtresinden BAĞIMSIZ: kendi 4 haftalık penceresini kullanır.
   const nowMsTP = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
   const myDoneTs = allCompletedRaw
-    .filter(b => (b.lead && b.lead.id === u.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id)))
+    .filter(b => (window.bnsIsLead(b, u.id)) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id)))
     .map(b => (b.bitis || 0) * (b.bitis && b.bitis < 1e10 ? 1000 : 1))
     .filter(Boolean);
   const tp = (typeof bnsThroughput === "function") ? bnsThroughput(myDoneTs, nowMsTP, 4) : { perWeek: 0, count: 0, lowSample: true };
@@ -232,7 +232,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   // ─── Performans özeti — üstte seçili GLOBAL tarih aralığına göre (data.completed zaten süzülü) ───
   const perfRangeLabel = drLabel;
   const perfDone = allCompleted.filter(b =>
-    (b.lead && b.lead.id === u.id) ||
+    (window.bnsIsLead(b, u.id)) ||
     (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id))
   );
   const perfN = perfDone.length;
@@ -247,7 +247,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   const perfSureArr = perfDone.map(b => b.sureH || 0).filter(h => h > 0);
   const perfHours = perfSureArr.reduce((s, v) => s + v, 0);
   const perfAvgSure = perfSureArr.length ? (perfHours / perfSureArr.length).toFixed(1) : "—";
-  const perfLead = perfDone.filter(b => b.lead && b.lead.id === u.id).length;
+  const perfLead = perfDone.filter(b => window.bnsIsLead(b, u.id)).length;
   const perfContrib = perfN - perfLead;
   const perfOnTime = perfDone.filter(b => (b.gecikmeH || 0) <= 0).length;
   const perfLate = perfN - perfOnTime;
@@ -478,7 +478,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
                 </thead>
                 <tbody>
                   {myCompleted.slice(0,12).map((b,i) => {
-                    const isLead = b.lead && b.lead.id === u.id;
+                    const isLead = window.bnsIsLead(b, u.id);
                     return (
                       <tr key={b.id} style={{borderTop:"1px solid var(--line-soft)", cursor:"pointer"}}
                         title="İşin detayını aç"

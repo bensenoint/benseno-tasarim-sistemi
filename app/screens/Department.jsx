@@ -34,7 +34,7 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
 
   // Load per person — tarihe duyarlı küme (capBriefs) üzerinden.
   const loadByPerson = people.map(p => {
-    const my = capBriefs.filter(b => (b.lead && b.lead.id === p.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id)));
+    const my = capBriefs.filter(b => (window.bnsIsLead(b, p.id)) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id)));
     const myOverdue = my.filter(b => _cutoff ? (typeof b.deadline === "number" && b.deadline < _cutoff) : (b.deltaH <= 0 && b.durum !== "tamamlandi")).length;
     return {
       user: p,
@@ -71,7 +71,7 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
   const dAvgRating = dRatingArr.length ? (dRatingArr.reduce((s, v) => s + v, 0) / dRatingArr.length).toFixed(1) : "—";
   const doneByPerson = people.map(p => ({
     user: p,
-    done: deptDone.filter(b => (b.lead && b.lead.id === p.id) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id))).length
+    done: deptDone.filter(b => (window.bnsIsLead(b, p.id)) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === p.id))).length
   })).filter(x => x.done > 0).sort((a, b) => b.done - a.done);
   const deptRows = [
     ["Toplam tamamlanan iş", String(dN)],

@@ -276,7 +276,7 @@ function App({ currentUser, onLogout }) {
     // Brief'in tüm ilişkili user ID'lerini topla
     const collectIds = (b) => {
       const ids = new Set();
-      if (b.lead?.id) ids.add(b.lead.id);
+      (window.bnsLeadList ? window.bnsLeadList(b) : (b.lead ? [b.lead] : [])).forEach(l => l?.id && ids.add(l.id));
       if (b.leadId) ids.add(b.leadId);
       (b.contributors || []).forEach(c => c?.id && ids.add(c.id));
       (b.contribIds || []).forEach(id => id && ids.add(id));

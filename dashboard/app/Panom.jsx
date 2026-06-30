@@ -139,7 +139,7 @@ function PanomScreen(props) {
   var briefs = data.briefs || [];
   var completed = data.completed || data._allCompleted || [];
   var me = (function () { var u = currentUser || {}; var sid = u.slack_id || u.id; return (data.USERS || []).find(function (x) { return x.id === sid; }) || { id: sid, name: u.name, rol: "" }; })();
-  var mine = function (b) { return (b.lead && b.lead.id === me.id) || (Array.isArray(b.contributors) && b.contributors.some(function (c) { return c && c.id === me.id; })); };
+  var mine = function (b) { return (me && window.bnsIsLead(b, me.id)) || (Array.isArray(b.contributors) && b.contributors.some(function (c) { return c && c.id === me.id; })); };
   var brandColor = function (b) { return (b.brand && b.brand.color) || (data.BR && data.BR[b.marka] && data.BR[b.marka].color) || "var(--ink-4)"; };
   var fmtDelta = function (dh) { var late = dh <= 0; return late ? Math.abs(Math.round(dh)) + "sa↑" : Math.round(dh) + "sa"; };
   var deltaCol = function (dh) { return dh <= 0 ? "var(--prio-red)" : dh <= 24 ? "var(--prio-orange)" : "var(--prio-yellow)"; };

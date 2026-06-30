@@ -10,7 +10,7 @@ function labPrioColor(code) {
             ylw: "var(--prio-yellow)", grn: "var(--prio-green)" })[code] || "var(--ink-4)";
 }
 function labPersonOn(b, uid) {
-  return (b.lead && b.lead.id === uid) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === uid));
+  return window.bnsIsLead(b, uid) || (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === uid));
 }
 function LabCard({ title, hint, children, pad = 16 }) {
   return (

@@ -110,7 +110,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   // Öncelik filtresi (tüm scope'larda): "over" = geçmiş/geciken, diğerleri renk kodu
   if (prioFilter === "over")       rows = rows.filter(b => typeof b.deltaH === "number" && b.deltaH <= 0);
   else if (prioFilter !== "all")   rows = rows.filter(b => b.priority && b.priority.code === prioFilter);
-  if (person !== "all") rows = rows.filter(b => [b.lead, ...(b.contributors || [])].some(p => p && p.id === person));
+  if (person !== "all") rows = rows.filter(b => [...window.bnsLeadList(b), ...(b.contributors || [])].some(p => p && p.id === person));
   if (search.trim()) {
     const q = search.toLowerCase().trim();
     rows = rows.filter(b =>

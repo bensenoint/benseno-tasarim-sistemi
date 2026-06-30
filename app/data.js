@@ -557,6 +557,10 @@ function bnsHydrateCompleted(raw, idx) {
       return liveUsers.find(u => u.id === lid) ||
         (lid ? { id: lid, name: (raw.leads && raw.leads[0] && raw.leads[0].name) || raw.leadName || lid.slice(-4), initials: "?", color: "#999", rol: "", dept: "" } : null);
     })(),
+    // TÜM lead'ler (co-lead dahil) — bnsIsLead/bnsLeadList için. Yoksa lead'e düşer.
+    leads: (Array.isArray(raw.leads) ? raw.leads.map(l => l && l.id).filter(Boolean)
+            : (raw.leadId ? [raw.leadId] : []))
+      .map(id => liveUsers.find(u => u.id === id) || { id, name: id, initials: "?", color: "#999", rol: "", dept: "" }),
     contributors: (raw.contribIds || (Array.isArray(raw.workers) ? raw.workers.map(w => w && w.id) : []) || [])
       .map(id => liveUsers.find(u => u.id === id)).filter(Boolean),
     deadline,
@@ -669,6 +673,17 @@ window.bnsSebepFor = function (type, key, range) {
   return hist[0];
 };
 window.bnsApplyExtras = bnsApplyExtras;
+
+// Lead üyeliği — TÜM lead'leri kontrol eder (co-lead dahil), yalnız b.lead (ilk lead) değil.
+// Bir işte birden çok lead olabilir; b.lead = leads[0] olduğundan tekil kontrol ikinci lead'i kaçırır.
+window.bnsLeadList = function (b) {
+  if (!b) return [];
+  if (Array.isArray(b.leads) && b.leads.length) return b.leads;
+  return b.lead ? [b.lead] : [];
+};
+window.bnsIsLead = function (b, uid) {
+  return !!uid && window.bnsLeadList(b).some(function (l) { return l && l.id === uid; });
+};
 
 // Polling için window'a expose et
 window.bnsHydrateBrief = bnsHydrateBrief;

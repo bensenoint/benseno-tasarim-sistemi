@@ -157,7 +157,7 @@ function odyMyBriefs(uid) {
   if (!uid) return b;
   var inArr = function (a) { return Array.isArray(a) && a.some(function (u) { return u && u.id === uid; }); };
   var mine = b.filter(function (x) {
-    if (x.lead && x.lead.id === uid) return true;
+    if (window.bnsIsLead(x, uid)) return true;
     if (x.reviewer && x.reviewer.id === uid) return true;
     return inArr(x.contributors) || inArr(x.workers) || inArr(x.leads) || inArr(x.observers);
   });

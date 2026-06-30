@@ -117,8 +117,8 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   // Hem aktif hem tamamlanan kayıtlar HYDRATE edilmiş aynı shape'e sahip (lead obje, contributors dizi)
   // → tek helper ikisinde de çalışır. (Eskiden completed c.leadId/c.contribIds okuyordu; hydrate bunları
   //   lead/contributors objesine çevirdiği için atanan "—" görünüyordu.)
-  const rowIds   = b => [b.lead && b.lead.id, ...((b.contributors || []).map(c => c && c.id))].filter(Boolean);
-  const rowNames = b => [b.lead && b.lead.name, ...((b.contributors || []).map(c => c && c.name))].filter(Boolean);
+  const rowIds   = b => [...window.bnsLeadList(b).map(l => l && l.id),   ...((b.contributors || []).map(c => c && c.id))].filter(Boolean);
+  const rowNames = b => [...window.bnsLeadList(b).map(l => l && l.name), ...((b.contributors || []).map(c => c && c.name))].filter(Boolean);
   const activeIds = rowIds;
 
   const [person, setPerson] = React.useState("");
@@ -129,8 +129,8 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   // kişi seçenekleri (aktif lead+contributors ∪ tamamlanan lead+contrib)
   const people = React.useMemo(() => {
     const seen = {};
-    for (const b of active) { if (b.lead && b.lead.id) seen[b.lead.id] = b.lead.name || b.lead.id; (b.contributors || []).forEach(c => { if (c && c.id) seen[c.id] = c.name || c.id; }); }
-    for (const c of done) { if (c.lead && c.lead.id) seen[c.lead.id] = c.lead.name || c.lead.id; (c.contributors || []).forEach(x => { if (x && x.id && !seen[x.id]) seen[x.id] = x.name || x.id; }); }
+    for (const b of active) { window.bnsLeadList(b).forEach(l => { if (l && l.id) seen[l.id] = l.name || l.id; }); (b.contributors || []).forEach(c => { if (c && c.id) seen[c.id] = c.name || c.id; }); }
+    for (const c of done) { window.bnsLeadList(c).forEach(l => { if (l && l.id && !seen[l.id]) seen[l.id] = l.name || l.id; }); (c.contributors || []).forEach(x => { if (x && x.id && !seen[x.id]) seen[x.id] = x.name || x.id; }); }
     return Object.entries(seen).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, "tr"));
   }, [active, done]);
 
