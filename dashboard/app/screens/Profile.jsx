@@ -369,6 +369,11 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
         <Kpi label="Marka"         value={Object.keys(brandCount).length} sub="farklı"/>
       </div>
 
+      {/* ─── Bildirim tercihleri — yalnız kendi profilinde ─── */}
+      {u.id === (currentUser && currentUser.slack_id) && (
+        <div style={{marginBottom:"var(--grid-gap)"}}><NotifPrefsCard/></div>
+      )}
+
       {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
       <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
         <div style={{padding:"13px 16px", borderBottom:"1px solid var(--line)", display:"flex", justifyContent:"space-between", alignItems:"center", gap:12, flexWrap:"wrap"}}>
@@ -610,6 +615,45 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
       )}
 
     </div>
+  );
+}
+
+// ─── Bildirim tercihleri kartı (yalnız kendi profilinde) ─────────────────────
+function NotifPrefsCard() {
+  const [p, setP] = React.useState(null);
+  React.useEffect(() => {
+    if (typeof window.bnsApiGet === "function")
+      window.bnsApiGet("/api/notify-prefs").then(setP).catch(() => setP({}));
+  }, []);
+  if (!p) return null;
+  const save = (patch) => {
+    const next = { ...p, ...patch }; setP(next);
+    if (typeof window.bnsApiPost === "function") window.bnsApiPost("/api/notify-prefs", next);
+  };
+  const Row = ({ k, label }) => (
+    <label style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",cursor:"pointer"}}>
+      <span style={{font:"400 13px/1.4 var(--font-sans)",color:"var(--ink-2)"}}>{label}</span>
+      <input type="checkbox" checked={p[k] !== false} onChange={e => save({ [k]: e.target.checked })}/>
+    </label>
+  );
+  return (
+    <Card style={{padding:16}}>
+      <div style={{font:"600 13px/1 var(--font-sans)",marginBottom:10}}>Bildirim tercihleri</div>
+      <Row k="ogle_dijest" label="Öğle dijesti (13:30)"/>
+      <Row k="tip_termin" label="Termin uyarısı — anlık"/>
+      <Row k="tip_atama" label="Atama/lead — anlık"/>
+      <Row k="tip_bloke" label="Bloke/müşteri — anlık"/>
+      <div style={{display:"flex",gap:8,alignItems:"center",marginTop:10}}>
+        <span style={{font:"400 13px var(--font-sans)",color:"var(--ink-2)"}}>Sessiz saat</span>
+        <select value={p.sessiz_bas ?? 19} onChange={e => save({ sessiz_bas: +e.target.value })}>
+          {Array.from({length:24},(_,i)=><option key={i} value={i}>{String(i).padStart(2,"0")}:00</option>)}
+        </select>
+        <span>–</span>
+        <select value={p.sessiz_bit ?? 8} onChange={e => save({ sessiz_bit: +e.target.value })}>
+          {Array.from({length:24},(_,i)=><option key={i} value={i}>{String(i).padStart(2,"0")}:00</option>)}
+        </select>
+      </div>
+    </Card>
   );
 }
 

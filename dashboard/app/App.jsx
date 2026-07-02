@@ -241,6 +241,20 @@ function App({ currentUser, onLogout }) {
       if (!r.ok) throw new Error("api " + r.status);
       return r.json();
     };
+    // Authlı POST helper — bnsApiGet ile aynı base/token yaklaşımı, JSON gövde ile POST.
+    window.bnsApiPost = async (path, body) => {
+      const base = (typeof window.BNS_API_BASE === "string" && window.BNS_API_BASE)
+        ? window.BNS_API_BASE.replace(/\/+$/, "")
+        : "https://benseno-api-production.up.railway.app";
+      const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+      const r = await fetch(base + path, {
+        method: "POST",
+        headers: { "content-type": "application/json", ...(tok ? { Authorization: "Bearer " + tok } : {}) },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) throw new Error("api " + r.status);
+      return r.json();
+    };
   }, []);
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
