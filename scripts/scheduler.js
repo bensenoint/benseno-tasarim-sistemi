@@ -64,17 +64,26 @@ function run(script) {
 
 // Orchestrator KALDIRILDI (Cutover tamam, 4 Haz): canvas→live-data pipeline emekli;
 // raporlar /api/embedded (DB) okuyor, briefler /yeni-brief ile DB'ye düşüyor.
+const NOTIFY_V2 = process.env.BNS_NOTIFY_V2 === '1';
 // Sabah raporu — hafta içi 07:50
 cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
-// Kişisel iş özeti — hafta içi 07:55, aktif işi olan her çalışana DM
-cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
+// Kişisel: V2'de dijest (08:30 sabah + 13:30 öğle), eski sistemde 07:55 kisisel rapor.
+if (NOTIFY_V2) {
+  cron.schedule('30 8 * * 1-5', () => run('run-dijest.sh'), opts);
+  cron.schedule('30 13 * * 1-5', () => run('run-dijest-ogle.sh'), opts);
+} else {
+  cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
+}
 // Termin riski — hafta içi 09-19 SAAT BAŞI (:15), tüm aktif briefleri tarar; teslime ≤24sa
 // olanı thread'e uyarır. Idempotent (20sa): her saat kontrol eder ama aynı işi spam'lemez.
 cron.schedule('15 9-19 * * 1-5', () => run('run-termin-risk.sh'), opts);
-// Thread özeti + tamamlanan iş insight'ı — hafta içi 09-19 arası saatte bir
-cron.schedule('0 9-19 * * 1-5', () => run('run-thread-ozet.sh'), opts);
-// Marka kanal özeti — hafta içi 09-19 arası saatte bir, yarım saat kaydırmalı (xx:30)
-cron.schedule('30 9-19 * * 1-5', () => run('run-kanal-ozet.sh'), opts);
+// Saatlik kanal/thread özetleri: V2'de KAPALI (gürültü kaynağı).
+if (!NOTIFY_V2) {
+  // Thread özeti + tamamlanan iş insight'ı — hafta içi 09-19 arası saatte bir
+  cron.schedule('0 9-19 * * 1-5', () => run('run-thread-ozet.sh'), opts);
+  // Marka kanal özeti — hafta içi 09-19 arası saatte bir, yarım saat kaydırmalı (xx:30)
+  cron.schedule('30 9-19 * * 1-5', () => run('run-kanal-ozet.sh'), opts);
+}
 // Marka gün-sonu insight — hafta içi 18:45 (brand_daily arşivine yazar)
 cron.schedule('45 18 * * 1-5', () => run('run-kanal-gunsonu.sh'), opts);
 // 17:00 raporları kaydırıldı (aynı anda spawn olmasın → çift-claude/push yarışı yok):
