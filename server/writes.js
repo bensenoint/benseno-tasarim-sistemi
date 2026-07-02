@@ -429,13 +429,11 @@ async function zincirCtx(client, id) {
 async function setStatus(id, raw, _depth = 0) {
   const d = statusBody.parse(raw);
   let zincirNote = null, dmNext = null, resumeMs = null;   // resumeMs: işe-dönüş hatırlatıcısı için bekleme süresi
-  let notifyPrevDurum = null;   // Bildirim reformu: tx dışında blokeli/müşteri-dönüşü kararı için prevDurum'u dışarı taşı
   const res = await tx(async (client) => {
     const ctx = await zincirCtx(client, id);
     if (!ctx) throw new Error('brief bulunamadı: ' + id);
     const prevRow = await client.query('SELECT durum FROM briefs WHERE id=$1', [id]);
     const prevDurum = prevRow.rows[0] && prevRow.rows[0].durum;
-    notifyPrevDurum = prevDurum;
     // Idempotency: aynı Slack olayı (slack_ts) daha önce durum değiştirmişse tekrar uygulama
     // (kuyruk replay'inde sayaç/zincir mükerrer ilerlemesini önler)
     if (d.slack_ts) {
@@ -556,21 +554,6 @@ async function setStatus(id, raw, _depth = 0) {
     note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin uzat\` yaz (bekleme kadar uzatır) ya da \`termin 15.06 17:00\` ile tarih ver; bu uzatma **gecikme sayılmaz**. (Dashboard'da da tek tıkla var.)`;
   }
   await reflectChange(id, note, d.source, { by: d.by });
-  // Bildirim reformu: blokeli / müşteri dönüşü → dijeste girecek NORMAL bildirim (anlık değil).
-  // NOT: prevDurum/RESUME_ACTIVE tx callback'ine kapalı; uygulanan durum res.durum, prevDurum notifyPrevDurum'da.
-  const RESUME_ACTIVE_NOTIFY = ['basladi', 'calisiliyor', 'incelemede', 'revizyon'];
-  const yeniDurum = res && res.durum;
-  if (NOTIFY_V2 && (yeniDurum === 'blokeli' || (['beklemede', 'musteride'].includes(notifyPrevDurum) && RESUME_ACTIVE_NOTIFY.includes(yeniDurum)))) {
-    try {
-      const bi = (await pool.query(`SELECT no, baslik, slack_url FROM briefs WHERE id=$1`, [id])).rows[0] || {};
-      const tip = yeniDurum === 'blokeli' ? 'bloke' : 'musteri';
-      const txt = yeniDurum === 'blokeli'
-        ? `⛔ #${bi.no} ${bi.baslik || ''} bloke edildi`
-        : `↩️ #${bi.no} ${bi.baslik || ''} müşteriden döndü — akış devam ediyor`;
-      const a = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND role IN ('contributor','lead')`, [id]);
-      for (const row of a.rows) if (/^U/.test(row.user_id || '')) await notify(row.user_id, { tip, aciliyet: 'normal', text: txt, link: bi.slack_url, briefId: id });
-    } catch (e) { console.error('[setStatus] bloke/müşteri bildirimi:', e.message); }
-  }
   // Dashboard çanı: işe dönüş hatırlatıcısını atananlara da düşür (brief açmadan görsün).
   if (resumeMs != null) {
     try {
@@ -833,7 +816,11 @@ async function reflectChange(briefId, summary, source, opts) {
     // DM YOK: thread notu zaten takipçilere Slack bildirimi üretiyor (çift bildirim önlenir).
     // Dashboard çanı beslenmeye devam etsin diye yalnız notifications tablosuna yazılır.
     const u = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1`, [briefId]);
-    for (const row of u.rows) if (/^U/.test(row.user_id || '')) await slack.logNotification(row.user_id, text, threadLink);
+    for (const row of u.rows) {
+      if (!/^U/.test(row.user_id || '')) continue;
+      if (NOTIFY_V2) await notify(row.user_id, { tip: 'statu', aciliyet: 'normal', text, link: threadLink, briefId });
+      else await slack.logNotification(row.user_id, text, threadLink);
+    }
   } catch (e) { console.error('[writes] reflect hata:', e.message); }
 }
 
