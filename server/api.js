@@ -668,6 +668,55 @@ app.post('/api/notify-prefs', auth.authGuard, async (req, res) => {
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
+// İşe/markaya göre TEKİL bildirim sayıları — kişinin seen zamanından sonrası.
+app.get('/api/notif-counts', auth.authGuard, async (req, res) => {
+  try {
+    const uid = req.user.slack_id;
+    const r = await pool.query(`
+      WITH tekil AS (
+        SELECT DISTINCT ON (n.brief_id, n.tip, n.text) n.brief_id, n.marka, n.created_at
+        FROM notifications n
+        WHERE n.brief_id IS NOT NULL
+        ORDER BY n.brief_id, n.tip, n.text, n.created_at DESC
+      )
+      SELECT t.brief_id, t.marka, count(*) AS cnt, max(t.created_at) AS last_at
+      FROM tekil t
+      LEFT JOIN brief_notif_seen s ON s.user_id=$1 AND s.brief_id=t.brief_id
+      WHERE t.created_at > COALESCE(s.seen_at, now() - interval '7 days')
+      GROUP BY t.brief_id, t.marka`, [uid]);
+    const briefs = {}, markalar = {};
+    for (const row of r.rows) {
+      briefs[row.brief_id] = { count: +row.cnt, last_at: row.last_at };
+      if (row.marka) {
+        markalar[row.marka] = markalar[row.marka] || { count: 0, last_at: null };
+        markalar[row.marka].count += +row.cnt;
+        if (!markalar[row.marka].last_at || row.last_at > markalar[row.marka].last_at) markalar[row.marka].last_at = row.last_at;
+      }
+    }
+    res.json({ briefs, markalar });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Bir işin tekil bildirim listesi (son 30).
+app.get('/api/briefs/:id/notifications', auth.authGuard, async (req, res) => {
+  try {
+    const r = await pool.query(`
+      SELECT DISTINCT ON (tip, text) tip, text, link, created_at
+      FROM notifications WHERE brief_id=$1
+      ORDER BY tip, text, created_at DESC LIMIT 30`, [+req.params.id]);
+    res.json({ notifications: r.rows.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Görüldü işaretle (rozet söner).
+app.post('/api/briefs/:id/notif-seen', auth.authGuard, async (req, res) => {
+  try {
+    await pool.query(`INSERT INTO brief_notif_seen (user_id, brief_id, seen_at) VALUES ($1,$2,now())
+      ON CONFLICT (user_id, brief_id) DO UPDATE SET seen_at=now()`, [req.user.slack_id, +req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
 // Script'lerin (uyarı DM'leri) bildirim düşmesi için — writeGuard.
 app.post('/api/notifications', writeGuard, async (req, res) => {
   try {
