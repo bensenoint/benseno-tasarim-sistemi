@@ -48,16 +48,17 @@ async function notify(userId, { tip = 'genel', aciliyet = 'normal', text, link =
     } catch (e) { /* marka best-effort */ }
   }
   // 1) Zil kaydı — GARANTİ (koşulsuz).
-  await pool.query(
-    `INSERT INTO notifications (user_id, text, link, tip, aciliyet, brief_id, marka) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+  const ins = await pool.query(
+    `INSERT INTO notifications (user_id, text, link, tip, aciliyet, brief_id, marka) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id`,
     [userId, text, link, tip, aciliyet, briefId, marka]);
+  const notifId = ins.rows[0] && ins.rows[0].id;
   // 2) Acil + izin → anlık DM (çift-log yok: skipLog=true; kaydı zaten yukarıda yazdık).
   if (aciliyet === 'acil') {
     try {
       const prefs = await getPrefs(userId);
       if (shouldPushNow({ tip, aciliyet }, prefs, new Date())) {
         await slack.dm(userId, text, link, true);
-        await pool.query(`UPDATE notifications SET slack_at=now() WHERE id=(SELECT id FROM notifications WHERE user_id=$1 AND text=$2 ORDER BY id DESC LIMIT 1)`, [userId, text]);
+        if (notifId) await pool.query(`UPDATE notifications SET slack_at=now() WHERE id=$1`, [notifId]);
       }
     } catch (e) { console.error('[notify] anlık DM hata:', e.message); }  // satır tabloda güvende
   }
