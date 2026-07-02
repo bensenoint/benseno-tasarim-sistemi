@@ -47,7 +47,7 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
   });
 
   // ─── Departman performans özeti — üstte seçili GLOBAL tarih aralığına göre (data.completed süzülü) ───
-  const RANGE_LABELS = { "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
+  const RANGE_LABELS = { today:"Bugün", yesterday:"Dün", "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
   const deptRangeLabel = RANGE_LABELS[(data.dateRange && data.dateRange.preset) || "all"] || "seçili aralık";
   const allCompleted = data.completed || data._allCompleted || [];
   const deptDone = allCompleted.filter(b =>

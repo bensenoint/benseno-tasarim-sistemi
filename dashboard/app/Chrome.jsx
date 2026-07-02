@@ -1199,7 +1199,7 @@ function DateRangeControl({ range, onChange, now, compact, disabled }) {
     : (typeof range.from === "number" && typeof range.to === "number" && range.to < 8e15)
       ? (toYMD(range.from) === toYMD(range.to) ? fmtG(range.from) : `${fmtG(range.from)} – ${fmtG(range.to)}`)
       : "";
-  const isDefault = range.preset === "30d";
+  const isDefault = range.preset === "all";   // gerçek varsayılan "all" (App.jsx) — temiz açılışta filtre "aktif" görünmesin
   // Özel aralık inputları: her açılışta mevcut aralığı yansıtır (yoksa bugüne).
   const [cFrom, setCFrom] = React.useState("");
   const [cTo, setCTo] = React.useState("");

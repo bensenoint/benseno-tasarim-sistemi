@@ -397,7 +397,7 @@ async function zincirCtx(client, id) {
   return { ...b, halkalar, zincirli };
 }
 
-async function setStatus(id, raw) {
+async function setStatus(id, raw, _depth = 0) {
   const d = statusBody.parse(raw);
   let zincirNote = null, dmNext = null, resumeMs = null;   // resumeMs: işe-dönüş hatırlatıcısı için bekleme süresi
   const res = await tx(async (client) => {
@@ -553,7 +553,8 @@ async function setStatus(id, raw) {
   }
   // Otomatik ilerleme: bu brief tamamlandi/musteride olduysa, onu aktif işi yapan
   // contributor'lar için sıradaki kuyruk işini aktive et. source:'system' → echo/loop koruması.
-  if ((d.durum === 'tamamlandi' || d.durum === 'musteride') && d.source !== 'system') {
+  // Depth-cap: birbirine referanslı kuyruklarda sonsuz/aşırı özyineleme koruması (source:'system' echo koruması + zincir derinliği ≤ 3).
+  if ((d.durum === 'tamamlandi' || d.durum === 'musteride') && d.source !== 'system' && _depth < 3) {
     const cont = await pool.query(
       `SELECT user_id FROM brief_assignees WHERE brief_id=$1 AND role='contributor'`, [id]);
     for (const row of cont.rows) {
@@ -561,7 +562,7 @@ async function setStatus(id, raw) {
       if (nextId && nextId !== id) {
         const nb = await pool.query('SELECT durum FROM briefs WHERE id=$1', [nextId]);
         if (nb.rows[0] && nb.rows[0].durum !== 'basladi') {
-          await setStatus(nextId, { durum: activateTarget(nb.rows[0].durum), by: d.by, source: 'system' });
+          await setStatus(nextId, { durum: activateTarget(nb.rows[0].durum), by: d.by, source: 'system' }, _depth + 1);
         }
       }
     }
@@ -860,9 +861,12 @@ async function permanentDeleteBrief(id, by) {
     'SELECT id, no FROM briefs WHERE id=$1 AND deleted_at IS NOT NULL', [id]
   );
   if (!check.rows[0]) throw new Error('brief bulunamadı veya önce silinenler listesine alınmamış: ' + id);
-  await pool.query('DELETE FROM brief_assignees WHERE brief_id=$1', [id]);
-  await pool.query('DELETE FROM events WHERE brief_id=$1', [id]);
-  await pool.query('DELETE FROM briefs WHERE id=$1', [id]);
+  // Tek transaction: kısmi başarısızlıkta orphan (assignees/events silinip brief kalması) olmaz.
+  await tx(async (client) => {
+    await client.query('DELETE FROM brief_assignees WHERE brief_id=$1', [id]);
+    await client.query('DELETE FROM events WHERE brief_id=$1', [id]);
+    await client.query('DELETE FROM briefs WHERE id=$1', [id]);
+  });
   return { id, no: check.rows[0].no };
 }
 
