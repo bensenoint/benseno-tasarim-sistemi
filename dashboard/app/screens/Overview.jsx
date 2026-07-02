@@ -737,12 +737,14 @@ function StarOfTheWeek({ data }) {
   // Kişi başına istatistik hesapla
   const byUser = {};
   thisWeek.forEach(c => {
-    const u = c.lead;
-    if (!u || !u.id) return;
-    if (!byUser[u.id]) byUser[u.id] = { user: u, count: 0, totalSure: 0, sureCount: 0, minSure: Infinity };
-    const s = byUser[u.id];
-    s.count++;
-    if (c.sureH > 0) { s.totalSure += c.sureH; s.sureCount++; s.minSure = Math.min(s.minSure, c.sureH); }
+    // TÜM lead'lere kredi ver (co-lead dahil) — sadece ilk lead'e değil.
+    window.bnsLeadList(c).forEach(u => {
+      if (!u || !u.id) return;
+      if (!byUser[u.id]) byUser[u.id] = { user: u, count: 0, totalSure: 0, sureCount: 0, minSure: Infinity };
+      const s = byUser[u.id];
+      s.count++;
+      if (c.sureH > 0) { s.totalSure += c.sureH; s.sureCount++; s.minSure = Math.min(s.minSure, c.sureH); }
+    });
   });
 
   // En çok iş tamamlayan — eşit puanda en hızlı ortalama kazanır
@@ -753,7 +755,7 @@ function StarOfTheWeek({ data }) {
 
   // 0 gecikme olan kişi
   const zeroLate = Object.values(byUser).filter(s => {
-    return thisWeek.filter(c => c.lead?.id === s.user.id && (c.gecikmeH || 0) > 0).length === 0;
+    return thisWeek.filter(c => window.bnsIsLead(c, s.user.id) && (c.gecikmeH || 0) > 0).length === 0;
   }).map(s => s.user);
 
   // En hızlı teslim

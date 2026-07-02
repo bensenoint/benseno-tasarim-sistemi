@@ -254,7 +254,7 @@ function PanomScreen(props) {
       return rd.map(function (b) { return listRow(b, fmtDelta(b.deltaH), deltaCol(b.deltaH)); });
     }
     if (type === "team") {
-      var counts = {}; briefs.filter(function (b) { return b.durum !== "tamamlandi" && b.durum !== "musteride"; }).forEach(function (b) { [b.lead].concat(b.contributors || []).forEach(function (p) { if (p && p.id) counts[p.id] = (counts[p.id] || 0) + 1; }); });
+      var counts = {}; briefs.filter(function (b) { return b.durum !== "tamamlandi" && b.durum !== "musteride"; }).forEach(function (b) { window.bnsLeadList(b).concat(b.contributors || []).forEach(function (p) { if (p && p.id) counts[p.id] = (counts[p.id] || 0) + 1; }); });
       var tarr = (data.USERS || []).map(function (u) { return { name: u.name || u.id, v: counts[u.id] || 0 }; }).filter(function (x) { return x.v > 0; }).sort(function (a, b) { return b.v - a.v; }).slice(0, 14);
       if (!tarr.length) return empty("Veri yok");
       var tmx = tarr.reduce(function (m, x) { return Math.max(m, x.v); }, 1);

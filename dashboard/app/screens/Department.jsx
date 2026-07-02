@@ -51,7 +51,7 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
   const deptRangeLabel = RANGE_LABELS[(data.dateRange && data.dateRange.preset) || "all"] || "seçili aralık";
   const allCompleted = data.completed || data._allCompleted || [];
   const deptDone = allCompleted.filter(b =>
-    (b.lead && (b.lead.dept || b.lead.rol) === role) ||
+    (window.bnsLeadList(b).some(l => l && (l.dept || l.rol) === role)) ||
     (b.dept === role) ||
     (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.dept || c.rol) === role))
   );

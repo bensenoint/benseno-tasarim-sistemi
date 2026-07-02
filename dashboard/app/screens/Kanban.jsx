@@ -17,7 +17,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
 
   // Çalışan seçenekleri — aktif + tamamlanan brief'lerdeki lead+contributor'lardan.
   const personOpts = peopleOf([...(data._allBriefs || data.briefs || []), ...(data._allCompleted || data.completed || [])]);
-  const onPerson = (b) => person === "all" || [b.lead, ...(b.contributors || [])].some(p => p && p.id === person);
+  const onPerson = (b) => person === "all" || [...window.bnsLeadList(b), ...(b.contributors || [])].some(p => p && p.id === person);
 
   const cols = [
     { id: "yeni",        label: "Yeni",        Ic: I.Inbox,  accent: "var(--ink-3)" },
@@ -41,7 +41,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     allCompleted = allCompleted.filter(c =>
       (c.baslik||"").toLowerCase().includes(cq) ||
       (c.marka||"").toLowerCase().includes(cq) ||
-      (c.lead?.name||"").toLowerCase().includes(cq)
+      window.bnsLeadList(c).some(l => l && (l.name||"").toLowerCase().includes(cq))
     );
   }
   const completedAsBriefs = allCompleted.slice(0, 12).map(c => {
@@ -70,7 +70,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     allBriefs = allBriefs.filter(b =>
       (b.baslik||"").toLowerCase().includes(q) ||
       (b.marka||"").toLowerCase().includes(q) ||
-      (b.lead?.name||"").toLowerCase().includes(q)
+      window.bnsLeadList(b).some(l => l && (l.name||"").toLowerCase().includes(q))
     );
   }
 

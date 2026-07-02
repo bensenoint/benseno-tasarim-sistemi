@@ -2,7 +2,7 @@
 
 function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCompleted, onStatusChange, setDateRange, dept, hideHead }) {
   // Departman sayfasına gömülünce (dept set) tüm kaynak yalnız o departmanın işlerine süzülür.
-  const inDept = dept ? (b) => (b && ((b.lead && (b.lead.dept || b.lead.rol) === dept) || b.dept === dept
+  const inDept = dept ? (b) => (b && ((window.bnsLeadList(b).some(l => l && (l.dept || l.rol) === dept)) || b.dept === dept
     || (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.dept || c.rol) === dept)))) : null;
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   // Sticky anahtarlar dept'e göre ad-uzaylanır → departman sayfasındaki gömülü Detay bakış, ana sayfayı kirletmez.
@@ -116,7 +116,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
     rows = rows.filter(b =>
       (b.baslik || "").toLowerCase().includes(q) ||
       (b.marka  || "").toLowerCase().includes(q) ||
-      (b.lead?.name || "").toLowerCase().includes(q) ||
+      window.bnsLeadList(b).some(l => l && (l.name || "").toLowerCase().includes(q)) ||
       (b.contributors || []).some(u => (u?.name || "").toLowerCase().includes(q))
     );
   }
@@ -194,7 +194,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
       revIc:     C("İç revize", rows.reduce((s, b) => s + (b.rev_ic || 0), 0)),
       revMus:    C("Müşteri revize", rows.reduce((s, b) => s + (b.rev_musteri || 0), 0), "var(--musteride)"),
       musBekle:  C("Müşteri dönüşü", rows.filter(b => b.musteri_bekliyor).length, "var(--musteride)"),
-      kisi:      C("Kişi", new Set(rows.flatMap(b => [b.lead, ...(b.contributors || [])].filter(Boolean).map(p => p.id))).size),
+      kisi:      C("Kişi", new Set(rows.flatMap(b => [...window.bnsLeadList(b), ...(b.contributors || [])].filter(Boolean).map(p => p.id))).size),
       marka:     C("Marka", new Set(rows.map(b => b.marka).filter(Boolean)).size),
       stale:     C("Hareketsiz", rows.filter(b => b.stale).length, "var(--prio-orange)"),
       ortYas:    C("Ort. açık yaş", (() => { const a = rows.filter(b => b.created_at); return a.length ? fmtH(avg(a, b => (NOW - b.created_at) / 3600000)) : "—"; })()),
@@ -538,7 +538,7 @@ function CardsView({ rows, onOpenBrief }) {
 function peopleOf(rows) {
   const m = new Map();
   for (const b of (rows || [])) {
-    for (const p of [b.lead, ...(b.contributors || [])]) {
+    for (const p of [...window.bnsLeadList(b), ...(b.contributors || [])]) {
       if (p && p.id && !m.has(p.id)) m.set(p.id, { id: p.id, name: p.name });
     }
   }
