@@ -124,12 +124,12 @@ async function logNotification(userId, text, explicitLink) {
 }
 
 // Tek kullanıcıya DM (channel=userID → bot DM açar; im:write gerekir).
-async function dm(userId, text, link) {
+async function dm(userId, text, link, skipLog = false) {
   if (!hasToken() || !userId) return { ok: false, skipped: true };
   // FR... = freelancer (Slack'te yok) — DM sessizce atlanır, takip dashboard'dan yapılır.
   if (!/^U/.test(userId)) return { ok: false, skipped: true };
   const res = await slackCall("chat.postMessage", { channel: userId, text, username: BOT_NAME, unfurl_links: false });
-  if (res.ok) logNotification(userId, text, link);   // await yok — DM akışını geciktirmesin
+  if (res.ok && !skipLog) logNotification(userId, text, link);   // notify() kendi kaydını yazarsa skipLog=true
   return res.ok ? { ok: true } : { ok: false, error: res.error };
 }
 
