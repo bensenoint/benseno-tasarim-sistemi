@@ -364,6 +364,8 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
             ))}
           </div>
 
+          <BriefNotifs briefId={b.id}/>
+
           <Hr/>
 
           <Eyebrow>Not</Eyebrow>
@@ -411,6 +413,32 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
         </footer>
       </div>
     </>
+  );
+}
+
+// Bildirimler bölümü — drawer açılınca briefin bildirimlerini çeker ve görünce "seen" işaretler.
+function BriefNotifs({ briefId }) {
+  const [items, setItems] = React.useState(null);
+  React.useEffect(() => {
+    if (!briefId) return;
+    if (typeof window.bnsApiGet === "function")
+      window.bnsApiGet(`/api/briefs/${briefId}/notifications`).then(r => setItems((r && r.notifications) || [])).catch(() => setItems([]));
+    if (typeof window.bnsApiPost === "function") window.bnsApiPost(`/api/briefs/${briefId}/notif-seen`, {});
+  }, [briefId]);
+  if (!items || !items.length) return null;
+  const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", genel:"🔔" };
+  return (
+    <div style={{marginTop:14}}>
+      <div style={{font:"600 12px/1 var(--font-sans)",color:"var(--ink-3)",textTransform:"uppercase",letterSpacing:".08em",marginBottom:8}}>Bildirimler</div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {items.map((n,i)=>(
+          <div key={i} style={{display:"flex",gap:8,alignItems:"baseline",font:"400 13px/1.4 var(--font-sans)",color:"var(--ink-2)"}}>
+            <span>{icon[n.tip]||"🔔"}</span><span style={{flex:1}}>{n.text}</span>
+            <span style={{font:"400 11px var(--font-mono)",color:"var(--ink-4)",whiteSpace:"nowrap"}}>{new Date(n.created_at).toLocaleDateString("tr-TR")}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

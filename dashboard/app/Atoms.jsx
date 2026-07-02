@@ -168,6 +168,14 @@ function Eyebrow({ children, style }) {
   }}>{children}</div>;
 }
 
+// Bildirim rozeti — okunmamış bildirim sayısını gösteren küçük nokta.
+// n: { count, last_at } (window.BNS_NOTIF.briefs[id] / .markalar[ad]); yoksa/0 ise render etmez.
+function NotifDot({ n }) {
+  if (!n || !n.count) return null;
+  return <span title={`${n.count} yeni bildirim`} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",minWidth:16,height:16,padding:"0 4px",borderRadius:8,background:"var(--info)",color:"#fff",font:"600 10px/1 var(--font-mono)",marginLeft:6,verticalAlign:"middle"}}>{n.count}</span>;
+}
+
+window.NotifDot = NotifDot;
 window.PriorityBadge = PriorityBadge;
 window.BrandChip = BrandChip;
 window.Avatar = Avatar;

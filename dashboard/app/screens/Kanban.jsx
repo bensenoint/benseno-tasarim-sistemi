@@ -225,7 +225,7 @@ function KanbanCard({ brief, onClick, draggable, dragging, onDragStartCard, onDr
         <div style={{minWidth:0, overflow:"hidden", flex:1}}>
           <BrandChip brand={brief.brand} size="sm"/>
         </div>
-        <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0}}>#{brief.no}</span>
+        <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)", flexShrink:0, display:"inline-flex", alignItems:"center"}}>#{brief.no}<NotifDot n={((window.BNS_NOTIF && window.BNS_NOTIF.briefs) || {})[brief.id]}/></span>
       </div>
       {/* İş adı — 2 satıra kadar */}
       <div style={{

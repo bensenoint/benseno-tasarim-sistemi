@@ -217,6 +217,8 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
         </>}
       />
 
+      <BrandNotifAccordion brand={brand} briefs={[...active, ...musteride, ...done]} onOpenBrief={onOpenBrief}/>
+
       <div className="bns-kpi-4" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)" }}>
         <Kpi label="Aktif iş" value={active.length} color={stats.color}/>
         <Kpi label="Tamamlanan" value={done.length}/>
@@ -357,6 +359,66 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
 
       {/* 📡 Kanal Özeti & 🌙 Gün Sonu Insight — günlük arşiv + tarih filtresi */}
       <BrandDailyPanel brand={brand}/>
+    </div>
+  );
+}
+
+// ── Marka bildirim accordion'u: özet başlık + açınca ilgili işlerin bildirimlerini birleştir ──
+// window.BNS_NOTIF.markalar[brand] varsa "🔔 N yeni bildirim" başlığı gösterir.
+// Açıldığında, sayfadaki (aktif+müşteride+tamamlanan) işlerden okunmamışı olanların
+// bildirimlerini lazy çeker, birleştirir; her satır tıklanınca ilgili işi açar.
+function BrandNotifAccordion({ brand, briefs, onOpenBrief }) {
+  const [open, setOpen] = React.useState(false);
+  const [items, setItems] = React.useState(null);   // null = henüz çekilmedi
+  const [loading, setLoading] = React.useState(false);
+  const meta = ((window.BNS_NOTIF && window.BNS_NOTIF.markalar) || {})[brand];
+  if (!meta || !meta.count) return null;
+  const briefNotif = (window.BNS_NOTIF && window.BNS_NOTIF.briefs) || {};
+  const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", genel:"🔔" };
+
+  const toggle = async () => {
+    const next = !open; setOpen(next);
+    if (next && items === null && typeof window.bnsApiGet === "function") {
+      setLoading(true);
+      // Sadece okunmamışı olan işleri çek (gürültüyü ve istek sayısını azalt).
+      const ids = [...new Set((briefs || []).map(b => b.id).filter(id => briefNotif[id] && briefNotif[id].count))];
+      const idToBrief = Object.fromEntries((briefs || []).map(b => [b.id, b]));
+      try {
+        const results = await Promise.all(ids.map(id =>
+          window.bnsApiGet(`/api/briefs/${id}/notifications`).then(r => ((r && r.notifications) || []).map(n => ({ ...n, _briefId: id }))).catch(() => [])
+        ));
+        const merged = results.flat().sort((a, z) => new Date(z.created_at) - new Date(a.created_at));
+        setItems(merged);
+      } catch (e) { setItems([]); }
+      setLoading(false);
+      // idToBrief satır tıklamasında kullanılır → state yerine closure yeterli değil, ref-vari:
+      window.__bnsBrandNotifBriefs = idToBrief;
+    }
+  };
+
+  return (
+    <div style={{ marginBottom:"var(--section-gap)", border:"1px solid var(--line)", borderRadius:10, overflow:"hidden" }}>
+      <button onClick={toggle} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, padding:"10px 14px", background:"var(--paper-2)", border:"none", cursor:"pointer", font:"600 13px/1.3 var(--font-sans)", color:"var(--ink)" }}>
+        <span>🔔 {meta.count} yeni bildirim</span>
+        <span style={{ color:"var(--ink-4)", font:"400 12px/1 var(--font-mono)" }}>{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div style={{ padding:"10px 14px", display:"flex", flexDirection:"column", gap:6 }}>
+          {loading && <div style={{ font:"400 13px var(--font-sans)", color:"var(--ink-4)" }}>Yükleniyor…</div>}
+          {!loading && items && items.length === 0 && <div style={{ font:"400 13px var(--font-sans)", color:"var(--ink-4)" }}>Bu işlerde görüntülenecek bildirim yok.</div>}
+          {!loading && items && items.map((n, i) => {
+            const b = (window.__bnsBrandNotifBriefs || {})[n._briefId];
+            return (
+              <div key={i} onClick={() => b && onOpenBrief && onOpenBrief(b)}
+                style={{ display:"flex", gap:8, alignItems:"baseline", cursor: b ? "pointer" : "default", font:"400 13px/1.4 var(--font-sans)", color:"var(--ink-2)" }}>
+                <span>{icon[n.tip] || "🔔"}</span>
+                <span style={{ flex:1 }}>{b && <span style={{ color:"var(--ink-4)", marginRight:6 }}>#{b.no}</span>}{n.text}</span>
+                <span style={{ font:"400 11px var(--font-mono)", color:"var(--ink-4)", whiteSpace:"nowrap" }}>{new Date(n.created_at).toLocaleDateString("tr-TR")}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

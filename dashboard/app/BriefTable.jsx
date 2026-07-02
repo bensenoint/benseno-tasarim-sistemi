@@ -162,6 +162,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, draggab
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>
       <td style={{...cellStyle(), width: 340, minWidth: 240, maxWidth: 340, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:"var(--ink)", fontWeight:500}}>
         {brief.baslik}
+        <NotifDot n={((window.BNS_NOTIF && window.BNS_NOTIF.briefs) || {})[brief.id]}/>
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle()}>
         <span style={{display:"inline-flex", alignItems:"center", gap:6}}>

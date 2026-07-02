@@ -241,12 +241,27 @@ function App({ currentUser, onLogout }) {
       if (!r.ok) throw new Error("api " + r.status);
       return r.json();
     };
+    // Authlı POST helper — bnsApiGet ile aynı base/token yaklaşımı, JSON gövde ile POST.
+    window.bnsApiPost = async (path, body) => {
+      const base = (typeof window.BNS_API_BASE === "string" && window.BNS_API_BASE)
+        ? window.BNS_API_BASE.replace(/\/+$/, "")
+        : "https://benseno-api-production.up.railway.app";
+      const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+      const r = await fetch(base + path, {
+        method: "POST",
+        headers: { "content-type": "application/json", ...(tok ? { Authorization: "Bearer " + tok } : {}) },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) throw new Error("api " + r.status);
+      return r.json();
+    };
   }, []);
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
   const [brandStats, setBrandStats] = React.useState(data.brandStats);
   const [history, setHistory] = React.useState(data.history || []); // 7 günlük geçmiş
   const [lastPollTime, setLastPollTime] = React.useState(null); // son başarılı poll zamanı
+  const [notifTick, setNotifTick] = React.useState(0); // bildirim rozetleri: window.BNS_NOTIF değişince re-render tetikler
   const [online, setOnline] = React.useState(true);   // API erişilebilir mi (false → çevrimdışı ekranı)
   const offlineFailsRef = React.useRef(0);             // ardışık başarısız poll sayısı
   // ─── Tarih aralığı filtresi (global) — açılışta son 30 gün ──────────────
@@ -390,6 +405,15 @@ function App({ currentUser, onLogout }) {
         const base = (window.BNS_API_BASE ? String(window.BNS_API_BASE).replace(/\/+$/, "") : DEFAULT_API);
         return base + "/api/embedded?t=" + Date.now();
       } catch (e) { return DEFAULT_API + "/api/embedded?t=" + Date.now(); }
+    }
+    // Bildirim sayaçları (iş/marka rozetleri) — best-effort, hata app'i bozmaz.
+    async function loadNotifCounts() {
+      try {
+        if (typeof window.bnsApiGet === "function") {
+          const c = await window.bnsApiGet("/api/notif-counts");
+          if (c && !c.error) { window.BNS_NOTIF = c; if (!cancelled) setNotifTick(x => x + 1); }
+        }
+      } catch (e) {}
     }
     async function poll() {
       try {
@@ -544,7 +568,8 @@ function App({ currentUser, onLogout }) {
       }
     }
     poll(); // ilk çağrı hemen (initial script load'dan farklı timestamp olabilir)
-    const id = setInterval(poll, 30_000);
+    loadNotifCounts(); // bildirim sayaçlarını mount'ta bir kez yükle
+    const id = setInterval(() => { poll(); loadNotifCounts(); }, 30_000);
     return () => { cancelled = true; clearInterval(id); };
   }, [pollTick]); // pollTick değişince yeni interval başlar → manual refresh
 
