@@ -3,6 +3,7 @@
 /** Haftalık Retrospektif — DETERMINISTIK (C2). Veri: /api/embedded. Cuma 17:10. */
 
 const { DASHBOARD_URL, H, DAY, trDate, deltaLabel, money, runReport } = require('./rapor-lib');
+const calc = require('../dashboard/app/calc.js');   // zamanında teslim: bekleme düşülmüş (dashboard ile aynı)
 
 const SYS = 'Sen Benseno tasarım ajansının operasyon analistisin. Haftanın olgularına bakıp en fazla 3 cümlelik, Türkçe, somut bir haftalık retrospektif yorumu yaz (verim, zamanında teslim, dikkat edilecekler). Başlık/madde KULLANMA, sadece düz yorum.';
 
@@ -16,7 +17,8 @@ function build(d) {
   const haftaTamam = completed.filter(c => c.bitis && c.bitis >= weekAgo);
   // Zamanında teslim % (deadline'ı olanlarda)
   const withDl = haftaTamam.filter(c => c.deadline > 0);
-  const onTime = withDl.filter(c => c.bitis <= c.deadline).length;
+  // Zamanında = net gecikme yok (bekleme/müşteri süresi düşülür) — calc.js bnsGecikmeH ile birebir.
+  const onTime = withDl.filter(c => calc.bnsGecikmeH(c.bitis, c.bekleme_ms || 0, c.deadline) <= 0).length;
   const onTimePct = withDl.length ? Math.round(onTime / withDl.length * 100) : null;
   // Marka kırılımı
   const byMarka = {};

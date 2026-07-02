@@ -82,9 +82,18 @@ function FilterPanel({ open, onClose, deptFilter, setDeptFilter, prioFilter, set
 }
 
 // ─── EDITORIAL ──────────────────────────────────────────────────────────────
+// Kapasite tarihe duyarlı: seçili aralığın sonu geçmişteyse o tarihte açık işleri geri-hesapla
+// (Departman/Karşılaştırma sayfalarıyla AYNI bnsBriefsAsOf kuralı). Bugünü kapsıyorsa güncel küme.
+function _ovCapBriefs(data) {
+  const _now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
+  const _dr = data.dateRange || {};
+  const _cutoff = (typeof _dr.to === "number" && _dr.to < _now) ? _dr.to : null;
+  const _allCompleted = data._allCompleted || data.completed || [];
+  return bnsBriefsAsOf((data._allBriefs || data.briefs || []), _allCompleted, _cutoff).filter(b => b.durum !== "musteride");
+}
 function calcAvgCapPct(data) {
   const ds = data.deptStats || {};
-  const briefs = data._allBriefs || data.briefs || [];
+  const briefs = _ovCapBriefs(data);
   const vals = Object.values(ds).map(s => bnsDeptCapPct(briefs, s, s.dept)).filter(v => v > 0);
   return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : null;
 }
@@ -141,7 +150,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
 
   // Kapasite
   const ds = data.deptStats || {};
-  const tasarimCap = ds.tasarim ? bnsDeptCapPct(data._allBriefs || data.briefs || [], ds.tasarim, 'tasarim') : null;
+  const tasarimCap = ds.tasarim ? bnsDeptCapPct(_ovCapBriefs(data), ds.tasarim, 'tasarim') : null;
   const capTone = tasarimCap != null && tasarimCap > 85 ? "warn" : "info";
   const capLabel = tasarimCap != null ? `Tasarım kapasitesi %${tasarimCap}` : "Tasarım kapasitesi";
   const capMetric = tasarimCap != null ? `%${tasarimCap}` : "—";
@@ -297,6 +306,7 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
   const firstName = user.name.split(" ")[0];
   const greeting = greetingFor();
   const avgCapPct = calcAvgCapPct(data);
+  const ovCap = _ovCapBriefs(data);
   const hist = data.history || [];
 
   // Gerçek history'den spark dizileri (kpi_history dolana kadar mock fallback)
@@ -417,10 +427,10 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
         <div className="bn-grid-3" style={{display:"grid", gridTemplateColumns:`repeat(${_admin?3:2}, 1fr)`, gap:"1px", background:"var(--line)", border:"1px solid var(--line)", marginTop:"var(--section-gap)"}}>
           <Card style={{border:"none", background:"var(--paper)"}}>
             <CardHead title="Departman özeti" sub="aktif · geciken · kapasite"/>
-            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
-            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"/>
-            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)"/>
-            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" last/>
+            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"  capBriefs={ovCap}/>
+            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"  capBriefs={ovCap}/>
+            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)" capBriefs={ovCap}/>
+            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)"  capBriefs={ovCap} last/>
           </Card>
           <Card style={{border:"none", background:"var(--paper)"}}>
             <CardHead title="Sorunlu markalar" sub="canlı brief'lerden"/>
@@ -444,6 +454,7 @@ function EditorialLayout({ data, musteride, user, viewMode, setViewMode, active,
 // ─── DENSE ──────────────────────────────────────────────────────────────────
 function DenseLayout({ data, musteride, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, onRefresh, filterOpen, setFilterOpen, deptFilter, setDeptFilter, prioFilter, setPrioFilter, filterActive, kpiVariant }) {
   const avgCapPct = calcAvgCapPct(data);
+  const ovCap = _ovCapBriefs(data);
   // Bu hafta özet — canlı veriden
   const nowTs2 = data.NOW || Date.now();
   const allComp2 = data.completed || data._allCompleted || [];
@@ -492,10 +503,10 @@ function DenseLayout({ data, musteride, active, overdue, today, todayDue, week, 
         <div style={{display:"flex", flexDirection:"column", gap: 12}}>
           <Card>
             <CardHead title="Departmanlar"/>
-            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)" compact/>
-            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)" compact/>
-            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)" compact/>
-            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" compact last/>
+            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"  capBriefs={ovCap} compact/>
+            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"  capBriefs={ovCap} compact/>
+            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)" capBriefs={ovCap} compact/>
+            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)"  capBriefs={ovCap} compact last/>
           </Card>
           <Card>
             <CardHead title="Onay bekleyen" sub={`${review.length} brief`}/>
@@ -521,6 +532,7 @@ function DenseLayout({ data, musteride, active, overdue, today, todayDue, week, 
 // ─── STORY (vertical narrative) ─────────────────────────────────────────────
 function StoryLayout({ data, musteride, active, overdue, today, todayDue, week, stale, review, blocked, onOpenBrief, onSwitchTab, kpiVariant }) {
   const avgCapPct = calcAvgCapPct(data);
+  const ovCap = _ovCapBriefs(data);
   return (
     <div className="bn-tab-in">
       <PageHead
@@ -584,10 +596,10 @@ function StoryLayout({ data, musteride, active, overdue, today, todayDue, week, 
         <div style={{display:"flex", flexDirection:"column", gap: "var(--grid-gap)"}}>
           <Card>
             <CardHead title="Departman"/>
-            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"/>
-            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"/>
-            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)"/>
-            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)" last/>
+            <DeptRow s={data.deptStats.tasarim}   color="var(--bw-1)"  capBriefs={ovCap}/>
+            <DeptRow s={data.deptStats.editor}    color="var(--bw-4)"  capBriefs={ovCap}/>
+            <DeptRow s={data.deptStats.ai}        color="var(--bw-14)" capBriefs={ovCap}/>
+            <DeptRow s={data.deptStats.freelance} color="var(--bw-8)"  capBriefs={ovCap} last/>
           </Card>
           <Card>
             <CardHead title="Onay bekleyenler" sub="manager review · 12"/>
@@ -617,13 +629,15 @@ function KpiGrid({ children, cols = 6 }) {
   );
 }
 
-function DeptRow({ s, color, last, compact }) {
+function DeptRow({ s, color, last, compact, capBriefs }) {
   if (!s) return null;
-  // TEK KURAL: aktif sayısı ve kapasite, Departman sayfasıyla aynı bnsDeptActive üzerinden hesaplanır.
+  // TEK KURAL: aktif sayısı güncel liste (bnsDeptActive); KAPASİTE tarihe duyarlı (capBriefs = as-of),
+  // Departman sayfasıyla birebir. capBriefs verilmezse güncel kümeye düşer.
   const _briefs = (typeof window !== "undefined" && window.BNS_DATA && window.BNS_DATA.briefs) || [];
+  const _capB = capBriefs || _briefs;
   const _key = s.dept;
   const active = (_key && typeof bnsDeptActive === "function") ? bnsDeptActive(_briefs, _key).length : s.active;
-  const capPct = (_key && typeof bnsDeptCapPct === "function") ? bnsDeptCapPct(_briefs, s, _key) : (s.capacity_pct ?? bnsCapPct(s) ?? 0);
+  const capPct = (_key && typeof bnsDeptCapPct === "function") ? bnsDeptCapPct(_capB, s, _key) : (s.capacity_pct ?? bnsCapPct(s) ?? 0);
   const capColor = capPct > 85 ? "var(--warning)" : capPct > 60 ? color || "var(--info)" : "var(--success)";
   return (
     <div style={{padding: compact ? "8px 0" : "11px 0", borderBottom: last ? "0" : "1px solid var(--line-soft)"}}>

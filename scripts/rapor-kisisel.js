@@ -28,8 +28,9 @@ async function main() {
   let sent = 0; const preview = [];
   for (const u of users) {
     const mine = briefs.filter(b =>
-      (b.workers || []).some(w => w && w.id === u.id) ||
-      (b.leads || []).some(l => l && l.id === u.id));
+      b.durum !== 'musteride' && b.durum !== 'tamamlandi' &&   // calc.js aktif tanımıyla aynı (müşteride hariç)
+      ((b.workers || []).some(w => w && w.id === u.id) ||
+       (b.leads || []).some(l => l && l.id === u.id)));
     if (!mine.length) continue; // aktif işi olmayana DM yok
     mine.sort((a, b) => (a.deadline || Infinity) - (b.deadline || Infinity));
     const gec = mine.filter(b => b.deadline && b.deadline < Date.now()).length;
