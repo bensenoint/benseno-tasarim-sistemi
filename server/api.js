@@ -646,6 +646,28 @@ app.post('/api/notifications/read', auth.authGuard, async (req, res) => {
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
+// authGuard → kişinin slack_id'sinden okur/yazar. notify_prefs(user_id PK, ...bool, sessiz_bas/bit smallint).
+app.get('/api/notify-prefs', auth.authGuard, async (req, res) => {
+  try {
+    const r = await pool.query('SELECT * FROM notify_prefs WHERE user_id=$1', [req.user.slack_id]);
+    res.json(r.rows[0] || { ogle_dijest: true, tip_termin: true, tip_atama: true, tip_bloke: true, sessiz_bas: 19, sessiz_bit: 8 });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/notify-prefs', auth.authGuard, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const bool = (v, d) => typeof v === 'boolean' ? v : d;
+    const hour = (v, d) => (Number.isInteger(v) && v >= 0 && v <= 23) ? v : d;
+    await pool.query(
+      `INSERT INTO notify_prefs (user_id, ogle_dijest, tip_termin, tip_atama, tip_bloke, sessiz_bas, sessiz_bit)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
+       ON CONFLICT (user_id) DO UPDATE SET ogle_dijest=$2, tip_termin=$3, tip_atama=$4, tip_bloke=$5, sessiz_bas=$6, sessiz_bit=$7`,
+      [req.user.slack_id, bool(b.ogle_dijest, true), bool(b.tip_termin, true), bool(b.tip_atama, true), bool(b.tip_bloke, true), hour(b.sessiz_bas, 19), hour(b.sessiz_bit, 8)]);
+    res.json({ ok: true });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
 // Script'lerin (uyarı DM'leri) bildirim düşmesi için — writeGuard.
 app.post('/api/notifications', writeGuard, async (req, res) => {
   try {
