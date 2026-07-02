@@ -90,7 +90,11 @@ app.get('/api/sebep-period', readGuard, async (req, res) => {
     const toMs = Number(req.query.to) || Date.now();
     const ck = `${type}:${key}:${Math.floor(fromMs / 864e5)}:${Math.floor(toMs / 864e5)}`;
     const hit = _sebepPeriodCache.get(ck);
-    if (hit && (Date.now() - hit.ts) < 6 * 3600 * 1000) return res.json({ sebep: hit.text, cached: true });
+    if (hit && (Date.now() - hit.ts) < 6 * 3600 * 1000) {
+      // LRU: isabette anahtarı en-son-kullanılan konumuna taşı (eviction en az kullanılanı atsın, FIFO değil).
+      _sebepPeriodCache.delete(ck); _sebepPeriodCache.set(ck, hit);
+      return res.json({ sebep: hit.text, cached: true });
+    }
 
     const ed = await getEmbedded();
     const deptOf = {};

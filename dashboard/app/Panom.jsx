@@ -158,7 +158,7 @@ function PanomScreen(props) {
       var over = act.filter(function (b) { return b.deltaH != null && b.deltaH <= 0; });
       var cli = briefs.filter(function (b) { return b.durum === "musteride"; });
       var aktifMine = briefs.filter(function (b) { return mine(b) && b.durum !== "musteride" && b.durum !== "tamamlandi"; }).length;
-      // Rol ağırlıklı yük (işçi 5/lead 2/gözlemci 1) → işçi-eşdeğeri (yük/5) → kapasite %.
+      // Rol ağırlıklı yük (işçi 5/lead 2/gözlemci 0) → işçi-eşdeğeri (yük/5) → kapasite %.
       var loadMine = (window.bnsPersonLoad && me) ? window.bnsPersonLoad(briefs, me.id) / 5 : aktifMine;
       var pct = window.bnsPersonCapPct ? window.bnsPersonCapPct(me, loadMine) : 0;
       var cell = function (v, lbl, col) { return h("div", { style: { flex: 1, textAlign: "center" } }, h("div", { style: { font: "600 30px/1 var(--font-display, serif)", color: col || "var(--ink)" } }, v), h("div", { style: { font: "400 10.5px/1 var(--font-sans)", color: "var(--ink-4)", marginTop: 5, textTransform: "uppercase", letterSpacing: ".05em" } }, lbl)); };
@@ -178,7 +178,7 @@ function PanomScreen(props) {
     if (type === "capacity") {
       var aktif = briefs.filter(function (b) { return mine(b) && b.durum !== "musteride" && b.durum !== "tamamlandi"; }).length;
       var limit = window.bnsPersonCapLimit ? window.bnsPersonCapLimit(me) : 6;
-      // Rol ağırlıklı yük (işçi 5/lead 2/gözlemci 1) → işçi-eşdeğeri (yük/5) → kapasite %.
+      // Rol ağırlıklı yük (işçi 5/lead 2/gözlemci 0) → işçi-eşdeğeri (yük/5) → kapasite %.
       var loadEq = (window.bnsPersonLoad && me) ? window.bnsPersonLoad(briefs, me.id) / 5 : aktif;
       var p2 = window.bnsPersonCapPct ? window.bnsPersonCapPct(me, loadEq) : 0;
       var col = p2 >= 90 ? "var(--prio-red)" : p2 >= 70 ? "var(--prio-orange)" : "var(--prio-green)";

@@ -40,7 +40,7 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
       user: p,
       active: my.length,
       overdue: myOverdue,
-      // Profil ekranıyla AYNI kapasite hesabı — rol ağırlıklı (işçi 5/lead 2/gözlemci 1),
+      // Profil ekranıyla AYNI kapasite hesabı — rol ağırlıklı (işçi 5/lead 2/gözlemci 0),
       // işçi-eşdeğerine çevrilip (yük/5) limite bölünür. bnsPersonLoad gözlemcileri de sayar.
       load: Math.max(0, bnsPersonCapPct(p, bnsPersonLoad(capBriefs, p.id) / 5) + (p.isNew ? -10 : 0))
     };

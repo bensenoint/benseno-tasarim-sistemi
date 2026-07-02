@@ -208,8 +208,13 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   // ─── Kapasite — TEK DOĞRULUK KAYNAĞI (data.js bnsPersonCap*) ile hesaplanır.
   //     Departman ekranındaki kişi doluluğu da aynı helper'ı kullanır → tutarlı.
   const CAP_LIMIT = bnsPersonCapLimit(u);
-  // Rol ağırlıklı yük (işçi 5/lead 2/gözlemci 1) → işçi-eşdeğeri (yük/5) → limite bölünür.
-  const capPct    = bnsPersonCapPct(u, bnsPersonLoad(allBriefs, u.id) / 5);
+  // Kapasite tarihe duyarlı (Departman/Genel bakış ile birebir): seçili aralığın sonu geçmişteyse
+  // o tarihte açık işleri geri-hesapla, bugünü kapsıyorsa güncel küme.
+  const _capNow    = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
+  const _capCutoff = (data.dateRange && typeof data.dateRange.to === "number" && data.dateRange.to < _capNow) ? data.dateRange.to : null;
+  const capBriefs  = bnsBriefsAsOf(allBriefs, allCompletedRaw, _capCutoff).filter(b => b.durum !== "musteride");
+  // Rol ağırlıklı yük (işçi 5/lead 2/gözlemci 0) → işçi-eşdeğeri (yük/5) → limite bölünür.
+  const capPct    = bnsPersonCapPct(u, bnsPersonLoad(capBriefs, u.id) / 5);
 
   // ─── Çıktı hızı (son 4 hafta tamamlanan/hafta) — calc.js bnsThroughput, düşük örneklemde uyarır.
   //     Zaman filtresinden BAĞIMSIZ: kendi 4 haftalık penceresini kullanır.
