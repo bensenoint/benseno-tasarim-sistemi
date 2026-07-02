@@ -40,18 +40,18 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
       user: p,
       active: my.length,
       overdue: myOverdue,
-      // Profil ekranıyla AYNI kapasite hesabı — rol ağırlıklı (işçi 5/lead 2/gözlemci 1),
+      // Profil ekranıyla AYNI kapasite hesabı — rol ağırlıklı (işçi 5/lead 2/gözlemci 0),
       // işçi-eşdeğerine çevrilip (yük/5) limite bölünür. bnsPersonLoad gözlemcileri de sayar.
       load: Math.max(0, bnsPersonCapPct(p, bnsPersonLoad(capBriefs, p.id) / 5) + (p.isNew ? -10 : 0))
     };
   });
 
   // ─── Departman performans özeti — üstte seçili GLOBAL tarih aralığına göre (data.completed süzülü) ───
-  const RANGE_LABELS = { "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
+  const RANGE_LABELS = { today:"Bugün", yesterday:"Dün", "7d":"Son 7 gün", "30d":"Son 30 gün", "90d":"Son 90 gün", year:"Bu yıl", all:"Tüm zamanlar", custom:"Özel aralık" };
   const deptRangeLabel = RANGE_LABELS[(data.dateRange && data.dateRange.preset) || "all"] || "seçili aralık";
   const allCompleted = data.completed || data._allCompleted || [];
   const deptDone = allCompleted.filter(b =>
-    (b.lead && (b.lead.dept || b.lead.rol) === role) ||
+    (window.bnsLeadList(b).some(l => l && (l.dept || l.rol) === role)) ||
     (b.dept === role) ||
     (Array.isArray(b.contributors) && b.contributors.some(c => c && (c.dept || c.rol) === role))
   );

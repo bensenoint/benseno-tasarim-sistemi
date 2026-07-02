@@ -6,7 +6,7 @@ var BNS_DEPT_PALETTE = { tasarim: "var(--bw-1)", editor: "var(--bw-4)", ai: "var
 
 // Bir tamamlanan işin departmana ait olup olmadığı (lead / brief.dept / contributor).
 function bnsCompletedInDept(c, role) {
-  return (c.lead && (c.lead.dept || c.lead.rol) === role) ||
+  return (window.bnsLeadList(c).some(l => l && (l.dept || l.rol) === role)) ||
     c.dept === role ||
     (Array.isArray(c.contributors) && c.contributors.some(x => x && (x.dept || x.rol) === role));
 }

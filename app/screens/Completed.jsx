@@ -15,13 +15,13 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
   // Filtreler (AND): teslim durumu + kişi + arama. Tamamlananlarda öncelik verisi yok (priority:null).
   let rows = allCompleted;
   if (deliveryFilter !== "all") rows = rows.filter(c => c.delivery_status === deliveryFilter);
-  if (person !== "all") rows = rows.filter(c => [c.lead, ...(c.contributors || [])].some(p => p && p.id === person));
+  if (person !== "all") rows = rows.filter(c => [...window.bnsLeadList(c), ...(c.contributors || [])].some(p => p && p.id === person));
   if (search.trim()) {
     const q = search.toLowerCase().trim();
     rows = rows.filter(c =>
       (c.baslik || "").toLowerCase().includes(q) ||
       (c.marka  || "").toLowerCase().includes(q) ||
-      (c.lead?.name || "").toLowerCase().includes(q) ||
+      window.bnsLeadList(c).some(l => l && (l.name || "").toLowerCase().includes(q)) ||
       (c.contributors || []).some(u => (u?.name || "").toLowerCase().includes(q))
     );
   }

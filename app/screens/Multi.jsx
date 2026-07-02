@@ -81,7 +81,7 @@ function MultiScreen({ data, onOpenBrief }) {
 function MultiCard({ brief: b, users, onClick }) {
   const type = getAssignType(b.durum_raw || b.durum);
   const completedIds = getCompletedIds(b.gecmis || "", users);
-  const allMembers = [b.lead, ...(b.contributors || [])].filter(Boolean);
+  const allMembers = [...window.bnsLeadList(b), ...(b.contributors || [])].filter(Boolean);
   const orderNum = type === "sirali" ? getOrderNum(b.durum_raw || b.durum) : null;
 
   const typeLabel = type === "paralel" ? "Paralel" : type === "sirali" ? "Sıralı" : "Multi";
