@@ -169,3 +169,20 @@ bakılmaksızın) — iş akışı zincirinde dolaylı etki görünür olsun.
 
 Yönetici "tüm ekip bildirimleri" ayrı görünümü/toggle'ı · Ody proaktif içgörü · sabah-kanal
 raporunun kişiselleştirilmesi · bildirim arama/filtreleme.
+
+## Bilinen takip maddeleri (canlı sonrası, final review)
+
+Feature canlıya alındı (BNS_NOTIFY_V2=1); final holistic review "ship-ready, Kritik yok" dedi.
+İki düşük öncelikli takip:
+
+1. **Çift bildirim — add-assignee.** Bir işe yeni kişi eklendiğinde `reflectChange`
+   (tip:'statu') ve atama-acil üreticisi (tip:'atama') ikisi birden yeni kişiye satır yazar
+   → 2 bildirim. Correctness/güvenlik sorunu DEĞİL, sadece gürültü; yalnız atama-ekleme
+   yolunda tetiklenir. Fix: `patchBrief`'te `reflectChange`'e yeni-eklenen kümesini geçirip
+   o kişileri statu-notify'dan hariç tutmak. Canlı yazma-yolunda cerrahi gerektirdiği ve
+   bayrakla geri-alınabilir olduğu için "izle, gerekirse düzelt" olarak bırakıldı.
+
+2. **Bayrak eşleşmesi.** `BNS_NOTIFY_V2` api (writes.js) ve bot (scheduler/dijest/termin-risk)
+   servislerinde AYRI okunur. İkisi HER ZAMAN birlikte açık/kapalı olmalı — aksi halde
+   api satır yazar ama bot dijest atmazsa satırlar birikir (yalnız rozet/drawer'da görünür,
+   Slack'e düşmez). Şu an ikisi de =1. Kural: bayrağı değiştirirken iki servisi birlikte değiştir.
