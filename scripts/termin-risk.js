@@ -14,6 +14,16 @@
  */
 const { token, fetchEmbedded, H } = require('./rapor-lib');
 const { bnsIsRisk } = require('../dashboard/app/calc.js');
+const { notify } = require('../server/notify');
+const { pool } = require('../server/db');
+const NOTIFY_V2 = process.env.BNS_NOTIFY_V2 === '1';
+
+// V2: son 20 saatte bu briefe termin bildirimi gitmişse tekrar bastır.
+async function notifTazeMi(briefId) {
+  const r = await pool.query(`SELECT created_at FROM notifications WHERE brief_id=$1 AND tip='termin' ORDER BY id DESC LIMIT 1`, [briefId]);
+  if (!r.rows[0]) return false;
+  return (Date.now() - new Date(r.rows[0].created_at).getTime()) < 20 * 3600 * 1000;
+}
 
 const DRY = process.argv.includes('--dry');
 const MARKER = 'Termin riski';
@@ -49,6 +59,30 @@ async function postThread(tok, channel, thread_ts, text) {
     const deltaH = (dl - nowMs) / H;
     if (!bnsIsRisk(b.durum, deltaH)) continue;        // calc.js — dashboard rozetiyle aynı kural
     risky++;
+
+    const saat = Math.round(deltaH);
+    const durumStr = saat <= 0
+      ? `termin *${Math.abs(saat)} saat önce geçti*`
+      : `teslime *${saat} saat* kaldı`;
+
+    // V2: thread'e spam yerine sorumlulara (lead + worker) kişisel ACİL bildirim.
+    if (NOTIFY_V2) {
+      const kisiler = [...(b.leads || []), ...(b.workers || [])].filter(p => p && /^U/.test(p.id || ''));
+      const uids = [...new Set(kisiler.map(p => p.id))];
+      if (DRY) {
+        const adMap = new Map(kisiler.map(p => [p.id, p.ad || p.name || p.id]));
+        const isim = uids.map(id => adMap.get(id)).join(', ');
+        console.log(`[DRY-V2] #${b.no} ${b.marka || ''} → notify: ${isim || '(kimse yok)'}`);
+        warned++; continue;
+      }
+      if (await notifTazeMi(b.id)) { skipped++; continue; }   // 20sa içinde zaten uyarıldı
+      for (const uid of uids) {
+        await notify(uid, { tip: 'termin', aciliyet: 'acil', text: `⏰ #${b.no} ${b.marka || ''} — ${durumStr}`, link: b.slack_url, briefId: b.id });
+      }
+      warned++; console.log(`uyarıldı(V2) #${b.no} ${b.marka || ''} → ${uids.length} kişi (${durumStr})`);
+      continue;
+    }
+
     if (!b.slack_ts || !b.slack_channel) { skipped++; continue; }
 
     // Idempotency: son 20 saatte bu thread'e zaten uyarı düştüyse atla
@@ -57,10 +91,6 @@ async function postThread(tok, channel, thread_ts, text) {
       (m.text || '').includes(MARKER) && (nowMs - parseFloat(m.ts || 0) * 1000) < WINDOW_MS);
     if (recent) { skipped++; continue; }
 
-    const saat = Math.round(deltaH);
-    const durumStr = saat <= 0
-      ? `termin *${Math.abs(saat)} saat önce geçti*`
-      : `teslime *${saat} saat* kaldı`;
     const text = `⚠️ *${MARKER}* — ${durumStr}, iş hâlâ *${b.durum}*.\n` +
       `Durumu güncelleyin ya da termini revize edin.`;
 
@@ -70,4 +100,5 @@ async function postThread(tok, channel, thread_ts, text) {
     else { skipped++; console.log(`atlandı #${b.no}: ${res.error}`); }
   }
   console.log(`termin-risk: ${risky} riskli iş, ${warned} uyarıldı, ${skipped} atlandı${DRY ? ' (DRY)' : ''}`);
+  try { await pool.end(); } catch { /* pool zaten kapalı olabilir */ }
 })().catch(e => { console.error('termin-risk hata:', e.message); process.exit(1); });
