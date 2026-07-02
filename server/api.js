@@ -146,7 +146,14 @@ app.get('/api/sebep-period', readGuard, async (req, res) => {
 // Opsiyonel guard: BNS_WRITE_TOKEN set ise x-bns-token eşleşmeli. Set değilse açık (staging).
 function writeGuard(req, res, next) {
   const want = process.env.BNS_WRITE_TOKEN;
-  if (!want) return next();
+  if (!want) {
+    // Savunma-derinliği: prod'da token set edilmemişse fail-closed (veri/finans/PII sızıntısını önler).
+    // Dev/staging'de (NODE_ENV!=='production') açık kalır — yerel geliştirme kolaylığı.
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ error: 'yapılandırma: BNS_WRITE_TOKEN prod ortamında zorunlu' });
+    }
+    return next();
+  }
   // Bot: paylaşılan write token (server-to-server)
   if (req.get('x-bns-token') === want) return next();
   // Dashboard: geçerli JWT (write token tarayıcıda tutulamaz)
@@ -310,9 +317,15 @@ app.post('/api/briefs/by-ts/:ts/financials', writeGuard, handleWrite(async req =
 // İki yol: dashboard JWT (req.user) veya Slack bot token (actor = body.by, ör. event.user).
 async function assertCanDeleteBrief(req, briefId) {
   if (req.user && req.user.role === 'admin') return;             // JWT admin
+  // Bot yolu: x-bns-token ile gelen server-to-server istek (req.user yok). Yalnız bu yolda
+  // body.by bir kimlik kanıtı sayılır (Slack event.user, bot tarafından set edilir) ve
+  // 'slack:deleted' Slack'in kendi yetkilendirmesiyle kabul edilir. JWT kullanıcısı body.by
+  // veya 'slack:deleted' göndererek yetki YÜKSELTEMEZ — kimliği yalnız req.user'dan gelir.
+  const want = process.env.BNS_WRITE_TOKEN;
+  const isBot = !req.user && !!want && req.get('x-bns-token') === want;
   const by = req.body && req.body.by;
-  if (by === 'slack:deleted') return;                            // Slack ana mesaj silindi (Slack gated)
-  const actor = (req.user && (req.user.slack_id || req.user.id)) || by;
+  if (isBot && by === 'slack:deleted') return;                   // Slack ana mesaj silindi (Slack gated, yalnız bot yolu)
+  const actor = req.user ? (req.user.slack_id || req.user.id) : (isBot ? by : null);
   if (actor) {
     const u = await pool.query("SELECT rol, yetki FROM users WHERE id=$1 LIMIT 1", [actor]);
     const r = u.rows[0];
@@ -497,8 +510,10 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
     let userMemory = '';
     try {
       const [lg, fb] = await Promise.all([
-        pool.query(`SELECT soru FROM ody_chat_log WHERE (user_id=$1 OR user_id=$2 OR user_name=$3) AND soru IS NOT NULL
-                    ORDER BY created_at DESC LIMIT 20`, [String(req.user.id || ''), req.user.slack_id || '', req.user.name || '']),
+        // Yalnız kesin kimlik eşleşmesi (user_id / slack_id). user_name benzersiz olmadığından
+        // eşleştirmeye DAHİL EDİLMEZ — aynı isimli kişiler arası çapraz sızıntıyı önler.
+        pool.query(`SELECT soru FROM ody_chat_log WHERE (user_id=$1 OR user_id=$2) AND soru IS NOT NULL
+                    ORDER BY created_at DESC LIMIT 20`, [String(req.user.id || ''), req.user.slack_id || '']),
         pool.query(`SELECT reason FROM ody_advice_feedback WHERE user_id=$1 AND vote='down' AND reason IS NOT NULL
                     ORDER BY created_at DESC LIMIT 3`, [req.user.slack_id || '']),
       ]);
