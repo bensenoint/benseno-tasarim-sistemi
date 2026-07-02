@@ -27,3 +27,8 @@ CREATE TABLE IF NOT EXISTS brief_notif_seen (
   seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, brief_id)
 );
+
+-- Backfill: reform ÖNCESİ mevcut bildirimleri "zaten dijestlenmiş" işaretle.
+-- Yoksa V2'nin ilk dijesti tüm tarihsel bildirimleri tek seferde herkese patlatır.
+-- Idempotent (yalnız NULL satırları etkiler).
+UPDATE notifications SET dijest_at = COALESCE(created_at, now()) WHERE dijest_at IS NULL;
