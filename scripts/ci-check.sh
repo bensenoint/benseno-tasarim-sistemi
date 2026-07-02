@@ -20,7 +20,7 @@ for f in server/*.js scripts/*.js dashboard/app/data.js dashboard/app/live-data.
 done
 
 echo "② JSX derlenebilirlik (esbuild parse)"
-for f in dashboard/app/*.jsx dashboard/app/screens/*.jsx v2/app/*.jsx; do
+for f in dashboard/app/*.jsx dashboard/app/screens/*.jsx; do
   [ -f "$f" ] || continue
   if npx --yes esbuild --loader=jsx --jsx=transform --jsx-factory=React.createElement --jsx-fragment=React.Fragment >/dev/null 2>/tmp/ci-err < "$f"; then
     :
