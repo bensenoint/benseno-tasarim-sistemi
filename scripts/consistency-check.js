@@ -15,6 +15,7 @@
 const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const calc = require('../dashboard/app/calc.js');   // dashboard'ın kullandığı ağırlıklı kapasite formülü (tek kaynak)
 
 const DB_URL = fs.readFileSync(path.join(__dirname, '../data/.db-url'), 'utf8').trim();
 const API = process.env.BNS_API || 'https://benseno-api-production.up.railway.app';
@@ -134,21 +135,32 @@ function check(name, ok, detail) {
   check('puanlar 1–5 aralığında', ratingBad === 0, `${ratingBad} işte aralık dışı puan`);
 
   // ─────────────────────────────────────────────────────────────────────────
-  console.log('⑤ KİŞİ KAPASİTESİ — Profil ↔ Departman aynı formül (regresyon koruması)');
+  console.log('⑤ KİŞİ KAPASİTESİ — AĞIRLIKLI yük (dashboard ile aynı: işçi 5/lead 2/gözlemci 0)');
+  // DB'den ağırlıklı yük: her (kişi,brief) için EN YÜKSEK rol ağırlığı (işçi>lead>gözlemci),
+  // aktif (completed_at yok) + müşteride hariç. Bu, calc.bnsPersonLoad'ın DB karşılığıdır.
   const capRows = sql(`
-    SELECT u.id, u.dept, u.yetki,
-      count(DISTINCT b.id) FILTER (WHERE b.completed_at IS NULL AND b.durum<>'musteride')
+    SELECT u.id, u.dept, u.yetki, COALESCE(SUM(w.weight),0) AS wload
     FROM users u
-    LEFT JOIN brief_assignees a ON a.user_id=u.id AND a.role IN ('contributor','lead')
-    LEFT JOIN briefs b ON b.id=a.brief_id AND b.deleted_at IS NULL
+    LEFT JOIN (
+      SELECT a.user_id, a.brief_id,
+        MAX(CASE a.role WHEN 'contributor' THEN 5 WHEN 'lead' THEN 2 ELSE 0 END) AS weight
+      FROM brief_assignees a
+      JOIN briefs b ON b.id=a.brief_id AND b.deleted_at IS NULL AND b.completed_at IS NULL AND b.durum<>'musteride'
+      GROUP BY a.user_id, a.brief_id
+    ) w ON w.user_id=u.id
     WHERE u.active GROUP BY u.id, u.dept, u.yetki`);
   const limit = (dept, yetki) => yetki === 'yonetici' ? 10 : ({ tasarim: 6, editor: 8, ai: 6, freelance: 6 })[dept] || 6;
-  let capBad = 0;
-  for (const [id, dept, yetki, active] of capRows) {
-    const pct = Math.min(100, Math.round((+active / limit(dept, yetki)) * 100));
+  let capBad = 0, loadMismatch = 0;
+  for (const [id, dept, yetki, wload] of capRows) {
+    const eq5 = (+wload) / 5;                                    // işçi-eşdeğeri iş sayısı
+    const pct = Math.min(100, Math.round((eq5 / limit(dept, yetki)) * 100));
     if (pct > 100 || pct < 0) { capBad++; check(`kişi ${id} kapasite aralığı`, false, `pct=${pct}`); }
+    // Regresyon koruması: DB ağırlıklı yük ↔ dashboard formülü (calc.bnsPersonLoad, API bns_briefs) birebir.
+    const apiLoad = calc.bnsPersonLoad(emb.bns_briefs || [], id);
+    if (!eq(+wload, apiLoad, 0)) { loadMismatch++; check(`kişi ${id} ağırlıklı yük DB↔API`, false, `db=${wload} api=${apiLoad}`); }
   }
   check(`kapasite 0–100 aralığında (${capRows.length} kişi)`, capBad === 0, `${capBad} kişi aralık dışı`);
+  check(`ağırlıklı yük DB↔API — calc.bnsPersonLoad (${capRows.length} kişi)`, loadMismatch === 0, `${loadMismatch} kişi ayrıştı`);
 
   // ─────────────────────────────────────────────────────────────────────────
   console.log('⑥ AGGREGATE çapraz-kontrol');
