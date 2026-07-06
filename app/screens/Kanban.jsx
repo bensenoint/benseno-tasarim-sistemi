@@ -126,6 +126,10 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
         </div>
       </div>
 
+      {(allBriefs.length + allCompleted.length) === 0 && (
+        <div style={{font:"400 13px/1.5 var(--font-sans)", color:"var(--ink-4)", padding:"16px 4px"}}>Bu görünümde iş yok. Filtreyi temizlemeyi ya da İşler'e bakmayı dene.</div>
+      )}
+
       <div className="bns-kanban-grid" style={{
         display:"grid", gridTemplateColumns:`repeat(${cols.length}, 220px)`, gap: 12,
         minHeight: 540, overflowX:"auto", WebkitOverflowScrolling:"touch"

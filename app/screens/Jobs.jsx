@@ -325,7 +325,10 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
         </div>
       </div>
 
-      {!isCompletedScope && view === "kanban" ? <KanbanView rows={pagedRows} onOpenBrief={onOpenBrief}/> :
+      {totalRows === 0 && !isCompletedScope ? (
+        <div style={{font:"400 13px/1.5 var(--font-sans)", color:"var(--ink-4)", padding:"16px 4px"}}>Sana atanmış aktif iş yok. Lider sana iş atadığında burada görünür.</div>
+      ) :
+       !isCompletedScope && view === "kanban" ? <KanbanView rows={pagedRows} onOpenBrief={onOpenBrief}/> :
        !isCompletedScope && (view === "cards" || view === "list") ? <CardsView rows={pagedRows} onOpenBrief={onOpenBrief}/> :
        <BriefTable rows={pagedRows}
          onRowClick={isCompletedScope ? (onOpenCompleted || onOpenBrief)
