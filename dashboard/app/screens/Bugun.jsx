@@ -1,6 +1,10 @@
 // app/screens/Bugun.jsx — kişisel "Bugün" bakışı: sıradaki iş + bugün deadline + geciken + kapasite.
 function BugunScreen({ data, user, currentUser, onOpenBrief, onStatusChange, onRemind, onBack }) {
-  const u = user || currentUser || {};
+  // Kullanıcıyı data.USERS'tan çöz (Panom/Profil ile aynı) — atanan id'leri Slack id (U…); user.id
+  // DB id olabilir. Yanlış eşleşme "işlerim" listesini boş bırakır. slack_id||id ile eşle.
+  const _uraw = user || currentUser || {};
+  const _sid = _uraw.slack_id || _uraw.id;
+  const u = (data.USERS || []).find(x => x.id === _sid) || _uraw;
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
   const briefs = (data._allBriefs || data.briefs || []);
   const mine = briefs.filter(b => b.durum !== "tamamlandi" &&
@@ -18,7 +22,7 @@ function BugunScreen({ data, user, currentUser, onOpenBrief, onStatusChange, onR
   const Row = (b) => (
     <div key={b.id} onClick={() => onOpenBrief && onOpenBrief(b)} style={{ display:"flex", flexWrap:"wrap", gap:8, alignItems:"center", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid var(--line-soft)", cursor:"pointer" }}>
       <span style={{ font:"500 13px/1.3 var(--font-sans)", color:"var(--ink)" }}>#{b.no} {b.marka} — {b.baslik || b.is}</span>
-      <BriefActions brief={b} currentUser={currentUser} onStatusChange={onStatusChange} onRemind={onRemind} compact/>
+      <BriefActions brief={b} currentUser={u} onStatusChange={onStatusChange} onRemind={onRemind} compact/>
     </div>
   );
   const Section = ({ title, rows, empty }) => (
@@ -39,7 +43,7 @@ function BugunScreen({ data, user, currentUser, onOpenBrief, onStatusChange, onR
         <Card style={{ padding:16, marginBottom:"var(--section-gap)", borderLeft:"3px solid var(--ember)" }}>
           <div style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ember)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:6 }}>Sıradaki iş</div>
           <div onClick={() => onOpenBrief && onOpenBrief(sirada)} style={{ font:"600 15px/1.3 var(--font-sans)", color:"var(--ink)", marginBottom:10, cursor:"pointer" }}>#{sirada.no} {sirada.marka} — {sirada.baslik || sirada.is}</div>
-          <BriefActions brief={sirada} currentUser={currentUser} onStatusChange={onStatusChange} onRemind={onRemind}/>
+          <BriefActions brief={sirada} currentUser={u} onStatusChange={onStatusChange} onRemind={onRemind}/>
         </Card>
       )}
       <Section title="Bugün deadline" rows={bugunDl} empty="Bugün teslimi olan işin yok."/>
