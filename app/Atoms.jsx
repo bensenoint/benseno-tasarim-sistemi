@@ -170,9 +170,43 @@ function Eyebrow({ children, style }) {
 
 // Bildirim rozeti — okunmamış bildirim sayısını gösteren küçük nokta.
 // n: { count, last_at } (window.BNS_NOTIF.briefs[id] / .markalar[ad]); yoksa/0 ise render etmez.
-function NotifDot({ n }) {
+function NotifDot({ n, briefId }) {
+  const [open, setOpen] = React.useState(false);
+  const [items, setItems] = React.useState(null);
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    if (!open) return;
+    if (briefId && typeof window.bnsApiGet === "function")
+      window.bnsApiGet(`/api/briefs/${briefId}/notifications`).then(r => setItems((r && r.notifications) || [])).catch(() => setItems([]));
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onEsc = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDoc); document.addEventListener("keydown", onEsc);
+    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onEsc); };
+  }, [open, briefId]);
   if (!n || !n.count) return null;
-  return <span title={`${n.count} yeni bildirim`} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",minWidth:16,height:16,padding:"0 4px",borderRadius:8,background:"var(--info)",color:"#fff",font:"600 10px/1 var(--font-mono)",marginLeft:6,verticalAlign:"middle"}}>{n.count}</span>;
+  const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", genel:"🔔" };
+  return (
+    <span ref={ref} style={{ position:"relative", display:"inline-flex" }}>
+      <span onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }} title={`${n.count} yeni bildirim — detay için tıkla`}
+        style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", minWidth:16, height:16, padding:"0 4px", borderRadius:8, background:"var(--info)", color:"#fff", font:"600 10px/1 var(--font-mono)", marginLeft:6, verticalAlign:"middle", cursor:"pointer" }}>
+        {n.count}
+      </span>
+      {open && (
+        <div onClick={(e) => e.stopPropagation()} style={{ position:"absolute", top:"20px", right:0, zIndex:50, width:280, maxHeight:320, overflowY:"auto", background:"var(--paper)", border:"1px solid var(--line)", borderRadius:10, boxShadow:"0 8px 24px rgba(0,0,0,0.12)", padding:"10px 12px" }}>
+          <div style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>Bildirimler</div>
+          {items === null && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)" }}>Yükleniyor…</div>}
+          {items && items.length === 0 && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)" }}>Bildirim yok.</div>}
+          {items && items.map((it, i) => (
+            <div key={i} style={{ display:"flex", gap:8, alignItems:"baseline", padding:"6px 0", borderBottom:"1px solid var(--line-soft)", font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-2)" }}>
+              <span>{icon[it.tip] || "🔔"}</span>
+              <span style={{ flex:1 }}>{it.text}</span>
+              <span style={{ font:"400 10px var(--font-mono)", color:"var(--ink-4)", whiteSpace:"nowrap" }}>{new Date(it.created_at).toLocaleDateString("tr-TR")}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </span>
+  );
 }
 
 window.NotifDot = NotifDot;
