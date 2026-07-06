@@ -274,8 +274,9 @@ function bnsBriefActionPerms(b, u) {
   var durum = b.durum;
   out.basla = isAssignee && (durum === 'yeni' || durum === 'calisiliyor');
   out.ilerlet = isAssignee && !!BNS_NEXT_STATUS[durum] && durum !== 'tamamlandi' && durum !== 'musteride';
-  var riskli = (typeof b.deltaH === 'number' && b.deltaH <= 24) || (typeof bnsIsRisk === 'function' && bnsIsRisk(durum, b.deltaH));
-  out.termin = riskli && (isLead || isCreator || isMgr);
+  // "Termini uzat" yalnız bekleme/müşteride durumundan dönüşte set edilen bir öneri (termin_oneri_ms)
+  // varsa gösterilir — aksi halde sunucu "uzatma hatırlatıcısı açık değil" hatası verir ve süre yazılamaz.
+  out.termin = !!b.termin_oneri_ms && (isLead || isCreator || isMgr);
   out.hatirlat = isLead || isMgr;
   return out;
 }
