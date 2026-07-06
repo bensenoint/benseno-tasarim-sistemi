@@ -314,7 +314,6 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
 
         {/* Tarih aralığı — global başlık filtresinden (yerel toggle kaldırıldı) */}
         <div style={{display:"flex", flexDirection:"column", alignItems: isMobile ? "flex-start" : "flex-end", gap:4}}>
-          <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--ink-3)", padding:"5px 10px", border:"1px solid var(--line)", borderRadius:999}}>📅 {drLabel}</span>
           <div style={{font:"400 10px/1 var(--font-sans)", color:"var(--ink-4)"}}>tamamlanan · üstteki global filtreden ayarla</div>
         </div>
 
