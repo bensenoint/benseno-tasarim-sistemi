@@ -1,6 +1,6 @@
 // app/BriefDrawer.jsx — interactive slide-in panel.
 
-function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
+function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatusChange, onRemind }) {
   const [b, setB] = React.useState(brief);
   const [saved, setSaved] = React.useState(false);
   const [assignedMe, setAssignedMe] = React.useState(false);
@@ -180,6 +180,18 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser }) {
               </span>
             )}
           </div>
+
+          {/* Aksiyon katmanı — Başladım / İlerlet / Termini uzat / Hatırlat (tamamlananlarda gizli).
+              currentUser'ı slack-id'li objeye çevir: bnsBriefActionPerms u.id'yi slack-id bekler. */}
+          {!ro && window.BriefActions && (
+            <div style={{ marginTop: 12 }}>
+              {React.createElement(window.BriefActions, {
+                brief: b,
+                currentUser: { id: _meId, yetki: _isMgr ? "yonetici" : undefined, rol: _meRec && _meRec.rol },
+                onStatusChange, onRemind,
+              })}
+            </div>
+          )}
 
           {/* Sıralı onay zinciri — her halka ✅ ile kapanır, son halka işi tamamlar */}
           {b.akis === "sirali" && (b.zincir || []).length > 1 && (
