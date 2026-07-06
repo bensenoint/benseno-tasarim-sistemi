@@ -701,10 +701,12 @@ app.get('/api/notif-counts', auth.authGuard, async (req, res) => {
 // Bir işin tekil bildirim listesi (son 30).
 app.get('/api/briefs/:id/notifications', auth.authGuard, async (req, res) => {
   try {
+    // unread = bu kullanıcının bu işe ait seen_at'inden SONRA oluşan bildirim (okunmamış).
     const r = await pool.query(`
-      SELECT DISTINCT ON (tip, text) tip, text, link, created_at
+      SELECT DISTINCT ON (tip, text) tip, text, link, created_at,
+        (created_at > COALESCE((SELECT seen_at FROM brief_notif_seen WHERE user_id=$2 AND brief_id=$1), 'epoch'::timestamptz)) AS unread
       FROM notifications WHERE brief_id=$1
-      ORDER BY tip, text, created_at DESC LIMIT 30`, [+req.params.id]);
+      ORDER BY tip, text, created_at DESC LIMIT 30`, [+req.params.id, req.user.slack_id]);
     res.json({ notifications: r.rows.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
