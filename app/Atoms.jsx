@@ -210,17 +210,24 @@ function NotifDot({ n, briefId }) {
         {n.count}
       </span>
       {open && pos && (
-        <div onClick={(e) => e.stopPropagation()} style={{ position:"fixed", top:pos.top, bottom:pos.bottom, right:pos.right, zIndex:1000, width:280, maxHeight:320, overflowY:"auto", background:"var(--paper)", border:"1px solid var(--line)", borderRadius:10, boxShadow:"0 8px 24px rgba(0,0,0,0.12)", padding:"10px 12px" }}>
-          <div style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>Bildirimler</div>
-          {items === null && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)" }}>Yükleniyor…</div>}
-          {items && items.length === 0 && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)" }}>Bildirim yok.</div>}
-          {items && items.map((it, i) => (
-            <div key={i} style={{ display:"flex", gap:8, alignItems:"baseline", padding:"6px 0", borderBottom:"1px solid var(--line-soft)", font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-2)" }}>
-              <span>{icon[it.tip] || "🔔"}</span>
-              <span style={{ flex:1 }}>{it.text}</span>
-              <span style={{ font:"400 10px var(--font-mono)", color:"var(--ink-4)", whiteSpace:"nowrap" }}>{new Date(it.created_at).toLocaleDateString("tr-TR")}</span>
-            </div>
-          ))}
+        <div onClick={(e) => e.stopPropagation()} style={{ position:"fixed", top:pos.top, bottom:pos.bottom, right:pos.right, zIndex:1000, width:360, maxWidth:"92vw", maxHeight:400, overflowY:"auto", background:"var(--paper)", border:"1px solid var(--line)", borderRadius:14, boxShadow:"0 12px 32px rgba(0,0,0,0.16)", padding:0 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px 10px", borderBottom:"1px solid var(--line-soft)", position:"sticky", top:0, background:"var(--paper)" }}>
+            <span style={{ font:"600 12px/1 var(--font-sans)", color:"var(--ink)", letterSpacing:".02em" }}>Bildirimler</span>
+            {items && items.length > 0 && <span style={{ font:"600 10px/1 var(--font-mono)", color:"var(--ink-4)", background:"var(--paper-2)", border:"1px solid var(--line-soft)", borderRadius:20, padding:"3px 8px" }}>{items.length}</span>}
+          </div>
+          <div style={{ padding:"4px 8px 8px" }}>
+            {items === null && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)", padding:"10px 8px" }}>Yükleniyor…</div>}
+            {items && items.length === 0 && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)", padding:"10px 8px" }}>Bildirim yok.</div>}
+            {items && items.map((it, i) => (
+              <div key={i} style={{ display:"flex", gap:11, alignItems:"flex-start", padding:"10px 8px", borderRadius:8, borderBottom: i < items.length - 1 ? "1px solid var(--line-soft)" : "none" }}>
+                <span style={{ flexShrink:0, display:"inline-flex", alignItems:"center", justifyContent:"center", width:26, height:26, borderRadius:8, background:"var(--paper-2)", border:"1px solid var(--line-soft)", fontSize:13 }}>{icon[it.tip] || "🔔"}</span>
+                <span style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:3 }}>
+                  <span style={{ font:"500 13px/1.4 var(--font-sans)", color:"var(--ink)", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{it.text}</span>
+                  <span style={{ font:"400 10px/1 var(--font-mono)", color:"var(--ink-4)" }}>{new Date(it.created_at).toLocaleDateString("tr-TR", { day:"numeric", month:"short" })} · {new Date(it.created_at).toLocaleTimeString("tr-TR", { hour:"2-digit", minute:"2-digit" })}</span>
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </span>
