@@ -325,7 +325,8 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
         </div>
       </div>
 
-      {totalRows === 0 && !isCompletedScope ? (
+      {/* Kişisel boş-durum mesajı yalnız GERÇEK boşlukta (filtreler nötrken); filtre boşaltmışsa tabloya düş → EmptyRow "filtreyi temizle" der */}
+      {totalRows === 0 && !isCompletedScope && !search.trim() && prioFilter === "all" && person === "all" && markaFilter === "all" ? (
         <div style={{font:"400 13px/1.5 var(--font-sans)", color:"var(--ink-4)", padding:"16px 4px"}}>Sana atanmış aktif iş yok. Lider sana iş atadığında burada görünür.</div>
       ) :
        !isCompletedScope && view === "kanban" ? <KanbanView rows={pagedRows} onOpenBrief={onOpenBrief}/> :

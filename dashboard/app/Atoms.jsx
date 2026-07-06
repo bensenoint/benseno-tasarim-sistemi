@@ -196,8 +196,9 @@ function NotifDot({ n, briefId }) {
       if (typeof window.bnsRefresh === "function") window.bnsRefresh();
     };
   }, [open, briefId]);
-  if (!n || !n.count) return null;
-  const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", ody_icgoru:"💡", genel:"🔔" };
+  // Popover açıkken unmount ETME: poll ile sayaç 0'a düşse de açık popover ekranda kalsın.
+  if (!open && (!n || !n.count)) return null;
+  const icon ={ termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", ody_icgoru:"💡", genel:"🔔" };
   // Rozetin ekran konumundan popover yerini hesapla; position:fixed → overflow/scroll konteyneri KIRPMAZ.
   const toggle = (e) => {
     e.stopPropagation();
@@ -214,10 +215,13 @@ function NotifDot({ n, briefId }) {
   };
   return (
     <span ref={ref} style={{ display:"inline-flex" }}>
-      <span onClick={toggle} title={`${n.count} yeni bildirim — detay için tıkla`}
-        style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", minWidth:16, height:16, padding:"0 4px", borderRadius:8, background:"var(--info)", color:"#fff", font:"600 10px/1 var(--font-mono)", marginLeft:6, verticalAlign:"middle", cursor:"pointer" }}>
-        {n.count}
-      </span>
+      {/* Rozet yalnız sayaç > 0 iken — açıkken sayaç 0'a düşerse rozet gizlenir ama popover kalır */}
+      {n && n.count > 0 && (
+        <span onClick={toggle} title={`${n.count} yeni bildirim — detay için tıkla`}
+          style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", minWidth:16, height:16, padding:"0 4px", borderRadius:8, background:"var(--info)", color:"#fff", font:"600 10px/1 var(--font-mono)", marginLeft:6, verticalAlign:"middle", cursor:"pointer" }}>
+          {n.count}
+        </span>
+      )}
       {open && pos && (
         <div onClick={(e) => e.stopPropagation()} style={{ position:"fixed", top:pos.top, bottom:pos.bottom, right:pos.right, zIndex:1000, width:360, maxWidth:"92vw", maxHeight:400, overflowY:"auto", background:"var(--paper)", border:"1px solid var(--line)", borderRadius:14, boxShadow:"0 12px 32px rgba(0,0,0,0.16)", padding:0 }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px 10px", borderBottom:"1px solid var(--line-soft)", position:"sticky", top:0, background:"var(--paper)" }}>
