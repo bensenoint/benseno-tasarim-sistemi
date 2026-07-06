@@ -337,3 +337,45 @@ window.PageHead = PageHead;
 window.Sparkline = Sparkline;
 window.SectionTitle = SectionTitle;
 window.MobileAccordion = MobileAccordion;
+
+// BriefActions — permission-gated action buttons for a brief (başla / ilerlet / termin / hatırlat)
+function BriefActions({ brief, currentUser, onStatusChange, onRemind, compact }) {
+  const p = (typeof bnsBriefActionPerms === "function")
+    ? bnsBriefActionPerms(brief, currentUser || {}) : { basla:false, ilerlet:false, termin:false, hatirlat:false };
+  const [busy, setBusy] = React.useState(false);
+  if (!p.basla && !p.ilerlet && !p.termin && !p.hatirlat) return null;
+  const apiBase = (typeof window.BNS_API_BASE === "string" && window.BNS_API_BASE) ? window.BNS_API_BASE.replace(/\/+$/, "") : "https://benseno-api-production.up.railway.app";
+  const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+  const Btn = ({ on, label, ic }) => (
+    <button disabled={busy} onClick={(e) => { e.stopPropagation(); on(); }}
+      style={{ display:"inline-flex", alignItems:"center", gap:4, font:"600 11px/1 var(--font-sans)",
+        padding: compact ? "4px 7px" : "6px 10px", border:"1px solid var(--line)", borderRadius:6,
+        background:"var(--paper-2)", color:"var(--ink-2)", cursor: busy ? "default" : "pointer", opacity: busy ? 0.5 : 1 }}>
+      {ic} {label}
+    </button>
+  );
+  const advance = (s) => { if (typeof onStatusChange === "function") onStatusChange(brief, s); };
+  const termin = async () => {
+    setBusy(true);
+    try {
+      await fetch(`${apiBase}/api/briefs/${brief.id}/termin-oneri-uzat`, { method:"POST",
+        headers:{ "content-type":"application/json", ...(tok?{Authorization:"Bearer "+tok}:{}) },
+        body: JSON.stringify({ by: currentUser && currentUser.slack_id }) });
+      window.bnsToast && window.bnsToast("⏱️ Termin önerisi uygulandı"); window.bnsRefresh && window.bnsRefresh();
+    } catch (e) { window.bnsToast && window.bnsToast("⚠ Termin uygulanamadı"); }
+    setBusy(false);
+  };
+  const remind = async () => {
+    setBusy(true);
+    try { if (typeof onRemind === "function") await onRemind(brief); } finally { setBusy(false); }
+  };
+  return (
+    <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
+      {p.basla    && <Btn on={() => advance("basladi")} label="Başladım" ic="🚀"/>}
+      {p.ilerlet  && <Btn on={() => advance(BNS_NEXT_STATUS[brief.durum])} label="İlerlet" ic="⏭️"/>}
+      {p.termin   && <Btn on={termin} label="Termin öner" ic="⏱️"/>}
+      {p.hatirlat && <Btn on={remind} label="Hatırlat" ic="🔔"/>}
+    </div>
+  );
+}
+window.BriefActions = BriefActions;
