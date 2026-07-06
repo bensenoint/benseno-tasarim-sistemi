@@ -67,8 +67,16 @@ async function main() {
   const briefs = d.bns_briefs || [];
   const users = (d.bns_users || []).filter(u => /^U/.test(u.id));
 
-  // DM tercihi kapalı olanlar (dashboard bildirimi yine yazılır; yalnız DM atlanır). --dry'da DB'ye hiç gitme.
-  const off = DRY ? new Set() : new Set((await pool.query(`SELECT user_id FROM notify_prefs WHERE ody_icgoru=false`)).rows.map(r => r.user_id));
+  // DM tercihleri: ody_icgoru kapalı mı + sessiz saat aralığı (dashboard bildirimi yine yazılır; yalnız DM atlanır). --dry'da DB'ye hiç gitme.
+  const prefs = DRY ? new Map() : new Map((await pool.query(
+    `SELECT user_id, ody_icgoru, sessiz_bas, sessiz_bit FROM notify_prefs`)).rows.map(r => [r.user_id, r]));
+  // İstanbul saatine göre şu anki saat + sessiz-saat kontrolü (server/notify.js'teki inQuiet ile aynı mantık, yerel kopya)
+  const trHour = parseInt(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul', hour12: false, hour: '2-digit' }), 10);
+  const inQuiet = (p) => {
+    const bas = (p && p.sessiz_bas != null) ? p.sessiz_bas : 19;
+    const bit = (p && p.sessiz_bit != null) ? p.sessiz_bit : 8;
+    return bas > bit ? (trHour >= bas || trHour < bit) : (trHour >= bas && trHour < bit);
+  };
 
   let sent = 0; const preview = [];
   for (const u of users) {
@@ -85,11 +93,21 @@ async function main() {
     if (!line) continue;
 
     if (live) {
-      await pool.query(
-        `INSERT INTO notifications (user_id, tip, aciliyet, text, brief_id, dijest_at)
-         VALUES ($1,'ody_icgoru','normal',$2,$3, now())`,
-        [u.id, line, null]);
-      if (!off.has(u.id)) await post(tok, u.id, `💡 ${line}\n🔗 ${DASHBOARD_URL}`);
+      // DM gönderilecek mi: tercih açık + sessiz saatte değil (sessizde INSERT yine yapılır, dashboard görür)
+      const p = prefs.get(u.id);
+      const dmIzin = !(p && p.ody_icgoru === false) && !inQuiet(p);
+      let dmAtildi = false;
+      if (dmIzin) dmAtildi = await post(tok, u.id, `💡 ${line}\n🔗 ${DASHBOARD_URL}`);
+      // K7: çift-çalışma yarışı — unique index ihlalini (23505) yut, diğer hataları fırlat
+      try {
+        await pool.query(
+          `INSERT INTO notifications (user_id, tip, aciliyet, text, brief_id, dijest_at, slack_at, marka)
+           VALUES ($1,'ody_icgoru','normal',$2,NULL, now(), $3, $4)`,
+          [u.id, line, dmAtildi ? new Date() : null, (signal.focus && signal.focus.marka) || null]);
+      } catch (e) {
+        if (e.code === '23505') { console.error('[ody-icgoru] çift kayıt engellendi (23505):', u.id); continue; }
+        throw e;
+      }
     } else {
       preview.push(`### ${u.name}\n💡 ${line}`);
     }
