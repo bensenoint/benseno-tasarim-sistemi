@@ -14,6 +14,7 @@ const slack = require('./slack');
 const { pool } = require('./db');
 const calc = require('./calc-penalty.js'); // deadline uzatma cezası (API kökü server/; dashboard calc.js imajda yok)
 const odyTools = require('./ody-tools');
+const { notify } = require('./notify');
 
 const app = express();
 app.disable('x-powered-by');   // Express sürüm parmak izini gizle
@@ -714,6 +715,26 @@ app.post('/api/briefs/:id/notif-seen', auth.authGuard, async (req, res) => {
     await pool.query(`INSERT INTO brief_notif_seen (user_id, brief_id, seen_at) VALUES ($1,$2,now())
       ON CONFLICT (user_id, brief_id) DO UPDATE SET seen_at=now()`, [req.user.slack_id, +req.params.id]);
     res.json({ ok: true });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// Hatırlat/dürt — işin lead+worker'larına (isteği yapan hariç) bildirim.
+app.post('/api/briefs/:id/remind', auth.authGuard, async (req, res) => {
+  try {
+    const id = +req.params.id;
+    const actor = req.user.slack_id;
+    const bi = (await pool.query(`SELECT no, baslik, slack_url FROM briefs WHERE id=$1`, [id])).rows[0];
+    if (!bi) return res.status(404).json({ error: 'brief bulunamadı' });
+    const who = (await pool.query(`SELECT name FROM users WHERE id=$1`, [actor])).rows[0];
+    const adi = who ? who.name : 'Biri';
+    const a = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND role IN ('contributor','lead')`, [id]);
+    let sent = 0;
+    for (const row of a.rows) {
+      if (!/^U/.test(row.user_id || '') || row.user_id === actor) continue;   // kendine gönderme
+      await notify(row.user_id, { tip: 'genel', aciliyet: 'acil', text: `🔔 ${adi} hatırlattı: #${bi.no} ${bi.baslik || ''}`, link: bi.slack_url || null, briefId: id });
+      sent++;
+    }
+    res.json({ ok: true, sent });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
