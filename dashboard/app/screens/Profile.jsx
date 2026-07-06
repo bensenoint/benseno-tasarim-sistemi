@@ -344,6 +344,10 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   return (
     <div className="bn-tab-in">
 
+      {_isSelf && myAll.length === 0 && window.WelcomeCard && (
+        React.createElement(window.WelcomeCard, { name: (u && (u.first_name || (u.name || "").split(" ")[0])) || "" })
+      )}
+
       {/* ─── Kullanıcı seçici + hero ──────────────────────────── */}
       <div style={{display:"flex", alignItems:"center", gap: isMobile ? 12 : 20, padding: isMobile ? "4px 0 2px" : "20px 0 4px", flexWrap:"wrap"}}>
         {!isMobile && <Avatar user={u} size={64}/>}
