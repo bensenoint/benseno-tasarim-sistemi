@@ -301,12 +301,15 @@ async function patchBrief(id, raw) {
       if (oldMs && newMs && newMs > oldMs) {            // deadline ileri taşındı → uzatma
         if (muaf) {                                     // MUAF: ceza yok, uzatıldı rozeti tetiklenmez; izi uzatma_muaf'ta
           sets.push('uzatma_muaf = uzatma_muaf + 1');
-          sets.push('termin_oneri_at = NULL'); sets.push('termin_oneri_ms = NULL');  // hatırlatıcı kapanır
         } else {
           const ceza = calc.bnsUzatmaCezaFromTimes(Date.now(), oldMs);
           sets.push('uzatma_sayisi = uzatma_sayisi + 1');
           vals.push(ceza); sets.push(`uzatma_ceza = GREATEST(uzatma_ceza, $${vals.length})`);
         }
+      }
+      // Hatırlatıcı açıkken deadline HER değiştiğinde (ileri veya geri) temizle — öne çekme muaf sayılmaz ama hatırlatıcı kapanır (O8).
+      if (muaf && oldMs && newMs && newMs !== oldMs) {
+        sets.push('termin_oneri_at = NULL'); sets.push('termin_oneri_ms = NULL');  // hatırlatıcı kapanır
       }
       if (oldMs && newMs && newMs !== oldMs) {          // her deadline değişimini geçmişe yaz (eski→yeni)
         const hist = JSON.stringify({ eski: oldRow.deadline, yeni: newDl, at: new Date().toISOString(), by: d.by || null, ileri: newMs > oldMs, muaf: muaf && newMs > oldMs });
@@ -530,8 +533,12 @@ async function setStatus(id, raw, _depth = 0) {
         `SELECT EXTRACT(EPOCH FROM max(ts)) * 1000 AS ts FROM events
          WHERE brief_id=$1 AND verb IN ('durum:beklemede','durum:musteride')`, [id]);
       const ps = pe.rows[0] && pe.rows[0].ts ? Math.round(+pe.rows[0].ts) : null;
-      resumeMs = ps ? Math.max(0, Date.now() - ps) : 0;
-      await client.query('UPDATE briefs SET termin_oneri_at = now(), termin_oneri_ms = $2 WHERE id=$1', [id, resumeMs]);
+      const beklemeMs = ps ? Math.max(0, Date.now() - ps) : 0;
+      // ms=0 kilidi: bekleme süresi 0/falsy ise hatırlatıcıyı HİÇ açma — "açık ama çalışmaz" durumu oluşmasın (O6).
+      if (beklemeMs > 0) {
+        resumeMs = beklemeMs;
+        await client.query('UPDATE briefs SET termin_oneri_at = now(), termin_oneri_ms = $2 WHERE id=$1', [id, resumeMs]);
+      }
     } else if (['tamamlandi', 'beklemede', 'musteride'].includes(durum)) {
       await client.query('UPDATE briefs SET termin_oneri_at = NULL, termin_oneri_ms = NULL WHERE id=$1', [id]);
     }
@@ -945,6 +952,8 @@ async function applyTerminOneri(id, by, source) {
   const base = row.deadline ? new Date(row.deadline).getTime() : Date.now();
   const yeni = new Date(base + Number(row.termin_oneri_ms)).toISOString();
   await patchBrief(id, { deadline: yeni, by, source: source || 'system' });
+  // Garanti kapanış: deadline NULL iken patchBrief'in temizlik dalı atlanabilir (oldMs yok) → hatırlatıcıyı burada idempotent kapat (O5, sonsuz uzatma önlenir).
+  await pool.query('UPDATE briefs SET termin_oneri_at = NULL, termin_oneri_ms = NULL WHERE id = $1', [id]);
   return { ok: true, yeni_deadline: yeni };
 }
 
