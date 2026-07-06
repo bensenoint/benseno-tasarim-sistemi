@@ -223,6 +223,13 @@ function App({ currentUser, onLogout }) {
   const [sidebarHover, setSidebarHover] = React.useState(false);
   const [viewMode, setViewMode] = React.useState(t.defaultView);
   const [openBrief, setOpenBrief] = React.useState(null);
+  const [tourOpen, setTourOpen] = React.useState(false);
+  const [tourSeen, setTourSeen] = useStickyState("tour_seen", false);
+  const _tourUid = currentUser && (currentUser.slack_id || currentUser.id);
+  const hasWork = !!_tourUid && (data.briefs || []).some(b =>
+    window.bnsIsLead(b, _tourUid) ||
+    (Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === _tourUid)) ||
+    (b.reviewer && b.reviewer.id === _tourUid));
   const [briefs, setBriefs] = React.useState(data.briefs); // mutable for live edits
   const [palette, setPalette] = React.useState(false);
   const [newBrief, setNewBrief] = React.useState(false);
@@ -263,6 +270,12 @@ function App({ currentUser, onLogout }) {
       return r.json();
     };
   }, []);
+  // WelcomeCard / Chrome "?" turu bu global ile açar.
+  React.useEffect(() => { window.bnsOpenTour = () => setTourOpen(true); }, []);
+  // İlk giriş: iş yok + daha önce görülmemiş → turu bir kez otomatik aç.
+  React.useEffect(() => {
+    if (!hasWork && !tourSeen) setTourOpen(true);
+  }, [hasWork, tourSeen]);
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
   const [brandStats, setBrandStats] = React.useState(data.brandStats);
@@ -669,6 +682,7 @@ function App({ currentUser, onLogout }) {
 
   return (
     <div data-screen-label={tab} style={{display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden", position:"relative"}}>
+      {window.WelcomeTour && React.createElement(window.WelcomeTour, { open: tourOpen, onClose: () => { setTourOpen(false); setTourSeen(true); } })}
       <Header
         user={user}
         tab={tab} onNav={navTo}
