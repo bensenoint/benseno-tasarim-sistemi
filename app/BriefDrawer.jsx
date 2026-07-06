@@ -55,7 +55,11 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
 
   function handleAssignMe() {
     if (!currentUser) return;
-    set({ lead: currentUser });
+    // Persist katmanı yalnız workers/leads/observers dizilerini diff'ler; auth objesi (id'siz)
+    // Avatar'ı kırabilir → roster kaydını bul, leads dizisine ekle (tekil 'lead' alanı DEĞİL).
+    const rosterMe = (allUsers || []).find(x => x && x.id === _meId)
+      || { id: _meId, name: (currentUser && currentUser.name) || _meId };
+    if (!(b.leads || []).some(l => l && l.id === _meId)) set({ leads: [...(b.leads || []), rosterMe] });
     setAssignedMe(true);
   }
 
@@ -185,11 +189,15 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
               currentUser'ı slack-id'li objeye çevir: bnsBriefActionPerms u.id'yi slack-id bekler. */}
           {!ro && window.BriefActions && (
             <div style={{ marginTop: 12 }}>
-              {React.createElement(window.BriefActions, {
-                brief: b,
-                currentUser: { id: _meId, yetki: _isMgr ? "yonetici" : undefined, rol: _meRec && _meRec.rol },
-                onStatusChange, onRemind,
-              })}
+              {/* Kaydedilmemiş yerel düzenleme varken statü aksiyonu + patch karışık diff riskine girmesin:
+                  aksiyonları gizle, kullanıcıyı önce Kaydet'e yönlendir. */}
+              {JSON.stringify(b) !== JSON.stringify(brief)
+                ? <div style={{font:"400 12px var(--font-sans)", color:"var(--warning)"}}>Kaydedilmemiş değişiklikler var — aksiyonlar için önce Kaydet.</div>
+                : React.createElement(window.BriefActions, {
+                    brief: b,
+                    currentUser: { id: _meId, yetki: _isMgr ? "yonetici" : undefined, rol: _meRec && _meRec.rol },
+                    onStatusChange, onRemind,
+                  })}
             </div>
           )}
 
@@ -435,7 +443,11 @@ function BriefNotifs({ briefId }) {
     if (!briefId) return;
     if (typeof window.bnsApiGet === "function")
       window.bnsApiGet(`/api/briefs/${briefId}/notifications`).then(r => setItems((r && r.notifications) || [])).catch(() => setItems([]));
-    if (typeof window.bnsApiPost === "function") window.bnsApiPost(`/api/briefs/${briefId}/notif-seen`, {});
+    // Başarıda rozet sayacını tazele; hata sessizce yutulur (best-effort)
+    if (typeof window.bnsApiPost === "function")
+      window.bnsApiPost(`/api/briefs/${briefId}/notif-seen`, {})
+        .then(() => { window.bnsRefresh && window.bnsRefresh(); })
+        .catch(() => {});
   }, [briefId]);
   if (!items || !items.length) return null;
   const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", genel:"🔔" };

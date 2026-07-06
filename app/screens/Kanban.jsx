@@ -64,7 +64,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
   let allBriefs = data._allBriefs || data.briefs;
   if (markaFilter !== "all") allBriefs = allBriefs.filter(b => b.marka === markaFilter);
   if (person !== "all") allBriefs = allBriefs.filter(onPerson);
-  if (prioFilter !== "all") allBriefs = allBriefs.filter(b => b.priority.code === prioFilter);
+  if (prioFilter !== "all") allBriefs = allBriefs.filter(b => b.priority && b.priority.code === prioFilter);   // null-guard (Jobs.jsx deseni)
   if (search.trim()) {
     const q = search.toLowerCase().trim();
     allBriefs = allBriefs.filter(b =>

@@ -242,6 +242,18 @@ function App({ currentUser, onLogout }) {
       const arr = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
       const b = arr.find(x => x && x.id === id);
       if (b) { setOpenBrief(b); return true; }
+      // Aktiflerde yoksa tamamlananlarda ara → salt-okunur aç (onOpenCompleted ile aynı eşleme)
+      const carr = (window.BNS_DATA && window.BNS_DATA.completed) || [];
+      const c = carr.find(x => x && x.id === id);
+      if (c) {
+        setOpenBrief({
+          ...c, _readOnly: true, durum: "tamamlandi",
+          workers: c.contributors || [], leads: c.lead ? [c.lead] : [], observers: [],
+          priority: null, deltaH: null, acilma: c.baslangic || null,
+        });
+        return true;
+      }
+      setToast(`#${id} bulunamadı — silinmiş olabilir`);
       return false;
     };
     window.bnsToast = (msg) => setToast(msg);            // başarı/hata bildirimi
@@ -272,15 +284,18 @@ function App({ currentUser, onLogout }) {
   }, []);
   // WelcomeCard / Chrome "?" turu bu global ile açar.
   React.useEffect(() => { window.bnsOpenTour = () => setTourOpen(true); }, []);
-  // İlk giriş: iş yok + daha önce görülmemiş → turu bir kez otomatik aç.
-  React.useEffect(() => {
-    if (!hasWork && !tourSeen) setTourOpen(true);
-  }, [hasWork, tourSeen]);
   const [toast, setToast] = React.useState(null);
   const [pollTick, setPollTick] = React.useState(0); // Yenile düğmesi için manual trigger
   const [brandStats, setBrandStats] = React.useState(data.brandStats);
   const [history, setHistory] = React.useState(data.history || []); // 7 günlük geçmiş
   const [lastPollTime, setLastPollTime] = React.useState(null); // son başarılı poll zamanı
+  // İlk giriş: iş yok + daha önce görülmemiş → turu bir kez otomatik aç.
+  // Veri yarışı düzeltmesi: karar CANLI veri geldikten sonra verilir (lastPollTime = ilk başarılı poll).
+  // NOT: bu effect lastPollTime TANIMINDAN SONRA durmalı (üstte kullanmak TDZ ReferenceError → App çöker).
+  React.useEffect(() => {
+    if (lastPollTime == null) return;   // henüz canlı veri yok → karar verme
+    if (!hasWork && !tourSeen) setTourOpen(true);
+  }, [lastPollTime, hasWork, tourSeen]);
   const [notifTick, setNotifTick] = React.useState(0); // bildirim rozetleri: window.BNS_NOTIF değişince re-render tetikler
   const [online, setOnline] = React.useState(true);   // API erişilebilir mi (false → çevrimdışı ekranı)
   const offlineFailsRef = React.useRef(0);             // ardışık başarısız poll sayısı
@@ -630,7 +645,8 @@ function App({ currentUser, onLogout }) {
   const onRemind = async (b) => {
     try {
       const r = await window.bnsApiPost(`/api/briefs/${b.id}/remind`, {});
-      setToast(r && r.ok ? `🔔 Hatırlatıldı (${r.sent||0} kişi)` : "⚠ Hatırlatma gönderilemedi");
+      // DM her zaman gitmez (sessiz saat) ama rozet her zaman yazılır → metin abartmasın.
+      setToast(r && r.ok ? `🔔 Hatırlatma bildirimi bırakıldı (${r.sent||0} kişi)` : "⚠ Hatırlatma gönderilemedi");
     } catch (e) { setToast("⚠ Hatırlatma gönderilemedi"); }
   };
   const onCreateBrief = (b) => {

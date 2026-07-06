@@ -358,10 +358,16 @@ function BriefActions({ brief, currentUser, onStatusChange, onRemind, compact })
   const termin = async () => {
     setBusy(true);
     try {
-      await fetch(`${apiBase}/api/briefs/${brief.id}/termin-oneri-uzat`, { method:"POST",
+      const res = await fetch(`${apiBase}/api/briefs/${brief.id}/termin-oneri-uzat`, { method:"POST",
         headers:{ "content-type":"application/json", ...(tok?{Authorization:"Bearer "+tok}:{}) },
         body: JSON.stringify({ by: currentUser && currentUser.slack_id }) });
-      window.bnsToast && window.bnsToast("⏱️ Termin uzatıldı"); window.bnsRefresh && window.bnsRefresh();
+      // res.ok kontrolü — hata dönerse sahte başarı toast'ı basma (BriefDrawer terminOneri deseni)
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        window.bnsToast && window.bnsToast("⚠ Termin uzatılamadı: " + (j.error || res.status));
+      } else {
+        window.bnsToast && window.bnsToast("⏱️ Termin uzatıldı"); window.bnsRefresh && window.bnsRefresh();
+      }
     } catch (e) { window.bnsToast && window.bnsToast("⚠ Termin uygulanamadı"); }
     setBusy(false);
   };
