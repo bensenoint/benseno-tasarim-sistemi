@@ -20,12 +20,13 @@ test('tamamlandi/musteride → ilerlet yok', () => {
   assert.equal(c.bnsBriefActionPerms(brief('tamamlandi'), worker).ilerlet, false);
   assert.equal(c.bnsBriefActionPerms(brief('musteride'), worker).ilerlet, false);
 });
-test('termin: riskli+lead/açan/yönetici; değilse yok', () => {
-  const risky = brief('basladi', { deltaH: -5 });
-  assert.equal(c.bnsBriefActionPerms(risky, lead).termin, true);
-  assert.equal(c.bnsBriefActionPerms(risky, mgr).termin, true);
-  assert.equal(c.bnsBriefActionPerms(risky, worker).termin, false);
-  assert.equal(c.bnsBriefActionPerms(brief('basladi', { deltaH: 100 }), lead).termin, false);
+test('termin: uzatma önerisi (termin_oneri_ms) varsa lead/açan/yönetici; değilse yok', () => {
+  const oneri = brief('basladi', { termin_oneri_ms: 3 * 86400000 });   // 3g bekleme dönüşü
+  assert.equal(c.bnsBriefActionPerms(oneri, lead).termin, true);
+  assert.equal(c.bnsBriefActionPerms(oneri, mgr).termin, true);
+  assert.equal(c.bnsBriefActionPerms(oneri, worker).termin, false);   // yetki yok
+  // öneri yoksa (termin_oneri_ms null) riskli olsa bile buton yok
+  assert.equal(c.bnsBriefActionPerms(brief('basladi', { deltaH: -5 }), lead).termin, false);
 });
 test('hatırlat: lead veya yönetici', () => {
   assert.equal(c.bnsBriefActionPerms(brief('basladi'), lead).hatirlat, true);
