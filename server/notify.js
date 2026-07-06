@@ -58,7 +58,8 @@ async function notify(userId, { tip = 'genel', aciliyet = 'normal', text, link =
       const prefs = await getPrefs(userId);
       if (shouldPushNow({ tip, aciliyet }, prefs, new Date())) {
         await slack.dm(userId, text, link, true);
-        if (notifId) await pool.query(`UPDATE notifications SET slack_at=now() WHERE id=$1`, [notifId]);
+        // Anlık DM iletildi → dijest_at da işaretle: sabah dijestinde TEKRAR gitmesin (yalnız başarı dalı).
+        if (notifId) await pool.query(`UPDATE notifications SET slack_at=now(), dijest_at=now() WHERE id=$1`, [notifId]);
       }
     } catch (e) { console.error('[notify] anlık DM hata:', e.message); }  // satır tabloda güvende
   }

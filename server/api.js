@@ -638,7 +638,10 @@ app.get('/api/notifications', auth.authGuard, async (req, res) => {
     const r = await pool.query(
       `SELECT id, text, link, created_at, read_at FROM notifications
        WHERE user_id=$1 ORDER BY created_at DESC LIMIT 30`, [req.user.slack_id]);
-    res.json({ notifications: r.rows, unread: r.rows.filter(n => !n.read_at).length });
+    // unread: son-30 listesinden değil, tablodan tam sayı (LIMIT'ten bağımsız; okundu kolonu: read_at).
+    const c = await pool.query(
+      `SELECT count(*)::int AS unread FROM notifications WHERE user_id=$1 AND read_at IS NULL`, [req.user.slack_id]);
+    res.json({ notifications: r.rows, unread: c.rows[0].unread });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 app.post('/api/notifications/read', auth.authGuard, async (req, res) => {
@@ -660,11 +663,17 @@ app.post('/api/notify-prefs', auth.authGuard, async (req, res) => {
     const b = req.body || {};
     const bool = (v, d) => typeof v === 'boolean' ? v : d;
     const hour = (v, d) => (Number.isInteger(v) && v >= 0 && v <= 23) ? v : d;
+    // Kısmi gövde mevcut ayarları EZMESİN: önce mevcut satırı oku, gelmeyen alan mevcut değeri (yoksa varsayılanı) korur.
+    const cur = (await pool.query('SELECT * FROM notify_prefs WHERE user_id=$1', [req.user.slack_id])).rows[0] || {};
     await pool.query(
       `INSERT INTO notify_prefs (user_id, ogle_dijest, tip_termin, tip_atama, tip_bloke, sessiz_bas, sessiz_bit, ody_icgoru)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
        ON CONFLICT (user_id) DO UPDATE SET ogle_dijest=$2, tip_termin=$3, tip_atama=$4, tip_bloke=$5, sessiz_bas=$6, sessiz_bit=$7, ody_icgoru=$8`,
-      [req.user.slack_id, bool(b.ogle_dijest, true), bool(b.tip_termin, true), bool(b.tip_atama, true), bool(b.tip_bloke, true), hour(b.sessiz_bas, 19), hour(b.sessiz_bit, 8), bool(b.ody_icgoru, true)]);
+      [req.user.slack_id,
+       bool(b.ogle_dijest, cur.ogle_dijest ?? true), bool(b.tip_termin, cur.tip_termin ?? true),
+       bool(b.tip_atama, cur.tip_atama ?? true), bool(b.tip_bloke, cur.tip_bloke ?? true),
+       hour(b.sessiz_bas, cur.sessiz_bas ?? 19), hour(b.sessiz_bit, cur.sessiz_bit ?? 8),
+       bool(b.ody_icgoru, cur.ody_icgoru ?? true)]);
     res.json({ ok: true });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
@@ -677,7 +686,7 @@ app.get('/api/notif-counts', auth.authGuard, async (req, res) => {
       WITH tekil AS (
         SELECT DISTINCT ON (n.brief_id, n.tip, n.text) n.brief_id, n.marka, n.created_at
         FROM notifications n
-        WHERE n.brief_id IS NOT NULL
+        WHERE n.brief_id IS NOT NULL AND n.user_id = $1  -- yalnız kişinin KENDİ bildirimleri sayılır
         ORDER BY n.brief_id, n.tip, n.text, n.created_at DESC
       )
       SELECT t.brief_id, t.marka, count(*) AS cnt, max(t.created_at) AS last_at
@@ -698,14 +707,14 @@ app.get('/api/notif-counts', auth.authGuard, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Bir işin tekil bildirim listesi (son 30).
+// Bir işin tekil bildirim listesi (son 30) — kişinin KENDİ bildirimleri.
 app.get('/api/briefs/:id/notifications', auth.authGuard, async (req, res) => {
   try {
     // unread = bu kullanıcının bu işe ait seen_at'inden SONRA oluşan bildirim (okunmamış).
     const r = await pool.query(`
       SELECT DISTINCT ON (tip, text) tip, text, link, created_at,
         (created_at > COALESCE((SELECT seen_at FROM brief_notif_seen WHERE user_id=$2 AND brief_id=$1), 'epoch'::timestamptz)) AS unread
-      FROM notifications WHERE brief_id=$1
+      FROM notifications WHERE brief_id=$1 AND user_id=$2
       ORDER BY tip, text, created_at DESC LIMIT 30`, [+req.params.id, req.user.slack_id]);
     res.json({ notifications: r.rows.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -725,8 +734,17 @@ app.post('/api/briefs/:id/remind', auth.authGuard, async (req, res) => {
   try {
     const id = +req.params.id;
     const actor = req.user.slack_id;
-    const bi = (await pool.query(`SELECT no, baslik, slack_url, slack_channel, slack_ts FROM briefs WHERE id=$1`, [id])).rows[0];
+    const bi = (await pool.query(`SELECT no, baslik, slack_url, slack_channel, slack_ts, created_by FROM briefs WHERE id=$1`, [id])).rows[0];
     if (!bi) return res.status(404).json({ error: 'brief bulunamadı' });
+    // Yetki: yalnız yönetici, işin lead'i veya işi açan hatırlatabilir (UI perms ile aynı).
+    const u = (await pool.query(`SELECT rol, yetki FROM users WHERE id=$1 LIMIT 1`, [actor])).rows[0];
+    const isMgr = !!(u && (u.rol === 'yonetici' || u.yetki === 'yonetici'));
+    const isLead = (await pool.query(`SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND user_id=$2 AND role='lead' LIMIT 1`, [id, actor])).rowCount > 0;
+    if (!isMgr && !isLead && bi.created_by !== actor) return res.status(403).json({ error: 'yetki yok' });
+    // Tekrar koruması: son 10 dakikada aynı işe hatırlatma gittiyse tekrar spam'leme.
+    const dup = await pool.query(
+      `SELECT 1 FROM notifications WHERE brief_id=$1 AND text LIKE '%hatırlattı%' AND created_at > now() - interval '10 minutes' LIMIT 1`, [id]);
+    if (dup.rowCount > 0) return res.status(429).json({ error: 'az önce hatırlatıldı' });
     const who = (await pool.query(`SELECT name FROM users WHERE id=$1`, [actor])).rows[0];
     const adi = who ? who.name : 'Biri';
     const txt = `🔔 ${adi} hatırlattı: #${bi.no} ${bi.baslik || ''}`;
