@@ -185,13 +185,11 @@ function NotifDot({ n, briefId }) {
         if (typeof window.bnsApiPost === "function")
           window.bnsApiPost(`/api/briefs/${briefId}/notif-seen`, {}).then(() => { if (typeof window.bnsRefresh === "function") window.bnsRefresh(); }).catch(() => {});
       }).catch(() => setItems([]));
+    // YALNIZ dışarı tıklama + Escape kapatır (kaydırma/resize kapatmaz — kullanıcı boşluğa basana dek açık kalır).
     const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     const onEsc = (e) => { if (e.key === "Escape") setOpen(false); };
-    // Kaydırma/yeniden boyut → fixed popover konumu kayacağı için kapat.
-    const onScroll = () => setOpen(false);
     document.addEventListener("mousedown", onDoc); document.addEventListener("keydown", onEsc);
-    window.addEventListener("scroll", onScroll, true); window.addEventListener("resize", onScroll);
-    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onEsc); window.removeEventListener("scroll", onScroll, true); window.removeEventListener("resize", onScroll); };
+    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onEsc); };
   }, [open, briefId]);
   if (!n || !n.count) return null;
   const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", genel:"🔔" };
