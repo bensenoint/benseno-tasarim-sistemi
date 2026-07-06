@@ -1,7 +1,7 @@
 // app/screens/Profile.jsx — Kişisel performans dashboardı v2
 // Aktif işler · tamamlanan · revize · saat · marka · iş tipi · verilen/alınan görevler
 
-function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, initialSel }) {
+function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, initialSel, onStatusChange, onRemind }) {
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [selectedUser, setSelectedUser] = React.useState(user);
   // Avatar tıklamasından gelen kişi (window.bnsOpenUser → App.jsx initialSel) — t damgası her tıklamada değişir
@@ -373,6 +373,49 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
       {u.id === (currentUser && currentUser.slack_id) && (
         <div style={{marginBottom:"var(--grid-gap)"}}><NotifPrefsCard/></div>
       )}
+
+      {/* ─── Bugün — sıradaki iş + bugün deadline + geciken (yalnız kendi profilinde) ─── */}
+      {u.id === (currentUser && currentUser.slack_id) && (() => {
+        const sirada = [...myActive].sort((a,b) => (myKisiSira(a)-myKisiSira(b)) || ((a.deadline||Infinity)-(b.deadline||Infinity)))[0] || null;
+        const now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
+        const bugunDeadline = myActive.filter(b => {
+          const d = b.deadline;
+          if (!d) return false;
+          return new Date(d).toDateString() === new Date(now).toDateString();
+        });
+        const Row = (b) => (
+          <div key={b.id} onClick={() => onOpenBrief && onOpenBrief(b)} style={{display:"flex",flexWrap:"wrap",gap:8,alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid var(--line-soft)",cursor:"pointer"}}>
+            <span style={{font:"500 13px/1.3 var(--font-sans)",color:"var(--ink)"}}>#{b.no} {b.marka} — {b.baslik || b.is}</span>
+            <BriefActions brief={b} currentUser={u} onStatusChange={onStatusChange} onRemind={onRemind} compact/>
+          </div>
+        );
+        return (
+          <Card style={{marginBottom:"var(--grid-gap)"}}>
+            <CardHead title="🗓️ Bugün" sub="şimdi ne yapmalı"/>
+            {sirada && (
+              <div style={{margin:"12px 0 4px"}}>
+                <Eyebrow style={{marginBottom:8}}>Sıradaki iş</Eyebrow>
+                <div style={{border:"1px solid var(--line)", borderRadius:8, padding:"12px 14px", display:"flex", flexWrap:"wrap", gap:10, alignItems:"center", justifyContent:"space-between"}}>
+                  <span onClick={() => onOpenBrief && onOpenBrief(sirada)} style={{font:"600 15px/1.3 var(--font-sans)", color:"var(--ink)", cursor:"pointer"}}>#{sirada.no} {sirada.marka} — {sirada.baslik || sirada.is}</span>
+                  <BriefActions brief={sirada} currentUser={u} onStatusChange={onStatusChange} onRemind={onRemind}/>
+                </div>
+              </div>
+            )}
+            <div style={{marginTop:16}}>
+              <Eyebrow style={{marginBottom:4}}>Bugün deadline</Eyebrow>
+              {bugunDeadline.length > 0
+                ? bugunDeadline.map(Row)
+                : <div style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", padding:"8px 0"}}>Bugün deadline'ı olan iş yok.</div>}
+            </div>
+            <div style={{marginTop:16}}>
+              <Eyebrow style={{marginBottom:4}}>Geciken</Eyebrow>
+              {overdue.length > 0
+                ? overdue.map(Row)
+                : <div style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", padding:"8px 0"}}>Geciken iş yok.</div>}
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
       <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
