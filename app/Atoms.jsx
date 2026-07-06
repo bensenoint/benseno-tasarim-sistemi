@@ -180,16 +180,21 @@ function NotifDot({ n, briefId }) {
     if (briefId && typeof window.bnsApiGet === "function")
       window.bnsApiGet(`/api/briefs/${briefId}/notifications`).then(r => {
         setItems((r && r.notifications) || []);
-        // GET (unread bayrakları eski seen_at'e göre) çözülDÜKTEN SONRA okundu işaretle → bu görünümde
-        // okunmamışlar doğru ayrışır; sonraki açılışta hepsi okunmuş sayılır + rozet sayacı tazelenir.
+        // GET (unread bayrakları) çözülDÜKTEN SONRA sunucuda okundu işaretle → bu görünümde okunmamışlar
+        // doğru ayrışır. bnsRefresh'i BURADA ÇAĞIRMA: rozet sayacı 0'a düşüp NotifDot unmount olur →
+        // popover anında kapanır. Sayaç tazelemeyi kapanışa ertele (aşağıdaki cleanup).
         if (typeof window.bnsApiPost === "function")
-          window.bnsApiPost(`/api/briefs/${briefId}/notif-seen`, {}).then(() => { if (typeof window.bnsRefresh === "function") window.bnsRefresh(); }).catch(() => {});
+          window.bnsApiPost(`/api/briefs/${briefId}/notif-seen`, {}).catch(() => {});
       }).catch(() => setItems([]));
     // YALNIZ dışarı tıklama + Escape kapatır (kaydırma/resize kapatmaz — kullanıcı boşluğa basana dek açık kalır).
     const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     const onEsc = (e) => { if (e.key === "Escape") setOpen(false); };
     document.addEventListener("mousedown", onDoc); document.addEventListener("keydown", onEsc);
-    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onEsc); };
+    return () => {
+      document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onEsc);
+      // Popover kapandığında rozet sayacını tazele (okundu düşsün).
+      if (typeof window.bnsRefresh === "function") window.bnsRefresh();
+    };
   }, [open, briefId]);
   if (!n || !n.count) return null;
   const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", genel:"🔔" };
