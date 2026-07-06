@@ -69,6 +69,7 @@ const NOTIFY_V2 = process.env.BNS_NOTIFY_V2 === '1';
 cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
 // Kişisel: V2'de dijest (08:30 sabah + 13:30 öğle), eski sistemde 07:55 kisisel rapor.
 if (NOTIFY_V2) {
+  cron.schedule('15 8 * * 1-5', () => run('run-ody-icgoru.sh'), opts);
   cron.schedule('30 8 * * 1-5', () => run('run-dijest.sh'), opts);
   cron.schedule('30 13 * * 1-5', () => run('run-dijest-ogle.sh'), opts);
 } else {
