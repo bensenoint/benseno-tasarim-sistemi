@@ -143,6 +143,7 @@ function PanomScreen(props) {
   var brandColor = function (b) { return (b.brand && b.brand.color) || (data.BR && data.BR[b.marka] && data.BR[b.marka].color) || "var(--ink-4)"; };
   var fmtDelta = function (dh) { var late = dh <= 0; return late ? Math.abs(Math.round(dh)) + "sa↑" : Math.round(dh) + "sa"; };
   var deltaCol = function (dh) { return dh <= 0 ? "var(--prio-red)" : dh <= 24 ? "var(--prio-orange)" : "var(--prio-yellow)"; };
+  var actions = function (b) { return window.BriefActions ? h(window.BriefActions, { key: "act", brief: b, currentUser: me, onStatusChange: props.onStatusChange, onRemind: props.onRemind, compact: true }) : null; };
 
   var empty = function (msg, emoji) { return h("div", { style: { flex: 1, minHeight: 60, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, color: "var(--ink-4)" } }, emoji ? h("div", { style: { fontSize: 24 } }, emoji) : null, h("div", { style: { font: "400 13px/1.4 var(--font-sans)" } }, msg)); };
   var listRow = function (b, right, rightCol) {
@@ -168,12 +169,12 @@ function PanomScreen(props) {
     if (type === "risk") {
       var rows = briefs.filter(function (b) { return mine(b) && window.bnsIsRisk && window.bnsIsRisk(b.durum, b.deltaH); }).sort(function (a, b) { return a.deltaH - b.deltaH; });
       if (!rows.length) return empty("Risk yok — temiz.", "👍");
-      return rows.map(function (b) { return h("div", { key: b.no, style: { display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "var(--prio-red-bg)", borderRadius: 0, marginBottom: 7 } }, h("span", { style: { font: "500 10.5px/1 var(--font-mono)", color: "var(--ink-4)" } }, "#" + b.no), h("span", { style: { flex: 1, font: "500 12.5px/1.3 var(--font-sans)", color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, b.baslik || ""), h("span", { style: { font: "700 11px/1 var(--font-mono)", color: "var(--prio-red)" } }, fmtDelta(b.deltaH))); });
+      return rows.map(function (b) { return h("div", { key: b.no, style: { display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", background: "var(--prio-red-bg)", borderRadius: 0, marginBottom: 7 } }, h("span", { style: { font: "500 10.5px/1 var(--font-mono)", color: "var(--ink-4)" } }, "#" + b.no), h("span", { style: { flex: 1, font: "500 12.5px/1.3 var(--font-sans)", color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, b.baslik || ""), h("span", { style: { font: "700 11px/1 var(--font-mono)", color: "var(--prio-red)" } }, fmtDelta(b.deltaH)), actions(b)); });
     }
     if (type === "mine") {
       var rm = briefs.filter(function (b) { return mine(b) && b.durum !== "tamamlandi"; }).sort(function (a, b) { return (a.deltaH || 999) - (b.deltaH || 999); });
       if (!rm.length) return empty("Sana atanmış aktif iş yok.");
-      return rm.map(function (b) { return listRow(b, b.deltaH != null ? fmtDelta(b.deltaH) : null, b.deltaH != null ? deltaCol(b.deltaH) : null); });
+      return rm.map(function (b) { var a = actions(b); return a ? h("div", { key: b.no, style: { display: "flex", alignItems: "center", gap: 8 } }, h("div", { style: { flex: 1, minWidth: 0 } }, listRow(b, b.deltaH != null ? fmtDelta(b.deltaH) : null, b.deltaH != null ? deltaCol(b.deltaH) : null)), a) : listRow(b, b.deltaH != null ? fmtDelta(b.deltaH) : null, b.deltaH != null ? deltaCol(b.deltaH) : null); });
     }
     if (type === "capacity") {
       var aktif = briefs.filter(function (b) { return mine(b) && b.durum !== "musteride" && b.durum !== "tamamlandi"; }).length;
@@ -202,7 +203,7 @@ function PanomScreen(props) {
     if (type === "today") {
       var rt = briefs.filter(function (b) { return b.deltaH != null && b.deltaH <= 48 && b.durum !== "tamamlandi" && b.durum !== "musteride"; }).sort(function (a, b) { return a.deltaH - b.deltaH; }).slice(0, 40);
       if (!rt.length) return empty("48 saatte termin yok");
-      return rt.map(function (b) { return listRow(b, fmtDelta(b.deltaH), deltaCol(b.deltaH)); });
+      return rt.map(function (b) { var a = actions(b); return a ? h("div", { key: b.no, style: { display: "flex", alignItems: "center", gap: 8 } }, h("div", { style: { flex: 1, minWidth: 0 } }, listRow(b, fmtDelta(b.deltaH), deltaCol(b.deltaH))), a) : listRow(b, fmtDelta(b.deltaH), deltaCol(b.deltaH)); });
     }
     if (type === "overdue") {
       var ro = briefs.filter(function (b) { return b.deltaH != null && b.deltaH <= 0 && b.durum !== "tamamlandi" && b.durum !== "musteride"; }).sort(function (a, b) { return a.deltaH - b.deltaH; }).slice(0, 40);
@@ -309,6 +310,7 @@ function PanomScreen(props) {
     h("div", { style: { display: "flex", alignItems: "baseline", gap: 12, marginBottom: 18 } },
       h("div", { style: { font: "500 30px/1 var(--font-display, serif)", color: "var(--ink)" } }, "Panom"),
       h("div", { style: { flex: 1, font: "400 12.5px/1 var(--font-sans)", color: "var(--ink-4)" } }, edit ? "tablo seç · başlıktan sürükle · sağ-alt köşeden boyutlandır" : "kişisel iş panon"),
+      h("button", { onClick: function () { if (props.onGoBugun) props.onGoBugun(); }, title: "Kişisel Bugün bakışı", style: { display: "inline-flex", alignItems: "center", gap: 5, font: "600 12px/1 var(--font-sans)", padding: "6px 11px", border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper-2)", color: "var(--ink)", cursor: "pointer" } }, "🗓️ Bugün"),
       h("button", { onClick: function () { setEdit(function (e) { return !e; }); }, style: Object.assign({}, btn, edit ? { background: "var(--ember)", borderColor: "var(--ember)", color: "#fff" } : {}) }, edit ? "✓ bitti" : "düzenle")),
     editor,
     items.length === 0

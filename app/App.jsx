@@ -607,6 +607,12 @@ function App({ currentUser, onLogout }) {
       .then(res => { if (res && res.ok && window.bnsRefresh) window.bnsRefresh(); })
       .catch(e => setToast("⚠ Durum kaydedilemedi: " + (e.message || e)));
   };
+  const onRemind = async (b) => {
+    try {
+      const r = await window.bnsApiPost(`/api/briefs/${b.id}/remind`, {});
+      setToast(r && r.ok ? `🔔 Hatırlatıldı (${r.sent||0} kişi)` : "⚠ Hatırlatma gönderilemedi");
+    } catch (e) { setToast("⚠ Hatırlatma gönderilemedi"); }
+  };
   const onCreateBrief = (b) => {
     setBriefs(arr => [b, ...arr]);
     setToast(`Yeni brief oluşturuldu · #${b.no} ${b.marka}`);
@@ -643,6 +649,8 @@ function App({ currentUser, onLogout }) {
     setToast(`#${no} bulunamadı — silinmiş olabilir`);
   }}/>;
   else if (tab === "help")    Screen = <HelpScreen />;
+  else if (tab === "bugun")    Screen = <BugunScreen data={liveData} user={user} currentUser={currentUser} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange} onRemind={onRemind} onBack={() => setTab("panom")}/>;
+  else if (tab === "panom")    Screen = <PanomScreen data={liveData} user={user} currentUser={currentUser} onOpenBrief={onOpenBrief} onGoBugun={() => setTab("bugun")} onStatusChange={onStatusChange} onRemind={onRemind}/>;
   else if (tab === "users")      Screen = currentUser?.role === 'admin'
     ? <UsersScreen currentUser={currentUser}/>
     : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;

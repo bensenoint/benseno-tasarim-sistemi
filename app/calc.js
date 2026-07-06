@@ -254,7 +254,33 @@ function bnsDeliveryStatus(bitisMs, deadlineMs, beklemeMs, uzatildi) {
   return 'zamaninda';
 }
 
+// ── "Bugün"/aksiyon katmanı — ileri statü haritası + yetki kararı (saf, UI için) ──
+var BNS_NEXT_STATUS = {
+  yeni: 'calisiliyor', calisiliyor: 'basladi', basladi: 'incelemede',
+  incelemede: 'tamamlandi', revizyon: 'incelemede', beklemede: 'basladi', blokeli: 'basladi'
+};
+// Brief satırında hangi aksiyonlar gösterilsin? Salt-veri (window bağımlılığı yok → node'da test edilir).
+function bnsBriefActionPerms(b, u) {
+  var out = { basla: false, ilerlet: false, termin: false, hatirlat: false };
+  if (!b || !u || !u.id) return out;
+  var uid = u.id;
+  var leads = Array.isArray(b.leads) ? b.leads : (b.lead ? [b.lead] : []);
+  var isLead = leads.some(function (l) { return l && l.id === uid; });
+  var workers = Array.isArray(b.workers) ? b.workers : (Array.isArray(b.contributors) ? b.contributors : []);
+  var isWorker = workers.some(function (w) { return w && w.id === uid; });
+  var isAssignee = isLead || isWorker;
+  var isMgr = u.yetki === 'yonetici' || u.rol === 'yonetici';
+  var isCreator = b.created_by === uid;
+  var durum = b.durum;
+  out.basla = isAssignee && (durum === 'yeni' || durum === 'calisiliyor');
+  out.ilerlet = isAssignee && !!BNS_NEXT_STATUS[durum] && durum !== 'tamamlandi' && durum !== 'musteride';
+  var riskli = (typeof b.deltaH === 'number' && b.deltaH <= 24) || (typeof bnsIsRisk === 'function' && bnsIsRisk(durum, b.deltaH));
+  out.termin = riskli && (isLead || isCreator || isMgr);
+  out.hatirlat = isLead || isMgr;
+  return out;
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS };
 }
