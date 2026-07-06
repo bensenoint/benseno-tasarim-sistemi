@@ -1351,6 +1351,15 @@ function Header({ user, tab, onNav, viewMode, setViewMode, dateRange, setDateRan
           </span>
         )}
 
+        {/* "?" turu-aç butonu — hem mobil hem desktop'ta görünür */}
+        <button onClick={() => window.bnsOpenTour && window.bnsOpenTour()} title="Sistem turunu aç" aria-label="Yardım / tur" style={{
+          width: isMobile ? 34 : 32, height: isMobile ? 34 : 32, flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          border: "1px solid var(--line)", borderRadius: 8,
+          background: "var(--surface)", color: "var(--ink-3)", cursor: "pointer",
+          font: "600 14px/1 var(--font-sans)",
+        }}>?</button>
+
         {/* Tarih aralığı filtresi — global. Kanban'da tarih filtresi anlamsız → pasif. */}
         {dateRange && setDateRange && (
           <DateRangeControl range={dateRange} onChange={setDateRange}
