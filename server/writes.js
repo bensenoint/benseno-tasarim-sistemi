@@ -561,10 +561,12 @@ async function setStatus(id, raw, _depth = 0) {
         `SELECT DISTINCT a.user_id FROM brief_assignees a WHERE a.brief_id=$1 AND a.role IN ('contributor','lead')`, [id]);
       const b = await pool.query(`SELECT no, baslik, slack_url FROM briefs WHERE id=$1`, [id]);
       const bi = b.rows[0] || {};
+      const txt = `↩️ #${bi.no} ${bi.baslik || ''} işine geri dönüldü — termin uzatmak ister misin? (uzatma gecikme sayılmaz)`;
       for (const row of a.rows) {
         if (!row.user_id) continue;
-        await pool.query('INSERT INTO notifications (user_id, text, link) VALUES ($1,$2,$3)',
-          [row.user_id, `↩️ #${bi.no} ${bi.baslik || ''} işine geri dönüldü — termin uzatmak ister misin? (uzatma gecikme sayılmaz)`, bi.slack_url || null]);
+        // V2: notify()'a bağla (tip 'musteri', brief_id etiketli → iş rozeti + dijest); flag kapalıyken eski ham insert.
+        if (NOTIFY_V2) await notify(row.user_id, { tip: 'musteri', aciliyet: 'normal', text: txt, link: bi.slack_url || null, briefId: id });
+        else await pool.query('INSERT INTO notifications (user_id, text, link) VALUES ($1,$2,$3)', [row.user_id, txt, bi.slack_url || null]);
       }
     } catch (e) { console.error('[setStatus] işe-dönüş bildirimi:', e.message); }
   }
