@@ -178,7 +178,13 @@ function NotifDot({ n, briefId }) {
   React.useEffect(() => {
     if (!open) return;
     if (briefId && typeof window.bnsApiGet === "function")
-      window.bnsApiGet(`/api/briefs/${briefId}/notifications`).then(r => setItems((r && r.notifications) || [])).catch(() => setItems([]));
+      window.bnsApiGet(`/api/briefs/${briefId}/notifications`).then(r => {
+        setItems((r && r.notifications) || []);
+        // GET (unread bayrakları eski seen_at'e göre) çözülDÜKTEN SONRA okundu işaretle → bu görünümde
+        // okunmamışlar doğru ayrışır; sonraki açılışta hepsi okunmuş sayılır + rozet sayacı tazelenir.
+        if (typeof window.bnsApiPost === "function")
+          window.bnsApiPost(`/api/briefs/${briefId}/notif-seen`, {}).then(() => { if (typeof window.bnsRefresh === "function") window.bnsRefresh(); }).catch(() => {});
+      }).catch(() => setItems([]));
     const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     const onEsc = (e) => { if (e.key === "Escape") setOpen(false); };
     // Kaydırma/yeniden boyut → fixed popover konumu kayacağı için kapat.
@@ -218,15 +224,28 @@ function NotifDot({ n, briefId }) {
           <div style={{ padding:"4px 8px 8px" }}>
             {items === null && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)", padding:"10px 8px" }}>Yükleniyor…</div>}
             {items && items.length === 0 && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)", padding:"10px 8px" }}>Bildirim yok.</div>}
-            {items && items.map((it, i) => (
-              <div key={i} style={{ display:"flex", gap:11, alignItems:"flex-start", padding:"10px 8px", borderRadius:8, borderBottom: i < items.length - 1 ? "1px solid var(--line-soft)" : "none" }}>
-                <span style={{ flexShrink:0, display:"inline-flex", alignItems:"center", justifyContent:"center", width:26, height:26, borderRadius:8, background:"var(--paper-2)", border:"1px solid var(--line-soft)", fontSize:13 }}>{icon[it.tip] || "🔔"}</span>
-                <span style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:3 }}>
-                  <span style={{ font:"500 13px/1.4 var(--font-sans)", color:"var(--ink)", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{it.text}</span>
-                  <span style={{ font:"400 10px/1 var(--font-mono)", color:"var(--ink-4)" }}>{new Date(it.created_at).toLocaleDateString("tr-TR", { day:"numeric", month:"short" })} · {new Date(it.created_at).toLocaleTimeString("tr-TR", { hour:"2-digit", minute:"2-digit" })}</span>
-                </span>
-              </div>
-            ))}
+            {items && items.length > 0 && (() => {
+              const unread = items.filter(x => x.unread);
+              const read = items.filter(x => !x.unread);
+              const goDetail = () => { if (typeof window.bnsOpenBriefById === "function") window.bnsOpenBriefById(briefId); setOpen(false); };
+              const label = { font:"600 10px/1 var(--font-sans)", color:"var(--ink-4)", textTransform:"uppercase", letterSpacing:".08em", padding:"8px 8px 5px" };
+              const Row = (it, i, uk) => (
+                <div key={uk + i} onClick={goDetail} title="Detayı aç"
+                  style={{ display:"flex", gap:11, alignItems:"flex-start", padding:"10px 8px", borderRadius:8, cursor:"pointer",
+                    background: uk === "u" ? "color-mix(in srgb, var(--info) 7%, transparent)" : "transparent" }}>
+                  <span style={{ flexShrink:0, display:"inline-flex", alignItems:"center", justifyContent:"center", width:26, height:26, borderRadius:8, background:"var(--paper-2)", border:`1px solid ${uk === "u" ? "var(--info)" : "var(--line-soft)"}`, fontSize:13 }}>{icon[it.tip] || "🔔"}</span>
+                  <span style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:3 }}>
+                    <span style={{ font:`${uk === "u" ? 600 : 500} 13px/1.4 var(--font-sans)`, color:"var(--ink)", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{it.text}</span>
+                    <span style={{ font:"400 10px/1 var(--font-mono)", color:"var(--ink-4)" }}>{new Date(it.created_at).toLocaleDateString("tr-TR", { day:"numeric", month:"short" })} · {new Date(it.created_at).toLocaleTimeString("tr-TR", { hour:"2-digit", minute:"2-digit" })}</span>
+                  </span>
+                  {uk === "u" && <span style={{ flexShrink:0, width:7, height:7, borderRadius:99, background:"var(--info)", marginTop:7 }}/>}
+                </div>
+              );
+              return (<>
+                {unread.length > 0 && <><div style={label}>Okunmamış · {unread.length}</div>{unread.map((it, i) => Row(it, i, "u"))}</>}
+                {read.length > 0 && <>{unread.length > 0 && <div style={{ height:6 }}/>}<div style={label}>Öncekiler</div>{read.map((it, i) => Row(it, i, "r"))}</>}
+              </>);
+            })()}
           </div>
         </div>
       )}

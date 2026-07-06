@@ -230,6 +230,13 @@ function App({ currentUser, onLogout }) {
   React.useEffect(() => {
     window.openNewBriefModal = () => setNewBrief(true);
     window.bnsRefresh = () => setPollTick(x => x + 1);   // yazma sonrası anlık poll (NewBrief formu çağırır)
+    // Bildirim popover'ından "detaya git": briefId ile o işin drawer'ını aç.
+    window.bnsOpenBriefById = (id) => {
+      const arr = (window.BNS_DATA && window.BNS_DATA.briefs) || [];
+      const b = arr.find(x => x && x.id === id);
+      if (b) { setOpenBrief(b); return true; }
+      return false;
+    };
     window.bnsToast = (msg) => setToast(msg);            // başarı/hata bildirimi
     // Authlı GET helper — lazy ekranlar (ör. dönem değerlendirmesi) API'den veri çeker.
     window.bnsApiGet = async (path) => {
