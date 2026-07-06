@@ -369,11 +369,23 @@ function BriefActions({ brief, currentUser, onStatusChange, onRemind, compact })
     setBusy(true);
     try { if (typeof onRemind === "function") await onRemind(brief); } finally { setBusy(false); }
   };
+  // İlerlet: hangi statüye gideceğini etikette göster.
+  const NEXT_TR = { calisiliyor:"İş planı", basladi:"Başladı", incelemede:"İnceleme", tamamlandi:"Tamamlandı" };
+  const nextS = BNS_NEXT_STATUS[brief.durum];
+  const ilerletLabel = nextS ? `İlerlet → ${NEXT_TR[nextS] || nextS}` : "İlerlet";
+  // Termini uzat: eklenecek süreyi (termin_oneri_ms) etikette göster.
+  const fmtUz = (ms) => {
+    if (!ms) return "";
+    const g = ms / 86400000; if (g >= 1) return ` +${Math.round(g)}g`;
+    const s = ms / 3600000;  if (s >= 1) return ` +${Math.round(s)}sa`;
+    return ` +${Math.round(ms / 60000)}dk`;
+  };
+  const uzatLabel = `Termini uzat${fmtUz(brief.termin_oneri_ms)}`;
   return (
     <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
       {p.basla    && <Btn on={() => advance("basladi")} label="Başladım" ic="🚀"/>}
-      {p.ilerlet  && <Btn on={() => advance(BNS_NEXT_STATUS[brief.durum])} label="İlerlet" ic="⏭️"/>}
-      {p.termin   && <Btn on={termin} label="Termini uzat" ic="⏱️"/>}
+      {p.ilerlet  && <Btn on={() => advance(nextS)} label={ilerletLabel} ic="⏭️"/>}
+      {p.termin   && <Btn on={termin} label={uzatLabel} ic="⏱️"/>}
       {p.hatirlat && <Btn on={remind} label="Hatırlat" ic="🔔"/>}
     </div>
   );
