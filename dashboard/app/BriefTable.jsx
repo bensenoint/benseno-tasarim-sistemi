@@ -253,7 +253,7 @@ function EmptyRow() {
     <div style={{display:"flex", flexDirection:"column", alignItems:"center", gap:10, color:"var(--ink-3)"}}>
       <I.Inbox size={28}/>
       <div style={{font:"500 14px/1.4 var(--font-sans)", color:"var(--ink-2)"}}>
-        Bu filtreyle eşleşen brief yok.
+        Bu filtreyle eşleşen brief yok — filtreyi temizlemeyi dene.
       </div>
       <div style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)"}}>
         Kapsamı genişlet ya da filtreleri sıfırla.

@@ -54,7 +54,7 @@ function BugunAccordion({ myActive, myKisiSira, overdue, onOpenBrief, onStatusCh
         )}
         <div style={{marginTop:16}}>
           <Eyebrow style={{marginBottom:4}}>Bugün deadline</Eyebrow>
-          {bugunDeadline.length > 0 ? bugunDeadline.map(Row) : <div style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", padding:"8px 0"}}>Bugün deadline'ı olan iş yok.</div>}
+          {bugunDeadline.length > 0 ? bugunDeadline.map(Row) : <div style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-4)", padding:"8px 0"}}>Bugün deadline'ı olan iş yok — rahatça nefes al ya da İşler'den sıradakine bak.</div>}
         </div>
         <div style={{marginTop:16}}>
           <Eyebrow style={{marginBottom:4}}>Geciken</Eyebrow>
