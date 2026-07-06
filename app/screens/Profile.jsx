@@ -3,19 +3,29 @@
 
 function AyarlarBolumu() {
   const [open, setOpen] = React.useState(false);
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onEsc = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDoc); document.addEventListener("keydown", onEsc);
+    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onEsc); };
+  }, [open]);
   return (
-    <div style={{marginBottom:"var(--grid-gap)"}}>
-      <button onClick={() => setOpen(o => !o)} aria-expanded={open}
-        style={{display:"inline-flex",alignItems:"center",gap:6,font:"600 12px/1 var(--font-sans)",padding:"7px 12px",border:"1px solid var(--line)",borderRadius:8,background:"var(--paper-2)",color:"var(--ink-2)",cursor:"pointer"}}>
-        <span style={{fontSize:14}}>⚙️</span> Ayarlar <span style={{color:"var(--ink-4)",fontFamily:"var(--font-mono)",fontSize:11}}>{open ? "▲" : "▼"}</span>
-      </button>
-      {open && <div style={{marginTop:10}}><NotifPrefsCard/></div>}
+    <div ref={ref} style={{position:"relative", display:"inline-flex"}}>
+      <button onClick={() => setOpen(o => !o)} aria-expanded={open} title="Ayarlar"
+        style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:32,height:32,border:"1px solid var(--line)",borderRadius:8,background:"var(--paper-2)",color:"var(--ink-2)",cursor:"pointer",fontSize:15}}>⚙️</button>
+      {open && (
+        <div onClick={(e) => e.stopPropagation()} style={{position:"absolute", top:"38px", right:0, zIndex:60, width:300, background:"var(--paper)", border:"1px solid var(--line)", borderRadius:10, boxShadow:"0 8px 24px rgba(0,0,0,0.12)", padding:12}}>
+          <NotifPrefsCard/>
+        </div>
+      )}
     </div>
   );
 }
 
 function BugunAccordion({ myActive, myKisiSira, overdue, onOpenBrief, onStatusChange, onRemind, u }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useStickyState("profile.bugunOpen", false);
   const sirada = [...myActive].sort((a,b) => (myKisiSira(a)-myKisiSira(b)) || ((a.deadline||Infinity)-(b.deadline||Infinity)))[0] || null;
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || Date.now();
   const bugunDeadline = myActive.filter(b => { const d=b.deadline; if(!d) return false; return new Date(d).toDateString()===new Date(now).toDateString(); });
@@ -404,6 +414,11 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
             </div>
           );
         })()}
+
+        {/* ⚙️ Ayarlar — sağ üst köşe, yalnız kendi profilinde (açılır dropdown) */}
+        {u.id === (currentUser && currentUser.slack_id) && (
+          <div style={{marginLeft:"auto"}}><AyarlarBolumu/></div>
+        )}
       </div>
 
       <div style={{height:16}}/>
@@ -421,9 +436,6 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
         <Kpi label="Kapasite"      value={capPct+"%"} color={capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":undefined}/>
         <Kpi label="Marka"         value={Object.keys(brandCount).length} sub="farklı"/>
       </div>
-
-      {/* ─── Bildirim tercihleri (⚙️ Ayarlar) — yalnız kendi profilinde ─── */}
-      {u.id === (currentUser && currentUser.slack_id) && <AyarlarBolumu/>}
 
       {/* ─── Bugün — akordiyon (yalnız kendi profilinde) ─── */}
       {u.id === (currentUser && currentUser.slack_id) &&

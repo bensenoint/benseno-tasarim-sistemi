@@ -173,6 +173,7 @@ function Eyebrow({ children, style }) {
 function NotifDot({ n, briefId }) {
   const [open, setOpen] = React.useState(false);
   const [items, setItems] = React.useState(null);
+  const [pos, setPos] = React.useState(null);   // fixed konum (rozetin ekran koordinatından)
   const ref = React.useRef(null);
   React.useEffect(() => {
     if (!open) return;
@@ -180,19 +181,36 @@ function NotifDot({ n, briefId }) {
       window.bnsApiGet(`/api/briefs/${briefId}/notifications`).then(r => setItems((r && r.notifications) || [])).catch(() => setItems([]));
     const onDoc = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     const onEsc = (e) => { if (e.key === "Escape") setOpen(false); };
+    // Kaydırma/yeniden boyut → fixed popover konumu kayacağı için kapat.
+    const onScroll = () => setOpen(false);
     document.addEventListener("mousedown", onDoc); document.addEventListener("keydown", onEsc);
-    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onEsc); };
+    window.addEventListener("scroll", onScroll, true); window.addEventListener("resize", onScroll);
+    return () => { document.removeEventListener("mousedown", onDoc); document.removeEventListener("keydown", onEsc); window.removeEventListener("scroll", onScroll, true); window.removeEventListener("resize", onScroll); };
   }, [open, briefId]);
   if (!n || !n.count) return null;
   const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", genel:"🔔" };
+  // Rozetin ekran konumundan popover yerini hesapla; position:fixed → overflow/scroll konteyneri KIRPMAZ.
+  const toggle = (e) => {
+    e.stopPropagation();
+    if (!open) {
+      const r = e.currentTarget.getBoundingClientRect();
+      const below = (window.innerHeight - r.bottom) > 340;   // altta yer yoksa yukarı aç
+      setPos({
+        top: below ? Math.round(r.bottom + 4) : undefined,
+        bottom: below ? undefined : Math.round(window.innerHeight - r.top + 4),
+        right: Math.max(8, Math.round(window.innerWidth - r.right)),
+      });
+    }
+    setOpen(o => !o);
+  };
   return (
-    <span ref={ref} style={{ position:"relative", display:"inline-flex" }}>
-      <span onClick={(e) => { e.stopPropagation(); setOpen(o => !o); }} title={`${n.count} yeni bildirim — detay için tıkla`}
+    <span ref={ref} style={{ display:"inline-flex" }}>
+      <span onClick={toggle} title={`${n.count} yeni bildirim — detay için tıkla`}
         style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", minWidth:16, height:16, padding:"0 4px", borderRadius:8, background:"var(--info)", color:"#fff", font:"600 10px/1 var(--font-mono)", marginLeft:6, verticalAlign:"middle", cursor:"pointer" }}>
         {n.count}
       </span>
-      {open && (
-        <div onClick={(e) => e.stopPropagation()} style={{ position:"absolute", top:"20px", right:0, zIndex:50, width:280, maxHeight:320, overflowY:"auto", background:"var(--paper)", border:"1px solid var(--line)", borderRadius:10, boxShadow:"0 8px 24px rgba(0,0,0,0.12)", padding:"10px 12px" }}>
+      {open && pos && (
+        <div onClick={(e) => e.stopPropagation()} style={{ position:"fixed", top:pos.top, bottom:pos.bottom, right:pos.right, zIndex:1000, width:280, maxHeight:320, overflowY:"auto", background:"var(--paper)", border:"1px solid var(--line)", borderRadius:10, boxShadow:"0 8px 24px rgba(0,0,0,0.12)", padding:"10px 12px" }}>
           <div style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", textTransform:"uppercase", letterSpacing:".08em", marginBottom:8 }}>Bildirimler</div>
           {items === null && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)" }}>Yükleniyor…</div>}
           {items && items.length === 0 && <div style={{ font:"400 12px var(--font-sans)", color:"var(--ink-4)" }}>Bildirim yok.</div>}
