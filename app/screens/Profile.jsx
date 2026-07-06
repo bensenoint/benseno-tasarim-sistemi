@@ -714,6 +714,7 @@ function NotifPrefsCard() {
       <Row k="tip_termin" label="Termin uyarısı — anlık"/>
       <Row k="tip_atama" label="Atama/lead — anlık"/>
       <Row k="tip_bloke" label="Bloke/müşteri — anlık"/>
+      <Row k="ody_icgoru" label="Ody günlük içgörü"/>
       <div style={{display:"flex",gap:8,alignItems:"center",marginTop:10}}>
         <span style={{font:"400 13px var(--font-sans)",color:"var(--ink-2)"}}>Sessiz saat</span>
         <select value={p.sessiz_bas ?? 19} onChange={e => save({ sessiz_bas: +e.target.value })}>

@@ -197,7 +197,7 @@ function NotifDot({ n, briefId }) {
     };
   }, [open, briefId]);
   if (!n || !n.count) return null;
-  const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", genel:"🔔" };
+  const icon = { termin:"⏰", atama:"📌", bloke:"⛔", musteri:"↩️", statu:"🔄", ody_icgoru:"💡", genel:"🔔" };
   // Rozetin ekran konumundan popover yerini hesapla; position:fixed → overflow/scroll konteyneri KIRPMAZ.
   const toggle = (e) => {
     e.stopPropagation();
