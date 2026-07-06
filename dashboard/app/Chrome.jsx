@@ -23,14 +23,6 @@ const NAV_SECTIONS = [
     ]
   },
   {
-    id: "kisisel",
-    label: "Kişisel",
-    items: [
-      { id: "panom",  label: "Pano",   icon: "Grid" },
-      { id: "bugun",  label: "Bugün",  icon: "Calendar" },
-    ]
-  },
-  {
     id: "planlama",
     label: "Planlama",
     items: [

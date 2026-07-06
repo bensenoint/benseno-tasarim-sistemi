@@ -626,7 +626,7 @@ function App({ currentUser, onLogout }) {
                                        layout={t.overviewLayout} kpiVariant={t.kpiVariant}
                                        onOpenBrief={onOpenBrief} onSwitchTab={navTo} onJumpJobs={jumpToJobs} onRefresh={onRefresh} onStatusChange={onStatusChange}/>;
   else if (tab === "jobs")     Screen = <JobsScreen     data={liveData} user={user} initialScope={jobsScope} tableMode={t.tableMode} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} setDateRange={setDateRange}/>;
-  else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} currentUser={currentUser} initialSel={profileSel}/>;
+  else if (tab === "profile")  Screen = <ProfileScreen  data={liveData} user={user} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} currentUser={currentUser} initialSel={profileSel} onStatusChange={onStatusChange} onRemind={onRemind}/>;
   else if (tab === "gantt")    Screen = <PlanScreen     data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "kanban")   Screen = <KanbanScreen   data={liveData} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange}/>;
   else if (tab === "musteride")Screen = <MusterideScreen data={liveData} onOpenBrief={onOpenBrief}/>;
@@ -649,8 +649,6 @@ function App({ currentUser, onLogout }) {
     setToast(`#${no} bulunamadı — silinmiş olabilir`);
   }}/>;
   else if (tab === "help")    Screen = <HelpScreen />;
-  else if (tab === "bugun")    Screen = <BugunScreen data={liveData} user={user} currentUser={currentUser} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange} onRemind={onRemind} onBack={() => setTab("panom")}/>;
-  else if (tab === "panom")    Screen = <PanomScreen data={liveData} user={user} currentUser={currentUser} onOpenBrief={onOpenBrief} onGoBugun={() => setTab("bugun")} onStatusChange={onStatusChange} onRemind={onRemind}/>;
   else if (tab === "users")      Screen = currentUser?.role === 'admin'
     ? <UsersScreen currentUser={currentUser}/>
     : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;

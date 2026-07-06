@@ -36,7 +36,6 @@ cat \
   "$APP/screens/Users.jsx" \
   "$APP/screens/Silinenler.jsx" \
   "$APP/screens/Help.jsx" \
-  "$APP/screens/Bugun.jsx" \
   "$APP/Panom.jsx" \
   "$APP/Chrome.jsx" \
   "$APP/App.jsx" \
