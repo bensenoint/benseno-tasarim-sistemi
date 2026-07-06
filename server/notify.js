@@ -34,7 +34,7 @@ function shouldPushNow(ev, prefs, now) {
 
 async function getPrefs(userId) {
   const r = await pool.query('SELECT * FROM notify_prefs WHERE user_id=$1', [userId]);
-  return r.rows[0] || { ogle_dijest: true, tip_termin: true, tip_atama: true, tip_bloke: true, sessiz_bas: 19, sessiz_bit: 8 };
+  return r.rows[0] || { ogle_dijest: true, tip_termin: true, tip_atama: true, tip_bloke: true, sessiz_bas: 19, sessiz_bit: 8, ody_icgoru: true };
 }
 
 // Ana giriş: her zaman notifications'a yazar; acil+izinliyse anlık DM.
