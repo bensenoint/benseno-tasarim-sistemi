@@ -35,8 +35,22 @@ if [ "$do_dash" -eq 1 ]; then
   git push -q
   VER="$(grep -o 'bundle.js?v=[0-9]*' dashboard/index.html | head -1)"
   echo "  Pages yayını bekleniyor ($VER)…"
-  until curl -s "https://bensenoint.github.io/benseno-tasarim-sistemi/dashboard/index.html" | grep -q "$VER"; do :; done
-  echo "  ✅ Pages canlı: $VER"
+  # 5sn aralıkla yokla, en fazla ~5 dk (60×5sn). Cache baypas (?cb + no-cache) → edge cache'e takılma.
+  # Süre dolarsa uyar ve devam et: kod push edildi, Pages build'i askıda kalsa bile GitHub kendi yayınlar
+  # (ya da `git commit --allow-empty` ile yeniden tetiklenebilir). Sonsuz sıkı-döngü YOK.
+  DASH_OK=0
+  for _i in $(seq 1 60); do
+    if curl -s -H "Cache-Control: no-cache" "https://bensenoint.github.io/benseno-tasarim-sistemi/dashboard/index.html?cb=$(date +%s)" | grep -q "$VER"; then
+      DASH_OK=1; break
+    fi
+    sleep 5
+  done
+  if [ "$DASH_OK" -eq 1 ]; then
+    echo "  ✅ Pages canlı: $VER"
+  else
+    echo "  ⚠️  Pages ~5 dk içinde $VER sürümünü yayınlamadı (build askıda olabilir)."
+    echo "     Kod push edildi (origin/main güncel). Tetiklemek için: git commit --allow-empty -m 'retrigger' && git push"
+  fi
 fi
 
 if [ "$do_api" -eq 1 ]; then
