@@ -18,7 +18,9 @@ function computeSignal(user, briefs, now) {
     b.durum !== 'musteride' && b.durum !== 'tamamlandi' &&
     ((b.workers || []).some(w => w && w.id === uid) || (b.leads || []).some(l => l && l.id === uid)));
   const dh = (b) => b.deadline == null ? null : (b.deadline - now) / H;
-  const sameDay = (ms) => new Date(ms).toDateString() === new Date(now).toDateString();
+  // "Aynı gün" Europe/Istanbul takvimine göre (sunucu UTC olsa da gün sınırı TR saatiyle).
+  const trDay = (ms) => new Date(ms).toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul' });
+  const sameDay = (ms) => trDay(ms) === trDay(now);
   const geciken = [], riskli = [], bugun = [];
   for (const b of related) {
     const d = dh(b);
@@ -48,7 +50,7 @@ async function generateLine(signal) {
     headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify(body),
   });
-  if (!r.ok) return null;
+  if (!r.ok) { console.error('[ody-icgoru] LLM HTTP', r.status); return null; }
   const j = await r.json();
   const raw = (j.content && j.content[0] && j.content[0].text) || '';
   const line = raw.split('\n').map(s => s.trim()).filter(Boolean)[0] || '';
@@ -65,7 +67,8 @@ async function main() {
   const briefs = d.bns_briefs || [];
   const users = (d.bns_users || []).filter(u => /^U/.test(u.id));
 
-  const off = new Set((await pool.query(`SELECT user_id FROM notify_prefs WHERE ody_icgoru=false`)).rows.map(r => r.user_id));
+  // DM tercihi kapalı olanlar (dashboard bildirimi yine yazılır; yalnız DM atlanır). --dry'da DB'ye hiç gitme.
+  const off = DRY ? new Set() : new Set((await pool.query(`SELECT user_id FROM notify_prefs WHERE ody_icgoru=false`)).rows.map(r => r.user_id));
 
   let sent = 0; const preview = [];
   for (const u of users) {
@@ -74,7 +77,8 @@ async function main() {
     if (DRY) { preview.push(`### ${u.name}\n${JSON.stringify(signal, null, 2)}`); continue; }
 
     const dup = await pool.query(
-      `SELECT 1 FROM notifications WHERE user_id=$1 AND tip='ody_icgoru' AND created_at::date = now()::date LIMIT 1`, [u.id]);
+      `SELECT 1 FROM notifications WHERE user_id=$1 AND tip='ody_icgoru'
+        AND (created_at AT TIME ZONE 'Europe/Istanbul')::date = (now() AT TIME ZONE 'Europe/Istanbul')::date LIMIT 1`, [u.id]);
     if (dup.rowCount) continue;
 
     const line = await generateLine(signal);
