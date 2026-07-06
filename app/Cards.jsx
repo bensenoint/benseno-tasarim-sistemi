@@ -361,7 +361,7 @@ function BriefActions({ brief, currentUser, onStatusChange, onRemind, compact })
       await fetch(`${apiBase}/api/briefs/${brief.id}/termin-oneri-uzat`, { method:"POST",
         headers:{ "content-type":"application/json", ...(tok?{Authorization:"Bearer "+tok}:{}) },
         body: JSON.stringify({ by: currentUser && currentUser.slack_id }) });
-      window.bnsToast && window.bnsToast("⏱️ Termin önerisi uygulandı"); window.bnsRefresh && window.bnsRefresh();
+      window.bnsToast && window.bnsToast("⏱️ Termin uzatıldı"); window.bnsRefresh && window.bnsRefresh();
     } catch (e) { window.bnsToast && window.bnsToast("⚠ Termin uygulanamadı"); }
     setBusy(false);
   };
@@ -373,7 +373,7 @@ function BriefActions({ brief, currentUser, onStatusChange, onRemind, compact })
     <div style={{ display:"flex", gap:6, flexWrap:"wrap", alignItems:"center" }}>
       {p.basla    && <Btn on={() => advance("basladi")} label="Başladım" ic="🚀"/>}
       {p.ilerlet  && <Btn on={() => advance(BNS_NEXT_STATUS[brief.durum])} label="İlerlet" ic="⏭️"/>}
-      {p.termin   && <Btn on={termin} label="Termin öner" ic="⏱️"/>}
+      {p.termin   && <Btn on={termin} label="Termini uzat" ic="⏱️"/>}
       {p.hatirlat && <Btn on={remind} label="Hatırlat" ic="🔔"/>}
     </div>
   );
