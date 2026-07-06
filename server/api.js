@@ -725,16 +725,22 @@ app.post('/api/briefs/:id/remind', auth.authGuard, async (req, res) => {
   try {
     const id = +req.params.id;
     const actor = req.user.slack_id;
-    const bi = (await pool.query(`SELECT no, baslik, slack_url FROM briefs WHERE id=$1`, [id])).rows[0];
+    const bi = (await pool.query(`SELECT no, baslik, slack_url, slack_channel, slack_ts FROM briefs WHERE id=$1`, [id])).rows[0];
     if (!bi) return res.status(404).json({ error: 'brief bulunamadı' });
     const who = (await pool.query(`SELECT name FROM users WHERE id=$1`, [actor])).rows[0];
     const adi = who ? who.name : 'Biri';
+    const txt = `🔔 ${adi} hatırlattı: #${bi.no} ${bi.baslik || ''}`;
     const a = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND role IN ('contributor','lead')`, [id]);
     let sent = 0;
     for (const row of a.rows) {
       if (!/^U/.test(row.user_id || '') || row.user_id === actor) continue;   // kendine gönderme
-      await notify(row.user_id, { tip: 'genel', aciliyet: 'acil', text: `🔔 ${adi} hatırlattı: #${bi.no} ${bi.baslik || ''}`, link: bi.slack_url || null, briefId: id });
+      await notify(row.user_id, { tip: 'genel', aciliyet: 'acil', text: txt, link: bi.slack_url || null, briefId: id });
       sent++;
+    }
+    // İş'in Slack thread'ine de görünür bir not düş (best-effort — thread yoksa/hata olursa yut).
+    if (bi.slack_channel && bi.slack_ts && slack.hasToken()) {
+      try { await slack.postThread({ channel: bi.slack_channel, thread_ts: bi.slack_ts, text: txt }); }
+      catch (e) { console.error('[remind] thread notu hata:', e.message); }
     }
     res.json({ ok: true, sent });
   } catch (e) { res.status(400).json({ error: e.message }); }
