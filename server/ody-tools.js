@@ -2,8 +2,32 @@
 // Tüm tool'lar getEmbedded() yapısal dizileri üzerinde KOD ile sayar; model asla saymaz.
 
 const odySlack = require('./ody-slack');
-const calc = require('../dashboard/app/calc');
 const { pool } = require('./db');
+
+// NOT: dashboard/app/calc.js benseno-api Docker imajında YOK (yalnız server/ kopyalanır) →
+// require edilemez. finans hesabı burada server-local tutulur (calc.js'teki bnsKarMarj/
+// bnsFinansOzet ile aynı mantık; ikisi de saf, senkron kalmalı).
+const calc = {
+  bnsKarMarj(b) {
+    const m = (typeof b.maliyet === 'number') ? b.maliyet : null;
+    const s = (typeof b.satis === 'number') ? b.satis : null;
+    if (m == null && s == null) return { kar: null, marj: null };
+    const kar = (s || 0) - (m || 0);
+    const marj = (s && s > 0) ? Math.round((kar / s) * 100) : null;
+    return { kar, marj };
+  },
+  bnsFinansOzet(briefs) {
+    let satis = 0, maliyet = 0, kar = 0, faturalanmamis = 0, tahsilEdilmemis = 0;
+    (briefs || []).forEach((b) => {
+      const km = calc.bnsKarMarj(b);
+      if (km.kar != null) kar += km.kar;
+      if (typeof b.satis === 'number') { satis += b.satis; if (!b.fatura) faturalanmamis += b.satis; else if (!b.odeme) tahsilEdilmemis += b.satis; }
+      if (typeof b.maliyet === 'number') maliyet += b.maliyet;
+    });
+    const marj = satis > 0 ? Math.round((kar / satis) * 100) : null;
+    return { satis, maliyet, kar, marj, faturalanmamis, tahsilEdilmemis };
+  },
+};
 
 const MAXMS = 8.64e15;
 
