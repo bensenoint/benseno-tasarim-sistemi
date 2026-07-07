@@ -47,21 +47,30 @@ async function summarize(messages, names, brief) {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5', max_tokens: 350,
-      system: 'Bir tasarım ajansının iş takip thread\'ini özetliyorsun. 3-5 cümlelik, Türkçe, olgusal bir özet yaz: ne istendi, ne konuşuldu, son durum ne, açık soru/bekleyen ne var. Bot durum bildirimlerini ("durum güncellendi" vb.) sayma — insan yazışmasına odaklan. Mesajlarda OLMAYAN hiçbir şeyi uydurma. İnsan mesajı yoksa sadece "Henüz yazışma yok." yaz. Başlık/madde işareti kullanma, düz metin.',
+      model: 'claude-haiku-4-5', max_tokens: 400,
+      system: 'Bir tasarım ajansının iş takip thread\'ini özetliyorsun. Bot durum bildirimlerini ("durum güncellendi" vb.) sayma — insan yazışmasına odaklan. Mesajlarda OLMAYAN hiçbir şeyi uydurma. Yanıtı SADECE JSON ver: {"ozet":"...","ton":"notr|gergin|memnun|acil"} — ozet: 3-5 cümlelik, Türkçe, olgusal bir özet (ne istendi, ne konuşuldu, son durum ne, açık soru/bekleyen ne var; başlık/madde işareti kullanma, düz metin; insan mesajı yoksa "Henüz yazışma yok."). ton: thread\'in duygu tonu — gergin (sürtünme/şikayet/baskı), memnun (olumlu/teşekkür), acil (aciliyet/deadline baskısı), notr (nötr/sıradan); ton\'dan emin değilsen "notr".',
       messages: [{ role: 'user', content: `İş: #${brief.no} ${brief.marka} — ${brief.baslik}\n\nThread:\n${lines.slice(0, 12000)}` }],
     }),
   });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) { console.log(`  özet hata: ${j.error?.message || r.status}`); return null; }
-  return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim() || null;
+  const raw = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('').trim();
+  if (!raw) return null;
+  const TONLAR = ['notr', 'gergin', 'memnun', 'acil'];
+  let ozet = raw, ton = 'notr';
+  try {
+    const p = JSON.parse(raw.replace(/^```(?:json)?\s*|\s*```$/g, '').trim());
+    if (p && typeof p.ozet === 'string' && p.ozet.trim()) ozet = p.ozet.trim();
+    if (p && TONLAR.includes(p.ton)) ton = p.ton;
+  } catch { /* JSON değilse: ozet=ham metin, ton='notr' */ }
+  return { ozet, ton };
 }
 
-async function saveOzet(briefId, ozet, lastTs) {
+async function saveOzet(briefId, ozet, lastTs, ton) {
   const r = await fetch(`${API_BASE}/api/briefs/${briefId}/thread-ozet`, {
     method: 'PATCH',
     headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
-    body: JSON.stringify({ ozet, last_ts: lastTs }),
+    body: JSON.stringify({ ozet, last_ts: lastTs, ton }),
   });
   if (!r.ok) { const j = await r.json().catch(() => ({})); console.log(`  kayıt hata ${r.status}: ${j.error || ''}`); return false; }
   return true;
@@ -229,8 +238,8 @@ async function main() {
       const lastTs = msgs[msgs.length - 1].ts;
       if (b.thread_ozet_ts && b.thread_ozet_ts === lastTs) skipped++;
       else {
-        const ozet = await summarize(msgs, names, b);
-        if (ozet && await saveOzet(b.id, ozet, lastTs)) { updated++; console.log(`  ✓ #${b.no} ${b.marka} özetlendi (${msgs.length} mesaj)`); }
+        const s = await summarize(msgs, names, b);
+        if (s && s.ozet && await saveOzet(b.id, s.ozet, lastTs, s.ton)) { updated++; console.log(`  ✓ #${b.no} ${b.marka} özetlendi (${msgs.length} mesaj, ton: ${s.ton})`); }
         await new Promise(r => setTimeout(r, 1100));
       }
     } else skipped++;

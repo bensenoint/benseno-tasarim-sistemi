@@ -293,6 +293,10 @@ defs.is_detay = {
       insight: done ? (b.insight || null) : null,
     };
     if (ctx.isAdmin && done) { out.puan = b.rating ?? null; out.puan_sebep = b.rating_sebep || null; }
+    // Thread duygu tonu — yalnız yöneticilere (admin || rol='yonetici')
+    const me = (ctx.ed.bns_users || []).find(u => u && u.id === (ctx.user && ctx.user.slack_id));
+    const yonetici = ctx.isAdmin || (me && me.rol === 'yonetici');
+    if (yonetici && b.thread_ton) out.ton = b.thread_ton;
     return out;
   },
 };

@@ -482,11 +482,12 @@ app.patch('/api/briefs/by-ts/:ts', writeGuard, handleWrite(async req => writes.p
 // Thread özeti (AI) — thread-ozet.js scripti yazar. Bilinçli olarak sessiz: DM/thread notu YOK.
 app.patch('/api/briefs/:id/thread-ozet', botGuard, async (req, res) => {  // SEC-3b: thread-ozet.js scripti yazar
   try {
-    const { ozet, last_ts } = req.body || {};
+    const { ozet, last_ts, ton } = req.body || {};
     if (!ozet) return res.status(400).json({ error: 'ozet gerekli' });
+    const ton_ok = ['notr', 'gergin', 'memnun', 'acil'].includes(ton) ? ton : null;
     const r = await pool.query(
-      'UPDATE briefs SET thread_ozet=$1, thread_ozet_at=now(), thread_ozet_ts=$2 WHERE id=$3 RETURNING id',
-      [String(ozet).slice(0, 4000), last_ts || null, +req.params.id]
+      'UPDATE briefs SET thread_ozet=$1, thread_ozet_at=now(), thread_ozet_ts=$2, thread_ton=$3 WHERE id=$4 RETURNING id',
+      [String(ozet).slice(0, 4000), last_ts || null, ton_ok, +req.params.id]
     );
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true, id: r.rows[0].id });

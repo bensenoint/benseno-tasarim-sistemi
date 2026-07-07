@@ -177,6 +177,12 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
               rev {String(b.revision).padStart(2,"0")}
               {(b.rev_ic > 0 || b.rev_musteri > 0) && ` · ${b.rev_ic||0} iç / ${b.rev_musteri||0} müşteri`}
             </span>
+            {_isMgr && b.thread_ton && ({notr:"😐", gergin:"😟", memnun:"🙂", acil:"🔥"}[b.thread_ton]) && (
+              <span title={`Thread tonu: ${b.thread_ton}`}
+                style={{font:"500 13px/1 var(--font-sans)", cursor:"default"}}>
+                {{notr:"😐", gergin:"😟", memnun:"🙂", acil:"🔥"}[b.thread_ton]}
+              </span>
+            )}
             {b.musteri_bekliyor && !ro && (
               <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase",
                 color:"var(--musteride)", background:"rgba(124,92,255,0.1)", padding:"4px 8px", borderRadius:999}}>
