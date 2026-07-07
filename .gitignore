@@ -7,6 +7,8 @@ data/.slack-user-token
 data/.slack-list-id
 data/.dashboard-auth-hash
 data/.github-pat-created
+# SEC-5: finans store yalnızca yerel audit/yedek — public repo'ya gitmez
+data/brief-financials.json
 
 # Runtime cache
 data/canvas_cache.md

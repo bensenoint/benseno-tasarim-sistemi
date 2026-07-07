@@ -36,6 +36,10 @@ function withGitLock(fn) {
 
 function main() {
   let live; try { live = JSON.parse(fs.readFileSync(LIVE, 'utf8')); } catch { logLine('live-data okunamadı'); return; }
+  // SEC-5 savunma derinliği: finansal alanlar (maliyet/satis/fatura/odeme) PUBLIC EMBEDDED'a
+  // ASLA gömülmez — kaynağı ne olursa olsun burada sökülür. Finans yalnız login-arkası API'den sunulur.
+  const strip = (arr) => Array.isArray(arr) && arr.forEach(b => { delete b.maliyet; delete b.satis; delete b.fatura; delete b.odeme; });
+  strip(live.bns_briefs); strip(live.bns_completed);
   // Saf JSON EMBEDDED — backtick/template YOK. canvas_markdown live-data'da olmadığı için doğal olarak düşer.
   const body = 'window.EMBEDDED_DATA = ' + JSON.stringify(live, null, 2) + ';';
   // </script> ile anchor'lı: blok ister satır-içi (…"};) ister girintili (\n};) bitsin yakalar.
