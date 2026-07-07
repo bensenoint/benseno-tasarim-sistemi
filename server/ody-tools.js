@@ -2,6 +2,7 @@
 // Tüm tool'lar getEmbedded() yapısal dizileri üzerinde KOD ile sayar; model asla saymaz.
 
 const odySlack = require('./ody-slack');
+const calc = require('../dashboard/app/calc');
 
 const MAXMS = 8.64e15;
 
@@ -384,6 +385,25 @@ defs.slack_sorgu = {
       return { kaynak: 'slack', kelime: input.kelime, sonuc: filt };
     }
     return { hata: 'bilinmeyen mod' };
+  },
+};
+
+defs.finans_ozet = {
+  description: "Kârlılık özeti — YALNIZ yönetici. kapsam: firma (genel kâr/marj/faturalanmamış/tahsil) | marka (bir markanın kârı; marka gerekir). Kâr=satış−maliyet, tamamlanan işlerden (seçili aralık). Maliyet/satış DB'den.",
+  input_schema: { type: 'object', required: ['kapsam'], properties: { kapsam: { type: 'string', enum: ['firma', 'marka'] }, marka: { type: 'string' } } },
+  run: async (input, ctx) => {
+    const me = (ctx.ed.bns_users || []).find(u => u && u.id === (ctx.user && ctx.user.slack_id));
+    const yonetici = ctx.isAdmin || (me && me.rol === 'yonetici');
+    if (!yonetici) return { hata: 'bu bilgi yöneticilere özel' };
+    let done = ctx.ed.bns_completed || [];
+    if (input.kapsam === 'marka') {
+      const q = String(input.marka || '').toLocaleLowerCase('tr');
+      if (!q) return { hata: 'marka gerekli' };
+      done = done.filter(c => (c.marka || '').toLocaleLowerCase('tr').includes(q));
+      if (!done.length) return { hata: 'marka bulunamadı / tamamlanan iş yok' };
+    }
+    const o = calc.bnsFinansOzet(done);
+    return { kapsam: input.kapsam, marka: input.marka || null, ...o };
   },
 };
 
