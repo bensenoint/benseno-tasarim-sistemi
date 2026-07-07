@@ -71,6 +71,14 @@ function sebepFor(ed, range, type, ...keys) {
   return null;
 }
 
+// Downvote geri bildirim özeti — kullanıcıların beğenmediği öneri tarzlarını kısa bağlama derler.
+function bnsFeedbackOzet(rows) {
+  const parts = (rows || []).map(r => (r.reason || r.advice_text || '').trim()).filter(Boolean);
+  if (!parts.length) return '';
+  const s = parts.slice(0, 8).join(' · ');
+  return s.length > 400 ? s.slice(0, 397) + '…' : s;
+}
+
 // ── Tool tanımları ───────────────────────────────────────────────────────────
 const defs = {};
 
@@ -417,4 +425,4 @@ async function runTool(name, input, ctx) {
   catch (e) { return { error: e.message }; }
 }
 
-module.exports = { TOOLS, runTool, defs, _matchUser, resolvePerson, _userCandidates, normRange, inRange };
+module.exports = { TOOLS, runTool, defs, _matchUser, resolvePerson, _userCandidates, normRange, inRange, bnsFeedbackOzet };

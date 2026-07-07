@@ -41,8 +41,15 @@ function computeSignal(user, briefs, now) {
 const SYS = "Sen Ody, Benseno iş asistanısın. Verilen GERÇEK sinyallere dayanarak kişiye TEK CÜMLE, sıcak ve eyleme yönelik bir içgörü yaz. YALNIZ verilen verileri kullan — sayı uydurma, veri ekleme. En fazla 140 karakter. Türkçe. En kritik işe somut atıf ver (#no marka). Selamlama/emoji/markdown ekleme, düz tek cümle.";
 
 async function generateLine(signal) {
+  // P3.2 V1: geçmiş downvote'ları prompt'a besle — beğenilmeyen öneri tarzını tekrarlama.
+  let sys = SYS;
+  try {
+    const fb = await pool.query(`SELECT advice_text, reason FROM ody_advice_feedback WHERE vote='down' ORDER BY created_at DESC LIMIT 20`);
+    const oz = require('../server/ody-tools').bnsFeedbackOzet(fb.rows);
+    if (oz) sys += ` Not: kullanıcılar geçmişte şu tarz önerileri beğenmedi, farklı yaklaş: ${oz}`;
+  } catch (e) {}
   const body = {
-    model: 'claude-sonnet-4-6', max_tokens: 80, system: SYS,
+    model: 'claude-sonnet-4-6', max_tokens: 80, system: sys,
     messages: [{ role: 'user', content: JSON.stringify({ ad: signal.ad, geciken: signal.geciken, riskli: signal.riskli, bugun: signal.bugun }) }],
   };
   const r = await fetch('https://api.anthropic.com/v1/messages', {

@@ -593,6 +593,16 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
       }
     } catch (e) { /* öğrenme bağlamı best-effort; başarısızsa sessiz geç */ }
 
+    // ── GENEL FEEDBACK ÖĞRENME (P3.2 V1) ───────────────────────────────
+    // Tüm kullanıcıların downvote'ladığı öneri tarzlarını (son 20) prompt'a beslenir:
+    // "şu tarz beğenilmedi, tekrarlama". Kişiden bağımsız; best-effort.
+    let fbBlok = '';
+    try {
+      const fb = await pool.query(`SELECT advice_text, reason FROM ody_advice_feedback WHERE vote='down' ORDER BY created_at DESC LIMIT 20`);
+      const oz = odyTools.bnsFeedbackOzet(fb.rows);
+      if (oz) fbBlok = `\n## GEÇMİŞ GERİ BİLDİRİM\nKullanıcılar şu tarz önerileri beğenmedi — tekrarlama, daha somut/farklı yaklaş: ${oz}\n`;
+    } catch (e) {}
+
     const system =
       `Senin adın Ody. Sadece bir yapay zekâ asistanı değil; aynı zamanda Benseno Tasarım Sistemi'nin bir ÇALIŞANI ve DANIŞMANISIN. (Slack botunun adı WT'dir.) ` +
       `Şu an seninle GİRİŞ YAPMIŞ kişi: ${req.user.name}${isAdmin ? ' (yönetici)' : ''}. Onunla bu kişiye özel, ismiyle, sıcak ve yardımsever konuş — kiminle konuştuğunu bil ve ona göre cevap ver. ` +
@@ -610,7 +620,7 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
       `Kişiye özel sorularda ("benim işlerim", "bugün ne yapmalıyım") kisi olarak "${req.user.name}" ile tool çağır. Genel soruları ("kaç iş gecikti") genel tool'larla yanıtla.\n\n` +
       `## BELİRSİZLİK & YARDIM EDEMEME\n` +
       `Bir tool {belirsiz:true, adaylar:[...]} dönerse kendin seçme — hangisini kastettiğini SOR. Bir isteği karşılayamıyorsan (veri yok / yetki yok / kapsam dışı), "karşılayamadım" gibi BOŞ bir cevap verme; NEDENİNİ net söyle ve mümkünse alternatif/yapabileceğini öner. Her zaman yardımcı olmaya çalış.\n\n` +
-      `# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI + userMemory;
+      `# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI + userMemory + fbBlok;
 
     const convo = msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) }));
 
