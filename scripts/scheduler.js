@@ -72,6 +72,9 @@ if (NOTIFY_V2) {
   cron.schedule('15 8 * * 1-5', () => run('run-ody-icgoru.sh'), opts);
   cron.schedule('30 8 * * 1-5', () => run('run-dijest.sh'), opts);
   cron.schedule('30 13 * * 1-5', () => run('run-dijest-ogle.sh'), opts);
+  // P3.3a: firma-seviyesi proaktif sinyaller (kapasite/geciken/marka-risk/kişi-kalite) — 09:00 + 15:00
+  cron.schedule('0 9 * * 1-5', () => run('run-firma-sinyal.sh'), opts);
+  cron.schedule('0 15 * * 1-5', () => run('run-firma-sinyal.sh'), opts);
 } else {
   cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
 }
