@@ -281,7 +281,27 @@ function bnsBriefActionPerms(b, u) {
   return out;
 }
 
+function bnsKarMarj(b) {
+  var m = (typeof b.maliyet === 'number') ? b.maliyet : null;
+  var s = (typeof b.satis === 'number') ? b.satis : null;
+  if (m == null && s == null) return { kar: null, marj: null };
+  var kar = (s || 0) - (m || 0);
+  var marj = (s && s > 0) ? Math.round((kar / s) * 100) : null;
+  return { kar: kar, marj: marj };
+}
+function bnsFinansOzet(briefs) {
+  var satis = 0, maliyet = 0, kar = 0, faturalanmamis = 0, tahsilEdilmemis = 0;
+  (briefs || []).forEach(function (b) {
+    var km = bnsKarMarj(b);
+    if (km.kar != null) kar += km.kar;
+    if (typeof b.satis === 'number') { satis += b.satis; if (!b.fatura) faturalanmamis += b.satis; else if (!b.odeme) tahsilEdilmemis += b.satis; }
+    if (typeof b.maliyet === 'number') maliyet += b.maliyet;
+  });
+  var marj = satis > 0 ? Math.round((kar / satis) * 100) : null;
+  return { satis: satis, maliyet: maliyet, kar: kar, marj: marj, faturalanmamis: faturalanmamis, tahsilEdilmemis: tahsilEdilmemis };
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet };
 }
