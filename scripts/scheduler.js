@@ -75,6 +75,8 @@ if (NOTIFY_V2) {
   // P3.3a: firma-seviyesi proaktif sinyaller (kapasite/geciken/marka-risk/kişi-kalite) — 09:00 + 15:00
   cron.schedule('0 9 * * 1-5', () => run('run-firma-sinyal.sh'), opts);
   cron.schedule('0 15 * * 1-5', () => run('run-firma-sinyal.sh'), opts);
+  // P3.3c: haftalık GM brifingi (Opus sentezi) — Pazartesi 08:00
+  cron.schedule('0 8 * * 1', () => run('run-firma-brifing.sh'), opts);
 } else {
   cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
 }
