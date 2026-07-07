@@ -738,14 +738,14 @@ app.post('/api/notify-prefs', auth.authGuard, async (req, res) => {
     // Kısmi gövde mevcut ayarları EZMESİN: önce mevcut satırı oku, gelmeyen alan mevcut değeri (yoksa varsayılanı) korur.
     const cur = (await pool.query('SELECT * FROM notify_prefs WHERE user_id=$1', [req.user.slack_id])).rows[0] || {};
     await pool.query(
-      `INSERT INTO notify_prefs (user_id, ogle_dijest, tip_termin, tip_atama, tip_bloke, sessiz_bas, sessiz_bit, ody_icgoru)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
-       ON CONFLICT (user_id) DO UPDATE SET ogle_dijest=$2, tip_termin=$3, tip_atama=$4, tip_bloke=$5, sessiz_bas=$6, sessiz_bit=$7, ody_icgoru=$8`,
+      `INSERT INTO notify_prefs (user_id, ogle_dijest, tip_termin, tip_atama, tip_bloke, sessiz_bas, sessiz_bit, ody_icgoru, tip_firma_sinyal)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       ON CONFLICT (user_id) DO UPDATE SET ogle_dijest=$2, tip_termin=$3, tip_atama=$4, tip_bloke=$5, sessiz_bas=$6, sessiz_bit=$7, ody_icgoru=$8, tip_firma_sinyal=$9`,
       [req.user.slack_id,
        bool(b.ogle_dijest, cur.ogle_dijest ?? true), bool(b.tip_termin, cur.tip_termin ?? true),
        bool(b.tip_atama, cur.tip_atama ?? true), bool(b.tip_bloke, cur.tip_bloke ?? true),
        hour(b.sessiz_bas, cur.sessiz_bas ?? 19), hour(b.sessiz_bit, cur.sessiz_bit ?? 8),
-       bool(b.ody_icgoru, cur.ody_icgoru ?? true)]);
+       bool(b.ody_icgoru, cur.ody_icgoru ?? true), bool(b.tip_firma_sinyal, cur.tip_firma_sinyal ?? true)]);
     res.json({ ok: true });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
