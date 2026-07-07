@@ -89,8 +89,10 @@ function HelpScreen() {
 
       <Section title="💰 Finansal Bilgi" note="Brief thread'ine yazın. Dashboard'a birkaç dakika içinde yansır.">
         <Row left="maliyet 1500 satış 4000" right="Maliyet ve satış tutarını kaydeder" sub="Tek tek de yazılabilir: 'maliyet 1500' / 'satış 4000'"/>
+        <Row left="/maliyet" right="Slack komutuyla da girilebilir — veri DB'ye kaydedilir"/>
         <Row left="fatura ok" right="Fatura kesildi olarak işaretler" sub="Geri almak için: fatura iptal"/>
         <Row left="ödeme ok" right="Ödeme alındı olarak işaretler" sub="Geri almak için: ödeme iptal"/>
+        <Row left="🔒 Gizlilik" right="Maliyet/satış bilgisi dashboard'da YALNIZ giriş yaptıktan sonra görünür — herkese açık (login'siz) sayfada gösterilmez" sub="Slack tarafı değişmez: /maliyet ve thread'e maliyet/satış yazımı hâlâ çalışır, veri DB'ye kaydedilir; giriş yapan kullanıcılar dashboard'da görür."/>
       </Section>
 
       <Section title="📊 Kapasite & İş Yükü" note="Bir kişinin/departmanın yükü ROL AĞIRLIKLI hesaplanır — her işteki rolü kadar yük sayılır.">
@@ -115,6 +117,29 @@ function HelpScreen() {
         <Row left="🌴 Tatil" right="Slack durumunu 🌴 / 'tatil' / 'izin' / 'OOO' yaparsan uyarılar sana gelmez" sub="Tüm atananları tatildeki brieflerde hareketsizlik süresi de işlemez."/>
       </Section>
 
+      <Section title="🔔 Bildirimler & Tercihler" note="Bildirimler günlük dijeste toplanır; sadece acil olanlar anında gelir. Rozetler dashboard'da, tercihler Profil ⚙️'de.">
+        <Row left="Günlük dijest" right="Hafta içi 08:30 (sabah) + 13:30 (öğle) — biriken bildirimler tek DM'de toplu gelir" sub="Öğle dijesti tercihten kapatılabilir."/>
+        <Row left="Acil = anında DM" right="Termin riski + yeni atama anında DM gelir; diğer her şey dijeste toplanır"/>
+        <Row left="Sessiz saat" right="Gece penceresinde (varsayılan 19:00–08:00) anlık DM gelmez — dijeste kalır" sub="Aralık Profil ⚙️'den ayarlanır."/>
+        <Row left="İş/marka rozetleri" right="Dashboard'da okunmamış bildirim sayısını gösteren rozetler"/>
+        <Row left="Bildirim popover" right="Rozete tıkla → bildirim listesi açılır; okunmamış/okunmuş ayrı; açınca okundu sayılır; bir bildirime tıklayınca ilgili brief detayı açılır" sub="Boşluğa tıkla veya Esc ile kapanır."/>
+        <Row left="⚙️ Tercihler" right="Profil ekranında sağ üstteki ⚙️ (Ayarlar) → 'Bildirim tercihleri': Öğle dijesti aç/kapa · Termin/atama/bloke anlık aç/kapa · Sessiz saat aralığı · Ody günlük içgörü aç/kapa" sub="Yalnız kendi profilinde görünür."/>
+      </Section>
+
+      <Section title="⚡ Dashboard'dan Aksiyon" note="Brief kartlarında, brief detay çekmecesinde ve Profil→Bugün'de: Slack'e geçmeden durumu güncelle. Her aksiyon Slack thread'ine de yansır. Butonlar yetkiye göre görünür.">
+        <Row left="🚀 Başladım" right="İşe başladığını işaretler" sub="Atanan kişide görünür."/>
+        <Row left="⏭️ İlerlet" right="İşi bir sonraki hedef statüye taşır → [hedef statü]" sub="Atanan kişide görünür."/>
+        <Row left="⏱️ Termini uzat" right="Termini +[süre] uzatır — bekleme telafisidir (muaf uzatma, puan düşürmez)" sub="Lead / açan / yönetici görebilir; yalnız bekleme/müşteride'den dönen işte aktiftir."/>
+        <Row left="🔔 Hatırlat" right="İş için hatırlatma kurar" sub="Lead / yönetici görebilir."/>
+      </Section>
+
+      <Section title="👋 Yeni Başlayanlar" note="Sistemi ilk kez kullananlar için yönlendirme; deneyimliler için üst çubuktaki '?' ile her zaman tekrar açılabilir.">
+        <Row left="Tanıtım turu" right="İlk giriş 4 adımlık tur — hiç işi olmayan yeni kullanıcıda bir kez otomatik açılır" sub="Üst çubuktaki '?' ile herkes tekrar açabilir."/>
+        <Row left="Hoş geldin kartı" right="Hiç işin yokken profilde 'Hoş geldin' kartı görünür"/>
+        <Row left="Boş ekran yönlendirmesi" right="Boş ekranlarda 'ne yapmalısın' yönlendirmesi çıkar"/>
+        <Row left="🗓️ Bugün" right="Profil'de 'Bugün' açılır bölümü: sıradaki iş + bugün deadline + geciken" sub="Yalnız kendi profilinde görünür. Dashboard aksiyon butonları burada da çalışır."/>
+      </Section>
+
       <Section title="⭐ Yıldız Puanlama & Karne" note="Her tamamlanan işe AI, thread'inden 1-5 kalite puanı verir (5=pürüzsüz/zamanında, 1=ciddi sorun).">
         <Row left="AI puanı" right="İş tamamlanınca otomatik verilir — Tamamlananlar'da yıldızların yanında 'AI' rozeti görünür"/>
         <Row left="Deadline uzatma cezası" right="Bir işin deadline'ı ileri tarihe alınırsa AI puanından otomatik düşülür — deadline'a ne kadar YAKIN uzatılırsa o kadar çok" sub="48sa'dan fazla kala -0.5 · 24-48sa arası (48 dahil) -1.0 · 24sa ve altı -1.5 · deadline GEÇTİKTEN sonra -2.0. Birden fazla uzatmada en kötüsü sayılır. Yönetici override'ı etkilenmez."/>
@@ -136,13 +161,16 @@ function HelpScreen() {
         <Row left="Sohbet kalır" right="Paneli kapatıp başka iş halledip tekrar açtığında sohbet kaldığı yerden devam eder" sub="'sohbeti temizle' ile sıfırlanır."/>
         <Row left="🔔 Bildirimler" right="Çan Ody'de; okunmamış sayısı üstteki kırmızı rozette görünür" sub="Paneli açtığın an okundu sayılır. Bir bildirime tıklayınca ilgili Slack thread'i açılır."/>
         <Row left="📋 Günlük özet" right="Ody'yi açınca bugünkü kişisel iş özetini bir kez gösterir"/>
+        <Row left="💡 Günlük içgörü" right="Ody sabahları, kayda değer durumda (riskli/geciken/bugün biten işin varsa) günde bir tek satır 💡 içgörü verir — dashboard bildirimi + Slack DM" sub="Kayda değer bir şey yoksa susar. Profil ⚙️ Bildirim tercihlerinden 'Ody günlük içgörü' ile kapatılabilir."/>
         <Row left="😊 Ruh halleri" right="Ody senin kişisel iş akışına göre ifade değiştirir; üzerine gelince nedenini yazar" sub="meşgul=işin çok · kızgın=2'den fazla geciken · düşünüyor=yeni iş · mutlu=iş tamamladın · uyuyor=1 saattir bildirim yok"/>
       </Section>
 
       <Section title="💬 Thread Özeti & Raporlar">
         <Row left="Thread Özeti" right="Her brief'in Slack yazışmaları AI ile özetlenir — brief detayında '💬 Thread Özeti' bölümü" sub="Hafta içi saatte bir güncellenir; yeni mesaj yoksa değişmez."/>
-        <Row left="07:50 hafta içi" right="Sabah raporu — #benseno-grafik + 5 yönetici DM"/>
-        <Row left="07:55 hafta içi" right="Kişisel iş özeti — aktif işi olan herkese kendi brief listesi DM olarak" sub="İşin yoksa DM gelmez."/>
+        <Row left="07:50 sabah raporu" right="Firma geneli günlük durum raporu — #benseno-grafik kanalına + 5 yöneticiye DM" sub="Kişisel dijestten ayrıdır; yönetim özeti niteliğindedir."/>
+        <Row left="08:30 dijest" right="Sabah dijesti — dünden bugüne biriken bildirimlerin tek DM'de toplu özeti; aktif işi olan herkese" sub="İşin yoksa DM gelmez. Detay: '🔔 Bildirimler & Tercihler'."/>
+        <Row left="13:30 dijest" right="Öğle dijesti — sabahtan beri biriken bildirimlerin ikinci toplu özeti" sub="Profil ⚙️ Bildirim tercihlerinden kapatılabilir."/>
+        <Row left="Acil = anında DM" right="Termin riski + yeni atama gibi acil bildirimler dijeste beklemeden ANINDA DM gelir; gerisi dijeste toplanır"/>
       </Section>
 
       <Section title="👁️ Otomatik Gözlemci" note="Yeni brief açıldığında işi yapanların departman yöneticileri otomatik gözlemci olarak eklenir; bildirim ilk thread yanıtındaki mention ile gelir. (Gözlemcilik kapasiteye yük olarak EKLENMEZ.)">
