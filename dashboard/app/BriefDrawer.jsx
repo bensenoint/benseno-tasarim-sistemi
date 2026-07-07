@@ -183,6 +183,24 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
                 {{notr:"😐", gergin:"😟", memnun:"🙂", acil:"🔥"}[b.thread_ton]}
               </span>
             )}
+            {(() => {
+              // P3.3b: öngörülen gecikme rozeti — atanan (worker/lead) veya yönetici görür
+              const _atanan = [...(b.workers||[]), ...(b.leads||[])].some(p => p && p.id === _meId);
+              if (!(_isMgr || _atanan)) return null;
+              const _comp = (window.BNS_DATA && window.BNS_DATA.completed) || [];
+              const _baseH = (typeof bnsBaselineCycle === "function") ? bnsBaselineCycle(_comp, b.marka) : null;
+              const _elapsedH = (typeof bnsCycleSure === "function") ? (bnsCycleSure(b.durum_olaylari || [], Date.now()).toplamH || 0) : 0;
+              const _o = (typeof bnsGecikmeOngoru === "function")
+                ? bnsGecikmeOngoru({ deadline: b.deadline, durum: b.durum, rev_ic: b.rev_ic, rev_musteri: b.rev_musteri, elapsedH: _elapsedH }, _baseH, Date.now())
+                : { risk: false };
+              return _o.risk ? (
+                <span title={`Öngörülen gecikme (${_o.sebep})`}
+                  style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase",
+                    color:"var(--prio-orange)", background:"rgba(255,140,0,0.1)", padding:"4px 8px", borderRadius:999}}>
+                  ⏳ öngörülen gecikme
+                </span>
+              ) : null;
+            })()}
             {b.musteri_bekliyor && !ro && (
               <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase",
                 color:"var(--musteride)", background:"rgba(124,92,255,0.1)", padding:"4px 8px", borderRadius:999}}>
