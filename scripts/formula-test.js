@@ -130,5 +130,43 @@ t('döngü: açık iş now()a kadar (basladi 3sa önce)',
 t('döngü: event yoksa fallback',
   C.bnsCycleSure([], hh(99), { baslangic: hh(1), bitis: hh(5), beklemeMs: 0 }).toplamH, 4);
 
+// ── P3.3a firma sinyalleri ──
+// Kapasite: eşik %85
+t('kapasite %85 tam → sinyal yok', C.bnsSinyalKapasite(85).length, 0);
+t('kapasite %86 → 1 sinyal',       C.bnsSinyalKapasite(86).length, 1);
+t('kapasite sinyal tipi',          C.bnsSinyalKapasite(90)[0].tip, 'firma_kapasite');
+
+// Geciken: eşik 5 (deadline < now, durum aktif)
+const NOW = new Date('2026-07-07T12:00:00+03:00').getTime();
+const gec = (n) => ({ no: n, marka: 'M' + n, deadline: NOW - 3600000, durum: 'devam' });
+t('geciken 5 → sinyal yok', C.bnsSinyalGeciken([gec(1),gec(2),gec(3),gec(4),gec(5)], NOW).length, 0);
+t('geciken 6 → 1 sinyal',   C.bnsSinyalGeciken([gec(1),gec(2),gec(3),gec(4),gec(5),gec(6)], NOW).length, 1);
+t('geciken: tamamlandi hariç', C.bnsSinyalGeciken(
+   [gec(1),gec(2),gec(3),gec(4),gec(5),{ no:6, marka:'X', deadline: NOW-3600000, durum:'tamamlandi' }], NOW).length, 0);
+t('geciken: gelecek deadline hariç', C.bnsSinyalGeciken(
+   [gec(1),gec(2),gec(3),gec(4),gec(5),{ no:6, marka:'X', deadline: NOW+3600000, durum:'devam' }], NOW).length, 0);
+
+// Marka-risk: risk_seviye='yuksek' VEYA thread_ton gergin/acil
+t('marka risk_seviye yuksek → sinyal', C.bnsSinyalMarkaRisk(
+   [{ marka:'Acme', thread_ton:null }], { Acme:'yuksek' }).length, 1);
+t('marka risk_seviye orta → yok', C.bnsSinyalMarkaRisk(
+   [{ marka:'Acme', thread_ton:null }], { Acme:'orta' }).length, 0);
+t('marka thread_ton gergin → sinyal', C.bnsSinyalMarkaRisk(
+   [{ marka:'Beta', thread_ton:'gergin' }], {}).length, 1);
+t('marka: aynı marka tek sinyal', C.bnsSinyalMarkaRisk(
+   [{ marka:'Beta', thread_ton:'gergin' }, { marka:'Beta', thread_ton:'acil' }], {}).length, 1);
+t('marka key = marka adı', C.bnsSinyalMarkaRisk([{ marka:'Beta', thread_ton:'acil' }], {})[0].key, 'Beta');
+
+// Kişi kalite: son5 ort, önceki5 ort; ≥1.0 düşüş VE son<4.0, en az 10 iş
+const kisi = (ad, ratings) => ({ id:'U'+ad, ad, ratings });
+t('kişi ≥1.0 düşüş & son<4 → sinyal', C.bnsSinyalKisiKalite(
+   [kisi('A', [5,5,5,5,5, 3,3,3,4,4])]).length, 1);
+t('kişi <1.0 düşüş → yok', C.bnsSinyalKisiKalite(
+   [kisi('B', [4,4,4,4,4, 4,4,4,3,4])]).length, 0);
+t('kişi son≥4.0 → yok', C.bnsSinyalKisiKalite(
+   [kisi('C', [5,5,5,5,5, 4,4,4,5,5])]).length, 0);
+t('kişi <10 iş → yok', C.bnsSinyalKisiKalite(
+   [kisi('D', [5,5,5,5, 2,2,2,2])]).length, 0);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);
