@@ -39,6 +39,12 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
 
   const fmtNum = (n) => n.toFixed(1).replace(".", ",");
 
+  // Yönetici bayrağı + finans özeti (kâr KPI/kolon yalnız yöneticiye) — Brand.jsx ile aynı desen.
+  const _meId = currentUser && (currentUser.slack_id || currentUser.id);
+  const _meRec = (data.USERS || []).find(u => u && u.id === _meId);
+  const _isMgr = (currentUser && currentUser.role === 'admin') || (_meRec && _meRec.rol === 'yonetici');
+  const fin = bnsFinansOzet(rows);
+
   const cols = [
     { h: "#",        mobile: true  },
     { h: "Marka",    mobile: true  },
@@ -52,6 +58,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
     { h: "Gecikme",  mobile: true  },
     { h: "Teslim",   mobile: true  },
     { h: "⭐",       mobile: true  },
+    ...(_isMgr ? [{ h: "Kâr", mobile: false }] : []),
     { h: "🔗",       mobile: false },
   ];
 
@@ -79,12 +86,13 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
         </div>
       </div>
 
-      <div className="bns-kpi-5" style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap: 12, marginBottom: 16}}>
+      <div className="bns-kpi-5" style={{display:"grid", gridTemplateColumns:`repeat(${_isMgr ? 6 : 5}, 1fr)`, gap: 12, marginBottom: 16}}>
         <Kpi label="Tamamlanan" value={rows.length} sub={drLabel}/>
         <Kpi label="Ort. süre"    value={rows.length ? fmtNum(avgSure) + " sa"  : "—"}/>
         <Kpi label="Ort. gecikme" value={rows.length ? fmtNum(avgGecikme) + " sa" : "—"}/>
         <Kpi label="Ort. revize"  value={rows.length ? fmtNum(avgRev)    : "—"}/>
         <Kpi label="Ort. puan"    value={rows.length && avgRating > 0 ? fmtNum(avgRating) + " / 5" : "—"}/>
+        {_isMgr && <Kpi label="Toplam kâr" value={fin.kar != null ? fmtTRY(fin.kar) : "—"} sub={fin.marj != null ? ("%" + fin.marj + " marj") : undefined}/>}
       </div>
 
       <div className="bns-table-wrap" style={{
@@ -98,7 +106,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
                 <th key={i} className={c.mobile ? "" : "bns-col-mobile-hide"} style={{
                   font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)",
                   letterSpacing:"0.04em", textTransform:"uppercase",
-                  textAlign: ["Süre","Gecikme","#","Rev"].includes(c.h) ? "right" : "left",
+                  textAlign: ["Süre","Gecikme","#","Rev","Kâr"].includes(c.h) ? "right" : "left",
                   padding:"10px 10px", borderBottom:"1px solid var(--line-strong)", whiteSpace:"nowrap"
                 }}>{c.h}</th>
               ))}
@@ -106,7 +114,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan={13} style={{padding:"32px 16px", textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>
+              <tr><td colSpan={_isMgr ? 14 : 13} style={{padding:"32px 16px", textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>
                 Seçili tarih aralığında ({drLabel}) tamamlanan brief bulunamadı.
               </td></tr>
             )}
@@ -131,6 +139,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
                     sebep={c.rating_sebep || (c.insight ? c.insight.split(/(?<=[.!?])\s/).slice(0, 2).join(' ').slice(0, 200) : null)}
                     onRate={currentUser?.role === 'admin' ? (n) => rateBrief(c.id, n) : null}/>
                 </td>
+                {_isMgr && (() => { const k = bnsKarMarj(c).kar; return <td className="bns-col-mobile-hide" style={cs(true, "right")}>{k != null ? fmtTRY(k) : "—"}</td>; })()}
                 <td className="bns-col-mobile-hide" style={cs()}>
                   <a href={c.slack_url && c.slack_url !== "#" ? c.slack_url : undefined}
                      target="_blank" rel="noopener noreferrer"

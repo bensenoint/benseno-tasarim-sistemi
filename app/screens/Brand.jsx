@@ -14,7 +14,7 @@ function fmtDate(d) {
 }
 function csvCell(s) { s = String(s == null ? "" : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 
-function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel }) {
+function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel, currentUser }) {
   const [sel, setSel] = React.useState(initialSel ? initialSel.name : null);
   React.useEffect(() => { if (initialSel) setSel(initialSel.name); }, [initialSel]);
   const [sort, setSort] = React.useState("active");
@@ -23,7 +23,7 @@ function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel }) {
   // Tek marka seçiliyse detay sayfasını göster
   if (sel) {
     const stats = (data.brandStats || []).find(b => b.name === sel) || { name: sel };
-    return <BrandDetail brand={sel} stats={stats} data={data} onBack={() => setSel(null)} onSwitch={setSel} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} />;
+    return <BrandDetail brand={sel} stats={stats} data={data} onBack={() => setSel(null)} onSwitch={setSel} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} currentUser={currentUser} />;
   }
 
   let rows = data.brandStats;
@@ -102,7 +102,7 @@ function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel }) {
 }
 
 // ── Tek marka detay sayfası ─────────────────────────────────────────────────
-function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpenCompleted }) {
+function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpenCompleted, currentUser }) {
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
 
   // Marka brief'lerini birleşik satır modeline çevir (aktif + tamamlanan)
@@ -165,6 +165,11 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
     if (c.odeme)  a.od += Number(c.satis) || 0;
     return a;
   }, { m: 0, s: 0, fa: 0, od: 0 });
+
+  const _meId = currentUser && (currentUser.slack_id || currentUser.id);
+  const _meRec = (data.USERS || []).find(u => u && u.id === _meId);
+  const _isMgr = (currentUser && currentUser.role === 'admin') || (_meRec && _meRec.rol === 'yonetici');
+  const fin = bnsFinansOzet(filteredDone);
 
   function exportCsv() {
     let head, lines;
@@ -331,6 +336,15 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
             </table>
           </div>
         </Card>
+      )}
+
+      {_isMgr && (
+        <div style={{display:"flex", gap:16, flexWrap:"wrap", alignItems:"center", marginTop:10}}>
+          <span title="Kâr = Σ satış − Σ maliyet (tamamlanan)" style={{font:"600 13px var(--font-sans)", color: fin.kar < 0 ? "var(--danger)" : "var(--ok,#1a8f5a)"}}>Kâr: {fmtTRY(fin.kar)}</span>
+          {fin.marj != null && <span style={{font:"600 13px var(--font-sans)", color:"var(--ink-2)"}}>Marj: %{fin.marj}</span>}
+          {fin.faturalanmamis > 0 && <span style={{font:"500 12px var(--font-sans)", color:"var(--warning)"}}>Faturalanmamış: {fmtTRY(fin.faturalanmamis)}</span>}
+          {fin.tahsilEdilmemis > 0 && <span style={{font:"500 12px var(--font-sans)", color:"var(--warning)"}}>Tahsil edilmemiş: {fmtTRY(fin.tahsilEdilmemis)}</span>}
+        </div>
       )}
 
       {/* ⭐ Marka yıldız karnesi — LİSTENİN ALTINDA, döneme özel lazy değerlendirme */}
