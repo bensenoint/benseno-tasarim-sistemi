@@ -67,5 +67,19 @@ async function cacheYaz(tip, anahtar, scope, ham) {
     [tip, anahtar, scope, String(ham).slice(0, 8000)]);
 }
 
+// marka adından o markanın Slack kanal id'si (en güncel brief'in slack_channel'ı — gerçek C… id)
+async function markaKanalId(marka) {
+  const q = await pool.query(
+    `SELECT b.slack_channel FROM briefs b LEFT JOIN brands br ON br.id=b.marka_id
+     WHERE br.name ILIKE $1 AND b.slack_channel IS NOT NULL ORDER BY b.id DESC LIMIT 1`, [`%${marka || ''}%`]);
+  return (q.rows[0] && q.rows[0].slack_channel) || null;
+}
+// brief #no → { slack_channel, slack_ts, no }
+async function briefThreadRef(no) {
+  const q = await pool.query('SELECT slack_channel, slack_ts, no FROM briefs WHERE no=$1', [no]);
+  return q.rows[0] || null;
+}
+
 module.exports = { GORKEM, TTL_MS, erisebilirMi, cacheTaze, userKanallari,
-  kanalMesajlari, threadDokumu, slackArama, kisiDurumu, cacheOku, cacheYaz };
+  kanalMesajlari, threadDokumu, slackArama, kisiDurumu, cacheOku, cacheYaz,
+  markaKanalId, briefThreadRef };

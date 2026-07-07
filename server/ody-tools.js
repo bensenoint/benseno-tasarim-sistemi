@@ -1,6 +1,8 @@
 // server/ody-tools.js — Ody'nin deterministik veri tool'ları.
 // Tüm tool'lar getEmbedded() yapısal dizileri üzerinde KOD ile sayar; model asla saymaz.
 
+const odySlack = require('./ody-slack');
+
 const MAXMS = 8.64e15;
 
 // "Tüm zamanlar" preset'ini null'a indirger.
@@ -312,6 +314,76 @@ defs.insightlar = {
         .filter(r => r.ozet);
     }
     return { toplam: rows.length, kayitlar: rows.slice(0, 25), kirpildi: rows.length > 25 };
+  },
+};
+
+defs.slack_sorgu = {
+  description: "Slack'ten CANLI bilgi çek (DB'de olmayan taze veri gerektiğinde). mod: " +
+    "kanal_mesaj (bir markanın kanalındaki son mesajlar; marka gerekir) | " +
+    "thread (bir brief'in #no Slack thread'i ham; no gerekir) | " +
+    "arama (anahtar kelimeyle tüm kanallar; SLACK_USER_TOKEN yoksa kapalı; kelime gerekir) | " +
+    "kisi_durum (kişinin tatil/izin/çevrimiçi durumu; kisi gerekir). " +
+    "Dönen ham veriyi YORUMLA. Kullanıcı yalnız ERİŞTİĞİ kanalların bilgisini görür.",
+  input_schema: { type: 'object', required: ['mod'], properties: {
+    mod: { type: 'string', enum: ['kanal_mesaj', 'thread', 'arama', 'kisi_durum'] },
+    marka: { type: 'string' }, no: { type: 'number' }, kelime: { type: 'string' }, kisi: { type: 'string' },
+  } },
+  run: async (input, ctx) => {
+    const asker = (ctx && ctx.user && ctx.user.slack_id) || '';
+    const scope = asker === odySlack.GORKEM ? 'gorkem' : (asker || 'anon');
+    const now = Date.now();
+    const mod = input.mod;
+
+    if (mod === 'kisi_durum') {
+      const pr = resolvePerson(ctx.ed, input.kisi);
+      if (!pr.user) return { hata: 'kişi bulunamadı/belirsiz', adaylar: pr.adaylar };
+      const person = pr.user;
+      const cached = await odySlack.cacheOku('kisi_durum', person.id, 'genel');
+      if (odySlack.cacheTaze(cached, now)) return { kaynak: 'cache', kisi: person.name, durum: JSON.parse(cached.ham_ozet) };
+      const d = await odySlack.kisiDurumu(person.id);
+      if (!d) return { hata: 'Slack durum alınamadı' };
+      await odySlack.cacheYaz('kisi_durum', person.id, 'genel', JSON.stringify(d));
+      return { kaynak: 'slack', kisi: person.name, durum: d };
+    }
+
+    const userCh = asker === odySlack.GORKEM ? null : await odySlack.userKanallari(asker);
+
+    if (mod === 'kanal_mesaj') {
+      const ch = await odySlack.markaKanalId(input.marka);
+      if (!ch) return { hata: 'marka kanalı bulunamadı' };
+      if (!odySlack.erisebilirMi(userCh, ch, asker)) return { hata: 'bu kanala erişimin yok' };
+      const cached = await odySlack.cacheOku('kanal_mesaj', ch, scope);
+      if (odySlack.cacheTaze(cached, now)) return { kaynak: 'cache', mesajlar: JSON.parse(cached.ham_ozet) };
+      const msgs = await odySlack.kanalMesajlari(ch);
+      if (!msgs) return { hata: 'kanal mesajları alınamadı' };
+      const slim = msgs.slice(0, 50).map(m => ({ user: m.user, text: (m.text || '').slice(0, 500), ts: m.ts }));
+      await odySlack.cacheYaz('kanal_mesaj', ch, scope, JSON.stringify(slim));
+      return { kaynak: 'slack', kanal: ch, mesajlar: slim };
+    }
+
+    if (mod === 'thread') {
+      const b = await odySlack.briefThreadRef(input.no);
+      if (!b || !b.slack_channel || !b.slack_ts) return { hata: 'brief thread bulunamadı' };
+      if (!odySlack.erisebilirMi(userCh, b.slack_channel, asker)) return { hata: 'bu iş kanalına erişimin yok' };
+      const cached = await odySlack.cacheOku('thread', String(input.no), scope);
+      if (odySlack.cacheTaze(cached, now)) return { kaynak: 'cache', mesajlar: JSON.parse(cached.ham_ozet) };
+      const msgs = await odySlack.threadDokumu(b.slack_channel, b.slack_ts);
+      if (!msgs) return { hata: 'thread alınamadı' };
+      const slim = msgs.slice(0, 50).map(m => ({ user: m.user, text: (m.text || '').slice(0, 500), ts: m.ts }));
+      await odySlack.cacheYaz('thread', String(input.no), scope, JSON.stringify(slim));
+      return { kaynak: 'slack', no: input.no, mesajlar: slim };
+    }
+
+    if (mod === 'arama') {
+      const matches = await odySlack.slackArama(input.kelime || '');
+      if (matches && matches.disabled) return { hata: 'Slack araması şu an kapalı (SLACK_USER_TOKEN yok)' };
+      if (!matches) return { hata: 'arama yapılamadı' };
+      const filt = matches.filter(m => odySlack.erisebilirMi(userCh, m.channel && m.channel.id, asker))
+        .slice(0, 20).map(m => ({ kanal: m.channel && m.channel.name, user: m.username, text: (m.text || '').slice(0, 400), ts: m.ts }));
+      await odySlack.cacheYaz('arama', (input.kelime || '').slice(0, 120), scope, JSON.stringify(filt));
+      return { kaynak: 'slack', kelime: input.kelime, sonuc: filt };
+    }
+    return { hata: 'bilinmeyen mod' };
   },
 };
 
