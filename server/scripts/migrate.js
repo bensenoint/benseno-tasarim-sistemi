@@ -58,10 +58,17 @@ async function up() {
   }
 }
 
-(async () => {
-  try {
-    if (process.argv[2] === 'status') await status();
-    else await up();
-  } catch (e) { process.exitCode = 1; }
-  finally { await pool.end(); }
-})();
+// CLI olarak çalıştırıldığında (node scripts/migrate.js [status]) kendi pool'unu kapatır.
+// require() ile (api.js boot auto-migrate) IIFE ÇALIŞMAZ + pool AÇIK kalır (paylaşılan pool'u
+// kapatmaz). up/status dışa verilir → api.js açılışta bekleyen migration'ları uygular.
+if (require.main === module) {
+  (async () => {
+    try {
+      if (process.argv[2] === 'status') await status();
+      else await up();
+    } catch (e) { process.exitCode = 1; }
+    finally { await pool.end(); }
+  })();
+}
+
+module.exports = { up, status };

@@ -1054,5 +1054,18 @@ app.get('/api/attachment/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-const server = app.listen(PORT, () => console.log(`[api] dinleniyor :${PORT}`));
-module.exports = { app, server };
+let server;
+// Boot'ta bekleyen migration'ları uygula (idempotent). Başarısızsa DİNLEME — process çık;
+// Railway yeni container'ı sağlıksız sayıp ESKİ (çalışan) sürümü korur → prod kırılmaz.
+// Bu, ssh ile elle migrate zorunluluğunu kaldırır (0014 gibi kolon-şart bağımlılıkları güvenli).
+(async () => {
+  try {
+    await require('./scripts/migrate').up();
+    console.log('[api] migrations güncel');
+  } catch (e) {
+    console.error('[api] migration başarısız — boot iptal:', e.message);
+    process.exit(1);
+  }
+  server = app.listen(PORT, () => console.log(`[api] dinleniyor :${PORT}`));
+})();
+module.exports = { app, get server() { return server; } };
