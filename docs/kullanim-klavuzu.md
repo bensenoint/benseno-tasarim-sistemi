@@ -38,7 +38,7 @@ Kılavuzun tamamını okumadan başlamak için rolüne göre 3 madde:
 3. Teslim gelince onayla; gerekiyorsa 🔒 ile kapat.
 
 **👔 Yöneticiysen:**
-1. Her sabah **07:50 DM raporunu** oku — "Bugün senin için 3 aksiyon" bölümüne bak.
+1. Her sabah **08:30 dijestini** oku — biriken bildirimlerin toplu özeti + "Bugün senin için 3 aksiyon". Acil işler (termin/atama) zaten anında DM gelir.
 2. Önceliği değiştirmek için brief'in parent'ına 🔴🟠🟡🟢 ekle (anlık işlenir).
 3. Dashboard → **Yönetici** ekranı + KPI kartlarına tıklayarak ilgili listelere atla.
 
@@ -59,7 +59,7 @@ Benseno Tasarım Sistemi; 16 kişilik dijital ajans ekibinin 33 marka için üre
 - Atanan ekip üyelerine Slack DM ile bildirim gönderir
 - Geciken, bekleyen, sorunlu brief'leri tespit eder ve uyarı verir
 - Tüm veriyi canlı Dashboard'a yansıtır (https://bensenoint.github.io/benseno-tasarim-sistemi/)
-- Her sabah 07:50'de yöneticilere ve tüm ekibe özet rapor gönderir
+- Hafta içi 08:30 (sabah) ve 13:30 (öğle) dijestleriyle biriken bildirimleri toplu özetler; acil işleri (termin/atama) anında DM'ler
 
 ### Kimler Ne Yapar?
 
@@ -314,6 +314,29 @@ Tasarımcılar da **kendi atandıkları işte** 🔒 kullanabilir (sözlü onay 
 ---
 
 ## 4. Slack — Bildirimler ve DM'ler
+
+### 4.0 Bildirim Reformu — Dijest, Acil DM ve Sessiz Saat
+
+Bildirimler artık tek tek DM olarak yağmaz; **günlük dijeste** toplanır. Sadece gerçekten acil olanlar anında gelir.
+
+| Ne | Ne Zaman | Nasıl |
+|----|----------|-------|
+| **Sabah dijesti** | Hafta içi **08:30** | Dünden bugüne biriken bildirimlerin tek DM'de toplu özeti (aktif işi olana). |
+| **Öğle dijesti** | Hafta içi **13:30** | Sabahtan beri biriken bildirimlerin ikinci toplu özeti. **Tercihten kapatılabilir.** |
+| **Acil = anında DM** | Anında | **Termin riski** + **yeni atama** dijeste beklemeden hemen DM gelir; diğer her şey dijeste toplanır. |
+| **Sessiz saat** | Varsayılan **19:00–08:00** | Gece penceresinde anlık DM gelmez — dijeste kalır. Aralık tercihten değiştirilebilir. |
+
+> ℹ️ İş/marka bazlı **okunmamış bildirim rozetleri** dashboard'da görünür (bkz. Bölüm 6). Çan/popover'a tıklayınca bildirim listesi açılır, açınca okundu sayılır.
+
+**Bildirim Tercihleri (Profil → ⚙️):**  
+Dashboard → **Profil** ekranında sağ üstteki **⚙️ (Ayarlar)** → **"Bildirim tercihleri"** ile ayarlanır (yalnız kendi profilinde):
+
+- Öğle dijesti aç/kapa
+- Termin / atama / bloke anlık bildirim aç/kapa
+- Sessiz saat aralığı
+- **Ody günlük içgörü** aç/kapa
+
+---
 
 ### 4.1 Atama Bildirimi (Şablon 1)
 
@@ -613,6 +636,56 @@ Filtreler: Marka, kişi, tarih aralığı, revizyon sayısı
 ### 6.14 Profil
 
 **Ne gösterir:** Şu an seçili kullanıcının kişisel istatistikleri, tamamlanan işler, puan geçmişi.
+
+**🗓️ Bugün bölümü (yalnız kendi profilinde):** Profil'de açılır bir **"Bugün"** bölümü — sıradaki iş + bugün deadline'ı olan işler + geciken işler tek yerde.
+
+**⚙️ Ayarlar (yalnız kendi profilinde):** Sağ üstteki ⚙️ → **"Bildirim tercihleri"** (bkz. Bölüm 4.0).
+
+---
+
+### 6.15 Dashboard'dan Aksiyon Butonları
+
+Brief kartlarında, brief detay çekmecesinde ve Profil → **Bugün** bölümünde durumu **Slack'e geçmeden** güncelleyebilirsin. Her aksiyon Slack thread'ine de yansır. Butonlar yetkiye göre görünür:
+
+| Buton | Ne Yapar | Kim Görür |
+|-------|----------|-----------|
+| 🚀 Başladım | İşe başladığını işaretler | Atanan kişi |
+| ⏭️ İlerlet → [hedef statü] | İşi bir sonraki hedef statüye taşır | Atanan kişi |
+| ⏱️ Termini uzat +[süre] | Termini uzatır — **bekleme telafisidir (muaf uzatma, puan düşürmez)** | Lead / açan / yönetici — yalnız bekleme/müşteride'den dönen işte |
+| 🔔 Hatırlat | İş için hatırlatma kurar | Lead / yönetici |
+
+---
+
+### 6.16 Bildirimler — Rozet ve Popover
+
+- İş/marka bazlı **okunmamış bildirim rozetleri** dashboard'da görünür.
+- Rozete (çan) tıkla → **bildirim popover'ı** açılır; **okunmamış** ve **okunmuş** ayrı listelenir.
+- Popover'ı açtığın an bildirimler **okundu** sayılır.
+- Bir bildirime tıklayınca **ilgili brief detayı** açılır.
+- Boşluğa tıkla veya **Esc** ile kapanır.
+
+Dijest saatleri, acil anlık DM ve sessiz saat için bkz. **Bölüm 4.0**; tercih anahtarları için **Profil → ⚙️** (Bölüm 6.14).
+
+---
+
+### 6.17 Onboarding — Tanıtım Turu ve Boş Ekranlar
+
+- **İlk giriş turu:** Hiç işi olmayan yeni kullanıcıda **4 adımlık tanıtım turu** bir kez otomatik açılır.
+- Üst çubuktaki **"?"** ile herkes turu her zaman tekrar açabilir.
+- Hiç işin yokken profilde **"Hoş geldin"** kartı görünür.
+- Boş ekranlarda **"ne yapmalısın"** yönlendirmesi çıkar.
+
+---
+
+### 6.18 Ody Proaktif İçgörü
+
+Ody sabahları, **kayda değer bir durum varsa** (riskli / geciken / bugün biten işin varsa) günde **bir kez tek satır 💡 içgörü** verir: dashboard bildirimi + Slack DM. Kayda değer bir şey yoksa susar. Profil → ⚙️ **Bildirim tercihleri** → "Ody günlük içgörü" ile kapatılabilir.
+
+---
+
+### 6.19 Finans Bilgisi — Giriş Arkasında
+
+Maliyet/satış bilgisi dashboard'da **yalnız giriş yaptıktan sonra** görünür; herkese açık (login'siz) sayfada gösterilmez. Slack tarafı değişmez: `/maliyet` komutu ve thread'e "maliyet/satış" yazımı hâlâ çalışır → veri DB'ye kaydedilir, giriş yapan kullanıcılar dashboard'da görür.
 
 ---
 

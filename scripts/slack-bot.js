@@ -685,6 +685,17 @@ app.command('/yardim', async ({ command, ack, respond }) => {
 
       { type: 'divider' },
 
+      // Bildirimler & Dashboard
+      { type: 'section', text: { type: 'mrkdwn', text:
+        '*Bildirimler & Dashboard*\n' +
+        '• Günlük dijest *08:30* + *13:30* (öğle) — biriken bildirimler toplu gelir; acil işler (termin/atama) *anında* DM.\n' +
+        '• Bildirim tercihleri & sessiz saat: Dashboard → *Profil* → *⚙️*.\n' +
+        '• Dashboard\'dan aksiyon: *Başladım* / *İlerlet* / *Termini uzat* / *Hatırlat* — Slack\'e gerek yok, thread\'e de yansır.\n' +
+        '• Ody sabahları riskli işlerin varsa tek satır 💡 içgörü verir (dashboard + DM; tercihten kapatılır).'
+      }},
+
+      { type: 'divider' },
+
       // Diğer
       { type: 'section', text: { type: 'mrkdwn', text: '*Diğer*' } },
       { type: 'section', text: { type: 'mrkdwn', text:
