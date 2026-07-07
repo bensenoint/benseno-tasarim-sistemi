@@ -353,7 +353,63 @@ function bnsSinyalKisiKalite(kisiler) {
   return out;
 }
 
+// ── P3.3b tahmin katmanı (gözlemlenen veriden; tahmini_sure_h kullanılmaz) ──
+function bnsBaselineCycle(completed, marka) {
+  var arr = (completed || []).filter(function (b) { return b.marka === marka && typeof b.sureH === 'number'; })
+    .map(function (b) { return b.sureH; }).sort(function (a, b) { return a - b; });
+  if (arr.length < 3) return null;
+  var mid = Math.floor(arr.length / 2);
+  return arr.length % 2 ? arr[mid] : (arr[mid - 1] + arr[mid]) / 2;
+}
+function bnsGecikmeOngoru(b, baselineH, now) {
+  if (['incelemede', 'musteride', 'tamamlandi'].indexOf(b.durum) !== -1) return { risk: false, sebep: null };
+  if (b.deadline == null) return { risk: false, sebep: null };
+  var timeLeftH = (b.deadline - now) / BNS_H;
+  if (baselineH != null && (baselineH - (b.elapsedH || 0)) > timeLeftH) return { risk: true, sebep: 'projeksiyon' };
+  var revize = (b.rev_ic || 0) + (b.rev_musteri || 0);
+  if (revize >= 2 && ['yeni', 'calisiliyor', 'revizyon'].indexOf(b.durum) !== -1 && timeLeftH < 48) {
+    return { risk: true, sebep: 'davranissal' };
+  }
+  return { risk: false, sebep: null };
+}
+function bnsBurnout(upcomingCount, capLimit) {
+  var pct = capLimit > 0 ? Math.round((upcomingCount / capLimit) * 100) : 0;
+  return { pct: pct, asiri: pct >= 120 };
+}
+function bnsKisiPerformans(completed, now) {
+  var arr = completed || [];
+  var n = arr.length;
+  if (!n) return { tamamlanan: 0, ortDonguH: null, zamanindaPct: null, ortRevize: null, ortPuan: null, tipDagilim: {}, throughputHaftalik: 0 };
+  var r1 = function (x) { return Math.round(x * 10) / 10; };
+  var donguler = arr.filter(function (b) { return typeof b.sureH === 'number'; }).map(function (b) { return b.sureH; });
+  var ortDonguH = donguler.length ? r1(donguler.reduce(function (a, x) { return a + x; }, 0) / donguler.length) : null;
+  var dlOlan = arr.filter(function (b) { return b.deadline != null && b.bitis != null; });
+  var zamaninda = dlOlan.filter(function (b) { return b.bitis <= b.deadline; }).length;
+  var zamanindaPct = dlOlan.length ? Math.round((zamaninda / dlOlan.length) * 100) : null;
+  var ortRevize = r1(arr.reduce(function (a, b) { return a + (b.rev_ic || 0) + (b.rev_musteri || 0); }, 0) / n);
+  var puanlar = arr.filter(function (b) { return b.rating != null; }).map(function (b) { return b.rating; });
+  var ortPuan = puanlar.length ? r1(puanlar.reduce(function (a, x) { return a + x; }, 0) / puanlar.length) : null;
+  var tipDagilim = {};
+  arr.forEach(function (b) { if (b.marka) tipDagilim[b.marka] = (tipDagilim[b.marka] || 0) + 1; });
+  var dortHaftaOnce = (now || 0) - 28 * 24 * BNS_H;
+  var son4 = arr.filter(function (b) { return b.bitis != null && b.bitis >= dortHaftaOnce; }).length;
+  return { tamamlanan: n, ortDonguH: ortDonguH, zamanindaPct: zamanindaPct, ortRevize: ortRevize,
+    ortPuan: ortPuan, tipDagilim: tipDagilim, throughputHaftalik: r1(son4 / 4) };
+}
+function bnsSinyalGecikme(atRiskBriefs) {
+  return (atRiskBriefs || []).map(function (b) {
+    return { tip: 'gecikme_ongoru', aciliyet: 'acil', key: b.marka || null,
+      text: '⏳ #' + b.no + ' ' + (b.marka || '') + ' — öngörülen gecikme (deadline yetişmeyebilir).' };
+  });
+}
+function bnsSinyalBurnout(kisiler) {
+  return (kisiler || []).map(function (k) {
+    return { tip: 'burnout', aciliyet: 'normal', key: k.ad || null,
+      text: '🔥 ' + k.ad + ' gelecek 5 günde %' + k.pct + ' yüklü — burnout riski, yük dengelemesi düşün.' };
+  });
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsBurnout, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout };
 }
