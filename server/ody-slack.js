@@ -25,9 +25,9 @@ async function slackGet(method, params, token) {
     const qs = new URLSearchParams(params).toString();
     const r = await fetch(`https://slack.com/api/${method}?${qs}`, { headers: { Authorization: `Bearer ${token}` } });
     const j = await r.json();
-    if (!j.ok) { console.error('[ody-slack]', method, j.error); return null; }
+    if (!j.ok) { console.error('[ody-slack]', method, j.error); return { __err: j.error }; }
     return j;
-  } catch (e) { console.error('[ody-slack]', method, e.message); return null; }
+  } catch (e) { console.error('[ody-slack]', method, e.message); return { __err: 'network' }; }
 }
 
 async function userKanallari(slackUserId) {
@@ -44,9 +44,11 @@ async function threadDokumu(channelId, ts, limit = 50) {
   return j && j.messages || null;
 }
 async function slackArama(query, limit = 20) {
-  if (!USER()) return { disabled: true };
+  if (!USER()) return { disabled: true };   // user token yok
   const j = await slackGet('search.messages', { query, count: limit }, USER());
-  return j && j.messages && j.messages.matches || null;
+  // Token var ama search:read izni yoksa (missing_scope) → arama fiilen kapalı; zarifçe belirt.
+  if (j && j.__err) return (j.__err === 'missing_scope' || j.__err === 'not_allowed_token_type') ? { disabled: true } : null;
+  return (j && j.messages && j.messages.matches) || null;
 }
 async function kisiDurumu(slackUserId) {
   const pres = await slackGet('users.getPresence', { user: slackUserId }, BOT());
