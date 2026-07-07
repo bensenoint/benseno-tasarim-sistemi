@@ -747,7 +747,7 @@
       <a href="../" title="Dashboard'a dön">
         <img src="../app/logo.png" alt="Benseno" class="sidebar-logo">
       </a>
-      <div class="sidebar-badge" style="margin-top:8px;">Kullanım Kılavuzu v7.13</div>
+      <div class="sidebar-badge" style="margin-top:8px;">Kullanım Kılavuzu v7.14</div>
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">
@@ -781,7 +781,7 @@
 
     <!-- Cover -->
     <div class="cover">
-      <div class="cover-eyebrow">Benseno Tasarım Sistemi · v7.13</div>
+      <div class="cover-eyebrow">Benseno Tasarım Sistemi · v7.14</div>
       <h1 class="cover-title">Kullanım<br>Kılavuzu</h1>
       <p class="cover-sub">Tasarımcılar, editörler, AI ve yöneticiler için eksiksiz sistem rehberi. Brief açmaktan dashboard'u okumaya, reaction'lardan otomatik raporlara kadar her adım.</p>
       <div class="cover-meta">
@@ -1115,6 +1115,31 @@
         </div>
       </div>
 
+      <h3>4.0 Bildirim Reformu — Dijest, Acil DM ve Sessiz Saat</h3>
+      <p>Bildirimler artık tek tek DM olarak yağmaz; <strong>günlük dijeste</strong> toplanır. Sadece gerçekten acil olanlar anında gelir.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ne</th><th>Ne Zaman</th><th>Nasıl</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Sabah dijesti</strong></td><td>Hafta içi <strong>08:30</strong></td><td>Dünden bugüne biriken bildirimlerin tek DM'de toplu özeti (aktif işi olana).</td></tr>
+            <tr><td><strong>Öğle dijesti</strong></td><td>Hafta içi <strong>13:30</strong></td><td>Sabahtan beri biriken bildirimlerin ikinci toplu özeti. <strong>Tercihten kapatılabilir.</strong></td></tr>
+            <tr><td><strong>Acil = anında DM</strong></td><td>Anında</td><td><strong>Termin riski</strong> + <strong>yeni atama</strong> dijeste beklemeden hemen DM gelir; diğer her şey dijeste toplanır.</td></tr>
+            <tr><td><strong>Sessiz saat</strong></td><td>Varsayılan <strong>19:00–08:00</strong></td><td>Gece penceresinde anlık DM gelmez — dijeste kalır. Aralık tercihten değiştirilebilir.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout info">
+        <span class="callout-icon">ℹ️</span>
+        <span>İş/marka bazlı <strong>okunmamış bildirim rozetleri</strong> dashboard'da görünür (bkz. Bölüm 6). Çan/popover'a tıklayınca bildirim listesi açılır, açınca okundu sayılır.</span>
+      </div>
+      <p><strong>Bildirim Tercihleri (Profil → ⚙️):</strong> Dashboard → <strong>Profil</strong> ekranında sağ üstteki <strong>⚙️ (Ayarlar)</strong> → <strong>"Bildirim tercihleri"</strong> ile ayarlanır (yalnız kendi profilinde):</p>
+      <ul>
+        <li>Öğle dijesti aç/kapa</li>
+        <li>Termin / atama / bloke anlık bildirim aç/kapa</li>
+        <li>Sessiz saat aralığı</li>
+        <li><strong>Ody günlük içgörü</strong> aç/kapa</li>
+      </ul>
+
       <h3>Şablon 1 — Atama Bildirimi</h3>
       <div class="tmpl">
         <div class="tmpl-header">Atanan kişiye DM</div>
@@ -1313,6 +1338,11 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         <div class="screen-card"><div class="screen-num">6.15</div><div class="screen-name">Silinenler</div><div class="screen-desc">Silinmiş brief'ler — geri al / kalıcı sil (yönetici)</div></div>
         <div class="screen-card"><div class="screen-num">6.16</div><div class="screen-name">Yardım</div><div class="screen-desc">Komut, emoji ve kısayol referansı</div></div>
         <div class="screen-card"><div class="screen-num">6.17</div><div class="screen-name">✈️ Müşteride</div><div class="screen-desc">Müşteri dönüşü bekleyen işler. Ayrı sayfa menüden kaldırıldı — Detay bakış'taki "Müşteride" filtresinde görünür</div></div>
+        <div class="screen-card"><div class="screen-num">§6.15</div><div class="screen-name">🚀 Aksiyon Butonları</div><div class="screen-desc">Kart/detay/Bugün'de Slack'e geçmeden durum güncelle, termin uzat, hatırlat (yetkiye göre)</div></div>
+        <div class="screen-card"><div class="screen-num">§6.16</div><div class="screen-name">🔔 Bildirim Popover</div><div class="screen-desc">Okunmamış rozetleri; çana tıkla → okunmamış/okunmuş liste, brief detayına atla</div></div>
+        <div class="screen-card"><div class="screen-num">§6.17</div><div class="screen-name">👋 Onboarding Turu</div><div class="screen-desc">Yeni kullanıcıya 4 adımlık tanıtım turu + boş ekran yönlendirmeleri; "?" ile tekrar</div></div>
+        <div class="screen-card"><div class="screen-num">§6.18</div><div class="screen-name">💡 Ody İçgörü</div><div class="screen-desc">Kayda değer durum varsa günde bir kez tek satır proaktif içgörü (bildirim + DM)</div></div>
+        <div class="screen-card"><div class="screen-num">§6.19</div><div class="screen-name">💰 Finans — Giriş Arkasında</div><div class="screen-desc">Maliyet/satış yalnız giriş sonrası görünür; login'siz sayfada gizli</div></div>
       </div>
 
       <h3>6.1 Genel Bakış — KPI Kartları</h3>
@@ -1352,6 +1382,48 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
       </div>
       <p>Marka detayında bu sütunlara ek olarak <strong>Maliyet · Satış · Fatura · Ödeme</strong> finans sütunları da görünür.</p>
       <p>İşe tıklayınca açılan detay panelinde ayrıca <strong>💬 Thread Özeti</strong> bölümü vardır: Slack thread'indeki yazışmaların AI özeti (hafta içi saatte bir güncellenir), atama/zaman bilgileri, aktivite geçmişi ve not alanı.</p>
+
+      <h3>6.14 Profil — 🗓️ Bugün & ⚙️ Ayarlar</h3>
+      <p><strong>🗓️ Bugün bölümü (yalnız kendi profilinde):</strong> Profil'de açılır bir <strong>"Bugün"</strong> bölümü — sıradaki iş + bugün deadline'ı olan işler + geciken işler tek yerde.</p>
+      <p><strong>⚙️ Ayarlar (yalnız kendi profilinde):</strong> Sağ üstteki ⚙️ → <strong>"Bildirim tercihleri"</strong> (bkz. Bölüm 4.0).</p>
+
+      <h3>6.15 Dashboard'dan Aksiyon Butonları</h3>
+      <p>Brief kartlarında, brief detay çekmecesinde ve Profil → <strong>Bugün</strong> bölümünde durumu <strong>Slack'e geçmeden</strong> güncelleyebilirsin. Her aksiyon Slack thread'ine de yansır. Butonlar yetkiye göre görünür:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Buton</th><th>Ne Yapar</th><th>Kim Görür</th></tr></thead>
+          <tbody>
+            <tr><td>🚀 Başladım</td><td>İşe başladığını işaretler</td><td>Atanan kişi</td></tr>
+            <tr><td>⏭️ İlerlet → [hedef statü]</td><td>İşi bir sonraki hedef statüye taşır</td><td>Atanan kişi</td></tr>
+            <tr><td>⏱️ Termini uzat +[süre]</td><td>Termini uzatır — <strong>bekleme telafisidir (muaf uzatma, puan düşürmez)</strong></td><td>Lead / açan / yönetici — yalnız bekleme/müşteride'den dönen işte</td></tr>
+            <tr><td>🔔 Hatırlat</td><td>İş için hatırlatma kurar</td><td>Lead / yönetici</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6.16 Bildirimler — Rozet ve Popover</h3>
+      <ul>
+        <li>İş/marka bazlı <strong>okunmamış bildirim rozetleri</strong> dashboard'da görünür.</li>
+        <li>Rozete (çan) tıkla → <strong>bildirim popover'ı</strong> açılır; <strong>okunmamış</strong> ve <strong>okunmuş</strong> ayrı listelenir.</li>
+        <li>Popover'ı açtığın an bildirimler <strong>okundu</strong> sayılır.</li>
+        <li>Bir bildirime tıklayınca <strong>ilgili brief detayı</strong> açılır.</li>
+        <li>Boşluğa tıkla veya <strong>Esc</strong> ile kapanır.</li>
+      </ul>
+      <p>Dijest saatleri, acil anlık DM ve sessiz saat için bkz. <strong>Bölüm 4.0</strong>; tercih anahtarları için <strong>Profil → ⚙️</strong> (Bölüm 6.14).</p>
+
+      <h3>6.17 Onboarding — Tanıtım Turu ve Boş Ekranlar</h3>
+      <ul>
+        <li><strong>İlk giriş turu:</strong> Hiç işi olmayan yeni kullanıcıda <strong>4 adımlık tanıtım turu</strong> bir kez otomatik açılır.</li>
+        <li>Üst çubuktaki <strong>"?"</strong> ile herkes turu her zaman tekrar açabilir.</li>
+        <li>Hiç işin yokken profilde <strong>"Hoş geldin"</strong> kartı görünür.</li>
+        <li>Boş ekranlarda <strong>"ne yapmalısın"</strong> yönlendirmesi çıkar.</li>
+      </ul>
+
+      <h3>6.18 Ody Proaktif İçgörü</h3>
+      <p>Ody sabahları, <strong>kayda değer bir durum varsa</strong> (riskli / geciken / bugün biten işin varsa) günde <strong>bir kez tek satır 💡 içgörü</strong> verir: dashboard bildirimi + Slack DM. Kayda değer bir şey yoksa susar. Profil → ⚙️ <strong>Bildirim tercihleri</strong> → "Ody günlük içgörü" ile kapatılabilir.</p>
+
+      <h3>6.19 Finans Bilgisi — Giriş Arkasında</h3>
+      <p>Maliyet/satış bilgisi dashboard'da <strong>yalnız giriş yaptıktan sonra</strong> görünür; herkese açık (login'siz) sayfada gösterilmez. Slack tarafı değişmez: <code>/maliyet</code> komutu ve thread'e "maliyet/satış" yazımı hâlâ çalışır → veri DB'ye kaydedilir, giriş yapan kullanıcılar dashboard'da görür.</p>
     </section>
 
     <!-- ─────────────────────────────────────────── -->
