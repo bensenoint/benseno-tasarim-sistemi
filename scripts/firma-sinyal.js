@@ -81,6 +81,34 @@ async function sinyalleriHesapla(d, now) {
   }));
   out.push(...C.bnsSinyalKisiKalite(kisiler));
 
+  // 5. Gecikme öngörüsü: her aktif brief için marka baseline + açık döngü elapsed
+  const atRisk = [];
+  aktif.forEach((b) => {
+    const baselineH = C.bnsBaselineCycle(tamamlanan, b.marka);
+    const elapsedH = C.bnsCycleSure(b.durum_olaylari || [], now).toplamH || 0;
+    const o = C.bnsGecikmeOngoru({ deadline: b.deadline, durum: b.durum, rev_ic: b.rev_ic, rev_musteri: b.rev_musteri, elapsedH }, baselineH, now);
+    if (o.risk) atRisk.push(b);
+  });
+  out.push(...C.bnsSinyalGecikme(atRisk));
+
+  // 6. Burnout: kişi başına gelecek-5-gün deadline'lı aktif iş sayısı / kapasite limiti
+  const BES_GUN = 5 * 24 * 3600000;
+  const userById = {};
+  (d.bns_users || []).forEach((u) => { userById[u.id] = u; });
+  const upByKisi = {};
+  aktif.forEach((b) => {
+    if (b.deadline == null || b.deadline < now || b.deadline > now + BES_GUN) return;
+    (b.workers || []).concat(b.leads || []).forEach((p) => {
+      if (!p || !/^U/.test(p.id)) return;
+      (upByKisi[p.id] = upByKisi[p.id] || { id: p.id, ad: (p.name || '').split(' ')[0] || p.name, n: 0 }).n++;
+    });
+  });
+  const burnoutlar = Object.values(upByKisi).map((k) => {
+    const bo = C.bnsBurnout(k.n, C.bnsPersonCapLimit(userById[k.id] || {}));
+    return { ad: k.ad, pct: bo.pct, asiri: bo.asiri };
+  }).filter((k) => k.asiri);
+  out.push(...C.bnsSinyalBurnout(burnoutlar));
+
   return out;
 }
 
