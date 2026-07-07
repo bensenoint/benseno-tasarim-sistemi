@@ -168,5 +168,40 @@ t('kişi son≥4.0 → yok', C.bnsSinyalKisiKalite(
 t('kişi <10 iş → yok', C.bnsSinyalKisiKalite(
    [kisi('D', [5,5,5,5, 2,2,2,2])]).length, 0);
 
+// ── P3.3b tahmin katmanı ──
+const H2 = C.BNS_H;
+const comp = (marka, sureH) => ({ marka, sureH });
+t('baseline <3 örnek → null', C.bnsBaselineCycle([comp('A',10),comp('A',20)], 'A'), null);
+t('baseline 3 örnek medyan', C.bnsBaselineCycle([comp('A',10),comp('A',20),comp('A',30)], 'A'), 20);
+t('baseline farklı marka sayılmaz', C.bnsBaselineCycle([comp('A',10),comp('A',20),comp('A',30),comp('B',99)], 'A'), 20);
+
+const NOWG = new Date('2026-07-07T12:00:00+03:00').getTime();
+const dlIn = (h) => NOWG + h*H2;
+t('gecikme projMiss → risk', C.bnsGecikmeOngoru({ deadline: dlIn(20), durum:'calisiliyor', rev_ic:0, rev_musteri:0, elapsedH:10 }, 40, NOWG).risk, true);
+t('gecikme projMiss sebep', C.bnsGecikmeOngoru({ deadline: dlIn(20), durum:'calisiliyor', rev_ic:0, rev_musteri:0, elapsedH:10 }, 40, NOWG).sebep, 'projeksiyon');
+t('gecikme bol zaman → risk yok', C.bnsGecikmeOngoru({ deadline: dlIn(100), durum:'calisiliyor', rev_ic:0, rev_musteri:0, elapsedH:10 }, 40, NOWG).risk, false);
+t('gecikme davranışsal → risk', C.bnsGecikmeOngoru({ deadline: dlIn(24), durum:'revizyon', rev_ic:1, rev_musteri:1, elapsedH:5 }, null, NOWG).sebep, 'davranissal');
+t('gecikme incelemede → risk yok', C.bnsGecikmeOngoru({ deadline: dlIn(1), durum:'incelemede', rev_ic:3, rev_musteri:0, elapsedH:99 }, 40, NOWG).risk, false);
+
+t('burnout %100 → asiri false', C.bnsBurnout(5, 5).asiri === false && C.bnsBurnout(5,5).pct === 100, true);
+t('burnout %120 → asiri true', C.bnsBurnout(6, 5).asiri, true);
+t('burnout capLimit 0 → %0', C.bnsBurnout(3, 0).pct, 0);
+
+const cb = (o) => Object.assign({ sureH:10, deadline: 1000, bitis: 900, rev_ic:0, rev_musteri:0, rating:5, marka:'A' }, o);
+const perf = C.bnsKisiPerformans([
+  cb({ sureH:10, bitis:900, deadline:1000, rev_ic:1, rev_musteri:0, rating:5, marka:'A' }),
+  cb({ sureH:20, bitis:1200, deadline:1000, rev_ic:1, rev_musteri:2, rating:3, marka:'B' }),
+], NOWG);
+t('perf tamamlanan', perf.tamamlanan, 2);
+t('perf ortDonguH', perf.ortDonguH, 15);
+t('perf zamanindaPct (1/2)', perf.zamanindaPct, 50);
+t('perf ortRevize', perf.ortRevize, 2);
+t('perf ortPuan', perf.ortPuan, 4);
+t('perf tipDagilim', JSON.stringify(perf.tipDagilim), JSON.stringify({ A:1, B:1 }));
+t('perf boş girdi', C.bnsKisiPerformans([], NOWG).tamamlanan, 0);
+
+t('sinyal gecikme sayısı+key', (() => { const s = C.bnsSinyalGecikme([{ marka:'Z', no:5 }]); return s.length===1 && s[0].key==='Z' && s[0].tip==='gecikme_ongoru'; })(), true);
+t('sinyal burnout sayısı+key', (() => { const s = C.bnsSinyalBurnout([{ ad:'Eda', pct:140 }]); return s.length===1 && s[0].key==='Eda' && s[0].tip==='burnout'; })(), true);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);
