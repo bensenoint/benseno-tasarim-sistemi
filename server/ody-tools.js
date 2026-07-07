@@ -3,6 +3,7 @@
 
 const odySlack = require('./ody-slack');
 const calc = require('../dashboard/app/calc');
+const { pool } = require('./db');
 
 const MAXMS = 8.64e15;
 
@@ -416,6 +417,51 @@ defs.finans_ozet = {
     }
     const o = calc.bnsFinansOzet(done);
     return { kapsam: input.kapsam, marka: input.marka || null, ...o };
+  },
+};
+
+// Son günlerin insight'ından müşteri-risk seviyesini LLM ile sınıflar → {risk, gerekce}. Hatada null.
+async function sinifla(metin) {
+  if (!process.env.ANTHROPIC_API_KEY) return null;
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6', max_tokens: 120,
+        system: "Sana bir markanın son günlerdeki gün-sonu insight'ları verilir. Müşteri-risk seviyesini değerlendir. YALNIZ JSON döndür: {\"risk\":\"dusuk|orta|yuksek\",\"gerekce\":\"tek kısa cümle\"}. Memnuniyetsizlik/aciliyet/revize baskısı artıyorsa risk yükselir. Emin değilsen dusuk.",
+        messages: [{ role: 'user', content: metin }],
+      }),
+    });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const txt = (j.content && j.content[0] && j.content[0].text) || '';
+    const m = txt.match(/\{[\s\S]*\}/);
+    if (!m) return null;
+    const o = JSON.parse(m[0]);
+    const risk = ['dusuk', 'orta', 'yuksek'].includes(o.risk) ? o.risk : 'bilinmiyor';
+    return { risk, gerekce: String(o.gerekce || '').slice(0, 200) };
+  } catch (e) { return null; }
+}
+
+defs.marka_risk = {
+  description: "Marka sağlık / müşteri-risk trendi (YALNIZ yönetici). Son ~5 günün gün-sonu insight'ından risk seviyesi (dusuk/orta/yuksek) + 1 cümle gerekçe. marka gerekir.",
+  input_schema: { type: 'object', required: ['marka'], properties: { marka: { type: 'string' } } },
+  run: async (input, ctx) => {
+    const me = (ctx.ed.bns_users || []).find(u => u && u.id === (ctx.user && ctx.user.slack_id));
+    if (!(ctx.isAdmin || (me && me.rol === 'yonetici'))) return { hata: 'bu bilgi yöneticilere özel' };
+    const q = await pool.query(
+      `SELECT d.id, d.tarih, d.insight, d.risk_seviye FROM brand_daily d JOIN brands b ON b.id=d.brand_id
+       WHERE b.name ILIKE $1 AND d.insight IS NOT NULL ORDER BY d.tarih DESC LIMIT 5`, [`%${input.marka}%`]);
+    if (q.rows.length < 2) return { risk: 'yetersiz veri', gerekce: 'son günlerde yeterli insight yok' };
+    // Bugünkü (en güncel) satırda risk zaten hesaplandıysa cache'ten dön
+    if (q.rows[0].risk_seviye) return { marka: input.marka, risk: q.rows[0].risk_seviye, gerekce: '(önbellek)' };
+    const metin = q.rows.map(r => `${r.tarih}: ${r.insight}`).join('\n');
+    const parsed = await sinifla(metin);
+    if (parsed && parsed.risk && parsed.risk !== 'bilinmiyor') {
+      try { await pool.query('UPDATE brand_daily SET risk_seviye=$1 WHERE id=$2', [parsed.risk, q.rows[0].id]); } catch (e) {}
+    }
+    return { marka: input.marka, risk: (parsed && parsed.risk) || 'bilinmiyor', gerekce: (parsed && parsed.gerekce) || '' };
   },
 };
 
