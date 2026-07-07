@@ -48,3 +48,4 @@ data/.write-token
 
 # Çevrimdışı yazma kuyruğu (runtime, asla commit edilmez)
 data/.write-queue.jsonl
+backups/

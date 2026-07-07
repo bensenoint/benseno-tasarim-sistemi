@@ -6,14 +6,16 @@ const SECRET = () => {
   if (!process.env.BNS_JWT_SECRET) throw new Error('BNS_JWT_SECRET env eksik');
   return process.env.BNS_JWT_SECRET;
 };
-const TTL = '7d';
+// SEC-9: 7d → 24h. Mevcut (eski) token'lar süresi dolana dek çalışmaya devam eder — ani logout yok.
+const TTL = '24h';
 
 function signToken(payload) {
   return jwt.sign(payload, SECRET(), { expiresIn: TTL });
 }
 
 function verifyToken(token) {
-  return jwt.verify(token, SECRET()); // throws on invalid/expired
+  // SEC-9: algoritma pinleme — yalnız HS256 kabul (alg confusion önlenir).
+  return jwt.verify(token, SECRET(), { algorithms: ['HS256'] }); // throws on invalid/expired
 }
 
 function authGuard(req, res, next) {

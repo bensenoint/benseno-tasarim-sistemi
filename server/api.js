@@ -43,15 +43,21 @@ app.use((req, res, next) => {
 
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
-// SEC-4: duyarlı veri (finans/puan) izni — bot (req.user yok), admin veya rol='yonetici'.
-// Yönetici ekranları (puan karnesi, finans) çalışmaya devam etsin; düz üyeler soyulmuş veri alır.
-async function canSeeSensitive(req) {
-  if (!req.user) return true;                       // bot (x-bns-token)
-  if (req.user.role === 'admin') return true;
-  try {
-    const r = await pool.query('SELECT rol FROM users WHERE id=$1', [req.user.slack_id]);
-    return (r.rows[0] || {}).rol === 'yonetici';
-  } catch (e) { return false; }                     // şüphede: soyulmuş veri (fail-closed)
+// SEC-4: duyarlı veri (finans/puan) izni. KULLANICI KARARI (2026-07-07): girişli TÜM üyeler
+// finans/puanı görebilir — sakınca görülmedi. Süzgeç altyapısı (stripBriefSensitive + sensitive
+// parametresi) ileride kısıtlamak istenirse hazır durur; kimliksiz erişim zaten 401 (readGuard).
+async function canSeeSensitive(req) { return true; }
+
+// SEC-10: LLM maliyet koruması — kullanıcı başına 10 dk'da en çok 20 istek (bellek içi, restart'ta sıfırlanır).
+const llmHits = new Map();
+function llmLimiter(req, res, next) {
+  const uid = (req.user && req.user.slack_id) || req.ip;
+  const now = Date.now(), win = 10 * 60 * 1000;
+  const arr = (llmHits.get(uid) || []).filter(t => now - t < win);
+  if (arr.length >= 20) return res.status(429).json({ error: 'çok fazla istek — 10 dk sonra tekrar dene' });
+  arr.push(now); llmHits.set(uid, arr);
+  if (llmHits.size > 5000) { for (const [k, v] of llmHits) if (!v.some(t => now - t < win)) llmHits.delete(k); }
+  next();
 }
 
 app.get('/api/state', readGuard, async (req, res) => {
@@ -98,7 +104,7 @@ app.get('/api/events', readGuard, async (req, res) => {
 // Seçili [from,to] dönemindeki TAMAMLANAN işlerin DB verisinden (sayılar deterministik)
 // kısa bir değerlendirme üretir; aynı dönem için 6 saat bellek-içi cache'lenir.
 const _sebepPeriodCache = new Map();
-app.get('/api/sebep-period', readGuard, async (req, res) => {
+app.get('/api/sebep-period', readGuard, llmLimiter, async (req, res) => {
   try {
     const type = String(req.query.type || 'firma');
     const key = String(req.query.key || '');
@@ -241,7 +247,16 @@ function loginFail(id) {
   e.fails += 1;
   if (e.fails >= LOGIN_MAX) { e.until = Date.now() + LOGIN_WINDOW; e.fails = 0; }
   loginFails.set(id, e);
-  if (loginFails.size > 5000) loginFails.clear(); // güvenlik valfi (bellek)
+  // SEC-13: güvenlik valfi (bellek) — clear() tüm aktif kilitleri sıfırlıyordu (saldırgan 5000 hesap
+  // deneyerek kendi kilidini açabilirdi). Önce süresi/penceresi geçmiş girdiler silinir; hâlâ >5000 ise
+  // en eski eklenenler atılır (Map ekleme sıralı). Gerçek (aktif) kilitler korunur.
+  if (loginFails.size > 5000) {
+    const now = Date.now();
+    for (const [k, v] of loginFails) {
+      if ((!v.until || v.until <= now) && v.fails < LOGIN_MAX) loginFails.delete(k);
+    }
+    while (loginFails.size > 5000) loginFails.delete(loginFails.keys().next().value);
+  }
 }
 
 // POST /api/auth/login — { slack_id, password } → { token, user }
@@ -541,7 +556,7 @@ const CHAT_BILGI = (() => {
   try { return require('fs').readFileSync(require('path').join(__dirname, 'chat-bilgi.md'), 'utf8'); }
   catch (e) { console.error('[chat] bilgi dosyası okunamadı:', e.message); return ''; }
 })();
-app.post('/api/chat', auth.authGuard, async (req, res) => {
+app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
   try {
     const msgs = Array.isArray(req.body?.messages) ? req.body.messages.slice(-12) : [];
     if (!msgs.length) return res.status(400).json({ error: 'messages gerekli' });

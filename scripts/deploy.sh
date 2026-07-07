@@ -30,7 +30,8 @@ bash scripts/ci-check.sh || { echo "🔴 CI kapısı kaldı — deploy iptal."; 
 if [ "$do_dash" -eq 1 ]; then
   echo "═══ 1/4 · Dashboard derle + push ═══"
   bash scripts/build-dashboard.sh
-  git add -A
+  # SEC-17: data/ altındaki dotfile'lar (gitignore'a girmemiş olsa bile) kazayla commitlenmesin.
+  git add -A -- ':(exclude)data/.*'
   git commit -q -m "deploy: dashboard $(date +%H:%M)" || echo "  (commit edilecek değişiklik yok)"
   git push -q
   VER="$(grep -o 'bundle.js?v=[0-9]*' dashboard/index.html | head -1)"

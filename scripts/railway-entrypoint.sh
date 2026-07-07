@@ -12,7 +12,8 @@ cd "$PROJ"
 mkdir -p "$PROJ/logs"
 
 # env var doluysa ilgili gizli dosyayı yaz
-write_secret() { [ -n "${2:-}" ] && printf '%s' "$2" > "data/$1" && echo "  ✓ data/$1"; }
+# SEC-12 (kısmi): yazımdan sonra chmod 600 — yalnız sahibi okuyabilsin. (Non-root'a geçiş ayrı iş.)
+write_secret() { [ -n "${2:-}" ] && printf '%s' "$2" > "data/$1" && chmod 600 "data/$1" && echo "  ✓ data/$1"; }
 
 echo "[entrypoint] Gizli dosyalar env'den üretiliyor..."
 write_secret ".github-pat-sistem"   "${BENSENO_GITHUB_PAT:-}"
@@ -35,10 +36,14 @@ git config --global --add safe.directory "$PROJ"
 # deterministik kuruyoruz. reset --hard tracked dosyaları origin/main'e eşitler;
 # secret'lar + node_modules + logs gitignored=untracked olduğu için KORUNUR.
 if [ -n "${BENSENO_GITHUB_PAT:-}" ]; then
-  REMOTE="https://${BENSENO_GITHUB_PAT}@github.com/bensenoint/benseno-tasarim-sistemi.git"
   git init -q
   git remote remove origin 2>/dev/null || true
-  git remote add origin "$REMOTE"
+  git remote add origin "https://github.com/bensenoint/benseno-tasarim-sistemi.git"
+  # SEC-6: PAT remote URL'e gömülmez — kimlik http.extraheader ile verilir. Not: extraheader da
+  # .git/config'te durur ama `git remote -v` çıktısında görünmez + base64 kodlu (kaza sızıntısı azalır);
+  # bu bir gizleme katmanıdır, tam koruma değildir.
+  B64=$(printf 'x-access-token:%s' "$BENSENO_GITHUB_PAT" | base64 | tr -d '\n')
+  git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $B64"
   if git fetch origin main -q; then
     git reset --hard origin/main && git branch -M main 2>/dev/null
     git branch --set-upstream-to=origin/main main 2>/dev/null || true
