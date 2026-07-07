@@ -301,7 +301,59 @@ function bnsFinansOzet(briefs) {
   return { satis: satis, maliyet: maliyet, kar: kar, marj: marj, faturalanmamis: faturalanmamis, tahsilEdilmemis: tahsilEdilmemis };
 }
 
+// ── P3.3a firma-seviyesi proaktif sinyaller (deterministik; push motoru scripts/firma-sinyal.js) ──
+// Her fonksiyon 0..n sinyal nesnesi döndürür: { tip, aciliyet, key, text }. key=dedup anahtarı (firma=null, marka=marka adı, kişi=ad).
+function bnsSinyalKapasite(capPct) {
+  if (capPct == null || capPct <= 85) return [];
+  return [{ tip: 'firma_kapasite', aciliyet: 'acil', key: null,
+    text: '⚠️ Firma kapasitesi %' + Math.round(capPct) + ' — yük dengelemesi gerekebilir.' }];
+}
+function bnsSinyalGeciken(briefs, now) {
+  var gec = (briefs || []).filter(function (b) {
+    return b.deadline != null && b.deadline < now &&
+      ['tamamlandi', 'musteride'].indexOf(b.durum) === -1;
+  });
+  if (gec.length <= 5) return [];
+  gec.sort(function (a, b) { return (a.deadline || 0) - (b.deadline || 0); });
+  var top = gec[0];
+  return [{ tip: 'firma_geciken', aciliyet: 'acil', key: null,
+    text: '🔴 ' + gec.length + ' iş gecikmede (>5 eşik). En kritik: #' + top.no + ' ' + (top.marka || '') + '.' }];
+}
+function bnsSinyalMarkaRisk(briefs, riskMap) {
+  var rm = riskMap || {};
+  var byMarka = {};
+  (briefs || []).forEach(function (b) {
+    if (!b.marka) return;
+    var yuksek = rm[b.marka] === 'yuksek';
+    var kotuTon = ['gergin', 'acil'].indexOf(b.thread_ton) !== -1;
+    if (yuksek || kotuTon) {
+      if (!byMarka[b.marka]) byMarka[b.marka] = rm[b.marka] || b.thread_ton;
+    }
+  });
+  return Object.keys(byMarka).map(function (marka) {
+    return { tip: 'marka_risk', aciliyet: 'acil', key: marka,
+      text: '📉 ' + marka + ' müşteri-risk sinyali: ' + byMarka[marka] + '. İlişkiye göz at.' };
+  });
+}
+function bnsSinyalKisiKalite(kisiler) {
+  var out = [];
+  (kisiler || []).forEach(function (k) {
+    var r = k.ratings || [];
+    if (r.length < 10) return; // yeterli veri yok
+    var son5 = r.slice(-5), onceki5 = r.slice(-10, -5);
+    var avg = function (a) { return a.reduce(function (s, x) { return s + x; }, 0) / a.length; };
+    var sonAvg = avg(son5), onckAvg = avg(onceki5);
+    if (onckAvg - sonAvg >= 1.0 && sonAvg < 4.0) {
+      out.push({ tip: 'kisi_kalite', aciliyet: 'normal', key: k.ad,
+        text: '📊 ' + k.ad + ' son işlerde puan düşüşü (' +
+          (Math.round(onckAvg * 10) / 10) + '→' + (Math.round(sonAvg * 10) / 10) +
+          '). Kısa bir mentörlük görüşmesi iyi gelebilir.' });
+    }
+  });
+  return out;
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite };
 }

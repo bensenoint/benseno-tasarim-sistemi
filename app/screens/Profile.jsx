@@ -1,7 +1,7 @@
 // app/screens/Profile.jsx — Kişisel performans dashboardı v2
 // Aktif işler · tamamlanan · revize · saat · marka · iş tipi · verilen/alınan görevler
 
-function AyarlarBolumu() {
+function AyarlarBolumu({ isMgr }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
   React.useEffect(() => {
@@ -17,7 +17,7 @@ function AyarlarBolumu() {
         style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:32,height:32,border:"1px solid var(--line)",borderRadius:8,background:"var(--paper-2)",color:"var(--ink-2)",cursor:"pointer",fontSize:15}}>⚙️</button>
       {open && (
         <div onClick={(e) => e.stopPropagation()} style={{position:"absolute", top:"38px", right:0, zIndex:60, width:300, background:"var(--paper)", border:"1px solid var(--line)", borderRadius:10, boxShadow:"0 8px 24px rgba(0,0,0,0.12)", padding:12}}>
-          <NotifPrefsCard/>
+          <NotifPrefsCard isMgr={isMgr}/>
         </div>
       )}
     </div>
@@ -421,7 +421,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
 
         {/* ⚙️ Ayarlar — sağ üst köşe, yalnız kendi profilinde (açılır dropdown) */}
         {u.id === (currentUser && currentUser.slack_id) && (
-          <div style={{marginLeft:"auto"}}><AyarlarBolumu/></div>
+          <div style={{marginLeft:"auto"}}><AyarlarBolumu isMgr={isManager}/></div>
         )}
       </div>
 
@@ -690,7 +690,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
 }
 
 // ─── Bildirim tercihleri kartı (yalnız kendi profilinde) ─────────────────────
-function NotifPrefsCard() {
+function NotifPrefsCard({ isMgr }) {
   const [p, setP] = React.useState(null);
   React.useEffect(() => {
     if (typeof window.bnsApiGet === "function")
@@ -715,6 +715,7 @@ function NotifPrefsCard() {
       <Row k="tip_atama" label="Atama/lead — anlık"/>
       <Row k="tip_bloke" label="Bloke/müşteri — anlık"/>
       <Row k="ody_icgoru" label="Ody günlük içgörü"/>
+      {isMgr && <Row k="tip_firma_sinyal" label="Firma risk sinyalleri (yönetici)"/>}
       <div style={{display:"flex",gap:8,alignItems:"center",marginTop:10}}>
         <span style={{font:"400 13px var(--font-sans)",color:"var(--ink-2)"}}>Sessiz saat</span>
         <select value={p.sessiz_bas ?? 19} onChange={e => save({ sessiz_bas: +e.target.value })}>
