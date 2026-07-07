@@ -45,7 +45,14 @@ async function allBriefsWithAssignees() {
   });
 }
 
-async function getState() {
+// SEC-4: sensitive=false ise brief'lerden finans (maliyet/satis/fatura/odeme) ve puan
+// (rating/rating_by/rating_sebep) alanlarını çıkar. Bot/admin (sensitive=true) tam veri alır.
+function stripBriefSensitive(b) {
+  const { maliyet, satis, fatura, odeme, rating, rating_by, rating_sebep, ...rest } = b;
+  return rest;
+}
+
+async function getState({ sensitive = true } = {}) {
   const [users, brands, all, dept, brand, events] = await Promise.all([
     pool.query(`SELECT id,name,rol,dept,yetki,initials,color,title,active,avatar_url,sched_scope FROM users WHERE active ORDER BY rol,name`),
     pool.query(`SELECT id,name,color,wheel_idx,slack_channel FROM brands ORDER BY name`),
@@ -84,11 +91,13 @@ async function getState() {
 
   const deptStats = {};
   for (const r of dept.rows) deptStats[r.dept] = r;
+  // SEC-4: admin/bot değilse her brief'ten finans + puan alanlarını çıkar.
+  const clean = (arr) => sensitive ? arr : arr.map(stripBriefSensitive);
   return {
     users: users.rows,
     brands: brands.rows,
-    briefs: all.filter(b => !b.completed_at && !b.deleted_at),
-    completed: all.filter(b => b.completed_at && !b.deleted_at),
+    briefs: clean(all.filter(b => !b.completed_at && !b.deleted_at)),
+    completed: clean(all.filter(b => b.completed_at && !b.deleted_at)),
     deleted: all.filter(b => b.deleted_at),
     deptStats,
     brandStats: brand.rows,
@@ -100,7 +109,7 @@ async function getState() {
 
 // DB → dashboard'ın HAM beklediği bns_* shape (index.html EMBEDDED_DATA + poll ile aynı).
 // Dashboard kendi bnsHydrate* hattından geçirir; biz sadece doğru ham alan adlarını üretiriz.
-async function getEmbedded() {
+async function getEmbedded({ sensitive = true } = {}) {
   const [all, brands, users, dept] = await Promise.all([
     allBriefsWithAssignees(),
     pool.query(`SELECT name, color, wheel_idx FROM brands ORDER BY name`),
@@ -171,7 +180,8 @@ async function getEmbedded() {
     termin_oneri_at: ms(b.termin_oneri_at), termin_oneri_ms: b.termin_oneri_ms != null ? Number(b.termin_oneri_ms) : null,
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     gonderim_sayisi: b.gonderim_sayisi || 0, son_gonderim_at: ms(b.son_gonderim_at), musteri_bekliyor: !!b.musteri_bekliyor,
-    maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
+    // SEC-4: finans yalnız admin/bot; diğer JWT kullanıcılar için çıkarılır.
+    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme } : {}),
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at || null, thread_ozet_ts: b.thread_ozet_ts || null,
@@ -193,12 +203,13 @@ async function getEmbedded() {
     sure_cycles: cyc.cycles, sureH: cyc.toplamH, sureH_son: cyc.sonH, sureH_toplam: cyc.toplamH,
     rev: b.rev || 0,
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
-    maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
+    // SEC-4: finans + puan alanları yalnız admin/bot; diğer JWT kullanıcılar için çıkarılır.
+    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
+      rating: b.rating || null, rating_by: b.rating_by || null, rating_sebep: b.rating_sebep || null } : {}),
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at ? ms(b.thread_ozet_at) : null,
     insight: b.insight || null, insight_at: b.insight_at ? ms(b.insight_at) : null,
-    rating: b.rating || null, rating_by: b.rating_by || null, rating_sebep: b.rating_sebep || null,
     image_url: b.image_url || null,
     notes: b.musteri_notu || '',
     attachments: attByBrief[b.id] || [],
@@ -228,8 +239,9 @@ async function getEmbedded() {
   }));
 
   // ⭐ Yıldız karnesi — puanlı tamamlanan işlerden canlı ortalamalar (firma/dept/kişi/marka)
+  // SEC-4: puan/rating_sebep yalnız admin/bot; diğer JWT kullanıcılar için hiç sorgulanmaz/dönmez.
   let bns_ratings = null, bns_sebep = [], bns_sebep_history = [];
-  try {
+  if (sensitive) try {
     const [firma, deptR, userR, sebep] = await Promise.all([
       pool.query(`SELECT round(avg(rating)::numeric,1)::float avg, count(*)::int cnt FROM briefs WHERE rating IS NOT NULL`),
       // Dept ortalaması katılımcıların departmanından: çok departmanlı işte (örn. tasarım+editör)
@@ -254,7 +266,7 @@ async function getEmbedded() {
   } catch (e) { console.error('[queries] ratings okunamadı:', e.message); }
   // Tarihli sebep arşivi AYRI try/catch — tablo henüz yoksa (migration uygulanmadıysa)
   // ratings/sebep akışını ÇÖKERTMESİN (regresyon koruması).
-  try {
+  if (sensitive) try {
     const sebepHist = await pool.query(`SELECT type, key, to_char(gun,'YYYY-MM-DD') AS gun, sebep, rating_avg::float, rating_count
                   FROM entity_sebep_history WHERE gun >= (now() - interval '1 year')::date ORDER BY gun`);
     bns_sebep_history = sebepHist.rows;

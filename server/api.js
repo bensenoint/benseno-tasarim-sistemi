@@ -43,22 +43,37 @@ app.use((req, res, next) => {
 
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
+// SEC-4: duyarlı veri (finans/puan) izni — bot (req.user yok), admin veya rol='yonetici'.
+// Yönetici ekranları (puan karnesi, finans) çalışmaya devam etsin; düz üyeler soyulmuş veri alır.
+async function canSeeSensitive(req) {
+  if (!req.user) return true;                       // bot (x-bns-token)
+  if (req.user.role === 'admin') return true;
+  try {
+    const r = await pool.query('SELECT rol FROM users WHERE id=$1', [req.user.slack_id]);
+    return (r.rows[0] || {}).rol === 'yonetici';
+  } catch (e) { return false; }                     // şüphede: soyulmuş veri (fail-closed)
+}
+
 app.get('/api/state', readGuard, async (req, res) => {
   try {
-    res.json(await getState());
+    // SEC-4: bot/admin/yönetici tam veri; düz üyeler finans/puan görmez (UI ile hizalı).
+    const sensitive = await canSeeSensitive(req);
+    res.json(await getState({ sensitive }));
   } catch (e) {
     console.error('[api] /api/state hata:', e.message);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: 'sunucu hatası' });
   }
 });
 
 // Dashboard'ın doğrudan tükettiği HAM bns_* shape (poll buraya bağlanacak; Faz 2).
 app.get('/api/embedded', readGuard, async (req, res) => {
   try {
-    res.json(await getEmbedded());
+    // SEC-4: bot/admin/yönetici tam veri; düz üyeler finans/puan görmez (UI ile hizalı).
+    const sensitive = await canSeeSensitive(req);
+    res.json(await getEmbedded({ sensitive }));
   } catch (e) {
     console.error('[api] /api/embedded hata:', e.message);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: 'sunucu hatası' });
   }
 });
 
@@ -74,7 +89,7 @@ app.get('/api/events', readGuard, async (req, res) => {
     }));
   } catch (e) {
     console.error('[api] /api/events hata:', e.message);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: 'sunucu hatası' });
   }
 });
 
@@ -144,7 +159,7 @@ app.get('/api/sebep-period', readGuard, async (req, res) => {
       _sebepPeriodCache.set(ck, { text, ts: _now2 });
     }
     res.json({ sebep: text || null, adet: comp.length });
-  } catch (e) { console.error('[sebep-period] hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[sebep-period] hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // ── Yazma yolu (Faz 3) ───────────────────────────────────────
@@ -165,9 +180,28 @@ function writeGuard(req, res, next) {
   const authz = req.get('Authorization') || '';
   const jwtTok = authz.startsWith('Bearer ') ? authz.slice(7) : null;
   if (jwtTok) {
-    try { req.user = auth.verifyToken(jwtTok); return next(); } catch { /* geçersiz JWT → 401 */ }
+    try {
+      req.user = auth.verifyToken(jwtTok);
+      // SEC-7: dashboard yazımında 'by' spoof edilemez — kimliği JWT'den zorla ez.
+      // (Bot yolu req.user set etmez → body.by olduğu gibi kalır; script meşru vekâleten yazar.)
+      if (req.body && typeof req.body === 'object') req.body.by = req.user.slack_id;
+      return next();
+    } catch { /* geçersiz JWT → 401 */ }
   }
   return res.status(401).json({ error: 'yetkisiz (giriş veya write token gerekli)' });
+}
+
+// SEC-3a: Yalnız bot (server-to-server) yazabilir — dashboard/JWT KABUL EDİLMEZ.
+// Yalnız script'lerin yazdığı uçlar (kanal özeti, insight, KPI vb.) iç phishing/veri kirletme
+// yüzeyini daraltmak için JWT ile çağrılamamalı.
+function botGuard(req, res, next) {
+  const want = process.env.BNS_WRITE_TOKEN;
+  if (!want) { // writeGuard ile aynı dev/prod davranışı
+    if (process.env.NODE_ENV === 'production') return res.status(403).json({ error: 'yapılandırma: BNS_WRITE_TOKEN prod\'da zorunlu' });
+    return next();
+  }
+  if (req.get('x-bns-token') === want) return next();
+  return res.status(403).json({ error: 'yalnız sistem (bot) erişimi' });
 }
 
 // Okuma guard'ı — write guard ile AYNI mantık (JWT veya x-bns-token; BNS_WRITE_TOKEN yoksa açık).
@@ -182,7 +216,7 @@ function handleWrite(fn) {
       res.json({ ok: true, ...(await fn(req)) });
     } catch (e) {
       if (e && e.name === 'ZodError') return res.status(400).json({ error: 'doğrulama', issues: e.issues });
-      const code = /bulunamadı/.test(e.message || '') ? 404 : 400;
+      const code = e.status || (/bulunamadı/.test(e.message || '') ? 404 : 400);
       console.error('[api] write hata:', e.message);
       res.status(code).json({ error: e.message });
     }
@@ -244,7 +278,7 @@ app.get('/api/layout', auth.authGuard, async (req, res) => {
   try {
     const r = await pool.query('SELECT layout FROM dashboard_layouts WHERE user_id=$1', [req.user.slack_id]);
     res.json({ layout: r.rows[0] ? r.rows[0].layout : null });
-  } catch (e) { console.error('[api] layout get hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] layout get hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 app.post('/api/layout', auth.authGuard, async (req, res) => {
   try {
@@ -256,7 +290,7 @@ app.post('/api/layout', auth.authGuard, async (req, res) => {
        ON CONFLICT (user_id) DO UPDATE SET layout=$2, updated_at=now()`,
       [req.user.slack_id, JSON.stringify(layout)]);
     res.json({ ok: true });
-  } catch (e) { console.error('[api] layout put hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] layout put hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // ── Kullanıcı yönetimi (admin only) ─────────────────────────────────────────
@@ -265,7 +299,7 @@ app.get('/api/users', auth.authGuard, auth.adminGuard, async (req, res) => {
   try {
     const r = await pool.query('SELECT id, slack_id, name, role, created_at, last_login FROM dashboard_users ORDER BY id');
     res.json({ users: r.rows });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // POST /api/users — { slack_id, name, role, password }
@@ -282,7 +316,7 @@ app.post('/api/users', auth.authGuard, auth.adminGuard, async (req, res) => {
     res.json({ ok: true, user: r.rows[0] });
   } catch (e) {
     if (e.code === '23505') return res.status(409).json({ error: 'bu slack_id zaten kayıtlı' });
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: 'sunucu hatası' });
   }
 });
 
@@ -300,23 +334,32 @@ app.patch('/api/users/:id', auth.authGuard, auth.adminGuard, async (req, res) =>
   try {
     await pool.query(`UPDATE dashboard_users SET ${updates.join(',')} WHERE id=$${params.length}`, params);
     res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
+
+// SEC-3c: JWT kullanıcı finansal yazıyorsa yönetici olmalı; bot (req.user yok) serbest.
+async function assertCanWriteFinancials(req) {
+  if (!req.user) return; // bot
+  if (req.user.role === 'admin') return;
+  const r = await pool.query('SELECT rol FROM users WHERE id=$1', [req.user.slack_id]);
+  if ((r.rows[0] || {}).rol === 'yonetici') return;
+  const e = new Error('finansal veri için yönetici yetkisi gerekli'); e.status = 403; throw e;
+}
 
 app.post('/api/briefs', writeGuard, handleWrite(req => writes.createBrief(req.body)));
 app.patch('/api/briefs/:id', writeGuard, handleWrite(req => writes.patchBrief(+req.params.id, req.body)));
 app.post('/api/briefs/:id/status', writeGuard, handleWrite(req => writes.setStatus(+req.params.id, req.body)));
-app.post('/api/briefs/:id/financials', writeGuard, handleWrite(req => writes.setFinancials(+req.params.id, req.body)));
+app.post('/api/briefs/:id/financials', writeGuard, handleWrite(async req => { await assertCanWriteFinancials(req); return writes.setFinancials(+req.params.id, req.body); }));
 app.post('/api/briefs/:id/termin-oneri-kapat', writeGuard, handleWrite(req => writes.clearTerminOneri(+req.params.id)));   // işe-dönüş hatırlatıcısını uzatmadan kapat
 app.post('/api/briefs/:id/termin-oneri-uzat', writeGuard, handleWrite(req => writes.applyTerminOneri(+req.params.id, (req.user && (req.user.slack_id || String(req.user.id))) || req.body?.by, 'dashboard')));   // bekleme kadar muaf uzat
 app.post('/api/briefs/by-ts/:ts/termin-oneri-uzat', writeGuard, handleWrite(async req => writes.applyTerminOneri(await writes.tsToId(req.params.ts), req.body?.by, 'slack')));   // Slack "termin uzat"
 
 // Slack tarafı için: brief'i no / slack_ts ile hedefle (b3/cutover bot bunları çağırır).
 app.post('/api/briefs/by-no/:no/status', writeGuard, handleWrite(async req => writes.setStatus(await writes.noToId(+req.params.no), req.body)));
-app.post('/api/briefs/by-no/:no/financials', writeGuard, handleWrite(async req => writes.setFinancials(await writes.noToId(+req.params.no), req.body)));
+app.post('/api/briefs/by-no/:no/financials', writeGuard, handleWrite(async req => { await assertCanWriteFinancials(req); return writes.setFinancials(await writes.noToId(+req.params.no), req.body); }));
 app.patch('/api/briefs/by-no/:no', writeGuard, handleWrite(async req => writes.patchBrief(await writes.noToId(+req.params.no), req.body)));
 app.post('/api/briefs/by-ts/:ts/status', writeGuard, handleWrite(async req => writes.setStatus(await writes.tsToId(req.params.ts), req.body)));
-app.post('/api/briefs/by-ts/:ts/financials', writeGuard, handleWrite(async req => writes.setFinancials(await writes.tsToId(req.params.ts), req.body)));
+app.post('/api/briefs/by-ts/:ts/financials', writeGuard, handleWrite(async req => { await assertCanWriteFinancials(req); return writes.setFinancials(await writes.tsToId(req.params.ts), req.body); }));
 // Soft-delete yetkisi: admin + yönetici + işin LEAD'i (dashboard butonuyla aynı kural).
 // Slack'in ana mesaj silme sinyali (by:'slack:deleted') Slack'in kendi yetkisiyle gelir → kabul.
 // İki yol: dashboard JWT (req.user) veya Slack bot token (actor = body.by, ör. event.user).
@@ -352,8 +395,9 @@ async function assertCanDeleteBrief(req, briefId) {
 app.delete('/api/briefs/:id/permanent', writeGuard, auth.adminGuard, handleWrite(req => writes.permanentDeleteBrief(+req.params.id, req.body?.by)));
 app.delete('/api/briefs/:id',          writeGuard, handleWrite(async req => { await assertCanDeleteBrief(req, +req.params.id); return writes.deleteBrief(+req.params.id, req.body?.by); }));
 app.delete('/api/briefs/by-ts/:ts',    writeGuard, handleWrite(async req => { const id = await writes.tsToId(req.params.ts); await assertCanDeleteBrief(req, id); return writes.deleteBrief(id, req.body?.by); }));
-app.post('/api/briefs/:id/restore',    writeGuard, handleWrite(req => writes.restoreBrief(+req.params.id, req.body?.by)));
-app.post('/api/briefs/by-ts/:ts/restore', writeGuard, handleWrite(async req => writes.restoreBrief(await writes.tsToId(req.params.ts), req.body?.by)));
+// SEC-8: restore de silme kadar yetki ister (aynı assertCanDeleteBrief kuralı).
+app.post('/api/briefs/:id/restore',    writeGuard, handleWrite(async req => { await assertCanDeleteBrief(req, +req.params.id); return writes.restoreBrief(+req.params.id, req.body?.by); }));
+app.post('/api/briefs/by-ts/:ts/restore', writeGuard, handleWrite(async req => { const id = await writes.tsToId(req.params.ts); await assertCanDeleteBrief(req, id); return writes.restoreBrief(id, req.body?.by); }));
 
 // Kişisel iş kuyruğu sırası — yalnız kişinin kendisi veya admin. Body: { order: [briefId,...] }.
 app.post('/api/users/:uid/queue', auth.authGuard, handleWrite(async req => {
@@ -383,7 +427,7 @@ app.post('/api/kanban/reorder', auth.authGuard, handleWrite(async req => {
 }));
 
 // Onay anındaki son görseli kaydet (Slack bot ✅ handler'ından çağrılır, best-effort)
-app.patch('/api/briefs/by-ts/:ts/set-image', writeGuard, async (req, res) => {
+app.patch('/api/briefs/by-ts/:ts/set-image', botGuard, async (req, res) => {  // SEC-3b: yalnız Slack bot ✅ handler'ı yazar
   try {
     const { image_url } = req.body || {};
     if (!image_url) return res.status(400).json({ error: 'image_url gerekli' });
@@ -393,7 +437,7 @@ app.patch('/api/briefs/by-ts/:ts/set-image', writeGuard, async (req, res) => {
     );
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.ts });
     res.json({ ok: true, id: r.rows[0].id });
-  } catch (e) { console.error('[api] set-image hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] set-image hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Final teslim(ler): 📎 ile işaretlenen mesajın dosyaları → brief_attachments(is_final=true).
@@ -421,7 +465,7 @@ app.post('/api/briefs/by-ts/:ts/final-deliverables', writeGuard, async (req, res
 app.patch('/api/briefs/by-ts/:ts', writeGuard, handleWrite(async req => writes.patchBrief(await writes.tsToId(req.params.ts), req.body)));
 
 // Thread özeti (AI) — thread-ozet.js scripti yazar. Bilinçli olarak sessiz: DM/thread notu YOK.
-app.patch('/api/briefs/:id/thread-ozet', writeGuard, async (req, res) => {
+app.patch('/api/briefs/:id/thread-ozet', botGuard, async (req, res) => {  // SEC-3b: thread-ozet.js scripti yazar
   try {
     const { ozet, last_ts } = req.body || {};
     if (!ozet) return res.status(400).json({ error: 'ozet gerekli' });
@@ -431,12 +475,12 @@ app.patch('/api/briefs/:id/thread-ozet', writeGuard, async (req, res) => {
     );
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true, id: r.rows[0].id });
-  } catch (e) { console.error('[api] thread-ozet hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] thread-ozet hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // İş insight'ı (AI) — tamamlanan işler için; ileride marka/iş değerlendirmelerinde kullanılacak. Sessiz.
 // puan (1-5) AI değerlendirmesinden gelir; yönetici elle verdiyse (rating_by≠'ai') AI üzerine yazamaz.
-app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
+app.patch('/api/briefs/:id/insight', botGuard, async (req, res) => {  // SEC-3b: insight scripti yazar
   try {
     const { insight, puan, puan_sebep } = req.body || {};
     if (!insight) return res.status(400).json({ error: 'insight gerekli' });
@@ -464,7 +508,7 @@ app.patch('/api/briefs/:id/insight', writeGuard, async (req, res) => {
     );
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true, id: r.rows[0].id });
-  } catch (e) { console.error('[api] insight hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] insight hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Yönetici puan override'ı — AI puanının üzerine yazar, AI bir daha dokunamaz.
@@ -477,17 +521,17 @@ app.patch('/api/briefs/:id/rating', auth.authGuard, auth.adminGuard, async (req,
       [rating, req.user.slack_id, +req.params.id]);
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true });
-  } catch (e) { console.error('[api] rating hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] rating hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Avatar senkronu — bot açılışta Slack profil fotoğraflarını buraya yazar.
-app.patch('/api/users-avatar/:id', writeGuard, async (req, res) => {
+app.patch('/api/users-avatar/:id', botGuard, async (req, res) => {  // SEC-3b: bot açılışta Slack avatar'larını yazar
   try {
     const { avatar_url } = req.body || {};
     if (!avatar_url) return res.status(400).json({ error: 'avatar_url gerekli' });
     const r = await pool.query('UPDATE users SET avatar_url=$1 WHERE id=$2 RETURNING id', [String(avatar_url).slice(0, 600), req.params.id]);
     res.json({ ok: true, updated: !!r.rows[0] });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // ── Sistem Asistanı (dashboard chatbot) ─────────────────────────────────────
@@ -628,7 +672,7 @@ app.post('/api/chat', auth.authGuard, async (req, res) => {
       [req.user.id || req.user.slack_id || null, req.user.name || null, req.user.role || null,
        soru, JSON.stringify(toolsUsed), toolsUsed.length, turnsUsed, reply.slice(0, 4000)]
     ).catch(e => console.error('[chat] log yazılamadı:', e.message));
-  } catch (e) { console.error('[chat] hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[chat] hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // ── Bildirimler (dashboard zili) ────────────────────────────────────────────
@@ -642,20 +686,20 @@ app.get('/api/notifications', auth.authGuard, async (req, res) => {
     const c = await pool.query(
       `SELECT count(*)::int AS unread FROM notifications WHERE user_id=$1 AND read_at IS NULL`, [req.user.slack_id]);
     res.json({ notifications: r.rows, unread: c.rows[0].unread });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 app.post('/api/notifications/read', auth.authGuard, async (req, res) => {
   try {
     await pool.query('UPDATE notifications SET read_at=now() WHERE user_id=$1 AND read_at IS NULL', [req.user.slack_id]);
     res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 // authGuard → kişinin slack_id'sinden okur/yazar. notify_prefs(user_id PK, ...bool, sessiz_bas/bit smallint).
 app.get('/api/notify-prefs', auth.authGuard, async (req, res) => {
   try {
     const r = await pool.query('SELECT * FROM notify_prefs WHERE user_id=$1', [req.user.slack_id]);
     res.json(r.rows[0] || { ogle_dijest: true, tip_termin: true, tip_atama: true, tip_bloke: true, sessiz_bas: 19, sessiz_bit: 8, ody_icgoru: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 app.post('/api/notify-prefs', auth.authGuard, async (req, res) => {
@@ -704,7 +748,7 @@ app.get('/api/notif-counts', auth.authGuard, async (req, res) => {
       }
     }
     res.json({ briefs, markalar });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Bir işin tekil bildirim listesi (son 30) — kişinin KENDİ bildirimleri.
@@ -717,7 +761,7 @@ app.get('/api/briefs/:id/notifications', auth.authGuard, async (req, res) => {
       FROM notifications WHERE brief_id=$1 AND user_id=$2
       ORDER BY tip, text, created_at DESC LIMIT 30`, [+req.params.id, req.user.slack_id]);
     res.json({ notifications: r.rows.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)) });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Görüldü işaretle (rozet söner).
@@ -765,14 +809,14 @@ app.post('/api/briefs/:id/remind', auth.authGuard, async (req, res) => {
 });
 
 // Script'lerin (uyarı DM'leri) bildirim düşmesi için — writeGuard.
-app.post('/api/notifications', writeGuard, async (req, res) => {
+app.post('/api/notifications', botGuard, async (req, res) => {  // SEC-2: script uyarı DM'leri yazar; dashboard erişmemeli (iç phishing yüzeyi)
   try {
     const { user_id, text, link } = req.body || {};
     if (!user_id || !text) return res.status(400).json({ error: 'user_id ve text gerekli' });
     await pool.query('INSERT INTO notifications (user_id, text, link) VALUES ($1,$2,$3)',
       [user_id, String(text).slice(0, 1000), link || null]);
     res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Ody öneri geri bildirimi (beğen/beğenme + sebep + yeniden-değerlendirme sonucu).
@@ -789,11 +833,11 @@ app.post('/api/ody/advice-feedback', auth.authGuard, async (req, res) => {
        adviceText ? String(adviceText).slice(0, 4000) : null, vote,
        reason ? String(reason).slice(0, 1000) : null, !!outcome, outcome || null]);
     res.json({ ok: true, id: r.rows[0].id });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Yıldız karnesi sebep açıklaması (AI) — gün-sonu turu yazar. Sessiz upsert.
-app.post('/api/rating-sebep', writeGuard, async (req, res) => {
+app.post('/api/rating-sebep', botGuard, async (req, res) => {  // SEC-3b: gün-sonu turu yazar
   try {
     const { type, key, sebep, rating_avg, rating_count } = req.body || {};
     if (!type || !key || !sebep) return res.status(400).json({ error: 'type, key, sebep gerekli' });
@@ -811,7 +855,7 @@ app.post('/api/rating-sebep', writeGuard, async (req, res) => {
       ON CONFLICT (type, key, gun) DO UPDATE SET sebep=$3, rating_avg=$4, rating_count=$5, created_at=now()`,
       [type, key, s, rating_avg ?? null, rating_count ?? null]);
     res.json({ ok: true });
-  } catch (e) { console.error('[api] rating-sebep hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] rating-sebep hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Marka günlük arşivi — tarih filtresiyle geçmiş kanal özetleri + gün-sonu insight'ları
@@ -822,11 +866,11 @@ app.get('/api/brands/by-name/:name/daily', readGuard, async (req, res) => {
       FROM brand_daily d JOIN brands b ON b.id = d.brand_id
       WHERE b.name = $1 ORDER BY d.tarih DESC LIMIT 90`, [req.params.name]);
     res.json({ daily: r.rows });
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Marka kanal özeti (AI) — kanal-ozet.js scripti yazar. Sessiz.
-app.patch('/api/brands/by-name/:name/kanal-ozet', writeGuard, async (req, res) => {
+app.patch('/api/brands/by-name/:name/kanal-ozet', botGuard, async (req, res) => {  // SEC-3b: kanal-ozet.js scripti yazar
   try {
     const { ozet, last_ts } = req.body || {};
     if (!ozet) return res.status(400).json({ error: 'ozet gerekli' });
@@ -835,11 +879,11 @@ app.patch('/api/brands/by-name/:name/kanal-ozet', writeGuard, async (req, res) =
       [String(ozet).slice(0, 4000), last_ts || null, req.params.name]);
     if (!r.rows[0]) return res.status(404).json({ error: 'marka bulunamadı: ' + req.params.name });
     res.json({ ok: true });
-  } catch (e) { console.error('[api] kanal-ozet hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] kanal-ozet hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Marka gün-sonu insight'ı — günde bir, brand_daily'ye arşivlenir (ileride marka değerlendirmeleri için).
-app.post('/api/brands/by-name/:name/gun-sonu', writeGuard, async (req, res) => {
+app.post('/api/brands/by-name/:name/gun-sonu', botGuard, async (req, res) => {  // SEC-3b: gün-sonu turu yazar
   try {
     const { insight, ozet } = req.body || {};
     if (!insight) return res.status(400).json({ error: 'insight gerekli' });
@@ -851,11 +895,11 @@ app.post('/api/brands/by-name/:name/gun-sonu', writeGuard, async (req, res) => {
       [req.params.name, ozet ? String(ozet).slice(0, 4000) : null, String(insight).slice(0, 4000)]);
     if (!r.rows[0]) return res.status(404).json({ error: 'marka bulunamadı: ' + req.params.name });
     res.json({ ok: true });
-  } catch (e) { console.error('[api] gun-sonu hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] gun-sonu hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // KPI anlık görüntüsü — saatlik thread bakımı tetikler; Overview spark grafiklerinin gerçek verisi.
-app.post('/api/kpi-snapshot', writeGuard, async (req, res) => {
+app.post('/api/kpi-snapshot', botGuard, async (req, res) => {  // SEC-3b: saatlik thread bakımı tetikler
   try {
     const r = await pool.query(`
       INSERT INTO kpi_history (active, overdue, today, review, stale, musteride)
@@ -869,24 +913,24 @@ app.post('/api/kpi-snapshot', writeGuard, async (req, res) => {
       FROM briefs WHERE completed_at IS NULL AND deleted_at IS NULL
       RETURNING id, ts, active, overdue`);
     res.json({ ok: true, snapshot: r.rows[0] });
-  } catch (e) { console.error('[api] kpi-snapshot hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] kpi-snapshot hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Hareketsizlik bayrağı + cevapsız uyarı işareti — thread-ozet.js yazar. Sessiz (DM/thread notu yok).
-app.patch('/api/briefs/:id/stale', writeGuard, async (req, res) => {
+app.patch('/api/briefs/:id/stale', botGuard, async (req, res) => {  // SEC-3b: thread-ozet.js yazar
   try {
     const r = await pool.query('UPDATE briefs SET stale=$1 WHERE id=$2 RETURNING id', [!!req.body?.stale, +req.params.id]);
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true });
-  } catch (e) { console.error('[api] stale hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] stale hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
-app.post('/api/briefs/:id/uyari', writeGuard, async (req, res) => {
+app.post('/api/briefs/:id/uyari', botGuard, async (req, res) => {  // SEC-3b: uyarı bayrağını script yazar
   try {
     const col = req.body?.level === 2 ? 'uyari2_at' : 'uyari_at';
     const r = await pool.query(`UPDATE briefs SET ${col}=now() WHERE id=$1 RETURNING id`, [+req.params.id]);
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
     res.json({ ok: true });
-  } catch (e) { console.error('[api] uyari hata:', e.message); res.status(500).json({ error: e.message }); }
+  } catch (e) { console.error('[api] uyari hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
 // Dosya ekleri (dashboard) — base64 JSON: { files:[{name,mime,b64}], by }. Slack thread'e yükler + DB.
@@ -917,11 +961,23 @@ app.post('/api/briefs/:id/attachments', writeGuard, async (req, res) => {
 app.post('/api/briefs/:id/attachments-meta', writeGuard, async (req, res) => {
   try {
     const id = +req.params.id;
+    // SEC-1 (savunma derinliği): yalnız Slack-barındırılmış dosya URL'i kabul et — yabancı host DB'ye girmesin.
+    if (!isSlackUrl(req.body.url)) return res.status(400).json({ error: 'yalnız Slack dosya URL\'i kabul edilir' });
     await pool.query(`INSERT INTO brief_attachments(brief_id,url,filename,mime,uploaded_by,source) VALUES ($1,$2,$3,$4,$5,'slack')`,
       [id, req.body.url || '', req.body.filename || null, null, req.body.by || null]);
     res.json({ ok: true });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
+
+// SEC-1: Bot token YALNIZCA Slack host'larına gönderilir. attachments-meta url'i doğrulamasız
+// yazıldığından (herhangi bir JWT üyesi), saldırgan url=https://evil.com koyup bu proxy'yi
+// çağırırsa token dışarı sızardı. Fetch öncesi host'u allowlist'e sabitle.
+function isSlackUrl(u) {
+  try {
+    const h = new URL(u).hostname.toLowerCase();
+    return h === 'slack.com' || h === 'files.slack.com' || h.endsWith('.slack.com');
+  } catch (e) { return false; }
+}
 
 // Slack görsel proxy — galeri için. Slack private URL → bot token ile çek → tarayıcıya ilet.
 // NOT: /api/img bilinçli olarak PUBLIC — dashboard <img src> ile çağırır ve tarayıcı
@@ -932,6 +988,7 @@ app.get('/api/img/:id', async (req, res) => {
     const r = await pool.query('SELECT image_url FROM briefs WHERE id = $1', [+req.params.id]);
     const row = r.rows[0];
     if (!row || !row.image_url) return res.status(404).end();
+    if (!isSlackUrl(row.image_url)) return res.status(400).end();   // SEC-1: token yalnız Slack host'una
     const slackRes = await fetch(row.image_url, {
       headers: { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` },
     });
@@ -953,6 +1010,7 @@ app.get('/api/attachment/:id', async (req, res) => {
     const r = await pool.query('SELECT url, filename, mime FROM brief_attachments WHERE id=$1', [+req.params.id]);
     const row = r.rows[0];
     if (!row || !row.url) return res.status(404).end();
+    if (!isSlackUrl(row.url)) return res.status(400).end();   // SEC-1: token yalnız Slack host'una
     const sres = await fetch(row.url, { headers: { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` } });
     if (!sres.ok) return res.status(sres.status).end();
     const ct = sres.headers.get('content-type') || row.mime || 'application/octet-stream';
