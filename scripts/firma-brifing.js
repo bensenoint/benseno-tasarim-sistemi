@@ -14,13 +14,16 @@ const C = require('../dashboard/app/calc.js');
 const DRY = process.argv.includes('--dry');
 const OPUS = process.env.ODY_OPUS_MODEL || 'claude-opus-4-7';
 const GUARD = ' ÖNEMLİ: Yalnızca aşağıdaki olgulara dayan. Tarih, ay, proje türü (bu bir tasarım/reklam ajansıdır — yazılım değil), müşteri veya OLMAYAN hiçbir bilgi UYDURMA. Emin olmadığını yazma.';
-const SYS = 'Sen Ody, Benseno iş asistanısın. Yöneticilere HAFTA-ÖNÜ stratejik brifing yaz: bu hafta neye dikkat edilmeli. Verilen sinyalleri ve finansı yorumla; en kritik 3-5 maddeyi öne çıkar, kısa ve eyleme yönelik ol. Başlık + madde imleri kullan, en fazla ~250 kelime. Türkçe.' + GUARD;
+const SYS = 'Sen Ody, Benseno iş asistanısın. Yöneticilere HAFTA-ÖNÜ stratejik brifing yaz: bu hafta neye dikkat edilmeli. Verilen sinyalleri ve finansı yorumla; en kritik 3-5 maddeyi öne çıkar, kısa ve eyleme yönelik ol. Başlık + madde imleri kullan, en fazla ~250 kelime. Türkçe. Eğer finansVar=false ise finansal rakam/yorum YAPMA (veri girilmemiş, 0 sanma).' + GUARD;
 
 // Saf olgu toplama (Opus'a ve fallback'e girdi)
 async function brifingOlgulari(d, now) {
   const sinyaller = await sinyalleriHesapla(d, now);
   const finans = C.bnsFinansOzet(d.bns_completed || []);
-  return { sinyaller, finans, aktifSayi: (d.bns_briefs || []).length, tamamlananSayi: (d.bns_completed || []).length };
+  // Finans alanları (satış/maliyet) girilmemişse yanıltıcı 0 gösterme / Opus'a "yorum yapma" de.
+  const finansVar = (finans.satis || 0) > 0 || (finans.maliyet || 0) > 0;
+  return { sinyaller, finans, finansVar,
+    aktifSayi: (d.bns_briefs || []).length, tamamlananSayi: (d.bns_completed || []).length };
 }
 
 // Deterministik fallback (Opus yok/hatalı) — link main'de eklenir
@@ -34,8 +37,10 @@ function fallbackMetin(o) {
     ...(satirlar.length ? satirlar : ['• Bu hafta kritik sinyal yok.']),
     '',
     '💰 Finans (tamamlanan):',
-    `• Kâr: ${f.kar != null ? f.kar : '—'} · Marj: ${f.marj != null ? '%' + f.marj : '—'}`,
-    `• Faturalanmamış: ${f.faturalanmamis || 0} · Tahsil edilmemiş: ${f.tahsilEdilmemis || 0}`,
+    ...(o.finansVar
+      ? [`• Kâr: ${f.kar != null ? f.kar : '—'} · Marj: ${f.marj != null ? '%' + f.marj : '—'}`,
+         `• Faturalanmamış: ${f.faturalanmamis || 0} · Tahsil edilmemiş: ${f.tahsilEdilmemis || 0}`]
+      : ['• Finans verisi girilmemiş (satış/maliyet alanları boş).']),
   ].join('\n');
 }
 
