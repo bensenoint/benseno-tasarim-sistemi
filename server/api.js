@@ -601,6 +601,8 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
       `Sayısal her şey (iş sayıları, listeler, puanlar, kapasite, gecikme, olgular) SADECE sana verilen TOOL'lardan gelir. Bir sayı/olgu söylemeden ÖNCE ilgili tool'u çağır; sonucu BİREBİR kullan — asla kendin sayma, tahmin etme, uydurma. Tool boş/0 dönerse açıkça "yok" de.\n\n` +
       `## YORUM/ÖNERİ İÇİN NİTEL VERİYİ HARMANLA\n` +
       `Özet, öneri, yorum, değerlendirme istendiğinde sadece kuru sayı verme. Nitel tool'ları (is_detay → thread özeti/insight/puan sebebi; insightlar → işlerin özet/insight metinleri; yildiz_karne → puan + yorum; marka_dokumu → kanal özeti/son insight/yorum) çağır ve bunları sayısal verilerle HARMANLA: bağlam kat, neden-sonuç kur, somut öneri sun. Sayısal kısım hep DB'den; yorum kısmı bu nitel kaynaklardan beslenir. Bir işi/markayı/kişiyi değerlendirirken önce ilgili nitel tool'u çağırmayı düşün.\n\n` +
+      `## SLACK'TEN CANLI BİLGİ\n` +
+      `Slack'te olan TAZE bilgi gerektiğinde (bir markanın kanalında bugün ne konuşuldu, bir işin ham Slack thread'i, bir konuyu tüm kanallarda arama, bir kişinin tatil/izin/çevrimiçi durumu) slack_sorgu tool'unu çağır ve dönen ham veriyi YORUMLA — özetle, bağlam kat. Kullanıcı YALNIZ eriştiği Slack kanallarının bilgisini görür; tool "erişimin yok" derse bunu kibarca ilet. Arama kapalıysa (tool öyle derse) kullanıcıya belirt.\n\n` +
       `## HİYERARŞİ AMA BİLGİSİZ BIRAKMA\n` +
       (isAdmin
         ? `Bu kişi yönetici: tüm kişi/departman/marka puanlarına ve kıyaslara erişebilir.\n`
