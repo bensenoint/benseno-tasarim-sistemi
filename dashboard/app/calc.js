@@ -397,9 +397,20 @@ function bnsKisiPerformans(completed, now) {
     ortPuan: ortPuan, tipDagilim: tipDagilim, throughputHaftalik: r1(son4 / 4) };
 }
 function bnsSinyalGecikme(atRiskBriefs) {
-  return (atRiskBriefs || []).map(function (b) {
-    return { tip: 'gecikme_ongoru', aciliyet: 'acil', key: b.marka || null,
-      text: '⏳ #' + b.no + ' ' + (b.marka || '') + ' — öngörülen gecikme (deadline yetişmeyebilir).' };
+  // Marka başına toplulaştır — dedup anahtarı marka olduğu için aynı markanın
+  // birden çok at-risk işini tek sinyalde topla (bilgi kaybı olmasın).
+  var byMarka = {};
+  (atRiskBriefs || []).forEach(function (b) {
+    var m = b.marka || '(marka yok)';
+    if (!byMarka[m]) byMarka[m] = { marka: b.marka || null, adet: 0, ilk: b.no };
+    byMarka[m].adet++;
+  });
+  return Object.keys(byMarka).map(function (m) {
+    var g = byMarka[m];
+    var text = g.adet === 1
+      ? '⏳ #' + g.ilk + ' ' + (g.marka || '') + ' — öngörülen gecikme (deadline yetişmeyebilir).'
+      : '⏳ ' + (g.marka || m) + ' — ' + g.adet + ' iş öngörülen gecikmede (örn #' + g.ilk + ').';
+    return { tip: 'gecikme_ongoru', aciliyet: 'acil', key: g.marka || null, text: text };
   });
 }
 function bnsSinyalBurnout(kisiler) {

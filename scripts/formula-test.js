@@ -201,6 +201,7 @@ t('perf tipDagilim', JSON.stringify(perf.tipDagilim), JSON.stringify({ A:1, B:1 
 t('perf boş girdi', C.bnsKisiPerformans([], NOWG).tamamlanan, 0);
 
 t('sinyal gecikme sayısı+key', (() => { const s = C.bnsSinyalGecikme([{ marka:'Z', no:5 }]); return s.length===1 && s[0].key==='Z' && s[0].tip==='gecikme_ongoru'; })(), true);
+t('sinyal gecikme aynı marka toplulaşır', (() => { const s = C.bnsSinyalGecikme([{marka:'Z',no:5},{marka:'Z',no:9},{marka:'Y',no:1}]); return s.length===2 && s.find(x=>x.key==='Z').text.includes('2 iş'); })(), true);
 t('sinyal burnout sayısı+key', (() => { const s = C.bnsSinyalBurnout([{ ad:'Eda', pct:140 }]); return s.length===1 && s[0].key==='Eda' && s[0].tip==='burnout'; })(), true);
 
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
