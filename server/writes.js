@@ -553,6 +553,9 @@ async function setStatus(id, raw, _depth = 0) {
     if (zincirNote) note += `\n${zincirNote}`;
   } else if (zincirNote) {
     note = zincirNote;
+  } else if (d.source === 'system' && d.durum === 'basladi') {
+    // Otomatik kuyruk ilerlemesi — insan imzası yok, Ody imzalı (yanıltıcı atıf düzeltmesi).
+    note = `🤖 *Ody:* önceki işin kapandı — sıradaki işin otomatik başlatıldı (kuyruk ilerlemesi).`;
   } else {
     note = `🔄 durum güncellendi: *${d.durum}*`;
   }
@@ -610,8 +613,11 @@ async function setStatus(id, raw, _depth = 0) {
       const nextId = await (async () => { const c = await pool.connect(); try { return await userActiveBriefId(c, row.user_id); } finally { c.release(); } })();
       if (nextId && nextId !== id) {
         const nb = await pool.query('SELECT durum FROM briefs WHERE id=$1', [nextId]);
-        if (nb.rows[0] && nb.rows[0].durum !== 'basladi') {
-          await setStatus(nextId, { durum: activateTarget(nb.rows[0].durum), by: d.by, source: 'system' }, _depth + 1);
+        // Yalnız iş planındaki (calisiliyor) ve beklemedeki kuyruk-başı otomatik başlatılır.
+        // yeni (henüz kabul edilmemiş), revizyon/incelemede/blokeli/basladi DOKUNULMAZ —
+        // eski activateTarget kuralı revizyonu/blokeyi eziyordu (#188/#189 vakası).
+        if (nb.rows[0] && ['calisiliyor', 'beklemede'].includes(nb.rows[0].durum)) {
+          await setStatus(nextId, { durum: 'basladi', by: null, source: 'system' }, _depth + 1);
         }
       }
     }
@@ -642,11 +648,6 @@ async function briefHasOtherActive(client, briefId, exceptUid) {
   return false;
 }
 
-// Aktive etme: mevcut duruma göre hedef durum (geçiş tablosu).
-function activateTarget(durum) {
-  if (durum === 'incelemede' || durum === 'musteride') return 'revizyon';
-  return 'basladi'; // yeni/calisiliyor/beklemede/blokeli/tamamlandi → basladi (tamamlandi reopen)
-}
 
 // Bir kullanıcının kuyruğunu yeniden sırala + aktif/demote hesapla.
 // order: briefId dizisi (yalnız uid'in contributor olduğu işler dikkate alınır). by: işlemi yapan.
