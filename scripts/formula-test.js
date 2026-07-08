@@ -232,5 +232,50 @@ t('perms: yabancı termin', C.bnsBriefActionPerms(pB, {id:'X9'}).termin, false);
 t('perms: yabancı hatirlat', C.bnsBriefActionPerms(pB, {id:'X9'}).hatirlat, false);
 t('perms: lead hatirlat (regresyon)', C.bnsBriefActionPerms(pB, {id:'L1'}).hatirlat, true);
 
+// ── Kapasite v2: zamana yayılmış yük ──
+const D = (s) => Date.parse(s + 'T12:00:00+03:00');           // İstanbul öğlen ts
+const K = (s) => s;                                             // gün anahtarı 'YYYY-MM-DD'
+const bYeni = { created_at: D('2026-07-06'), deadline: D('2026-07-10'),
+  durum: 'yeni', durum_olaylari: [] };
+t('v2: başlanmamış gün1 pay 1.0', C.bnsYayilimGunlukPay(bYeni, 5, K('2026-07-06')), 1);
+t('v2: başlanmamış gün2 pay 1.25', C.bnsYayilimGunlukPay(bYeni, 5, K('2026-07-07')), 1.25);
+t('v2: başlanmamış son gün pay 5', C.bnsYayilimGunlukPay(bYeni, 5, K('2026-07-10')), 5);
+const bCalisan = { created_at: D('2026-07-06'), deadline: D('2026-07-10'), durum: 'basladi',
+  durum_olaylari: [{ ts: D('2026-07-06'), durum: 'basladi' }] };
+t('v2: çalışan gün1 pay 1.0', C.bnsYayilimGunlukPay(bCalisan, 5, K('2026-07-06')), 1);
+t('v2: çalışan gün3 pay 1.0', C.bnsYayilimGunlukPay(bCalisan, 5, K('2026-07-08')), 1);
+t('v2: çalışan gün5 pay 1.0', C.bnsYayilimGunlukPay(bCalisan, 5, K('2026-07-10')), 1);
+const bBekle = { created_at: D('2026-07-06'), deadline: D('2026-07-10'), durum: 'revizyon',
+  durum_olaylari: [
+    { ts: D('2026-07-06'), durum: 'basladi' },
+    { ts: Date.parse('2026-07-06T18:00:00+03:00'), durum: 'musteride' },
+    { ts: D('2026-07-09'), durum: 'revizyon' } ] };
+t('v2: ✈️ günü pay 0', C.bnsYayilimGunlukPay(bBekle, 5, K('2026-07-06')), 0);
+t('v2: müşteride gün pay 0', C.bnsYayilimGunlukPay(bBekle, 5, K('2026-07-07')), 0);
+t('v2: dönüş günü pay 2.5 (R=5, 2 gün)', C.bnsYayilimGunlukPay(bBekle, 5, K('2026-07-09')), 2.5);
+const bInc = { created_at: D('2026-07-06'), deadline: D('2026-07-10'), durum: 'incelemede',
+  durum_olaylari: [{ ts: D('2026-07-06'), durum: 'incelemede' }] };
+t('v2: incelemede tüketir (gün2 pay 1.0)', C.bnsYayilimGunlukPay(bInc, 5, K('2026-07-07')), 1);
+const bGec = { created_at: D('2026-07-01'), deadline: D('2026-07-03'), durum: 'yeni', durum_olaylari: [] };
+t('v2: overdue tüm R bugüne', C.bnsYayilimGunlukPay(bGec, 5, K('2026-07-08')), 5);
+t('v2: hafta sonu pay 0', C.bnsYayilimGunlukPay(bYeni, 5, K('2026-07-11')), 0);
+const bCuma = { created_at: D('2026-07-10'), deadline: D('2026-07-13'), durum: 'yeni', durum_olaylari: [] };
+t('v2: Cum→Pzt 2 iş günü (pay 2.5)', C.bnsYayilimGunlukPay(bCuma, 5, K('2026-07-10')), 2.5);
+const bBitti = { created_at: D('2026-07-06'), deadline: D('2026-07-10'), durum: 'tamamlandi',
+  durum_olaylari: [{ ts: D('2026-07-06'), durum: 'basladi' }, { ts: D('2026-07-08'), durum: 'tamamlandi' }] };
+t('v2: tamamlandi günü pay 0', C.bnsYayilimGunlukPay(bBitti, 5, K('2026-07-08')), 0);
+const bReopen = { created_at: D('2026-07-01'), deadline: D('2026-07-03'), durum: 'basladi',
+  durum_olaylari: [
+    { ts: D('2026-07-01'), durum: 'basladi' }, { ts: D('2026-07-02'), durum: 'tamamlandi' },
+    { ts: D('2026-07-08'), durum: 'basladi' } ] };
+t('v2: reopen tam V + overdue', C.bnsYayilimGunlukPay(bReopen, 5, K('2026-07-08')), 5);
+const u2 = { id: 'U9', dept: 'tasarim' };
+const bA = { ...bCalisan, workers: [{ id: 'U9' }], leads: [] };
+const bB2 = { ...bCalisan, workers: [], leads: [{ id: 'U9' }] };
+t('v2: kişi gün doluluk %20', C.bnsKisiGunDoluluk([bA, bB2], u2, K('2026-07-07')), 20);
+const seri = C.bnsKisiGunlukSeri([bA], u2, K('2026-07-06'), 5);
+t('v2: seri 5 eleman', seri.length, 5);
+t('v2: seri hafta sonunu atlar (Cum→Pzt)', seri[4].gun, '2026-07-10');
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);

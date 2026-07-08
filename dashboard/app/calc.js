@@ -448,7 +448,79 @@ function bnsKisiTrend(completed, now) {
   });
 }
 
+// ── Kapasite v2 — zamana yayılmış yük (spec: 2026-07-08-zamana-yayilmis-kapasite) ──
+// Sınıflar: BASLANMAMIS pay biner R sabit · CALISAN pay biner R-=pay · DURAN/BITTI pay 0 R sabit.
+// Reopen (BITTI→aktif) R=V. Overdue kalan gün=1. İş günü: Pzt-Cum Europe/Istanbul.
+var BNS_V2_CALISAN = { basladi: 1, revizyon: 1, incelemede: 1 };
+var BNS_V2_DURAN = { beklemede: 1, musteride: 1, blokeli: 1 };
+function bnsGunKey(ms) {
+  return new Date(ms).toLocaleDateString('en-CA', { timeZone: 'Europe/Istanbul' }); // YYYY-MM-DD
+}
+function bnsIsGunuMu(gunKey) {
+  var wd = new Date(gunKey + 'T12:00:00+03:00').toLocaleDateString('en-US', { timeZone: 'Europe/Istanbul', weekday: 'short' });
+  return wd !== 'Sat' && wd !== 'Sun';
+}
+function bnsSonrakiGun(gunKey) {
+  var t = Date.parse(gunKey + 'T12:00:00+03:00') + 24 * BNS_H;
+  return bnsGunKey(t);
+}
+// gunKey'den deadline gününe (dahil) kalan iş günü; overdue → 1.
+function bnsKalanIsGunu(gunKey, deadlineMs) {
+  var dlKey = bnsGunKey(deadlineMs);
+  if (gunKey > dlKey) return 1;
+  var n = 0, g = gunKey;
+  while (g <= dlKey) { if (bnsIsGunuMu(g)) n++; g = bnsSonrakiGun(g); }
+  return Math.max(1, n);
+}
+// Simülatör: işin yaşamını hedef güne kadar gün gün yürüt → hedef günün payı.
+// b: { created_at, deadline, durum, durum_olaylari[{ts,durum}] } · V: rol ağırlığı.
+// Gün sınıfı = o günün SON olayındaki durum (gün-sonu kuralı). Gelecek günlerde
+// (olayların ötesi) son bilinen durum sabit sürer (projeksiyon varsayımı).
+function bnsYayilimGunlukPay(b, V, hedefGunKey) {
+  if (!b || !V || b.created_at == null || b.deadline == null) return 0;
+  if (!bnsIsGunuMu(hedefGunKey)) return 0;
+  var ev = (b.durum_olaylari || []).filter(function (e) { return e && e.ts != null && e.durum; })
+    .slice().sort(function (a, c) { return a.ts - c.ts; });
+  var g = bnsGunKey(b.created_at);
+  if (hedefGunKey < g) return 0;
+  var R = V, durum = 'yeni', i = 0;
+  while (true) {
+    // Bu günün sonuna kadarki olayları uygula (reopen: BITTI→aktif → R=V).
+    var gunSonu = Date.parse(g + 'T23:59:59+03:00');
+    while (i < ev.length && ev[i].ts <= gunSonu) {
+      if (durum === 'tamamlandi' && ev[i].durum !== 'tamamlandi') R = V; // yeni döngü
+      durum = ev[i].durum; i++;
+    }
+    var pay = 0;
+    if (bnsIsGunuMu(g) && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi') {
+      pay = R / bnsKalanIsGunu(g, b.deadline);
+      if (BNS_V2_CALISAN[durum]) R = Math.max(0, R - pay);
+    }
+    if (g === hedefGunKey) return Math.round(pay * 100) / 100;
+    g = bnsSonrakiGun(g);
+  }
+}
+// Kişinin bir gündeki doluluk %'si (kırpılmaz — %100 aşılabilir, aşırı yük görünsün).
+function bnsKisiGunDoluluk(briefs, u, gunKey) {
+  var toplam = 0;
+  (briefs || []).forEach(function (b) {
+    var V = bnsBriefLoadWeight(b, u && u.id);
+    if (V > 0) toplam += bnsYayilimGunlukPay(b, V, gunKey);
+  });
+  var lim = bnsPersonCapLimit(u);
+  return lim > 0 ? Math.round((toplam / lim) * 100) : 0;
+}
+// Bugünden ileriye n İŞ GÜNLÜK doluluk serisi: [{gun, pct}].
+function bnsKisiGunlukSeri(briefs, u, baslangicGunKey, n) {
+  var out = [], g = baslangicGunKey;
+  while (out.length < (n || 5)) {
+    if (bnsIsGunuMu(g)) out.push({ gun: g, pct: bnsKisiGunDoluluk(briefs, u, g) });
+    g = bnsSonrakiGun(g);
+  }
+  return out;
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsBurnout, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsBurnout, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri };
 }
