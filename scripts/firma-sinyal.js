@@ -27,19 +27,7 @@ function yoneticiMi(u) {
   return u.id === GORKEM || u.rol === 'yonetici' || u.yetki === 'yonetici';
 }
 
-// Firma kapasite doluluğu: aktif atama-slotları / toplam kapasite-slotları (per-kişi limit toplamı).
-function firmaCapPct(d) {
-  const humans = (d.bns_users || []).filter((u) => /^U/.test(u.id) && u.active !== false);
-  const cap = humans.reduce((s, u) => s + C.bnsPersonCapLimit(u), 0);
-  let load = 0;
-  (d.bns_briefs || []).forEach((b) => {
-    const ppl = new Set();
-    (b.workers || []).forEach((w) => { if (w) ppl.add(w.id); });
-    (b.leads || []).forEach((l) => { if (l) ppl.add(l.id); });
-    load += ppl.size;
-  });
-  return cap > 0 ? Math.min(100, Math.round((load / cap) * 100)) : 0;
-}
+// Firma kapasitesi: v2 zamana-yayılmış bugün doluluğu (calc.bnsFirmaGunDoluluk) — Aşama 4 geçişi.
 
 // Embedded'dan sinyal girdilerini çıkar → tüm sinyalleri topla
 async function sinyalleriHesapla(d, now) {
@@ -47,8 +35,8 @@ async function sinyalleriHesapla(d, now) {
   const tamamlanan = d.bns_completed || [];
   const out = [];
 
-  // 1. Kapasite
-  out.push(...C.bnsSinyalKapasite(firmaCapPct(d)));
+  // 1. Kapasite (v2: zamana yayılmış bugün doluluğu)
+  out.push(...C.bnsSinyalKapasite(C.bnsFirmaGunDoluluk(aktif, d.bns_users, C.bnsGunKey(now))));
 
   // 2. Geciken (aktif işler)
   out.push(...C.bnsSinyalGeciken(aktif, now));
@@ -91,22 +79,16 @@ async function sinyalleriHesapla(d, now) {
   });
   out.push(...C.bnsSinyalGecikme(atRisk));
 
-  // 6. Burnout: kişi başına gelecek-5-gün deadline'lı aktif iş sayısı / kapasite limiti
-  const BES_GUN = 5 * 24 * 3600000;
-  const userById = {};
-  (d.bns_users || []).forEach((u) => { userById[u.id] = u; });
-  const upByKisi = {};
-  aktif.forEach((b) => {
-    if (b.deadline == null || b.deadline < now || b.deadline > now + BES_GUN) return;
-    (b.workers || []).concat(b.leads || []).forEach((p) => {
-      if (!p || !/^U/.test(p.id)) return;
-      (upByKisi[p.id] = upByKisi[p.id] || { id: p.id, ad: (p.name || '').split(' ')[0] || p.name, n: 0 }).n++;
-    });
+  // 6. Burnout v2: kişi 5-iş-günü serisinde ≥%120 gün (zamana yayılmış projeksiyon).
+  const bugun = C.bnsGunKey(now);
+  const GUN_AD = (k) => new Date(k + 'T12:00:00+03:00').toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul', weekday: 'short' });
+  const burnoutlar = [];
+  (d.bns_users || []).forEach((u) => {
+    if (!/^U/.test(u.id) || u.active === false) return;
+    const seri = C.bnsKisiGunlukSeri(aktif, u, bugun, 5);
+    const tepe = seri.reduce((a, x) => (x.pct > a.pct ? x : a), { pct: 0 });
+    if (tepe.pct >= 120) burnoutlar.push({ ad: (u.name || '').split(' ')[0] || u.id, pct: tepe.pct, gun: GUN_AD(tepe.gun) });
   });
-  const burnoutlar = Object.values(upByKisi).map((k) => {
-    const bo = C.bnsBurnout(k.n, C.bnsPersonCapLimit(userById[k.id] || {}));
-    return { ad: k.ad, pct: bo.pct, asiri: bo.asiri };
-  }).filter((k) => k.asiri);
   out.push(...C.bnsSinyalBurnout(burnoutlar));
 
   return out;

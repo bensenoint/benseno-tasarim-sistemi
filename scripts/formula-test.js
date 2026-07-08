@@ -183,9 +183,6 @@ t('gecikme bol zaman → risk yok', C.bnsGecikmeOngoru({ deadline: dlIn(100), du
 t('gecikme davranışsal → risk', C.bnsGecikmeOngoru({ deadline: dlIn(24), durum:'revizyon', rev_ic:1, rev_musteri:1, elapsedH:5 }, null, NOWG).sebep, 'davranissal');
 t('gecikme incelemede → risk yok', C.bnsGecikmeOngoru({ deadline: dlIn(1), durum:'incelemede', rev_ic:3, rev_musteri:0, elapsedH:99 }, 40, NOWG).risk, false);
 
-t('burnout %100 → asiri false', C.bnsBurnout(5, 5).asiri === false && C.bnsBurnout(5,5).pct === 100, true);
-t('burnout %120 → asiri true', C.bnsBurnout(6, 5).asiri, true);
-t('burnout capLimit 0 → %0', C.bnsBurnout(3, 0).pct, 0);
 
 const cb = (o) => Object.assign({ sureH:10, deadline: 1000, bitis: 900, rev_ic:0, rev_musteri:0, rating:5, marka:'A' }, o);
 const perf = C.bnsKisiPerformans([
