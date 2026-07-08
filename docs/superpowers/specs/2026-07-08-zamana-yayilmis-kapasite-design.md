@@ -31,6 +31,8 @@ pay(gün) = R(gün) / o günden deadline'a kalan iş günü
 
 **Overdue:** deadline geçtiyse `kalan iş günü = 1` sabitlenir → **tüm kalan değer her gün bugüne biner** (geciken iş günü ezer — istenen sinyal).
 
+**Teslim & yeniden açılma:** `tamamlandi` anında pay 0, yük tamamen düşer. İş **yeniden açılırsa** (🔃) tam değeriyle **yeni döngü** başlar: `R = V` (bnsCycleSure döngü semantiğiyle simetrik). Deadline hâlâ geçmişse overdue kuralı uygulanır (tüm V bugüne biner); yeni termin verilirse V yeni pencereye yayılır. Rötuşun küçüklüğü kısa terminle ifade edilir — indirimli değer sabiti yok (YAGNI).
+
 ## Gün ve kapasite tanımı
 
 - **İş günü:** hafta içi, Europe/Istanbul (Cmt/Paz bölene ve pay gününe girmez — hareketsizlik hesabıyla aynı ilke).
