@@ -520,8 +520,44 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
         <Kpi label="Lead olarak"   value={asLead.length} sub="açtığım"/>
         <Kpi label="Contributor"   value={asContrib.length} sub="atandığım"/>
         <Kpi label="Kapasite"      value={capPct+"%"} color={capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":undefined}/>
+        <Kpi label="Kapasite v2" value={(() => {
+          const s = (typeof bnsKisiGunlukSeri === "function")
+            ? bnsKisiGunlukSeri(myAll, u, bnsGunKey(Date.now()), 1) : [];
+          return s.length ? s[0].pct + "%" : "—";
+        })()} sub="zamana yayılmış · bugün" color={(() => {
+          const s = (typeof bnsKisiGunlukSeri === "function")
+            ? bnsKisiGunlukSeri(myAll, u, bnsGunKey(Date.now()), 1) : [];
+          const p = s.length ? s[0].pct : 0;
+          return p >= 120 ? "var(--prio-red)" : p >= 100 ? "var(--prio-orange)" : undefined;
+        })()}/>
         <Kpi label="Marka"         value={Object.keys(brandCount).length} sub="farklı"/>
       </div>
+
+      {/* ─── Kapasite v2: 5 iş günü doluluk projeksiyonu (yalnız kendi profilinde) ─── */}
+      {_isSelf && (() => {
+        const seri = (typeof bnsKisiGunlukSeri === "function")
+          ? bnsKisiGunlukSeri(myAll, u, bnsGunKey(Date.now()), 5) : [];
+        if (!seri.length) return null;
+        const gunAd = (k) => new Date(k + "T12:00:00+03:00").toLocaleDateString("tr-TR", { timeZone: "Europe/Istanbul", weekday: "short" });
+        return (
+          <Card style={{padding:12, marginBottom:"var(--grid-gap)"}}>
+            <div style={{font:"600 12px/1 var(--font-sans)", marginBottom:8}}>📅 Önümüzdeki 5 iş günü — doluluk projeksiyonu <span style={{font:"400 10px var(--font-sans)", color:"var(--ink-4)"}}>(zamana yayılmış model — deneme)</span></div>
+            <div style={{display:"flex", gap:8}}>
+              {seri.map((x, i) => (
+                <div key={x.gun} style={{flex:1, textAlign:"center"}}>
+                  <div style={{height:44, display:"flex", alignItems:"flex-end", justifyContent:"center"}}>
+                    <div style={{width:"70%", borderRadius:3,
+                      height: Math.max(3, Math.min(44, Math.round(x.pct / 150 * 44))),
+                      background: x.pct >= 120 ? "var(--prio-red)" : x.pct >= 100 ? "var(--prio-orange)" : "var(--prio-green)"}}/>
+                  </div>
+                  <div style={{font:"600 11px/1.4 var(--font-sans)"}}>%{x.pct}</div>
+                  <div style={{font:"400 10px/1.2 var(--font-sans)", color:"var(--ink-3)"}}>{i === 0 ? "bugün" : gunAd(x.gun)}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* ─── Bugün — akordiyon (yalnız kendi profilinde) ─── */}
       {u.id === (currentUser && currentUser.slack_id) &&
