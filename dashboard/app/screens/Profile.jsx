@@ -65,6 +65,59 @@ function BugunAccordion({ myActive, myKisiSira, overdue, onOpenBrief, onStatusCh
   );
 }
 
+// ─── P3.4a: Kendi performansını görme (Ç1) — yalnız kendi profilinde (_isSelf) ───────
+// Veri zaten akıyor (SEC-4 gevşek); bu kart görünürlüğü KENDİ verisi için açar.
+function KendiPerformansKarti({ u, allCompleted }) {
+  // Kişinin worker VEYA lead olduğu tamamlananlar (alan adı esnek: workers/contributors)
+  const benim = (allCompleted || []).filter(b => {
+    const ppl = [...(b.workers || b.contributors || []), ...(b.leads || [])];
+    return ppl.some(p => p && p.id === u.id);
+  });
+  if (!benim.length) return null;
+  const P = (typeof bnsKisiPerformans === "function") ? bnsKisiPerformans(benim, Date.now()) : null;
+  const topMarka = P ? Object.entries(P.tipDagilim).sort((a,b) => b[1]-a[1]).slice(0,3) : [];
+  const son20 = benim.slice().sort((a,b) => (b.bitis||0)-(a.bitis||0)).slice(0,20);
+  const K = ({ v, l }) => (
+    <div style={{textAlign:"center"}}>
+      <div style={{font:"700 18px/1.2 var(--font-sans)"}}>{v ?? "—"}</div>
+      <div style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-3)"}}>{l}</div>
+    </div>
+  );
+  return (
+    <Card style={{padding:16, marginTop:16}}>
+      <div style={{font:"600 13px/1 var(--font-sans)", marginBottom:12}}>⭐ Performansım</div>
+      {P && (
+        <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(90px, 1fr))", gap:10, marginBottom:14}}>
+          <K v={P.tamamlanan} l="tamamlanan"/>
+          <K v={P.ortPuan != null ? P.ortPuan : "—"} l="ort. puan"/>
+          <K v={P.zamanindaPct != null ? "%" + P.zamanindaPct : "—"} l="zamanında"/>
+          <K v={P.ortRevize} l="ort. revize"/>
+          <K v={P.ortDonguH != null ? P.ortDonguH + "sa" : "—"} l="ort. döngü"/>
+          <K v={P.throughputHaftalik} l="iş/hafta"/>
+        </div>
+      )}
+      {topMarka.length > 0 && (
+        <div style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-2)", marginBottom:12}}>
+          En çok: {topMarka.map(([m,n]) => `${m} (${n})`).join(" · ")}
+        </div>
+      )}
+      <div style={{font:"600 12px/1 var(--font-sans)", margin:"4px 0 8px"}}>İşlerim ve puanlarım</div>
+      {son20.map(b => (
+        <div key={b.id || b.no} style={{display:"flex", gap:8, alignItems:"baseline", padding:"6px 0", borderTop:"1px solid var(--line)"}}>
+          <span style={{font:"500 12px/1.4 var(--font-sans)", whiteSpace:"nowrap"}}>#{b.no} {b.marka || ""}</span>
+          <span style={{font:"400 12px/1.4 var(--font-sans)", color:"var(--ink-2)", flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{b.baslik || ""}</span>
+          {b.rating > 0
+            ? <Stars n={b.rating} ai={b.rating_by === "ai"} sebep={b.rating_sebep || null}/>
+            : <span style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-3)"}}>henüz puanlanmadı</span>}
+        </div>
+      ))}
+      <div style={{font:"400 11px/1.6 var(--font-sans)", color:"var(--ink-3)", marginTop:8}}>
+        Puanın sebebini görmek için yıldızların üzerine gel. Puanlar yönetici tarafından belirlenir.
+      </div>
+    </Card>
+  );
+}
+
 function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, initialSel, onStatusChange, onRemind }) {
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   const [selectedUser, setSelectedUser] = React.useState(user);
@@ -444,6 +497,9 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
       {/* ─── Bugün — akordiyon (yalnız kendi profilinde) ─── */}
       {u.id === (currentUser && currentUser.slack_id) &&
         <BugunAccordion myActive={myActive} myKisiSira={myKisiSira} overdue={overdue} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange} onRemind={onRemind} u={u}/>}
+
+      {/* ─── P3.4a: Performansım — kendi puan+sebep+metrikler (yalnız kendi profilinde) ─── */}
+      {_isSelf && <KendiPerformansKarti u={u} allCompleted={allCompletedRaw}/>}
 
       {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
       <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
