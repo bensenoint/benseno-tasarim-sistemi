@@ -187,6 +187,10 @@ async function deptManagers(client, worker_ids, creatorId) {
 // ── operasyonlar ─────────────────────────────────────────────
 async function createBrief(raw) {
   const d = briefCreate.parse(raw);
+  // Kapasite v2 kuralı: deadline zorunlu — terminsiz iş zamana yayılmış yükte hesaplanamaz.
+  if (d.deadline == null || d.deadline === '') {
+    const e = new Error('termin (deadline) zorunlu — terminsiz iş açılamaz'); e.status = 400; throw e;
+  }
   const result = await tx(async (client) => {
     const markaId = await brandIdByName(client, d.marka);
     // no: verilmemişse max+1

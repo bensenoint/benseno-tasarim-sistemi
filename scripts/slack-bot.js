@@ -767,7 +767,7 @@ app.command('/yeni-brief', async ({ command, ack, client, respond }) => {
           { type: 'context', elements: [{ type: 'mrkdwn', text: `📁 Marka: *${marka}* _(kanaldan belirlendi)_` }] },
           { type: 'input', block_id: 'baslik_b', label: { type: 'plain_text', text: 'Başlık / İş' },
             element: { type: 'plain_text_input', action_id: 'baslik', placeholder: { type: 'plain_text', text: 'ör. Sosyal medya paketi — Mayıs' } } },
-          { type: 'input', block_id: 'deadline_b', optional: true, label: { type: 'plain_text', text: 'Deadline (tarih + saat)' },
+          { type: 'input', block_id: 'deadline_b', label: { type: 'plain_text', text: 'Deadline (tarih + saat) — zorunlu' },
             element: { type: 'datetimepicker', action_id: 'deadline' } },
           { type: 'input', block_id: 'workers_b', label: { type: 'plain_text', text: 'İşi yapan(lar)' },
             element: { type: 'multi_users_select', action_id: 'workers', placeholder: { type: 'plain_text', text: 'Kişi(ler) — sıralı akışta seçim sırası = zincir sırası' } } },
