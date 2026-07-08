@@ -808,11 +808,11 @@ app.post('/api/briefs/:id/remind', auth.authGuard, async (req, res) => {
     const actor = req.user.slack_id;
     const bi = (await pool.query(`SELECT no, baslik, slack_url, slack_channel, slack_ts, created_by FROM briefs WHERE id=$1`, [id])).rows[0];
     if (!bi) return res.status(404).json({ error: 'brief bulunamadı' });
-    // Yetki: yalnız yönetici, işin lead'i veya işi açan hatırlatabilir (UI perms ile aynı).
+    // Yetki (P3.4c): yönetici, işin HERHANGİ bir atananı (lead/worker) veya işi açan hatırlatabilir (UI perms ile aynı).
     const u = (await pool.query(`SELECT rol, yetki FROM users WHERE id=$1 LIMIT 1`, [actor])).rows[0];
     const isMgr = !!(u && (u.rol === 'yonetici' || u.yetki === 'yonetici'));
-    const isLead = (await pool.query(`SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND user_id=$2 AND role='lead' LIMIT 1`, [id, actor])).rowCount > 0;
-    if (!isMgr && !isLead && bi.created_by !== actor) return res.status(403).json({ error: 'yetki yok' });
+    const isAssignee = (await pool.query(`SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND user_id=$2 LIMIT 1`, [id, actor])).rowCount > 0;
+    if (!isMgr && !isAssignee && bi.created_by !== actor) return res.status(403).json({ error: 'yetki yok' });
     // Tekrar koruması: son 10 dakikada aynı işe hatırlatma gittiyse tekrar spam'leme.
     const dup = await pool.query(
       `SELECT 1 FROM notifications WHERE brief_id=$1 AND text LIKE '%hatırlattı%' AND created_at > now() - interval '10 minutes' LIMIT 1`, [id]);
