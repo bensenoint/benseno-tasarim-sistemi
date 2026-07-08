@@ -1,5 +1,58 @@
 // app/BriefDrawer.jsx — interactive slide-in panel.
 
+// ─── Finans girişi (yönetici-only) — mevcut /financials endpoint'i; SEC-5: yalnız login-arkası API ───
+function FinansBolumu({ b, onUpdate }) {
+  const [f, setF] = React.useState({
+    maliyet: b.maliyet ?? "", satis: b.satis ?? "", fatura: !!b.fatura, odeme: !!b.odeme });
+  const [durum, setDurum] = React.useState(null); // null | 'kaydediliyor' | 'ok' | hata metni
+  const kaydet = async () => {
+    setDurum('kaydediliyor');
+    try {
+      const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
+      const tok = localStorage.getItem('bns_token');
+      const body = { fatura: f.fatura, odeme: f.odeme };
+      if (f.maliyet !== "") body.maliyet = +f.maliyet;
+      if (f.satis !== "") body.satis = +f.satis;
+      const res = await fetch(`${apiBase}/api/briefs/${b.id}/financials`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) { const j = await res.json().catch(() => ({})); setDurum(j.error || 'kaydedilemedi'); return; }
+      setDurum('ok');
+      onUpdate && onUpdate();
+      setTimeout(() => setDurum(null), 2000);
+    } catch (e) { setDurum('bağlantı hatası'); }
+  };
+  const inp = { width: 90, font: "400 12px var(--font-sans)", padding: "5px 8px",
+    border: "1px solid var(--line)", borderRadius: 6, background: "var(--paper)", color: "var(--ink)" };
+  const lbl = { font: "400 11px/1.4 var(--font-sans)", color: "var(--ink-3)", display: "block", marginBottom: 3 };
+  return (
+    <div style={{margin: "0 20px 12px", padding: 12, border: "1px solid var(--line)", borderRadius: 10}}>
+      <div style={{font: "600 12px/1 var(--font-sans)", marginBottom: 10}}>💰 Finans (yönetici)</div>
+      <div style={{display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end"}}>
+        <div><span style={lbl}>Maliyet (₺)</span>
+          <input type="number" min="0" style={inp} value={f.maliyet}
+            onChange={e => setF({ ...f, maliyet: e.target.value })}/></div>
+        <div><span style={lbl}>Satış (₺)</span>
+          <input type="number" min="0" style={inp} value={f.satis}
+            onChange={e => setF({ ...f, satis: e.target.value })}/></div>
+        <label style={{font: "400 12px var(--font-sans)", display: "flex", gap: 5, alignItems: "center", cursor: "pointer"}}>
+          <input type="checkbox" checked={f.fatura} onChange={e => setF({ ...f, fatura: e.target.checked })}/> fatura kesildi</label>
+        <label style={{font: "400 12px var(--font-sans)", display: "flex", gap: 5, alignItems: "center", cursor: "pointer"}}>
+          <input type="checkbox" checked={f.odeme} onChange={e => setF({ ...f, odeme: e.target.checked })}/> ödeme alındı</label>
+        <button onClick={kaydet} disabled={durum === 'kaydediliyor'}
+          style={{font: "600 12px var(--font-sans)", padding: "6px 14px", border: "1px solid var(--line)",
+            borderRadius: 8, background: "var(--paper-2)", color: "var(--ink)", cursor: "pointer"}}>
+          {durum === 'kaydediliyor' ? '…' : 'Kaydet'}</button>
+        {durum === 'ok' && <span style={{font: "500 12px var(--font-sans)", color: "var(--prio-green, #2e9e5b)"}}>✓ kaydedildi</span>}
+        {durum && durum !== 'ok' && durum !== 'kaydediliyor' &&
+          <span style={{font: "400 11px var(--font-sans)", color: "var(--prio-red)"}}>{durum}</span>}
+      </div>
+    </div>
+  );
+}
+
 function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatusChange, onRemind }) {
   const [b, setB] = React.useState(brief);
   const [saved, setSaved] = React.useState(false);
@@ -431,6 +484,8 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
             )}
           </div>
         )}
+        {/* Finans girişi (veri-girişi mini-fazı) — yalnız yönetici */}
+        {_isMgr && <FinansBolumu b={b} onUpdate={onUpdate}/>}
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>
           <div>
