@@ -377,6 +377,36 @@ async function loadBriefs() {
   }
 }
 
+// ─── Durum değişikliği yetkisi (Slack) ────────────────────────────────────────
+// Emoji/kelime ile durum değiştirme yalnız atanan (worker/lead) + açan + yönetici
+// (dashboard bnsBriefActionPerms / P3.4c ile aynı politika). Gerekçe: kanaldaki
+// herhangi birinin gündelik 🚀/✅ reaction'ı iş durumunu sessizce değiştiriyordu.
+// Hata/bulunamama → engelleme YAPMA (fail-open: meşru akış API hıçkırığına kurban gitmesin).
+async function statusYetki(userId, briefTs) {
+  if (MANAGER_IDS.has(userId)) return { ok: true };
+  try {
+    const _wt = process.env.BNS_WRITE_TOKEN;
+    const r = await fetch(`${API_BASE}/api/embedded`, { cache: 'no-store', headers: _wt ? { 'x-bns-token': _wt } : {} });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const b = (d.bns_briefs || []).find(x => x.slack_ts === briefTs);
+    if (!b) return { ok: true }; // brief eşleşmedi → eski davranış
+    const u = (d.bns_users || []).find(x => x.id === userId);
+    if (u && (u.rol === 'yonetici' || u.yetki === 'yonetici')) return { ok: true };
+    if (b.created_by === userId) return { ok: true };
+    const atanan = [...(b.workers || []), ...(b.leads || [])].some(p => p && p.id === userId);
+    return atanan ? { ok: true } : { ok: false, no: b.no, marka: b.marka || '' };
+  } catch (e) { log(`statusYetki hata (fail-open): ${e.message}`); return { ok: true }; }
+}
+// Yetkisiz denemede kişiye kısa DM — sessiz kafa karışıklığı olmasın.
+async function statusYetkiRed(client, userId, chk, durum) {
+  log(`durum REDDEDİLDİ: ${userId} → #${chk.no} ${durum} (atanan/açan/yönetici değil)`);
+  try {
+    await client.chat.postMessage({ channel: userId, username: BOT_NAME,
+      text: `⛔ *#${chk.no} ${chk.marka}* işinin durumunu değiştirme yetkin yok — durumu yalnız işin atananı, açanı veya bir yönetici değiştirebilir. (Emoji/reaction'ın işleme alınmadı.)` });
+  } catch (e) { log(`yetki-red DM hatası: ${e.message}`); }
+}
+
 // ─── /brief-durum ─────────────────────────────────────────────────────────────
 
 app.command('/brief-durum', async ({ command, ack, respond, client }) => {
@@ -632,7 +662,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
       { type: 'divider' },
 
       // Emoji kısayolları
-      { type: 'section', text: { type: 'mrkdwn', text: '*Emoji kısayolları* — brief mesajına reaction ekle VEYA thread\'e tek emoji yaz. Klasik VE Benseno özel emojileri birlikte kullanılabilir; ikisi de aynı sonucu verir.' } },
+      { type: 'section', text: { type: 'mrkdwn', text: '*Emoji kısayolları* — brief mesajına reaction ekle VEYA thread\'e tek emoji yaz. Klasik VE Benseno özel emojileri birlikte kullanılabilir; ikisi de aynı sonucu verir. _Yetki: durumu yalnız işin atananı, açanı veya yönetici değiştirebilir._' } },
       { type: 'section', fields: [
         { type: 'mrkdwn', text:
           '*Durum (klasik · Benseno):*\n' +
@@ -920,6 +950,8 @@ app.event('reaction_added', async ({ event, client }) => {
   // ✅ Brief tamamlama (atanan/editör/yönetici — yetkiyi script kontrol eder).
   // Deterministik: brief'i bns_briefs→bns_completed taşır + push. MCP/claude gerektirmez.
   if (event.reaction === 'white_check_mark' || event.reaction === 'bso-tamamlandi') {
+    const chk = await statusYetki(event.user, briefTs);
+    if (!chk.ok) { await statusYetkiRed(client, event.user, chk, 'tamamlandi'); return; }
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
     log(`✅ tamamlama: ${briefTs} — ${event.user}`);
     // Thread'deki son görseli onay öncesi yakala → galeri için image_url'e kaydet
@@ -958,6 +990,8 @@ app.event('reaction_added', async ({ event, client }) => {
   };
   if (reactionBase in DURUM_MAP) {
     const durum = DURUM_MAP[reactionBase];
+    const chk = await statusYetki(event.user, briefTs);
+    if (!chk.ok) { await statusYetkiRed(client, event.user, chk, durum); return; }
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
     log(`durum reaction: :${reactionBase}: → ${durum} @ ${briefTs} — ${event.user}`);
     // DB: emoji → durum kodu (reflectChange thread onayını düşürür).
@@ -1243,6 +1277,8 @@ app.event('message', async ({ event, client }) => {
     const eMatch = EMOJI_DURUM.find(e => trimmed.startsWith(e.emoji));
     if (eMatch) {
       const briefTs = event.thread_ts;  // thread reply'da thread_ts = brief ana mesajı ts'i
+      const chk = await statusYetki(event.user, briefTs);
+      if (!chk.ok) { await statusYetkiRed(client, event.user, chk, eMatch.durum); return; }
       log(`durum metin-emoji: ${eMatch.emoji} → ${eMatch.durum} | ${briefTs} — ${event.user}`);
       // DB'ye yaz (best-effort). writes.setStatus → reflectChange thread'e onay düşürür.
       dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: eMatch.durum, by: event.user, source: 'slack' });
@@ -1336,6 +1372,8 @@ app.event('message', async ({ event, client }) => {
     if (kMatch) {
       const briefTs = event.thread_ts;
       if (kMatch.type === 'durum') {
+        const chk = await statusYetki(event.user, briefTs);
+        if (!chk.ok) { await statusYetkiRed(client, event.user, chk, kMatch.value); return; }
         log(`durum keyword: "${kMatch.key}" → ${kMatch.value} | ${briefTs} — ${event.user}`);
         dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: kMatch.value, by: event.user, source: 'slack', slack_ts: event.event_ts });
       } else {

@@ -53,7 +53,7 @@ function HelpScreen() {
         <Row left="help" right="Herhangi bir kanala 'help' yaz → sorun/öneri bildirim formu (sistem adminlerine DM)"/>
       </Section>
 
-      <Section title="📌 Brief Durum Emojileri" note="Brief thread'ine reaction olarak ekleyin VEYA thread'e o emojiyle başlayan bir mesaj yazın — ikisi de aynı sonucu verir. Hem KLASİK emojiler hem BENSENO özel emojileri (:bso-…:) çalışır; istediğinizi kullanın.">
+      <Section title="📌 Brief Durum Emojileri" note="Brief thread'ine reaction olarak ekleyin VEYA thread'e o emojiyle başlayan bir mesaj yazın — ikisi de aynı sonucu verir. Hem KLASİK emojiler hem BENSENO özel emojileri (:bso-…:) çalışır. YETKİ: durumu yalnız işin atananı (yapan/lead), açanı veya yönetici değiştirebilir — başkasının emoji/reaction'ı işleme alınmaz (kişiye DM ile bildirilir).">
         <EmojiRow emoji="🎨 ✍️ 🤖" alt={[':bso-calisiliyor:']} label="İş kabulü / İş planında" desc="İşi planına aldım (🎨 tasarım · ✍️ editör · 🤖 AI). Açıldıktan sonra 1 saat içinde bu emojiyi koyman beklenir."/>
         <EmojiRow emoji="🚀" label="İşe başlandı" desc="Fiilen çalışmaya başladım."/>
         <EmojiRow emoji="🔄" alt={[':bso-devam:']} label="Devam ediyor" desc="İş hâlâ aktif olarak sürüyor."/>
