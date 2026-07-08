@@ -277,5 +277,16 @@ const seri = C.bnsKisiGunlukSeri([bA], u2, K('2026-07-06'), 5);
 t('v2: seri 5 eleman', seri.length, 5);
 t('v2: seri hafta sonunu atlar (Cum→Pzt)', seri[4].gun, '2026-07-10');
 
+// ── Kapasite v2: departman/firma + burnout v2 ──
+const uT1 = { id: 'U11', dept: 'tasarim', active: true };
+const uT2 = { id: 'U12', dept: 'tasarim', active: true };
+const uE1 = { id: 'U13', dept: 'editor', active: true };
+const bD1 = { created_at: D('2026-07-06'), deadline: D('2026-07-10'), durum: 'basladi',
+  durum_olaylari: [{ ts: D('2026-07-06'), durum: 'basladi' }], workers: [{ id: 'U11' }], leads: [] };
+t('v2: dept doluluk %8', C.bnsDeptGunDoluluk([bD1], [uT1, uT2, uE1], 'tasarim', K('2026-07-07')), 8);
+t('v2: firma doluluk %5', C.bnsFirmaGunDoluluk([bD1], [uT1, uT2, uE1], K('2026-07-07')), 5);
+t('v2: dept boş üye listesi %0', C.bnsDeptGunDoluluk([bD1], [], 'tasarim', K('2026-07-07')), 0);
+t('v2: burnout sinyal gün adlı', C.bnsSinyalBurnout([{ ad: 'Eda', pct: 140, gun: 'Per' }])[0].text.includes('Per'), true);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);

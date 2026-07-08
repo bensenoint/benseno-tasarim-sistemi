@@ -417,7 +417,7 @@ function bnsSinyalGecikme(atRiskBriefs) {
 function bnsSinyalBurnout(kisiler) {
   return (kisiler || []).map(function (k) {
     return { tip: 'burnout', aciliyet: 'normal', key: k.ad || null,
-      text: '🔥 ' + k.ad + ' gelecek 5 günde %' + k.pct + ' yüklü — burnout riski, yük dengelemesi düşün.' };
+      text: '🔥 ' + k.ad + (k.gun ? ' ' + k.gun + ' günü' : ' gelecek 5 günde') + ' %' + k.pct + ' yüklü — burnout riski, yük dengelemesi düşün.' };
   });
 }
 
@@ -520,7 +520,35 @@ function bnsKisiGunlukSeri(briefs, u, baslangicGunKey, n) {
   return out;
 }
 
+// Departman/firma gün doluluğu — üyelerin paylarının toplamı / limit toplamı (kırpılmaz).
+function bnsDeptGunDoluluk(briefs, users, deptKey, gunKey) {
+  var uyeler = (users || []).filter(function (u) {
+    return u && /^U/.test(u.id || '') && u.active !== false && (u.dept || u.rol) === deptKey;
+  });
+  var pay = 0, lim = 0;
+  uyeler.forEach(function (u) {
+    lim += bnsPersonCapLimit(u);
+    (briefs || []).forEach(function (b) {
+      var V = bnsBriefLoadWeight(b, u.id);
+      if (V > 0) pay += bnsYayilimGunlukPay(b, V, gunKey);
+    });
+  });
+  return lim > 0 ? Math.round((pay / lim) * 100) : 0;
+}
+function bnsFirmaGunDoluluk(briefs, users, gunKey) {
+  var kisiler = (users || []).filter(function (u) { return u && /^U/.test(u.id || '') && u.active !== false; });
+  var pay = 0, lim = 0;
+  kisiler.forEach(function (u) {
+    lim += bnsPersonCapLimit(u);
+    (briefs || []).forEach(function (b) {
+      var V = bnsBriefLoadWeight(b, u.id);
+      if (V > 0) pay += bnsYayilimGunlukPay(b, V, gunKey);
+    });
+  });
+  return lim > 0 ? Math.round((pay / lim) * 100) : 0;
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsBurnout, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsBurnout, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk };
 }
