@@ -276,8 +276,9 @@ function bnsBriefActionPerms(b, u) {
   out.ilerlet = isAssignee && !!BNS_NEXT_STATUS[durum] && durum !== 'tamamlandi' && durum !== 'musteride';
   // "Termini uzat" yalnız bekleme/müşteride durumundan dönüşte set edilen bir öneri (termin_oneri_ms)
   // varsa gösterilir — aksi halde sunucu "uzatma hatırlatıcısı açık değil" hatası verir ve süre yazılamaz.
-  out.termin = !!b.termin_oneri_ms && (isLead || isCreator || isMgr);
-  out.hatirlat = isLead || isMgr;
+  // P3.4c (Ç6): atanan (worker) kendi işinde termin uzatabilir/hatırlatabilir — lead bağımlılığı kalkar.
+  out.termin = !!b.termin_oneri_ms && (isAssignee || isCreator || isMgr);
+  out.hatirlat = isAssignee || isCreator || isMgr;
   return out;
 }
 

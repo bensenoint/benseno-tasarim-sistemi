@@ -221,5 +221,16 @@ t('trend ay sınırı Tem', sinir[5].tamamlanan, 1);
 t('trend bitis null sayılmaz', C.bnsKisiTrend([{ rating: 5 }], TNOW)[5].tamamlanan, 0);
 t('trend yıl geçişi', C.bnsKisiTrend([], Date.parse('2026-02-10T12:00:00+03:00'))[0].ay, 'Eyl');
 
+// ── P3.4c self-servis termin/hatırlat (perms) ──
+const pB = { leads: [{id:'L1'}], workers: [{id:'W1'}], created_by: 'C1', durum: 'calisiliyor', termin_oneri_ms: 3600000 };
+const pB0 = { ...pB, termin_oneri_ms: null };
+t('perms: worker termin (öneri var)', C.bnsBriefActionPerms(pB, {id:'W1'}).termin, true);
+t('perms: worker termin (öneri yok)', C.bnsBriefActionPerms(pB0, {id:'W1'}).termin, false);
+t('perms: worker hatirlat', C.bnsBriefActionPerms(pB, {id:'W1'}).hatirlat, true);
+t('perms: açan hatirlat', C.bnsBriefActionPerms(pB, {id:'C1'}).hatirlat, true);
+t('perms: yabancı termin', C.bnsBriefActionPerms(pB, {id:'X9'}).termin, false);
+t('perms: yabancı hatirlat', C.bnsBriefActionPerms(pB, {id:'X9'}).hatirlat, false);
+t('perms: lead hatirlat (regresyon)', C.bnsBriefActionPerms(pB, {id:'L1'}).hatirlat, true);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);
