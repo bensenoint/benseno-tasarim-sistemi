@@ -32,10 +32,10 @@ t('editor 4 iş = %50', C.bnsPersonCapPct({ dept: 'editor' }, 4), 50);
 t('100 üstü kırpılır', C.bnsPersonCapPct({ dept: 'ai' }, 20), 100); // 20/6 → %333 → %100
 t('0 iş = %0',         C.bnsPersonCapPct({ dept: 'ai' }, 0), 0);
 
-// ── Rol ağırlıklı iş yükü (işçi 5 / lead 2 / gözlemci 1) ──
+// ── Rol ağırlıklı iş yükü (işçi 5 / lead 1 / gözlemci 0) ──
 const _wA = { id: 'A' }, _wB = { id: 'B' }, _wC = { id: 'C' };
 t('yük: işçi=5', C.bnsBriefLoadWeight({ workers: [_wA] }, 'A'), 5);
-t('yük: lead=2', C.bnsBriefLoadWeight({ leads: [_wB] }, 'B'), 2);
+t('yük: lead=1', C.bnsBriefLoadWeight({ leads: [_wB] }, 'B'), 1);
 t('yük: gözlemci=0 (kapasiteye katılmaz)', C.bnsBriefLoadWeight({ observers: [_wC] }, 'C'), 0);
 t('yük: rol yoksa 0', C.bnsBriefLoadWeight({ workers: [_wA] }, 'Z'), 0);
 t('yük: en yüksek rol (işçi>lead)', C.bnsBriefLoadWeight({ workers: [_wA], leads: [_wA] }, 'A'), 5);
@@ -46,13 +46,13 @@ const _briefs = [
   { durum: 'musteride', workers: [_wA] },     // sayılmaz
 ];
 t('personLoad A = 5+0(gözlemci) = 5', C.bnsPersonLoad(_briefs, 'A'), 5);
-t('personLoad B = 2+5 = 7', C.bnsPersonLoad(_briefs, 'B'), 7);
+t('personLoad B = 1+5 = 6', C.bnsPersonLoad(_briefs, 'B'), 6);
 // kapasite %: işçi-eşdeğeri = yük/5. A: 5/5=1 iş-eşdeğeri, ai limiti 6 → %17
 t('capPct A (rol ağırlıklı, gözlemci hariç)', C.bnsPersonCapPct({ dept: 'ai' }, C.bnsPersonLoad(_briefs, 'A') / 5), 17);
 // dept yükü: tasarım üyeleri — A,B tasarımcı say → dept yük; capacity 6 → (yük/5)/6
 const _dBriefs = [{ durum: 'devam', workers: [{ id: 'A', dept: 'tasarim' }], leads: [{ id: 'B', dept: 'tasarim' }] }];
-t('deptLoad tasarim = 5+2 = 7', C.bnsDeptLoad(_dBriefs, 'tasarim'), 7);
-t('deptCapPct tasarim (7/5)/6≈%23', C.bnsDeptCapPct(_dBriefs, { capacity: 6 }, 'tasarim'), 23);
+t('deptLoad tasarim = 5+1 = 6', C.bnsDeptLoad(_dBriefs, 'tasarim'), 6);
+t('deptCapPct tasarim (6/5)/6=%20', C.bnsDeptCapPct(_dBriefs, { capacity: 6 }, 'tasarim'), 20);
 
 // ── Tarihe duyarlı "o gün açık olan işler" (geri-hesaplama) ──
 const _asofBriefs = [

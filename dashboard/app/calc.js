@@ -27,13 +27,13 @@ function bnsDeptActive(briefs, deptKey) {
   });
 }
 // ── Rol bazlı iş yükü katsayıları ───────────────────────────────────────────
-// Bir işte: işi yapan (worker/contributor)=5, lead=2, gözlemci=0. Yük bu ağırlıkların
+// Bir işte: işi yapan (worker/contributor)=5, lead=1, gözlemci=0. Yük bu ağırlıkların
 // toplamıdır. Kapasite yüzdesinde ağırlıklı yük "işçi-eşdeğeri iş sayısına" çevrilir
 // (yük/5): saf işçi N iş = N (eski davranışla birebir), lead N iş = 0.4N.
 // gözlemcilik gözetimdir, ÜRETİM yükü değil → katsayı 0. Genel bakış/Departman
 // kapasitesi de gözlemcileri dışlar (bnsDeptActive + sunucu a.role<>'gozlemci'); kişi
 // kapasitesi de aynı olsun ki yöneticiler "her işe gözlemci" diye %100 görünmesin.
-var BNS_ROLE_W = { worker: 5, lead: 2, observer: 0 };
+var BNS_ROLE_W = { worker: 5, lead: 1, observer: 0 };
 // Bir kişinin tek bir briefteki rol ağırlığı (en yüksek rol geçerli: işçi > lead > gözlemci).
 function bnsBriefLoadWeight(b, userId) {
   if (!b || !userId) return 0;
@@ -55,7 +55,7 @@ function bnsPersonLoad(briefs, userId) {
   return sum;
 }
 // Departmanın AĞIRLIKLI yükü — her aktif briefte o departmana ait tüm atananların
-// rol ağırlıkları toplanır (işçi 5 + lead 2; gözlemci 0 = kapasiteye katılmaz).
+// rol ağırlıkları toplanır (işçi 5 + lead 1; gözlemci 0 = kapasiteye katılmaz).
 function bnsDeptLoad(briefs, deptKey) {
   if (!Array.isArray(briefs) || !deptKey) return 0;
   var inDept = function (p) { return p && (p.dept || p.rol) === deptKey; };

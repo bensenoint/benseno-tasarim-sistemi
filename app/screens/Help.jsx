@@ -99,7 +99,7 @@ function HelpScreen() {
 
       <Section title="📊 Kapasite & İş Yükü" note="Bir kişinin/departmanın yükü ROL AĞIRLIKLI hesaplanır — her işteki rolü kadar yük sayılır.">
         <Row left="İşi yapan = 5" right="İşi fiilen yapan (worker) en yüksek ağırlık"/>
-        <Row left="Lead = 2" right="İşin lead'i (sorumlusu) orta ağırlık"/>
+        <Row left="Lead = 1" right="İşin lead'i (sorumlusu) düşük ağırlık"/>
         <Row left="Gözlemci = 0" right="Gözlemcilik gözetimdir, ÜRETİM yükü değil → kapasiteye KATILMAZ" sub="Bu yüzden her işe gözlemci eklenen yöneticiler yapay olarak %100 görünmez. Genel bakış, Departman ve Profil aynı kuralı kullanır."/>
         <Row left="Kapasite %" right="Ağırlıklı yük, kişinin limitine göre yüzdeye çevrilir" sub="Limit: yönetici 10 · editör 8 · tasarım/AI/freelance 6 (yarım gün çalışanda yarıya iner)."/>
         <Row left="Tarihe duyarlı" right="Geçmiş bir tarih aralığı seçilirse kapasite/aktif yük, o tarihte açık olan işlerden geri-hesaplanır" sub="Bugünü kapsayan aralıkta güncel durumu gösterir."/>
