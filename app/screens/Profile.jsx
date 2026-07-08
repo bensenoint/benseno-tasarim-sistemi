@@ -101,6 +101,35 @@ function KendiPerformansKarti({ u, allCompleted }) {
           En çok: {topMarka.map(([m,n]) => `${m} (${n})`).join(" · ")}
         </div>
       )}
+      {(() => {
+        // P3.4b: son 6 ay trend — <2 dolu ay ise gizle (tek nokta trend değildir)
+        const T = (typeof bnsKisiTrend === "function") ? bnsKisiTrend(benim, Date.now()) : [];
+        if (T.filter(x => x.tamamlanan > 0).length < 2) return null;
+        return (
+          <div style={{marginBottom:14}}>
+            <div style={{font:"600 12px/1 var(--font-sans)", margin:"4px 0 8px"}}>Son 6 ay</div>
+            <div style={{display:"flex", gap:6, alignItems:"flex-end", height:40, marginBottom:8}}>
+              {T.map((x, i) => (
+                <div key={i} title={`${x.ay} · ${x.ortPuan != null ? x.ortPuan + " puan" : "puan yok"} · ${x.tamamlanan} iş`}
+                  style={{flex:1, height: Math.max(3, Math.round((x.ortPuan || 0) / 5 * 36)),
+                    background: x.ortPuan != null ? "var(--prio-yellow)" : "var(--line)",
+                    borderRadius:2, opacity: x.ortPuan != null ? 1 : 0.5}}/>
+              ))}
+            </div>
+            <table style={{width:"100%", font:"400 11px/1.5 var(--font-sans)", color:"var(--ink-2)", borderCollapse:"collapse"}}>
+              <thead><tr style={{color:"var(--ink-3)", textAlign:"left"}}>
+                <th>ay</th><th>iş</th><th>puan</th><th>zamanında</th><th>döngü</th></tr></thead>
+              <tbody>{T.map((x, i) => (
+                <tr key={i} style={{borderTop:"1px solid var(--line)"}}>
+                  <td>{x.ay}</td><td>{x.tamamlanan}</td>
+                  <td>{x.ortPuan ?? "—"}</td>
+                  <td>{x.zamanindaPct != null ? "%" + x.zamanindaPct : "—"}</td>
+                  <td>{x.ortDonguH != null ? x.ortDonguH + "sa" : "—"}</td>
+                </tr>))}</tbody>
+            </table>
+          </div>
+        );
+      })()}
       <div style={{font:"600 12px/1 var(--font-sans)", margin:"4px 0 8px"}}>İşlerim ve puanlarım</div>
       {son20.map(b => (
         <div key={b.id || b.no} style={{display:"flex", gap:8, alignItems:"baseline", padding:"6px 0", borderTop:"1px solid var(--line)"}}>
