@@ -449,52 +449,68 @@ function bnsKisiTrend(completed, now) {
 // Reopen (BITTI→aktif) R=V. Overdue kalan gün=1. İş günü: Pzt-Cum Europe/Istanbul.
 var BNS_V2_CALISAN = { basladi: 1, revizyon: 1, incelemede: 1 };
 var BNS_V2_DURAN = { beklemede: 1, musteride: 1, blokeli: 1 };
-function bnsGunKey(ms) {
-  return new Date(ms).toLocaleDateString('en-CA', { timeZone: 'Europe/Istanbul' }); // YYYY-MM-DD
-}
-function bnsIsGunuMu(gunKey) {
-  var wd = new Date(gunKey + 'T12:00:00+03:00').toLocaleDateString('en-US', { timeZone: 'Europe/Istanbul', weekday: 'short' });
-  return wd !== 'Sat' && wd !== 'Sun';
-}
-function bnsSonrakiGun(gunKey) {
-  var t = Date.parse(gunKey + 'T12:00:00+03:00') + 24 * BNS_H;
-  return bnsGunKey(t);
-}
+// PERFORMANS: İstanbul 2016'dan beri SABİT UTC+3 (DST yok) → gün matematiği saf aritmetik.
+// Eski sürüm hot-loop'ta toLocaleDateString (Intl) çağırıyordu → departman ekranı ~24sn'ye çıkmıştı.
+var BNS_TR_OFF = 3 * BNS_H, BNS_GUN_MS = 24 * BNS_H;
+function bnsEpochGun(ms) { return Math.floor((ms + BNS_TR_OFF) / BNS_GUN_MS); }   // İstanbul gün no
+function bnsGunFromKey(k) { return bnsEpochGun(Date.parse(k + 'T12:00:00+03:00')); }
+function bnsKeyFromGun(day) { return new Date(day * BNS_GUN_MS).toISOString().slice(0, 10); }
+function bnsGunIsMi(day) { var w = (day + 4) % 7; return w !== 6 && w !== 0; }     // 1970-01-01=Per; Cmt=6, Paz=0
+function bnsGunKey(ms) { return bnsKeyFromGun(bnsEpochGun(ms)); }                  // YYYY-MM-DD (İstanbul)
+function bnsIsGunuMu(gunKey) { return bnsGunIsMi(bnsGunFromKey(gunKey)); }
+function bnsSonrakiGun(gunKey) { return bnsKeyFromGun(bnsGunFromKey(gunKey) + 1); }
 // gunKey'den deadline gününe (dahil) kalan iş günü; overdue → 1.
 function bnsKalanIsGunu(gunKey, deadlineMs) {
-  var dlKey = bnsGunKey(deadlineMs);
-  if (gunKey > dlKey) return 1;
-  var n = 0, g = gunKey;
-  while (g <= dlKey) { if (bnsIsGunuMu(g)) n++; g = bnsSonrakiGun(g); }
+  var g = bnsGunFromKey(gunKey), dl = bnsEpochGun(deadlineMs);
+  if (g > dl) return 1;
+  var n = 0;
+  for (; g <= dl; g++) if (bnsGunIsMi(g)) n++;
   return Math.max(1, n);
 }
-// Simülatör: işin yaşamını hedef güne kadar gün gün yürüt → hedef günün payı.
-// b: { created_at, deadline, durum, durum_olaylari[{ts,durum}] } · V: rol ağırlığı.
-// Gün sınıfı = o günün SON olayındaki durum (gün-sonu kuralı). Gelecek günlerde
-// (olayların ötesi) son bilinen durum sabit sürer (projeksiyon varsayımı).
+// Simülatör önbelleği: pay V'de LİNEER (pay=R/kalan, R=V ölçekli) → iş başına V=1 ile TEK simülasyon,
+// rol ağırlığıyla çarpılır. Anahtar veri parmak izi + hedef gün → ekranlar/render'lar arası paylaşılır;
+// poll ile veri değişince (olay sayısı/son ts) anahtar değişir, kendiliğinden tazelenir.
+var _bnsV2Cache = {}, _bnsV2CacheN = 0;
+function bnsYayilimBirimPay(b, hedefGun) {
+  var ev = (b.durum_olaylari || []);
+  var son = ev.length ? ev[ev.length - 1] : null;
+  var ck = (b.id != null ? b.id : b.no) + ':' + b.created_at + ':' + b.deadline + ':' + ev.length + ':' + (son ? son.ts : 0) + ':' + hedefGun;
+  if (ck in _bnsV2Cache) return _bnsV2Cache[ck];
+  var evs = ev.filter(function (e) { return e && e.ts != null && e.durum; })
+    .slice().sort(function (a, c) { return a.ts - c.ts; });
+  var g = bnsEpochGun(b.created_at), dl = bnsEpochGun(b.deadline);
+  var R = 1, durum = 'yeni', i = 0, sonuc = 0;
+  // kalan iş günü artımlı: başlangıçta say, her geçen iş gününde azalt (O(gün²) → O(gün)).
+  var kalan = 0; for (var d = Math.min(g, dl); d <= dl; d++) if (bnsGunIsMi(d)) kalan++;
+  if (g > dl) kalan = 1;
+  for (; g <= hedefGun; g++) {
+    var gunSonuTs = (g + 1) * BNS_GUN_MS - BNS_TR_OFF - 1; // İstanbul gün sonu (ms)
+    while (i < evs.length && evs[i].ts <= gunSonuTs) {
+      if (durum === 'tamamlandi' && evs[i].durum !== 'tamamlandi') R = 1; // reopen: yeni döngü
+      durum = evs[i].durum; i++;
+    }
+    var isGunu = bnsGunIsMi(g);
+    if (g === hedefGun) {
+      if (isGunu && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi') sonuc = R / Math.max(1, g > dl ? 1 : kalan);
+      break;
+    }
+    if (isGunu && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi' && BNS_V2_CALISAN[durum]) {
+      R = Math.max(0, R - R / Math.max(1, g > dl ? 1 : kalan));
+    }
+    if (isGunu && g <= dl) kalan--; // geçen iş günü bölenden düşer
+  }
+  if (++_bnsV2CacheN > 20000) { _bnsV2Cache = {}; _bnsV2CacheN = 0; } // basit tavan
+  _bnsV2Cache[ck] = sonuc;
+  return sonuc;
+}
+// Simülatör: işin hedef gündeki payı. b: { created_at, deadline, durum_olaylari } · V: rol ağırlığı.
+// Gün sınıfı = günün SON olayı (gün-sonu kuralı); olayların ötesinde son durum sabit sürer (projeksiyon).
 function bnsYayilimGunlukPay(b, V, hedefGunKey) {
   if (!b || !V || b.created_at == null || b.deadline == null) return 0;
-  if (!bnsIsGunuMu(hedefGunKey)) return 0;
-  var ev = (b.durum_olaylari || []).filter(function (e) { return e && e.ts != null && e.durum; })
-    .slice().sort(function (a, c) { return a.ts - c.ts; });
-  var g = bnsGunKey(b.created_at);
-  if (hedefGunKey < g) return 0;
-  var R = V, durum = 'yeni', i = 0;
-  while (true) {
-    // Bu günün sonuna kadarki olayları uygula (reopen: BITTI→aktif → R=V).
-    var gunSonu = Date.parse(g + 'T23:59:59+03:00');
-    while (i < ev.length && ev[i].ts <= gunSonu) {
-      if (durum === 'tamamlandi' && ev[i].durum !== 'tamamlandi') R = V; // yeni döngü
-      durum = ev[i].durum; i++;
-    }
-    var pay = 0;
-    if (bnsIsGunuMu(g) && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi') {
-      pay = R / bnsKalanIsGunu(g, b.deadline);
-      if (BNS_V2_CALISAN[durum]) R = Math.max(0, R - pay);
-    }
-    if (g === hedefGunKey) return Math.round(pay * 100) / 100;
-    g = bnsSonrakiGun(g);
-  }
+  var hedef = bnsGunFromKey(hedefGunKey);
+  if (!bnsGunIsMi(hedef)) return 0;
+  if (hedef < bnsEpochGun(b.created_at)) return 0;
+  return Math.round(bnsYayilimBirimPay(b, hedef) * V * 100) / 100;
 }
 // Kişinin bir gündeki doluluk %'si (kırpılmaz — %100 aşılabilir, aşırı yük görünsün).
 function bnsKisiGunDoluluk(briefs, u, gunKey) {
