@@ -847,6 +847,40 @@ app.post('/api/notifications', botGuard, async (req, res) => {  // SEC-2: script
   } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
 
+// ── Kapasite v2 saatlik arşivi (hibrit) ─────────────────────────────────────
+// Hesap SCRIPT'te (scheduler imajında calc var; server imajında YOK — 502 dersi).
+// Server yalnız saklar/sunar. POST: scripts/kapasite-snapshot.js saatlik batch yazar.
+app.post('/api/kapasite-snapshot', writeGuard, async (req, res) => {
+  try {
+    const rows = Array.isArray(req.body && req.body.rows) ? req.body.rows : [];
+    if (!rows.length) return res.status(400).json({ error: 'rows boş' });
+    // Saatlik dedup: aynı saat penceresinde firma kaydı varsa (manuel/çift koşu) toptan atla.
+    const dup = await pool.query(
+      `SELECT 1 FROM kapasite_snapshot WHERE scope='firma' AND ts > now() - interval '50 minutes' LIMIT 1`);
+    if (dup.rowCount) return res.json({ ok: true, skipped: true });
+    const vals = [], ph = [];
+    rows.slice(0, 200).forEach((r, i) => {
+      if (!r || typeof r.scope !== 'string' || !Number.isFinite(+r.pct)) return;
+      vals.push(r.scope.slice(0, 60), Math.round(+r.pct));
+      ph.push(`($${vals.length - 1}, $${vals.length})`);
+    });
+    if (!ph.length) return res.status(400).json({ error: 'geçerli satır yok' });
+    await pool.query(`INSERT INTO kapasite_snapshot (scope, pct) VALUES ${ph.join(',')}`, vals);
+    res.json({ ok: true, inserted: ph.length });
+  } catch (e) { console.error('[api] kapasite-snapshot:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+});
+// Arşiv okuma (dashboard/Ody/raporlar): ?scope=firma&days=30
+app.get('/api/kapasite-arsiv', readGuard, async (req, res) => {
+  try {
+    const scope = String(req.query.scope || 'firma').slice(0, 60);
+    const days = Math.min(180, Math.max(1, parseInt(req.query.days, 10) || 30));
+    const r = await pool.query(
+      `SELECT ts, pct FROM kapasite_snapshot WHERE scope=$1 AND ts > now() - ($2 || ' days')::interval ORDER BY ts`,
+      [scope, days]);
+    res.json({ scope, rows: r.rows });
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+});
+
 // Ody öneri geri bildirimi (beğen/beğenme + sebep + yeniden-değerlendirme sonucu).
 // Giriş yapan kişiye bağlı; ileride Ody'nin öğrenmesi/raporlama için saklanır.
 app.post('/api/ody/advice-feedback', auth.authGuard, async (req, res) => {
