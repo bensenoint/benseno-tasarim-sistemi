@@ -92,7 +92,9 @@ function HelpScreen() {
         <Row left="/maliyet" right="Slack komutuyla da girilebilir — veri DB'ye kaydedilir"/>
         <Row left="fatura ok" right="Fatura kesildi olarak işaretler" sub="Geri almak için: fatura iptal"/>
         <Row left="ödeme ok" right="Ödeme alındı olarak işaretler" sub="Geri almak için: ödeme iptal"/>
-        <Row left="🔒 Gizlilik" right="Maliyet/satış bilgisi dashboard'da YALNIZ giriş yaptıktan sonra görünür — herkese açık (login'siz) sayfada gösterilmez" sub="Slack tarafı değişmez: /maliyet ve thread'e maliyet/satış yazımı hâlâ çalışır, veri DB'ye kaydedilir; giriş yapan kullanıcılar dashboard'da görür."/>
+        <Row left="💰 Drawer'dan giriş" right="Brief detayında (çekmece) 'Finans' bölümü: maliyet/satış/fatura/ödeme doğrudan girilir — Slack'e gerek yok" sub="Yalnız yönetici görür ve girebilir. Kâr/marj hesapları (Marka detayı, Tamamlananlar, haftalık brifing) bu veriden beslenir."/>
+        <Row left="Tamamlanma hatırlatması" right="Bir iş finans girilmeden tamamlanırsa thread'e otomatik '💰 maliyet/satış girilmedi' notu düşer" sub="Veri girildikçe hatırlatma kendiliğinden kesilir."/>
+        <Row left="🔒 Gizlilik" right="Maliyet/satış bilgisi dashboard'da YALNIZ giriş yaptıktan sonra görünür — herkese açık (login'siz) sayfada gösterilmez" sub="Slack tarafı değişmez: /maliyet ve thread'e maliyet/satış yazımı hâlâ çalışır, veri DB'ye kaydedilir; giriş yapan kullanıcılar dashboard'da görür. Kâr/marj yalnız yöneticiye gösterilir."/>
       </Section>
 
       <Section title="📊 Kapasite & İş Yükü" note="Bir kişinin/departmanın yükü ROL AĞIRLIKLI hesaplanır — her işteki rolü kadar yük sayılır.">
@@ -123,14 +125,15 @@ function HelpScreen() {
         <Row left="Sessiz saat" right="Gece penceresinde (varsayılan 19:00–08:00) anlık DM gelmez — dijeste kalır" sub="Aralık Profil ⚙️'den ayarlanır."/>
         <Row left="İş/marka rozetleri" right="Dashboard'da okunmamış bildirim sayısını gösteren rozetler"/>
         <Row left="Bildirim popover" right="Rozete tıkla → bildirim listesi açılır; okunmamış/okunmuş ayrı; açınca okundu sayılır; bir bildirime tıklayınca ilgili brief detayı açılır" sub="Boşluğa tıkla veya Esc ile kapanır."/>
-        <Row left="⚙️ Tercihler" right="Profil ekranında sağ üstteki ⚙️ (Ayarlar) → 'Bildirim tercihleri': Öğle dijesti aç/kapa · Termin/atama/bloke anlık aç/kapa · Sessiz saat aralığı · Ody günlük içgörü aç/kapa" sub="Yalnız kendi profilinde görünür."/>
+        <Row left="⚙️ Tercihler" right="Profil ekranında sağ üstteki ⚙️ (Ayarlar) → 'Bildirim tercihleri': Öğle dijesti aç/kapa · Termin/atama/bloke anlık aç/kapa · Sessiz saat aralığı · Ody günlük içgörü aç/kapa · Firma risk sinyalleri aç/kapa (yönetici)" sub="Yalnız kendi profilinde görünür."/>
       </Section>
 
       <Section title="⚡ Dashboard'dan Aksiyon" note="Brief kartlarında, brief detay çekmecesinde ve Profil→Bugün'de: Slack'e geçmeden durumu güncelle. Her aksiyon Slack thread'ine de yansır. Butonlar yetkiye göre görünür.">
         <Row left="🚀 Başladım" right="İşe başladığını işaretler" sub="Atanan kişide görünür."/>
         <Row left="⏭️ İlerlet" right="İşi bir sonraki hedef statüye taşır → [hedef statü]" sub="Atanan kişide görünür."/>
-        <Row left="⏱️ Termini uzat" right="Termini +[süre] uzatır — bekleme telafisidir (muaf uzatma, puan düşürmez)" sub="Lead / açan / yönetici görebilir; yalnız bekleme/müşteride'den dönen işte aktiftir."/>
-        <Row left="🔔 Hatırlat" right="İş için hatırlatma kurar" sub="Lead / yönetici görebilir."/>
+        <Row left="⏱️ Termini uzat" right="Termini +[süre] uzatır — bekleme telafisidir (muaf uzatma, puan düşürmez)" sub="Atanan (işi yapan/lead) / açan / yönetici görebilir; yalnız bekleme/müşteride'den dönen işte aktiftir."/>
+        <Row left="🔔 Hatırlat" right="İş için hatırlatma kurar (thread'e not + atananlara bildirim)" sub="Atanan (işi yapan/lead) / açan / yönetici görebilir. Aynı işe 10 dk içinde ikinci hatırlatma gönderilmez."/>
+        <Row left="⏳ Öngörülen gecikme" right="Rozet: işin geçmiş tamamlanma hızına ve revize/termin durumuna göre 'deadline yetişmeyebilir' erken uyarısı" sub="Brief detayında; atanan + yönetici görür. Reaktif 24sa termin riskinden farklı — ERKEN tahmindir."/>
       </Section>
 
       <Section title="👋 Yeni Başlayanlar" note="Sistemi ilk kez kullananlar için yönlendirme; deneyimliler için üst çubuktaki '?' ile her zaman tekrar açılabilir.">
@@ -145,9 +148,21 @@ function HelpScreen() {
         <Row left="Deadline uzatma cezası" right="Bir işin deadline'ı ileri tarihe alınırsa AI puanından otomatik düşülür — deadline'a ne kadar YAKIN uzatılırsa o kadar çok" sub="48sa'dan fazla kala -0.5 · 24-48sa arası (48 dahil) -1.0 · 24sa ve altı -1.5 · deadline GEÇTİKTEN sonra -2.0. Birden fazla uzatmada en kötüsü sayılır. Yönetici override'ı etkilenmez."/>
         <Row left="Teslim durumu" right="Tamamlananlar'da 'Teslim' kolonu: 🟢 Zamanında · 🟡 Uzatılarak teslim · 🔴 Gecikmeli"/>
         <Row left="Yönetici override" right="Tamamlananlar'daki yıldızlara tıklayarak puanı değiştir (yönetici)" sub="Override sonrası AI o işe bir daha dokunmaz."/>
-        <Row left="Yıldız Karnesi" right="Departmanlar özet sayfasında + her departman sayfasında: firma & departman puan ortalamaları (seçili tarih aralığına göre)" sub="Genel Bakış'taki 'BENSENO ⭐' rozeti de Departmanlar özet'e götürür. Marka puanı Marka detayında; kişi puanı sadece yöneticiye, Profil'de."/>
+        <Row left="Yıldız Karnesi" right="Departmanlar özet sayfasında + her departman sayfasında: firma & departman puan ortalamaları (seçili tarih aralığına göre)" sub="Genel Bakış'taki 'BENSENO ⭐' rozeti de Departmanlar özet'e götürür. Marka puanı Marka detayında; başkalarının kişi puanları yalnız yöneticiye. KENDİ puanlarını herkes kendi profilinde görür (bkz. ⭐ Performansım)."/>
         <Row left="Değerlendirme (aç)" right="Karnedeki 'Değerlendirme' satırını AÇINCA, seçili döneme özel AI yorumu o an üretilir" sub="Sayfa/tarih değişiminde otomatik çalışmaz (maliyet yok); açtığında üretir, tarih değişince yeniden. Sayısal veriler her zaman DB'den."/>
         <Row left="⛓️ Sıralı iş" right="Brief 'Sıralı' açılırsa işi yapanlar seçim sırasına göre zincir olur: ✅ yalnız sıradaki halkayı onaylar, herkes onaylamadan iş kapanmaz" sub="✏️ zinciri geri sarar; 'revize: @kişi' belirli halkaya döndürür. Uyarılar ve yük yalnız sırası gelen kişiye işler."/>
+      </Section>
+
+      <Section title="⭐ Performansım — Kendi Puanların & Trend" note="Kendi profilinde (yalnız sana görünür): kendi işlerinin puanı, AI'ın yazılı sebebi ve aylık gelişimin.">
+        <Row left="Performansım kartı" right="Tamamlanan sayısı · ort. puan · zamanında % · ort. revize · ort. döngü · iş/hafta + en çok çalıştığın markalar" sub="Profil'de, Bugün bölümünün altında. Tamamlanan işin yoksa görünmez."/>
+        <Row left="İşlerim ve puanlarım" right="Son 20 tamamlanan işin ⭐ puanı — yıldızların üzerine gelince AI'ın yazılı SEBEBİNİ görürsün" sub="'Neden 3 yıldız aldım' artık cevaplı. Puanlar salt-okunur: yalnız yönetici değiştirebilir. Başkalarının puanlarını göremezsin."/>
+        <Row left="Son 6 ay trendi" right="Aylık mini çubuklar + tablo: ay bazında iş sayısı, ort. puan, zamanında %, ort. döngü" sub="'Geçen aylara göre iyileşiyor muyum' tek bakışta. En az 2 dolu ay veri olunca görünür."/>
+      </Section>
+
+      <Section title="📡 Firma Sinyalleri & Haftalık Brifing (yönetici)" note="Sistem firma-geneli riskleri kendiliğinden yöneticilere bildirir — sormana gerek kalmaz.">
+        <Row left="09:00 + 15:00 sinyal taraması" right="Hafta içi günde 2 kez: kapasite >%85 · geciken iş >5 · marka müşteri-risk yükselişi · kişi kalite-düşüşü · öngörülen gecikme (marka bazında toplu) · burnout projeksiyonu (gelecek 5 gün ≥%120 doluluk)" sub="Yalnız yöneticilere DM + dashboard bildirimi. Aynı sinyal günde 1 kez gelir; sessiz saate uyar."/>
+        <Row left="Pazartesi 08:00 brifing" right="Ody haftalık GM brifingi: tüm sinyalleri + finans özetini yorumlayıp 'bu hafta neye dikkat' DM'i gönderir" sub="En güçlü modelle sentezlenir; finans verisi girilmemişse bunu açıkça belirtir (uydurmaz)."/>
+        <Row left="Aç/kapa" right="Profil ⚙️ → Bildirim tercihleri → 'Firma risk sinyalleri (yönetici)'" sub="Kapatınca hem sinyaller hem haftalık brifing sana gelmez."/>
       </Section>
 
       <Section title="📡 Marka Günlük Takibi" note="Marka detay sayfasında, tabloların altında.">
@@ -158,6 +173,9 @@ function HelpScreen() {
 
       <Section title="🤖 Ody — Sistem Asistanı, Bildirimler & Ruh Halleri" note="Sağ altta yüzen maskot. Sürükleyerek istediğin yere taşıyabilirsin; pencere küçülünce kendini görünür alana çeker.">
         <Row left="Soru sor" right="Ody'ye tıkla → kullanım soruları + marka/iş/kişi bazlı canlı veri soruları + öneri/değerlendirme" sub="Sayısal yanıtlar her zaman DB'den; kişi puanlarını sadece yöneticilere söyler. Sentez/öneri sorularında daha güçlü modele yükselir."/>
+        <Row left="💬 Canlı Slack bilgisi" right="Ody gerektiğinde Slack'ten canlı bilgi çeker: kanal son mesajları, iş thread'i, arama, kişinin durumu/tatilde mi" sub="Yalnız SENİN üye olduğun kanalların bilgisini verir (erişim filtresi). Örn: 'X kanalında son ne konuşuldu?', 'Ali tatilde mi?'"/>
+        <Row left="📉 Yönetici araçları" right="Yöneticiler Ody'den kârlılık özeti ('bu ay marka kârlılığı?') ve marka müşteri-risk trendi ('X markasında ilişki nasıl gidiyor?') isteyebilir" sub="Finans ve risk yanıtları yalnız yöneticiye."/>
+        <Row left="👍👎 Öğrenme" right="Ody'nin önerilerine verdiğin 👎'ler (sebepleriyle) sonraki önerilerine yön verir — beğenilmeyen tarzı tekrarlamaz"/>
         <Row left="Sohbet kalır" right="Paneli kapatıp başka iş halledip tekrar açtığında sohbet kaldığı yerden devam eder" sub="'sohbeti temizle' ile sıfırlanır."/>
         <Row left="🔔 Bildirimler" right="Çan Ody'de; okunmamış sayısı üstteki kırmızı rozette görünür" sub="Paneli açtığın an okundu sayılır. Bir bildirime tıklayınca ilgili Slack thread'i açılır."/>
         <Row left="📋 Günlük özet" right="Ody'yi açınca bugünkü kişisel iş özetini bir kez gösterir"/>
@@ -193,6 +211,8 @@ function HelpScreen() {
         <Row left="Departmanlar özet" right="4 departmanın karşılaştırması + ortak Yıldız Karnesi (tarihe duyarlı)"/>
         <Row left="Departman sayfaları" right="Sıra: iş listesi → Yıldız Karnesi → Departman ekibi + Dönemsel özet" sub="Sol menüden Tasarım / Editör / AI / Freelance."/>
         <Row left="Marka detayı" right="Tek 'Durum' filtresi (aktif alt-statüler + Müşteride + Tamamlanan); Yıldız Karnesi listenin altında. Tamamlanan işlere tıklayıp salt-okunur detayı açabilirsin"/>
+        <Row left="💰 Kâr/marj (yönetici)" right="Marka detayında kâr/marj + faturalanmamış/tahsil edilmemiş; Tamamlananlar'da kâr KPI'ı ve kolonu" sub="Yalnız yönetici görür; maliyet/satış girildikçe dolar (bkz. 💰 Finansal Bilgi)."/>
+        <Row left="😐😟🙂🔥 Ton rozeti (yönetici)" right="Brief detayında thread'in duygu tonu rozeti — müşteri iletişiminin havası tek bakışta" sub="Yalnız yönetici görür."/>
         <Row left="Geçmiş" right="Her satırda kim ne yaptı + sağda etiket (statü/alan); tüm aksiyon türlerini filtreleyen menü + tarih filtresi + 100/sayfa" sub="Olay satırına tıkla → ilgili işin detayı açılır."/>
         <Row left="Galeri" right="Her teslimde iki link: 💬 Slack thread · 🔍 iş detayı. Görsele tıkla → önizleme. Takvim filtresine uyumlu"/>
         <Row left="Komut paleti" right="Cmd+K (Mac) / Ctrl+K — brief adı, marka veya kişiye göre hızlı arama"/>

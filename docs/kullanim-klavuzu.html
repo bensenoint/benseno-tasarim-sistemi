@@ -1383,9 +1383,15 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
       <p>Marka detayında bu sütunlara ek olarak <strong>Maliyet · Satış · Fatura · Ödeme</strong> finans sütunları da görünür.</p>
       <p>İşe tıklayınca açılan detay panelinde ayrıca <strong>💬 Thread Özeti</strong> bölümü vardır: Slack thread'indeki yazışmaların AI özeti (hafta içi saatte bir güncellenir), atama/zaman bilgileri, aktivite geçmişi ve not alanı.</p>
 
-      <h3>6.14 Profil — 🗓️ Bugün & ⚙️ Ayarlar</h3>
+      <h3>6.14 Profil — 🗓️ Bugün, ⭐ Performansım & ⚙️ Ayarlar</h3>
       <p><strong>🗓️ Bugün bölümü (yalnız kendi profilinde):</strong> Profil'de açılır bir <strong>"Bugün"</strong> bölümü — sıradaki iş + bugün deadline'ı olan işler + geciken işler tek yerde.</p>
-      <p><strong>⚙️ Ayarlar (yalnız kendi profilinde):</strong> Sağ üstteki ⚙️ → <strong>"Bildirim tercihleri"</strong> (bkz. Bölüm 4.0).</p>
+      <p><strong>⭐ Performansım (yalnız kendi profilinde):</strong> Kendi işlerinin şeffaf karnesi:</p>
+      <ul>
+        <li><strong>Özet metrikler:</strong> tamamlanan · ort. puan · zamanında % · ort. revize · ort. döngü · iş/hafta + en çok çalıştığın markalar.</li>
+        <li><strong>İşlerim ve puanlarım:</strong> son 20 işinin ⭐ puanı; yıldızların üzerine gelince <strong>AI'ın yazılı sebebini</strong> görürsün. Puanlar salt-okunur (yalnız yönetici değiştirir); başkalarının puanlarını göremezsin.</li>
+        <li><strong>Son 6 ay trendi:</strong> aylık çubuklar + tablo — "geçen aylara göre iyileşiyor muyum" tek bakışta (en az 2 dolu ay veriyle görünür).</li>
+      </ul>
+      <p><strong>⚙️ Ayarlar (yalnız kendi profilinde):</strong> Sağ üstteki ⚙️ → <strong>"Bildirim tercihleri"</strong> (bkz. Bölüm 4.0). Yöneticilerde ayrıca <strong>"Firma risk sinyalleri"</strong> anahtarı (bkz. 8.5).</p>
 
       <h3>6.15 Dashboard'dan Aksiyon Butonları</h3>
       <p>Brief kartlarında, brief detay çekmecesinde ve Profil → <strong>Bugün</strong> bölümünde durumu <strong>Slack'e geçmeden</strong> güncelleyebilirsin. Her aksiyon Slack thread'ine de yansır. Butonlar yetkiye göre görünür:</p>
@@ -1395,11 +1401,13 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
           <tbody>
             <tr><td>🚀 Başladım</td><td>İşe başladığını işaretler</td><td>Atanan kişi</td></tr>
             <tr><td>⏭️ İlerlet → [hedef statü]</td><td>İşi bir sonraki hedef statüye taşır</td><td>Atanan kişi</td></tr>
-            <tr><td>⏱️ Termini uzat +[süre]</td><td>Termini uzatır — <strong>bekleme telafisidir (muaf uzatma, puan düşürmez)</strong></td><td>Lead / açan / yönetici — yalnız bekleme/müşteride'den dönen işte</td></tr>
-            <tr><td>🔔 Hatırlat</td><td>İş için hatırlatma kurar</td><td>Lead / yönetici</td></tr>
+            <tr><td>⏱️ Termini uzat +[süre]</td><td>Termini uzatır — <strong>bekleme telafisidir (muaf uzatma, puan düşürmez)</strong></td><td><strong>Atanan (işi yapan/lead)</strong> / açan / yönetici — yalnız bekleme/müşteride'den dönen işte</td></tr>
+            <tr><td>🔔 Hatırlat</td><td>İş için hatırlatma kurar (thread'e not + atananlara bildirim; 10 dk spam koruması)</td><td><strong>Atanan (işi yapan/lead)</strong> / açan / yönetici</td></tr>
           </tbody>
         </table>
       </div>
+      <p><strong>⏳ Öngörülen gecikme rozeti:</strong> Brief detayında, geçmiş tamamlanma hızına ve revize/termin durumuna göre "deadline yetişmeyebilir" <strong>erken</strong> uyarısı (atanan + yönetici). Reaktif 24sa termin riskinden farklı — tahmindir.</p>
+      <p><strong>😐😟🙂🔥 Ton rozeti (yönetici):</strong> Brief detayında thread'in duygu tonu — müşteri iletişiminin havası tek bakışta.</p>
 
       <h3>6.16 Bildirimler — Rozet ve Popover</h3>
       <ul>
@@ -1419,11 +1427,23 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         <li>Boş ekranlarda <strong>"ne yapmalısın"</strong> yönlendirmesi çıkar.</li>
       </ul>
 
-      <h3>6.18 Ody Proaktif İçgörü</h3>
+      <h3>6.18 Ody — Proaktif İçgörü ve Yeni Yetenekler</h3>
       <p>Ody sabahları, <strong>kayda değer bir durum varsa</strong> (riskli / geciken / bugün biten işin varsa) günde <strong>bir kez tek satır 💡 içgörü</strong> verir: dashboard bildirimi + Slack DM. Kayda değer bir şey yoksa susar. Profil → ⚙️ <strong>Bildirim tercihleri</strong> → "Ody günlük içgörü" ile kapatılabilir.</p>
+      <ul>
+        <li><strong>💬 Canlı Slack bilgisi:</strong> Ody gerektiğinde Slack'ten canlı bilgi çeker — kanal son mesajları, iş thread'i, arama, kişinin durumu (tatilde mi). Yalnız <strong>senin üye olduğun kanalların</strong> bilgisini verir. Örn: "X kanalında son ne konuşuldu?", "Ali tatilde mi?"</li>
+        <li><strong>📉 Yönetici araçları:</strong> Kârlılık özeti ("bu ay marka kârlılığı?") ve marka müşteri-risk trendi ("X markasında ilişki nasıl gidiyor?") — yanıtlar yalnız yöneticiye.</li>
+        <li><strong>👍👎 Öğrenme:</strong> Önerilere verdiğin 👎'ler (sebepleriyle) sonraki önerilere yön verir — beğenilmeyen tarz tekrarlanmaz.</li>
+      </ul>
 
-      <h3>6.19 Finans Bilgisi — Giriş Arkasında</h3>
-      <p>Maliyet/satış bilgisi dashboard'da <strong>yalnız giriş yaptıktan sonra</strong> görünür; herkese açık (login'siz) sayfada gösterilmez. Slack tarafı değişmez: <code>/maliyet</code> komutu ve thread'e "maliyet/satış" yazımı hâlâ çalışır → veri DB'ye kaydedilir, giriş yapan kullanıcılar dashboard'da görür.</p>
+      <h3>6.19 Finans Bilgisi — Giriş, Kâr/Marj ve Gizlilik</h3>
+      <p><strong>Giriş yolları (yönetici):</strong></p>
+      <ul>
+        <li><strong>Dashboard (önerilen):</strong> Brief detayında <strong>💰 Finans</strong> bölümü — maliyet / satış / fatura / ödeme doğrudan girilir, Kaydet ile anında kaydedilir.</li>
+        <li><strong>Slack:</strong> <code>/maliyet</code> komutu (modal) veya thread'e <code>maliyet 1500 satış 4000</code> yazımı.</li>
+        <li><strong>Hatırlatma:</strong> Finans girilmeden tamamlanan işin thread'ine otomatik <strong>"💰 maliyet/satış girilmedi"</strong> notu düşer; veri girildikçe kesilir.</li>
+      </ul>
+      <p><strong>Kâr/marj yüzeyleri (yalnız yönetici):</strong> Marka detayında kâr/marj + faturalanmamış/tahsil edilmemiş; Tamamlananlar'da kâr KPI'ı ve kolonu; Ody'den kârlılık sorusu; Pazartesi haftalık brifinginde finans özeti.</p>
+      <p><strong>🔒 Gizlilik:</strong> Maliyet/satış dashboard'da <strong>yalnız giriş yaptıktan sonra</strong> görünür; login'siz sayfada gösterilmez. Kâr/marj yalnız yöneticiye.</p>
     </section>
 
     <!-- ─────────────────────────────────────────── -->
@@ -1508,14 +1528,26 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         <div class="section-num">8</div>
         <div class="section-title-wrap">
           <h2 class="section-title">Otomatik Raporlar</h2>
-          <div class="section-tag">4 rapor · Zamanlama · İçerik</div>
+          <div class="section-tag">Raporlar · Sinyaller · Zamanlama</div>
         </div>
       </div>
 
       <div class="schedule-grid">
         <div class="schedule-row">
           <div class="schedule-time">☀️ Hafta içi 07:50</div>
-          <div class="schedule-task"><strong>Sabah Raporu</strong> — #benseno-grafik + 5 yönetici DM · <strong>07:55</strong>'te aktif işi olan her çalışana kişisel özet DM</div>
+          <div class="schedule-task"><strong>Sabah Raporu</strong> — #benseno-grafik + 5 yönetici DM</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">📋 Pazartesi 08:00</div>
+          <div class="schedule-task"><strong>Haftalık GM Brifingi (yönetici)</strong> — Ody tüm sinyalleri + finansı sentezler: "bu hafta neye dikkat" DM'i. Finans verisi girilmemişse bunu açıkça belirtir.</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">💡 Hafta içi 08:15</div>
+          <div class="schedule-task"><strong>Ody Günlük İçgörü</strong> — riskli/geciken işin varsa tek satır kişisel içgörü (bkz. 6.18)</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">📣 Hafta içi 09:00 + 15:00</div>
+          <div class="schedule-task"><strong>Firma Risk Sinyalleri (yönetici)</strong> — kapasite &gt;%85 · geciken &gt;5 · marka müşteri-riski · kişi kalite-düşüşü · ⏳ öngörülen gecikme · 🔥 burnout projeksiyonu. Aynı sinyal günde 1 kez; Profil ⚙️ "Firma risk sinyalleri" ile kapatılır.</div>
         </div>
         <div class="schedule-row">
           <div class="schedule-time">📊 Cuma 17:10</div>
@@ -1527,7 +1559,7 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         </div>
         <div class="schedule-row">
           <div class="schedule-time">🔍 Hafta içi 17:05</div>
-          <div class="schedule-task"><strong>Günlük Sistem Özeti</strong> — Kaç run yapıldı, timeout/hata, Slack Bot durumu (yalnız Görkem'e)</div>
+          <div class="schedule-task"><strong>Günlük Sistem Özeti</strong> — günün durumu + sistem sağlığı (yalnız Görkem'e)</div>
         </div>
       </div>
 
@@ -1650,12 +1682,24 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
           <div class="schedule-task"><strong>Sabah raporu</strong> — aktif brief, dün tamamlananlar, günün öncelikleri (#benseno-grafik + 5 yönetici DM)</div>
         </div>
         <div class="schedule-row">
-          <div class="schedule-time">Hafta içi 07:55</div>
-          <div class="schedule-task"><strong>Kişisel iş özeti</strong> — aktif işi olan her çalışana kendi brief listesi DM olarak</div>
+          <div class="schedule-time">Pazartesi 08:00</div>
+          <div class="schedule-task"><strong>Haftalık GM brifingi</strong> — Ody sinyal+finans sentezi, yöneticilere DM</div>
         </div>
         <div class="schedule-row">
-          <div class="schedule-time">Hafta içi 09–19, saatte bir</div>
-          <div class="schedule-task"><strong>Thread bakımı</strong> — AI thread özetleri, hareketsiz işaretleme, cevapsız brief uyarısı + eskalasyon, tamamlanan iş insight'ı</div>
+          <div class="schedule-time">Hafta içi 08:15 · 08:30 · 13:30</div>
+          <div class="schedule-task"><strong>Ody içgörü · sabah dijesti · öğle dijesti</strong> — kişisel bildirim akışı (bkz. Bölüm 4.0)</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Hafta içi 09:00 + 15:00</div>
+          <div class="schedule-task"><strong>Firma risk sinyalleri</strong> — kapasite/geciken/marka-risk/kalite/öngörülen gecikme/burnout → yönetici DM (bkz. 8.5)</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Hafta içi 09:15–19:15, saat başı :15</div>
+          <div class="schedule-task"><strong>Termin riski taraması</strong> — teslime ≤24sa kalan işlere thread uyarısı</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Hafta içi 18:45</div>
+          <div class="schedule-task"><strong>Marka gün-sonu insight</strong> — her markanın gün değerlendirmesi arşive yazılır</div>
         </div>
         <div class="schedule-row">
           <div class="schedule-time">Hafta içi 17:05</div>
@@ -1668,6 +1712,10 @@ Yapamayacaksan ya da bir engel varsa hemen yöneticine haber ver.
         <div class="schedule-row">
           <div class="schedule-time">Ayın 25–31'i 17:15</div>
           <div class="schedule-task"><strong>Aylık strateji</strong> — aylık özet</div>
+        </div>
+        <div class="schedule-row">
+          <div class="schedule-time">Her gece 03:30 · 04:00</div>
+          <div class="schedule-task"><strong>Bakım</strong> — log temizliği · veritabanı yedeği</div>
         </div>
       </div>
     </section>

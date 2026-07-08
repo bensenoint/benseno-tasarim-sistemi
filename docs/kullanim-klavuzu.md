@@ -584,6 +584,8 @@ Sütunlar: **Yeni → Çalışılıyor → İncelemede → Blokeli → Tamamland
 
 Filtreler: Marka, kişi, tarih aralığı, revizyon sayısı
 
+**💰 Kâr (yalnız yönetici):** Üstte kâr KPI'ı + tabloda kâr kolonu — maliyet/satış girilmiş işlerden hesaplanır (bkz. 6.19).
+
 ---
 
 ### 6.7 Karşılaştırma
@@ -614,6 +616,8 @@ Filtreler: Marka, kişi, tarih aralığı, revizyon sayısı
 
 **Ne gösterir:** Her markanın aktif brief sayısı, tamamlanan iş sayısı, ortalama teslim süresi ve sorun skoru.
 
+**💰 Kâr/marj (yalnız yönetici):** Marka detayında kâr, marj %, faturalanmamış ve tahsil edilmemiş toplamları (bkz. 6.19).
+
 ---
 
 ### 6.12 Ekip Matrisi
@@ -639,7 +643,12 @@ Filtreler: Marka, kişi, tarih aralığı, revizyon sayısı
 
 **🗓️ Bugün bölümü (yalnız kendi profilinde):** Profil'de açılır bir **"Bugün"** bölümü — sıradaki iş + bugün deadline'ı olan işler + geciken işler tek yerde.
 
-**⚙️ Ayarlar (yalnız kendi profilinde):** Sağ üstteki ⚙️ → **"Bildirim tercihleri"** (bkz. Bölüm 4.0).
+**⭐ Performansım (yalnız kendi profilinde):** Kendi işlerinin şeffaf karnesi — üç parça:
+- **Özet metrikler:** tamamlanan sayısı · ort. puan · zamanında % · ort. revize · ort. döngü saati · iş/hafta + en çok çalıştığın markalar.
+- **İşlerim ve puanlarım:** son 20 tamamlanan işinin ⭐ puanı; yıldızların üzerine gelince **AI'ın yazılı sebebini** görürsün ("neden 3 yıldız aldım" artık cevaplı). Puanlar salt-okunur — yalnız yönetici değiştirebilir. Başkalarının puanlarını göremezsin.
+- **Son 6 ay trendi:** aylık mini çubuklar + tablo (iş sayısı, ort. puan, zamanında %, ort. döngü) — "geçen aylara göre iyileşiyor muyum" tek bakışta. En az 2 dolu ay veri olunca görünür.
+
+**⚙️ Ayarlar (yalnız kendi profilinde):** Sağ üstteki ⚙️ → **"Bildirim tercihleri"** (bkz. Bölüm 4.0). Yöneticilerde ayrıca **"Firma risk sinyalleri"** anahtarı (bkz. Bölüm 8.5).
 
 ---
 
@@ -651,8 +660,12 @@ Brief kartlarında, brief detay çekmecesinde ve Profil → **Bugün** bölümü
 |-------|----------|-----------|
 | 🚀 Başladım | İşe başladığını işaretler | Atanan kişi |
 | ⏭️ İlerlet → [hedef statü] | İşi bir sonraki hedef statüye taşır | Atanan kişi |
-| ⏱️ Termini uzat +[süre] | Termini uzatır — **bekleme telafisidir (muaf uzatma, puan düşürmez)** | Lead / açan / yönetici — yalnız bekleme/müşteride'den dönen işte |
-| 🔔 Hatırlat | İş için hatırlatma kurar | Lead / yönetici |
+| ⏱️ Termini uzat +[süre] | Termini uzatır — **bekleme telafisidir (muaf uzatma, puan düşürmez)** | **Atanan (işi yapan/lead)** / açan / yönetici — yalnız bekleme/müşteride'den dönen işte |
+| 🔔 Hatırlat | İş için hatırlatma kurar (thread'e not + atananlara bildirim; 10 dk spam koruması) | **Atanan (işi yapan/lead)** / açan / yönetici |
+
+**⏳ Öngörülen gecikme rozeti:** Brief detayında, işin geçmiş tamamlanma hızına ve revize/termin durumuna göre "deadline yetişmeyebilir" **erken** uyarısı görünür (atanan + yönetici). Reaktif 24 saat termin riskinden farklıdır — tahmindir.
+
+**😐😟🙂🔥 Ton rozeti (yönetici):** Brief detayında thread'in duygu tonu rozeti — müşteri iletişiminin havası tek bakışta.
 
 ---
 
@@ -677,15 +690,28 @@ Dijest saatleri, acil anlık DM ve sessiz saat için bkz. **Bölüm 4.0**; terci
 
 ---
 
-### 6.18 Ody Proaktif İçgörü
+### 6.18 Ody — Proaktif İçgörü ve Yeni Yetenekler
 
 Ody sabahları, **kayda değer bir durum varsa** (riskli / geciken / bugün biten işin varsa) günde **bir kez tek satır 💡 içgörü** verir: dashboard bildirimi + Slack DM. Kayda değer bir şey yoksa susar. Profil → ⚙️ **Bildirim tercihleri** → "Ody günlük içgörü" ile kapatılabilir.
 
+**💬 Canlı Slack bilgisi:** Ody gerektiğinde Slack'ten canlı bilgi çeker — kanal son mesajları, iş thread'i, mesaj arama, kişinin durumu (tatilde mi). Yalnız **senin üye olduğun kanalların** bilgisini verir (erişim filtresi). Örn: *"X kanalında son ne konuşuldu?"*, *"Ali tatilde mi?"*
+
+**📉 Yönetici araçları:** Yöneticiler Ody'den **kârlılık özeti** ("bu ay marka kârlılığı?") ve **marka müşteri-risk trendi** ("X markasında ilişki nasıl gidiyor?") isteyebilir. Finans ve risk yanıtları yalnız yöneticiye verilir.
+
+**👍👎 Öğrenme:** Ody'nin önerilerine verdiğin 👎'ler (sebepleriyle birlikte) sonraki önerilerine yön verir — beğenilmeyen öneri tarzını tekrarlamaz.
+
 ---
 
-### 6.19 Finans Bilgisi — Giriş Arkasında
+### 6.19 Finans Bilgisi — Giriş, Kâr/Marj ve Gizlilik
 
-Maliyet/satış bilgisi dashboard'da **yalnız giriş yaptıktan sonra** görünür; herkese açık (login'siz) sayfada gösterilmez. Slack tarafı değişmez: `/maliyet` komutu ve thread'e "maliyet/satış" yazımı hâlâ çalışır → veri DB'ye kaydedilir, giriş yapan kullanıcılar dashboard'da görür.
+**Giriş yolları (yönetici):**
+- **Dashboard (önerilen):** Brief detayında (çekmece) **💰 Finans** bölümü — maliyet / satış / fatura kesildi / ödeme alındı doğrudan girilir, Kaydet ile anında DB'ye yazılır.
+- **Slack:** `/maliyet` komutu (modal) veya thread'e `maliyet 1500 satış 4000` yazımı.
+- **Hatırlatma:** Bir iş finans girilmeden tamamlanırsa thread'e otomatik **"💰 maliyet/satış girilmedi"** notu düşer; veri girildikçe hatırlatma kesilir.
+
+**Kâr/marj yüzeyleri (yalnız yönetici):** Marka detayında kâr/marj + faturalanmamış/tahsil edilmemiş toplamları; Tamamlananlar'da kâr KPI'ı ve kolonu; Ody'den "bu ay kârlılık?" sorusu; Pazartesi haftalık brifinginde finans özeti.
+
+**🔒 Gizlilik:** Maliyet/satış bilgisi dashboard'da **yalnız giriş yaptıktan sonra** görünür; herkese açık (login'siz) sayfada gösterilmez. Kâr/marj hesapları yalnız yöneticiye gösterilir.
 
 ---
 
@@ -837,15 +863,34 @@ Bkz. Bölüm 7.4.
 
 ---
 
-### 8.4 Günlük Sistem Özeti — Her Hafta İçi 17:00 *(şu an DEVRE DIŞI)*
+### 8.4 Günlük Sistem Özeti — Her Hafta İçi 17:05
 
-> ⚠️ Bu rapor şu an devre dışı (Railway scheduler'a henüz eklenmedi). Yayın-sonrası eklenmesi planlanıyor. Aşağıdaki içerik hedeflenen kapsamdır.
+Görkem'e kısa günlük sistem/durum özeti DM'i (deterministik veriler + kısa AI yorumu):
+- Aktif brief sayısı, geciken sayısı, günün hareketi
+- Sistem sağlığı sinyalleri
 
-Yöneticilere (öncelikli Görkem'e) kısa sistem sağlığı DM'i:
-- Kaç orchestrator run yapıldı
-- Timeout / hata var mı
-- Aktif brief sayısı, geciken sayısı, gönderilen DM sayısı
-- Slack Bot çalışıyor mu?
+---
+
+### 8.5 Firma Risk Sinyalleri — Hafta İçi 09:00 + 15:00 *(yönetici)*
+
+Sistem firma-geneli riskleri günde iki kez tarar ve **yalnız yöneticilere** DM + dashboard bildirimi gönderir:
+
+| Sinyal | Tetik |
+|--------|-------|
+| ⚠️ Kapasite | Firma doluluğu **>%85** |
+| 🔴 Geciken yığılması | Geciken iş sayısı **>5** |
+| 📉 Marka müşteri-riski | Markanın risk seviyesi "yüksek" veya thread tonu gergin/acil |
+| 📊 Kişi kalite-düşüşü | Son 5 işin puanı öncekilere göre belirgin düşük (mentörlük sinyali) |
+| ⏳ Öngörülen gecikme | Geçmiş tamamlanma hızına göre "yetişmeyebilir" işler (marka bazında toplu) |
+| 🔥 Burnout projeksiyonu | Gelecek 5 günde kişi doluluğu **≥%120** |
+
+Aynı sinyal günde en fazla **1 kez** gelir; sessiz saate uyar. Aç/kapa: Profil ⚙️ → **"Firma risk sinyalleri"**.
+
+---
+
+### 8.6 Haftalık GM Brifingi — Pazartesi 08:00 *(yönetici)*
+
+Ody, tüm firma sinyallerini + finans özetini en güçlü modelle sentezleyip **"bu hafta neye dikkat"** brifingini yöneticilere DM'ler. Finans verisi girilmemişse bunu açıkça belirtir (rakam uydurmaz). Aynı "Firma risk sinyalleri" tercihine bağlıdır.
 
 ---
 
@@ -902,15 +947,24 @@ Tüm sistem **Railway'de tek bir always-on container'da** çalışır (proje: `f
 
 | Zaman (TR) | İşlem | Script |
 |------------|-------|--------|
-| **Hft içi :15 ve :45 (08:15–16:45)** | Orchestrator (brief tarama, bildirim, dashboard) | `run-orchestrator.sh` |
-| **07:50 hafta içi** | Sabah raporu | `run-sabah-raporu.sh` |
-| **Cuma 17:00** | Haftalık retrospektif | `run-haftalik-retro.sh` |
-| **Ay sonu 17:00** | Aylık stratejik özet | `run-aylik-strateji.sh` |
+| **07:50 hafta içi** | Sabah raporu (yönetim özeti) | `run-sabah-raporu.sh` |
+| **08:00 Pazartesi** | Haftalık GM brifingi (Ody/Opus, yönetici) | `run-firma-brifing.sh` |
+| **08:15 hafta içi** | Ody günlük içgörü (kişisel 💡) | `run-ody-icgoru.sh` |
+| **08:30 hafta içi** | Sabah dijesti (kişisel bildirimler) | `run-dijest.sh` |
+| **09:00 + 15:00 hafta içi** | Firma risk sinyalleri (yönetici) | `run-firma-sinyal.sh` |
+| **09:15–19:15 saat başı :15, hafta içi** | Termin riski taraması (≤24sa) | `run-termin-risk.sh` |
+| **13:30 hafta içi** | Öğle dijesti | `run-dijest-ogle.sh` |
+| **17:05 hafta içi** | Günlük sistem özeti (Görkem) | `run-gunluk-ozet.sh` |
+| **Cuma 17:10** | Haftalık retrospektif | `run-haftalik-retro.sh` |
+| **Ay sonu 17:15** | Aylık stratejik özet | `run-aylik-strateji.sh` |
+| **18:45 hafta içi** | Marka gün-sonu insight (brand_daily arşivi) | `run-kanal-gunsonu.sh` |
+| **Pazartesi 09:00** | PAT (token) süre kontrolü | `check-pat-expiry.sh` |
 | **Her gece 03:30** | Log temizliği | `run-log-temizle.sh` |
+| **Her gece 04:00** | DB yedeği | `run-yedek.sh` |
 
-> ℹ️ **"Günlük Sistem Özeti" (eski 17:00 DM) şu an çalışmıyor** — devre dışı, yayın-sonrası ele alınacak.
+> ℹ️ **Orchestrator emekli edildi** (Haziran cutover): raporlar artık doğrudan DB/API okur, briefler `/yeni-brief` ile DB'ye düşer. Saatlik thread/kanal özetleri bildirim-V2'de kapalıdır (gürültü kaynağıydı).
 
-### 10.3 Orchestrator Adımları (Her :15/:45)
+### 10.3 Orchestrator Adımları *(TARİHÎ — Haziran'da emekli edildi; referans için saklanıyor)*
 
 Her 30 dakikada bir sistem şu adımları sırayla tamamlar:
 

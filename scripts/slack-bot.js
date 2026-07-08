@@ -690,8 +690,10 @@ app.command('/yardim', async ({ command, ack, respond }) => {
         '*Bildirimler & Dashboard*\n' +
         '• Günlük dijest *08:30* + *13:30* (öğle) — biriken bildirimler toplu gelir; acil işler (termin/atama) *anında* DM.\n' +
         '• Bildirim tercihleri & sessiz saat: Dashboard → *Profil* → *⚙️*.\n' +
-        '• Dashboard\'dan aksiyon: *Başladım* / *İlerlet* / *Termini uzat* / *Hatırlat* — Slack\'e gerek yok, thread\'e de yansır.\n' +
-        '• Ody sabahları riskli işlerin varsa tek satır 💡 içgörü verir (dashboard + DM; tercihten kapatılır).'
+        '• Dashboard\'dan aksiyon: *Başladım* / *İlerlet* / *Termini uzat* / *Hatırlat* — artık *atananlar da* kullanabilir; Slack\'e gerek yok, thread\'e de yansır.\n' +
+        '• Ody sabahları riskli işlerin varsa tek satır 💡 içgörü verir (dashboard + DM; tercihten kapatılır).\n' +
+        '• *⭐ Performansım:* kendi profilinde KENDİ işlerinin puanını + AI\'ın sebebini + son 6 ay trendini görürsün.\n' +
+        '• *Yönetici:* firma risk sinyalleri hafta içi *09:00 + 15:00* DM (kapasite/geciken/marka-risk/kalite/gecikme öngörüsü/burnout) · Pazartesi *08:00* haftalık Ody brifingi · brief detayında 💰 Finans girişi (maliyet/satış/fatura/ödeme).'
       }},
 
       { type: 'divider' },
@@ -701,7 +703,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
       { type: 'section', text: { type: 'mrkdwn', text:
         '`help` — herhangi bir kanala yaz → sorun/öneri bildirim formu (adminlere gider)\n' +
         '🌴 — Slack durumunu 🌴/tatil/izin yap → uyarı DM\'leri sana gelmez\n' +
-        '🤖 — Dashboard sağ alttaki asistana kullanım ve iş/marka/kişi soruları sorabilirsin\n' +
+        '🤖 — Dashboard sağ alttaki asistana kullanım ve iş/marka/kişi soruları sorabilirsin — üye olduğun kanallardan CANLI Slack bilgisi de çeker ("X kanalında son ne konuşuldu?", "Ali tatilde mi?")\n' +
         '⏰ — İşi 1 saat içinde planına al (🎨/✍️/🤖), yoksa hatırlatma; 2 saat sonra yöneticine bilgi gider'
       }},
 
