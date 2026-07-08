@@ -103,6 +103,19 @@ function StarReport({ data, depts }) {
 window.StarReport = StarReport;
 
 function DeptCompareScreen({ data }) {
+  // Kapasite v2 arşiv trendi (saatlik snapshot → gün ortalaması). Veri geldikçe dolar.
+  const [v2Arsiv, setV2Arsiv] = React.useState(null); // null=yükleniyor, []=veri yok/erişilemedi
+  React.useEffect(() => {
+    let iptal = false;
+    (async () => {
+      try {
+        const j = (typeof window.bnsApiGet === "function")
+          ? await window.bnsApiGet("/api/kapasite-arsiv?scope=firma&days=30") : null;
+        if (!iptal) setV2Arsiv((j && j.rows) || []);
+      } catch (e) { if (!iptal) setV2Arsiv([]); }
+    })();
+    return () => { iptal = true; };
+  }, []);
   const raw = data.deptStats || {};
   const DEPT_DEF = {
     tasarim:   { name: "Tasarım",   people: 7, capacity: 42 },
@@ -210,6 +223,41 @@ function DeptCompareScreen({ data }) {
             🏢 Firma kapasite v2 (bugün): <span style={{fontWeight:700, color: p >= 120 ? "var(--prio-red)" : p >= 100 ? "var(--prio-orange)" : "var(--ink)"}}>%{p}</span>
             <span style={{color:"var(--ink-4)"}}> · zamana yayılmış model (deneme)</span>
           </div>
+        );
+      })()}
+
+      {/* ─── Firma doluluk trendi — saatlik arşivden, gün ortalaması (veri geldikçe dolar) ─── */}
+      {(() => {
+        if (v2Arsiv == null) return null; // yükleniyor — sessiz
+        // Gün kovalarına ortala (İstanbul günü; saatlik noktalar → günlük temsil)
+        const gunler = {};
+        v2Arsiv.forEach(r => {
+          const g = (typeof bnsGunKey === "function") ? bnsGunKey(Date.parse(r.ts)) : String(r.ts).slice(0, 10);
+          (gunler[g] = gunler[g] || []).push(r.pct);
+        });
+        const seri = Object.keys(gunler).sort().map(g => ({
+          gun: g, pct: Math.round(gunler[g].reduce((a, x) => a + x, 0) / gunler[g].length) }));
+        const az = seri.length < 3;
+        return (
+          <Card style={{padding: 14, marginBottom: "var(--section-gap)"}}>
+            <div style={{font:"600 12px/1 var(--font-sans)", marginBottom: 8}}>
+              📈 Firma doluluk trendi <span style={{font:"400 10px var(--font-sans)", color:"var(--ink-4)"}}>· saatlik arşivden gün ortalaması · son 30 gün</span>
+            </div>
+            {az ? (
+              <div style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}>
+                Veri birikiyor — arşiv saatlik dolmaya başladı{seri.length ? ` (şimdilik ${seri.length} gün: ${seri.map(x => "%" + x.pct).join(", ")})` : ""}. Birkaç gün içinde trend burada çizilecek.
+              </div>
+            ) : (
+              <div style={{display:"flex", gap: 3, alignItems:"flex-end", height: 52}}>
+                {seri.slice(-30).map(x => (
+                  <div key={x.gun} title={`${x.gun} · %${x.pct}`}
+                    style={{flex: 1, minWidth: 3, borderRadius: 2,
+                      height: Math.max(3, Math.min(52, Math.round(x.pct / 150 * 52))),
+                      background: x.pct >= 120 ? "var(--prio-red)" : x.pct >= 100 ? "var(--prio-orange)" : "var(--prio-green)"}}/>
+                ))}
+              </div>
+            )}
+          </Card>
         );
       })()}
 
