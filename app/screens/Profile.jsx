@@ -67,7 +67,8 @@ function BugunAccordion({ myActive, myKisiSira, overdue, onOpenBrief, onStatusCh
 
 // ─── P3.4a: Kendi performansını görme (Ç1) — yalnız kendi profilinde (_isSelf) ───────
 // Veri zaten akıyor (SEC-4 gevşek); bu kart görünürlüğü KENDİ verisi için açar.
-function KendiPerformansKarti({ u, allCompleted }) {
+function KendiPerformansKarti({ u, allCompleted, isSelf }) {
+  const [acik, setAcik] = React.useState(false); // açılır-kapanır; varsayılan kapalı
   // Kişinin worker VEYA lead olduğu tamamlananlar (alan adı esnek: workers/contributors)
   const benim = (allCompleted || []).filter(b => {
     const ppl = [...(b.workers || b.contributors || []), ...(b.leads || [])];
@@ -83,9 +84,23 @@ function KendiPerformansKarti({ u, allCompleted }) {
       <div style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-3)"}}>{l}</div>
     </div>
   );
+  const baslik = isSelf ? "⭐ Performansım" : `⭐ Performans — ${u.name || u.id}`;
+  if (!acik) {
+    return (
+      <Card style={{padding:"12px 16px", marginBottom:"var(--grid-gap)", cursor:"pointer"}} onClick={() => setAcik(true)}>
+        <div style={{font:"600 13px/1 var(--font-sans)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+          <span>{baslik}{P && P.ortPuan != null ? `  ·  ort. ${P.ortPuan}★` : ""}</span>
+          <span style={{color:"var(--ink-3)"}}>▸ aç</span>
+        </div>
+      </Card>
+    );
+  }
   return (
-    <Card style={{padding:16, marginTop:16}}>
-      <div style={{font:"600 13px/1 var(--font-sans)", marginBottom:12}}>⭐ Performansım</div>
+    <Card style={{padding:16, marginBottom:"var(--grid-gap)"}}>
+      <div style={{font:"600 13px/1 var(--font-sans)", marginBottom:12, display:"flex", justifyContent:"space-between", alignItems:"center", cursor:"pointer"}}
+        onClick={() => setAcik(false)}>
+        <span>{baslik}</span><span style={{color:"var(--ink-3)"}}>▾ kapat</span>
+      </div>
       {P && (
         <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(90px, 1fr))", gap:10, marginBottom:14}}>
           <K v={P.tamamlanan} l="tamamlanan"/>
@@ -533,8 +548,9 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
         <Kpi label="Marka"         value={Object.keys(brandCount).length} sub="farklı"/>
       </div>
 
-      {/* ─── Kapasite v2: 5 iş günü doluluk projeksiyonu (yalnız kendi profilinde) ─── */}
-      {_isSelf && (() => {
+      {/* ─── Kapasite v2: 5 iş günü doluluk projeksiyonu — kendi profilinde herkese;
+           başkasının profilinde yalnız yöneticiye (iş yükü görünürlüğü). ─── */}
+      {(_isSelf || isManager) && (() => {
         const seri = (typeof bnsKisiGunlukSeri === "function")
           ? bnsKisiGunlukSeri(myAll, u, bnsGunKey(Date.now()), 5) : [];
         if (!seri.length) return null;
@@ -562,9 +578,6 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
       {/* ─── Bugün — akordiyon (yalnız kendi profilinde) ─── */}
       {u.id === (currentUser && currentUser.slack_id) &&
         <BugunAccordion myActive={myActive} myKisiSira={myKisiSira} overdue={overdue} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange} onRemind={onRemind} u={u}/>}
-
-      {/* ─── P3.4a: Performansım — kendi puan+sebep+metrikler (yalnız kendi profilinde) ─── */}
-      {_isSelf && <KendiPerformansKarti u={u} allCompleted={allCompletedRaw}/>}
 
       {/* ─── İşlerim — tam genişlik tek tablo + dropdown görünüm seçici ─── */}
       <Card padding={0} style={{minWidth:0, marginBottom:"var(--grid-gap)"}}>
@@ -606,6 +619,10 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
           : <div style={{padding:32, textAlign:"center", color:"var(--ink-4)", font:"400 13px/1.4 var(--font-sans)"}}>{markaActive ? `${markaSel} markasında bu görünümde iş yok.` : "Bu görünümde iş yok."}</div>
         }
       </Card>
+
+      {/* ─── P3.4a: Performans — puan+sebep+metrikler. Kendi profilinde herkese; başkasının
+           profilinde yalnız yöneticiye (5 yönetici tüm çalışanların karnesini görür). ─── */}
+      {(_isSelf || isManager) && <KendiPerformansKarti u={u} allCompleted={allCompletedRaw} isSelf={_isSelf}/>}
 
       {/* ─── İş tipi analizi + Tamamlananlar ────────────────── */}
       <div style={{display:"grid", gridTemplateColumns:"1fr 1.8fr", gap:"var(--grid-gap)", marginBottom:"var(--grid-gap)"}} className="bn-grid-2">
