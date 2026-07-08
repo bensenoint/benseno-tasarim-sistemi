@@ -103,6 +103,8 @@ function HelpScreen() {
         <Row left="Gözlemci = 0" right="Gözlemcilik gözetimdir, ÜRETİM yükü değil → kapasiteye KATILMAZ" sub="Bu yüzden her işe gözlemci eklenen yöneticiler yapay olarak %100 görünmez. Genel bakış, Departman ve Profil aynı kuralı kullanır."/>
         <Row left="Kapasite %" right="Ağırlıklı yük, kişinin limitine göre yüzdeye çevrilir" sub="Limit: yönetici 10 · editör 8 · tasarım/AI/freelance 6 (yarım gün çalışanda yarıya iner)."/>
         <Row left="Tarihe duyarlı" right="Geçmiş bir tarih aralığı seçilirse kapasite/aktif yük, o tarihte açık olan işlerden geri-hesaplanır" sub="Bugünü kapsayan aralıkta güncel durumu gösterir."/>
+        <Row left="📅 Kapasite v2 (yeni)" right="Zamana yayılmış model: işin değeri başlangıç→teslim penceresine bölünür; güne düşen pay = kalan değer / kalan iş günü" sub="Başlanmamış işte pay deadline yaklaştıkça BÜYÜR; başlanınca düzenli çalışmada sabit akar; beklemede/müşteride/blokeli günlere pay binmez (kalan emek döneceği güne sıkışır); geciken işin tüm kalan değeri bugüne biner; teslimde yük düşer, yeniden açılan iş tam değerle döner. %100 AŞILABİLİR (aşırı yük görünsün diye). Profil'de 'Kapasite v2' KPI + 5 iş günü projeksiyon şeridi; Departman ekranlarında 'v2 bugün' değeri — deneme döneminde eski %'nin yanında."/>
+        <Row left="Deadline zorunlu" right="Terminsiz iş açılamaz — v2 model terminsiz yükü hesaplayamaz" sub="Slack /yeni-brief formunda da zorunlu alandır."/>
       </Section>
 
       <Section title="🗓️ Tarih Aralığı Filtresi" note="Üstteki 📅 düğmesi — tüm raporlama ekranlarını seçili döneme göre süzer.">

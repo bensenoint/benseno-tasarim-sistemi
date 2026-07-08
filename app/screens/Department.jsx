@@ -97,7 +97,10 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
         subtitle={(() => {
           const dr = window.BNS_DATA?.ratings?.dept?.[role];
           const star = dr && dr.cnt ? ` · ⭐ ${dr.avg}/5 (${dr.cnt} iş)` : "";
-          return `${rows.length} aktif iş · %${capPct} kapasite · ${overdueCount} geciken${star}`;
+          const v2 = (typeof bnsDeptGunDoluluk === "function")
+            ? bnsDeptGunDoluluk(allBriefs, data.USERS || [], role, bnsGunKey(Date.now())) : null;
+          const v2s = v2 == null ? "" : ` · v2 bugün %${v2}`;
+          return `${rows.length} aktif iş · %${capPct} kapasite${v2s} · ${overdueCount} geciken${star}`;
         })()}
         actions={null}
       />

@@ -182,6 +182,17 @@ function DeptCompareScreen({ data }) {
                 <span style={{color:"var(--prio-red)", fontWeight: 600}}>{s.overdue}</span> geciken ·{" "}
                 <span style={{color: s.capacity_pct > 85 ? "var(--warning)" : "var(--ink)", fontWeight: 600}}>%{s.capacity_pct}</span> kapasite
               </div>
+              {(() => {
+                // Kapasite v2 (zamana yayılmış) — bugünkü doluluk; eski %'nin yanında deneme dönemi
+                const p = (typeof bnsDeptGunDoluluk === "function")
+                  ? bnsDeptGunDoluluk(allBriefs, data.USERS || [], k, bnsGunKey(Date.now())) : null;
+                return p == null ? null : (
+                  <div style={{font:"400 11px/1.4 var(--font-sans)", color:"var(--ink-4)", marginTop: 3}}>
+                    v2 bugün: <span style={{fontWeight:600, color: p >= 120 ? "var(--prio-red)" : p >= 100 ? "var(--prio-orange)" : "var(--ink-2)"}}>%{p}</span>
+                    <span> · zamana yayılmış</span>
+                  </div>
+                );
+              })()}
               <div style={{marginTop: 12, height: 6, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
                 <div style={{width: s.capacity_pct + "%", height:"100%", background: BNS_DEPT_PALETTE[k]}}/>
               </div>
@@ -189,6 +200,18 @@ function DeptCompareScreen({ data }) {
           );
         })}
       </div>
+
+      {(() => {
+        // Firma-geneli kapasite v2 (bugün) — zamana yayılmış model, deneme dönemi
+        const p = (typeof bnsFirmaGunDoluluk === "function")
+          ? bnsFirmaGunDoluluk(allBriefs, data.USERS || [], bnsGunKey(Date.now())) : null;
+        return p == null ? null : (
+          <div style={{font:"500 12px/1.4 var(--font-sans)", color:"var(--ink-3)", margin:"-6px 0 var(--section-gap)"}}>
+            🏢 Firma kapasite v2 (bugün): <span style={{fontWeight:700, color: p >= 120 ? "var(--prio-red)" : p >= 100 ? "var(--prio-orange)" : "var(--ink)"}}>%{p}</span>
+            <span style={{color:"var(--ink-4)"}}> · zamana yayılmış model (deneme)</span>
+          </div>
+        );
+      })()}
 
       <Card>
         <CardHead title="Metrik karşılaştırma" sub={`bar chart · ${rangeLabel}`}/>

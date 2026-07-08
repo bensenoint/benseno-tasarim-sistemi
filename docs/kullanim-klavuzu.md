@@ -882,7 +882,9 @@ Sistem firma-geneli riskleri günde iki kez tarar ve **yalnız yöneticilere** D
 | 📉 Marka müşteri-riski | Markanın risk seviyesi "yüksek" veya thread tonu gergin/acil |
 | 📊 Kişi kalite-düşüşü | Son 5 işin puanı öncekilere göre belirgin düşük (mentörlük sinyali) |
 | ⏳ Öngörülen gecikme | Geçmiş tamamlanma hızına göre "yetişmeyebilir" işler (marka bazında toplu) |
-| 🔥 Burnout projeksiyonu | Gelecek 5 günde kişi doluluğu **≥%120** |
+| 🔥 Burnout projeksiyonu | Kişinin **5 iş günlük zamana-yayılmış doluluk serisinde** ≥%120 gün varsa ("X Per günü %140") |
+
+> Kapasite sinyali de **zamana yayılmış (v2)** firma doluluğundan hesaplanır: işin değeri başlangıç→teslim penceresine bölünür, güne düşen paylar toplanır. Başlanmamış iş deadline yaklaştıkça günü daha çok doldurur; beklemede/müşteride günlere pay binmez; geciken işin tüm kalan değeri bugüne biner. Bu yüzden % **100'ü aşabilir**. Deadline artık **zorunludur** (terminsiz iş açılamaz). Kişi bazında ayrıntı: Profil'de "Kapasite v2" + 5 günlük projeksiyon şeridi.
 
 Aynı sinyal günde en fazla **1 kez** gelir; sessiz saate uyar. Aç/kapa: Profil ⚙️ → **"Firma risk sinyalleri"**.
 
