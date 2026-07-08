@@ -87,8 +87,10 @@ function KendiPerformansKarti({ u, allCompleted, isSelf }) {
   const baslik = isSelf ? "⭐ Performansım" : `⭐ Performans — ${u.name || u.id}`;
   if (!acik) {
     return (
-      <Card style={{padding:"12px 16px", marginBottom:"var(--grid-gap)", cursor:"pointer"}} onClick={() => setAcik(true)}>
-        <div style={{font:"600 13px/1 var(--font-sans)", display:"flex", justifyContent:"space-between", alignItems:"center"}}>
+      <Card style={{padding:"12px 16px", marginBottom:"var(--grid-gap)"}}>
+        {/* onClick Card'a DEĞİL iç div'e: Card bileşeni onClick prop'unu iletmiyor (tıklama yutuluyordu). */}
+        <div onClick={() => setAcik(true)}
+          style={{font:"600 13px/1 var(--font-sans)", display:"flex", justifyContent:"space-between", alignItems:"center", cursor:"pointer"}}>
           <span>{baslik}{P && P.ortPuan != null ? `  ·  ort. ${P.ortPuan}★` : ""}</span>
           <span style={{color:"var(--ink-3)"}}>▸ aç</span>
         </div>
@@ -197,6 +199,12 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   // Müşteri onayındaki işler aktif yük/kapasite SAYILMAZ — ayrı KPI kartında gösterilir
   const myAll        = allBriefs.filter(b => isRelated(b, u.id));
   const myMusteride  = myAll.filter(b => b.durum === "musteride");
+  // Kapasite v2 serisi PAHALI (her iş için gün-gün simülasyon) → render başına TEK kez, memo'lu.
+  // Eskiden KPI değer + KPI renk + şerit ayrı ayrı çağırıyordu (3× hesap, her re-render'da) → sayfa ağırlaşmıştı.
+  const v2Seri = React.useMemo(() => (
+    (typeof bnsKisiGunlukSeri === "function" && typeof bnsGunKey === "function")
+      ? bnsKisiGunlukSeri(myAll, u, bnsGunKey(Date.now()), 5) : []
+  ), [allBriefs, u.id]);
   // Görüntülenen kişinin bu brief'teki kişisel kuyruk sırası (yoksa sona).
   const myKisiSira = (b) => {
     const c = (b.contributors || []).find(x => x && x.id === u.id);
@@ -535,24 +543,16 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
         <Kpi label="Lead olarak"   value={asLead.length} sub="açtığım"/>
         <Kpi label="Contributor"   value={asContrib.length} sub="atandığım"/>
         <Kpi label="Kapasite"      value={capPct+"%"} color={capPct>=100?"var(--prio-red)":capPct>=75?"var(--prio-orange)":undefined}/>
-        <Kpi label="Kapasite v2" value={(() => {
-          const s = (typeof bnsKisiGunlukSeri === "function")
-            ? bnsKisiGunlukSeri(myAll, u, bnsGunKey(Date.now()), 1) : [];
-          return s.length ? s[0].pct + "%" : "—";
-        })()} sub="zamana yayılmış · bugün" color={(() => {
-          const s = (typeof bnsKisiGunlukSeri === "function")
-            ? bnsKisiGunlukSeri(myAll, u, bnsGunKey(Date.now()), 1) : [];
-          const p = s.length ? s[0].pct : 0;
-          return p >= 120 ? "var(--prio-red)" : p >= 100 ? "var(--prio-orange)" : undefined;
-        })()}/>
+        <Kpi label="Kapasite v2" value={v2Seri.length ? v2Seri[0].pct + "%" : "—"}
+          sub="zamana yayılmış · bugün"
+          color={(v2Seri[0]?.pct ?? 0) >= 120 ? "var(--prio-red)" : (v2Seri[0]?.pct ?? 0) >= 100 ? "var(--prio-orange)" : undefined}/>
         <Kpi label="Marka"         value={Object.keys(brandCount).length} sub="farklı"/>
       </div>
 
       {/* ─── Kapasite v2: 5 iş günü doluluk projeksiyonu — kendi profilinde herkese;
            başkasının profilinde yalnız yöneticiye (iş yükü görünürlüğü). ─── */}
       {(_isSelf || isManager) && (() => {
-        const seri = (typeof bnsKisiGunlukSeri === "function")
-          ? bnsKisiGunlukSeri(myAll, u, bnsGunKey(Date.now()), 5) : [];
+        const seri = v2Seri; // memo'lu — render başına tek hesap
         if (!seri.length) return null;
         const gunAd = (k) => new Date(k + "T12:00:00+03:00").toLocaleDateString("tr-TR", { timeZone: "Europe/Istanbul", weekday: "short" });
         return (
