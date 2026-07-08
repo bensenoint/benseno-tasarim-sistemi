@@ -157,4 +157,4 @@ async function main() {
 }
 
 if (require.main === module) main().catch((e) => { console.error('firma-sinyal hata:', e.message); process.exit(1); });
-module.exports = { sinyalleriHesapla, firmaCapPct, yoneticiMi };
+module.exports = { sinyalleriHesapla, yoneticiMi };
