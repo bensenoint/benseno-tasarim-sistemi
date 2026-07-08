@@ -561,6 +561,17 @@ async function setStatus(id, raw, _depth = 0) {
     note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin uzat\` yaz (bekleme kadar uzatır) ya da \`termin 15.06 17:00\` ile tarih ver; bu uzatma **gecikme sayılmaz**. (Dashboard'da da tek tıkla var.)`;
   }
   await reflectChange(id, note, d.source, { by: d.by });
+  // Finans dürtüsü (veri-girişi mini-fazı): tamamlanan işte maliyet+satış boşsa thread'e hatırlat (best-effort).
+  if (d.durum === 'tamamlandi') {
+    try {
+      const fb = (await pool.query(
+        `SELECT no, maliyet, satis, slack_channel, slack_ts FROM briefs WHERE id=$1`, [id])).rows[0];
+      if (fb && fb.maliyet == null && fb.satis == null) {
+        await slack.postThread({ channel: fb.slack_channel, thread_ts: fb.slack_ts,
+          text: `💰 #${fb.no} tamamlandı — maliyet/satış girilmedi. Dashboard → iş → Finans, ya da \`/maliyet ${fb.no}\`` });
+      }
+    } catch (e) { console.error('[setStatus] finans dürtüsü:', e.message); }
+  }
   // Dashboard çanı: işe dönüş hatırlatıcısını atananlara da düşür (brief açmadan görsün).
   if (resumeMs != null) {
     try {
