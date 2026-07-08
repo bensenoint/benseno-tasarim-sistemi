@@ -420,7 +420,34 @@ function bnsSinyalBurnout(kisiler) {
   });
 }
 
+// ── P3.4b kişisel trend — son 6 ay (İstanbul takvimi); her kova bnsKisiPerformans'tan geçer ──
+function bnsKisiTrend(completed, now) {
+  var AYLAR = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+  var keyOf = function (ms) {
+    return new Date(ms).toLocaleDateString('en-CA', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit' }).slice(0, 7);
+  };
+  var nowKey = keyOf(now);
+  var y = parseInt(nowKey.slice(0, 4), 10), m = parseInt(nowKey.slice(5, 7), 10);
+  var kovalar = [];
+  for (var i = 5; i >= 0; i--) {
+    var mm = m - i, yy = y;
+    while (mm < 1) { mm += 12; yy -= 1; }
+    kovalar.push({ key: yy + '-' + String(mm).padStart(2, '0'), ay: AYLAR[mm - 1], yil: yy });
+  }
+  var byKey = {};
+  (completed || []).forEach(function (b) {
+    if (b.bitis == null) return;
+    var k = keyOf(b.bitis);
+    (byKey[k] = byKey[k] || []).push(b);
+  });
+  return kovalar.map(function (kv) {
+    var p = bnsKisiPerformans(byKey[kv.key] || [], now);
+    return { ay: kv.ay, yil: kv.yil, tamamlanan: p.tamamlanan, ortPuan: p.ortPuan,
+      zamanindaPct: p.zamanindaPct, ortDonguH: p.ortDonguH };
+  });
+}
+
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsBurnout, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsBurnout, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend };
 }

@@ -204,5 +204,22 @@ t('sinyal gecikme sayısı+key', (() => { const s = C.bnsSinyalGecikme([{ marka:
 t('sinyal gecikme aynı marka toplulaşır', (() => { const s = C.bnsSinyalGecikme([{marka:'Z',no:5},{marka:'Z',no:9},{marka:'Y',no:1}]); return s.length===2 && s.find(x=>x.key==='Z').text.includes('2 iş'); })(), true);
 t('sinyal burnout sayısı+key', (() => { const s = C.bnsSinyalBurnout([{ ad:'Eda', pct:140 }]); return s.length===1 && s[0].key==='Eda' && s[0].tip==='burnout'; })(), true);
 
+// ── P3.4b kişisel trend (aylık kovalar, İstanbul takvimi) ──
+const TNOW = Date.parse('2026-07-08T12:00:00+03:00');
+const tj = (iso, rating) => ({ bitis: Date.parse(iso), rating: rating == null ? 4 : rating,
+  deadline: Date.parse(iso) + 1, sureH: 10, rev_ic: 0, rev_musteri: 0, marka: 'A' });
+const tr6 = C.bnsKisiTrend([tj('2026-07-02T10:00:00+03:00', 5), tj('2026-06-15T10:00:00+03:00', 3)], TNOW);
+t('trend 6 eleman', tr6.length, 6);
+t('trend son ay Tem', tr6[5].ay, 'Tem');
+t('trend Tem tamamlanan', tr6[5].tamamlanan, 1);
+t('trend Tem ortPuan', tr6[5].ortPuan, 5);
+t('trend Haz ortPuan', tr6[4].ortPuan, 3);
+t('trend boş ay 0/null', tr6[0].tamamlanan === 0 && tr6[0].ortPuan === null, true);
+const sinir = C.bnsKisiTrend([tj('2026-06-30T23:30:00+03:00'), tj('2026-07-01T00:30:00+03:00')], TNOW);
+t('trend ay sınırı Haz', sinir[4].tamamlanan, 1);
+t('trend ay sınırı Tem', sinir[5].tamamlanan, 1);
+t('trend bitis null sayılmaz', C.bnsKisiTrend([{ rating: 5 }], TNOW)[5].tamamlanan, 0);
+t('trend yıl geçişi', C.bnsKisiTrend([], Date.parse('2026-02-10T12:00:00+03:00'))[0].ay, 'Eyl');
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);
