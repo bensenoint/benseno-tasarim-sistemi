@@ -952,6 +952,7 @@ Tüm sistem **Railway'de tek bir always-on container'da** çalışır (proje: `f
 | **08:15 hafta içi** | Ody günlük içgörü (kişisel 💡) | `run-ody-icgoru.sh` |
 | **08:30 hafta içi** | Sabah dijesti (kişisel bildirimler) | `run-dijest.sh` |
 | **09:00 + 15:00 hafta içi** | Firma risk sinyalleri (yönetici) | `run-firma-sinyal.sh` |
+| **09:00–19:00 saat başı, hafta içi** | Thread bakımı: özet + duygu tonu + KPI anlık görüntüsü + hareketsiz işaretleme + 1h/2h cevapsız uyarıları | `run-thread-ozet.sh` |
 | **09:15–19:15 saat başı :15, hafta içi** | Termin riski taraması (≤24sa) | `run-termin-risk.sh` |
 | **13:30 hafta içi** | Öğle dijesti | `run-dijest-ogle.sh` |
 | **17:05 hafta içi** | Günlük sistem özeti (Görkem) | `run-gunluk-ozet.sh` |
@@ -962,7 +963,7 @@ Tüm sistem **Railway'de tek bir always-on container'da** çalışır (proje: `f
 | **Her gece 03:30** | Log temizliği | `run-log-temizle.sh` |
 | **Her gece 04:00** | DB yedeği | `run-yedek.sh` |
 
-> ℹ️ **Orchestrator emekli edildi** (Haziran cutover): raporlar artık doğrudan DB/API okur, briefler `/yeni-brief` ile DB'ye düşer. Saatlik thread/kanal özetleri bildirim-V2'de kapalıdır (gürültü kaynağıydı).
+> ℹ️ **Orchestrator emekli edildi** (Haziran cutover): raporlar artık doğrudan DB/API okur, briefler `/yeni-brief` ile DB'ye düşer. Saatlik **kanal özeti** (markaların kanalına post) gürültü kaynağı olduğu için bildirim-V2'de kapalıdır; **thread bakımı** her modda çalışır.
 
 ### 10.3 Orchestrator Adımları *(TARİHÎ — Haziran'da emekli edildi; referans için saklanıyor)*
 

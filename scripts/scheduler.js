@@ -83,10 +83,12 @@ if (NOTIFY_V2) {
 // Termin riski — hafta içi 09-19 SAAT BAŞI (:15), tüm aktif briefleri tarar; teslime ≤24sa
 // olanı thread'e uyarır. Idempotent (20sa): her saat kontrol eder ama aynı işi spam'lemez.
 cron.schedule('15 9-19 * * 1-5', () => run('run-termin-risk.sh'), opts);
-// Saatlik kanal/thread özetleri: V2'de KAPALI (gürültü kaynağı).
+// Thread bakımı HER MODDA çalışır — hafta içi 09-19 saatte bir. Yalnız özet değil:
+// thread_ton (P3.2), kpi-snapshot (Overview spark), hareketsiz işaretleme ve 1h/2h
+// cevapsız uyarıları da bu script'te. V2'de yanlışlıkla kapalı kalmıştı (5 özellik ölüydü);
+// asıl gürültü kaynağı kanal-ozet'ti (kanala post) — o V2'de kapalı kalır.
+cron.schedule('0 9-19 * * 1-5', () => run('run-thread-ozet.sh'), opts);
 if (!NOTIFY_V2) {
-  // Thread özeti + tamamlanan iş insight'ı — hafta içi 09-19 arası saatte bir
-  cron.schedule('0 9-19 * * 1-5', () => run('run-thread-ozet.sh'), opts);
   // Marka kanal özeti — hafta içi 09-19 arası saatte bir, yarım saat kaydırmalı (xx:30)
   cron.schedule('30 9-19 * * 1-5', () => run('run-kanal-ozet.sh'), opts);
 }
