@@ -105,6 +105,9 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
         actions={null}
       />
 
+      {/* Kapasite v2 arşiv trendi — departman doluluk tarihçesi (veri geldikçe dolar) */}
+      <V2ArsivTrend scope={"dept:" + role} baslik="📈 Departman doluluk trendi"/>
+
       <div style={{display:"flex", flexDirection:"column", gap:"var(--section-gap)"}}>
         {/* 1) İŞ LİSTESİ (Detay bakış) — EN BAŞTA */}
         <div>

@@ -397,3 +397,52 @@ function BriefActions({ brief, currentUser, onStatusChange, onRemind, compact })
   );
 }
 window.BriefActions = BriefActions;
+
+// ─── Kapasite v2 arşiv trendi (ortak) — saatlik kapasite_snapshot → gün ortalaması ───
+// scope: 'firma' | 'dept:tasarim' | 'kisi:U...'. Veri geldikçe kendiliğinden dolar;
+// <3 gün veri varken "birikiyor" durumu gösterir. Firma/dept/kişi ekranları aynı bileşeni kullanır.
+function V2ArsivTrend({ scope, baslik }) {
+  const [rows, setRows] = React.useState(null); // null=yükleniyor, []=yok/erişilemedi
+  React.useEffect(() => {
+    let iptal = false;
+    (async () => {
+      try {
+        const j = (typeof window.bnsApiGet === "function")
+          ? await window.bnsApiGet(`/api/kapasite-arsiv?scope=${encodeURIComponent(scope)}&days=30`) : null;
+        if (!iptal) setRows((j && j.rows) || []);
+      } catch (e) { if (!iptal) setRows([]); }
+    })();
+    return () => { iptal = true; };
+  }, [scope]);
+  if (rows == null) return null; // yükleniyor — sessiz
+  const gunler = {};
+  rows.forEach(r => {
+    const g = (typeof bnsGunKey === "function") ? bnsGunKey(Date.parse(r.ts)) : String(r.ts).slice(0, 10);
+    (gunler[g] = gunler[g] || []).push(r.pct);
+  });
+  const seri = Object.keys(gunler).sort().map(g => ({
+    gun: g, pct: Math.round(gunler[g].reduce((a, x) => a + x, 0) / gunler[g].length) }));
+  const az = seri.length < 3;
+  return (
+    <Card style={{padding: 14, marginBottom: "var(--grid-gap)"}}>
+      <div style={{font:"600 12px/1 var(--font-sans)", marginBottom: 8}}>
+        {baslik || "📈 Doluluk trendi"} <span style={{font:"400 10px var(--font-sans)", color:"var(--ink-4)"}}>· saatlik arşivden gün ortalaması · son 30 gün</span>
+      </div>
+      {az ? (
+        <div style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}>
+          Veri birikiyor{seri.length ? ` (şimdilik ${seri.length} gün: ${seri.map(x => "%" + x.pct).join(", ")})` : ""} — birkaç gün içinde trend burada çizilecek.
+        </div>
+      ) : (
+        <div style={{display:"flex", gap: 3, alignItems:"flex-end", height: 52}}>
+          {seri.slice(-30).map(x => (
+            <div key={x.gun} title={`${x.gun} · %${x.pct}`}
+              style={{flex: 1, minWidth: 3, borderRadius: 2,
+                height: Math.max(3, Math.min(52, Math.round(x.pct / 150 * 52))),
+                background: x.pct >= 120 ? "var(--prio-red)" : x.pct >= 100 ? "var(--prio-orange)" : "var(--prio-green)"}}/>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+window.V2ArsivTrend = V2ArsivTrend;

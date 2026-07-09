@@ -575,6 +575,9 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
         );
       })()}
 
+      {/* Kapasite v2 arşiv trendi — kişinin doluluk tarihçesi (kendi + yönetici görünümü) */}
+      {(_isSelf || isManager) && <V2ArsivTrend scope={"kisi:" + u.id} baslik="📈 Doluluk trendim"/>}
+
       {/* ─── Bugün — akordiyon (yalnız kendi profilinde) ─── */}
       {u.id === (currentUser && currentUser.slack_id) &&
         <BugunAccordion myActive={myActive} myKisiSira={myKisiSira} overdue={overdue} onOpenBrief={onOpenBrief} onStatusChange={onStatusChange} onRemind={onRemind} u={u}/>}
