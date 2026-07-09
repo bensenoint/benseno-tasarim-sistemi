@@ -22,7 +22,15 @@ async function brifingOlgulari(d, now) {
   const finans = C.bnsFinansOzet(d.bns_completed || []);
   // Finans alanları (satış/maliyet) girilmemişse yanıltıcı 0 gösterme / Opus'a "yorum yapma" de.
   const finansVar = (finans.satis || 0) > 0 || (finans.maliyet || 0) > 0;
-  return { sinyaller, finans, finansVar,
+  // fatura-v2: bu ay retainer faturası kesilmemiş markalar (aylik_ucret'li olup bu ayın
+  // marka_fatura kaydı fatura=true OLMAYANLAR).
+  const buAy = new Date(now).toISOString().slice(0, 7);
+  const mf = d.bns_marka_fatura || [];
+  const kesilmemisRetainer = (d.bns_brands || [])
+    .filter((b) => b.aylik_ucret != null)
+    .filter((b) => !mf.some((x) => x.marka === b.name && x.ay === buAy && x.fatura))
+    .map((b) => b.name);
+  return { sinyaller, finans, finansVar, kesilmemisRetainer,
     aktifSayi: (d.bns_briefs || []).length, tamamlananSayi: (d.bns_completed || []).length };
 }
 
@@ -41,6 +49,8 @@ function fallbackMetin(o) {
       ? [`• Kâr: ${f.kar != null ? f.kar : '—'} · Marj: ${f.marj != null ? '%' + f.marj : '—'}`,
          `• Faturalanmamış: ${f.faturalanmamis || 0} · Tahsil edilmemiş: ${f.tahsilEdilmemis || 0}`]
       : ['• Finans verisi girilmemiş (satış/maliyet alanları boş).']),
+    ...((o.kesilmemisRetainer || []).length
+      ? ['', `📄 Kesilmemiş retainer (bu ay): ${o.kesilmemisRetainer.join(', ')}`] : []),
   ].join('\n');
 }
 
