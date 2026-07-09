@@ -139,7 +139,10 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
                     sebep={c.rating_sebep || (c.insight ? c.insight.split(/(?<=[.!?])\s/).slice(0, 2).join(' ').slice(0, 200) : null)}
                     onRate={currentUser?.role === 'admin' ? (n) => rateBrief(c.id, n) : null}/>
                 </td>
-                {_isMgr && (() => { const k = bnsKarMarj(c).kar; return <td className="bns-col-mobile-hide" style={cs(true, "right")}>{k != null ? fmtTRY(k) : "—"}</td>; })()}
+                {_isMgr && (() => {
+                  // fatura-v2: retainer kapsamındaki iş ayrıca faturalanmaz → kâr yerine rozet
+                  if (c.ucret_tipi === "kapsamda") return <td className="bns-col-mobile-hide" style={cs(true, "right")}><span title="Retainer kapsamında — ayrıca faturalanmaz" style={{font:"600 10px var(--font-sans)", color:"var(--ink-4)"}}>🔒 kapsamda</span></td>;
+                  const k = bnsKarMarj(c).kar; return <td className="bns-col-mobile-hide" style={cs(true, "right")}>{k != null ? fmtTRY(k) : "—"}</td>; })()}
                 <td className="bns-col-mobile-hide" style={cs()}>
                   <a href={c.slack_url && c.slack_url !== "#" ? c.slack_url : undefined}
                      target="_blank" rel="noopener noreferrer"
