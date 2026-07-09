@@ -561,20 +561,16 @@ const CHAT_BILGI = (() => {
   catch (e) { console.error('[chat] bilgi dosyası okunamadı:', e.message); return ''; }
 })();
 const chatReqSeq = new Map();   // ody-gönderim onay sırası (kullanıcı başına)
-app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
-  try {
-    const msgs = Array.isArray(req.body?.messages) ? req.body.messages.slice(-12) : [];
-    if (!msgs.length) return res.status(400).json({ error: 'messages gerekli' });
-    if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'asistan yapılandırılmamış' });
-    const rb = req.body?.range;
-    const range = (rb && typeof rb.from === 'number' && typeof rb.to === 'number') ? { from: rb.from, to: rb.to } : null;
-    const isAdmin = req.user.role === 'admin';
+// ── ODY SOHBET ÇEKİRDEĞİ ────────────────────────────────────────────────────
+// Dashboard (/api/chat) ve Slack DM (/api/ody-dm) aynı beyni paylaşır.
+// Davranış /api/chat'in eski gövdesiyle birebir; yalnız req/res bağımlılığı çıkarıldı.
+async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
     const ed = await getEmbedded();   // tek fetch; tüm tool çağrıları paylaşır
     // Ody-gönderim onay garantisi: kullanıcı başına istek sırası — onay ancak önizlemeden
     // SONRAKİ istekte geçerli (ody-tools slack_gonder_onayla reqSeq karşılaştırır).
-    const _seqKey = req.user.slack_id || String(req.user.id);
+    const _seqKey = user.slack_id || String(user.id);
     const reqSeq = (chatReqSeq.get(_seqKey) || 0) + 1; chatReqSeq.set(_seqKey, reqSeq);
-    const ctx = { user: req.user, isAdmin, range, ed, reqSeq };
+    const ctx = { user, isAdmin, range, ed, reqSeq };
 
     // ── KİŞİ-BAZLI ÖĞRENME ─────────────────────────────────────────────
     // Bu kişinin geçmiş soruları (sık ilgilendiği konular) + olumsuz geri bildirim dersleri →
@@ -586,14 +582,14 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
         // Yalnız kesin kimlik eşleşmesi (user_id / slack_id). user_name benzersiz olmadığından
         // eşleştirmeye DAHİL EDİLMEZ — aynı isimli kişiler arası çapraz sızıntıyı önler.
         pool.query(`SELECT soru FROM ody_chat_log WHERE (user_id=$1 OR user_id=$2) AND soru IS NOT NULL
-                    ORDER BY created_at DESC LIMIT 20`, [String(req.user.id || ''), req.user.slack_id || '']),
+                    ORDER BY created_at DESC LIMIT 20`, [String(user.id || ''), user.slack_id || '']),
         pool.query(`SELECT reason FROM ody_advice_feedback WHERE user_id=$1 AND vote='down' AND reason IS NOT NULL
-                    ORDER BY created_at DESC LIMIT 3`, [req.user.slack_id || '']),
+                    ORDER BY created_at DESC LIMIT 3`, [user.slack_id || '']),
       ]);
       const sorular = [...new Set(lg.rows.map(r => String(r.soru).trim()).filter(Boolean))].slice(0, 10);
       if (sorular.length) {
-        userMemory += `\n\n## BU KİŞİYE ÖZEL ÖĞRENME (gizli, ${req.user.name})\n` +
-          `${req.user.name} geçmişte şunları sordu — sık ilgilendiği konuları TANI; bunlardan birine benzer bir soru gelirse hızlı ve isabetli davran, doğru tool'u doğrudan çağır, gereksiz soru sorma:\n- ` +
+        userMemory += `\n\n## BU KİŞİYE ÖZEL ÖĞRENME (gizli, ${user.name})\n` +
+          `${user.name} geçmişte şunları sordu — sık ilgilendiği konuları TANI; bunlardan birine benzer bir soru gelirse hızlı ve isabetli davran, doğru tool'u doğrudan çağır, gereksiz soru sorma:\n- ` +
           sorular.join('\n- ');
       }
       if (fb.rows.length) {
@@ -614,7 +610,7 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
 
     const system =
       `Senin adın Ody. Sadece bir yapay zekâ asistanı değil; aynı zamanda Benseno Tasarım Sistemi'nin bir ÇALIŞANI ve DANIŞMANISIN. (Slack botunun adı WT'dir.) ` +
-      `Şu an seninle GİRİŞ YAPMIŞ kişi: ${req.user.name}${isAdmin ? ' (yönetici)' : ''}. Onunla bu kişiye özel, ismiyle, sıcak ve yardımsever konuş — kiminle konuştuğunu bil ve ona göre cevap ver. ` +
+      `Şu an seninle GİRİŞ YAPMIŞ kişi: ${user.name}${isAdmin ? ' (yönetici)' : ''}. Onunla bu kişiye özel, ismiyle, sıcak ve yardımsever konuş — kiminle konuştuğunu bil ve ona göre cevap ver. ` +
       `Türkçe, net ve öz konuş; gerektiğinde adım adım yönlendir, fırsat varsa proaktif öneri sun. İnsanlara yardım etmeye isteklisin.\n\n` +
       `## SAYILAR DAİMA VERİTABANINDAN\n` +
       `Sayısal her şey (iş sayıları, listeler, puanlar, kapasite, gecikme, olgular) SADECE sana verilen TOOL'lardan gelir. Bir sayı/olgu söylemeden ÖNCE ilgili tool'u çağır; sonucu BİREBİR kullan — asla kendin sayma, tahmin etme, uydurma. Tool boş/0 dönerse açıkça "yok" de.\n\n` +
@@ -627,7 +623,7 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
       (isAdmin
         ? `Bu kişi yönetici: tüm kişi/departman/marka puanlarına ve kıyaslara erişebilir.\n`
         : `Bu kişi yönetici DEĞİL: başka kişilerin puanı, performans kıyası gibi yönetici-özel bilgileri PAYLAŞMA. Ama kişiyi bilgisiz bırakma — kendi işlerini, kapasitesini, genel durumu ve genel bilgileri serbestçe ver. Veremediğinde "bu bilgi yöneticilere özel" diye NEDENİYLE açıkla, sonra yapabileceğini öner.\n`) +
-      `Kişiye özel sorularda ("benim işlerim", "bugün ne yapmalıyım") kisi olarak "${req.user.name}" ile tool çağır. Genel soruları ("kaç iş gecikti") genel tool'larla yanıtla.\n\n` +
+      `Kişiye özel sorularda ("benim işlerim", "bugün ne yapmalıyım") kisi olarak "${user.name}" ile tool çağır. Genel soruları ("kaç iş gecikti") genel tool'larla yanıtla.\n\n` +
       `## BELİRSİZLİK & YARDIM EDEMEME\n` +
       `Bir tool {belirsiz:true, adaylar:[...]} dönerse kendin seçme — hangisini kastettiğini SOR. Bir isteği karşılayamıyorsan (veri yok / yetki yok / kapsam dışı), "karşılayamadım" gibi BOŞ bir cevap verme; NEDENİNİ net söyle ve mümkünse alternatif/yapabileceğini öner. Her zaman yardımcı olmaya çalış.\n\n` +
       `# SİSTEM KULLANIM BİLGİSİ\n` + CHAT_BILGI + userMemory + fbBlok;
@@ -672,7 +668,7 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
         r = await aiCall(model, withTools);
         j = await r.json().catch(() => ({}));
       }
-      if (!r.ok) { console.error('[chat] AI hata:', j.error?.message || r.status); return res.status(502).json({ error: 'asistan şu an yanıt veremiyor' }); }
+      if (!r.ok) { console.error('[chat] AI hata:', j.error?.message || r.status); const err = new Error('asistan şu an yanıt veremiyor'); err.status = 502; throw err; }
       blocks = j.content || [];
       final = blocks.filter(c => c.type === 'text').map(c => c.text).join('').trim();
       if (j.stop_reason !== 'tool_use') break;
@@ -700,16 +696,58 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
       } catch (e) { console.error('[chat] boş-cevap retry hata:', e.message); }
     }
     const reply = final || 'İsteğini tam karşılayamadım, tekrar dener misin?';
-    res.json({ reply });
-    // Sohbet logu — best-effort, yanıtı bloklamaz (doğruluk gözlemlenebilirliği; tool çağrılmayanları yakalamak için).
+    // Sohbet logu — best-effort, yanıtı bloklamaz (doğruluk gözlemlenebilirliği).
     const soru = String(msgs[msgs.length - 1]?.content || '').slice(0, 2000);
     pool.query(
-      `INSERT INTO ody_chat_log(user_id, user_name, role, soru, tools, tool_sayisi, turlar, yanit)
-       VALUES ($1,$2,$3,$4,$5::jsonb,$6,$7,$8)`,
-      [req.user.id || req.user.slack_id || null, req.user.name || null, req.user.role || null,
-       soru, JSON.stringify(toolsUsed), toolsUsed.length, turnsUsed, reply.slice(0, 4000)]
+      `INSERT INTO ody_chat_log(user_id, user_name, role, soru, tools, tool_sayisi, turlar, yanit, kanal)
+       VALUES ($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9)`,
+      [user.id || user.slack_id || null, user.name || null, user.role || null,
+       soru, JSON.stringify(toolsUsed), toolsUsed.length, turnsUsed, reply.slice(0, 4000), kanal || 'dashboard']
     ).catch(e => console.error('[chat] log yazılamadı:', e.message));
-  } catch (e) { console.error('[chat] hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+    return reply;
+}
+
+app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
+  try {
+    const msgs = Array.isArray(req.body?.messages) ? req.body.messages.slice(-12) : [];
+    if (!msgs.length) return res.status(400).json({ error: 'messages gerekli' });
+    if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'asistan yapılandırılmamış' });
+    const rb = req.body?.range;
+    const range = (rb && typeof rb.from === 'number' && typeof rb.to === 'number') ? { from: rb.from, to: rb.to } : null;
+    const reply = await odyChatRun({ user: req.user, isAdmin: req.user.role === 'admin', msgs, range, kanal: 'dashboard' });
+    res.json({ reply });
+  } catch (e) {
+    console.error('[chat] hata:', e.message);
+    res.status(e.status || 500).json({ error: e.status === 502 ? 'asistan şu an yanıt veremiyor' : 'sunucu hatası' });
+  }
+});
+
+// ── ODY SLACK DM DİYALOĞU ───────────────────────────────────────────────────
+// Bot'a gelen DM'leri Ody beynine bağlar: okur, kaydeder (kanal='slack-dm'),
+// yetki dahilinde aksiyon alır. Kimlik = Slack'in doğruladığı event.user.
+// Sunucu-bellek DM geçmişi: kişi başına son 10 mesaj, 2 saat TTL.
+const _dmGecmis = new Map();   // slackId → { msgs: [{role,content}], ts }
+app.post('/api/ody-dm', writeGuard, llmLimiter, async (req, res) => {
+  try {
+    const slackId = String(req.body?.slack_id || '');
+    const text = String(req.body?.text || '').trim().slice(0, 4000);
+    if (!/^U/.test(slackId) || !text) return res.status(400).json({ error: 'slack_id ve text gerekli' });
+    if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'asistan yapılandırılmamış' });
+    const ed = await getEmbedded();
+    const kisi = (ed.bns_users || []).find(x => x.id === slackId);
+    if (!kisi) return res.json({ reply: 'Merhaba! Seni sistemde tanıyamadım — Görkem ile iletişime geçebilirsin. 🙏' });
+    const isAdmin = kisi.rol === 'yonetici' || kisi.yetki === 'yonetici';
+    const user = { id: slackId, slack_id: slackId, name: kisi.name, role: isAdmin ? 'admin' : 'user' };
+    const g = _dmGecmis.get(slackId);
+    const gecmis = (g && Date.now() - g.ts < 2 * 60 * 60 * 1000) ? g.msgs : [];
+    const msgs = [...gecmis, { role: 'user', content: text }].slice(-10);
+    const reply = await odyChatRun({ user, isAdmin, msgs, range: null, kanal: 'slack-dm' });
+    _dmGecmis.set(slackId, { msgs: [...msgs, { role: 'assistant', content: reply }].slice(-10), ts: Date.now() });
+    res.json({ reply });
+  } catch (e) {
+    console.error('[ody-dm] hata:', e.message);
+    res.status(e.status || 500).json({ error: 'sunucu hatası' });
+  }
 });
 
 // ── Bildirimler (dashboard zili) ────────────────────────────────────────────

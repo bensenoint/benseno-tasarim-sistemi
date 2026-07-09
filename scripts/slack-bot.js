@@ -1199,6 +1199,28 @@ app.event('message', async ({ event, client }) => {
   // Text yoksa yoksay
   if (!event.text) return;
 
+  // ── ODY DM DİYALOĞU ─────────────────────────────────────────────────────────
+  // Bot'a gelen DM'ler Ody beynine gider: okur, kaydeder, yetki dahilinde aksiyon alır.
+  // Döngü koruması: bot mesajları ve subtype'lar yukarıda elendi. "help" istisnası korunur.
+  if (event.channel_type === 'im' && !event.bot_id && !/^help$/i.test(event.text.trim())) {
+    try {
+      const r = await fetch(`${API_BASE}/api/ody-dm`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
+        body: JSON.stringify({ slack_id: event.user, text: event.text }),
+        signal: AbortSignal.timeout(90000),   // LLM + tool turları 30sn+ sürebilir
+      });
+      const j = await r.json().catch(() => ({}));
+      const reply = r.ok && j.reply ? j.reply : 'Şu an yanıt veremiyorum — birazdan tekrar dener misin? 🙏';
+      await client.chat.postMessage({ channel: event.channel, username: BOT_NAME, text: reply });
+    } catch (e) {
+      log(`ody-dm hata: ${e.message}`);
+      client.chat.postMessage({ channel: event.channel, username: BOT_NAME,
+        text: 'Şu an yanıt veremiyorum — birazdan tekrar dener misin? 🙏' }).catch(() => {});
+    }
+    return;
+  }
+
   // ── Serhat mesai dışında mention'landıysa thread'e nazik hatırlatma ─────────
   // (yarım gün: hafta içi 08:00-13:00). Kendi mesajını ve bot mesajlarını atla; spam önlemek
   // için aynı thread'de 30 dk'da bir.
