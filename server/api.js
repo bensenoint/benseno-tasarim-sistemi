@@ -560,6 +560,7 @@ const CHAT_BILGI = (() => {
   try { return require('fs').readFileSync(require('path').join(__dirname, 'chat-bilgi.md'), 'utf8'); }
   catch (e) { console.error('[chat] bilgi dosyası okunamadı:', e.message); return ''; }
 })();
+const chatReqSeq = new Map();   // ody-gönderim onay sırası (kullanıcı başına)
 app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
   try {
     const msgs = Array.isArray(req.body?.messages) ? req.body.messages.slice(-12) : [];
@@ -569,7 +570,11 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
     const range = (rb && typeof rb.from === 'number' && typeof rb.to === 'number') ? { from: rb.from, to: rb.to } : null;
     const isAdmin = req.user.role === 'admin';
     const ed = await getEmbedded();   // tek fetch; tüm tool çağrıları paylaşır
-    const ctx = { user: req.user, isAdmin, range, ed };
+    // Ody-gönderim onay garantisi: kullanıcı başına istek sırası — onay ancak önizlemeden
+    // SONRAKİ istekte geçerli (ody-tools slack_gonder_onayla reqSeq karşılaştırır).
+    const _seqKey = req.user.slack_id || String(req.user.id);
+    const reqSeq = (chatReqSeq.get(_seqKey) || 0) + 1; chatReqSeq.set(_seqKey, reqSeq);
+    const ctx = { user: req.user, isAdmin, range, ed, reqSeq };
 
     // ── KİŞİ-BAZLI ÖĞRENME ─────────────────────────────────────────────
     // Bu kişinin geçmiş soruları (sık ilgilendiği konular) + olumsuz geri bildirim dersleri →
@@ -617,6 +622,7 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
       `Özet, öneri, yorum, değerlendirme istendiğinde sadece kuru sayı verme. Nitel tool'ları (is_detay → thread özeti/insight/puan sebebi; insightlar → işlerin özet/insight metinleri; yildiz_karne → puan + yorum; marka_dokumu → kanal özeti/son insight/yorum) çağır ve bunları sayısal verilerle HARMANLA: bağlam kat, neden-sonuç kur, somut öneri sun. Sayısal kısım hep DB'den; yorum kısmı bu nitel kaynaklardan beslenir. Bir işi/markayı/kişiyi değerlendirirken önce ilgili nitel tool'u çağırmayı düşün.\n\n` +
       `## SLACK'TEN CANLI BİLGİ\n` +
       `Slack'te olan TAZE bilgi gerektiğinde (bir markanın kanalında bugün ne konuşuldu, bir işin ham Slack thread'i, bir konuyu tüm kanallarda arama, bir kişinin tatil/izin/çevrimiçi durumu) slack_sorgu tool'unu çağır ve dönen ham veriyi YORUMLA — özetle, bağlam kat. Kullanıcı YALNIZ eriştiği Slack kanallarının bilgisini görür; tool "erişimin yok" derse bunu kibarca ilet. Arama kapalıysa (tool öyle derse) kullanıcıya belirt.\n\n` +
+      `Kullanıcı Slack'e mesaj GÖNDERMENİ açıkça isterse slack_gonder'ı çağır; dönen önizlemeyi kullanıcıya AYNEN göster ve onay iste. Kullanıcı açık onay (evet/gönder) verdikten sonra slack_gonder_onayla'yı çağır. Onay almadan onaylama aracını ASLA çağırma; kullanıcı istemeden gönderim teklif etme.\n\n` +
       `## HİYERARŞİ AMA BİLGİSİZ BIRAKMA\n` +
       (isAdmin
         ? `Bu kişi yönetici: tüm kişi/departman/marka puanlarına ve kıyaslara erişebilir.\n`

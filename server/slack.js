@@ -124,6 +124,13 @@ async function logNotification(userId, text, explicitLink) {
 }
 
 // Tek kullanıcıya DM (channel=userID → bot DM açar; im:write gerekir).
+// Kanala düz mesaj (thread'siz) — Ody gönderimleri gibi genel kullanım için.
+async function postChannel(channel, text) {
+  if (!hasToken() || !channel) return { ok: false, skipped: true };
+  const res = await slackCall("chat.postMessage", { channel, text, username: BOT_NAME, unfurl_links: false });
+  return res.ok ? { ok: true, ts: res.ts } : { ok: false, error: res.error };
+}
+
 async function dm(userId, text, link, skipLog = false) {
   if (!hasToken() || !userId) return { ok: false, skipped: true };
   // FR... = freelancer (Slack'te yok) — DM sessizce atlanır, takip dashboard'dan yapılır.
@@ -157,4 +164,4 @@ async function uploadFile({ channel, thread_ts, filename, buf, title }) {
   return { ok: true, file_id: g.file_id, permalink: f.permalink || null, name: filename };
 }
 
-module.exports = { postBrief, postThread, dm, logNotification, uploadFile, channelForBrand, hasToken, CHANNELS };
+module.exports = { postBrief, postThread, postChannel, dm, logNotification, uploadFile, channelForBrand, hasToken, CHANNELS };

@@ -489,6 +489,97 @@ defs.marka_risk = {
   },
 };
 
+// ── Ody → Slack GÖNDERİM (yazma yeteneği) ────────────────────────────────────
+// Güvenlik çerçevesi: imza zorunlu · önizleme+onay SUNUCUDA garanti (reqSeq: onay ancak
+// önizlemeden SONRAKİ kullanıcı isteğinde geçerli) · 10 gönderim/saat · TTL 10dk · log.
+const slackMod = require('./slack');
+const _gonderBekleyen = new Map();   // uid → { mod, aciklama, gonder(), kod, reqSeq, ts0 }
+const _gonderSayac = new Map();      // uid → ts[]
+function _gonderLimitAsildi(uid) {
+  const now = Date.now(), arr = (_gonderSayac.get(uid) || []).filter(t => now - t < 3600000);
+  _gonderSayac.set(uid, arr);
+  return arr.length >= 10;
+}
+function _odyIsMgr(ctx) {
+  if (ctx.isAdmin) return true;
+  const uid = ctx.user && ctx.user.slack_id;
+  const u = (ctx.ed.bns_users || []).find(x => x.id === uid);
+  return !!(u && (u.rol === 'yonetici' || u.yetki === 'yonetici'));
+}
+function _odyAd(ctx) {
+  const uid = ctx.user && ctx.user.slack_id;
+  const u = (ctx.ed.bns_users || []).find(x => x.id === uid);
+  return (u && u.name) || (ctx.user && ctx.user.name) || uid || 'kullanıcı';
+}
+
+defs.slack_gonder = {
+  description: "Slack'e mesaj GÖNDERİM ÖNİZLEMESİ hazırlar (henüz göndermez). YALNIZ kullanıcı açıkça mesaj göndermeni istediğinde çağır. mod: 'thread' (iş no thread'ine — atanan/açan/yönetici) | 'dm' (kişiye — yalnız yönetici) | 'kanal' (marka kanalına — yalnız yönetici). Dönen önizlemeyi kullanıcıya aynen göster ve onay iste.",
+  input_schema: { type: 'object', required: ['mod', 'hedef', 'mesaj'], properties: {
+    mod: { type: 'string', enum: ['thread', 'dm', 'kanal'] },
+    hedef: { type: 'string', description: 'thread: iş no · dm: kişi adı/ID · kanal: marka adı' },
+    mesaj: { type: 'string', description: 'gönderilecek metin (en çok 600 karakter)' },
+  } },
+  run(input, ctx) {
+    const uid = ctx.user && ctx.user.slack_id;
+    if (!uid) return { hata: 'kimlik çözülemedi' };
+    const mesaj = String(input.mesaj || '').trim().slice(0, 600);
+    if (!mesaj) return { hata: 'mesaj boş' };
+    if (_gonderLimitAsildi(uid)) return { hata: 'saatlik gönderim limiti (10) doldu — bir süre sonra dene' };
+    const imzali = `🤖 Ody — ${_odyAd(ctx)} adına:\n${mesaj}`;
+    const mgr = _odyIsMgr(ctx);
+    let aciklama, gonder;
+    if (input.mod === 'thread') {
+      const no = parseInt(String(input.hedef).replace(/\D/g, ''), 10);
+      const b = (ctx.ed.bns_briefs || []).find(x => x.no === no) || (ctx.ed.bns_completed || []).find(x => x.no === no);
+      if (!b) return { hata: `#${no} bulunamadı` };
+      if (!b.slack_channel || !b.slack_ts) return { hata: `#${no} işinin Slack thread'i yok` };
+      const iliskili = [...(b.workers || []), ...(b.leads || [])].some(p => p && p.id === uid) || b.created_by === uid;
+      if (!mgr && !iliskili) return { hata: 'bu işin thread\'ine yalnız atananı, açanı veya yönetici mesaj gönderebilir' };
+      aciklama = `#${b.no} ${b.marka || ''} iş thread'i`;
+      gonder = () => slackMod.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text: imzali });
+    } else if (input.mod === 'dm') {
+      if (!mgr) return { hata: 'kişiye DM göndermek yöneticilere özeldir' };
+      const q = String(input.hedef || '').toLowerCase();
+      const kisi = (ctx.ed.bns_users || []).find(x => x.id === input.hedef)
+        || (ctx.ed.bns_users || []).find(x => (x.name || '').toLowerCase().includes(q));
+      if (!kisi || !/^U/.test(kisi.id)) return { hata: `kişi bulunamadı: ${input.hedef}` };
+      aciklama = `${kisi.name} (DM)`;
+      gonder = () => slackMod.dm(kisi.id, imzali);
+    } else if (input.mod === 'kanal') {
+      if (!mgr) return { hata: 'marka kanalına mesaj göndermek yöneticilere özeldir' };
+      const kanal = slackMod.channelForBrand ? slackMod.channelForBrand(input.hedef) : null;
+      if (!kanal) return { hata: `marka kanalı bulunamadı: ${input.hedef}` };
+      aciklama = `${input.hedef} marka kanalı`;
+      gonder = () => slackMod.postChannel(kanal, imzali);
+    } else return { hata: 'mod thread|dm|kanal olmalı' };
+    const kod = String(Math.floor(100000 + Math.random() * 900000));
+    _gonderBekleyen.set(uid, { kod, reqSeq: ctx.reqSeq || 0, ts0: Date.now(), aciklama, imzali, gonder });
+    return { onay_gerekli: true, onay_kodu: kod, nereye: aciklama, onizleme: imzali,
+      not: 'Önizlemeyi kullanıcıya aynen göster ve onay iste. Kullanıcı AÇIK onay (evet/gönder) vermeden slack_gonder_onayla ÇAĞIRMA.' };
+  },
+};
+
+defs.slack_gonder_onayla = {
+  description: "slack_gonder önizlemesini kullanıcı AÇIKÇA onayladıktan sonra gerçek gönderimi yapar. Onay kodunu ver. Kullanıcı onaylamadan asla çağırma.",
+  input_schema: { type: 'object', required: ['onay_kodu'], properties: { onay_kodu: { type: 'string' } } },
+  async run(input, ctx) {
+    const uid = ctx.user && ctx.user.slack_id;
+    const p = _gonderBekleyen.get(uid);
+    if (!p) return { hata: 'bekleyen gönderi yok — önce slack_gonder ile önizleme oluştur' };
+    if (String(input.onay_kodu) !== p.kod) return { hata: 'onay kodu eşleşmiyor' };
+    if (Date.now() - p.ts0 > 10 * 60 * 1000) { _gonderBekleyen.delete(uid); return { hata: 'önizleme süresi doldu (10dk) — yeniden oluştur' }; }
+    // SUNUCU GARANTİSİ: onay, önizlemeden SONRAKİ bir kullanıcı isteğinde gelmeli (aynı-tur bypass imkânsız).
+    if (!(ctx.reqSeq > p.reqSeq)) return { hata: 'onay, önizlemeyi gösterip kullanıcının AÇIK onayını aldıktan sonraki mesajda verilmeli' };
+    _gonderBekleyen.delete(uid);
+    if (process.env.ODY_GONDER_TEST === '1') return { test: true, gonderildi: true, nereye: p.aciklama };
+    const r = await p.gonder();
+    if (r && r.ok === false) return { hata: 'Slack gönderimi başarısız: ' + (r.error || 'bilinmiyor') };
+    (_gonderSayac.get(uid) || _gonderSayac.set(uid, []).get(uid)).push(Date.now());
+    console.log(`[ody-gonder] ${uid} → ${p.aciklama}`);
+    return { gonderildi: true, nereye: p.aciklama };
+  },
+};
+
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
 

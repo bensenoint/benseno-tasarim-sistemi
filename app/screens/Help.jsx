@@ -178,6 +178,7 @@ function HelpScreen() {
         <Row left="💬 Canlı Slack bilgisi" right="Ody gerektiğinde Slack'ten canlı bilgi çeker: kanal son mesajları, iş thread'i, arama, kişinin durumu/tatilde mi" sub="Yalnız SENİN üye olduğun kanalların bilgisini verir (erişim filtresi). Örn: 'X kanalında son ne konuşuldu?', 'Ali tatilde mi?'"/>
         <Row left="📉 Yönetici araçları" right="Yöneticiler Ody'den kârlılık özeti ('bu ay marka kârlılığı?') ve marka müşteri-risk trendi ('X markasında ilişki nasıl gidiyor?') isteyebilir" sub="Finans ve risk yanıtları yalnız yöneticiye."/>
         <Row left="👍👎 Öğrenme" right="Ody'nin önerilerine verdiğin 👎'ler (sebepleriyle) sonraki önerilerine yön verir — beğenilmeyen tarzı tekrarlamaz"/>
+        <Row left="📤 Slack'e mesaj" right="'Ody, #85 thread'ine yaz: revizyon yarına sarkıyor' → Ody önizlemeyi gösterir, SEN onaylayınca gönderir" sub="Mesajlar '🤖 Ody — {adın} adına' imzasıyla gider. Thread'e: atanan/açan/yönetici · kişiye DM ve marka kanalı: yalnız yönetici. Saatte en çok 10 gönderim."/>
         <Row left="Sohbet kalır" right="Paneli kapatıp başka iş halledip tekrar açtığında sohbet kaldığı yerden devam eder" sub="'sohbeti temizle' ile sıfırlanır."/>
         <Row left="🔔 Bildirimler" right="Çan Ody'de; okunmamış sayısı üstteki kırmızı rozette görünür" sub="Paneli açtığın an okundu sayılır. Bir bildirime tıklayınca ilgili Slack thread'i açılır."/>
         <Row left="📋 Günlük özet" right="Ody'yi açınca bugünkü kişisel iş özetini bir kez gösterir"/>
