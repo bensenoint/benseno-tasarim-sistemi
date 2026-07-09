@@ -1203,6 +1203,7 @@ app.event('message', async ({ event, client }) => {
   // Bot'a gelen DM'ler Ody beynine gider: okur, kaydeder, yetki dahilinde aksiyon alır.
   // Döngü koruması: bot mesajları ve subtype'lar yukarıda elendi. "help" istisnası korunur.
   if (event.channel_type === 'im' && !event.bot_id && !/^help$/i.test(event.text.trim())) {
+    log(`ody-dm ← ${event.user}: ${String(event.text).slice(0, 80)}`);
     try {
       const r = await fetch(`${API_BASE}/api/ody-dm`, {
         method: 'POST',
