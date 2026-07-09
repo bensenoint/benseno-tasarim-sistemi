@@ -572,14 +572,17 @@ async function setStatus(id, raw, _depth = 0) {
     note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin uzat\` yaz (bekleme kadar uzatır) ya da \`termin 15.06 17:00\` ile tarih ver; bu uzatma **gecikme sayılmaz**. (Dashboard'da da tek tıkla var.)`;
   }
   await reflectChange(id, note, d.source, { by: d.by });
-  // Finans dürtüsü (veri-girişi mini-fazı): tamamlanan işte maliyet+satış boşsa thread'e hatırlat (best-effort).
+  // Finans dürtüsü: tamamlanan EK işte maliyet+satış boşsa thread'e hatırlat (best-effort).
+  // fatura-v2: retainer kapsamındaki işler ayrıca faturalanmaz → dürtü SUSAR.
   if (d.durum === 'tamamlandi') {
     try {
       const fb = (await pool.query(
-        `SELECT no, maliyet, satis, slack_channel, slack_ts FROM briefs WHERE id=$1`, [id])).rows[0];
-      if (fb && fb.maliyet == null && fb.satis == null) {
+        `SELECT b.no, b.maliyet, b.satis, b.ucret_tipi, br.aylik_ucret, b.slack_channel, b.slack_ts
+         FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id WHERE b.id=$1`, [id])).rows[0];
+      const ekIs = fb && (fb.ucret_tipi === 'ek' || (fb.ucret_tipi == null && fb.aylik_ucret == null));
+      if (ekIs && fb.maliyet == null && fb.satis == null) {
         await slack.postThread({ channel: fb.slack_channel, thread_ts: fb.slack_ts,
-          text: `💰 #${fb.no} tamamlandı — maliyet/satış girilmedi. Dashboard → iş → Finans, ya da \`/maliyet ${fb.no}\`` });
+          text: `💰 #${fb.no} tamamlandı — maliyet/satış girilmedi (ek iş). Dashboard → iş → Finans, ya da \`/maliyet ${fb.no}\`` });
       }
     } catch (e) { console.error('[setStatus] finans dürtüsü:', e.message); }
   }
