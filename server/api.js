@@ -572,6 +572,18 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
     const reqSeq = (chatReqSeq.get(_seqKey) || 0) + 1; chatReqSeq.set(_seqKey, reqSeq);
     const ctx = { user, isAdmin, range, ed, reqSeq };
 
+    // ── SUNUCU-TARAFI ONAY TESPİTİ (Ody-gönderim) ──────────────────────
+    // Bekleyen gönderi varken kullanıcının SON mesajı kısa bir onay ifadesiyse ctx.onay=true.
+    // Onayı LLM değil SUNUCU tespit eder: LLM onay turunda önizlemeyi yeniden üretse/metni
+    // değiştirse bile döngü oluşmaz, gönderim tek "evet" ile tamamlanır.
+    try {
+      const sonMesaj = String([...msgs].reverse().find(m => m.role !== 'assistant')?.content || '').trim();
+      ctx.onay = odyTools.gonderBekliyor(user.slack_id)
+        && sonMesaj.length <= 60
+        && /(^|\s)(evet|onay(l[ıi]yorum|la)?|g[öo]nder(ebil[a-zçğıöşü]*)?|olur|tamam(d[ıi]r)?|yes|ok(ey)?|send)\b/i.test(sonMesaj)
+        && !/(g[öo]nderme|onaylam[ıi]yorum|hay[ıi]r|iptal|dur|vazge[çc])/i.test(sonMesaj);
+    } catch (e) { ctx.onay = false; }
+
     // ── KİŞİ-BAZLI ÖĞRENME ─────────────────────────────────────────────
     // Bu kişinin geçmiş soruları (sık ilgilendiği konular) + olumsuz geri bildirim dersleri →
     // prompt'a beslenir ki kendine has tekrar eden sorulara daha hızlı/isabetli yardım edilsin.

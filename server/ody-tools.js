@@ -552,13 +552,17 @@ defs.slack_gonder = {
       aciklama = `${input.hedef} marka kanalı`;
       gonder = () => slackMod.postChannel(kanal, imzali);
     } else return { hata: 'mod thread|dm|kanal olmalı' };
-    // İdempotent: aynı mesajın yeniden önizlemesi (LLM onay turunda tekrar çağırırsa)
+    // İdempotent: bekleyen gönderi varken yeniden önizleme (LLM onay turunda tekrar çağırırsa)
     // orijinal kod ve reqSeq'i KORUR — yoksa onay sayacı her turda sıfırlanıp sonsuz onay döngüsü oluşur.
+    // ctx.onay (sunucunun kendisi kullanıcı mesajından tespit etti) → metin ufak değişse bile
+    // ESKİ (kullanıcının gördüğü) önizleme geçerlidir; LLM'in yeniden yazdığı varyant onay sürecini bozamaz.
     const eski = _gonderBekleyen.get(uid);
-    if (eski && eski.imzali === imzali && eski.aciklama === aciklama && Date.now() - eski.ts0 < 10 * 60 * 1000) {
-      eski.gonder = gonder;
-      return { onay_gerekli: true, onay_kodu: eski.kod, nereye: aciklama, onizleme: imzali,
-        not: 'Bu önizleme ZATEN oluşturulmuştu ve kullanıcıya gösterildi. Kullanıcı onay verdiyse ŞİMDİ slack_gonder_onayla çağır — yeniden onay isteme.' };
+    if (eski && Date.now() - eski.ts0 < 10 * 60 * 1000 && (ctx.onay || (eski.imzali === imzali && eski.aciklama === aciklama))) {
+      if (eski.imzali === imzali && eski.aciklama === aciklama) eski.gonder = gonder;
+      return { onay_gerekli: true, onay_kodu: eski.kod, nereye: eski.aciklama, onizleme: eski.imzali,
+        not: ctx.onay
+          ? `Kullanıcı bu gönderiyi ZATEN ONAYLADI. Başka soru sormadan HEMEN slack_gonder_onayla çağır (onay_kodu: ${eski.kod}).`
+          : 'Bu önizleme ZATEN oluşturulmuştu ve kullanıcıya gösterildi. Kullanıcı onay verdiyse ŞİMDİ slack_gonder_onayla çağır — yeniden onay isteme.' };
     }
     const kod = String(Math.floor(100000 + Math.random() * 900000));
     _gonderBekleyen.set(uid, { kod, reqSeq: ctx.reqSeq || 0, ts0: Date.now(), aciklama, imzali, gonder });
@@ -576,8 +580,10 @@ defs.slack_gonder_onayla = {
     if (!p) return { hata: 'bekleyen gönderi yok — önce slack_gonder ile önizleme oluştur' };
     if (String(input.onay_kodu) !== p.kod) return { hata: 'onay kodu eşleşmiyor' };
     if (Date.now() - p.ts0 > 10 * 60 * 1000) { _gonderBekleyen.delete(uid); return { hata: 'önizleme süresi doldu (10dk) — yeniden oluştur' }; }
-    // SUNUCU GARANTİSİ: onay, önizlemeden SONRAKİ bir kullanıcı isteğinde gelmeli (aynı-tur bypass imkânsız).
-    if (!(ctx.reqSeq > p.reqSeq)) return { hata: 'onay, önizlemeyi gösterip kullanıcının AÇIK onayını aldıktan sonraki mesajda verilmeli' };
+    // SUNUCU GARANTİSİ: onay ya önizlemeden SONRAKİ bir kullanıcı isteğinde gelmeli (reqSeq),
+    // ya da sunucu kullanıcının SON MESAJINDAN onayı kendisi tespit etmiş olmalı (ctx.onay).
+    // İkisi de LLM'in kontrolünde değil → aynı-tur bypass imkânsız.
+    if (!(ctx.reqSeq > p.reqSeq || ctx.onay)) return { hata: 'onay, önizlemeyi gösterip kullanıcının AÇIK onayını aldıktan sonraki mesajda verilmeli' };
     _gonderBekleyen.delete(uid);
     if (process.env.ODY_GONDER_TEST === '1') return { test: true, gonderildi: true, nereye: p.aciklama };
     const r = await p.gonder();
@@ -587,6 +593,12 @@ defs.slack_gonder_onayla = {
     return { gonderildi: true, nereye: p.aciklama };
   },
 };
+
+// Bekleyen (taze) gönderi var mı? — api.js sunucu-tarafı onay tespiti için.
+function gonderBekliyor(uid) {
+  const p = _gonderBekleyen.get(uid);
+  return !!(p && Date.now() - p.ts0 < 10 * 60 * 1000);
+}
 
 // Anthropic'in beklediği {name, description, input_schema} dizisi + isimle çalıştırıcı.
 const TOOLS = Object.entries(defs).map(([name, d]) => ({ name, description: d.description, input_schema: d.input_schema }));
@@ -598,4 +610,4 @@ async function runTool(name, input, ctx) {
   catch (e) { return { error: e.message }; }
 }
 
-module.exports = { TOOLS, runTool, defs, _matchUser, resolvePerson, _userCandidates, normRange, inRange, bnsFeedbackOzet };
+module.exports = { TOOLS, runTool, gonderBekliyor, defs, _matchUser, resolvePerson, _userCandidates, normRange, inRange, bnsFeedbackOzet };
