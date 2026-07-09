@@ -552,6 +552,14 @@ defs.slack_gonder = {
       aciklama = `${input.hedef} marka kanalı`;
       gonder = () => slackMod.postChannel(kanal, imzali);
     } else return { hata: 'mod thread|dm|kanal olmalı' };
+    // İdempotent: aynı mesajın yeniden önizlemesi (LLM onay turunda tekrar çağırırsa)
+    // orijinal kod ve reqSeq'i KORUR — yoksa onay sayacı her turda sıfırlanıp sonsuz onay döngüsü oluşur.
+    const eski = _gonderBekleyen.get(uid);
+    if (eski && eski.imzali === imzali && eski.aciklama === aciklama && Date.now() - eski.ts0 < 10 * 60 * 1000) {
+      eski.gonder = gonder;
+      return { onay_gerekli: true, onay_kodu: eski.kod, nereye: aciklama, onizleme: imzali,
+        not: 'Bu önizleme ZATEN oluşturulmuştu ve kullanıcıya gösterildi. Kullanıcı onay verdiyse ŞİMDİ slack_gonder_onayla çağır — yeniden onay isteme.' };
+    }
     const kod = String(Math.floor(100000 + Math.random() * 900000));
     _gonderBekleyen.set(uid, { kod, reqSeq: ctx.reqSeq || 0, ts0: Date.now(), aciklama, imzali, gonder });
     return { onay_gerekli: true, onay_kodu: kod, nereye: aciklama, onizleme: imzali,
