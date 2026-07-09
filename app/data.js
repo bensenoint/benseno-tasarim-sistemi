@@ -705,6 +705,8 @@ try {
       );
       window.BNS_DATA.BRANDS = normalized;
       window.BNS_DATA.BR = Object.fromEntries(normalized.map(b => [b.name, b]));
+      // fatura-v2: ay×marka retainer kayıtları (sensitive — login'li embedded'da gelir)
+      if (Array.isArray(ed.bns_marka_fatura)) window.BNS_DATA.MARKA_FATURA = ed.bns_marka_fatura;
     }
     // User list (Slack workspace) — bots/silinmiş hariç tüm aktif kişiler
     if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
@@ -788,6 +790,7 @@ window.bnsApplyEmbedded = function (ed) {
   var sm = window.bnsSafeMap || function (a, f) { return (a || []).map(f); };
   try {
     if (Array.isArray(ed.bns_brands)) D.BRANDS = ed.bns_brands;
+    if (Array.isArray(ed.bns_marka_fatura)) D.MARKA_FATURA = ed.bns_marka_fatura;
     if (Array.isArray(ed.bns_users)) D.USERS = window.bnsMergeUser ? ed.bns_users.map(window.bnsMergeUser) : ed.bns_users;
     if (Array.isArray(ed.bns_briefs)) D.briefs = window.bnsHydrateBrief ? sm(ed.bns_briefs, window.bnsHydrateBrief, "brief") : ed.bns_briefs;
     if (Array.isArray(ed.bns_completed)) D.completed = window.bnsHydrateCompleted ? sm(ed.bns_completed, window.bnsHydrateCompleted, "completed") : ed.bns_completed;

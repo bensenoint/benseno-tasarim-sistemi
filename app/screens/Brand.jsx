@@ -340,12 +340,15 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
 
       {_isMgr && (
         <div style={{display:"flex", gap:16, flexWrap:"wrap", alignItems:"center", marginTop:10}}>
-          <span title="Kâr = Σ satış − Σ maliyet (tamamlanan)" style={{font:"600 13px var(--font-sans)", color: fin.kar < 0 ? "var(--danger)" : "var(--ok,#1a8f5a)"}}>Kâr: {fmtTRY(fin.kar)}</span>
+          <span title="Kâr = Σ ek-iş satışı − Σ maliyet (tamamlanan; retainer kapsamı satışa sayılmaz)" style={{font:"600 13px var(--font-sans)", color: fin.kar < 0 ? "var(--danger)" : "var(--ok,#1a8f5a)"}}>Kâr: {fmtTRY(fin.kar)}</span>
           {fin.marj != null && <span style={{font:"600 13px var(--font-sans)", color:"var(--ink-2)"}}>Marj: %{fin.marj}</span>}
           {fin.faturalanmamis > 0 && <span style={{font:"500 12px var(--font-sans)", color:"var(--warning)"}}>Faturalanmamış: {fmtTRY(fin.faturalanmamis)}</span>}
           {fin.tahsilEdilmemis > 0 && <span style={{font:"500 12px var(--font-sans)", color:"var(--warning)"}}>Tahsil edilmemiş: {fmtTRY(fin.tahsilEdilmemis)}</span>}
         </div>
       )}
+
+      {/* ─── Fatura v2: Retainer kartı (yönetici) — aylık tutar + ay×fatura/ödeme işaretleri ─── */}
+      {_isMgr && <RetainerKarti brand={brand}/>}
 
       {/* ⭐ Marka yıldız karnesi — LİSTENİN ALTINDA, döneme özel lazy değerlendirme */}
       {(() => {
@@ -527,3 +530,70 @@ function bCs(mono, align, color) {
 
 window.BrandScreen = BrandScreen;
 window.BrandDetail = BrandDetail;
+
+// ─── Fatura v2: Retainer kartı — aylık sabit ücret + ay×marka fatura/ödeme takibi (yönetici) ───
+// Tutar kaydedilince sunucu GEÇİŞ TETİĞİNİ çalıştırır: markanın tipsiz işleri 'kapsamda' olur.
+function RetainerKarti({ brand }) {
+  const meta = (window.BNS_DATA && window.BNS_DATA.BR && window.BNS_DATA.BR[brand]) || {};
+  const [tutar, setTutar] = React.useState(meta.aylik_ucret ?? "");
+  const [durum, setDurum] = React.useState(null);
+  const [aylar, setAylar] = React.useState(() => {
+    const kayit = (window.BNS_DATA && window.BNS_DATA.MARKA_FATURA) || [];
+    const out = [];
+    const d = new Date();
+    for (let i = 0; i < 3; i++) {
+      const ay = new Date(d.getFullYear(), d.getMonth() - i, 15).toISOString().slice(0, 7);
+      const r = kayit.find(x => x.marka === brand && x.ay === ay);
+      out.push({ ay, tutar: r ? r.tutar : null, fatura: !!(r && r.fatura), odeme: !!(r && r.odeme) });
+    }
+    return out;
+  });
+  const post = async (path, body) => {
+    if (typeof window.bnsApiPost !== "function") return null;
+    return window.bnsApiPost(path, body);
+  };
+  const kaydetTutar = async () => {
+    setDurum("kaydediliyor");
+    try {
+      const j = await post(`/api/brands/by-name/${encodeURIComponent(brand)}/retainer`,
+        { aylik_ucret: tutar === "" ? null : +tutar });
+      setDurum(j && j.kapsamda_isaretlenen != null
+        ? `✓ kaydedildi — ${j.kapsamda_isaretlenen} iş kapsamda işaretlendi` : "✓ kaydedildi");
+      setTimeout(() => setDurum(null), 4000);
+    } catch (e) { setDurum("kaydedilemedi"); }
+  };
+  const isaretle = async (ay, alan, deger) => {
+    setAylar(a => a.map(x => x.ay === ay ? { ...x, [alan]: deger } : x));
+    try { await post(`/api/brands/by-name/${encodeURIComponent(brand)}/retainer-ay`, { ay, [alan]: deger }); }
+    catch (e) { /* poll düzeltir */ }
+  };
+  const retainerli = meta.aylik_ucret != null || tutar !== "";
+  return (
+    <Card style={{padding: 14, marginTop: 12}}>
+      <div style={{font:"600 12px/1 var(--font-sans)", marginBottom: 10}}>📄 Retainer (aylık sabit ücret)</div>
+      <div style={{display:"flex", gap: 10, alignItems:"center", flexWrap:"wrap"}}>
+        <input type="number" min="0" placeholder="aylık ₺ — boş = retainer yok" value={tutar}
+          onChange={e => setTutar(e.target.value)}
+          style={{width: 200, font:"400 12px var(--font-sans)", padding:"5px 8px", border:"1px solid var(--line)", borderRadius: 6, background:"var(--paper)", color:"var(--ink)"}}/>
+        <button onClick={kaydetTutar}
+          style={{font:"600 12px var(--font-sans)", padding:"6px 14px", border:"1px solid var(--line)", borderRadius: 8, background:"var(--paper-2)", color:"var(--ink)", cursor:"pointer"}}>Kaydet</button>
+        {durum && <span style={{font:"400 11px var(--font-sans)", color: String(durum).startsWith("✓") ? "var(--ok,#1a8f5a)" : "var(--ink-3)"}}>{durum}</span>}
+      </div>
+      {retainerli && (
+        <div style={{marginTop: 10}}>
+          {aylar.map(x => (
+            <div key={x.ay} style={{display:"flex", gap: 14, alignItems:"center", padding:"6px 0", borderTop:"1px solid var(--line-soft)", font:"400 12px var(--font-sans)", color:"var(--ink-2)"}}>
+              <span style={{width: 64, font:"500 12px var(--font-mono)"}}>{x.ay}</span>
+              <label style={{display:"flex", gap: 5, alignItems:"center", cursor:"pointer"}}>
+                <input type="checkbox" checked={x.fatura} onChange={e => isaretle(x.ay, "fatura", e.target.checked)}/> fatura kesildi</label>
+              <label style={{display:"flex", gap: 5, alignItems:"center", cursor:"pointer"}}>
+                <input type="checkbox" checked={x.odeme} onChange={e => isaretle(x.ay, "odeme", e.target.checked)}/> ödeme alındı</label>
+            </div>
+          ))}
+          <div style={{font:"400 10px/1.5 var(--font-sans)", color:"var(--ink-4)", marginTop: 6}}>
+            Tutar kaydedilince markanın tipsiz işleri otomatik "kapsamda" işaretlenir; ek işleri iş detayından ➕ ek yaparsın.</div>
+        </div>
+      )}
+    </Card>
+  );
+}

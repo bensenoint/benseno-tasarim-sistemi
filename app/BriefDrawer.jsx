@@ -3,16 +3,20 @@
 // ─── Finans girişi (yönetici-only) — mevcut /financials endpoint'i; SEC-5: yalnız login-arkası API ───
 function FinansBolumu({ b, onUpdate }) {
   const [f, setF] = React.useState({
-    maliyet: b.maliyet ?? "", satis: b.satis ?? "", fatura: !!b.fatura, odeme: !!b.odeme });
+    maliyet: b.maliyet ?? "", satis: b.satis ?? "", fatura: !!b.fatura, odeme: !!b.odeme,
+    ucret_tipi: b.ucret_tipi || "ek" });
   const [durum, setDurum] = React.useState(null); // null | 'kaydediliyor' | 'ok' | hata metni
+  const kapsamda = f.ucret_tipi === "kapsamda";
   const kaydet = async () => {
     setDurum('kaydediliyor');
     try {
       const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
       const tok = localStorage.getItem('bns_token');
-      const body = { fatura: f.fatura, odeme: f.odeme };
+      // fatura-v2: kapsamda işte satış/fatura/ödeme gönderilmez (retainer içi — ayrıca faturalanmaz).
+      const body = { ucret_tipi: f.ucret_tipi };
+      if (!kapsamda) { body.fatura = f.fatura; body.odeme = f.odeme; }
       if (f.maliyet !== "") body.maliyet = +f.maliyet;
-      if (f.satis !== "") body.satis = +f.satis;
+      if (!kapsamda && f.satis !== "") body.satis = +f.satis;
       const res = await fetch(`${apiBase}/api/briefs/${b.id}/financials`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) },
@@ -29,18 +33,30 @@ function FinansBolumu({ b, onUpdate }) {
   const lbl = { font: "400 11px/1.4 var(--font-sans)", color: "var(--ink-3)", display: "block", marginBottom: 3 };
   return (
     <div style={{margin: "0 20px 12px", padding: 12, border: "1px solid var(--line)", borderRadius: 10}}>
-      <div style={{font: "600 12px/1 var(--font-sans)", marginBottom: 10}}>💰 Finans (yönetici)</div>
+      <div style={{font: "600 12px/1 var(--font-sans)", marginBottom: 10, display:"flex", gap:12, alignItems:"center", flexWrap:"wrap"}}>
+        <span>💰 Finans (yönetici)</span>
+        <span style={{display:"inline-flex", border:"1px solid var(--line)", borderRadius:8, overflow:"hidden"}}>
+          {[["kapsamda","🔒 kapsamda"],["ek","➕ ek iş"]].map(([v,l]) => (
+            <button key={v} onClick={() => setF({ ...f, ucret_tipi: v })}
+              style={{font:"600 11px var(--font-sans)", padding:"5px 10px", border:"none", cursor:"pointer",
+                background: f.ucret_tipi === v ? "var(--paper-2)" : "transparent",
+                color: f.ucret_tipi === v ? "var(--ink)" : "var(--ink-3)"}}>{l}</button>
+          ))}
+        </span>
+      </div>
+      {kapsamda && <div style={{font:"400 11px/1.5 var(--font-sans)", color:"var(--ink-3)", marginBottom:8}}>
+        🔒 Retainer kapsamında — ayrıca faturalanmaz. Yalnız iç maliyet girilebilir.</div>}
       <div style={{display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end"}}>
         <div><span style={lbl}>Maliyet (₺)</span>
           <input type="number" min="0" style={inp} value={f.maliyet}
             onChange={e => setF({ ...f, maliyet: e.target.value })}/></div>
         <div><span style={lbl}>Satış (₺)</span>
-          <input type="number" min="0" style={inp} value={f.satis}
+          <input type="number" min="0" style={{...inp, opacity: kapsamda ? 0.4 : 1}} value={kapsamda ? "" : f.satis} disabled={kapsamda}
             onChange={e => setF({ ...f, satis: e.target.value })}/></div>
-        <label style={{font: "400 12px var(--font-sans)", display: "flex", gap: 5, alignItems: "center", cursor: "pointer"}}>
-          <input type="checkbox" checked={f.fatura} onChange={e => setF({ ...f, fatura: e.target.checked })}/> fatura kesildi</label>
-        <label style={{font: "400 12px var(--font-sans)", display: "flex", gap: 5, alignItems: "center", cursor: "pointer"}}>
-          <input type="checkbox" checked={f.odeme} onChange={e => setF({ ...f, odeme: e.target.checked })}/> ödeme alındı</label>
+        <label style={{font: "400 12px var(--font-sans)", display: "flex", gap: 5, alignItems: "center", cursor: kapsamda ? "default" : "pointer", opacity: kapsamda ? 0.4 : 1}}>
+          <input type="checkbox" disabled={kapsamda} checked={!kapsamda && f.fatura} onChange={e => setF({ ...f, fatura: e.target.checked })}/> fatura kesildi</label>
+        <label style={{font: "400 12px var(--font-sans)", display: "flex", gap: 5, alignItems: "center", cursor: kapsamda ? "default" : "pointer", opacity: kapsamda ? 0.4 : 1}}>
+          <input type="checkbox" disabled={kapsamda} checked={!kapsamda && f.odeme} onChange={e => setF({ ...f, odeme: e.target.checked })}/> ödeme alındı</label>
         <button onClick={kaydet} disabled={durum === 'kaydediliyor'}
           style={{font: "600 12px var(--font-sans)", padding: "6px 14px", border: "1px solid var(--line)",
             borderRadius: 8, background: "var(--paper-2)", color: "var(--ink)", cursor: "pointer"}}>
