@@ -29,6 +29,15 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
   const rows = bnsDeptActive(allBriefs, role);
   const overdueCount = rows.filter(b => b.deltaH <= 0 && b.durum !== "tamamlandi").length;
   const capPct = (r.stats && r.stats.capacity) ? bnsDeptCapPct(capBriefs, r.stats, role) : _capPctFromStats;
+  // Ekip satırları için kişi başına v2 doluluk (zamana yayılmış) — kalibrasyon döneminde eski %'nin yanında.
+  const v2ByPerson = React.useMemo(() => {
+    if (typeof bnsKisiGunDoluluk !== "function") return {};
+    const g = bnsGunKey(Date.now());
+    const src = data._allBriefs || data.briefs || [];
+    const m = {};
+    people.forEach(u => { m[u.id] = bnsKisiGunDoluluk(src, u, g); });
+    return m;
+  }, [data._allBriefs, data.briefs, role]);
   const reviewCount = rows.filter(b => b.durum === "incelemede").length;
   const thisWeek = rows.filter(b => b.deltaH > 0 && b.deltaH <= 168).length;
 
@@ -143,11 +152,18 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
                     {p.active} aktif{p.overdue > 0 ? <span style={{color:"var(--prio-red)"}}> · {p.overdue} geciken</span> : null}
                   </div>
                 </div>
-                <div style={{width: 70, display:"flex", flexDirection:"column", alignItems:"flex-end", gap: 3}}>
+                <div style={{width: 84, display:"flex", flexDirection:"column", alignItems:"flex-end", gap: 3}}>
                   <span style={{font:"500 11px/1 var(--font-mono)", color:"var(--ink-4)"}}>%{p.load}</span>
                   <div style={{width: 70, height: 4, background:"var(--line-soft)", borderRadius:999, overflow:"hidden"}}>
-                    <div style={{width: p.load+"%", height:"100%", background: p.load > 85 ? "var(--warning)" : r.accent}}/>
+                    <div style={{width: Math.min(100, p.load)+"%", height:"100%", background: p.load > 85 ? "var(--warning)" : r.accent}}/>
                   </div>
+                  {v2ByPerson[p.user.id] != null && (
+                    <span title="Kapasite v2 — zamana yayılmış bugün doluluğu (Profil ile aynı hesap)"
+                      style={{font:"500 10px/1 var(--font-mono)",
+                        color: v2ByPerson[p.user.id] >= 120 ? "var(--prio-red)" : v2ByPerson[p.user.id] >= 100 ? "var(--prio-orange)" : "var(--ink-4)"}}>
+                      v2 %{v2ByPerson[p.user.id]}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
