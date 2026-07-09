@@ -365,6 +365,9 @@ app.post('/api/briefs', writeGuard, handleWrite(req => writes.createBrief(req.bo
 app.patch('/api/briefs/:id', writeGuard, handleWrite(req => writes.patchBrief(+req.params.id, req.body)));
 app.post('/api/briefs/:id/status', writeGuard, handleWrite(req => writes.setStatus(+req.params.id, req.body)));
 app.post('/api/briefs/:id/financials', writeGuard, handleWrite(async req => { await assertCanWriteFinancials(req); return writes.setFinancials(+req.params.id, req.body); }));
+// fatura-v2: retainer tutarı (geçiş tetiğiyle) + ay×marka fatura/ödeme işareti — yönetici.
+app.post('/api/brands/by-name/:name/retainer', writeGuard, handleWrite(async req => { await assertCanWriteFinancials(req); return writes.setBrandRetainer(req.params.name, req.body?.aylik_ucret ?? null); }));
+app.post('/api/brands/by-name/:name/retainer-ay', writeGuard, handleWrite(async req => { await assertCanWriteFinancials(req); return writes.upsertMarkaFaturaAy(req.params.name, req.body?.ay, req.body || {}); }));
 app.post('/api/briefs/:id/termin-oneri-kapat', writeGuard, handleWrite(req => writes.clearTerminOneri(+req.params.id)));   // işe-dönüş hatırlatıcısını uzatmadan kapat
 app.post('/api/briefs/:id/termin-oneri-uzat', writeGuard, handleWrite(req => writes.applyTerminOneri(+req.params.id, (req.user && (req.user.slack_id || String(req.user.id))) || req.body?.by, 'dashboard')));   // bekleme kadar muaf uzat
 app.post('/api/briefs/by-ts/:ts/termin-oneri-uzat', writeGuard, handleWrite(async req => writes.applyTerminOneri(await writes.tsToId(req.params.ts), req.body?.by, 'slack')));   // Slack "termin uzat"

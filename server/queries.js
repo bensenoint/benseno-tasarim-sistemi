@@ -13,7 +13,7 @@ async function allBriefsWithAssignees() {
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
            b.akis, b.stale, b.created_at, b.created_by, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.thread_ton, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
-           b.rating, b.rating_by, b.rating_sebep,
+           b.rating, b.rating_by, b.rating_sebep, b.ucret_tipi,
            b.deadline_orig, b.uzatma_sayisi, b.uzatma_ceza, b.uzatma_muaf, b.deadline_history,
            b.termin_oneri_at, b.termin_oneri_ms,
            b.image_url, b.started_at, b.basladi_at,
@@ -55,7 +55,7 @@ function stripBriefSensitive(b) {
 async function getState({ sensitive = true } = {}) {
   const [users, brands, all, dept, brand, events] = await Promise.all([
     pool.query(`SELECT id,name,rol,dept,yetki,initials,color,title,active,avatar_url,sched_scope FROM users WHERE active ORDER BY rol,name`),
-    pool.query(`SELECT id,name,color,wheel_idx,slack_channel FROM brands ORDER BY name`),
+    pool.query(`SELECT id,name,color,wheel_idx,slack_channel,aylik_ucret FROM brands ORDER BY name`),
     allBriefsWithAssignees(),
     // departman yükü (aktif + gecikmiş), kişi sayısı
     pool.query(`
@@ -112,7 +112,7 @@ async function getState({ sensitive = true } = {}) {
 async function getEmbedded({ sensitive = true } = {}) {
   const [all, brands, users, dept] = await Promise.all([
     allBriefsWithAssignees(),
-    pool.query(`SELECT name, color, wheel_idx FROM brands ORDER BY name`),
+    pool.query(`SELECT name, color, wheel_idx, aylik_ucret FROM brands ORDER BY name`),
     pool.query(`SELECT id,name,rol,dept,yetki,initials,color,avatar_url,sched_scope FROM users WHERE active ORDER BY rol,name`),
     pool.query(`
       SELECT u.dept,
@@ -181,7 +181,7 @@ async function getEmbedded({ sensitive = true } = {}) {
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     gonderim_sayisi: b.gonderim_sayisi || 0, son_gonderim_at: ms(b.son_gonderim_at), musteri_bekliyor: !!b.musteri_bekliyor,
     // SEC-4: finans yalnız admin/bot; diğer JWT kullanıcılar için çıkarılır.
-    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme } : {}),
+    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme, ucret_tipi: b.ucret_tipi || null } : {}),
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at || null, thread_ozet_ts: b.thread_ozet_ts || null,
@@ -205,7 +205,7 @@ async function getEmbedded({ sensitive = true } = {}) {
     rev: b.rev || 0,
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     // SEC-4: finans + puan alanları yalnız admin/bot; diğer JWT kullanıcılar için çıkarılır.
-    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme,
+    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme, ucret_tipi: b.ucret_tipi || null,
       rating: b.rating || null, rating_by: b.rating_by || null, rating_sebep: b.rating_sebep || null } : {}),
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
@@ -291,17 +291,28 @@ async function getEmbedded({ sensitive = true } = {}) {
       ORDER BY tarih DESC LIMIT 1) d ON TRUE`);
   const ozetById = Object.fromEntries(bo.rows.map(r => [r.name, r]));
 
+  // fatura-v2: son 3 ayın retainer kayıtları — yalnız sensitive (SEC-5: finans login-arkası).
+  let bns_marka_fatura = [];
+  if (sensitive) {
+    const mf = await pool.query(
+      `SELECT br.name AS marka, mf.ay, mf.tutar::float AS tutar, mf.fatura, mf.odeme
+       FROM marka_fatura mf JOIN brands br ON br.id = mf.marka_id
+       WHERE mf.ay >= to_char(now() - interval '2 months', 'YYYY-MM') ORDER BY mf.ay DESC`);
+    bns_marka_fatura = mf.rows;
+  }
+
   return {
     now: new Date().toISOString(),
     bns_brands: brands.rows.map(b => {
       const o = ozetById[b.name] || {};
       return { name: b.name, color: b.color, wheelIdx: b.wheel_idx,
+        ...(sensitive ? { aylik_ucret: b.aylik_ucret != null ? +b.aylik_ucret : null } : {}),
         kanal_ozet: o.kanal_ozet || null, kanal_ozet_at: o.kanal_ozet_at ? ms(o.kanal_ozet_at) : null,
         son_insight: o.son_insight || null, son_insight_tarih: o.son_insight_tarih || null };
     }),
     bns_users: users.rows,
     bns_briefs, bns_completed, bns_deleted, bns_dept_stats, bns_events, bns_history,
-    bns_ratings, bns_sebep, bns_sebep_history,
+    bns_ratings, bns_sebep, bns_sebep_history, bns_marka_fatura,
     source: 'postgres', generated_at: new Date().toISOString(),
   };
 }

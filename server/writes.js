@@ -69,6 +69,7 @@ const financialsBody = z.object({
   satis: z.number().nullable().optional(),
   fatura: z.boolean().optional(),
   odeme: z.boolean().optional(),
+  ucret_tipi: z.enum(['kapsamda', 'ek']).optional(),   // fatura-v2: retainer kapsamı / ayrıca faturalanır
   by: zUserId.optional(),
   source: z.enum(['dashboard', 'slack', 'system']).default('dashboard'),
   slack_ts: z.string().optional(),
@@ -203,12 +204,15 @@ async function createBrief(raw) {
     // Böylece açan, başkasını lead yapsa bile lead kalır ve silme yetkisi korunur.
     const leadIds = [...new Set([...(d.lead_ids || []), ...(d.by ? [d.by] : [])])];
     const dept = await deriveDept(client, d.worker_ids, d.by);
+    // fatura-v2: retainer'lı markada yeni iş varsayılan 'kapsamda', değilse 'ek'.
+    const mu = await client.query('SELECT aylik_ucret FROM brands WHERE id=$1', [markaId]);
+    const ucretTipi = (mu.rows[0] && mu.rows[0].aylik_ucret != null) ? 'kapsamda' : 'ek';
     const r = await client.query(
-      `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,deadline_orig,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url,created_by)
-       VALUES ($1,$2,$3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`,
+      `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,deadline_orig,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url,created_by,ucret_tipi)
+       VALUES ($1,$2,$3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`,
       [no, markaId, d.baslik, dept, toTs(d.deadline), d.priority || null,
        d.akis || 'paralel', d.maliyet ?? null, d.satis ?? null, d.musteri_notu || null,
-       d.slack_ts || null, null, d.by || null]);
+       d.slack_ts || null, null, d.by || null, ucretTipi]);
     const id = r.rows[0].id;
     // gözlemci = manuel seçilenler ∪ ilgili dept yöneticileri (her zaman)
     // Auto-yöneticiler: zaten işi yapan/lead olanları gözlemciye ekleme (tek kişi iki listede görünmesin).
@@ -764,6 +768,41 @@ async function setKanbanOrder(rawOrder, actor) {
   return { ok: true };
 }
 
+// ── Fatura v2: retainer (aylık sabit ücret) ─────────────────────────────────
+// Tutar set edilirken GEÇİŞ TETİĞİ çalışır: markanın tipsiz (NULL) işleri 'kapsamda' olur.
+async function setBrandRetainer(name, aylikUcret) {
+  return tx(async (client) => {
+    const markaId = await brandIdByName(client, name);
+    await client.query('UPDATE brands SET aylik_ucret=$2 WHERE id=$1', [markaId, aylikUcret]);
+    let gecis = 0;
+    if (aylikUcret != null) {
+      const g = await client.query(
+        `UPDATE briefs SET ucret_tipi='kapsamda' WHERE marka_id=$1 AND ucret_tipi IS NULL`, [markaId]);
+      gecis = g.rowCount;
+    }
+    return { ok: true, marka: name, aylik_ucret: aylikUcret, kapsamda_isaretlenen: gecis };
+  });
+}
+// Ay×marka retainer fatura/ödeme kaydı (upsert). tutar verilmemişse markanın güncel aylık ücreti.
+async function upsertMarkaFaturaAy(name, ay, patch) {
+  if (!/^\d{4}-\d{2}$/.test(String(ay || ''))) { const e = new Error("ay 'YYYY-MM' olmalı"); e.status = 400; throw e; }
+  return tx(async (client) => {
+    const markaId = await brandIdByName(client, name);
+    const mu = await client.query('SELECT aylik_ucret FROM brands WHERE id=$1', [markaId]);
+    const tutar = patch.tutar != null ? patch.tutar : (mu.rows[0] ? mu.rows[0].aylik_ucret : null);
+    const r = await client.query(
+      `INSERT INTO marka_fatura (marka_id, ay, tutar, fatura, odeme)
+       VALUES ($1,$2,$3,COALESCE($4,false),COALESCE($5,false))
+       ON CONFLICT (marka_id, ay) DO UPDATE SET
+         tutar = COALESCE($3, marka_fatura.tutar),
+         fatura = COALESCE($4, marka_fatura.fatura),
+         odeme  = COALESCE($5, marka_fatura.odeme)
+       RETURNING ay, tutar, fatura, odeme`,
+      [markaId, ay, tutar, patch.fatura ?? null, patch.odeme ?? null]);
+    return { ok: true, marka: name, ...r.rows[0] };
+  });
+}
+
 async function setFinancials(id, raw) {
   const d = financialsBody.parse(raw);
   const res = await tx(async (client) => {
@@ -773,6 +812,7 @@ async function setFinancials(id, raw) {
     if (d.satis !== undefined) put('satis', d.satis);
     if (d.fatura !== undefined) put('fatura', d.fatura);
     if (d.odeme !== undefined) put('odeme', d.odeme);
+    if (d.ucret_tipi !== undefined) put('ucret_tipi', d.ucret_tipi);
     vals.push(id);
     const r = await client.query(`UPDATE briefs SET ${sets.join(',')} WHERE id=$${vals.length} RETURNING id`, vals);
     if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
@@ -973,4 +1013,4 @@ async function applyTerminOneri(id, by, source) {
   return { ok: true, yeni_deadline: yeni };
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, setBrandRetainer, upsertMarkaFaturaAy, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };
