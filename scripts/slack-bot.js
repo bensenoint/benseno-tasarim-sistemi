@@ -1213,10 +1213,12 @@ app.event('message', async ({ event, client }) => {
       });
       const j = await r.json().catch(() => ({}));
       const reply = r.ok && j.reply ? j.reply : 'Şu an yanıt veremiyorum — birazdan tekrar dener misin? 🙏';
-      await client.chat.postMessage({ channel: event.channel, username: BOT_NAME, text: reply });
+      // Yanıt kullanıcının mesajının THREAD'ine gider — konuşma tek zincirde kalır,
+      // bildirim trafiğiyle karışmaz. Thread içinden devam edilirse aynı zincirde sürer.
+      await client.chat.postMessage({ channel: event.channel, thread_ts: event.thread_ts || event.ts, username: BOT_NAME, text: reply });
     } catch (e) {
       log(`ody-dm hata: ${e.message}`);
-      client.chat.postMessage({ channel: event.channel, username: BOT_NAME,
+      client.chat.postMessage({ channel: event.channel, thread_ts: event.thread_ts || event.ts, username: BOT_NAME,
         text: 'Şu an yanıt veremiyorum — birazdan tekrar dener misin? 🙏' }).catch(() => {});
     }
     return;
