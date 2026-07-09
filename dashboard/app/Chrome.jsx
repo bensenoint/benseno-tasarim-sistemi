@@ -1115,7 +1115,17 @@ function ChatBot({ currentUser, dateRange }) {
                         {/* Aksiyonlar — v2 Button yapısı (r6, hairline, 600/13) */}
                         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 2 }}>
                           {sel.link && <a href={sel.link} target="_blank" rel="noreferrer" style={{ textDecoration: "none", border: "1px solid var(--ody)", background: "var(--ody)", color: "#fff", borderRadius: 6, padding: "9px 14px", font: "600 13px/1 var(--font-sans)", display: "inline-flex", alignItems: "center", gap: 6 }}><I.Link size={14}/> Slack thread'inde aç</a>}
-                          <button onClick={() => setTab("chat")} style={{ border: "1px solid var(--line-strong)", background: "var(--surface)", color: "var(--ink)", borderRadius: 6, padding: "9px 14px", font: "600 13px/1 var(--font-sans)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}><I.Bell size={14}/> Ody'ye sor</button>
+                          <button onClick={() => {
+                            // Tasarım düzeltmesi: öneri soruyla bitiyordu ama cevap kanalı yoktu.
+                            // Öneriyi sohbete Ody'nin mesajı olarak taşı → kullanıcı doğrudan yanıtlar;
+                            // /api/chat geçmişle çağrıldığından Ody neyi teklif ettiğini bilir.
+                            const a = advice[sel.id];
+                            if (a && a.state === "done" && a.text) {
+                              const ctx = `💡 Bildirim önerim (${sel.text || "#" + sel.id}):\n\n${a.text}\n\n— Bu öneri üzerine konuşabiliriz; ne yapmak istersin?`;
+                              setMsgs(m => m.some(x => x.role === "assistant" && x.content === ctx) ? m : [...m, { role: "assistant", content: ctx }]);
+                            }
+                            setTab("chat");
+                          }} style={{ border: "1px solid var(--line-strong)", background: "var(--surface)", color: "var(--ink)", borderRadius: 6, padding: "9px 14px", font: "600 13px/1 var(--font-sans)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}><I.Bell size={14}/> Sohbette devam et</button>
                         </div>
                       </div>
                     );
