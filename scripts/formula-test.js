@@ -266,6 +266,11 @@ const bReopen = { created_at: D('2026-07-01'), deadline: D('2026-07-03'), durum:
     { ts: D('2026-07-01'), durum: 'basladi' }, { ts: D('2026-07-02'), durum: 'tamamlandi' },
     { ts: D('2026-07-08'), durum: 'basladi' } ] };
 t('v2: reopen tam V + overdue', C.bnsYayilimGunlukPay(bReopen, 5, K('2026-07-08')), 5);
+// İrem bug'ı: overdue ÇALIŞAN işte R tüketilmez — iş bitene kadar kalan emek her gün bugüne biner.
+const bIrem = { created_at: D('2026-06-16'), deadline: D('2026-06-25'), durum: 'basladi',
+  durum_olaylari: [{ ts: D('2026-06-16'), durum: 'basladi' }] };
+t('v2: overdue çalışan iş — pay sıfırlanmaz (gün+1)', C.bnsYayilimGunlukPay(bIrem, 5, K('2026-06-26')) > 0, true);
+t('v2: overdue çalışan iş — haftalar sonra hâlâ biner', C.bnsYayilimGunlukPay(bIrem, 5, K('2026-07-09')) > 0, true);
 const u2 = { id: 'U9', dept: 'tasarim' };
 const bA = { ...bCalisan, workers: [{ id: 'U9' }], leads: [] };
 const bB2 = { ...bCalisan, workers: [], leads: [{ id: 'U9' }] };

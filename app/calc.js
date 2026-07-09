@@ -493,13 +493,18 @@ function bnsYayilimBirimPay(b, hedefGun) {
     }
     var isGunu = bnsGunIsMi(g);
     if (g === hedefGun) {
-      if (isGunu && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi') sonuc = R / Math.max(1, g > dl ? 1 : kalan);
+      // Overdue + AÇIK iş → TAM DEĞER biner (birim=1; V ile ölçeklenir): iş bitmediyse
+      // "tam iş bugün masada" — başlanmış/başlanmamış ayrımı yapılmaz (İrem bug'ı:
+      // pencere içi tüketim R'yi sıfırlayıp 23 gün gecikmiş işi %0 gösteriyordu).
+      if (isGunu && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi') sonuc = g > dl ? 1 : R / Math.max(1, kalan);
       break;
     }
-    if (isGunu && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi' && BNS_V2_CALISAN[durum]) {
-      R = Math.max(0, R - R / Math.max(1, g > dl ? 1 : kalan));
+    // R tüketimi: yalnız deadline penceresi İÇİNDE ve SON GÜN HARİÇ (kalan>1) —
+    // tüketim işi asla "bitmiş" sayamaz; bitişi yalnız tamamlandi olayı belirler.
+    if (isGunu && g <= dl && kalan > 1 && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi' && BNS_V2_CALISAN[durum]) {
+      R = Math.max(0, R - R / kalan);
     }
-    if (isGunu && g <= dl) kalan--; // geçen iş günü bölenden düşer
+    if (isGunu && g <= dl) kalan--; // geçen iş günü bölenden düşer (overdue'da tüketim zaten yok)
   }
   if (++_bnsV2CacheN > 20000) { _bnsV2Cache = {}; _bnsV2CacheN = 0; } // basit tavan
   _bnsV2Cache[ck] = sonuc;
