@@ -285,5 +285,15 @@ t('v2: firma doluluk %5', C.bnsFirmaGunDoluluk([bD1], [uT1, uT2, uE1], K('2026-0
 t('v2: dept boş üye listesi %0', C.bnsDeptGunDoluluk([bD1], [], 'tasarim', K('2026-07-07')), 0);
 t('v2: burnout sinyal gün adlı', C.bnsSinyalBurnout([{ ad: 'Eda', pct: 140, gun: 'Per' }])[0].text.includes('Per'), true);
 
+// ── Fatura v2: kapsamda işler satış tarafında sayılmaz; maliyet her işte ──
+const fEk = { maliyet: 100, satis: 400, fatura: true, odeme: false, ucret_tipi: 'ek' };
+const fKap = { maliyet: 200, satis: 999, fatura: false, odeme: false, ucret_tipi: 'kapsamda' }; // satis girilmişse bile sayılmaz
+const fo2 = C.bnsFinansOzet([fEk, fKap]);
+t('fatura-v2: satis yalnız ek', fo2.satis, 400);
+t('fatura-v2: maliyet hepsi', fo2.maliyet, 300);
+t('fatura-v2: kar = ek satış − tüm maliyet', fo2.kar, 100);
+t('fatura-v2: tahsil yalnız ek', fo2.tahsilEdilmemis, 400);
+t('fatura-v2: tipsiz eski davranış', C.bnsFinansOzet([{ maliyet: 50, satis: 150 }]).kar, 100);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);

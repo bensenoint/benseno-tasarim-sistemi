@@ -291,13 +291,15 @@ function bnsKarMarj(b) {
   return { kar: kar, marj: marj };
 }
 function bnsFinansOzet(briefs) {
-  var satis = 0, maliyet = 0, kar = 0, faturalanmamis = 0, tahsilEdilmemis = 0;
+  // fatura-v2: 'kapsamda' (retainer içi) işlerin SATIŞ tarafı sayılmaz — ayrıca faturalanmazlar;
+  // MALİYET her işte sayılır (iç maliyet takibi). kar = ek-satış toplamı − tüm maliyet.
+  var satis = 0, maliyet = 0, faturalanmamis = 0, tahsilEdilmemis = 0;
   (briefs || []).forEach(function (b) {
-    var km = bnsKarMarj(b);
-    if (km.kar != null) kar += km.kar;
-    if (typeof b.satis === 'number') { satis += b.satis; if (!b.fatura) faturalanmamis += b.satis; else if (!b.odeme) tahsilEdilmemis += b.satis; }
+    var ek = b.ucret_tipi !== 'kapsamda';
+    if (ek && typeof b.satis === 'number') { satis += b.satis; if (!b.fatura) faturalanmamis += b.satis; else if (!b.odeme) tahsilEdilmemis += b.satis; }
     if (typeof b.maliyet === 'number') maliyet += b.maliyet;
   });
+  var kar = satis - maliyet;
   var marj = satis > 0 ? Math.round((kar / satis) * 100) : null;
   return { satis: satis, maliyet: maliyet, kar: kar, marj: marj, faturalanmamis: faturalanmamis, tahsilEdilmemis: tahsilEdilmemis };
 }
