@@ -134,10 +134,12 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
         <Card padding={0}>
           <div style={{padding:"14px 16px", borderBottom:"1px solid var(--line)"}}>
             <h2 style={{font:"italic 500 18px/1.15 var(--font-display)", color:"var(--ink)", margin:0}}>{r.name} ekibi</h2>
-            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{people.length} kişi · yüke göre sıralı</div>
+            <div style={{font:"400 12px/1.3 var(--font-sans)", color:"var(--ink-3)", marginTop:4}}>{people.length} kişi · v2 doluluğa göre sıralı</div>
           </div>
           <div>
-            {loadByPerson.sort((a,b) => b.load - a.load).map((p, i) => (
+            {loadByPerson.sort((a,b) =>
+              ((v2ByPerson[b.user.id] ?? 0) - (v2ByPerson[a.user.id] ?? 0)) || (b.load - a.load)
+            ).map((p, i) => (
               <div key={p.user.id} style={{
                 display:"flex", alignItems:"center", gap: 10, padding:"11px 16px",
                 borderBottom: i === loadByPerson.length - 1 ? "0" : "1px solid var(--line-soft)"
