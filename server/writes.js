@@ -35,6 +35,7 @@ const briefCreate = z.object({
   satis: z.number().nullable().optional(),
   musteri_notu: z.string().optional(),
   is_tipi: z.string().max(40).optional(),      // iş tipi (is_tipleri.kod); yoksa başlıktan tahmin → 'diger'
+  ucret_tipi: z.enum(['kapsamda', 'ek']).optional(),   // fatura-takip: girişte faturalama; yoksa marka varsayılanı
   tags: z.array(z.string()).optional(),
   no: z.number().int().optional(),
   by: zUserId.optional(),                       // işlemi yapan
