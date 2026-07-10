@@ -51,6 +51,13 @@ function HelpScreen() {
         <Row left="Ody'ye sor" right="'En çok hangi iş tipini yapıyoruz?', 'SM planı tipik ne kadar sürüyor?', '#85 nedir?' (tip + tipik süre gösterir)"/>
       </Section>
 
+      <Section title="🧾 Faturalama & Takip" note="Tüm müşteriler aylık fee (retainer) ile çalışır; yalnız ek işler ayrıca faturalanır. Faturalama İŞ AÇILIRKEN seçilir (varsayılan: fee).">
+        <Row left="İş açarken" right="Faturalama: 🔒 Aylık fee / ➕ Ek iş. Ek işte satış tutarı opsiyonel — belli değilse boş bırak" sub="Maliyet (dış tedarik vb.) her zaman opsiyonel, sonradan da girilebilir"/>
+        <Row left="Ek iş tamamlanınca" right="Thread'e kart düşer: tutar girildiyse '✅ Fatura kesildi' butonu, girilmediyse '💰 Tutarı gir' (modal: satış zorunlu)" sub="Butonları lead, işi açan ya da yönetici kullanabilir"/>
+        <Row left="Hatırlatma zinciri" right="Eksik (tutar yok / fatura yok) kapanana dek: 24 saat → 3 gün → 1 hafta lead+yönetici DM'i; her ayın 25'i (hafta sonuysa önceki Cuma) toplu liste" sub="Fatura kesildi işaretlenince zincir anında durur. İş yeniden açılırsa takip sıfırlanır."/>
+        <Row left="Rozetler" right="Tamamlananlar tablosunda satışı girilmemiş ek iş '₺ bekliyor', faturası kesilmemiş 'faturasız' rozetiyle görünür (yönetici)"/>
+      </Section>
+
       <Section title="🤖 Slack Komutları" note="Slack'te herhangi bir kanalda yazın.">
         <Row left="/yeni-brief" right="Marka kanalında yeni brief açar" sub="Form: başlık, marka (kanaldan otomatik), termin, işi yapanlar, lead, gözlemci, not, dosya"/>
         <Row left="/brief-durum" right="Sana atanmış aktif briefleri listeler"/>

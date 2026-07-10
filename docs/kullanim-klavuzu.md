@@ -1261,3 +1261,10 @@ Canvas güncellemeleri yanlış yapılırsa veri bozulur. Kesinlikle uyulması g
 - **İş Tipleri** ekranı: tip×adet, tip×marka, tip×kişi (+net saat), öğrenilen süreler (medyan · aralık · n), gecikme oranı, aylık trend, tahmini-vs-gerçek gözlemi.
 - Ody'ye sorulabilir: "en çok hangi iş tipini yapıyoruz?", "SM planı tipik ne kadar sürüyor?".
 - Not: Süre verisi 🚀 işaretinin dürüst kullanımına bağlıdır — işe fiilen başlarken işaretleyin.
+
+## 🧾 Faturalama & Takip
+
+- Faturalama **iş açılırken** seçilir: 🔒 Aylık fee (varsayılan, retainer kapsamı) / ➕ Ek iş (ayrıca faturalanır). Ek işte satış tutarı opsiyoneldir — belli değilse boş bırakılır.
+- Ek iş **tamamlanınca** thread'e kart düşer: tutar girildiyse "✅ Fatura kesildi" butonu; girilmediyse "💰 Tutarı gir" (satış zorunlu, maliyet ops.). Butonlar lead / işi açan / yönetici içindir.
+- Eksikler (tutar yok / fatura yok) kapanana dek **24 saat → 3 gün → 1 hafta** DM hatırlatması + **her ayın 25'i** (hafta sonuysa önceki Cuma) toplu liste gider. Fatura kesildi işaretlenince zincir durur.
+- Satışı girilmemiş ek işler dashboard'da **"₺ bekliyor"**, faturası kesilmemişler **"faturasız"** rozetiyle görünür; haftalık GM brifingi bekleyen ek-iş cirosunu raporlar.
