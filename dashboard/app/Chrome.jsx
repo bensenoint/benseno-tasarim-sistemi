@@ -336,6 +336,28 @@ function odySesCal(mood) {
   } catch (e) { /* ses best-effort */ }
 }
 
+// Bildirim zili — yeni bildirim gelince nazik iki-notalı "ding" (aynı 🔊 tercihine bağlı).
+function odyBildirimSesi() {
+  if (!odySesAcik()) return;
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    _odyAudioCtx = _odyAudioCtx || new AC();
+    var ctx = _odyAudioCtx;
+    if (ctx.state === 'suspended') { ctx.resume().catch(function () {}); if (ctx.state === 'suspended') return; }
+    var t0 = ctx.currentTime + 0.02;
+    [{ t: 0, f: 880 }, { t: 0.12, f: 1175 }].forEach(function (n) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(n.f, t0 + n.t);
+      g.gain.setValueAtTime(0, t0 + n.t);
+      g.gain.linearRampToValueAtTime(0.06, t0 + n.t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.t + 0.5);   // çan gibi uzun sönüm
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t0 + n.t); o.stop(t0 + n.t + 0.55);
+    });
+  } catch (e) { /* best-effort */ }
+}
+
 // Ses aç/kapa düğmesi (kendi state'i — panel altında).
 function OdySesDugmesi() {
   const [acik, setAcik] = React.useState(odySesAcik());
@@ -638,7 +660,7 @@ function ChatBot({ currentUser, dateRange }) {
           // Uyku sayacı: oturum içinde yeni bildirim geldiyse "son bildirim" anını güncelle.
           const maxId = items.reduce((m, n) => (n.id > m ? n.id : m), 0);
           if (newestIdRef.current === 0) newestIdRef.current = maxId;          // ilk yükleme — baz al
-          else if (maxId > newestIdRef.current) { lastNotifRef.current = Date.now(); newestIdRef.current = maxId; }
+          else if (maxId > newestIdRef.current) { lastNotifRef.current = Date.now(); newestIdRef.current = maxId; odyBildirimSesi(); }
           // Günlük tamamlanan iş sayısı: created_at bugünse, id-dedupe ile (yeni iş → düşünüyor mood'u zaten metinden).
           try {
             const todayStr = new Date().toISOString().slice(0, 10);
