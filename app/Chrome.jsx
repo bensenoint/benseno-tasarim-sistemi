@@ -693,7 +693,12 @@ function ChatBot({ currentUser, dateRange }) {
   const [openAdvice, setOpenAdvice] = React.useState(null); // hangi bildirimin önerisi açık
   const [advicePeek, setAdvicePeek] = React.useState(null); // boştayken dönüşümlü gösterilen öneri-balonu bildirimi
   const [brief, setBrief] = React.useState(null);         // günlük iş özeti (msgs'ten ayrı kart; görülünce kaybolur)
-  React.useEffect(() => { if (endRef.current) endRef.current.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy]);
+  // Yalnız MESAJ KONTEYNERİNİ kaydır — scrollIntoView atalarını da (overflow:hidden panel kabuğu
+  // dahil) kaydırıyor, başlık görünmez kalıyordu ("Sohbette devam et" sonrası kayıp X butonu hatası).
+  React.useEffect(() => {
+    const el = endRef.current && endRef.current.parentElement;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [msgs, busy, tab]);
   // Sohbeti oturuma yaz (son 30 mesaj) → unmount/kapanmada kaybolmaz, geri dönünce yüklenir.
   React.useEffect(() => { try { sessionStorage.setItem("bns_ody_chat_" + (uid || "x"), JSON.stringify(msgs.slice(-30))); } catch (e) {} }, [msgs, uid]);
 
