@@ -51,6 +51,13 @@ function HelpScreen() {
         <Row left="Ody'ye sor" right="'En çok hangi iş tipini yapıyoruz?', 'SM planı tipik ne kadar sürüyor?', '#85 nedir?' (tip + tipik süre gösterir)"/>
       </Section>
 
+      <Section title="🎯 Tek Aktif İş Kuralı" note="Bir kişi aynı anda yalnız 1 işte fiilen çalışabilir (🚀 = fiilî çalışma). Paralel işlerde herkes kendi 🚀'siyle aynı işe eş zamanlı girebilir — kısıt yalnız kişinin İKİ FARKLI işte aynı anda çalışmasına.">
+        <Row left="🚀 çakışınca" right="Başka işte çalışırken yeni işe 🚀 koyarsan sistem onay ister: 'şu an #X'tesin — buna başlarsan #X beklemeye alınacak' → Onayla / Vazgeç" sub="Onayda eski iş otomatik beklemeye alınır (Ody imzalı not). Dashboard'da aynı onay penceresi çıkar."/>
+        <Row left="Çok kişili işte" right="🚀'yi koyan kişi o işin aktif çalışanı olur; iş zaten başladıysa ikinci atanan da kendi 🚀'sini koyarak katılır (durum değişmez)" sub="Profilinde, başkasının çalıştığı ama senin girmediğin iş 'sen: beklemede' rozetiyle görünür."/>
+        <Row left="Revizyonda" right="Revizyona dönen iş otomatik 'çalışılıyor' sayılmaz — fiilen başlarken 🚀 koy (süren doğru ölçülür)"/>
+        <Row left="Sıralı işte" right="Kuyruk ilerlerken başka işte çalışıyorsan sıradaki iş otomatik BAŞLATILMAZ; plana alınır ve sana DM gelir — hazır olunca 🚀"/>
+      </Section>
+
       <Section title="🧾 Faturalama & Takip" note="Tüm müşteriler aylık fee (retainer) ile çalışır; yalnız ek işler ayrıca faturalanır. Faturalama İŞ AÇILIRKEN seçilir (varsayılan: fee).">
         <Row left="İş açarken" right="Faturalama: 🔒 Aylık fee / ➕ Ek iş. Ek işte satış tutarı opsiyonel — belli değilse boş bırak" sub="Maliyet (dış tedarik vb.) her zaman opsiyonel, sonradan da girilebilir"/>
         <Row left="Ek iş tamamlanınca" right="Thread'e kart düşer: tutar girildiyse '✅ Fatura kesildi' butonu, girilmediyse '💰 Tutarı gir' (modal: satış zorunlu)" sub="Butonları lead, işi açan ya da yönetici kullanabilir"/>

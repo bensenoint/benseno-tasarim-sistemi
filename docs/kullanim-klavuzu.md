@@ -1268,3 +1268,10 @@ Canvas güncellemeleri yanlış yapılırsa veri bozulur. Kesinlikle uyulması g
 - Ek iş **tamamlanınca** thread'e kart düşer: tutar girildiyse "✅ Fatura kesildi" butonu; girilmediyse "💰 Tutarı gir" (satış zorunlu, maliyet ops.). Butonlar lead / işi açan / yönetici içindir.
 - Eksikler (tutar yok / fatura yok) kapanana dek **24 saat → 3 gün → 1 hafta** DM hatırlatması + **her ayın 25'i** (hafta sonuysa önceki Cuma) toplu liste gider. Fatura kesildi işaretlenince zincir durur.
 - Satışı girilmemiş ek işler dashboard'da **"₺ bekliyor"**, faturası kesilmemişler **"faturasız"** rozetiyle görünür; haftalık GM brifingi bekleyen ek-iş cirosunu raporlar.
+
+## 🎯 Tek Aktif İş Kuralı (WIP=1)
+
+- Bir kişi aynı anda **yalnız 1 işte** fiilen çalışabilir; fiilî çalışma = 🚀 (başladı).
+- Başka işte çalışırken yeni işe 🚀 koyunca sistem **onay ister**; onaylarsan önceki iş otomatik **beklemeye** alınır (Ody imzalı not). Dashboard'da aynı onay penceresi çıkar.
+- **Paralel çok kişili işte** herkes kendi 🚀'siyle aynı işe eş zamanlı girebilir; profil sayfasında henüz başlamadığın böyle işler *"sen: beklemede"* rozetiyle görünür.
+- **Revizyona** dönen iş otomatik çalışılıyor sayılmaz — fiilen başlarken 🚀 koy. **Sıralı işte** çakışma varsa kuyruk otomatik başlatmaz; iş plana alınır, sana DM gelir.
