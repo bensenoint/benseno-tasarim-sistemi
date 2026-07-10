@@ -358,6 +358,41 @@ function odyBildirimSesi() {
   } catch (e) { /* best-effort */ }
 }
 
+// 🎤 Dikte düğmesi — Web Speech API (tr-TR). Konuşma kutuya CANLI yazılır, gönderimi kullanıcı yapar.
+// Destek yoksa (Firefox/eski Safari) düğme render edilmez. Ses tarayıcıda işlenir — sunucuya gitmez.
+function OdyMikrofon({ setInput, disabled }) {
+  const destek = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+  const [dinliyor, setDinliyor] = React.useState(false);
+  const recRef = React.useRef(null);
+  const tabanRef = React.useRef('');   // dikteye başlarken kutudaki mevcut metin
+  if (!destek) return null;
+  const durdur = () => { try { recRef.current && recRef.current.stop(); } catch (e) {} setDinliyor(false); };
+  const basla = () => {
+    try {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const r = new SR();
+      r.lang = 'tr-TR'; r.continuous = true; r.interimResults = true;
+      setInput(cur => { tabanRef.current = cur ? cur.replace(/\s+$/, '') + ' ' : ''; return cur; });
+      r.onresult = (e) => {
+        let metin = '';
+        for (let i = 0; i < e.results.length; i++) metin += e.results[i][0].transcript;
+        setInput(tabanRef.current + metin);
+      };
+      r.onend = () => setDinliyor(false);
+      r.onerror = () => setDinliyor(false);
+      r.start(); recRef.current = r; setDinliyor(true);
+    } catch (e) { setDinliyor(false); }
+  };
+  return (
+    <button onClick={() => (dinliyor ? durdur() : basla())} disabled={disabled}
+      title={dinliyor ? 'Dinlemeyi durdur' : 'Sesle yaz (dikte)'} style={{
+        padding: '0 12px', border: '1px solid var(--line-strong)', borderRadius: 6, cursor: 'pointer',
+        background: dinliyor ? 'var(--ody)' : 'var(--surface)', color: dinliyor ? '#fff' : 'var(--ink-3)',
+        font: '400 15px/1 var(--font-sans)', animation: dinliyor ? 'odyBounce .9s ease-in-out infinite' : 'none' }}>
+      🎤</button>
+  );
+}
+
 // Ses aç/kapa düğmesi (kendi state'i — panel altında).
 function OdySesDugmesi() {
   const [acik, setAcik] = React.useState(odySesAcik());
@@ -1252,6 +1287,7 @@ function ChatBot({ currentUser, dateRange }) {
                   placeholder="Soru yaz…" disabled={busy}
                   style={{ flex: 1, padding: "11px 14px", border: "1px solid var(--line-strong)", borderRadius: 6,
                     background: "var(--surface)", color: "var(--ink)", font: "400 13px/1.3 var(--font-sans)", outline: "none" }}/>
+                <OdyMikrofon setInput={setInput} disabled={busy}/>
                 <button onClick={send} disabled={busy || !input.trim()} style={{
                   padding: "0 18px", border: 0, borderRadius: 6, background: "var(--ody)", color: "#fff",
                   font: "600 13px/1 var(--font-sans)", cursor: busy ? "default" : "pointer", opacity: busy || !input.trim() ? 0.5 : 1,
