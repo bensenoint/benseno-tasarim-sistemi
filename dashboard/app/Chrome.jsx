@@ -292,6 +292,60 @@ function odyFaceProd(mood) {
   }
   return h('div', { key: 'f-' + mood, style: { position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: gap + 'px', animation: anim || undefined } }, left, right, extra);
 }
+// ── Ody ruh hali sesleri — WebAudio sentezi (dosya yok; kısa, yumuşak chirp'ler) ──
+// Tarayıcı kuralı: kullanıcı etkileşiminden önce ses çalınamaz → ctx 'suspended' ise sessizce atla.
+// Kapatma: localStorage bns_ody_ses='0' (kişi bazında, panel altındaki 🔊 düğmesi).
+function odySesAcik() { try { return localStorage.getItem('bns_ody_ses') !== '0'; } catch (e) { return true; } }
+var _odyAudioCtx = null;
+function odySesCal(mood) {
+  if (!odySesAcik()) return;
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    _odyAudioCtx = _odyAudioCtx || new AC();
+    var ctx = _odyAudioCtx;
+    if (ctx.state === 'suspended') { ctx.resume().catch(function () {}); if (ctx.state === 'suspended') return; }
+    // nota: {t: başlangıç sn, f: Hz, d: süre sn, tip, v: hacim, kay: bitiş Hz (glide)}
+    var N = {
+      mutlu:     [{ t: 0, f: 523, d: .12 }, { t: .13, f: 659, d: .16 }],
+      neseli:    [{ t: 0, f: 523, d: .1 }, { t: .11, f: 659, d: .1 }, { t: .22, f: 784, d: .14 }],
+      coskulu:   [{ t: 0, f: 587, d: .08 }, { t: .09, f: 740, d: .08 }, { t: .18, f: 880, d: .16 }],
+      heyecanli: [{ t: 0, f: 660, d: .07 }, { t: .09, f: 660, d: .07 }, { t: .18, f: 880, d: .12 }],
+      endiseli:  [{ t: 0, f: 440, d: .14 }, { t: .16, f: 415, d: .18 }],
+      kizgin:    [{ t: 0, f: 130, d: .22, tip: 'sawtooth', v: .05 }, { t: .1, f: 110, d: .2, tip: 'sawtooth', v: .05 }],
+      mesgul:    [{ t: 0, f: 700, d: .05 }, { t: .09, f: 700, d: .05 }],
+      dusunuyor: [{ t: 0, f: 494, d: .2, v: .05 }],
+      uykulu:    [{ t: 0, f: 330, d: .3, v: .04, kay: 262 }],
+      uzgun:     [{ t: 0, f: 415, d: .35, kay: 262 }],
+      sikilmis:  [{ t: 0, f: 349, d: .22, v: .045 }],
+    }[mood];
+    if (!N) return;
+    var t0 = ctx.currentTime + 0.02;
+    N.forEach(function (n) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = n.tip || 'sine';
+      o.frequency.setValueAtTime(n.f, t0 + n.t);
+      if (n.kay) o.frequency.exponentialRampToValueAtTime(n.kay, t0 + n.t + n.d);
+      var v = n.v || 0.07;   // düşük hacim — ofis dostu
+      g.gain.setValueAtTime(0, t0 + n.t);
+      g.gain.linearRampToValueAtTime(v, t0 + n.t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.t + n.d);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t0 + n.t); o.stop(t0 + n.t + n.d + 0.05);
+    });
+  } catch (e) { /* ses best-effort */ }
+}
+
+// Ses aç/kapa düğmesi (kendi state'i — panel altında).
+function OdySesDugmesi() {
+  const [acik, setAcik] = React.useState(odySesAcik());
+  return (
+    <button onClick={() => { const yeni = !acik; try { localStorage.setItem('bns_ody_ses', yeni ? '1' : '0'); } catch (e) {} setAcik(yeni); if (yeni) odySesCal('mutlu'); }}
+      title="Ody ruh hali değişimlerinde kısa ses çalar" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>
+      {acik ? "🔊 ses açık" : "🔇 ses kapalı"}</button>
+  );
+}
+
 function odyFxProd(host, mood) {
   if (!host) return;
   var spawn = function (txt, color, x, size) {
@@ -517,7 +571,12 @@ function ChatBot({ currentUser, dateRange }) {
   React.useEffect(() => { try { sessionStorage.setItem("bns_ody_chat_" + (uid || "x"), JSON.stringify(msgs.slice(-30))); } catch (e) {} }, [msgs, uid]);
 
   // Ody ruh hâli: değişince fx partikülü; kapalıyken periyodik bildirim ifadesi + okunmadı işareti
-  React.useEffect(() => { odyFxProd(blobRef.current, mood); }, [mood]);
+  const _moodIlk = React.useRef(true);
+  React.useEffect(() => {
+    odyFxProd(blobRef.current, mood);
+    if (_moodIlk.current) { _moodIlk.current = false; return; }   // sayfa açılış mood'u sessiz
+    odySesCal(mood);
+  }, [mood]);
   React.useEffect(() => { setMood(odyRestingMood(uid)); }, [uid]);
 
   // Idle ruh-hali: bildirim yokken normal (neşeli); uzun süre boşta → sıkılmış; çok iş → kızgın.
@@ -1161,7 +1220,10 @@ function ChatBot({ currentUser, dateRange }) {
                 {busy && <div style={{ alignSelf: "flex-start", padding: "10px 13px", borderRadius: 10, background: "var(--paper-2)", border: "1px solid var(--line)", color: "var(--ink-4)", font: "400 13px/1 var(--font-sans)" }}>yazıyor…</div>}
                 <div ref={endRef}/>
               </div>
-              {msgs.length > 0 && <div style={{ padding: "0 16px 10px", flex: "none" }}><button onClick={() => setMsgs([])} style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>sohbeti temizle</button></div>}
+              <div style={{ padding: "0 16px 10px", flex: "none", display: "flex", gap: 14, alignItems: "center" }}>
+                {msgs.length > 0 && <button onClick={() => setMsgs([])} style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>sohbeti temizle</button>}
+                <OdySesDugmesi/>
+              </div>
               <div style={{ padding: 12, borderTop: "1px solid var(--line-strong)", display: "flex", gap: 9, background: "var(--paper)", flex: "none" }}>
                 <input value={input} onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") send(); }}
