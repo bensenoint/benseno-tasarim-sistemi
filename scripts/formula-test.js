@@ -300,5 +300,46 @@ t('fatura-v2: kar = ek satış − tüm maliyet', fo2.kar, 100);
 t('fatura-v2: tahsil yalnız ek', fo2.tahsilEdilmemis, 400);
 t('fatura-v2: tipsiz eski davranış', C.bnsFinansOzet([{ maliyet: 50, satis: 150 }]).kar, 100);
 
+
+// ── İş tipi süre motoru: net iş saati (mesai Pzt-Cum 09-19 TR; beklemede/müşteride/blokeli düşülür) ──
+const TS = (s) => Date.parse(s + '+03:00');   // İstanbul saatli ms
+// (a) basladi yok → null
+t('süre: basladi yok → null', C.bnsNetIsSaati([{ ts: TS('2026-07-06T10:00'), durum: 'tamamlandi' }]), null);
+// (b) mesai içi basit: Pzt 10:00 → Pzt 14:00 = 4 saat
+t('süre: mesai içi 4 saat', C.bnsNetIsSaati([
+  { ts: TS('2026-07-06T10:00'), durum: 'basladi' },
+  { ts: TS('2026-07-06T14:00'), durum: 'tamamlandi' }]), 4);
+// (c) beklemede düşülür: 10-12 çalış, 12-15 beklemede, 15-17 çalış = 4 saat
+t('süre: beklemede düşülür', C.bnsNetIsSaati([
+  { ts: TS('2026-07-06T10:00'), durum: 'basladi' },
+  { ts: TS('2026-07-06T12:00'), durum: 'beklemede' },
+  { ts: TS('2026-07-06T15:00'), durum: 'basladi' },
+  { ts: TS('2026-07-06T17:00'), durum: 'tamamlandi' }]), 4);
+// (d) hafta sonu/mesai dışı sayılmaz: Cum 17:00 → Pzt 11:00 = Cum 2 + Pzt 2 = 4 saat
+t('süre: hafta sonu sayılmaz', C.bnsNetIsSaati([
+  { ts: TS('2026-07-10T17:00'), durum: 'basladi' },
+  { ts: TS('2026-07-13T11:00'), durum: 'tamamlandi' }]), 4);
+// (e) musteride de düşülür (tek gün: 10-11 çalış, 11-16 müşteride, 16-18 çalış = 3)
+t('süre: müşteride düşülür', C.bnsNetIsSaati([
+  { ts: TS('2026-07-07T10:00'), durum: 'basladi' },
+  { ts: TS('2026-07-07T11:00'), durum: 'musteride' },
+  { ts: TS('2026-07-07T16:00'), durum: 'revizyon' },
+  { ts: TS('2026-07-07T18:00'), durum: 'tamamlandi' }]), 3);
+// istatistik: medyan + n (0.25 saatten kısa örnek havuza girmez)
+const cS1 = { is_tipi: 'sm-gorsel', marka: 'A', durum_olaylari: [{ ts: TS('2026-07-06T10:00'), durum: 'basladi' }, { ts: TS('2026-07-06T12:00'), durum: 'tamamlandi' }] };
+const cS2 = { is_tipi: 'sm-gorsel', marka: 'A', durum_olaylari: [{ ts: TS('2026-07-07T10:00'), durum: 'basladi' }, { ts: TS('2026-07-07T14:00'), durum: 'tamamlandi' }] };
+const cS3 = { is_tipi: 'sm-gorsel', marka: 'B', durum_olaylari: [{ ts: TS('2026-07-08T10:00'), durum: 'basladi' }, { ts: TS('2026-07-08T16:00'), durum: 'tamamlandi' }] };
+const cS4 = { is_tipi: 'video-produksiyon', marka: 'A', durum_olaylari: [{ ts: TS('2026-07-08T09:00'), durum: 'basladi' }, { ts: TS('2026-07-08T09:05'), durum: 'tamamlandi' }] }; // 5dk → filtre
+const ist = C.bnsTipSureIstatistik([cS1, cS2, cS3, cS4]);
+t('süre: istatistik medyan 4', ist['sm-gorsel'].medyan, 4);
+t('süre: istatistik n=3', ist['sm-gorsel'].n, 3);
+t('süre: kısa örnek filtrelendi', ist['video-produksiyon'], undefined);
+// tipik süre fallback: tip+marka(n>=3) yok → tip(n>=3) var
+const tk = C.bnsTipikSure('sm-gorsel', 'A', [cS1, cS2, cS3, cS4]);
+t('süre: fallback tip', tk.kaynak, 'tip');
+t('süre: fallback saat 4', tk.saat, 4);
+const tkG = C.bnsTipikSure('ambalaj', null, [cS1, cS2, cS3, cS4]);
+t('süre: fallback genel', tkG.kaynak, 'genel');
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);
