@@ -13,7 +13,7 @@ async function allBriefsWithAssignees() {
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
            b.akis, b.stale, b.created_at, b.created_by, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.thread_ton, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
-           b.rating, b.rating_by, b.rating_sebep, b.ucret_tipi,
+           b.rating, b.rating_by, b.rating_sebep, b.ucret_tipi, b.is_tipi,
            b.deadline_orig, b.uzatma_sayisi, b.uzatma_ceza, b.uzatma_muaf, b.deadline_history,
            b.termin_oneri_at, b.termin_oneri_ms,
            b.image_url, b.started_at, b.basladi_at,
@@ -166,7 +166,7 @@ async function getEmbedded({ sensitive = true } = {}) {
   for (const br of brands.rows) brandColor[br.name] = br.color;
 
   const bns_briefs = all.filter(b => !b.completed_at && !b.deleted_at).map(b => ({
-    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, dept: b.dept || '',
+    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, is_tipi: b.is_tipi || null, dept: b.dept || '',
     oncelik: b.priority || '🟡',   // manuel öncelik (🔴🟠🟡🟢) — girilmemişse NORMAL
     workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '', sira: w.sira ?? null, kisi_sira: w.kisi_sira ?? null, onay: !!w.onay_at, onay_by: w.onay_by || null })),
     akis: b.akis || 'paralel',
@@ -193,7 +193,7 @@ async function getEmbedded({ sensitive = true } = {}) {
   }));
 
   const bns_completed = all.filter(b => b.completed_at && !b.deleted_at).map(b => { const cyc = cycleOf(b); return ({
-    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik,
+    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, is_tipi: b.is_tipi || null,
     leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
     workers: b.workers.map(w => ({ id: w.id, name: w.name, sira: w.sira ?? null, kisi_sira: w.kisi_sira ?? null, onay: !!w.onay_at })),
     akis: b.akis || 'paralel',
@@ -220,7 +220,7 @@ async function getEmbedded({ sensitive = true } = {}) {
 
   const bns_deleted = all.filter(b => b.deleted_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, marka_color: brandColor[b.marka] || null,
-    baslik: b.baslik, durum: b.durum,
+    baslik: b.baslik, is_tipi: b.is_tipi || null, durum: b.durum,
     deleted_at: b.deleted_at, deleted_by: b.deleted_by,
   }));
 
@@ -292,6 +292,12 @@ async function getEmbedded({ sensitive = true } = {}) {
   const ozetById = Object.fromEntries(bo.rows.map(r => [r.name, r]));
 
   // fatura-v2: son 3 ayın retainer kayıtları — yalnız sensitive (SEC-5: finans login-arkası).
+  let bns_is_tipleri = [];
+  try {
+    const it = await pool.query(`SELECT kod, ad, grup, sira FROM is_tipleri WHERE aktif ORDER BY sira`);
+    bns_is_tipleri = it.rows;
+  } catch (e) { /* migration öncesi boot'ta sessiz geç */ }
+
   let bns_marka_fatura = [];
   if (sensitive) {
     const mf = await pool.query(
@@ -312,7 +318,7 @@ async function getEmbedded({ sensitive = true } = {}) {
     }),
     bns_users: users.rows,
     bns_briefs, bns_completed, bns_deleted, bns_dept_stats, bns_events, bns_history,
-    bns_ratings, bns_sebep, bns_sebep_history, bns_marka_fatura,
+    bns_ratings, bns_sebep, bns_sebep_history, bns_marka_fatura, bns_is_tipleri,
     source: 'postgres', generated_at: new Date().toISOString(),
   };
 }
