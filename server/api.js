@@ -72,6 +72,29 @@ app.get('/api/state', readGuard, async (req, res) => {
 });
 
 // Dashboard'ın doğrudan tükettiği HAM bns_* shape (poll buraya bağlanacak; Faz 2).
+// Tatil takvimi (admin yönetir; hesaplar bns_tatiller üzerinden tatil-bilinçli).
+app.get('/api/tatiller', readGuard, async (req, res) => {
+  try {
+    const r = await pool.query(`SELECT to_char(gun,'YYYY-MM-DD') AS gun, ad, yarim FROM tatiller ORDER BY gun`);
+    res.json({ tatiller: r.rows });
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+});
+app.post('/api/tatiller', writeGuard, async (req, res) => {
+  try {
+    const { gun, ad, yarim } = req.body || {};
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(gun || '')) || !String(ad || '').trim()) return res.status(400).json({ error: 'gun (YYYY-MM-DD) ve ad gerekli' });
+    await pool.query(`INSERT INTO tatiller (gun, ad, yarim) VALUES ($1,$2,$3)
+      ON CONFLICT (gun) DO UPDATE SET ad=$2, yarim=$3`, [gun, String(ad).trim().slice(0, 80), !!yarim]);
+    res.json({ ok: true });
+  } catch (e) { console.error('[tatil]', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+});
+app.delete('/api/tatiller/:gun', writeGuard, async (req, res) => {
+  try {
+    const r = await pool.query('DELETE FROM tatiller WHERE gun=$1', [req.params.gun]);
+    res.json({ silinen: r.rowCount });
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+});
+
 // Tek seferlik temizlik: fatura-takip ÖNCESİ açılmış, finans verisi hiç girilmemiş 'ek'/NULL
 // işler aslında aylık fee (retainer) işleridir → kapsamda'ya çevrilir, hatırlatma zinciri iptal.
 // İdempotent; satış/maliyet/fatura girilmişlere DOKUNMAZ.

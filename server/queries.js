@@ -292,6 +292,12 @@ async function getEmbedded({ sensitive = true } = {}) {
   const ozetById = Object.fromEntries(bo.rows.map(r => [r.name, r]));
 
   // fatura-v2: son 3 ayın retainer kayıtları — yalnız sensitive (SEC-5: finans login-arkası).
+  let bns_tatiller = [];
+  try {
+    const tt = await pool.query(`SELECT to_char(gun,'YYYY-MM-DD') AS gun, ad, yarim FROM tatiller ORDER BY gun`);
+    bns_tatiller = tt.rows;
+  } catch (e) { /* migration öncesi sessiz */ }
+
   let bns_is_tipleri = [];
   try {
     const it = await pool.query(`SELECT kod, ad, grup, sira FROM is_tipleri WHERE aktif ORDER BY sira`);
@@ -318,7 +324,7 @@ async function getEmbedded({ sensitive = true } = {}) {
     }),
     bns_users: users.rows,
     bns_briefs, bns_completed, bns_deleted, bns_dept_stats, bns_events, bns_history,
-    bns_ratings, bns_sebep, bns_sebep_history, bns_marka_fatura, bns_is_tipleri,
+    bns_ratings, bns_sebep, bns_sebep_history, bns_marka_fatura, bns_is_tipleri, bns_tatiller,
     source: 'postgres', generated_at: new Date().toISOString(),
   };
 }
