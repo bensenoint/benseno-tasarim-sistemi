@@ -72,6 +72,21 @@ app.get('/api/state', readGuard, async (req, res) => {
 });
 
 // Dashboard'ın doğrudan tükettiği HAM bns_* shape (poll buraya bağlanacak; Faz 2).
+// Tek seferlik temizlik: fatura-takip ÖNCESİ açılmış, finans verisi hiç girilmemiş 'ek'/NULL
+// işler aslında aylık fee (retainer) işleridir → kapsamda'ya çevrilir, hatırlatma zinciri iptal.
+// İdempotent; satış/maliyet/fatura girilmişlere DOKUNMAZ.
+app.post('/api/fatura-temizlik', writeGuard, async (req, res) => {
+  try {
+    const r = await pool.query(`
+      UPDATE briefs SET ucret_tipi='kapsamda', fatura_hatirlatma_asama=0, fatura_kart_ts=NULL
+      WHERE (ucret_tipi='ek' OR ucret_tipi IS NULL)
+        AND satis IS NULL AND maliyet IS NULL AND fatura=false AND deleted_at IS NULL
+        AND created_at < '2026-07-10T00:00:00Z'`);
+    console.log('[fatura-temizlik]', r.rowCount, 'iş kapsamda yapıldı');
+    res.json({ kapsamda_yapilan: r.rowCount });
+  } catch (e) { console.error('[fatura-temizlik]', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+});
+
 // Backfill: geçmiş işlere toplu tip ataması. YALNIZ is_tipi NULL olanlara yazar (mevcut atamayı ezmez).
 app.post('/api/is-tipi-backfill', writeGuard, async (req, res) => {
   try {

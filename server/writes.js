@@ -925,7 +925,14 @@ async function setFinancials(id, raw) {
     if (d.satis !== undefined) put('satis', d.satis);
     if (d.fatura !== undefined) put('fatura', d.fatura);
     if (d.odeme !== undefined) put('odeme', d.odeme);
-    if (d.ucret_tipi !== undefined) put('ucret_tipi', d.ucret_tipi);
+    if (d.ucret_tipi !== undefined) {
+      put('ucret_tipi', d.ucret_tipi);
+      // kapsamda = retainer içi, ayrıca faturalanmaz → yanlışlıkla girilmiş satış/fatura/ödeme izi
+      // ve varsa fatura hatırlatma zinciri temizlenir (yanlış "fatura kesildi"yi geri almanın yolu).
+      if (d.ucret_tipi === 'kapsamda') {
+        sets.push('satis=NULL', 'fatura=false', 'odeme=false', 'fatura_hatirlatma_asama=0', 'fatura_kart_ts=NULL');
+      }
+    }
     vals.push(id);
     const r = await client.query(`UPDATE briefs SET ${sets.join(',')} WHERE id=$${vals.length} RETURNING id`, vals);
     if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
