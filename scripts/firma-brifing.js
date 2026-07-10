@@ -43,7 +43,9 @@ async function brifingOlgulari(d, now) {
   const son30Tamam = (d.bns_completed || []).filter((c) => c.bitis && c.bitis >= son30);
   const isaretsizBiten = son30Tamam.filter((c) => !(c.durum_olaylari || []).some((o) => o.durum === 'basladi')).length;
   const isaretsizOran = son30Tamam.length ? Math.round(isaretsizBiten / son30Tamam.length * 100) : null;
-  return { sinyaller, finans, finansVar, kesilmemisRetainer, tipDagilimi, isaretsizBiten, isaretsizOran, son30TamamSayi: son30Tamam.length,
+  // fatura-takip: eksik ek işler (tüm zamanlar — tahsilat riski birikimlidir)
+  const fe = C.bnsFaturaEksikleri(d.bns_completed || []);
+  return { sinyaller, finans, finansVar, kesilmemisRetainer, tipDagilimi, isaretsizBiten, isaretsizOran, son30TamamSayi: son30Tamam.length, faturaEksik: { faturasizToplam: fe.faturasizToplam, faturasizSayi: fe.faturasiz.length, tutarsizSayi: fe.tutarsiz.length },
     aktifSayi: (d.bns_briefs || []).length, tamamlananSayi: (d.bns_completed || []).length };
 }
 
@@ -66,6 +68,8 @@ function fallbackMetin(o) {
       ? ['', `📄 Kesilmemiş retainer (bu ay): ${o.kesilmemisRetainer.join(', ')}`] : []),
     ...((o.tipDagilimi || []).length
       ? ['', `🏷️ İş tipi dağılımı (son 30 gün): ${o.tipDagilimi.join(' · ')}`] : []),
+    ...((o.faturaEksik && (o.faturaEksik.faturasizSayi || o.faturaEksik.tutarsizSayi))
+      ? [`🧾 Bekleyen ek-iş cirosu: ${o.faturaEksik.faturasizToplam.toLocaleString('tr-TR')}₺ faturasız (${o.faturaEksik.faturasizSayi} iş) · tutarı girilmemiş ${o.faturaEksik.tutarsizSayi} iş`] : []),
     ...(o.isaretsizOran != null
       ? [`🚀 Başlandı işareti disiplini: ${o.son30TamamSayi - o.isaretsizBiten}/${o.son30TamamSayi} işaretli · ${o.isaretsizBiten} iş işaretsiz bitti (%${o.isaretsizOran}) — işaretsiz işler süre öğrenmesine giremiyor`] : []),
   ].join('\n');

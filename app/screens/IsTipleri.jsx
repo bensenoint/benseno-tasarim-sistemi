@@ -24,6 +24,7 @@ function IsTipleriScreen({ data, currentUser }) {
       if (c.marka) r.marka[c.marka] = (r.marka[c.marka] || 0) + 1;
       [...(c.workers || []), ...(c.contributors || [])].forEach(w => { if (w && w.name) r.kisi[w.name] = (r.kisi[w.name] || 0) + 1; });
       if (c.ucret_tipi === "ek" && typeof c.satis === "number") r.ekSatis += c.satis;
+      if (c.ucret_tipi === "ek" && c.satis == null) r.tutarsiz = (r.tutarsiz || 0) + 1;
     });
     briefs.forEach(b => { row(b.is_tipi || "").aktif++; });
     return m;
@@ -183,6 +184,8 @@ function IsTipleriScreen({ data, currentUser }) {
       {isMgr && (
         <React.Fragment>
           <div style={S.h}>💰 Tip × Ek-iş satışı (dönem, yönetici)</div>
+          {(() => { const n = kodlar.reduce((t, k) => t + (M[k].tutarsiz || 0), 0);
+            return n > 0 ? <div style={{ font: "400 12px var(--font-sans)", color: "var(--prio-orange, #c60)", marginBottom: 8 }}>⚠️ {n} ek işin satış tutarı girilmemiş ("₺ bekliyor") — toplamlar eksik olabilir.</div> : null; })()}
           <table style={{ borderCollapse: "collapse", width: "100%" }}><tbody>
             {kodlar.filter(k => M[k].ekSatis > 0).sort((a, b) => M[b].ekSatis - M[a].ekSatis).map(k => (
               <tr key={k}>

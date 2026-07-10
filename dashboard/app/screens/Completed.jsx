@@ -142,7 +142,11 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
                 {_isMgr && (() => {
                   // fatura-v2: retainer kapsamındaki iş ayrıca faturalanmaz → kâr yerine rozet
                   if (c.ucret_tipi === "kapsamda") return <td className="bns-col-mobile-hide" style={cs(true, "right")}><span title="Retainer kapsamında — ayrıca faturalanmaz" style={{font:"600 10px var(--font-sans)", color:"var(--ink-4)"}}>🔒 kapsamda</span></td>;
-                  const k = bnsKarMarj(c).kar; return <td className="bns-col-mobile-hide" style={cs(true, "right")}>{k != null ? fmtTRY(k) : "—"}</td>; })()}
+                  // fatura-takip: ek işte satış girilmemişse "₺ bekliyor", satış var ama fatura yoksa "faturasız" rozeti
+                  if (c.ucret_tipi === "ek" && c.satis == null) return <td className="bns-col-mobile-hide" style={cs(true, "right")}><span title="Ek iş — satış tutarı girilmedi; hatırlatma zinciri takipte" style={{font:"600 10px var(--font-sans)", color:"var(--prio-orange, #c60)"}}>₺ bekliyor</span></td>;
+                  const k = bnsKarMarj(c).kar;
+                  const faturasiz = c.ucret_tipi === "ek" && !c.fatura;
+                  return <td className="bns-col-mobile-hide" style={cs(true, "right")}>{k != null ? fmtTRY(k) : "—"}{faturasiz && <span title="Fatura kesilmedi" style={{font:"600 9px var(--font-sans)", color:"var(--prio-orange, #c60)", marginLeft:5}}>faturasız</span>}</td>; })()}
                 <td className="bns-col-mobile-hide" style={cs()}>
                   <a href={c.slack_url && c.slack_url !== "#" ? c.slack_url : undefined}
                      target="_blank" rel="noopener noreferrer"
