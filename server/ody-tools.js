@@ -16,6 +16,61 @@ const calc = {
     const marj = (s && s > 0) ? Math.round((kar / s) * 100) : null;
     return { kar, marj };
   },
+  // ── iş tipi süre motoru (dashboard/app/calc.js ile SENKRON kopya; imaj kuralı) ──
+  bnsMesaiSaatKes(t1, t2) {
+    if (!(t2 > t1)) return 0;
+    const H = 3600000, GUN = 24 * H, OFF = 3 * H;
+    let ms = 0;
+    for (let g = Math.floor((t1 + OFF) / GUN); g <= Math.floor((t2 + OFF) / GUN); g++) {
+      const w = (g + 4) % 7; if (w === 6 || w === 0) continue;
+      const gun0 = g * GUN - OFF;
+      const a = Math.max(t1, gun0 + 9 * H), b = Math.min(t2, gun0 + 19 * H);
+      if (b > a) ms += b - a;
+    }
+    return ms / H;
+  },
+  bnsNetIsSaati(olaylar) {
+    const DURAN = { beklemede: 1, musteride: 1, blokeli: 1 };
+    const ol = (olaylar || []).filter(o => o && o.ts && o.durum).sort((x, y) => x.ts - y.ts);
+    const bi = ol.findIndex(o => o.durum === 'basladi');
+    if (bi < 0) return null;
+    let toplam = 0, calisiyor = true, t0 = ol[bi].ts;
+    for (let j = bi + 1; j < ol.length; j++) {
+      const d = ol[j].durum, duran = DURAN[d] === 1, bitti = d === 'tamamlandi';
+      if (calisiyor && (duran || bitti)) { toplam += calc.bnsMesaiSaatKes(t0, ol[j].ts); calisiyor = false; }
+      else if (!calisiyor && !duran && !bitti) { t0 = ol[j].ts; calisiyor = true; }
+      if (bitti) return toplam;
+    }
+    return null;
+  },
+  bnsTipSureIstatistik(completed, markaFiltre) {
+    const havuz = {};
+    (completed || []).forEach(c => {
+      if (!c.is_tipi) return;
+      if (markaFiltre && c.marka !== markaFiltre) return;
+      const h = calc.bnsNetIsSaati(c.durum_olaylari);
+      if (h == null || h < 0.25) return;
+      (havuz[c.is_tipi] = havuz[c.is_tipi] || []).push(h);
+    });
+    const out = {};
+    Object.keys(havuz).forEach(tip => {
+      const v = havuz[tip].sort((a, b) => a - b);
+      const m = v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+      out[tip] = { medyan: Math.round(m * 10) / 10, min: Math.round(v[0] * 10) / 10, max: Math.round(v[v.length - 1] * 10) / 10, n: v.length };
+    });
+    return out;
+  },
+  bnsTipikSure(tip, marka, completed) {
+    if (marka) { const im = calc.bnsTipSureIstatistik(completed, marka)[tip]; if (im && im.n >= 3) return { saat: im.medyan, n: im.n, kaynak: 'tip-marka' }; }
+    const it = calc.bnsTipSureIstatistik(completed)[tip];
+    if (it && it.n >= 3) return { saat: it.medyan, n: it.n, kaynak: 'tip' };
+    const tum = [];
+    (completed || []).forEach(c => { const h = calc.bnsNetIsSaati(c.durum_olaylari); if (h != null && h >= 0.25) tum.push(h); });
+    if (!tum.length) return { saat: null, n: 0, kaynak: 'genel' };
+    tum.sort((a, b) => a - b);
+    const g = tum.length % 2 ? tum[(tum.length - 1) / 2] : (tum[tum.length / 2 - 1] + tum[tum.length / 2]) / 2;
+    return { saat: Math.round(g * 10) / 10, n: tum.length, kaynak: 'genel' };
+  },
   bnsFinansOzet(briefs) {
     let satis = 0, maliyet = 0, kar = 0, faturalanmamis = 0, tahsilEdilmemis = 0;
     (briefs || []).forEach((b) => {
@@ -298,6 +353,47 @@ defs.trend = {
   },
 };
 
+defs.is_tipi_ozet = {
+  description: "İş TİPİ bazlı metrikler: tip başına adet (tamamlanan+aktif), tipik süre (medyan, n), en çok yapan markalar/kişiler, gecikme oranı. tip verilirse tek tipin dökümü, verilmezse tüm tiplerin özeti. 'En çok hangi iş tipini yapıyoruz', 'X tipi ne kadar sürüyor' gibi sorular için.",
+  input_schema: { type: 'object', properties: { tip: { type: 'string', description: 'iş tipi kodu ya da adı (ops.)' } } },
+  run(input, ctx) {
+    const range = normRange(ctx.range);
+    const tipler = ctx.ed.bns_is_tipleri || [];
+    const comp = (ctx.ed.bns_completed || []).filter(c => inRange(c.bitis, range));
+    const compAll = ctx.ed.bns_completed || [];
+    const briefs = ctx.ed.bns_briefs || [];
+    const ist = calc.bnsTipSureIstatistik(compAll);
+    let hedef = null;
+    if (input.tip) {
+      const q = String(input.tip).toLocaleLowerCase('tr');
+      hedef = tipler.find(t => t.kod === q || (t.ad || '').toLocaleLowerCase('tr').includes(q));
+      if (!hedef) return { bulunamadi: true, tipler: tipler.map(t => t.ad) };
+    }
+    const satir = (t) => {
+      const cs = comp.filter(c => c.is_tipi === t.kod);
+      const marka = {}, kisi = {};
+      let gec = 0;
+      cs.forEach(c => {
+        if (c.marka) marka[c.marka] = (marka[c.marka] || 0) + 1;
+        (c.workers || []).forEach(w => { if (w && w.name) kisi[w.name] = (kisi[w.name] || 0) + 1; });
+        if (c.deadline && c.bitis && c.bitis > c.deadline) gec++;
+      });
+      const top = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, n]) => k + '(' + n + ')');
+      return {
+        tip: t.ad, kod: t.kod,
+        tamamlanan: cs.length,
+        aktif: briefs.filter(b => b.is_tipi === t.kod).length,
+        tipik_sure: ist[t.kod] || null,
+        markalar: top(marka), kisiler: top(kisi),
+        gecikme_orani_pct: cs.length ? Math.round(gec / cs.length * 100) : null,
+      };
+    };
+    if (hedef) return satir(hedef);
+    return { kapsam: range ? 'seçili aralık' : 'tüm zamanlar',
+      tipler: tipler.map(satir).filter(r => r.tamamlanan || r.aktif).sort((a, b) => (b.tamamlanan + b.aktif) - (a.tamamlanan + a.aktif)) };
+  },
+};
+
 defs.is_detay = {
   description: 'Tek bir işin (#no) DETAYI + NİTEL bağlam: marka, başlık, durum, termin, atananlar, gecikme; ayrıca thread özeti (thread_ozet), tamamlandıysa insight ve (yöneticiye) puan + puan sebebi. Bir işi özetlemek/yorumlamak/öneri vermek için bunu çağır.',
   input_schema: { type: 'object', required: ['no'], properties: { no: { type: 'number', description: 'iş numarası (#no)' } } },
@@ -316,7 +412,13 @@ defs.is_detay = {
       atananlar: [...(b.workers || []).map(w => w.name), ...(b.leads || []).map(l => l.name + '(lead)')],
       thread_ozet: b.thread_ozet || null,
       insight: done ? (b.insight || null) : null,
+      is_tipi: b.is_tipi || null,
     };
+    if (b.is_tipi) {
+      const tk = calc.bnsTipikSure(b.is_tipi, b.marka, ctx.ed.bns_completed || []);
+      if (tk.saat != null) out.tipik_sure = { saat: tk.saat, n: tk.n, kaynak: tk.kaynak };
+      if (done) { const g = calc.bnsNetIsSaati(b.durum_olaylari); if (g != null) out.gercek_net_saat = Math.round(g * 10) / 10; }
+    }
     if (ctx.isAdmin && done) { out.puan = b.rating ?? null; out.puan_sebep = b.rating_sebep || null; }
     // Thread duygu tonu — yalnız yöneticilere (admin || rol='yonetici')
     const me = (ctx.ed.bns_users || []).find(u => u && u.id === (ctx.user && ctx.user.slack_id));

@@ -30,7 +30,15 @@ async function brifingOlgulari(d, now) {
     .filter((b) => b.aylik_ucret != null)
     .filter((b) => !mf.some((x) => x.marka === b.name && x.ay === buAy && x.fatura))
     .map((b) => b.name);
-  return { sinyaller, finans, finansVar, kesilmemisRetainer,
+  // iş tipi dağılımı: son 30 günde tamamlananlar, ilk 5 tip
+  const tipAd = {}; (d.bns_is_tipleri || []).forEach((t) => tipAd[t.kod] = t.ad);
+  const son30 = now - 30 * 864e5, tipSay = {};
+  (d.bns_completed || []).forEach((c) => {
+    if (c.bitis && c.bitis >= son30 && c.is_tipi) tipSay[c.is_tipi] = (tipSay[c.is_tipi] || 0) + 1;
+  });
+  const tipDagilimi = Object.entries(tipSay).sort((a, b) => b[1] - a[1]).slice(0, 5)
+    .map(([k, n]) => `${tipAd[k] || k}: ${n}`);
+  return { sinyaller, finans, finansVar, kesilmemisRetainer, tipDagilimi,
     aktifSayi: (d.bns_briefs || []).length, tamamlananSayi: (d.bns_completed || []).length };
 }
 
@@ -51,6 +59,8 @@ function fallbackMetin(o) {
       : ['• Finans verisi girilmemiş (satış/maliyet alanları boş).']),
     ...((o.kesilmemisRetainer || []).length
       ? ['', `📄 Kesilmemiş retainer (bu ay): ${o.kesilmemisRetainer.join(', ')}`] : []),
+    ...((o.tipDagilimi || []).length
+      ? ['', `🏷️ İş tipi dağılımı (son 30 gün): ${o.tipDagilimi.join(' · ')}`] : []),
   ].join('\n');
 }
 
