@@ -654,6 +654,7 @@ app.command('/yardim', async ({ command, ack, respond }) => {
       { type: 'section', text: { type: 'mrkdwn', text: '*Komutlar*' } },
       { type: 'section', text: { type: 'mrkdwn', text:
         '`/yeni-brief` — Marka kanalında yeni brief açar\n' +
+        '🏷️ Yeni briefte *iş tipi* seçimi zorunlu — sistem tip başına gerçek süreleri öğrenir (İş Tipleri ekranı)\n' +
         '`/brief-durum` — Sana atanmış aktif brifleri listeler\n' +
         '`/kapasite` — Ekip kapasitesini gösterir _(Yönetici)_\n' +
         '`/maliyet` — Brief maliyet/satış bilgisi girer'

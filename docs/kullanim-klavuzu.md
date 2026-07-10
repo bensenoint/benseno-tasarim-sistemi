@@ -1253,3 +1253,11 @@ Canvas güncellemeleri yanlış yapılırsa veri bozulur. Kesinlikle uyulması g
 ---
 
 *Kılavuz sonu · Benseno Tasarım Sistemi v7.13 · Mayıs 2026*
+
+## 🏷️ İş Tipleri & Süre Öğrenme
+
+- Her işe bir **iş tipi** atanır (19 tip; DB'den yönetilir). `/yeni-brief` formunda zorunludur; dashboard'da iş detayından değiştirilebilir.
+- Sistem, **🚀 işe başlandı** işaretli işlerin **gerçek çalışma süresini** ölçer: beklemede/müşteride/blokeli aralıklar ve mesai dışı (akşam, hafta sonu) düşülür. Tip başına **medyan süre** her teslimle güncellenir.
+- **İş Tipleri** ekranı: tip×adet, tip×marka, tip×kişi (+net saat), öğrenilen süreler (medyan · aralık · n), gecikme oranı, aylık trend, tahmini-vs-gerçek gözlemi.
+- Ody'ye sorulabilir: "en çok hangi iş tipini yapıyoruz?", "SM planı tipik ne kadar sürüyor?".
+- Not: Süre verisi 🚀 işaretinin dürüst kullanımına bağlıdır — işe fiilen başlarken işaretleyin.

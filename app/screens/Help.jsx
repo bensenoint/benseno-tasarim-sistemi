@@ -44,6 +44,13 @@ function HelpScreen() {
         <div style={{ font: '400 13px/1 var(--font-sans)', color: 'var(--ink-3)', marginTop: 4 }}>Slack komutları, kısayollar, kapasite ve brief yönetimi</div>
       </div>
 
+      <Section title="🏷️ İş Tipleri & Süre Öğrenme" note="Her işe bir iş tipi atanır (19 tip: SM görseli, baskı-POP, video, ambalaj, SM planı...). Sistem, 🚀 işe başlandı işaretli işlerin GERÇEK çalışma süresinden (beklemede/müşteride ve mesai dışı süreler düşülür) tip başına tipik süreyi öğrenir — her teslimle güncellenir.">
+        <Row left="Yeni işte tip" right="/yeni-brief formunda zorunlu seçim; Slack'te seçilmezse form uyarır" sub="API'ye tipsiz düşen işlere başlıktan otomatik tahmin atanır"/>
+        <Row left="Tip değiştirme" right="Dashboard'da iş detayı (drawer) → 🏷️ İş tipi menüsü"/>
+        <Row left="İş Tipleri ekranı" right="Menü → İş Tipleri: tip×adet, tip×marka, tip×kişi, öğrenilen süreler (medyan · aralık · n), gecikme oranı, aylık trend" sub="n<3 olan tiplerde 'veri birikiyor' gösterilir. Süre verisi 🚀 işaretine bağlıdır — işe başlarken işaretlemek veriyi besler."/>
+        <Row left="Ody'ye sor" right="'En çok hangi iş tipini yapıyoruz?', 'SM planı tipik ne kadar sürüyor?', '#85 nedir?' (tip + tipik süre gösterir)"/>
+      </Section>
+
       <Section title="🤖 Slack Komutları" note="Slack'te herhangi bir kanalda yazın.">
         <Row left="/yeni-brief" right="Marka kanalında yeni brief açar" sub="Form: başlık, marka (kanaldan otomatik), termin, işi yapanlar, lead, gözlemci, not, dosya"/>
         <Row left="/brief-durum" right="Sana atanmış aktif briefleri listeler"/>
