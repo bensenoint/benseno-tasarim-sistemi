@@ -102,6 +102,9 @@ const NAV_ICONS = {
 // tüm serbest-metin alanlarında kullanılır. (Fonksiyon bildirimi: bundle genelinde erişilebilir.)
 // ── Ody mesaj biçimlendirici — mini markdown (kalın/kod/madde/başlık/tablo) ──
 // Ody yanıtları **kalın**, `kod`, madde imleri ve | tablo | içerir; düz basmak okumayı zorlaştırıyordu.
+function odyMdSoy(t) {
+  return String(t || '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/^#{1,3}\s+/gm, '');
+}
 function odyInline(text) {
   const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
   return parts.map((pp, i) => {
@@ -1086,7 +1089,7 @@ function ChatBot({ currentUser, dateRange }) {
             animation: "odyPopIn .3s ease",
           }}>
           <div style={{ font: "700 9px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 5, display: "flex", alignItems: "center", gap: 4 }}>💡 Ody'nin önerisi</div>
-          <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{adviceSummary(advice[advicePeek.id] && advice[advicePeek.id].text)}</div>
+          <div style={{ font: "400 12px/1.45 var(--font-sans)", color: "var(--ink-2)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{odyMdSoy(adviceSummary(advice[advicePeek.id] && advice[advicePeek.id].text))}</div>
           <div style={{ font: "600 10px/1 var(--font-sans)", color: "var(--ody)", marginTop: 6 }}>Detay için dokun →</div>
         </button>
       )}
@@ -1207,7 +1210,7 @@ function ChatBot({ currentUser, dateRange }) {
                             }}>
                               <span style={{ width: 24, height: 24, flex: "none", borderRadius: 4, border: "1px solid var(--line-strong)", display: "flex", alignItems: "center", justifyContent: "center", color: unread ? "var(--ody)" : "var(--ink-4)" }}><I.Bell size={12}/></span>
                               <span style={{ flex: 1, minWidth: 0 }}>
-                                <span style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-2)" }}>{n.text}</span>
+                                <span style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", font: (unread ? "600" : "400") + " 12.5px/1.4 var(--font-sans)", color: unread ? "var(--ink)" : "var(--ink-2)" }}>{odyMdSoy(n.text)}</span>
                                 <span style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 5, font: "500 10px/1 var(--font-mono)", color: "var(--ink-4)" }}>
                                   {fmtNotifT(n.created_at)}{n.link && <><span>·</span><span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}><I.Link size={10}/> Slack</span></>}
                                 </span>
@@ -1247,7 +1250,7 @@ function ChatBot({ currentUser, dateRange }) {
                           <span>· {fmtNotifT(sel.created_at)}</span>
                           {initials && <span title={m.lead.name} style={{ marginLeft: "auto", width: 22, height: 22, borderRadius: "50%", background: bc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", font: "700 9px var(--font-sans)" }}>{initials}</span>}
                         </div>
-                        <div style={{ font: "600 16px/1.35 var(--font-sans)", color: "var(--ink)", wordBreak: "break-word" }}>{titleText}</div>
+                        <div style={{ font: "600 16px/1.35 var(--font-sans)", color: "var(--ink)", wordBreak: "break-word" }}>{odyMdSoy(titleText)}</div>
                         {/* Marka/iş bağlam şeridi — kare, mavi sol şerit (yalnız iş eşleştiyse) */}
                         {(m.durum || m.rating > 0) && (
                           <div style={{ display: "flex", gap: "8px 18px", flexWrap: "wrap", padding: "11px 13px", border: "1px solid var(--line)", borderLeft: "3px solid var(--blue, #24479E)", background: "var(--paper-2)", font: "600 11px/1.4 var(--font-mono)", color: "var(--ink-3)" }}>
@@ -1263,7 +1266,7 @@ function ChatBot({ currentUser, dateRange }) {
                             <div style={{ display: "flex", alignItems: "center", gap: 8, font: "600 10px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 11 }}>
                               <span style={{ width: 16, height: 16, borderRadius: "55% 45% 58% 42% / 52% 48% 56% 44%", background: "var(--ody)", flex: "none" }}/> Ody'nin önerisi
                             </div>
-                            <div style={{ font: "400 13px/1.6 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={adv.text}/></div>
+                            <div style={{ color: "var(--ink-2)" }}><OdyMesajMetni text={adv.text}/></div>
                             {(() => {
                               const s = fb[sel.id] || {};
                               const fbBtn = { border: "1px solid var(--line-strong)", background: "var(--surface)", borderRadius: 6, padding: "4px 9px", cursor: "pointer", font: "400 13px/1 var(--font-sans)" };
@@ -1325,7 +1328,7 @@ function ChatBot({ currentUser, dateRange }) {
                       <span style={{ flex: 1, font: "700 10px/1 var(--font-sans)", letterSpacing: ".07em", textTransform: "uppercase", color: "var(--ody)" }}>Günlük özet</span>
                       <button onClick={dismissBrief} title="Kapat" style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", padding: 0, display: "inline-flex" }}><I.X size={13}/></button>
                     </div>
-                    <div style={{ font: "400 12.5px/1.55 var(--font-sans)", color: "var(--ink)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}><Linkify text={brief}/></div>
+                    <div style={{ color: "var(--ink)" }}><OdyMesajMetni text={brief}/></div>
                   </div>
                 )}
                 {!msgs.length && !busy && !brief && <div style={{ margin: "auto", textAlign: "center", font: "400 13px/1.6 var(--font-sans)", color: "var(--ink-4)", maxWidth: 280 }}>Marka, iş veya kişi hakkında soru sor — Ody sistem verisiyle yanıtlar.</div>}
