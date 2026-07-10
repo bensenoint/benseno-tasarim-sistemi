@@ -787,6 +787,17 @@ app.command('/yeni-brief', async ({ command, ack, client, respond }) => {
                 label: { type: 'plain_text', text: g },
                 options: tipler.filter(t => t.grup === g).map(t => ({ text: { type: 'plain_text', text: t.ad }, value: t.kod })),
               })) } }] : []),
+          { type: 'input', block_id: 'fatura_b', label: { type: 'plain_text', text: 'Faturalama' },
+            element: { type: 'radio_buttons', action_id: 'ucret_tipi',
+              initial_option: { text: { type: 'plain_text', text: '🔒 Aylık fee — retainer kapsamında' }, value: 'kapsamda' },
+              options: [
+                { text: { type: 'plain_text', text: '🔒 Aylık fee — retainer kapsamında' }, value: 'kapsamda' },
+                { text: { type: 'plain_text', text: '➕ Ek iş — ayrıca faturalanır' }, value: 'ek' },
+              ] } },
+          { type: 'input', block_id: 'satis_b', optional: true, label: { type: 'plain_text', text: 'Satış (₺) — yalnız ek işte; belli değilse boş bırak, iş bitince sistem sorar' },
+            element: { type: 'plain_text_input', action_id: 'satis', placeholder: { type: 'plain_text', text: 'ör. 4500' } } },
+          { type: 'input', block_id: 'maliyet_b', optional: true, label: { type: 'plain_text', text: 'Maliyet (₺) — ops. (dış tedarik vb.)' },
+            element: { type: 'plain_text_input', action_id: 'maliyet', placeholder: { type: 'plain_text', text: 'ör. 1200' } } },
           { type: 'input', block_id: 'deadline_b', label: { type: 'plain_text', text: 'Deadline (tarih + saat) — zorunlu' },
             element: { type: 'datetimepicker', action_id: 'deadline' } },
           { type: 'input', block_id: 'workers_b', label: { type: 'plain_text', text: 'İşi yapan(lar)' },
@@ -831,8 +842,13 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
   const fileIds = (v.dosya_b?.dosya?.files || []).map(f => f.id);
   const aciklama = (v.not_b?.aciklama?.value || '').trim();
   const isTipi = v.is_tipi_b?.is_tipi?.selected_option?.value || undefined;
+  const ucretTipi = v.fatura_b?.ucret_tipi?.selected_option?.value || 'kapsamda';
+  const paraOku = (x) => { const n = parseFloat(String(x || '').replace(/\./g, '').replace(',', '.')); return Number.isFinite(n) && n > 0 ? n : undefined; };
+  const satis = ucretTipi === 'ek' ? paraOku(v.satis_b?.satis?.value) : undefined;
+  const maliyetG = ucretTipi === 'ek' ? paraOku(v.maliyet_b?.maliyet?.value) : undefined;
   const payload = {
-    marka, baslik, is_tipi: isTipi,
+    marka, baslik, is_tipi: isTipi, ucret_tipi: ucretTipi,
+    satis, maliyet: maliyetG,
     deadline: dtSec ? new Date(dtSec * 1000).toISOString() : null,
     worker_ids: workers,
     akis,

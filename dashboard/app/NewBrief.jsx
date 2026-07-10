@@ -119,7 +119,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
   const [f, setF] = React.useState({
     marka: "", baslik: "", deadlineDate: "", deadlineTime: "17:00",
     workerIds: [], leadIds: [], gozlemciIds: [],   // lead boş → server işi vereni lead yapar
-    musteri_notu: "", akis: "paralel", maliyet: "", satis: "", isTipi: "",
+    musteri_notu: "", akis: "paralel", maliyet: "", satis: "", isTipi: "", ucretTipi: "kapsamda",
   });
   const tipler = (window.BNS_DATA && window.BNS_DATA.IS_TIPLERI) || data.IS_TIPLERI || [];
   const [files, setFiles] = React.useState([]);
@@ -146,8 +146,9 @@ function APIBriefForm({ apiBase, data, onClose }) {
       gozlemci_ids: f.gozlemciIds.length ? f.gozlemciIds : undefined,
       musteri_notu: f.musteri_notu.trim() || undefined,
       akis: f.akis,
-      maliyet: f.maliyet !== "" ? Number(f.maliyet) : undefined,
-      satis: f.satis !== "" ? Number(f.satis) : undefined,
+      ucret_tipi: f.ucretTipi,
+      maliyet: f.ucretTipi === "ek" && f.maliyet !== "" ? Number(f.maliyet) : undefined,
+      satis: f.ucretTipi === "ek" && f.satis !== "" ? Number(f.satis) : undefined,
       by: me.id || undefined,
       source: "dashboard",
     };
@@ -252,16 +253,34 @@ function APIBriefForm({ apiBase, data, onClose }) {
           placeholder="Brief detayı, referanslar, özel istekler…" style={{ ...FIELD_BOX, resize: "vertical", font: "400 14px/1.45 var(--font-sans)" }} />
       </label>
 
-      <div style={{ display: "flex", gap: 10 }}>
-        <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-          <span style={FIELD_LABEL}>Maliyet (₺)</span>
-          <input type="number" inputMode="decimal" value={f.maliyet} onChange={e => set("maliyet", e.target.value)} placeholder="—" style={FIELD_BOX} />
-        </label>
-        <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-          <span style={FIELD_LABEL}>Satış (₺)</span>
-          <input type="number" inputMode="decimal" value={f.satis} onChange={e => set("satis", e.target.value)} placeholder="—" style={FIELD_BOX} />
-        </label>
-      </div>
+      <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <span style={FIELD_LABEL}>Faturalama *</span>
+        <div style={{ display: "inline-flex", border: "1px solid var(--line)", borderRadius: 8, overflow: "hidden", alignSelf: "flex-start" }}>
+          {[["kapsamda", "🔒 Aylık fee"], ["ek", "➕ Ek iş"]].map(([v, l]) => (
+            <button key={v} type="button" onClick={() => set("ucretTipi", v)}
+              style={{ font: "600 12px var(--font-sans)", padding: "8px 14px", border: "none", cursor: "pointer",
+                background: f.ucretTipi === v ? "var(--paper-2)" : "transparent",
+                color: f.ucretTipi === v ? "var(--ink)" : "var(--ink-3)" }}>{l}</button>
+          ))}
+        </div>
+        <span style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)" }}>
+          {f.ucretTipi === "ek"
+            ? "Ayrıca faturalanır. Satış belli değilse boş bırak — iş bitince sistem sorar ve takip eder."
+            : "Retainer kapsamında — ayrıca faturalanmaz."}</span>
+      </label>
+
+      {f.ucretTipi === "ek" && (
+        <div style={{ display: "flex", gap: 10 }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+            <span style={FIELD_LABEL}>Satış (₺) — ops.</span>
+            <input type="number" inputMode="decimal" value={f.satis} onChange={e => set("satis", e.target.value)} placeholder="belli değilse boş" style={FIELD_BOX} />
+          </label>
+          <label style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+            <span style={FIELD_LABEL}>Maliyet (₺) — ops.</span>
+            <input type="number" inputMode="decimal" value={f.maliyet} onChange={e => set("maliyet", e.target.value)} placeholder="dış tedarik vb." style={FIELD_BOX} />
+          </label>
+        </div>
+      )}
 
       {err && <div style={{ padding: "8px 11px", background: "var(--prio-red-bg, #fee)", color: "var(--prio-red, #c00)", borderRadius: 8, font: "500 12px/1.4 var(--font-sans)" }}>{err}</div>}
 

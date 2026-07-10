@@ -207,8 +207,13 @@ async function createBrief(raw) {
     const leadIds = [...new Set([...(d.lead_ids || []), ...(d.by ? [d.by] : [])])];
     const dept = await deriveDept(client, d.worker_ids, d.by);
     // fatura-v2: retainer'lı markada yeni iş varsayılan 'kapsamda', değilse 'ek'.
-    const mu = await client.query('SELECT aylik_ucret FROM brands WHERE id=$1', [markaId]);
-    const ucretTipi = (mu.rows[0] && mu.rows[0].aylik_ucret != null) ? 'kapsamda' : 'ek';
+    // fatura-takip: faturalama artık formdan gelir; verilmemişse (eski kuyruk/dış istemci)
+    // marka-retainer varsayılanı korunur.
+    let ucretTipi = d.ucret_tipi;
+    if (!ucretTipi) {
+      const mu = await client.query('SELECT aylik_ucret FROM brands WHERE id=$1', [markaId]);
+      ucretTipi = (mu.rows[0] && mu.rows[0].aylik_ucret != null) ? 'kapsamda' : 'ek';
+    }
     // iş tipi: formlar zorunlu tutar; API'ye tipsiz düşen (eski kuyruk, dış istemci) başlıktan
     // tahmin edilir, o da tutmazsa 'diger'. Verilen değer is_tipleri'nde olmalı (400).
     let isTipi = d.is_tipi || null;
