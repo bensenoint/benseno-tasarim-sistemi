@@ -249,7 +249,7 @@ function handleWrite(fn) {
       if (e && e.name === 'ZodError') return res.status(400).json({ error: 'doğrulama', issues: e.issues });
       const code = e.status || (/bulunamadı/.test(e.message || '') ? 404 : 400);
       console.error('[api] write hata:', e.message);
-      res.status(code).json({ error: e.message });
+      res.status(code).json({ error: e.message, ...(e.cakisma ? { cakisma: e.cakisma } : {}) });
     }
   };
 }
@@ -388,6 +388,9 @@ async function assertCanWriteFinancials(req) {
 
 app.post('/api/briefs', writeGuard, handleWrite(req => writes.createBrief(req.body)));
 // Fatura-takip buton/modal aksiyonu (Slack bot çağırır; yetki writes.faturaAksiyon içinde: lead/açan/yönetici).
+// WIP=1: iş basladi'dayken ikinci atananın "ben de başladım" işareti (409+cakisma dönebilir).
+app.post('/api/briefs/:id/ben-basladim', writeGuard, handleWrite(req => writes.benBasladim(+req.params.id, req.body)));
+
 app.post('/api/briefs/:id/fatura-aksiyon', writeGuard, async (req, res) => {
   try { res.json(await writes.faturaAksiyon(+req.params.id, req.body || {})); }
   catch (e) { res.status(e.status || 500).json({ error: e.message }); }

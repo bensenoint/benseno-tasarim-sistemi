@@ -61,6 +61,7 @@ const briefPatch = z.object({
 
 const statusBody = z.object({
   durum: z.enum(DURUMLAR),
+  zorla: z.boolean().optional(),   // WIP=1: çakışmada kullanıcı onayıyla eski işi beklemeye alarak başlat
   by: zUserId.optional(),
   hedef: zUserId.optional(),   // sıralı zincirde revizyonun döneceği halka (revize: @kişi)
   source: z.enum(['dashboard', 'slack', 'system']).default('dashboard'),
@@ -464,6 +465,7 @@ async function zincirCtx(client, id) {
 async function setStatus(id, raw, _depth = 0) {
   const d = statusBody.parse(raw);
   let zincirNote = null, dmNext = null, resumeMs = null;   // resumeMs: işe-dönüş hatırlatıcısı için bekleme süresi
+  let wipEskiIsDis = null, wipOtomatikEngelDis = null;   // WIP=1: tx sonrası eylemler
   const res = await tx(async (client) => {
     const ctx = await zincirCtx(client, id);
     if (!ctx) throw new Error('brief bulunamadı: ' + id);
@@ -535,6 +537,42 @@ async function setStatus(id, raw, _depth = 0) {
       }
     }
 
+    // ── TEK AKTİF İŞ (WIP=1) ─────────────────────────────────────────────
+    // Kişi aynı anda tek işte fiilen çalışabilir (spec: 2026-07-10-tek-aktif-is).
+    // basladi geçişinde tetikleyen worker (yoksa tek worker) kapıdan geçer; çakışmada
+    // 409+cakisma (onay akışı) ya da zorla ile eski işten ayrılma. system kaynağında
+    // çakışma → otomatik başlatma İPTAL, iş planda kalır (dışarıda DM).
+    let wipAktifKisi = null, wipEskiIs = null, wipOtomatikEngel = null;
+    if (durum === 'basladi') {
+      const wq = await client.query(`SELECT user_id FROM brief_assignees WHERE brief_id=$1 AND role='contributor'`, [id]);
+      const workers = wq.rows.map(x => x.user_id);
+      wipAktifKisi = (d.by && workers.includes(d.by)) ? d.by : (workers.length === 1 ? workers[0] : null);
+      if (wipAktifKisi) {
+        const cq = await client.query(
+          `SELECT b.id, b.no, b.baslik, br.name AS marka FROM brief_assignees a
+           JOIN briefs b ON b.id = a.brief_id LEFT JOIN brands br ON br.id = b.marka_id
+           WHERE a.user_id=$1 AND a.calisiyor AND a.brief_id<>$2 AND b.deleted_at IS NULL LIMIT 1`, [wipAktifKisi, id]);
+        const cak = cq.rows[0];
+        if (cak && !d.zorla) {
+          if (d.source === 'system') {
+            // otomatik kuyruk: başlatma yerine planda bırak; kişiye DM (tx sonrası)
+            durum = 'calisiliyor';
+            wipOtomatikEngel = { kisi: wipAktifKisi, cakisma: cak };
+            wipAktifKisi = null;
+          } else {
+            const e = new Error(`şu an #${cak.no} üzerinde çalışıyorsun — bu işe başlarsan o beklemeye alınır`);
+            e.status = 409;
+            e.cakisma = { id: cak.id, no: cak.no, baslik: cak.baslik, marka: cak.marka, kisi: wipAktifKisi };
+            throw e;
+          }
+        } else if (cak && d.zorla) {
+          await client.query(`UPDATE brief_assignees SET calisiyor=false WHERE brief_id=$1 AND user_id=$2`, [cak.id, wipAktifKisi]);
+          const kalan = await client.query(`SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND calisiyor LIMIT 1`, [cak.id]);
+          if (!kalan.rows.length) wipEskiIs = { id: cak.id, no: cak.no };   // tx sonrası beklemeye alınır
+        }
+      }
+    }
+
     const completed = durum === 'tamamlandi';
     // Müşteri onayı akışı (✈️):
     //  - musteride → gönderim sayacı +1, son_gonderim_at, "müşteri dönüşü bekleniyor" bayrağı AÇIK
@@ -556,6 +594,14 @@ async function setStatus(id, raw, _depth = 0) {
        WHERE id=$3 RETURNING id, durum, rev_ic, rev_musteri, gonderim_sayisi, musteri_bekliyor`,
       [durum, completed, id]);
     if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
+    // WIP işaretleri: basladi'ya geçen işte tetikleyen kişi çalışıyor; basladi DIŞI duruma
+    // geçişte işin TÜM işaretleri kapanır (incelemede/beklemede/müşteride/revizyon/tamamlandi —
+    // revizyona dönen kişi 🚀 ile yeniden girer).
+    if (durum === 'basladi' && wipAktifKisi) {
+      await client.query(`UPDATE brief_assignees SET calisiyor=true WHERE brief_id=$1 AND user_id=$2 AND role='contributor'`, [id, wipAktifKisi]);
+    } else if (durum !== 'basladi') {
+      await client.query(`UPDATE brief_assignees SET calisiyor=false WHERE brief_id=$1 AND calisiyor`, [id]);
+    }
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'durum:' + durum,
       detail: { durum, istenen: d.durum, hedef: d.hedef }, source: d.source, slack_ts: d.slack_ts });
     // İşe dönüş hatırlatıcısı: beklemede/müşteride → aktif (tamamlanma değil) ise termin uzatma öner.
@@ -574,14 +620,36 @@ async function setStatus(id, raw, _depth = 0) {
     } else if (['tamamlandi', 'beklemede', 'musteride'].includes(durum)) {
       await client.query('UPDATE briefs SET termin_oneri_at = NULL, termin_oneri_ms = NULL WHERE id=$1', [id]);
     }
+    wipEskiIsDis = wipEskiIs; wipOtomatikEngelDis = wipOtomatikEngel;
     return r.rows[0];
   });
+  // ── WIP tx-sonrası eylemler ──
+  if (wipEskiIsDis) {
+    // Eski iş beklemeye: ayrı setStatus (kendi tx'i) + Ody imzalı not reflectChange içinde genel
+    try {
+      await setStatus(wipEskiIsDis.id, { durum: 'beklemede', source: 'system' }, _depth + 1);
+      const yeni = await pool.query('SELECT no FROM briefs WHERE id=$1', [id]);
+      const ad = d.by ? ((await pool.query('SELECT name FROM users WHERE id=$1', [d.by])).rows[0] || {}).name : null;
+      await reflectChange(wipEskiIsDis.id,
+        `🤖 *Ody:* ${ad || 'atanan'} #${(yeni.rows[0] || {}).no || ''} işine başladığı için bu iş *beklemeye* alındı (tek aktif iş kuralı).`,
+        'system', {});
+    } catch (e) { console.error('[wip] eski iş beklemeye alınamadı:', e.message); }
+  }
+  if (wipOtomatikEngelDis) {
+    try {
+      const b2 = await pool.query('SELECT no, baslik FROM briefs WHERE id=$1', [id]);
+      const bi2 = b2.rows[0] || {};
+      await slack.dm(wipOtomatikEngelDis.kisi,
+        `📋 Sıradaki işin hazır: *#${bi2.no}* ${bi2.baslik || ''}\nŞu an *#${wipOtomatikEngelDis.cakisma.no}* üzerinde çalıştığın için otomatik başlatılmadı — hazır olduğunda thread'e 🚀 koyarak başla.`);
+    } catch (e) { console.error('[wip] kuyruk DM hatası:', e.message); }
+  }
   // Thread notu — müşteri akışına özel, anlaşılır metinler
   let note;
   if (d.durum === 'musteride') {
     note = `✈️ *müşteriye yollandı* — müşteri dönüşü bekleniyor (${res.gonderim_sayisi}. gönderim). Dönüşteki ilk ✏️ müşteri revizyonu sayılır.`;
   } else if (d.durum === 'revizyon') {
     note = `✏️ revizyon kaydedildi — iç: *${res.rev_ic}* · müşteri: *${res.rev_musteri}*`;
+    note += `\n🚀 revizyona fiilen başlarken thread'e 🚀 koy — çalışma süren doğru ölçülsün.`;
     if (zincirNote) note += `\n${zincirNote}`;
   } else if (zincirNote) {
     note = zincirNote;
@@ -590,6 +658,9 @@ async function setStatus(id, raw, _depth = 0) {
     note = `🤖 *Ody:* önceki işin kapandı — sıradaki işin otomatik başlatıldı (kuyruk ilerlemesi).`;
   } else {
     note = `🔄 durum güncellendi: *${d.durum}*`;
+  }
+  if (wipOtomatikEngelDis) {
+    note = `🤖 *Ody:* önceki işin kapandı — sıradaki işin *plana alındı* (atanan şu an #${wipOtomatikEngelDis.cakisma.no} üzerinde çalıştığı için otomatik başlatılmadı; 🚀 ile başlar).`;
   }
   if (resumeMs != null) {
     const saat = Math.round(resumeMs / 3600000);
@@ -1055,6 +1126,41 @@ async function applyTerminOneri(id, by, source) {
   return { ok: true, yeni_deadline: yeni };
 }
 
+// ── WIP=1: "ben de başladım" — iş zaten basladi'dayken ikinci atananın 🚀'si ──
+// Durum değişmez; yalnız kişinin calisiyor işareti açılır (aynı tek-iş kapısından geçerek).
+async function benBasladim(id, raw) {
+  const by = raw && raw.by, zorla = !!(raw && raw.zorla);
+  if (!by) { const e = new Error('kimlik gerekli'); e.status = 400; throw e; }
+  const b = (await pool.query('SELECT durum, no FROM briefs WHERE id=$1 AND deleted_at IS NULL', [id])).rows[0];
+  if (!b) { const e = new Error('brief bulunamadı'); e.status = 404; throw e; }
+  if (b.durum !== 'basladi') { const e = new Error('iş şu an başladı durumunda değil'); e.status = 400; throw e; }
+  const w = await pool.query(`SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND user_id=$2 AND role='contributor'`, [id, by]);
+  if (!w.rows.length) { const e = new Error('bu işin atananı değilsin'); e.status = 403; throw e; }
+  const cq = await pool.query(
+    `SELECT b.id, b.no, b.baslik, br.name AS marka FROM brief_assignees a
+     JOIN briefs b ON b.id = a.brief_id LEFT JOIN brands br ON br.id = b.marka_id
+     WHERE a.user_id=$1 AND a.calisiyor AND a.brief_id<>$2 AND b.deleted_at IS NULL LIMIT 1`, [by, id]);
+  const cak = cq.rows[0];
+  if (cak && !zorla) {
+    const e = new Error(`şu an #${cak.no} üzerinde çalışıyorsun`);
+    e.status = 409; e.cakisma = { id: cak.id, no: cak.no, baslik: cak.baslik, marka: cak.marka, kisi: by };
+    throw e;
+  }
+  if (cak && zorla) {
+    await pool.query(`UPDATE brief_assignees SET calisiyor=false WHERE brief_id=$1 AND user_id=$2`, [cak.id, by]);
+    const kalan = await pool.query(`SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND calisiyor LIMIT 1`, [cak.id]);
+    if (!kalan.rows.length) {
+      try {
+        await setStatus(cak.id, { durum: 'beklemede', source: 'system' });
+        const ad = ((await pool.query('SELECT name FROM users WHERE id=$1', [by])).rows[0] || {}).name;
+        await reflectChange(cak.id, `🤖 *Ody:* ${ad || 'atanan'} #${b.no} işine başladığı için bu iş *beklemeye* alındı (tek aktif iş kuralı).`, 'system', {});
+      } catch (e) { console.error('[wip] benBasladim eski iş:', e.message); }
+    }
+  }
+  await pool.query(`UPDATE brief_assignees SET calisiyor=true WHERE brief_id=$1 AND user_id=$2 AND role='contributor'`, [id, by]);
+  return { ok: true, no: b.no };
+}
+
 // ── Fatura-takip aksiyonları (Slack butonları arkası; yetki SUNUCUDA: lead/açan/yönetici) ──
 async function faturaYetkiliMi(id, uid) {
   if (!uid) return false;
@@ -1088,4 +1194,4 @@ async function faturaAksiyon(id, raw) {
   return r.rows[0];
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, setBrandRetainer, upsertMarkaFaturaAy, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR, faturaAksiyon };
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, setBrandRetainer, upsertMarkaFaturaAy, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR, faturaAksiyon, benBasladim };
