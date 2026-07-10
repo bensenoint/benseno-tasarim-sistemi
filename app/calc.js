@@ -454,10 +454,29 @@ var BNS_V2_DURAN = { beklemede: 1, musteride: 1, blokeli: 1 };
 // PERFORMANS: İstanbul 2016'dan beri SABİT UTC+3 (DST yok) → gün matematiği saf aritmetik.
 // Eski sürüm hot-loop'ta toLocaleDateString (Intl) çağırıyordu → departman ekranı ~24sn'ye çıkmıştı.
 var BNS_TR_OFF = 3 * BNS_H, BNS_GUN_MS = 24 * BNS_H;
+// ── Tatil takvimi (spec: 2026-07-10-tatil-takvimi) ──
+// gün-no → katsayı: 0 = tam tatil (çalışılmaz) · 0.5 = yarım gün. Kayıt yoksa normal gün.
+// bnsTatilYukle embedded bns_tatiller ile beslenir (dashboard hydrate + script'ler + ody-tools kopyası).
+var BNS_TATIL = {}, BNS_TATIL_VER = 0;
+function bnsTatilYukle(liste) {
+  BNS_TATIL = {}; BNS_TATIL_VER++;
+  (liste || []).forEach(function (t) {
+    if (!t || !t.gun) return;
+    BNS_TATIL[bnsGunFromKey(String(t.gun).slice(0, 10))] = t.yarim ? 0.5 : 0;
+  });
+  _bnsV2Cache = {}; _bnsV2CacheN = 0;   // yayılım önbelleği tatile duyarlı — boşalt
+}
+// Günün çalışma katsayısı: hafta sonu/tam tatil 0 · yarım 0.5 · normal 1.
+function bnsGunKatsayi(day) {
+  var w = (day + 4) % 7;
+  if (w === 6 || w === 0) return 0;
+  var t = BNS_TATIL[day];
+  return t === undefined ? 1 : t;
+}
 function bnsEpochGun(ms) { return Math.floor((ms + BNS_TR_OFF) / BNS_GUN_MS); }   // İstanbul gün no
 function bnsGunFromKey(k) { return bnsEpochGun(Date.parse(k + 'T12:00:00+03:00')); }
 function bnsKeyFromGun(day) { return new Date(day * BNS_GUN_MS).toISOString().slice(0, 10); }
-function bnsGunIsMi(day) { var w = (day + 4) % 7; return w !== 6 && w !== 0; }     // 1970-01-01=Per; Cmt=6, Paz=0
+function bnsGunIsMi(day) { return bnsGunKatsayi(day) > 0; }   // hafta içi VE tam tatil değil (yarım gün iş günüdür)
 function bnsGunKey(ms) { return bnsKeyFromGun(bnsEpochGun(ms)); }                  // YYYY-MM-DD (İstanbul)
 function bnsIsGunuMu(gunKey) { return bnsGunIsMi(bnsGunFromKey(gunKey)); }
 function bnsSonrakiGun(gunKey) { return bnsKeyFromGun(bnsGunFromKey(gunKey) + 1); }
@@ -466,8 +485,8 @@ function bnsKalanIsGunu(gunKey, deadlineMs) {
   var g = bnsGunFromKey(gunKey), dl = bnsEpochGun(deadlineMs);
   if (g > dl) return 1;
   var n = 0;
-  for (; g <= dl; g++) if (bnsGunIsMi(g)) n++;
-  return Math.max(1, n);
+  for (; g <= dl; g++) n += bnsGunKatsayi(g);   // yarım gün 0.5 sayılır
+  return Math.max(0.5, n);
 }
 // Simülatör önbelleği: pay V'de LİNEER (pay=R/kalan, R=V ölçekli) → iş başına V=1 ile TEK simülasyon,
 // rol ağırlığıyla çarpılır. Anahtar veri parmak izi + hedef gün → ekranlar/render'lar arası paylaşılır;
@@ -476,14 +495,14 @@ var _bnsV2Cache = {}, _bnsV2CacheN = 0;
 function bnsYayilimBirimPay(b, hedefGun) {
   var ev = (b.durum_olaylari || []);
   var son = ev.length ? ev[ev.length - 1] : null;
-  var ck = (b.id != null ? b.id : b.no) + ':' + b.created_at + ':' + b.deadline + ':' + ev.length + ':' + (son ? son.ts : 0) + ':' + hedefGun;
+  var ck = (b.id != null ? b.id : b.no) + ':' + b.created_at + ':' + b.deadline + ':' + ev.length + ':' + (son ? son.ts : 0) + ':' + hedefGun + ':' + BNS_TATIL_VER;
   if (ck in _bnsV2Cache) return _bnsV2Cache[ck];
   var evs = ev.filter(function (e) { return e && e.ts != null && e.durum; })
     .slice().sort(function (a, c) { return a.ts - c.ts; });
   var g = bnsEpochGun(b.created_at), dl = bnsEpochGun(b.deadline);
   var R = 1, durum = 'yeni', i = 0, sonuc = 0;
   // kalan iş günü artımlı: başlangıçta say, her geçen iş gününde azalt (O(gün²) → O(gün)).
-  var kalan = 0; for (var d = Math.min(g, dl); d <= dl; d++) if (bnsGunIsMi(d)) kalan++;
+  var kalan = 0; for (var d = Math.min(g, dl); d <= dl; d++) kalan += bnsGunKatsayi(d);   // yarım gün 0.5
   if (g > dl) kalan = 1;
   for (; g <= hedefGun; g++) {
     var gunSonuTs = (g + 1) * BNS_GUN_MS - BNS_TR_OFF - 1; // İstanbul gün sonu (ms)
@@ -491,20 +510,21 @@ function bnsYayilimBirimPay(b, hedefGun) {
       if (durum === 'tamamlandi' && evs[i].durum !== 'tamamlandi') R = 1; // reopen: yeni döngü
       durum = evs[i].durum; i++;
     }
-    var isGunu = bnsGunIsMi(g);
+    var kat = bnsGunKatsayi(g);
+    var isGunu = kat > 0;
     if (g === hedefGun) {
       // Overdue + AÇIK iş → TAM DEĞER biner (birim=1; V ile ölçeklenir): iş bitmediyse
       // "tam iş bugün masada" — başlanmış/başlanmamış ayrımı yapılmaz (İrem bug'ı:
       // pencere içi tüketim R'yi sıfırlayıp 23 gün gecikmiş işi %0 gösteriyordu).
-      if (isGunu && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi') sonuc = g > dl ? 1 : R / Math.max(1, kalan);
+      if (isGunu && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi') sonuc = (g > dl ? 1 : R / Math.max(0.5, kalan)) * kat;
       break;
     }
     // R tüketimi: yalnız deadline penceresi İÇİNDE ve SON GÜN HARİÇ (kalan>1) —
     // tüketim işi asla "bitmiş" sayamaz; bitişi yalnız tamamlandi olayı belirler.
-    if (isGunu && g <= dl && kalan > 1 && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi' && BNS_V2_CALISAN[durum]) {
-      R = Math.max(0, R - R / kalan);
+    if (isGunu && g <= dl && kalan > kat && !BNS_V2_DURAN[durum] && durum !== 'tamamlandi' && BNS_V2_CALISAN[durum]) {
+      R = Math.max(0, R - (R / kalan) * kat);   // yarım günde yarım tüketim
     }
-    if (isGunu && g <= dl) kalan--; // geçen iş günü bölenden düşer (overdue'da tüketim zaten yok)
+    if (isGunu && g <= dl) kalan -= kat; // geçen iş günü (katsayısıyla) bölenden düşer
   }
   if (++_bnsV2CacheN > 20000) { _bnsV2Cache = {}; _bnsV2CacheN = 0; } // basit tavan
   _bnsV2Cache[ck] = sonuc;
@@ -578,10 +598,12 @@ function bnsMesaiSaatKes(t1, t2) {
   if (!(t2 > t1)) return 0;
   var ms = 0;
   for (var g = bnsEpochGun(t1); g <= bnsEpochGun(t2); g++) {
-    if (!bnsGunIsMi(g)) continue;
+    var kat = bnsGunKatsayi(g);
+    if (kat === 0) continue;                                      // hafta sonu / tam tatil
+    var bit = kat === 0.5 ? 13 : BNS_MESAI_BIT;                   // yarım gün: 09:00-13:00
     var gun0 = g * BNS_GUN_MS - BNS_TR_OFF;                       // TR gece yarısı (UTC ms)
     var a = Math.max(t1, gun0 + BNS_MESAI_BAS * BNS_H);
-    var b = Math.min(t2, gun0 + BNS_MESAI_BIT * BNS_H);
+    var b = Math.min(t2, gun0 + bit * BNS_H);
     if (b > a) ms += b - a;
   }
   return ms / BNS_H;
@@ -661,5 +683,5 @@ function bnsFaturaTopluGunu(nowMs) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes, bnsFaturaEksikleri, bnsFaturaTopluGunu };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes, bnsFaturaEksikleri, bnsFaturaTopluGunu, bnsTatilYukle, bnsGunKatsayi };
 }

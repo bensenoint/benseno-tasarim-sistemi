@@ -69,6 +69,7 @@ const NAV_SECTIONS = [
     adminOnly: true,
     items: [
       { id: "users",     label: "Kullanıcılar", icon: "Shield" },
+      { id: "takvim",  label: "Takvim",       icon: "Calendar" },
       { id: "silinenler", label: "Silinenler",   icon: "Trash2" },
     ]
   }
@@ -1526,7 +1527,7 @@ function Header({ user, tab, onNav, viewMode, setViewMode, dateRange, setDateRan
   const PRIMARY_TABS = ["overview", "jobs", "profile", "brand"];
   const SUB_TITLES = {};
   (NAV_SECTIONS || []).forEach(s => (s.items || []).forEach(it => { SUB_TITLES[it.id] = it.label; }));
-  Object.assign(SUB_TITLES, { completed:"Tamamlanan", musteride:"Müşteride", "dept-comp":"Departmanlar özet", "is-tipleri":"İş Tipleri", team:"Ekip", multi:"Sıralı işler" });
+  Object.assign(SUB_TITLES, { completed:"Tamamlanan", musteride:"Müşteride", "dept-comp":"Departmanlar özet", "is-tipleri":"İş Tipleri", takvim:"Takvim", team:"Ekip", multi:"Sıralı işler" });
   const isSubPage = isMobile && tab && !PRIMARY_TABS.includes(tab);
   const pageTitle = SUB_TITLES[tab] || "";
 
