@@ -639,6 +639,27 @@ function bnsTipikSure(tip, marka, completed) {
   return { saat: Math.round(g * 10) / 10, n: tum.length, kaynak: 'genel' };
 }
 
+
+// ── Fatura takip (spec: 2026-07-10-fatura-takip) ─────────────────────────────
+// Eksik ek işler: tutarsiz (satış girilmemiş) + faturasiz (satış var, fatura kesilmemiş).
+// completed dizisi üzerinde saf süzme — ekran rozeti, brifing ve hatırlatma script'i paylaşır.
+function bnsFaturaEksikleri(completed) {
+  var tutarsiz = [], faturasiz = [], faturasizToplam = 0;
+  (completed || []).forEach(function (c) {
+    if (c.ucret_tipi !== 'ek') return;
+    if (typeof c.satis !== 'number') tutarsiz.push({ no: c.no, marka: c.marka, baslik: c.baslik });
+    else if (!c.fatura) { faturasiz.push({ no: c.no, marka: c.marka, baslik: c.baslik, satis: c.satis }); faturasizToplam += c.satis; }
+  });
+  return { tutarsiz: tutarsiz, faturasiz: faturasiz, faturasizToplam: faturasizToplam };
+}
+// İçinde bulunulan ayın toplu-bildirim günü: 25'i; 25 Cmt/Paz ise önceki Cuma. YYYY-MM-DD döner.
+function bnsFaturaTopluGunu(nowMs) {
+  var key = bnsGunKey(nowMs);                        // İstanbul günü
+  var g25 = bnsGunFromKey(key.slice(0, 7) + '-25');  // bu ayın 25'i (gün no)
+  while (!bnsGunIsMi(g25)) g25--;                    // Cmt→Cum, Paz→Cum
+  return bnsKeyFromGun(g25);
+}
+
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes, bnsFaturaEksikleri, bnsFaturaTopluGunu };
 }

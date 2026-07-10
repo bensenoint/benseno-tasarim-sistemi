@@ -341,5 +341,21 @@ t('süre: fallback saat 4', tk.saat, 4);
 const tkG = C.bnsTipikSure('ambalaj', null, [cS1, cS2, cS3, cS4]);
 t('süre: fallback genel', tkG.kaynak, 'genel');
 
+
+// ── Fatura takip: eksik ek işler + toplu gönderim günü ──
+const feC1 = { no: 1, marka: 'A', ucret_tipi: 'ek', satis: null, fatura: false };          // tutarsız
+const feC2 = { no: 2, marka: 'B', ucret_tipi: 'ek', satis: 4500, fatura: false };          // faturasız
+const feC3 = { no: 3, marka: 'C', ucret_tipi: 'ek', satis: 900, fatura: true };            // tamam
+const feC4 = { no: 4, marka: 'D', ucret_tipi: 'kapsamda', satis: null, fatura: false };    // fee → yok
+const fe = C.bnsFaturaEksikleri([feC1, feC2, feC3, feC4]);
+t('fatura: tutarsız 1', fe.tutarsiz.length === 1 && fe.tutarsiz[0].no === 1, true);
+t('fatura: faturasız 1', fe.faturasiz.length === 1 && fe.faturasiz[0].no === 2, true);
+t('fatura: faturasız toplam', fe.faturasizToplam, 4500);
+// toplu gün: 25'i hafta içi → 25; 25 Cmt → 24 Cum; 25 Paz → 23 Cum
+const TG = (s) => Date.parse(s + 'T12:00:00+03:00');
+t('fatura: 25 Perş (2026-06)', C.bnsFaturaTopluGunu(TG('2026-06-10')), '2026-06-25');
+t('fatura: 25 Cmt → 24 Cum (2026-07)', C.bnsFaturaTopluGunu(TG('2026-07-10')), '2026-07-24');
+t('fatura: 25 Paz → 23 Cum (2026-10)', C.bnsFaturaTopluGunu(TG('2026-10-05')), '2026-10-23');
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);

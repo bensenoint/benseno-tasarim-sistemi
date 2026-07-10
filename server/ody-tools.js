@@ -71,6 +71,16 @@ const calc = {
     const g = tum.length % 2 ? tum[(tum.length - 1) / 2] : (tum[tum.length / 2 - 1] + tum[tum.length / 2]) / 2;
     return { saat: Math.round(g * 10) / 10, n: tum.length, kaynak: 'genel' };
   },
+  // fatura takip (calc.js ile SENKRON kopya)
+  bnsFaturaEksikleri(completed) {
+    const tutarsiz = [], faturasiz = []; let faturasizToplam = 0;
+    (completed || []).forEach((c) => {
+      if (c.ucret_tipi !== 'ek') return;
+      if (typeof c.satis !== 'number') tutarsiz.push({ no: c.no, marka: c.marka, baslik: c.baslik });
+      else if (!c.fatura) { faturasiz.push({ no: c.no, marka: c.marka, baslik: c.baslik, satis: c.satis }); faturasizToplam += c.satis; }
+    });
+    return { tutarsiz, faturasiz, faturasizToplam };
+  },
   bnsFinansOzet(briefs) {
     let satis = 0, maliyet = 0, kar = 0, faturalanmamis = 0, tahsilEdilmemis = 0;
     (briefs || []).forEach((b) => {
