@@ -22,7 +22,8 @@ const KURALLAR = [
   ['sm-gorsel',         /post|story|reklam g[öo]rsel|kampanya|g[öo]rsel|linkedin|instagram|\bsm\b|payla[şs][ıi]m|highlight|(babalar|anneler|sevgililer) g[üu]n|çekili[şs]|cekilis/i],
 ];
 function tahminEt(baslik) {
-  const b = String(baslik || '');
+  // Türkçe İ/I katlaması: JS /i bayrağı U+0130'u katlamaz → tr-lower normalize.
+  const b = String(baslik || '').toLocaleLowerCase('tr');
   for (const [tip, re] of KURALLAR) if (re.test(b)) return tip;
   return null;
 }

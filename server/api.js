@@ -72,6 +72,23 @@ app.get('/api/state', readGuard, async (req, res) => {
 });
 
 // Dashboard'ın doğrudan tükettiği HAM bns_* shape (poll buraya bağlanacak; Faz 2).
+// Backfill: geçmiş işlere toplu tip ataması. YALNIZ is_tipi NULL olanlara yazar (mevcut atamayı ezmez).
+app.post('/api/is-tipi-backfill', writeGuard, async (req, res) => {
+  try {
+    const atamalar = Array.isArray(req.body?.atamalar) ? req.body.atamalar : [];
+    if (!atamalar.length) return res.status(400).json({ error: 'atamalar gerekli' });
+    const gecerli = new Set((await pool.query('SELECT kod FROM is_tipleri')).rows.map(r => r.kod));
+    let yazilan = 0;
+    for (const a of atamalar) {
+      if (!a || typeof a.no !== 'number' || !gecerli.has(a.tip)) continue;
+      const r = await pool.query('UPDATE briefs SET is_tipi=$1 WHERE no=$2 AND is_tipi IS NULL', [a.tip, a.no]);
+      yazilan += r.rowCount;
+    }
+    console.log(`[is-tipi-backfill] ${yazilan}/${atamalar.length} yazıldı`);
+    res.json({ yazilan, istenen: atamalar.length });
+  } catch (e) { console.error('[is-tipi-backfill]', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+});
+
 // İş tipleri (Slack modalı seçenekleri; hafif). readGuard: bot token'la çeker.
 app.get('/api/is-tipleri', readGuard, async (req, res) => {
   try {
