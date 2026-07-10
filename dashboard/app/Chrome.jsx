@@ -103,12 +103,14 @@ const NAV_ICONS = {
 // ── Ody mesaj biçimlendirici — mini markdown (kalın/kod/madde/başlık/tablo) ──
 // Ody yanıtları **kalın**, `kod`, madde imleri ve | tablo | içerir; düz basmak okumayı zorlaştırıyordu.
 function odyMdSoy(t) {
-  return String(t || '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/^#{1,3}\s+/gm, '');
+  return String(t || '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*\n]+)\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1').replace(/^#{1,3}\s+/gm, '');
 }
 function odyInline(text) {
-  const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
+  const parts = String(text).split(/(\*\*[^*]+\*\*|\*[^*\n]+\*|`[^`]+`)/g).filter(Boolean);
   return parts.map((pp, i) => {
     if (/^\*\*[^*]+\*\*$/.test(pp)) return <strong key={i} style={{ fontWeight: 600, color: "var(--ink)" }}>{pp.slice(2, -2)}</strong>;
+    if (/^\*[^*\n]+\*$/.test(pp)) return <strong key={i} style={{ fontWeight: 600, color: "var(--ink)" }}>{pp.slice(1, -1)}</strong>;
     if (/^`[^`]+`$/.test(pp)) return <code key={i} style={{ font: "500 12px var(--font-mono)", background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 4, padding: "1px 5px" }}>{pp.slice(1, -1)}</code>;
     return <Linkify key={i} text={pp}/>;
   });
