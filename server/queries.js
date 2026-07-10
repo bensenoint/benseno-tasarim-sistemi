@@ -168,7 +168,7 @@ async function getEmbedded({ sensitive = true } = {}) {
   const bns_briefs = all.filter(b => !b.completed_at && !b.deleted_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, is_tipi: b.is_tipi || null, dept: b.dept || '',
     oncelik: b.priority || '🟡',   // manuel öncelik (🔴🟠🟡🟢) — girilmemişse NORMAL
-    workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '', sira: w.sira ?? null, kisi_sira: w.kisi_sira ?? null, onay: !!w.onay_at, onay_by: w.onay_by || null })),
+    workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '', sira: w.sira ?? null, kisi_sira: w.kisi_sira ?? null, onay: !!w.onay_at, onay_by: w.onay_by || null, calisiyor: w.calisiyor === true })),
     akis: b.akis || 'paralel',
     // sıralı zincirde sırası gelen halka (ilk onaysız contributor) — uyarılar ve UI bunun üstünden çalışır
     aktif_halka: (b.akis === 'sirali' && b.workers.length > 1) ? ((b.workers.find(w => !w.onay_at) || {}).id || null) : null,
