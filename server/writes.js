@@ -34,6 +34,7 @@ const briefCreate = z.object({
   maliyet: z.number().nullable().optional(),
   satis: z.number().nullable().optional(),
   musteri_notu: z.string().optional(),
+  is_tipi: z.string().max(40).optional(),      // iş tipi (is_tipleri.kod); yoksa başlıktan tahmin → 'diger'
   tags: z.array(z.string()).optional(),
   no: z.number().int().optional(),
   by: zUserId.optional(),                       // işlemi yapan
@@ -43,6 +44,7 @@ const briefCreate = z.object({
 
 const briefPatch = z.object({
   marka: z.string().min(1).optional(),
+  is_tipi: z.string().max(40).nullable().optional(),   // iş tipi değişikliği (drawer)
   baslik: z.string().min(1).optional(),
   deadline: zDate,
   priority: z.string().optional(),
@@ -207,12 +209,21 @@ async function createBrief(raw) {
     // fatura-v2: retainer'lı markada yeni iş varsayılan 'kapsamda', değilse 'ek'.
     const mu = await client.query('SELECT aylik_ucret FROM brands WHERE id=$1', [markaId]);
     const ucretTipi = (mu.rows[0] && mu.rows[0].aylik_ucret != null) ? 'kapsamda' : 'ek';
+    // iş tipi: formlar zorunlu tutar; API'ye tipsiz düşen (eski kuyruk, dış istemci) başlıktan
+    // tahmin edilir, o da tutmazsa 'diger'. Verilen değer is_tipleri'nde olmalı (400).
+    let isTipi = d.is_tipi || null;
+    if (isTipi) {
+      const chk = await client.query('SELECT 1 FROM is_tipleri WHERE kod=$1 AND aktif', [isTipi]);
+      if (!chk.rows.length) { const e = new Error('geçersiz iş tipi: ' + isTipi); e.status = 400; throw e; }
+    } else {
+      isTipi = require('./is-tipi-tahmin').tahminEt(d.baslik) || 'diger';
+    }
     const r = await client.query(
-      `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,deadline_orig,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url,created_by,ucret_tipi)
-       VALUES ($1,$2,$3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`,
+      `INSERT INTO briefs(no,marka_id,baslik,dept,deadline,deadline_orig,priority,akis,maliyet,satis,musteri_notu,slack_ts,slack_url,created_by,ucret_tipi,is_tipi)
+       VALUES ($1,$2,$3,$4,$5,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING id`,
       [no, markaId, d.baslik, dept, toTs(d.deadline), d.priority || null,
        d.akis || 'paralel', d.maliyet ?? null, d.satis ?? null, d.musteri_notu || null,
-       d.slack_ts || null, null, d.by || null, ucretTipi]);
+       d.slack_ts || null, null, d.by || null, ucretTipi, isTipi]);
     const id = r.rows[0].id;
     // gözlemci = manuel seçilenler ∪ ilgili dept yöneticileri (her zaman)
     // Auto-yöneticiler: zaten işi yapan/lead olanları gözlemciye ekleme (tek kişi iki listede görünmesin).
@@ -296,6 +307,13 @@ async function patchBrief(id, raw) {
     const put = (col, v) => { vals.push(v); sets.push(`${col}=$${vals.length}`); };
     if (d.marka !== undefined) put('marka_id', await brandIdByName(client, d.marka));
     if (d.baslik !== undefined) put('baslik', d.baslik);
+    if (d.is_tipi !== undefined) {
+      if (d.is_tipi) {
+        const chk = await client.query('SELECT 1 FROM is_tipleri WHERE kod=$1 AND aktif', [d.is_tipi]);
+        if (!chk.rows.length) { const e = new Error('geçersiz iş tipi: ' + d.is_tipi); e.status = 400; throw e; }
+      }
+      put('is_tipi', d.is_tipi);
+    }
     if (d.deadline !== undefined) {
       // Uzatma takibi: eski deadline'ı al; orijinali bir kez sabitle; daha GEÇ tarihe taşıma = uzatma → ceza.
       const cur = await client.query('SELECT deadline, deadline_orig, termin_oneri_at FROM briefs WHERE id=$1', [id]);

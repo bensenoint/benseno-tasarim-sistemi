@@ -72,6 +72,14 @@ app.get('/api/state', readGuard, async (req, res) => {
 });
 
 // Dashboard'ın doğrudan tükettiği HAM bns_* shape (poll buraya bağlanacak; Faz 2).
+// İş tipleri (Slack modalı seçenekleri; hafif). readGuard: bot token'la çeker.
+app.get('/api/is-tipleri', readGuard, async (req, res) => {
+  try {
+    const r = await pool.query('SELECT kod, ad, grup, sira FROM is_tipleri WHERE aktif ORDER BY sira');
+    res.json({ tipler: r.rows });
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+});
+
 app.get('/api/embedded', readGuard, async (req, res) => {
   try {
     // SEC-4: bot/admin/yönetici tam veri; düz üyeler finans/puan görmez (UI ile hizalı).

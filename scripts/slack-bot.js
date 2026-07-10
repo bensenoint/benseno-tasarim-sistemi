@@ -745,6 +745,18 @@ app.command('/yardim', async ({ command, ack, respond }) => {
 // ─── /yeni-brief — Slack'ten deterministik brief açma (Faz 3, LLM'siz) ────────
 // Block Kit modal → POST /api/briefs → DB + markanın kanalına post. Slash command'ı
 // Slack app config'inde (api.slack.com/apps → Slash Commands) /yeni-brief olarak kayıtlı olmalı.
+// İş tipleri (modal seçenekleri) — 10dk cache'li; API düşükse boş döner, modal tip alanını atlar.
+let _isTipleriCache = { ts: 0, tipler: [] };
+async function isTipleriGetir() {
+  if (Date.now() - _isTipleriCache.ts < 10 * 60 * 1000 && _isTipleriCache.tipler.length) return _isTipleriCache.tipler;
+  try {
+    const r = await fetch(`${API_BASE}/api/is-tipleri`, { headers: { 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' } });
+    const j = await r.json();
+    if (Array.isArray(j.tipler) && j.tipler.length) _isTipleriCache = { ts: Date.now(), tipler: j.tipler };
+  } catch (e) { log(`is-tipleri getir hata: ${e.message}`); }
+  return _isTipleriCache.tipler;
+}
+
 app.command('/yeni-brief', async ({ command, ack, client, respond }) => {
   await ack();
   // Marka kanaldan belirlenir — komut hangi marka kanalında çalıştıysa o marka.
@@ -754,6 +766,7 @@ app.command('/yeni-brief', async ({ command, ack, client, respond }) => {
     return;
   }
   try {
+    const tipler = await isTipleriGetir();
     await client.views.open({
       trigger_id: command.trigger_id,
       view: {
@@ -767,6 +780,12 @@ app.command('/yeni-brief', async ({ command, ack, client, respond }) => {
           { type: 'context', elements: [{ type: 'mrkdwn', text: `📁 Marka: *${marka}* _(kanaldan belirlendi)_` }] },
           { type: 'input', block_id: 'baslik_b', label: { type: 'plain_text', text: 'Başlık / İş' },
             element: { type: 'plain_text_input', action_id: 'baslik', placeholder: { type: 'plain_text', text: 'ör. Sosyal medya paketi — Mayıs' } } },
+          ...(tipler.length ? [{ type: 'input', block_id: 'is_tipi_b', label: { type: 'plain_text', text: 'İş Tipi — zorunlu' },
+            element: { type: 'static_select', action_id: 'is_tipi', placeholder: { type: 'plain_text', text: 'Tip seç' },
+              option_groups: [...new Set(tipler.map(t => t.grup))].map(g => ({
+                label: { type: 'plain_text', text: g },
+                options: tipler.filter(t => t.grup === g).map(t => ({ text: { type: 'plain_text', text: t.ad }, value: t.kod })),
+              })) } }] : []),
           { type: 'input', block_id: 'deadline_b', label: { type: 'plain_text', text: 'Deadline (tarih + saat) — zorunlu' },
             element: { type: 'datetimepicker', action_id: 'deadline' } },
           { type: 'input', block_id: 'workers_b', label: { type: 'plain_text', text: 'İşi yapan(lar)' },
@@ -810,8 +829,9 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
   const akis = v.akis_b?.akis?.selected_option?.value || 'paralel';
   const fileIds = (v.dosya_b?.dosya?.files || []).map(f => f.id);
   const aciklama = (v.not_b?.aciklama?.value || '').trim();
+  const isTipi = v.is_tipi_b?.is_tipi?.selected_option?.value || undefined;
   const payload = {
-    marka, baslik,
+    marka, baslik, is_tipi: isTipi,
     deadline: dtSec ? new Date(dtSec * 1000).toISOString() : null,
     worker_ids: workers,
     akis,
