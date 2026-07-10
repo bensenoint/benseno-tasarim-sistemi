@@ -1275,3 +1275,8 @@ Canvas güncellemeleri yanlış yapılırsa veri bozulur. Kesinlikle uyulması g
 - Başka işte çalışırken yeni işe 🚀 koyunca sistem **onay ister**; onaylarsan önceki iş otomatik **beklemeye** alınır (Ody imzalı not). Dashboard'da aynı onay penceresi çıkar.
 - **Paralel çok kişili işte** herkes kendi 🚀'siyle aynı işe eş zamanlı girebilir; profil sayfasında henüz başlamadığın böyle işler *"sen: beklemede"* rozetiyle görünür.
 - **Revizyona** dönen iş otomatik çalışılıyor sayılmaz — fiilen başlarken 🚀 koy. **Sıralı işte** çakışma varsa kuyruk otomatik başlatmaz; iş plana alınır, sana DM gelir.
+
+## 📅 Tatil Takvimi
+
+- Resmî tatiller **Menü → Takvim**'den yönetilir (yalnız yönetici). 2026 tatilleri yüklüdür; dinî bayramlar hilale göre ±1 gün düzeltilebilir.
+- Sistem genelinde iş günü matematiği tatil-bilinçlidir: kapasite bölünmesi, çalışma süresi ölçümü, kalan iş günü ve aylık fatura listesi günü tatilleri atlar. **Yarım gün** (arefe, 31 Aralık): mesai 09:00-13:00, kapasitede 0,5 gün.

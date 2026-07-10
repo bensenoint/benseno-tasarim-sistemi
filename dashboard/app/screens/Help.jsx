@@ -51,6 +51,11 @@ function HelpScreen() {
         <Row left="Ody'ye sor" right="'En çok hangi iş tipini yapıyoruz?', 'SM planı tipik ne kadar sürüyor?', '#85 nedir?' (tip + tipik süre gösterir)"/>
       </Section>
 
+      <Section title="📅 Tatil Takvimi" note="Resmî tatiller (hafta sonlarına ek) sistem genelinde iş günü matematiğine işlenir: kapasite bölünmesi, çalışma süresi ölçümü, kalan iş günü ve fatura takip günü tatilleri atlar.">
+        <Row left="Yönetim" right="Menü → Takvim (yalnız yönetici): tarih + ad + tam/yarım gün ekle-sil" sub="2026 resmî tatilleri yüklü geldi; dinî bayram tarihleri hilale göre ±1 gün oynayabilir — buradan düzeltilir."/>
+        <Row left="Yarım gün" right="Arefe ve 31 Aralık gibi günlerde mesai 09:00-13:00 sayılır; kapasitede 0,5 iş günü"/>
+      </Section>
+
       <Section title="🎯 Tek Aktif İş Kuralı" note="Bir kişi aynı anda yalnız 1 işte fiilen çalışabilir (🚀 = fiilî çalışma). Paralel işlerde herkes kendi 🚀'siyle aynı işe eş zamanlı girebilir — kısıt yalnız kişinin İKİ FARKLI işte aynı anda çalışmasına.">
         <Row left="🚀 çakışınca" right="Başka işte çalışırken yeni işe 🚀 koyarsan sistem onay ister: 'şu an #X'tesin — buna başlarsan #X beklemeye alınacak' → Onayla / Vazgeç" sub="Onayda eski iş otomatik beklemeye alınır (Ody imzalı not). Dashboard'da aynı onay penceresi çıkar."/>
         <Row left="Çok kişili işte" right="🚀'yi koyan kişi o işin aktif çalışanı olur; iş zaten başladıysa ikinci atanan da kendi 🚀'sini koyarak katılır (durum değişmez)" sub="Profilinde, başkasının çalıştığı ama senin girmediğin iş 'sen: beklemede' rozetiyle görünür."/>
