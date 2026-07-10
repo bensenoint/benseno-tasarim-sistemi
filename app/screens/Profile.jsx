@@ -615,7 +615,10 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
           </div>
         </div>
         {displayRows.length > 0
-          ? <BriefTable rows={displayRows}
+          ? <BriefTable rows={displayRows.map(b => (b.durum === "basladi" &&
+                (b.workers || []).some(w => w && w.id === u.id) &&
+                !((b.workers || []).find(w => w && w.id === u.id) || {}).calisiyor)
+                ? { ...b, _senBeklemede: true } : b)}
               onRowClick={curView.completed && onOpenCompleted ? onOpenCompleted : onOpenBrief}
               rowDraggable={(b) => !isMobile && canReorder && !curView.completed && isWorker(b)}
               onRowReorder={reorderQueue}/>

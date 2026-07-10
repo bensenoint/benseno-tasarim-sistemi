@@ -19,7 +19,7 @@ async function allBriefsWithAssignees() {
            b.image_url, b.started_at, b.basladi_at,
            b.rev_ic, b.rev_musteri, b.gonderim_sayisi, b.son_gonderim_at, b.musteri_bekliyor,
            COALESCE(json_agg(
-             json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color,'sira',a.sira,'kisi_sira',a.kisi_sira,'onay_at',a.onay_at,'onay_by',a.onay_by)
+             json_build_object('id',u.id,'name',u.name,'role',a.role,'dept',u.dept,'initials',u.initials,'color',u.color,'sira',a.sira,'kisi_sira',a.kisi_sira,'onay_at',a.onay_at,'onay_by',a.onay_by,'calisiyor',a.calisiyor)
              ORDER BY a.sira NULLS LAST
            ) FILTER (WHERE u.id IS NOT NULL), '[]') AS assignees
     FROM briefs b

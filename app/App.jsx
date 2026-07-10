@@ -52,13 +52,28 @@ async function bnsPersistBriefChange(prev, next, byId) {
       body: JSON.stringify({ ...body, by: byId || undefined, source: "dashboard" }),
     });
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(j.error === "doğrulama"
-      ? "Doğrulama: " + (j.issues || []).map(i => (i.path || []).join(".")).join(", ")
-      : (j.error || ("HTTP " + r.status)));
+    if (!r.ok) {
+      const err = new Error(j.error === "doğrulama"
+        ? "Doğrulama: " + (j.issues || []).map(i => (i.path || []).join(".")).join(", ")
+        : (j.error || ("HTTP " + r.status)));
+      if (j.cakisma) err.cakisma = j.cakisma;
+      throw err;
+    }
     return j;
   };
   // 1) Durum
-  if (next.durum !== prev.durum) await post("/status", { durum: next.durum });
+  if (next.durum !== prev.durum) {
+    // WIP=1: çakışmada (409+cakisma) kullanıcı onayıyla zorla — eski iş beklemeye alınır.
+    try { await post("/status", { durum: next.durum }); }
+    catch (e) {
+      const c = e && e.cakisma;
+      if (c && typeof window !== "undefined" &&
+          window.confirm(`Şu an #${c.no} ${c.marka || ""} üzerinde çalışıyorsun.\nBu işe başlarsan #${c.no} BEKLEMEYE alınacak (tek aktif iş kuralı).\n\nOnaylıyor musun?`)) {
+        await post("/status", { durum: next.durum, zorla: true });
+      } else if (c) { const err = new Error("vazgeçildi — durum değişmedi"); err.iptal = true; throw err; }
+      else throw e;
+    }
+  }
   // 2) PATCH alanları (baslik / not / roller)
   const patch = {};
   if (next.baslik !== prev.baslik) patch.baslik = next.baslik;

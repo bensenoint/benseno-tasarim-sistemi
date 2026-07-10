@@ -189,6 +189,8 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, draggab
             background: menu ? "var(--paper-2)" : "transparent"}}>
           <StatusPill status={brief.durum}/>
         </span>
+        {brief._senBeklemede && <span title="Bu işte başka atanan çalışıyor — sen henüz başlamadın (🚀 ile başla)"
+          style={{ font: "600 9px/1 var(--font-sans)", color: "var(--prio-orange, #c60)", border: "1px solid var(--prio-orange, #c60)", borderRadius: 999, padding: "2px 6px", marginLeft: 6, whiteSpace: "nowrap" }}>sen: beklemede</span>}
         {menu && onStatusChange && !brief.bitis && brief.durum !== "tamamlandi" && (
           <StatusMenu current={brief.durum} onPick={(s) => { setMenu(false); onStatusChange(brief, s); }}
             onClose={() => setMenu(false)}/>
