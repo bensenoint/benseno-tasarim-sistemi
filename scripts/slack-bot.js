@@ -589,6 +589,86 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
 // Sorun/öneri bildirimleri bu kişilere DM olarak düşer.
 const FEEDBACK_ADMINS = ['U030C48PL23', 'UD96GH76E'];   // Görkem, Reyhan
 
+// ── Fatura-takip butonları — yetki SUNUCUDA (fatura-aksiyon 403 → kibar uyarı) ──
+async function faturaAksiyonCagir(briefId, body) {
+  const r = await fetch(`${API_BASE}/api/briefs/${briefId}/fatura-aksiyon`, {
+    method: 'POST', headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
+    body: JSON.stringify(body),
+  });
+  const j = await r.json().catch(() => ({}));
+  return { ok: r.ok, status: r.status, ...j };
+}
+function faturaKartKapat(client, kanal, ts, metin) {
+  return client.chat.update({ channel: kanal, ts, text: metin,
+    blocks: [{ type: 'section', text: { type: 'mrkdwn', text: metin } }] }).catch(() => {});
+}
+app.action('bns_fatura_kesildi', async ({ ack, body, client, action }) => {
+  await ack();
+  const uid = body.user?.id, briefId = +action.value;
+  const r = await faturaAksiyonCagir(briefId, { by: uid, fatura: true });
+  if (!r.ok) {
+    const msg = r.status === 403 ? '⛔ Fatura işaretini yalnız lead, işi açan ya da yönetici koyabilir.' : `❌ ${r.error || 'işaretlenemedi'}`;
+    try { await client.chat.postMessage({ channel: uid, text: msg, username: BOT_NAME }); } catch {}
+    return;
+  }
+  const tut = r.satis != null ? ` (${Number(r.satis).toLocaleString('tr-TR')}₺)` : '';
+  await faturaKartKapat(client, body.channel?.id, body.message?.ts, `✅ #${r.no} ek iş${tut} — fatura kesildi (<@${uid}>). Takip kapandı.`);
+  log(`[fatura] #${r.no} kesildi (by ${uid})`);
+});
+app.action('bns_fatura_tutar', async ({ ack, body, client, action }) => {
+  await ack();
+  try {
+    await client.views.open({
+      trigger_id: body.trigger_id,
+      view: {
+        type: 'modal', callback_id: 'bns_fatura_tutar_modal',
+        private_metadata: JSON.stringify({ briefId: +action.value, kanal: body.channel?.id, ts: body.message?.ts }),
+        title: { type: 'plain_text', text: 'Ek İş — Satış Tutarı' },
+        submit: { type: 'plain_text', text: 'Kaydet' }, close: { type: 'plain_text', text: 'İptal' },
+        blocks: [
+          { type: 'input', block_id: 'satis_b', label: { type: 'plain_text', text: 'Satış (₺) — zorunlu' },
+            element: { type: 'plain_text_input', action_id: 'satis', placeholder: { type: 'plain_text', text: 'ör. 4500' } } },
+          { type: 'input', block_id: 'maliyet_b', optional: true, label: { type: 'plain_text', text: 'Maliyet (₺) — ops. (dış tedarik vb.)' },
+            element: { type: 'plain_text_input', action_id: 'maliyet' } },
+          { type: 'input', block_id: 'fatura_b', optional: true, label: { type: 'plain_text', text: 'Fatura' },
+            element: { type: 'checkboxes', action_id: 'fatura', options: [
+              { text: { type: 'plain_text', text: 'Fatura kesildi' }, value: 'kesildi' }] } },
+        ],
+      },
+    });
+  } catch (e) { log(`fatura tutar modal hata: ${e.message}`); }
+});
+app.view('bns_fatura_tutar_modal', async ({ ack, body, view, client }) => {
+  const v = view.state.values;
+  const paraOku2 = (x) => { const n = parseFloat(String(x || '').replace(/\./g, '').replace(',', '.')); return Number.isFinite(n) && n > 0 ? n : null; };
+  const satis = paraOku2(v.satis_b?.satis?.value);
+  if (!satis) { await ack({ response_action: 'errors', errors: { satis_b: 'Geçerli bir tutar gir (ör. 4500).' } }); return; }
+  await ack();
+  let meta = {}; try { meta = JSON.parse(view.private_metadata || '{}'); } catch {}
+  const uid = body.user?.id;
+  const maliyet = paraOku2(v.maliyet_b?.maliyet?.value);
+  const kesildi = (v.fatura_b?.fatura?.selected_options || []).some(o => o.value === 'kesildi');
+  const r = await faturaAksiyonCagir(meta.briefId, { by: uid, satis, ...(maliyet != null ? { maliyet } : {}), fatura: kesildi });
+  if (!r.ok) {
+    const msg = r.status === 403 ? '⛔ Tutarı yalnız lead, işi açan ya da yönetici girebilir.' : `❌ ${r.error || 'kaydedilemedi'}`;
+    try { await client.chat.postMessage({ channel: uid, text: msg, username: BOT_NAME }); } catch {}
+    return;
+  }
+  const tutTxt = Number(r.satis).toLocaleString('tr-TR') + '₺';
+  if (kesildi) {
+    await faturaKartKapat(client, meta.kanal, meta.ts, `✅ #${r.no} ek iş (${tutTxt}) — tutar girildi ve fatura kesildi (<@${uid}>). Takip kapandı.`);
+  } else {
+    // Tutar girildi ama fatura yok → kartı 'fatura kesildi mi' haline çevir (takip sürer).
+    await client.chat.update({ channel: meta.kanal, ts: meta.ts,
+      text: `➕ #${r.no} ek iş (${tutTxt}) — fatura kesildi mi?`,
+      blocks: [
+        { type: 'section', text: { type: 'mrkdwn', text: `➕ #${r.no} ek iş (*${tutTxt}*) — tutar girildi (<@${uid}>). Fatura kesildi mi?` } },
+        { type: 'actions', elements: [{ type: 'button', style: 'primary', action_id: 'bns_fatura_kesildi', value: String(meta.briefId), text: { type: 'plain_text', text: '✅ Fatura kesildi' } }] },
+      ] }).catch(() => {});
+  }
+  log(`[fatura] #${r.no} tutar ${tutTxt} (fatura=${kesildi}, by ${uid})`);
+});
+
 app.action('bns_feedback_open', async ({ ack, body, client }) => {
   await ack();
   try {

@@ -387,6 +387,12 @@ async function assertCanWriteFinancials(req) {
 }
 
 app.post('/api/briefs', writeGuard, handleWrite(req => writes.createBrief(req.body)));
+// Fatura-takip buton/modal aksiyonu (Slack bot çağırır; yetki writes.faturaAksiyon içinde: lead/açan/yönetici).
+app.post('/api/briefs/:id/fatura-aksiyon', writeGuard, async (req, res) => {
+  try { res.json(await writes.faturaAksiyon(+req.params.id, req.body || {})); }
+  catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
 app.patch('/api/briefs/:id', writeGuard, handleWrite(req => writes.patchBrief(+req.params.id, req.body)));
 app.post('/api/briefs/:id/status', writeGuard, handleWrite(req => writes.setStatus(+req.params.id, req.body)));
 app.post('/api/briefs/:id/financials', writeGuard, handleWrite(async req => { await assertCanWriteFinancials(req); return writes.setFinancials(+req.params.id, req.body); }));

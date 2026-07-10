@@ -90,9 +90,9 @@ async function postBrief({ marka, baslik, no, deadlineMs, dept, akis, leadName, 
 }
 
 // Brief'in Slack thread'ine yanıt (b2 — değişiklikler işin thread'inde devam eder).
-async function postThread({ channel, thread_ts, text }) {
+async function postThread({ channel, thread_ts, text, blocks }) {
   if (!hasToken() || !channel || !thread_ts) return { ok: false, skipped: true };
-  const res = await slackCall("chat.postMessage", { channel, thread_ts, text, username: BOT_NAME, unfurl_links: false });
+  const res = await slackCall("chat.postMessage", { channel, thread_ts, text, username: BOT_NAME, unfurl_links: false, ...(blocks ? { blocks } : {}) });
   return res.ok ? { ok: true, ts: res.ts } : { ok: false, error: res.error };
 }
 

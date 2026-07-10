@@ -595,19 +595,34 @@ async function setStatus(id, raw, _depth = 0) {
     note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin uzat\` yaz (bekleme kadar uzatır) ya da \`termin 15.06 17:00\` ile tarih ver; bu uzatma **gecikme sayılmaz**. (Dashboard'da da tek tıkla var.)`;
   }
   await reflectChange(id, note, d.source, { by: d.by });
-  // Finans dürtüsü: tamamlanan EK işte maliyet+satış boşsa thread'e hatırlat (best-effort).
-  // fatura-v2: retainer kapsamındaki işler ayrıca faturalanmaz → dürtü SUSAR.
+  // Fatura-takip kartı: tamamlanan EK işte eksik (satış yok / fatura yok) → thread'e butonlu kart.
+  // Eski "finans dürtüsü" DM'inin yerine geçer. Reopen'da kart geçersiz kılınır (else dalı).
   if (d.durum === 'tamamlandi') {
     try {
       const fb = (await pool.query(
-        `SELECT b.no, b.maliyet, b.satis, b.ucret_tipi, br.aylik_ucret, b.slack_channel, b.slack_ts
+        `SELECT b.no, b.satis, b.fatura, b.ucret_tipi, br.aylik_ucret, b.slack_channel, b.slack_ts
          FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id WHERE b.id=$1`, [id])).rows[0];
       const ekIs = fb && (fb.ucret_tipi === 'ek' || (fb.ucret_tipi == null && fb.aylik_ucret == null));
-      if (ekIs && fb.maliyet == null && fb.satis == null) {
-        await slack.postThread({ channel: fb.slack_channel, thread_ts: fb.slack_ts,
-          text: `💰 #${fb.no} tamamlandı — maliyet/satış girilmedi (ek iş). Dashboard → iş → Finans, ya da \`/maliyet ${fb.no}\`` });
+      const tutarVar = fb && fb.satis != null;
+      if (ekIs && (!tutarVar || !fb.fatura)) {
+        const text = tutarVar
+          ? `➕ #${fb.no} ek iş (*${Number(fb.satis).toLocaleString('tr-TR')}₺*) tamamlandı — fatura kesildi mi?`
+          : `➕ #${fb.no} ek iş tamamlandı — *satış tutarı girilmedi*. Tutar girilmeden fatura takibi başlayamaz.`;
+        const blocks = [
+          { type: 'section', text: { type: 'mrkdwn', text } },
+          { type: 'actions', elements: [tutarVar
+            ? { type: 'button', style: 'primary', action_id: 'bns_fatura_kesildi', value: String(id), text: { type: 'plain_text', text: '✅ Fatura kesildi' } }
+            : { type: 'button', style: 'primary', action_id: 'bns_fatura_tutar', value: String(id), text: { type: 'plain_text', text: '💰 Tutarı gir' } }] },
+          { type: 'context', elements: [{ type: 'mrkdwn', text: "Yetki: lead · işi açan · yönetici — eksik kapanana dek 24s/72s/1hf DM + her ayın 25'i toplu liste." }] },
+        ];
+        const r = await slack.postThread({ channel: fb.slack_channel, thread_ts: fb.slack_ts, text, blocks });
+        if (r && r.ts) await pool.query('UPDATE briefs SET fatura_kart_ts=$1, fatura_hatirlatma_asama=0 WHERE id=$2', [r.ts, id]);
       }
-    } catch (e) { console.error('[setStatus] finans dürtüsü:', e.message); }
+    } catch (e) { console.error('[setStatus] fatura kartı:', e.message); }
+  } else {
+    // Tamamlandı-dışına her geçiş (reopen dahil): varsa kartı/zinciri sıfırla — iş yeniden açıldı.
+    pool.query('UPDATE briefs SET fatura_kart_ts=NULL, fatura_hatirlatma_asama=0 WHERE id=$1 AND fatura_kart_ts IS NOT NULL', [id])
+      .catch(() => {});
   }
   // Dashboard çanı: işe dönüş hatırlatıcısını atananlara da düşür (brief açmadan görsün).
   if (resumeMs != null) {
@@ -1039,4 +1054,37 @@ async function applyTerminOneri(id, by, source) {
   return { ok: true, yeni_deadline: yeni };
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, setBrandRetainer, upsertMarkaFaturaAy, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR };
+// ── Fatura-takip aksiyonları (Slack butonları arkası; yetki SUNUCUDA: lead/açan/yönetici) ──
+async function faturaYetkiliMi(id, uid) {
+  if (!uid) return false;
+  const r = await pool.query(
+    `SELECT 1 FROM briefs b WHERE b.id=$1 AND (
+       b.created_by=$2
+       OR EXISTS (SELECT 1 FROM brief_assignees a WHERE a.brief_id=b.id AND a.user_id=$2 AND a.role='lead')
+       OR EXISTS (SELECT 1 FROM users u WHERE u.id=$2 AND (u.rol='yonetici' OR u.yetki='yonetici')))`, [id, uid]);
+  return !!r.rows.length;
+}
+// raw: {by, satis?, maliyet?, fatura?} — satis verilirse >0 zorunlu. Dönen satırla bot kartı günceller.
+async function faturaAksiyon(id, raw) {
+  const by = raw && raw.by;
+  if (!(await faturaYetkiliMi(id, by))) { const e = new Error('bu işlemi yalnız lead, işi açan ya da yönetici yapabilir'); e.status = 403; throw e; }
+  const sets = [], vals = [];
+  const put = (c, v) => { vals.push(v); sets.push(`${c}=$${vals.length}`); };
+  if (raw.satis !== undefined) {
+    const n = Number(raw.satis);
+    if (!Number.isFinite(n) || n <= 0) { const e = new Error('geçerli bir satış tutarı gir'); e.status = 400; throw e; }
+    put('satis', n);
+  }
+  if (raw.maliyet !== undefined && raw.maliyet !== null && raw.maliyet !== '') {
+    const m = Number(raw.maliyet);
+    if (Number.isFinite(m) && m >= 0) put('maliyet', m);
+  }
+  if (raw.fatura !== undefined) put('fatura', !!raw.fatura);
+  if (!sets.length) { const e = new Error('alan yok'); e.status = 400; throw e; }
+  vals.push(id);
+  const r = await pool.query(`UPDATE briefs SET ${sets.join(',')} WHERE id=$${vals.length} RETURNING no, satis, fatura, slack_channel, slack_ts, fatura_kart_ts`, vals);
+  if (!r.rows[0]) { const e = new Error('brief bulunamadı'); e.status = 404; throw e; }
+  return r.rows[0];
+}
+
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, setBrandRetainer, upsertMarkaFaturaAy, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR, faturaAksiyon };
