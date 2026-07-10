@@ -1140,8 +1140,8 @@ function ChatBot({ currentUser, dateRange }) {
         const shell = isM
           ? { position: "fixed", inset: 0, width: "100vw", height: "100dvh", borderRadius: 0, border: "none" }
           : { position: "fixed", left: _x, top: _y, width: _w, height: _h, maxWidth: "calc(100vw - 16px)", maxHeight: "calc(100vh - 16px)",
-              borderRadius: 18, border: "1px solid color-mix(in srgb, var(--ody) 28%, var(--line-strong))",
-              boxShadow: "0 28px 70px -22px rgba(0,0,0,.4), 0 6px 20px -6px rgba(0,0,0,.15), 0 0 0 4px color-mix(in srgb, var(--ody) 7%, transparent)",
+              borderRadius: 26, border: "1px solid color-mix(in srgb, var(--ink) 12%, transparent)",
+              boxShadow: "0 32px 80px -24px rgba(0,0,0,.45), 0 2px 12px rgba(0,0,0,.10), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent)",
               animation: "bn-slide-up 240ms var(--ease-out-quart)" };
         const sel = notifItems.find(n => n.id === selId) || null;
         const showList = isM ? !sel : true;
@@ -1159,11 +1159,19 @@ function ChatBot({ currentUser, dateRange }) {
           </button>
         );
         return (
-        <div style={Object.assign({ zIndex: 90, background: "var(--surface)", boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden" }, shell)}>
+        <div style={Object.assign({ zIndex: 90,
+          background: "color-mix(in srgb, var(--surface) 76%, transparent)",
+          backdropFilter: "blur(26px) saturate(1.5)", WebkitBackdropFilter: "blur(26px) saturate(1.5)",
+          boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }, shell)}>
+          {/* dekoratif ody ışıması — cam yüzeyin altında yumuşak renk */}
+          <div aria-hidden style={{ position: "absolute", top: -70, right: -50, width: 240, height: 240, borderRadius: "50%", pointerEvents: "none",
+            background: "radial-gradient(circle, color-mix(in srgb, var(--ody) 30%, transparent) 0%, transparent 68%)", filter: "blur(30px)", opacity: .8 }}/>
+          <div aria-hidden style={{ position: "absolute", bottom: -80, left: -60, width: 260, height: 260, borderRadius: "50%", pointerEvents: "none",
+            background: "radial-gradient(circle, color-mix(in srgb, var(--blue, #24479E) 18%, transparent) 0%, transparent 68%)", filter: "blur(34px)", opacity: .55 }}/>
           {/* Başlık — Ody + segment + kapat (sürüklenebilir; mobilde sabit) */}
           <div onPointerDown={isM ? undefined : startPanelDrag} title={isM ? undefined : "Sürükleyerek taşı"}
-            style={{ padding: "13px 16px", borderBottom: "1px solid var(--line-strong)", display: "flex", alignItems: "center", gap: 11, cursor: isM ? "default" : "grab", touchAction: "none", userSelect: "none",
-              background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 9%, var(--paper)) 0%, var(--paper) 100%)", flex: "none" }}>
+            style={{ padding: "13px 16px", display: "flex", alignItems: "center", gap: 11, cursor: isM ? "default" : "grab", touchAction: "none", userSelect: "none",
+              background: "transparent", borderBottom: "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", position: "relative", zIndex: 1, flex: "none" }}>
             <span style={{ position: "relative", width: 34, height: 34, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)", display: "flex", alignItems: "center", justifyContent: "center",
               boxShadow: "0 2px 8px -2px color-mix(in srgb, var(--ody) 55%, transparent), 0 0 0 3px color-mix(in srgb, var(--ody) 14%, transparent)" }}>
               <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
@@ -1182,10 +1190,10 @@ function ChatBot({ currentUser, dateRange }) {
 
           {/* GÖVDE */}
           {tab === "notif" ? (
-            <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
+            <div style={{ flex: 1, display: "flex", minHeight: 0, position: "relative", zIndex: 1 }}>
               {/* SOL — bildirim listesi */}
               {showList && (
-                <div style={{ width: isM ? "100%" : 312, flex: isM ? 1 : "none", borderRight: isM ? "none" : "1px solid var(--line-strong)", display: "flex", flexDirection: "column", minHeight: 0, background: "var(--paper)" }}>
+                <div style={{ width: isM ? "100%" : 312, flex: isM ? 1 : "none", borderRight: isM ? "none" : "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", flexDirection: "column", minHeight: 0, background: "color-mix(in srgb, var(--paper) 45%, transparent)", position: "relative", zIndex: 1 }}>
                   <div style={{ display: "flex", gap: 6, padding: 12, borderBottom: "1px solid var(--line)", flex: "none" }}>
                     {[["all", "Tümü"], ["unread", "Okunmamış"]].map(([k, lbl]) => (
                       <button key={k} onClick={() => setNotifFilter(k)} style={{
@@ -1232,7 +1240,7 @@ function ChatBot({ currentUser, dateRange }) {
               )}
               {/* SAĞ — detay */}
               {showDetail && (
-                <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "var(--surface)" }}>
+                <div style={{ flex: 1, overflowY: "auto", minHeight: 0, background: "transparent", position: "relative", zIndex: 1 }}>
                   {!sel ? (
                     <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, font: "400 13px var(--font-sans)", color: "var(--ink-4)", textAlign: "center" }}>Soldan bir bildirim seç.</div>
                   ) : (() => {
@@ -1326,7 +1334,7 @@ function ChatBot({ currentUser, dateRange }) {
             </div>
           ) : (
             /* SOHBET sekmesi */
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, position: "relative", zIndex: 1 }}>
               <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 12px", display: "flex", flexDirection: "column", gap: 14, minHeight: 0 }}>
                 {brief && (
                   <div style={{ border: "1px solid var(--line)", borderLeft: "3px solid var(--ody)", background: "var(--paper-2)", padding: "11px 13px", flex: "none" }}>
@@ -1364,7 +1372,7 @@ function ChatBot({ currentUser, dateRange }) {
                 {msgs.length > 0 && <button onClick={() => setMsgs([])} style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>sohbeti temizle</button>}
                 <OdySesDugmesi/>
               </div>
-              <div style={{ padding: 12, borderTop: "1px solid var(--line-strong)", display: "flex", gap: 9, background: "var(--paper)", flex: "none" }}>
+              <div style={{ padding: 12, borderTop: "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", gap: 9, background: "color-mix(in srgb, var(--paper) 40%, transparent)", flex: "none", position: "relative", zIndex: 1 }}>
                 <input value={input} onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") send(); }}
                   placeholder="Soru yaz…" disabled={busy}

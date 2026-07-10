@@ -414,35 +414,48 @@ function V2ArsivTrend({ scope, baslik }) {
     })();
     return () => { iptal = true; };
   }, [scope]);
-  if (rows == null) return null; // yükleniyor — sessiz
+  if (rows == null) return null;
   const gunler = {};
   rows.forEach(r => {
     const g = (typeof bnsGunKey === "function") ? bnsGunKey(Date.parse(r.ts)) : String(r.ts).slice(0, 10);
     (gunler[g] = gunler[g] || []).push(r.pct);
   });
   const seri = Object.keys(gunler).sort().map(g => ({
-    gun: g, pct: Math.round(gunler[g].reduce((a, x) => a + x, 0) / gunler[g].length) }));
+    gun: g, pct: Math.round(gunler[g].reduce((a, x) => a + x, 0) / gunler[g].length) })).slice(-30);
   const az = seri.length < 3;
+  const son = seri.length ? seri[seri.length - 1].pct : null;
+  const min = seri.length ? Math.min(...seri.map(x => x.pct)) : 0;
+  const max = seri.length ? Math.max(...seri.map(x => x.pct)) : 0;
+  const renk = (p) => p >= 120 ? "var(--prio-red)" : p >= 100 ? "var(--prio-orange)" : "var(--ok, #2E8F66)";
+  // Kompakt tek satır: başlık · sparkline · güncel değer. (Eski çubuk grafik çok yer kaplıyordu.)
+  const W = 200, Hh = 30, tavan = Math.max(130, max + 10);
+  const pt = (x, i) => `${(i / Math.max(1, seri.length - 1)) * W},${Hh - (x.pct / tavan) * Hh}`;
+  const cizgi = seri.map(pt).join(" ");
   return (
-    <Card style={{padding: 14, marginBottom: "var(--grid-gap)"}}>
-      <div style={{font:"600 12px/1 var(--font-sans)", marginBottom: 8}}>
-        {baslik || "📈 Doluluk trendi"} <span style={{font:"400 10px var(--font-sans)", color:"var(--ink-4)"}}>· saatlik arşivden gün ortalaması · son 30 gün</span>
-      </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 14px", marginBottom: "var(--grid-gap)",
+      border: "1px solid var(--line)", borderRadius: 10, background: "var(--paper)", flexWrap: "wrap" }}>
+      <span style={{ font: "600 11px/1 var(--font-sans)", color: "var(--ink-3)", flexShrink: 0 }}>{baslik || "Doluluk trendi"}</span>
       {az ? (
-        <div style={{font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}>
-          Veri birikiyor{seri.length ? ` (şimdilik ${seri.length} gün: ${seri.map(x => "%" + x.pct).join(", ")})` : ""} — birkaç gün içinde trend burada çizilecek.
-        </div>
+        <span style={{ font: "400 11px/1.4 var(--font-sans)", color: "var(--ink-4)" }}>
+          veri birikiyor{seri.length ? ` (${seri.length} gün)` : ""}</span>
       ) : (
-        <div style={{display:"flex", gap: 3, alignItems:"flex-end", height: 52}}>
-          {seri.slice(-30).map(x => (
-            <div key={x.gun} title={`${x.gun} · %${x.pct}`}
-              style={{flex: 1, minWidth: 3, borderRadius: 2,
-                height: Math.max(3, Math.min(52, Math.round(x.pct / 150 * 52))),
-                background: x.pct >= 120 ? "var(--prio-red)" : x.pct >= 100 ? "var(--prio-orange)" : "var(--prio-green)"}}/>
-          ))}
-        </div>
+        <React.Fragment>
+          <svg viewBox={`0 0 ${W} ${Hh}`} preserveAspectRatio="none"
+            style={{ flex: 1, minWidth: 120, height: Hh, display: "block", opacity: .95 }}>
+            {/* %100 eşik çizgisi */}
+            <line x1="0" x2={W} y1={Hh - (100 / tavan) * Hh} y2={Hh - (100 / tavan) * Hh}
+              stroke="var(--line-strong)" strokeWidth="1" strokeDasharray="3 4" vectorEffect="non-scaling-stroke"/>
+            <polyline points={`0,${Hh} ${cizgi} ${W},${Hh}`} fill={renk(son)} opacity="0.10" stroke="none"/>
+            <polyline points={cizgi} fill="none" stroke={renk(son)} strokeWidth="1.8"
+              strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
+            <circle cx={W} cy={Hh - (son / tavan) * Hh} r="2.6" fill={renk(son)}/>
+          </svg>
+          <span title={`son 30 gün · en düşük %${min} · en yüksek %${max}`}
+            style={{ font: "600 12px/1 var(--font-mono)", color: renk(son), flexShrink: 0 }}>%{son}</span>
+          <span style={{ font: "400 10px/1 var(--font-sans)", color: "var(--ink-4)", flexShrink: 0 }}>%{min}–%{max} · 30g</span>
+        </React.Fragment>
       )}
-    </Card>
+    </div>
   );
 }
 window.V2ArsivTrend = V2ArsivTrend;

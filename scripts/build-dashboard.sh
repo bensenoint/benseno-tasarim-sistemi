@@ -25,6 +25,7 @@ cat \
   "$APP/screens/Musteride.jsx" \
   "$APP/screens/Completed.jsx" \
   "$APP/screens/DeptCompare.jsx" \
+  "$APP/screens/IsTipleri.jsx" \
   "$APP/screens/Department.jsx" \
   "$APP/screens/History.jsx" \
   "$APP/screens/Gallery.jsx" \
