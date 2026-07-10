@@ -294,7 +294,7 @@ async function getEmbedded({ sensitive = true } = {}) {
   // fatura-v2: son 3 ayın retainer kayıtları — yalnız sensitive (SEC-5: finans login-arkası).
   let bns_tatiller = [];
   try {
-    const tt = await pool.query(`SELECT to_char(gun,'YYYY-MM-DD') AS gun, ad, yarim FROM tatiller ORDER BY gun`);
+    const tt = await pool.query(`SELECT to_char(gun,'YYYY-MM-DD') AS gun, ad, yarim, tur FROM tatiller ORDER BY gun`);
     bns_tatiller = tt.rows;
   } catch (e) { /* migration öncesi sessiz */ }
 

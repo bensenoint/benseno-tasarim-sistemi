@@ -376,5 +376,27 @@ t('tatil: yarım gün mesai 3sa', C.bnsMesaiSaatKes(TT('2026-10-28T10:00'), TT('
 C.bnsTatilYukle([]);
 t('tatil: yük boşaltınca normal', C.bnsIsGunuMu('2026-10-29'), true);
 
+
+// ── Evden çalışma: iş günü matematiğini etkilemez; saat bölme kovaları ──
+C.bnsTatilYukle([
+  { gun: '2026-07-10', ad: 'Evden', yarim: false, tur: 'evden' },   // Cuma — evden
+  { gun: '2026-07-09', ad: 'Tatil', yarim: false, tur: 'tatil' },   // Perşembe — tam tatil
+]);
+t('evden: iş günü kalır', C.bnsIsGunuMu('2026-07-10'), true);
+t('evden: bnsEvdenGunMu', C.bnsEvdenGunMu('2026-07-10'), true);
+t('evden: normal gün evden değil', C.bnsEvdenGunMu('2026-07-08'), false);
+// bölme: Çar 10-12 ofis (2sa) + Cum 10-13 evden (3sa); Per tatil sayılmaz
+const EB = C.bnsMesaiSaatKesBolu(Date.parse('2026-07-08T10:00:00+03:00'), Date.parse('2026-07-10T13:00:00+03:00'));
+t('evden: ofis kovası 9sa', EB.ofis, 9);    // Çar 10:00-19:00; Per tam tatil sayılmaz
+t('evden: evden kovası', EB.evden, 4);      // Cum 09-13 = 4sa evden
+// toplam tutarlılığı: bnsNetIsSaatiBolu toplamı = bnsNetIsSaati
+const olay = [
+  { ts: Date.parse('2026-07-08T10:00:00+03:00'), durum: 'basladi' },
+  { ts: Date.parse('2026-07-10T13:00:00+03:00'), durum: 'tamamlandi' },
+];
+const NB = C.bnsNetIsSaatiBolu(olay);
+t('evden: bölü toplam = net', Math.round((NB.evden + NB.ofis) * 10) / 10, C.bnsNetIsSaati(olay));
+C.bnsTatilYukle([]);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);

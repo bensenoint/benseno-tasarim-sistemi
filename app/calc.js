@@ -457,12 +457,14 @@ var BNS_TR_OFF = 3 * BNS_H, BNS_GUN_MS = 24 * BNS_H;
 // ── Tatil takvimi (spec: 2026-07-10-tatil-takvimi) ──
 // gün-no → katsayı: 0 = tam tatil (çalışılmaz) · 0.5 = yarım gün. Kayıt yoksa normal gün.
 // bnsTatilYukle embedded bns_tatiller ile beslenir (dashboard hydrate + script'ler + ody-tools kopyası).
-var BNS_TATIL = {}, BNS_TATIL_VER = 0;
+var BNS_TATIL = {}, BNS_EVDEN = {}, BNS_TATIL_VER = 0;
 function bnsTatilYukle(liste) {
-  BNS_TATIL = {}; BNS_TATIL_VER++;
+  BNS_TATIL = {}; BNS_EVDEN = {}; BNS_TATIL_VER++;
   (liste || []).forEach(function (t) {
     if (!t || !t.gun) return;
-    BNS_TATIL[bnsGunFromKey(String(t.gun).slice(0, 10))] = t.yarim ? 0.5 : 0;
+    var day = bnsGunFromKey(String(t.gun).slice(0, 10));
+    if (t.tur === 'evden') { BNS_EVDEN[day] = 1; return; }   // evden: normal iş günü, yalnız kayıt
+    BNS_TATIL[day] = t.yarim ? 0.5 : 0;
   });
   _bnsV2Cache = {}; _bnsV2CacheN = 0;   // yayılım önbelleği tatile duyarlı — boşalt
 }
@@ -472,6 +474,42 @@ function bnsGunKatsayi(day) {
   if (w === 6 || w === 0) return 0;
   var t = BNS_TATIL[day];
   return t === undefined ? 1 : t;
+}
+// Firma geneli evden çalışma günü mü? (raporlama; iş günü matematiğini etkilemez)
+function bnsEvdenGunMu(gunKey) { return BNS_EVDEN[bnsGunFromKey(gunKey)] === 1; }
+// Mesai kesişimini evden/ofis kovalarına böler — evden-vs-ofis verim raporlarının temeli.
+function bnsMesaiSaatKesBolu(t1, t2) {
+  var out = { evden: 0, ofis: 0 };
+  if (!(t2 > t1)) return out;
+  for (var g = bnsEpochGun(t1); g <= bnsEpochGun(t2); g++) {
+    var kat = bnsGunKatsayi(g);
+    if (kat === 0) continue;
+    var bit = kat === 0.5 ? 13 : BNS_MESAI_BIT;
+    var gun0 = g * BNS_GUN_MS - BNS_TR_OFF;
+    var a = Math.max(t1, gun0 + BNS_MESAI_BAS * BNS_H);
+    var b = Math.min(t2, gun0 + bit * BNS_H);
+    if (b > a) out[BNS_EVDEN[g] === 1 ? 'evden' : 'ofis'] += (b - a) / BNS_H;
+  }
+  return out;
+}
+// bnsNetIsSaati'nin kovalı ikizi: aynı çalışma dilimleri, evden/ofis ayrımıyla. basladi yoksa null.
+function bnsNetIsSaatiBolu(olaylar) {
+  var ol = (olaylar || []).filter(function (o) { return o && o.ts && o.durum; })
+    .sort(function (a, b) { return a.ts - b.ts; });
+  var basIdx = -1;
+  for (var i = 0; i < ol.length; i++) if (ol[i].durum === 'basladi') { basIdx = i; break; }
+  if (basIdx < 0) return null;
+  var top = { evden: 0, ofis: 0 }, calisiyor = true, t0 = ol[basIdx].ts;
+  for (var j = basIdx + 1; j < ol.length; j++) {
+    var d = ol[j].durum;
+    var duran = BNS_V2_DURAN[d] === 1, bitti = d === 'tamamlandi';
+    if (calisiyor && (duran || bitti)) {
+      var k = bnsMesaiSaatKesBolu(t0, ol[j].ts);
+      top.evden += k.evden; top.ofis += k.ofis; calisiyor = false;
+    } else if (!calisiyor && !duran && !bitti) { t0 = ol[j].ts; calisiyor = true; }
+    if (bitti) return top;
+  }
+  return null;
 }
 function bnsEpochGun(ms) { return Math.floor((ms + BNS_TR_OFF) / BNS_GUN_MS); }   // İstanbul gün no
 function bnsGunFromKey(k) { return bnsEpochGun(Date.parse(k + 'T12:00:00+03:00')); }
@@ -683,5 +721,5 @@ function bnsFaturaTopluGunu(nowMs) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes, bnsFaturaEksikleri, bnsFaturaTopluGunu, bnsTatilYukle, bnsGunKatsayi };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes, bnsFaturaEksikleri, bnsFaturaTopluGunu, bnsTatilYukle, bnsGunKatsayi, bnsEvdenGunMu, bnsMesaiSaatKesBolu, bnsNetIsSaatiBolu };
 }
