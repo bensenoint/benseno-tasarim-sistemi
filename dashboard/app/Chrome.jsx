@@ -100,6 +100,71 @@ const NAV_ICONS = {
 
 // Metin içindeki http(s) linklerini tıklanabilir yapar — özet/insight/not/sohbet gibi
 // tüm serbest-metin alanlarında kullanılır. (Fonksiyon bildirimi: bundle genelinde erişilebilir.)
+// ── Ody mesaj biçimlendirici — mini markdown (kalın/kod/madde/başlık/tablo) ──
+// Ody yanıtları **kalın**, `kod`, madde imleri ve | tablo | içerir; düz basmak okumayı zorlaştırıyordu.
+function odyInline(text) {
+  const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
+  return parts.map((pp, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(pp)) return <strong key={i} style={{ fontWeight: 600, color: "var(--ink)" }}>{pp.slice(2, -2)}</strong>;
+    if (/^`[^`]+`$/.test(pp)) return <code key={i} style={{ font: "500 12px var(--font-mono)", background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 4, padding: "1px 5px" }}>{pp.slice(1, -1)}</code>;
+    return <Linkify key={i} text={pp}/>;
+  });
+}
+function OdyMesajMetni({ text }) {
+  const lines = String(text || '').split('\n');
+  const blocks = [];
+  let i = 0;
+  const MADDE = /^\s*([•▪◦\-\*]|\d+[\.)])\s+/;
+  while (i < lines.length) {
+    const l = lines[i];
+    if (/^\s*\|.*\|\s*$/.test(l)) {
+      const rows = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { rows.push(lines[i]); i++; }
+      const parsed = rows.map(r => r.replace(/^\s*\||\|\s*$/g, '').split('|').map(c => c.trim()))
+        .filter(r => !r.every(c => /^:?-{2,}:?$/.test(c)));
+      if (parsed.length) blocks.push({ t: 'table', rows: parsed });
+      continue;
+    }
+    if (MADDE.test(l)) {
+      const items = [];
+      while (i < lines.length && MADDE.test(lines[i])) { items.push(lines[i].replace(MADDE, '')); i++; }
+      blocks.push({ t: 'ul', items });
+      continue;
+    }
+    if (/^#{1,3}\s+/.test(l)) { blocks.push({ t: 'h', text: l.replace(/^#{1,3}\s+/, '') }); i++; continue; }
+    if (!l.trim()) { i++; continue; }
+    const para = [l]; i++;
+    while (i < lines.length && lines[i].trim() && !MADDE.test(lines[i]) && !/^\s*\||^#{1,3}\s/.test(lines[i])) { para.push(lines[i]); i++; }
+    blocks.push({ t: 'p', text: para.join('\n') });
+  }
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {blocks.map((b, k) => {
+        if (b.t === 'h') return <div key={k} style={{ font: "600 13px/1.3 var(--font-sans)", color: "var(--ink)", marginTop: k ? 4 : 0 }}>{odyInline(b.text)}</div>;
+        if (b.t === 'ul') return (
+          <div key={k} style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            {b.items.map((it, j) => (
+              <div key={j} style={{ display: "flex", gap: 8 }}>
+                <span style={{ color: "var(--ody)", flexShrink: 0, lineHeight: "1.6" }}>•</span>
+                <span style={{ font: "400 13px/1.6 var(--font-sans)" }}>{odyInline(it)}</span>
+              </div>))}
+          </div>);
+        if (b.t === 'table') {
+          const [head, ...body] = b.rows;
+          return (
+            <div key={k} style={{ overflowX: "auto", border: "1px solid var(--line)", borderRadius: 8 }}>
+              <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 220 }}>
+                <thead><tr>{head.map((c, j) => <th key={j} style={{ font: "600 10px/1.2 var(--font-sans)", textTransform: "uppercase", letterSpacing: ".04em", color: "var(--ink-4)", textAlign: "left", padding: "7px 10px", borderBottom: "1px solid var(--line)", background: "var(--paper-2)" }}>{odyInline(c)}</th>)}</tr></thead>
+                <tbody>{body.map((r, ri) => <tr key={ri}>{r.map((c, j) => <td key={j} style={{ font: "400 12.5px/1.4 var(--font-sans)", padding: "6px 10px", borderTop: ri ? "1px solid var(--paper-2)" : 0 }}>{odyInline(c)}</td>)}</tr>)}</tbody>
+              </table>
+            </div>);
+        }
+        return <div key={k} style={{ font: "400 13px/1.6 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{odyInline(b.text)}</div>;
+      })}
+    </div>
+  );
+}
+
 function Linkify({ text }) {
   if (text == null) return null;
   const parts = String(text).split(/(https?:\/\/[^\s<>"')\]]+)/g);
@@ -1253,7 +1318,7 @@ function ChatBot({ currentUser, dateRange }) {
           ) : (
             /* SOHBET sekmesi */
             <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
-              <div style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 10, minHeight: 0 }}>
+              <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 12px", display: "flex", flexDirection: "column", gap: 14, minHeight: 0 }}>
                 {brief && (
                   <div style={{ border: "1px solid var(--line)", borderLeft: "3px solid var(--ody)", background: "var(--paper-2)", padding: "11px 13px", flex: "none" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
@@ -1264,17 +1329,26 @@ function ChatBot({ currentUser, dateRange }) {
                   </div>
                 )}
                 {!msgs.length && !busy && !brief && <div style={{ margin: "auto", textAlign: "center", font: "400 13px/1.6 var(--font-sans)", color: "var(--ink-4)", maxWidth: 280 }}>Marka, iş veya kişi hakkında soru sor — Ody sistem verisiyle yanıtlar.</div>}
-                {msgs.map((mm, i) => (
+                {msgs.map((mm, i) => mm.role === "user" ? (
                   <div key={i} style={{
-                    alignSelf: mm.role === "user" ? "flex-end" : "stretch", maxWidth: mm.role === "user" ? "85%" : "100%", width: mm.role === "user" ? undefined : "100%",
-                    padding: "10px 13px", borderRadius: 10, boxSizing: "border-box",
-                    background: mm.role === "user" ? "var(--blue, #24479E)" : "var(--paper-2)",
-                    color: mm.role === "user" ? "#fff" : "var(--ink-2)",
-                    border: mm.role === "user" ? 0 : "1px solid var(--line)",
-                    font: "400 13px/1.55 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word",
-                  }}>{mm.role === "assistant" ? <Linkify text={mm.content}/> : mm.content}</div>
+                    alignSelf: "flex-end", maxWidth: "82%",
+                    padding: "9px 14px", borderRadius: "14px 14px 4px 14px", boxSizing: "border-box",
+                    background: "var(--ody)", color: "#fff",
+                    font: "400 13px/1.5 var(--font-sans)", whiteSpace: "pre-wrap", wordBreak: "break-word",
+                    boxShadow: "0 1px 2px rgba(0,0,0,.08)",
+                  }}>{mm.content}</div>
+                ) : (
+                  <div key={i} style={{ width: "100%", boxSizing: "border-box", padding: "2px 0 2px 12px", borderLeft: "2px solid var(--ody)", color: "var(--ink-2)" }}>
+                    {(i === 0 || msgs[i - 1].role !== "assistant") &&
+                      <div style={{ font: "700 9.5px/1 var(--font-sans)", letterSpacing: ".09em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 6, opacity: .85 }}>Ody</div>}
+                    <OdyMesajMetni text={mm.content}/>
+                  </div>
                 ))}
-                {busy && <div style={{ alignSelf: "flex-start", padding: "10px 13px", borderRadius: 10, background: "var(--paper-2)", border: "1px solid var(--line)", color: "var(--ink-4)", font: "400 13px/1 var(--font-sans)" }}>yazıyor…</div>}
+                {busy && (
+                  <div style={{ alignSelf: "flex-start", display: "flex", gap: 4, alignItems: "center", padding: "6px 2px 6px 12px", borderLeft: "2px solid var(--ody)" }}>
+                    {[0, 1, 2].map(d => <span key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--ink-4)", display: "inline-block", animation: "odyBounce .9s ease-in-out infinite", animationDelay: (d * 0.15) + "s" }}/>)}
+                  </div>
+                )}
                 <div ref={endRef}/>
               </div>
               <div style={{ padding: "0 16px 10px", flex: "none", display: "flex", gap: 14, alignItems: "center" }}>
