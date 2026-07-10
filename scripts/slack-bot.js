@@ -589,6 +589,68 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
 // Sorun/öneri bildirimleri bu kişilere DM olarak düşer.
 const FEEDBACK_ADMINS = ['U030C48PL23', 'UD96GH76E'];   // Görkem, Reyhan
 
+// ── WIP=1: durum yazıcı — basladi'da çakışma (409) olursa thread'e onay kartı ──
+// Diğer durumlar/başarısızlıklar eski dbWrite yolundan (kuyruk semantiği) akar.
+async function wipStatusYaz(briefTs, kanal, body) {
+  if (body.durum !== 'basladi') { dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, body); return; }
+  const r = await sendWriteRaw('POST', `/api/briefs/by-ts/${briefTs}/status`, body);
+  if (r.status === 409 && r.json && r.json.cakisma) {
+    const c = r.json.cakisma;
+    try {
+      await app.client.chat.postMessage({
+        channel: kanal, thread_ts: briefTs, username: BOT_NAME,
+        text: `⚠️ <@${body.by}> şu an #${c.no} üzerinde çalışıyorsun — bu işe başlarsan #${c.no} beklemeye alınacak.`,
+        blocks: [
+          { type: 'section', text: { type: 'mrkdwn',
+            text: `⚠️ <@${body.by}> şu an *#${c.no} ${c.marka || ''}* işinde çalışıyorsun.\nBu işe başlarsan *#${c.no} beklemeye alınacak* (tek aktif iş kuralı).` } },
+          { type: 'actions', elements: [
+            { type: 'button', style: 'primary', action_id: 'bns_wip_onay',
+              value: JSON.stringify({ ts: briefTs, by: body.by }), text: { type: 'plain_text', text: '✅ Onayla — başla' } },
+            { type: 'button', action_id: 'bns_wip_vazgec',
+              value: JSON.stringify({ by: body.by }), text: { type: 'plain_text', text: '✖ Vazgeç' } },
+          ] },
+        ],
+      });
+    } catch (e) { log(`wip kart hata: ${e.message}`); }
+    return;
+  }
+  if (!r.ok) dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, body);   // kuyruk semantiği korunur
+}
+// sendWrite gövde döndürmüyor — WIP için ham sürüm
+async function sendWriteRaw(method, urlPath, body) {
+  try {
+    const r = await fetch(`${API_BASE}${urlPath}`, {
+      method, headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' }, body: JSON.stringify(body),
+    });
+    return { ok: r.ok, status: r.status, json: await r.json().catch(() => ({})) };
+  } catch (e) { return { ok: false, status: 0, json: {} }; }
+}
+app.action('bns_wip_onay', async ({ ack, body, client, action }) => {
+  await ack();
+  let v = {}; try { v = JSON.parse(action.value || '{}'); } catch {}
+  const uid = body.user?.id;
+  if (uid !== v.by) {
+    try { await client.chat.postMessage({ channel: uid, text: '⛔ Bu onay yalnız 🚀 koyan kişiye ait.', username: BOT_NAME }); } catch {}
+    return;
+  }
+  const r = await sendWriteRaw('POST', `/api/briefs/by-ts/${v.ts}/status`, { durum: 'basladi', by: uid, source: 'slack', zorla: true });
+  const metin = r.ok
+    ? `✅ Başladın — önceki işin beklemeye alındı (tek aktif iş).`
+    : `❌ Uygulanamadı: ${r.json.error || r.status}`;
+  try { await client.chat.update({ channel: body.channel?.id, ts: body.message?.ts, text: metin,
+    blocks: [{ type: 'section', text: { type: 'mrkdwn', text: metin } }] }); } catch {}
+  log(`[wip] onay ${v.ts} by ${uid} → ${r.status}`);
+});
+app.action('bns_wip_vazgec', async ({ ack, body, client, action }) => {
+  await ack();
+  let v = {}; try { v = JSON.parse(action.value || '{}'); } catch {}
+  const uid = body.user?.id;
+  if (uid !== v.by) return;
+  try { await client.chat.update({ channel: body.channel?.id, ts: body.message?.ts,
+    text: '✖ Vazgeçildi — mevcut işinde devam ediyorsun.',
+    blocks: [{ type: 'section', text: { type: 'mrkdwn', text: '✖ Vazgeçildi — mevcut işinde devam ediyorsun.' } }] }); } catch {}
+});
+
 // ── Fatura-takip butonları — yetki SUNUCUDA (fatura-aksiyon 403 → kibar uyarı) ──
 async function faturaAksiyonCagir(briefId, body) {
   const r = await fetch(`${API_BASE}/api/briefs/${briefId}/fatura-aksiyon`, {
@@ -1112,7 +1174,7 @@ app.event('reaction_added', async ({ event, client }) => {
     const saat = new Date().toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
     log(`durum reaction: :${reactionBase}: → ${durum} @ ${briefTs} — ${event.user}`);
     // DB: emoji → durum kodu (reflectChange thread onayını düşürür).
-    dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum, by: event.user, source: 'slack' });
+    wipStatusYaz(briefTs, event.item.channel, { durum, by: event.user, source: 'slack' });
     return;
   }
 
@@ -1423,7 +1485,7 @@ app.event('message', async ({ event, client }) => {
       if (!chk.ok) { await statusYetkiRed(client, event.user, chk, eMatch.durum); return; }
       log(`durum metin-emoji: ${eMatch.emoji} → ${eMatch.durum} | ${briefTs} — ${event.user}`);
       // DB'ye yaz (best-effort). writes.setStatus → reflectChange thread'e onay düşürür.
-      dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: eMatch.durum, by: event.user, source: 'slack' });
+      wipStatusYaz(briefTs, event.channel, { durum: eMatch.durum, by: event.user, source: 'slack' });
       return;
     }
 
@@ -1517,7 +1579,7 @@ app.event('message', async ({ event, client }) => {
         const chk = await statusYetki(event.user, briefTs);
         if (!chk.ok) { await statusYetkiRed(client, event.user, chk, kMatch.value); return; }
         log(`durum keyword: "${kMatch.key}" → ${kMatch.value} | ${briefTs} — ${event.user}`);
-        dbWrite('POST', `/api/briefs/by-ts/${briefTs}/status`, { durum: kMatch.value, by: event.user, source: 'slack', slack_ts: event.event_ts });
+        wipStatusYaz(briefTs, event.channel, { durum: kMatch.value, by: event.user, source: 'slack', slack_ts: event.event_ts });
       } else {
         log(`öncelik keyword: "${kMatch.key}" → ${kMatch.value} | ${briefTs} — ${event.user}`);
         dbWrite('PATCH', `/api/briefs/by-ts/${briefTs}`, { priority: kMatch.value, by: event.user, source: 'slack', slack_ts: event.event_ts });
