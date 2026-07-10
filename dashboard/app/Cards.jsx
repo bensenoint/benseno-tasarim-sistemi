@@ -440,8 +440,9 @@ function V2ArsivTrend({ scope, baslik }) {
           veri birikiyor{seri.length ? ` (${seri.length} gün)` : ""}</span>
       ) : (
         <React.Fragment>
+          <div style={{ flex: 1, minWidth: 120, position: "relative", height: Hh + 12, padding: "6px 0" }}>
           <svg viewBox={`0 0 ${W} ${Hh}`} preserveAspectRatio="none"
-            style={{ flex: 1, minWidth: 120, height: Hh, display: "block", opacity: .95 }}>
+            style={{ width: "100%", height: Hh, display: "block", opacity: .95 }}>
             {/* %100 eşik çizgisi */}
             <line x1="0" x2={W} y1={Hh - (100 / tavan) * Hh} y2={Hh - (100 / tavan) * Hh}
               stroke="var(--line-strong)" strokeWidth="1" strokeDasharray="3 4" vectorEffect="non-scaling-stroke"/>
@@ -449,26 +450,28 @@ function V2ArsivTrend({ scope, baslik }) {
             <polyline points={cizgi} fill="none" stroke={renk(son)} strokeWidth="1.8"
               strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
             <circle cx={W} cy={Hh - (son / tavan) * Hh} r="2.6" fill={renk(son)}/>
-            {(() => {
-              // küçük değer etiketleri: başlangıç, bitiş, min, max (çakışanlar tekilleştirilir)
-              const y = (v) => Hh - (v / tavan) * Hh;
-              const iMin = seri.findIndex(x => x.pct === min), iMax = seri.findIndex(x => x.pct === max);
-              const xAt = (i) => (i / Math.max(1, seri.length - 1)) * W;
-              const anchor = (x) => x < 18 ? "start" : x > W - 18 ? "end" : "middle";
-              const etiketler = [
-                { x: 0, v: seri[0].pct, alt: y(seri[0].pct) < 12 },
-                { x: W, v: son, alt: y(son) < 12 },
-                ...(min !== seri[0].pct && min !== son ? [{ x: xAt(iMin), v: min, alt: false }] : []),
-                ...(max !== seri[0].pct && max !== son && max !== min ? [{ x: xAt(iMax), v: max, alt: true }] : []),
-              ];
-              const seen = new Set();
-              return etiketler.filter(e => { const k = e.v + ":" + Math.round(e.x / 24); if (seen.has(k)) return false; seen.add(k); return true; })
-                .map((e, i) => (
-                  <text key={i} x={e.x} y={e.alt ? Math.min(Hh - 2, y(e.v) + 10) : Math.max(7, y(e.v) - 4)}
-                    textAnchor={anchor(e.x)} style={{ font: "600 7.5px var(--font-mono)", fill: "var(--ink-4)" }}>%{e.v}</text>
-                ));
-            })()}
           </svg>
+          {(() => {
+            // Değer etiketleri HTML katmanında (SVG preserveAspectRatio=none metni yatay eziyordu).
+            const yPct = (v) => (1 - v / tavan) * 100;
+            const iMin = seri.findIndex(x => x.pct === min), iMax = seri.findIndex(x => x.pct === max);
+            const xPct = (i) => (i / Math.max(1, seri.length - 1)) * 100;
+            const ilk = seri[0].pct;
+            const ler = [
+              { x: 0, v: ilk, ust: yPct(ilk) > 40 },
+              { x: 100, v: son, ust: yPct(son) > 40 },
+              ...(min !== ilk && min !== son ? [{ x: xPct(iMin), v: min, ust: false }] : []),
+              ...(max !== ilk && max !== son && max !== min ? [{ x: xPct(iMax), v: max, ust: true }] : []),
+            ];
+            const seen = new Set();
+            return ler.filter(e => { const k = e.v + ":" + Math.round(e.x / 14); if (seen.has(k)) return false; seen.add(k); return true; })
+              .map((e, i) => (
+                <span key={i} style={{ position: "absolute", left: e.x + "%", top: e.ust ? 0 : "auto", bottom: e.ust ? "auto" : 0,
+                  transform: "translateX(" + (e.x < 8 ? "0" : e.x > 92 ? "-100%" : "-50%") + ")",
+                  font: "600 8.5px/1 var(--font-mono)", color: "var(--ink-4)", pointerEvents: "none", whiteSpace: "nowrap" }}>%{e.v}</span>
+              ));
+          })()}
+          </div>
           <span title={`son 30 gün · en düşük %${min} · en yüksek %${max}`}
             style={{ font: "600 12px/1 var(--font-mono)", color: renk(son), flexShrink: 0 }}>%{son}</span>
           <span style={{ font: "400 10px/1 var(--font-sans)", color: "var(--ink-4)", flexShrink: 0 }}>%{min}–%{max} · 30g</span>

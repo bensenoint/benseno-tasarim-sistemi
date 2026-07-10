@@ -1063,8 +1063,11 @@ function ChatBot({ currentUser, dateRange }) {
               left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
               top: Math.max(8, pos.y - 72), width: 248, maxWidth: "calc(100vw - 24px)",
             }),
-            border: "1px solid var(--line)", borderRadius: 12, background: "var(--surface)",
-            boxShadow: "var(--shadow-2)", padding: "9px 12px", cursor: "pointer",
+            border: "1px solid color-mix(in srgb, var(--ink) 12%, transparent)", borderRadius: 14,
+            boxShadow: "0 16px 40px -14px rgba(0,0,0,.35), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent)",
+            background: "color-mix(in srgb, var(--surface) 42%, transparent)",
+            backdropFilter: "blur(14px) saturate(1.6)", WebkitBackdropFilter: "blur(14px) saturate(1.6)",
+            padding: "9px 12px", cursor: "pointer",
             animation: "odyPopIn .3s ease",
           }}>
           <div style={{ font: "700 9px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 5 }}>Ody · yeni bildirim</div>
@@ -1086,8 +1089,11 @@ function ChatBot({ currentUser, dateRange }) {
               left: Math.min(Math.max(8, pos.x), Math.max(8, vw - 256)),
               top: Math.max(8, pos.y - 72), width: 248, maxWidth: "calc(100vw - 24px)",
             }),
-            border: "1px solid var(--ody)", borderRadius: 12, background: "var(--surface)",
-            boxShadow: "var(--shadow-2)", padding: "9px 12px", cursor: "pointer",
+            border: "1px solid color-mix(in srgb, var(--ody) 55%, transparent)", borderRadius: 14,
+            boxShadow: "0 16px 40px -14px rgba(0,0,0,.35), inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent)",
+            background: "color-mix(in srgb, var(--surface) 42%, transparent)",
+            backdropFilter: "blur(14px) saturate(1.6)", WebkitBackdropFilter: "blur(14px) saturate(1.6)",
+            padding: "9px 12px", cursor: "pointer",
             animation: "odyPopIn .3s ease",
           }}>
           <div style={{ font: "700 9px/1 var(--font-sans)", letterSpacing: ".08em", textTransform: "uppercase", color: "var(--ody)", marginBottom: 5, display: "flex", alignItems: "center", gap: 4 }}>💡 Ody'nin önerisi</div>
@@ -1162,8 +1168,8 @@ function ChatBot({ currentUser, dateRange }) {
         );
         return (
         <div style={Object.assign({ zIndex: 90,
-          background: "color-mix(in srgb, var(--surface) 55%, transparent)",
-          backdropFilter: "blur(22px) saturate(1.6)", WebkitBackdropFilter: "blur(22px) saturate(1.6)",
+          background: "color-mix(in srgb, var(--surface) 38%, transparent)",
+          backdropFilter: "blur(16px) saturate(1.7)", WebkitBackdropFilter: "blur(16px) saturate(1.7)",
           boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }, shell)}>
           {/* dekoratif ody ışıması — cam yüzeyin altında yumuşak renk */}
           <div aria-hidden style={{ position: "absolute", top: -70, right: -50, width: 240, height: 240, borderRadius: "50%", pointerEvents: "none",
@@ -1195,7 +1201,7 @@ function ChatBot({ currentUser, dateRange }) {
             <div style={{ flex: 1, display: "flex", minHeight: 0, position: "relative", zIndex: 1 }}>
               {/* SOL — bildirim listesi */}
               {showList && (
-                <div style={{ width: isM ? "100%" : 312, flex: isM ? 1 : "none", borderRight: isM ? "none" : "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", flexDirection: "column", minHeight: 0, background: "color-mix(in srgb, var(--paper) 30%, transparent)", position: "relative", zIndex: 1 }}>
+                <div style={{ width: isM ? "100%" : 312, flex: isM ? 1 : "none", borderRight: isM ? "none" : "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", flexDirection: "column", minHeight: 0, background: "color-mix(in srgb, var(--paper) 18%, transparent)", position: "relative", zIndex: 1 }}>
                   <div style={{ display: "flex", gap: 6, padding: 12, borderBottom: "1px solid var(--line)", flex: "none" }}>
                     {[["all", "Tümü"], ["unread", "Okunmamış"]].map(([k, lbl]) => (
                       <button key={k} onClick={() => setNotifFilter(k)} style={{
@@ -1374,7 +1380,7 @@ function ChatBot({ currentUser, dateRange }) {
                 {msgs.length > 0 && <button onClick={() => setMsgs([])} style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>sohbeti temizle</button>}
                 <OdySesDugmesi/>
               </div>
-              <div style={{ padding: 12, borderTop: "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", gap: 9, background: "color-mix(in srgb, var(--paper) 28%, transparent)", flex: "none", position: "relative", zIndex: 1 }}>
+              <div style={{ padding: 12, borderTop: "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", gap: 9, background: "color-mix(in srgb, var(--paper) 16%, transparent)", flex: "none", position: "relative", zIndex: 1 }}>
                 <input value={input} onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") send(); }}
                   placeholder="Soru yaz…" disabled={busy}

@@ -92,7 +92,7 @@ function IsTipleriScreen({ data, currentUser }) {
   const veribekleyen = tipler.filter(t => !ist[t.kod]);
 
   return (
-    <div style={{ maxWidth: 1020, display: "flex", flexDirection: "column", gap: "var(--grid-gap)" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--grid-gap)" }}>
       <div>
         <div style={{ font: "italic 500 24px/1.15 var(--font-display)", color: "var(--ink)" }}>İş Tipleri</div>
         <div style={{ font: "400 13px/1.4 var(--font-sans)", color: "var(--ink-3)", marginTop: 4 }}>
