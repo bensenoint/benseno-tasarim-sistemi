@@ -111,6 +111,7 @@ async function main() {
   const live = process.env.BNS_REPORT_LIVE === '1';
   const now = Date.now();
   const d = await fetchEmbedded();
+  C.bnsTatilYukle && C.bnsTatilYukle(d.bns_tatiller || []);
 
   const sinyaller = await sinyalleriHesapla(d, now);
 

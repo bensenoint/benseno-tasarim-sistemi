@@ -642,6 +642,8 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
     // SONRAKİ istekte geçerli (ody-tools slack_gonder_onayla reqSeq karşılaştırır).
     const _seqKey = user.slack_id || String(user.id);
     const reqSeq = (chatReqSeq.get(_seqKey) || 0) + 1; chatReqSeq.set(_seqKey, reqSeq);
+    // Tatil takvimi: ody-tools süre kopyaları tatil-bilinçli çalışsın
+    try { odyTools.tatilYukle(ed.bns_tatiller || []); } catch (e) {}
     const ctx = { user, isAdmin, range, ed, reqSeq };
 
     // ── SUNUCU-TARAFI ONAY TESPİTİ (Ody-gönderim) ──────────────────────

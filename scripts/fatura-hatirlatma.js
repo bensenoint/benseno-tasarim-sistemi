@@ -39,6 +39,11 @@ function eksikMetni(b) {
 (async () => {
   const now = Date.now();
   const tok = token();
+  // Tatil takvimi: toplu-gün hesabı (bnsFaturaTopluGunu) tatil-bilinçli çalışsın
+  try {
+    const tt = await pool.query(`SELECT to_char(gun,'YYYY-MM-DD') AS gun, ad, yarim FROM tatiller`);
+    C.bnsTatilYukle(tt.rows);
+  } catch (e) { /* migration öncesi sessiz */ }
   const eksikler = await eksikleriGetir();
   const mgrs = await yoneticiler();
 

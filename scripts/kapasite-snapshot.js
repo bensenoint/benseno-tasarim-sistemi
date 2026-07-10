@@ -16,6 +16,7 @@ const DEPTLER = ['tasarim', 'editor', 'ai', 'freelance'];
 
 async function main() {
   const d = await fetchEmbedded();
+  C.bnsTatilYukle && C.bnsTatilYukle(d.bns_tatiller || []);
   const briefs = d.bns_briefs || [];
   const users = (d.bns_users || []).filter((u) => /^U/.test(u.id || '') && u.active !== false);
   const gun = C.bnsGunKey(Date.now());

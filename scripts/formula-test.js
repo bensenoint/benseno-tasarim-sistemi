@@ -357,5 +357,24 @@ t('fatura: 25 Perş (2026-06)', C.bnsFaturaTopluGunu(TG('2026-06-10')), '2026-06
 t('fatura: 25 Cmt → 24 Cum (2026-07)', C.bnsFaturaTopluGunu(TG('2026-07-10')), '2026-07-24');
 t('fatura: 25 Paz → 23 Cum (2026-10)', C.bnsFaturaTopluGunu(TG('2026-10-05')), '2026-10-23');
 
+
+// ── Tatil takvimi: iş günü matematiği tatil-bilinçli ──
+C.bnsTatilYukle([
+  { gun: '2026-10-29', ad: 'Cumhuriyet', yarim: false },   // Perşembe — tam tatil
+  { gun: '2026-10-28', ad: 'Arefe', yarim: true },          // Çarşamba — yarım
+]);
+t('tatil: tam tatil iş günü değil', C.bnsIsGunuMu('2026-10-29'), false);
+t('tatil: yarım gün İŞ GÜNÜ sayılır', C.bnsIsGunuMu('2026-10-28'), true);
+t('tatil: normal gün etkilenmez', C.bnsIsGunuMu('2026-10-27'), true);
+// kalan iş günü: Salı 27 → Cuma 30 = Sal(1) + Çar(0.5) + Cum(1) = 2.5 (Per tatil atlanır)
+t('tatil: kalan iş günü kesirli', C.bnsKalanIsGunu('2026-10-27', Date.parse('2026-10-30T18:00:00+03:00')), 2.5);
+// mesai: tam tatilde 0; yarım günde 09-13 arası sayılır (10:00→17:00 → 3 saat)
+const TT = (x) => Date.parse(x + '+03:00');
+t('tatil: tam tatil mesai 0', C.bnsMesaiSaatKes(TT('2026-10-29T10:00'), TT('2026-10-29T17:00')), 0);
+t('tatil: yarım gün mesai 3sa', C.bnsMesaiSaatKes(TT('2026-10-28T10:00'), TT('2026-10-28T17:00')), 3);
+// temizle (diğer testler etkilenmesin)
+C.bnsTatilYukle([]);
+t('tatil: yük boşaltınca normal', C.bnsIsGunuMu('2026-10-29'), true);
+
 console.log(`\n${FAIL === 0 ? '🟢 FORMÜLLER KİLİTLİ' : '🔴 FORMÜL AYRIŞMASI'} — ${PASS} geçti, ${FAIL} kaldı\n`);
 process.exit(FAIL === 0 ? 0 : 1);

@@ -16,15 +16,32 @@ const calc = {
     const marj = (s && s > 0) ? Math.round((kar / s) * 100) : null;
     return { kar, marj };
   },
+  // tatil takvimi (calc.js ile SENKRON): gün-no → 0 tam tatil | 0.5 yarım. tatilYukle ed'den beslenir.
+  _tatil: {},
+  tatilYukle(liste) {
+    calc._tatil = {};
+    (liste || []).forEach((t) => {
+      if (!t || !t.gun) return;
+      const H = 3600000, GUN = 24 * H, OFF = 3 * H;
+      const day = Math.floor((Date.parse(String(t.gun).slice(0, 10) + 'T12:00:00+03:00') + OFF) / GUN);
+      calc._tatil[day] = t.yarim ? 0.5 : 0;
+    });
+  },
+  gunKatsayi(day) {
+    const w = (day + 4) % 7;
+    if (w === 6 || w === 0) return 0;
+    const t = calc._tatil[day];
+    return t === undefined ? 1 : t;
+  },
   // ── iş tipi süre motoru (dashboard/app/calc.js ile SENKRON kopya; imaj kuralı) ──
   bnsMesaiSaatKes(t1, t2) {
     if (!(t2 > t1)) return 0;
     const H = 3600000, GUN = 24 * H, OFF = 3 * H;
     let ms = 0;
     for (let g = Math.floor((t1 + OFF) / GUN); g <= Math.floor((t2 + OFF) / GUN); g++) {
-      const w = (g + 4) % 7; if (w === 6 || w === 0) continue;
+      const kat = calc.gunKatsayi(g); if (kat === 0) continue;
       const gun0 = g * GUN - OFF;
-      const a = Math.max(t1, gun0 + 9 * H), b = Math.min(t2, gun0 + 19 * H);
+      const a = Math.max(t1, gun0 + 9 * H), b = Math.min(t2, gun0 + (kat === 0.5 ? 13 : 19) * H);
       if (b > a) ms += b - a;
     }
     return ms / H;
@@ -722,4 +739,4 @@ async function runTool(name, input, ctx) {
   catch (e) { return { error: e.message }; }
 }
 
-module.exports = { TOOLS, runTool, gonderBekliyor, defs, _matchUser, resolvePerson, _userCandidates, normRange, inRange, bnsFeedbackOzet };
+module.exports = { TOOLS, runTool, gonderBekliyor, tatilYukle: calc.tatilYukle, defs, _matchUser, resolvePerson, _userCandidates, normRange, inRange, bnsFeedbackOzet };
