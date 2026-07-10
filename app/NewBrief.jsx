@@ -119,7 +119,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
   const [f, setF] = React.useState({
     marka: "", baslik: "", deadlineDate: "", deadlineTime: "17:00",
     workerIds: [], leadIds: [], gozlemciIds: [],   // lead boş → server işi vereni lead yapar
-    musteri_notu: "", akis: "paralel", maliyet: "", satis: "", isTipi: "", ucretTipi: "kapsamda",
+    musteri_notu: "", akis: "paralel", maliyet: "", satis: "", isTipi: "", ucretTipi: "",
   });
   const tipler = (window.BNS_DATA && window.BNS_DATA.IS_TIPLERI) || data.IS_TIPLERI || [];
   const [files, setFiles] = React.useState([]);
@@ -127,7 +127,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
   const [err, setErr] = React.useState(null);
   const set = (k, v) => setF(s => ({ ...s, [k]: v }));
 
-  const valid = f.marka && f.baslik.trim() && f.workerIds.length && (!tipler.length || f.isTipi);
+  const valid = f.marka && f.baslik.trim() && f.workerIds.length && (!tipler.length || f.isTipi) && f.ucretTipi;
 
   async function submit() {
     if (!valid || busy) return;
@@ -146,7 +146,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
       gozlemci_ids: f.gozlemciIds.length ? f.gozlemciIds : undefined,
       musteri_notu: f.musteri_notu.trim() || undefined,
       akis: f.akis,
-      ucret_tipi: f.ucretTipi,
+      ucret_tipi: f.ucretTipi || undefined,
       maliyet: f.ucretTipi === "ek" && f.maliyet !== "" ? Number(f.maliyet) : undefined,
       satis: f.ucretTipi === "ek" && f.satis !== "" ? Number(f.satis) : undefined,
       by: me.id || undefined,
@@ -266,7 +266,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
         <span style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)" }}>
           {f.ucretTipi === "ek"
             ? "Ayrıca faturalanır. Satış belli değilse boş bırak — iş bitince sistem sorar ve takip eder."
-            : "Retainer kapsamında — ayrıca faturalanmaz."}</span>
+            : f.ucretTipi === "kapsamda" ? "Retainer kapsamında — ayrıca faturalanmaz." : "Seçim zorunlu — aylık fee mi, ek iş mi?"}</span>
       </label>
 
       {f.ucretTipi === "ek" && (

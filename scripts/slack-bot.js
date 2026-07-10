@@ -869,7 +869,6 @@ app.command('/yeni-brief', async ({ command, ack, client, respond }) => {
               })) } }] : []),
           { type: 'input', block_id: 'fatura_b', label: { type: 'plain_text', text: 'Faturalama' },
             element: { type: 'radio_buttons', action_id: 'ucret_tipi',
-              initial_option: { text: { type: 'plain_text', text: '🔒 Aylık fee — retainer kapsamında' }, value: 'kapsamda' },
               options: [
                 { text: { type: 'plain_text', text: '🔒 Aylık fee — retainer kapsamında' }, value: 'kapsamda' },
                 { text: { type: 'plain_text', text: '➕ Ek iş — ayrıca faturalanır' }, value: 'ek' },
@@ -913,6 +912,7 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
   if (!baslik) { await ack({ response_action: 'errors', errors: { baslik_b: 'Başlık gir.' } }); return; }
   const workers = v.workers_b?.workers?.selected_users || [];
   if (!workers.length) { await ack({ response_action: 'errors', errors: { workers_b: 'En az bir işi yapan seç.' } }); return; }
+  if (!(v.fatura_b?.ucret_tipi?.selected_option?.value)) { await ack({ response_action: 'errors', errors: { fatura_b: 'Faturalama seç: aylık fee mi, ek iş mi?' } }); return; }
   await ack();
   const by      = body.user?.id || '';
   const dtSec   = v.deadline_b?.deadline?.selected_date_time || null;  // Unix saniye (tarih+saat)
@@ -922,7 +922,7 @@ app.view('yeni_brief_modal', async ({ ack, body, view, client }) => {
   const fileIds = (v.dosya_b?.dosya?.files || []).map(f => f.id);
   const aciklama = (v.not_b?.aciklama?.value || '').trim();
   const isTipi = v.is_tipi_b?.is_tipi?.selected_option?.value || undefined;
-  const ucretTipi = v.fatura_b?.ucret_tipi?.selected_option?.value || 'kapsamda';
+  const ucretTipi = v.fatura_b?.ucret_tipi?.selected_option?.value || null;
   const paraOku = (x) => { const n = parseFloat(String(x || '').replace(/\./g, '').replace(',', '.')); return Number.isFinite(n) && n > 0 ? n : undefined; };
   const satis = ucretTipi === 'ek' ? paraOku(v.satis_b?.satis?.value) : undefined;
   const maliyetG = ucretTipi === 'ek' ? paraOku(v.maliyet_b?.maliyet?.value) : undefined;
