@@ -1139,7 +1139,10 @@ function ChatBot({ currentUser, dateRange }) {
         const _y = Math.min(Math.max(8, _b.y), Math.max(8, vh - _h - 8));
         const shell = isM
           ? { position: "fixed", inset: 0, width: "100vw", height: "100dvh", borderRadius: 0, border: "none" }
-          : { position: "fixed", left: _x, top: _y, width: _w, height: _h, maxWidth: "calc(100vw - 16px)", maxHeight: "calc(100vh - 16px)", borderRadius: 14, border: "1px solid var(--line-strong)" };
+          : { position: "fixed", left: _x, top: _y, width: _w, height: _h, maxWidth: "calc(100vw - 16px)", maxHeight: "calc(100vh - 16px)",
+              borderRadius: 18, border: "1px solid color-mix(in srgb, var(--ody) 28%, var(--line-strong))",
+              boxShadow: "0 28px 70px -22px rgba(0,0,0,.4), 0 6px 20px -6px rgba(0,0,0,.15), 0 0 0 4px color-mix(in srgb, var(--ody) 7%, transparent)",
+              animation: "bn-slide-up 240ms var(--ease-out-quart)" };
         const sel = notifItems.find(n => n.id === selId) || null;
         const showList = isM ? !sel : true;
         const showDetail = isM ? !!sel : true;
@@ -1147,27 +1150,30 @@ function ChatBot({ currentUser, dateRange }) {
         // SegBtn — Bildirimler/Sohbet segment kontrolü (v2: kenar, r6, aktifte mavi alt çizgi)
         const segBtn = (key, label, badge) => (
           <button onClick={() => setTab(key)} style={{
-            border: 0, borderRight: key === "notif" ? "1px solid var(--line)" : 0, background: tab === key ? "var(--paper-2)" : "transparent",
-            color: tab === key ? "var(--ink)" : "var(--ink-4)", padding: "8px 14px", cursor: "pointer",
-            font: "600 12px/1 var(--font-sans)", position: "relative", display: "inline-flex", alignItems: "center", gap: 6,
+            border: 0, background: tab === key ? "color-mix(in srgb, var(--ody) 13%, var(--surface))" : "transparent",
+            color: tab === key ? "var(--ody)" : "var(--ink-3)", borderRadius: 999, padding: "7px 14px",
+            font: "600 12px/1 var(--font-sans)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6,
+            transition: "background 140ms, color 140ms",
           }}>
-            {label}{badge > 0 && <span style={{ color: "var(--ody)", font: "700 10px/1 var(--font-mono)" }}>{badge}</span>}
-            {tab === key && <span style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, background: "var(--blue, #24479E)" }}/>}
+            {label}{badge > 0 && <span style={{ background: "var(--ody)", color: "#fff", borderRadius: 999, padding: "2px 6px", font: "700 9.5px/1 var(--font-mono)" }}>{badge}</span>}
           </button>
         );
         return (
         <div style={Object.assign({ zIndex: 90, background: "var(--surface)", boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden" }, shell)}>
           {/* Başlık — Ody + segment + kapat (sürüklenebilir; mobilde sabit) */}
           <div onPointerDown={isM ? undefined : startPanelDrag} title={isM ? undefined : "Sürükleyerek taşı"}
-            style={{ padding: "12px 14px", borderBottom: "1px solid var(--line-strong)", display: "flex", alignItems: "center", gap: 10, cursor: isM ? "default" : "grab", touchAction: "none", userSelect: "none", background: "var(--paper)", flex: "none" }}>
-            <span style={{ position: "relative", width: 32, height: 32, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            style={{ padding: "13px 16px", borderBottom: "1px solid var(--line-strong)", display: "flex", alignItems: "center", gap: 11, cursor: isM ? "default" : "grab", touchAction: "none", userSelect: "none",
+              background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 9%, var(--paper)) 0%, var(--paper) 100%)", flex: "none" }}>
+            <span style={{ position: "relative", width: 34, height: 34, flex: "none", borderRadius: "64% 36% 60% 40% / 56% 44% 60% 40%", background: "linear-gradient(180deg, color-mix(in srgb, var(--ody) 86%, #fff) 0%, var(--ody) 64%)", display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 2px 8px -2px color-mix(in srgb, var(--ody) 55%, transparent), 0 0 0 3px color-mix(in srgb, var(--ody) 14%, transparent)" }}>
               <span style={{ position: "absolute", inset: 0, transform: "scale(0.55)" }}>{odyFaceProd(mood)}</span>
             </span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ font: "600 14px/1 var(--font-sans)", color: "var(--ink)", display: "flex", alignItems: "center", gap: 7 }}>Ody <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--ok, #2E8F66)" }}/></div>
-              <div style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 2 }}>bildirim · öneri · sohbet</div>
+              <div style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 17, fontWeight: 500, color: "var(--ink)", display: "flex", alignItems: "center", gap: 8, lineHeight: 1 }}>Ody
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--ok, #2E8F66)", boxShadow: "0 0 0 3px color-mix(in srgb, var(--ok, #2E8F66) 22%, transparent)", animation: "odyNefes 2.4s ease-in-out infinite" }}/></div>
+              <div style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)", marginTop: 3 }}>şu an {odyMoodLabel(mood)} · bildirim · öneri · sohbet</div>
             </div>
-            <div style={{ display: "flex", border: "1px solid var(--line-strong)", borderRadius: 6, overflow: "hidden", flex: "none" }}>
+            <div style={{ display: "flex", gap: 3, border: "1px solid var(--line)", borderRadius: 999, padding: 3, background: "var(--paper-2)", flex: "none" }}>
               {segBtn("notif", "Bildirimler", notifCount)}
               {segBtn("chat", "Sohbet", 0)}
             </div>

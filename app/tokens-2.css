@@ -745,3 +745,4 @@ button:active,
     scroll-behavior: auto !important;
   }
 }
+@keyframes odyNefes{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.55;transform:scale(.82);}}
