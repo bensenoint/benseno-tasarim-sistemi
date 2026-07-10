@@ -22,6 +22,7 @@ const calc = {
     calc._tatil = {};
     (liste || []).forEach((t) => {
       if (!t || !t.gun) return;
+      if (t.tur === 'evden') return;   // evden = normal iş günü (calc.js ile senkron)
       const H = 3600000, GUN = 24 * H, OFF = 3 * H;
       const day = Math.floor((Date.parse(String(t.gun).slice(0, 10) + 'T12:00:00+03:00') + OFF) / GUN);
       calc._tatil[day] = t.yarim ? 0.5 : 0;
@@ -377,6 +378,110 @@ defs.trend = {
     if (!vals.length) return { hata: 'metrik bulunamadı' };
     // bns_history eskiden-yeniye sıralı: ilk = en eski, son = en güncel.
     return { metrik: input.metrik, nokta: vals.length, ilk: vals[0], son: vals[vals.length - 1], min: Math.min(...vals), max: Math.max(...vals) };
+  },
+};
+
+// ── Gün-bazlı analiz yardımcıları (evden-vs-ofis kıyasları; tatil/yarım-gün bilinçli) ──
+const _GUN_MS = 86400000, _TR_OFF = 3 * 3600000;
+function _gunNo(key) { return Math.floor((Date.parse(String(key).slice(0, 10) + 'T12:00:00+03:00') + _TR_OFF) / _GUN_MS); }
+function _gunKeyFromMs(ms) { return new Date(Math.floor((ms + _TR_OFF) / _GUN_MS) * _GUN_MS).toISOString().slice(0, 10); }
+// Bir işin çalışma dilimlerinin (basladi→duran/bitti) belirli GÜN ile mesai-kesişimli saati.
+function _gunNetSaat(olaylar, gunKey) {
+  const day = _gunNo(gunKey);
+  const g1 = day * _GUN_MS - _TR_OFF, g2 = g1 + _GUN_MS - 1;
+  const DURAN = { beklemede: 1, musteride: 1, blokeli: 1 };
+  const ol = (olaylar || []).filter(o => o && o.ts && o.durum).sort((a, b) => a.ts - b.ts);
+  const bi = ol.findIndex(o => o.durum === 'basladi');
+  if (bi < 0) return 0;
+  let top = 0, calisiyor = true, t0 = ol[bi].ts;
+  const kes = (a, b) => { const x = Math.max(a, g1), y = Math.min(b, g2); if (y > x) top += calc.bnsMesaiSaatKes(x, y); };
+  for (let j = bi + 1; j < ol.length; j++) {
+    const d = ol[j].durum, duran = DURAN[d] === 1, bitti = d === 'tamamlandi';
+    if (calisiyor && (duran || bitti)) { kes(t0, ol[j].ts); calisiyor = false; }
+    else if (!calisiyor && !duran && !bitti) { t0 = ol[j].ts; calisiyor = true; }
+    if (bitti) return top;
+  }
+  if (calisiyor) kes(t0, Date.now());   // hâlâ çalışılıyor — bugüne kadar
+  return top;
+}
+function _gunAd(key) {
+  return ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][new Date(key + 'T12:00:00+03:00').getDay()];
+}
+function _gunProfil(ed, key) {
+  const tat = (ed.bns_tatiller || []).find(t => t.gun === key);
+  const tum = [...(ed.bns_briefs || []), ...(ed.bns_completed || [])];
+  const g1 = _gunNo(key) * _GUN_MS - _TR_OFF, g2 = g1 + _GUN_MS - 1;
+  const tamamlanan = (ed.bns_completed || []).filter(c => c.bitis >= g1 && c.bitis <= g2)
+    .map(c => ({ no: c.no, marka: c.marka, baslik: c.baslik }));
+  let olaySayisi = 0, baslayan = 0, netSaat = 0;
+  const kisiSaat = {};
+  tum.forEach(b => {
+    (b.durum_olaylari || []).forEach(o => {
+      if (o.ts >= g1 && o.ts <= g2) { olaySayisi++; if (o.durum === 'basladi') baslayan++; }
+    });
+    const h = _gunNetSaat(b.durum_olaylari, key);
+    if (h > 0) {
+      netSaat += h;
+      (b.workers || []).forEach(w => { if (w && w.name) kisiSaat[w.name] = (kisiSaat[w.name] || 0) + h; });
+    }
+  });
+  return {
+    gun: key, hafta_gunu: _gunAd(key),
+    tur: tat ? (tat.tur === 'evden' ? 'evden' : (tat.yarim ? 'yarım tatil' : 'tatil')) : 'ofis',
+    tamamlanan_sayisi: tamamlanan.length, tamamlanan: tamamlanan.slice(0, 10),
+    baslayan_is: baslayan, durum_olayi: olaySayisi,
+    calisilan_net_saat: Math.round(netSaat * 10) / 10,
+    kisi_saat: Object.entries(kisiSaat).sort((a, b) => b[1] - a[1]).slice(0, 6)
+      .map(([k, v]) => k + ': ' + (Math.round(v * 10) / 10) + 'sa'),
+  };
+}
+
+defs.gun_karsilastir = {
+  description: "Belirli GÜNLERİ yan yana karşılaştırır (evden-vs-ofis dahil): her gün için tamamlanan işler, başlayan iş, durum hareketi, çalışılan net saat (mesai-kesimli) ve kişi bazlı saat. gunler: 'YYYY-MM-DD' listesi (2-5 gün). Dashboard tarih aralığından BAĞIMSIZ çalışır — 'şu Cuma ile bu Cuma'yı kıyasla' gibi sorular için BUNU kullan.",
+  input_schema: { type: 'object', required: ['gunler'], properties: {
+    gunler: { type: 'array', items: { type: 'string' }, description: "karşılaştırılacak günler, YYYY-MM-DD (en çok 5)" } } },
+  run(input, ctx) {
+    const gunler = (input.gunler || []).map(g => String(g).slice(0, 10)).filter(g => /^\d{4}-\d{2}-\d{2}$/.test(g)).slice(0, 5);
+    if (gunler.length < 1) return { hata: "en az bir geçerli gün ver (YYYY-MM-DD)" };
+    calc.tatilYukle(ctx.ed.bns_tatiller || []);
+    return { gunler: gunler.map(g => _gunProfil(ctx.ed, g)),
+      not: 'calisilan_net_saat = o güne düşen fiilî çalışma dilimlerinin mesai kesişimi (🚀 işaretli işlerden); tamamlanan = bitişi o gün olan işler.' };
+  },
+};
+
+defs.evden_ofis_ozet = {
+  description: "Evden çalışma günleri ile ofis günlerinin GENEL kıyası (yalnız yönetici): gün başına ortalama tamamlanan iş, çalışılan net saat, başlayan iş. Takvimdeki tüm evden günleri, aynı sayıda en yakın ofis iş günüyle karşılaştırır.",
+  input_schema: { type: 'object', properties: {} },
+  run(input, ctx) {
+    if (!_odyIsMgr(ctx)) return { hata: 'bu rapor yöneticilere özeldir' };
+    calc.tatilYukle(ctx.ed.bns_tatiller || []);
+    const evdenler = (ctx.ed.bns_tatiller || []).filter(t => t.tur === 'evden' && Date.parse(t.gun) <= Date.now())
+      .map(t => t.gun).sort();
+    if (!evdenler.length) return { bilgi: 'takvimde geçmiş evden çalışma günü yok' };
+    // ofis kıyas günleri: evden günlerinden geriye doğru en yakın normal iş günleri (eşit sayıda)
+    const ofisler = [];
+    let d = _gunNo(evdenler[evdenler.length - 1]);
+    const evdenSet = new Set(evdenler.map(_gunNo));
+    while (ofisler.length < evdenler.length && ofisler.length < 15) {
+      d--;
+      const key = _gunKeyFromMs(d * _GUN_MS);
+      const tat = (ctx.ed.bns_tatiller || []).find(t => t.gun === key);
+      const w = (d + 4) % 7;
+      if (w === 6 || w === 0 || evdenSet.has(d) || (tat && tat.tur !== 'evden')) continue;
+      ofisler.push(key);
+    }
+    const ort = (keys) => {
+      const ps = keys.map(k => _gunProfil(ctx.ed, k));
+      const n = ps.length || 1;
+      return {
+        gunler: keys,
+        ort_tamamlanan: Math.round(ps.reduce((t, p) => t + p.tamamlanan_sayisi, 0) / n * 10) / 10,
+        ort_net_saat: Math.round(ps.reduce((t, p) => t + p.calisilan_net_saat, 0) / n * 10) / 10,
+        ort_baslayan: Math.round(ps.reduce((t, p) => t + p.baslayan_is, 0) / n * 10) / 10,
+      };
+    };
+    return { evden: ort(evdenler), ofis: ort(ofisler),
+      not: 'Az günle ortalamalar oynak olabilir — evden günü biriktikçe kıyas güçlenir. Gün detayına inmek için gun_karsilastir kullan.' };
   },
 };
 
