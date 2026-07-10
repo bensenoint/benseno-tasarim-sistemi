@@ -1,5 +1,40 @@
 // app/BriefDrawer.jsx — interactive slide-in panel.
 
+// ─── İş tipi (herkes görür/değiştirir; sunucu is_tipleri'nden doğrular) ───
+function TipBolumu({ b, onUpdate }) {
+  const tipler = (window.BNS_DATA && window.BNS_DATA.IS_TIPLERI) || [];
+  const [v, setV] = React.useState(b.is_tipi || "");
+  const [st, setSt] = React.useState(null);
+  if (!tipler.length) return null;
+  const kaydet = async (yeni) => {
+    setV(yeni); setSt("kaydediliyor");
+    try {
+      const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
+      const tok = localStorage.getItem('bns_token');
+      const r = await fetch(`${apiBase}/api/briefs/${b.id}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) },
+        body: JSON.stringify({ is_tipi: yeni || null, source: 'dashboard' }),
+      });
+      if (!r.ok) { const j = await r.json().catch(() => ({})); setSt(j.error || 'kaydedilemedi'); return; }
+      setSt('ok'); onUpdate && onUpdate(); setTimeout(() => setSt(null), 1500);
+    } catch (e) { setSt('bağlantı hatası'); }
+  };
+  return (
+    <div style={{margin: "0 20px 12px", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap"}}>
+      <span style={{font: "600 12px/1 var(--font-sans)", color: "var(--ink-2)"}}>🏷️ İş tipi</span>
+      <select value={v} onChange={e => kaydet(e.target.value)}
+        style={{font: "400 12px var(--font-sans)", padding: "5px 8px", border: "1px solid var(--line)",
+          borderRadius: 6, background: "var(--paper)", color: "var(--ink)", maxWidth: 220}}>
+        <option value="">— seçilmedi —</option>
+        {tipler.map(t => <option key={t.kod} value={t.kod}>{t.ad}</option>)}
+      </select>
+      {st && <span style={{font: "400 11px var(--font-sans)", color: st === 'ok' ? 'var(--ink-3)' : 'var(--warn, #b00)'}}>
+        {st === 'ok' ? '✓ kaydedildi' : st === 'kaydediliyor' ? '…' : st}</span>}
+    </div>
+  );
+}
+
 // ─── Finans girişi (yönetici-only) — mevcut /financials endpoint'i; SEC-5: yalnız login-arkası API ───
 function FinansBolumu({ b, onUpdate }) {
   const [f, setF] = React.useState({
@@ -501,6 +536,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
           </div>
         )}
         {/* Finans girişi (veri-girişi mini-fazı) — yalnız yönetici */}
+        <TipBolumu b={b} onUpdate={onUpdate}/>
         {_isMgr && <FinansBolumu b={b} onUpdate={onUpdate}/>}
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>

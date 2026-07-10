@@ -568,6 +568,77 @@ function bnsFirmaGunDoluluk(briefs, users, gunKey) {
 }
 
 // node test ortamı için dışa aktar (tarayıcıda module tanımsız → atlanır)
+
+// ── İş tipi süre motoru (spec: 2026-07-10-is-tipi-sure-motoru) ────────────────
+// Net iş saati: basladi→tamamlandi çizgisinde ÇALIŞILAN durumlarda geçen sürenin
+// mesai (Pzt-Cum 09:00-19:00, sabit UTC+3) ile kesişimi. beklemede/musteride/blokeli düşülür.
+// basladi olayı olmayan iş → null (süre havuzuna girmez — eski işlerde 'plana alma' zamanı yanıltıcıydı).
+var BNS_MESAI_BAS = 9, BNS_MESAI_BIT = 19;
+function bnsMesaiSaatKes(t1, t2) {
+  if (!(t2 > t1)) return 0;
+  var ms = 0;
+  for (var g = bnsEpochGun(t1); g <= bnsEpochGun(t2); g++) {
+    if (!bnsGunIsMi(g)) continue;
+    var gun0 = g * BNS_GUN_MS - BNS_TR_OFF;                       // TR gece yarısı (UTC ms)
+    var a = Math.max(t1, gun0 + BNS_MESAI_BAS * BNS_H);
+    var b = Math.min(t2, gun0 + BNS_MESAI_BIT * BNS_H);
+    if (b > a) ms += b - a;
+  }
+  return ms / BNS_H;
+}
+function bnsNetIsSaati(olaylar) {
+  var ol = (olaylar || []).filter(function (o) { return o && o.ts && o.durum; })
+    .sort(function (a, b) { return a.ts - b.ts; });
+  var basIdx = -1;
+  for (var i = 0; i < ol.length; i++) if (ol[i].durum === 'basladi') { basIdx = i; break; }
+  if (basIdx < 0) return null;
+  var toplam = 0, calisiyor = true, t0 = ol[basIdx].ts;
+  for (var j = basIdx + 1; j < ol.length; j++) {
+    var d = ol[j].durum;
+    var duran = BNS_V2_DURAN[d] === 1, bitti = d === 'tamamlandi';
+    if (calisiyor && (duran || bitti)) { toplam += bnsMesaiSaatKes(t0, ol[j].ts); calisiyor = false; }
+    else if (!calisiyor && !duran && !bitti) { t0 = ol[j].ts; calisiyor = true; }
+    if (bitti) return toplam;
+  }
+  return null;   // tamamlandi olayı yok → henüz ölçülemez
+}
+// completed dizisinden tip → {medyan, min, max, n}. 15 dakikadan kısa örnekler gürültü sayılır.
+function bnsTipSureIstatistik(completed, markaFiltre) {
+  var havuz = {};
+  (completed || []).forEach(function (c) {
+    if (!c.is_tipi) return;
+    if (markaFiltre && c.marka !== markaFiltre) return;
+    var h = bnsNetIsSaati(c.durum_olaylari);
+    if (h == null || h < 0.25) return;
+    (havuz[c.is_tipi] = havuz[c.is_tipi] || []).push(h);
+  });
+  var out = {};
+  Object.keys(havuz).forEach(function (tip) {
+    var v = havuz[tip].sort(function (a, b) { return a - b; });
+    var m = v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+    out[tip] = { medyan: Math.round(m * 10) / 10, min: Math.round(v[0] * 10) / 10, max: Math.round(v[v.length - 1] * 10) / 10, n: v.length };
+  });
+  return out;
+}
+// Kademeli fallback: tip+marka (n>=3) → tip (n>=3) → genel medyan. {saat, n, kaynak}.
+function bnsTipikSure(tip, marka, completed) {
+  if (marka) {
+    var im = bnsTipSureIstatistik(completed, marka)[tip];
+    if (im && im.n >= 3) return { saat: im.medyan, n: im.n, kaynak: 'tip-marka' };
+  }
+  var it = bnsTipSureIstatistik(completed)[tip];
+  if (it && it.n >= 3) return { saat: it.medyan, n: it.n, kaynak: 'tip' };
+  var tum = [];
+  (completed || []).forEach(function (c) {
+    var h = bnsNetIsSaati(c.durum_olaylari);
+    if (h != null && h >= 0.25) tum.push(h);
+  });
+  if (!tum.length) return { saat: null, n: 0, kaynak: 'genel' };
+  tum.sort(function (a, b) { return a - b; });
+  var g = tum.length % 2 ? tum[(tum.length - 1) / 2] : (tum[tum.length / 2 - 1] + tum[tum.length / 2]) / 2;
+  return { saat: Math.round(g * 10) / 10, n: tum.length, kaynak: 'genel' };
+}
+
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes };
 }

@@ -140,7 +140,7 @@ function useStickyState(name, fallback) {
   return [v, setV];
 }
 // Refresh'te son sekmeden devam — geçerli sekmeler (geçersiz/eski id "Not found" basmasın).
-const BNS_VALID_TABS = new Set(["overview","manager","jobs","profile","gantt","kanban","musteride","completed","dept-comp","design","editor","ai","freelance","gallery","multi","brand","team","history","help","users","silinenler"]);
+const BNS_VALID_TABS = new Set(["overview","manager","jobs","profile","gantt","kanban","musteride","completed","dept-comp","is-tipleri","design","editor","ai","freelance","gallery","multi","brand","team","history","help","users","silinenler"]);
 const BNS_ADMIN_TABS = new Set(["users","silinenler"]);
 function bnsLoadTab(u) {
   try {
@@ -668,6 +668,7 @@ function App({ currentUser, onLogout }) {
   else if (tab === "musteride")Screen = <MusterideScreen data={liveData} onOpenBrief={onOpenBrief}/>;
   else if (tab === "completed")Screen = <CompletedScreen data={liveData} onOpenBrief={onOpenCompleted} currentUser={currentUser}/>;
   else if (tab === "dept-comp")Screen = <DeptCompareScreen data={liveData}/>;
+  else if (tab === "is-tipleri")Screen = <IsTipleriScreen data={liveData} currentUser={currentUser}/>;
   else if (tab === "design")   Screen = <DepartmentScreen data={liveData} role="tasarim" currentUser={currentUser} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={t.tableMode}/>;
   else if (tab === "editor")   Screen = <DepartmentScreen data={liveData} role="editor"  currentUser={currentUser} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={t.tableMode}/>;
   else if (tab === "ai")       Screen = <DepartmentScreen data={liveData} role="ai"      currentUser={currentUser} onOpenBrief={onOpenBrief} onOpenCompleted={onOpenCompleted} onStatusChange={onStatusChange} tableMode={t.tableMode}/>;

@@ -525,6 +525,7 @@ function bnsHydrateBrief(raw, idx) {
     deadline_orig: raw.deadline_orig != null ? raw.deadline_orig : null,   // ilk konan deadline
     deadline_history: Array.isArray(raw.deadline_history) ? raw.deadline_history : [],  // [{eski,yeni,at,by}]
     durum_olaylari: Array.isArray(raw.durum_olaylari) ? raw.durum_olaylari : [],  // [{ts,durum}] statü-giriş olayları (tarih-bazlı KPI sayımı)
+    is_tipi: raw.is_tipi || null,
     _kimden_id:   raw._kimden_id || null
   };
 }
@@ -569,6 +570,7 @@ function bnsHydrateCompleted(raw, idx) {
     sureH,
     sure_cycles: Array.isArray(raw.sure_cycles) ? raw.sure_cycles : null,  // [{n,basladi,bitis,sureH}] döngü kırılımı
     durum_olaylari: Array.isArray(raw.durum_olaylari) ? raw.durum_olaylari : [],  // [{ts,durum}] statü-giriş olayları (tarih-bazlı KPI sayımı)
+    is_tipi: raw.is_tipi || null,
     sureH_son: raw.sureH_son != null ? raw.sureH_son : null,
     sureH_toplam: raw.sureH_toplam != null ? raw.sureH_toplam : (raw.sureH != null ? raw.sureH : null),
     revision: raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),
@@ -707,6 +709,7 @@ try {
       window.BNS_DATA.BR = Object.fromEntries(normalized.map(b => [b.name, b]));
       // fatura-v2: ay×marka retainer kayıtları (sensitive — login'li embedded'da gelir)
       if (Array.isArray(ed.bns_marka_fatura)) window.BNS_DATA.MARKA_FATURA = ed.bns_marka_fatura;
+      if (Array.isArray(ed.bns_is_tipleri)) window.BNS_DATA.IS_TIPLERI = ed.bns_is_tipleri;
     }
     // User list (Slack workspace) — bots/silinmiş hariç tüm aktif kişiler
     if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
@@ -791,6 +794,7 @@ window.bnsApplyEmbedded = function (ed) {
   try {
     if (Array.isArray(ed.bns_brands)) D.BRANDS = ed.bns_brands;
     if (Array.isArray(ed.bns_marka_fatura)) D.MARKA_FATURA = ed.bns_marka_fatura;
+    if (Array.isArray(ed.bns_is_tipleri)) D.IS_TIPLERI = ed.bns_is_tipleri;
     if (Array.isArray(ed.bns_users)) D.USERS = window.bnsMergeUser ? ed.bns_users.map(window.bnsMergeUser) : ed.bns_users;
     if (Array.isArray(ed.bns_briefs)) D.briefs = window.bnsHydrateBrief ? sm(ed.bns_briefs, window.bnsHydrateBrief, "brief") : ed.bns_briefs;
     if (Array.isArray(ed.bns_completed)) D.completed = window.bnsHydrateCompleted ? sm(ed.bns_completed, window.bnsHydrateCompleted, "completed") : ed.bns_completed;
