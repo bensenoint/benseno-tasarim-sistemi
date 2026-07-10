@@ -1326,11 +1326,13 @@ function ChatBot({ currentUser, dateRange }) {
                             // Tasarım düzeltmesi: öneri soruyla bitiyordu ama cevap kanalı yoktu.
                             // Öneriyi sohbete Ody'nin mesajı olarak taşı → kullanıcı doğrudan yanıtlar;
                             // /api/chat geçmişle çağrıldığından Ody neyi teklif ettiğini bilir.
+                            // Bağlam HER durumda taşınır: öneri varsa öneriyle, yoksa bildirimin kendisiyle.
+                            // (Önceki hâli öneri yoksa hiçbir şey enjekte etmiyordu → Ody eski konulardan devam ediyordu.)
                             const a = advice[sel.id];
-                            if (a && a.state === "done" && a.text) {
-                              const ctx = `💡 Bildirim önerim (${sel.text || "#" + sel.id}):\n\n${a.text}\n\n— Bu öneri üzerine konuşabiliriz; ne yapmak istersin?`;
-                              setMsgs(m => m.some(x => x.role === "assistant" && x.content === ctx) ? m : [...m, { role: "assistant", content: ctx }]);
-                            }
+                            const ctx = (a && a.state === "done" && a.text)
+                              ? `💡 Bildirim önerim (${odyMdSoy(sel.text) || "#" + sel.id}):\n\n${a.text}\n\n— Bu öneri üzerine konuşabiliriz; ne yapmak istersin?`
+                              : `🔔 Şu bildirim üzerine konuşuyoruz:\n\n"${odyMdSoy(sel.text)}"\n\n— Detayına inebilir, ilgili kişi/işe bakabilirim; ne öğrenmek istersin?`;
+                            setMsgs(m => m.some(x => x.role === "assistant" && x.content === ctx) ? m : [...m, { role: "assistant", content: ctx }]);
                             setTab("chat");
                           }} style={{ border: "1px solid var(--line-strong)", background: "var(--surface)", color: "var(--ink)", borderRadius: 6, padding: "9px 14px", font: "600 13px/1 var(--font-sans)", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}><I.Bell size={14}/> Sohbette devam et</button>
                         </div>
