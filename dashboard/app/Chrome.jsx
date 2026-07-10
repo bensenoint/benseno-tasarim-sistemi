@@ -1162,8 +1162,8 @@ function ChatBot({ currentUser, dateRange }) {
         );
         return (
         <div style={Object.assign({ zIndex: 90,
-          background: "color-mix(in srgb, var(--surface) 76%, transparent)",
-          backdropFilter: "blur(26px) saturate(1.5)", WebkitBackdropFilter: "blur(26px) saturate(1.5)",
+          background: "color-mix(in srgb, var(--surface) 55%, transparent)",
+          backdropFilter: "blur(22px) saturate(1.6)", WebkitBackdropFilter: "blur(22px) saturate(1.6)",
           boxShadow: "var(--shadow-2)", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }, shell)}>
           {/* dekoratif ody ışıması — cam yüzeyin altında yumuşak renk */}
           <div aria-hidden style={{ position: "absolute", top: -70, right: -50, width: 240, height: 240, borderRadius: "50%", pointerEvents: "none",
@@ -1195,7 +1195,7 @@ function ChatBot({ currentUser, dateRange }) {
             <div style={{ flex: 1, display: "flex", minHeight: 0, position: "relative", zIndex: 1 }}>
               {/* SOL — bildirim listesi */}
               {showList && (
-                <div style={{ width: isM ? "100%" : 312, flex: isM ? 1 : "none", borderRight: isM ? "none" : "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", flexDirection: "column", minHeight: 0, background: "color-mix(in srgb, var(--paper) 45%, transparent)", position: "relative", zIndex: 1 }}>
+                <div style={{ width: isM ? "100%" : 312, flex: isM ? 1 : "none", borderRight: isM ? "none" : "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", flexDirection: "column", minHeight: 0, background: "color-mix(in srgb, var(--paper) 30%, transparent)", position: "relative", zIndex: 1 }}>
                   <div style={{ display: "flex", gap: 6, padding: 12, borderBottom: "1px solid var(--line)", flex: "none" }}>
                     {[["all", "Tümü"], ["unread", "Okunmamış"]].map(([k, lbl]) => (
                       <button key={k} onClick={() => setNotifFilter(k)} style={{
@@ -1374,7 +1374,7 @@ function ChatBot({ currentUser, dateRange }) {
                 {msgs.length > 0 && <button onClick={() => setMsgs([])} style={{ border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer", font: "400 11px var(--font-sans)" }}>sohbeti temizle</button>}
                 <OdySesDugmesi/>
               </div>
-              <div style={{ padding: 12, borderTop: "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", gap: 9, background: "color-mix(in srgb, var(--paper) 40%, transparent)", flex: "none", position: "relative", zIndex: 1 }}>
+              <div style={{ padding: 12, borderTop: "1px solid color-mix(in srgb, var(--ink) 8%, transparent)", display: "flex", gap: 9, background: "color-mix(in srgb, var(--paper) 28%, transparent)", flex: "none", position: "relative", zIndex: 1 }}>
                 <input value={input} onChange={e => setInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") send(); }}
                   placeholder="Soru yaz…" disabled={busy}

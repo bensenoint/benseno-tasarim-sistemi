@@ -428,7 +428,7 @@ function V2ArsivTrend({ scope, baslik }) {
   const max = seri.length ? Math.max(...seri.map(x => x.pct)) : 0;
   const renk = (p) => p >= 120 ? "var(--prio-red)" : p >= 100 ? "var(--prio-orange)" : "var(--ok, #2E8F66)";
   // Kompakt tek satır: başlık · sparkline · güncel değer. (Eski çubuk grafik çok yer kaplıyordu.)
-  const W = 200, Hh = 30, tavan = Math.max(130, max + 10);
+  const W = 200, Hh = 38, tavan = Math.max(130, max + 10);
   const pt = (x, i) => `${(i / Math.max(1, seri.length - 1)) * W},${Hh - (x.pct / tavan) * Hh}`;
   const cizgi = seri.map(pt).join(" ");
   return (
@@ -449,6 +449,25 @@ function V2ArsivTrend({ scope, baslik }) {
             <polyline points={cizgi} fill="none" stroke={renk(son)} strokeWidth="1.8"
               strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/>
             <circle cx={W} cy={Hh - (son / tavan) * Hh} r="2.6" fill={renk(son)}/>
+            {(() => {
+              // küçük değer etiketleri: başlangıç, bitiş, min, max (çakışanlar tekilleştirilir)
+              const y = (v) => Hh - (v / tavan) * Hh;
+              const iMin = seri.findIndex(x => x.pct === min), iMax = seri.findIndex(x => x.pct === max);
+              const xAt = (i) => (i / Math.max(1, seri.length - 1)) * W;
+              const anchor = (x) => x < 18 ? "start" : x > W - 18 ? "end" : "middle";
+              const etiketler = [
+                { x: 0, v: seri[0].pct, alt: y(seri[0].pct) < 12 },
+                { x: W, v: son, alt: y(son) < 12 },
+                ...(min !== seri[0].pct && min !== son ? [{ x: xAt(iMin), v: min, alt: false }] : []),
+                ...(max !== seri[0].pct && max !== son && max !== min ? [{ x: xAt(iMax), v: max, alt: true }] : []),
+              ];
+              const seen = new Set();
+              return etiketler.filter(e => { const k = e.v + ":" + Math.round(e.x / 24); if (seen.has(k)) return false; seen.add(k); return true; })
+                .map((e, i) => (
+                  <text key={i} x={e.x} y={e.alt ? Math.min(Hh - 2, y(e.v) + 10) : Math.max(7, y(e.v) - 4)}
+                    textAnchor={anchor(e.x)} style={{ font: "600 7.5px var(--font-mono)", fill: "var(--ink-4)" }}>%{e.v}</text>
+                ));
+            })()}
           </svg>
           <span title={`son 30 gün · en düşük %${min} · en yüksek %${max}`}
             style={{ font: "600 12px/1 var(--font-mono)", color: renk(son), flexShrink: 0 }}>%{son}</span>
