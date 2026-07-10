@@ -493,6 +493,9 @@ function App({ currentUser, onLogout }) {
           window.BNS_DATA.BRANDS = normB;
           window.BNS_DATA.BR = Object.fromEntries(normB.map(b => [b.name, b]));
         }
+        // iş tipleri (NewBrief formu + İş Tipleri ekranı + drawer seçenekleri)
+        if (Array.isArray(ed.bns_is_tipleri)) window.BNS_DATA.IS_TIPLERI = ed.bns_is_tipleri;
+        if (Array.isArray(ed.bns_marka_fatura)) window.BNS_DATA.MARKA_FATURA = ed.bns_marka_fatura;
         // User list (Slack workspace) — briefs hidrasyonundan ÖNCE
         if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
           window.BNS_DATA.USERS = ed.bns_users.map(u => window.bnsMergeUser ? window.bnsMergeUser(u) : ({ ...u, rol: u.rol || u.dept || "" }));
