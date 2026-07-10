@@ -119,14 +119,15 @@ function APIBriefForm({ apiBase, data, onClose }) {
   const [f, setF] = React.useState({
     marka: "", baslik: "", deadlineDate: "", deadlineTime: "17:00",
     workerIds: [], leadIds: [], gozlemciIds: [],   // lead boş → server işi vereni lead yapar
-    musteri_notu: "", akis: "paralel", maliyet: "", satis: "",
+    musteri_notu: "", akis: "paralel", maliyet: "", satis: "", isTipi: "",
   });
+  const tipler = (window.BNS_DATA && window.BNS_DATA.IS_TIPLERI) || data.IS_TIPLERI || [];
   const [files, setFiles] = React.useState([]);
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState(null);
   const set = (k, v) => setF(s => ({ ...s, [k]: v }));
 
-  const valid = f.marka && f.baslik.trim() && f.workerIds.length;
+  const valid = f.marka && f.baslik.trim() && f.workerIds.length && (!tipler.length || f.isTipi);
 
   async function submit() {
     if (!valid || busy) return;
@@ -139,6 +140,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
     }
     const body = {
       marka: f.marka, baslik: f.baslik.trim(), deadline,
+      is_tipi: f.isTipi || undefined,
       worker_ids: f.workerIds.length ? f.workerIds : undefined,
       lead_ids: f.leadIds.length ? f.leadIds : undefined,
       gozlemci_ids: f.gozlemciIds.length ? f.gozlemciIds : undefined,
@@ -197,6 +199,21 @@ function APIBriefForm({ apiBase, data, onClose }) {
         <span style={FIELD_LABEL}>Başlık / İş *</span>
         <input value={f.baslik} onChange={e => set("baslik", e.target.value)} placeholder="ör. Sosyal medya paketi — Mayıs" style={FIELD_BOX} />
       </label>
+
+      {tipler.length > 0 && (
+        <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <span style={FIELD_LABEL}>İş Tipi *</span>
+          <select value={f.isTipi} onChange={e => set("isTipi", e.target.value)} style={FIELD_BOX}>
+            <option value="">Tip seç…</option>
+            {[...new Set(tipler.map(t => t.grup))].map(g => (
+              <optgroup key={g} label={g}>
+                {tipler.filter(t => t.grup === g).map(t => <option key={t.kod} value={t.kod}>{t.ad}</option>)}
+              </optgroup>
+            ))}
+          </select>
+          <span style={{ font: "400 11px/1.3 var(--font-sans)", color: "var(--ink-4)" }}>Sistem tip başına gerçek süreleri öğrenir — İş Tipleri ekranı.</span>
+        </label>
+      )}
 
       <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <span style={FIELD_LABEL}>Akış</span>
