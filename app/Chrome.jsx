@@ -60,6 +60,7 @@ const NAV_SECTIONS = [
       { id: "brand",   label: "Marka",         icon: "Tag" },
       { id: "team",    label: "Ekip matrisi",  icon: "Grid" },
       { id: "profile", label: "Profil",        icon: "User" },
+      { id: "takvim",  label: "Takvim",        icon: "Calendar" },
       { id: "help",    label: "Yardım",        icon: "HelpCircle" },
     ]
   },
@@ -69,7 +70,6 @@ const NAV_SECTIONS = [
     adminOnly: true,
     items: [
       { id: "users",     label: "Kullanıcılar", icon: "Shield" },
-      { id: "takvim",  label: "Takvim",       icon: "Calendar" },
       { id: "silinenler", label: "Silinenler",   icon: "Trash2" },
     ]
   }

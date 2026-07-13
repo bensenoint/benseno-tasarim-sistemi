@@ -708,9 +708,7 @@ function App({ currentUser, onLogout }) {
   else if (tab === "users")      Screen = currentUser?.role === 'admin'
     ? <UsersScreen currentUser={currentUser}/>
     : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;
-  else if (tab === "takvim") Screen = currentUser?.role === 'admin'
-    ? <TakvimScreen/>
-    : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;
+  else if (tab === "takvim") Screen = <TakvimScreen currentUser={currentUser}/>;
   else if (tab === "silinenler") Screen = currentUser?.role === 'admin'
     ? <SilinenlerScreen data={liveData} currentUser={currentUser}/>
     : <div style={{padding:48, textAlign:"center", color:"var(--ink-3)"}}>Erişim yok</div>;

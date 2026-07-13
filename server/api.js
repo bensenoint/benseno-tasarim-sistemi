@@ -72,7 +72,15 @@ app.get('/api/state', readGuard, async (req, res) => {
 });
 
 // Dashboard'ın doğrudan tükettiği HAM bns_* shape (poll buraya bağlanacak; Faz 2).
-// Tatil takvimi (admin yönetir; hesaplar bns_tatiller üzerinden tatil-bilinçli).
+// Takvimi kim düzenleyebilir: admin JWT veya rol/yetki='yonetici'. (Görüntüleme herkese açık.)
+async function _tatilYetkili(user) {
+  if (user.role === 'admin') return true;
+  try {
+    const r = await pool.query(`SELECT 1 FROM users WHERE id=$1 AND (rol='yonetici' OR yetki='yonetici')`, [user.slack_id]);
+    return !!r.rows.length;
+  } catch (e) { return false; }
+}
+// Tatil takvimi (görüntüleme herkes; düzenleme yönetici/admin; hesaplar bns_tatiller üzerinden tatil-bilinçli).
 app.get('/api/tatiller', readGuard, async (req, res) => {
   try {
     const r = await pool.query(`SELECT to_char(gun,'YYYY-MM-DD') AS gun, ad, yarim, tur FROM tatiller ORDER BY gun`);
@@ -81,6 +89,7 @@ app.get('/api/tatiller', readGuard, async (req, res) => {
 });
 app.post('/api/tatiller', writeGuard, async (req, res) => {
   try {
+    if (req.user && !(await _tatilYetkili(req.user))) return res.status(403).json({ error: 'takvimi yalnız yönetici/admin düzenleyebilir' });
     const { gun, ad, yarim, tur } = req.body || {};
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(gun || '')) || !String(ad || '').trim()) return res.status(400).json({ error: 'gun (YYYY-MM-DD) ve ad gerekli' });
     const t = tur === 'evden' ? 'evden' : 'tatil';
@@ -92,6 +101,7 @@ app.post('/api/tatiller', writeGuard, async (req, res) => {
 });
 app.delete('/api/tatiller/:gun', writeGuard, async (req, res) => {
   try {
+    if (req.user && !(await _tatilYetkili(req.user))) return res.status(403).json({ error: 'takvimi yalnız yönetici/admin düzenleyebilir' });
     const r = await pool.query('DELETE FROM tatiller WHERE gun=$1', [req.params.gun]);
     res.json({ silinen: r.rowCount });
   } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }

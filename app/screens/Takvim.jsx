@@ -1,8 +1,10 @@
-// app/screens/Takvim.jsx — Resmî tatil takvimi (yalnız admin). Hafta sonları otomatiktir;
+// app/screens/Takvim.jsx — Resmî tatil + evden çalışma takvimi (görüntüleme HERKES; düzenleme yönetici/admin). Hafta sonları otomatiktir;
 // buradaki kayıtlar iş günü matematiğini (kapasite yayılımı, net iş saati, kalan gün,
 // fatura toplu günü) sistem genelinde etkiler. yarim=true → 09:00-13:00 mesai, 0.5 gün kapasite.
 
-function TakvimScreen() {
+function TakvimScreen({ currentUser }) {
+  const _me = ((window.BNS_DATA && window.BNS_DATA.USERS) || []).find(u => u.id === (currentUser && currentUser.slack_id));
+  const duzenleyebilir = (currentUser && currentUser.role === "admin") || (_me && (_me.rol === "yonetici" || _me.yetki === "yonetici"));
   const [tatiller, setTatiller] = React.useState(null);   // null=yükleniyor
   const [f, setF] = React.useState({ gun: "", ad: "", yarim: false, tur: "tatil" });
   const [turF, setTurF] = React.useState("hepsi");   // liste filtresi
@@ -60,7 +62,7 @@ function TakvimScreen() {
           Resmî tatiller — kapasite bölünmesi, çalışma süresi ölçümü, kalan iş günü ve fatura takip günü bu takvime göre hesaplanır. Hafta sonları otomatik; yarım gün = 09:00-13:00 mesai, 0,5 gün kapasite. 🏠 Evden çalışma günleri normal iş günüdür — yalnız kayıt tutulur (evden-vs-ofis verim raporlarının temeli).</div>
       </div>
 
-      <Card style={{ padding: "16px 18px" }}>
+      {duzenleyebilir && <Card style={{ padding: "16px 18px" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             <span style={{ font: "500 10px/1 var(--font-sans)", letterSpacing: ".06em", textTransform: "uppercase", color: "var(--ink-4)" }}>Tür</span>
@@ -90,7 +92,7 @@ function TakvimScreen() {
             font: "600 13px/1 var(--font-sans)", cursor: "pointer", opacity: st === "kaydediliyor" ? .5 : 1 }}>Ekle</button>
         </div>
         {st && st !== "kaydediliyor" && <div style={{ marginTop: 8, font: "500 11px var(--font-sans)", color: "var(--prio-red, #c00)" }}>{st}</div>}
-      </Card>
+      </Card>}
 
       <Card style={{ padding: "16px 18px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
@@ -133,7 +135,7 @@ function TakvimScreen() {
                     )}
                   </td>
                   <td style={{ ...TD, width: 40, textAlign: "right" }}>
-                    <button onClick={() => sil(t.gun)} title="Sil" style={{ border: 0, background: "transparent", cursor: "pointer", color: "var(--ink-4)", font: "500 12px var(--font-sans)" }}>✕</button>
+                    {duzenleyebilir && <button onClick={() => sil(t.gun)} title="Sil" style={{ border: 0, background: "transparent", cursor: "pointer", color: "var(--ink-4)", font: "500 12px var(--font-sans)" }}>✕</button>}
                   </td>
                 </tr>
               ))}
