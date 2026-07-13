@@ -526,6 +526,7 @@ function bnsHydrateBrief(raw, idx) {
     deadline_history: Array.isArray(raw.deadline_history) ? raw.deadline_history : [],  // [{eski,yeni,at,by}]
     durum_olaylari: Array.isArray(raw.durum_olaylari) ? raw.durum_olaylari : [],  // [{ts,durum}] statü-giriş olayları (tarih-bazlı KPI sayımı)
     is_tipi: raw.is_tipi || null,
+    parent_id: raw.parent_id || null, faz_no: raw.faz_no || 1,
     _kimden_id:   raw._kimden_id || null
   };
 }
@@ -571,6 +572,7 @@ function bnsHydrateCompleted(raw, idx) {
     sure_cycles: Array.isArray(raw.sure_cycles) ? raw.sure_cycles : null,  // [{n,basladi,bitis,sureH}] döngü kırılımı
     durum_olaylari: Array.isArray(raw.durum_olaylari) ? raw.durum_olaylari : [],  // [{ts,durum}] statü-giriş olayları (tarih-bazlı KPI sayımı)
     is_tipi: raw.is_tipi || null,
+    parent_id: raw.parent_id || null, faz_no: raw.faz_no || 1,
     sureH_son: raw.sureH_son != null ? raw.sureH_son : null,
     sureH_toplam: raw.sureH_toplam != null ? raw.sureH_toplam : (raw.sureH != null ? raw.sureH : null),
     revision: raw.revision != null ? raw.revision : (raw.rev != null ? parseInt(raw.rev)||0 : 0),

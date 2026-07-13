@@ -1285,3 +1285,8 @@ Canvas güncellemeleri yanlış yapılırsa veri bozulur. Kesinlikle uyulması g
 
 - İşi yapan bitirince **📤** koyar → "kontrole gönderildi": yapanın süresi durur ve tek-aktif-iş kuralında serbest kalır; **işin süresi kontrol beklerken akmaya devam eder** (kontrol süreleri işe dahildir). İşi isteyene DM düşer.
 - İsteyen **👀** koyunca mevcut İncelemede akışı aynen devam eder. Kelime kısayolu: "kontrole yolladım". Kanban'da İncelemede kolonunda "Kontrolde" olarak görünür; filtre ve raporlarda ayrı statüdür.
+
+## 🧩 Fazlı İşler
+
+- Bir işin devamı (tasarım → baskı gibi) **yeni faz** olarak açılır: drawer'da **🧩 Fazlar → + Faz ekle** ya da Slack thread'ine **"faz ekle"** yazıp çıkan butonla. Termin zorunlu; atananlar/tip/faturalama önceki fazdan kopyalanır, başlık "… — Faz N" (düzenlenebilir).
+- Her faz **ayrı thread, ayrı termin ve statüyle** bağımsız ilerler; yeni thread'e önceki fazın özeti+linki, eskisine yeni fazın linki düşer. Fazlar köke bağlıdır — raporlarda ve Ody'de zincir olarak ilişkilidir.

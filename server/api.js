@@ -439,6 +439,9 @@ async function assertCanWriteFinancials(req) {
 app.post('/api/briefs', writeGuard, handleWrite(req => writes.createBrief(req.body)));
 // Fatura-takip buton/modal aksiyonu (Slack bot çağırır; yetki writes.faturaAksiyon içinde: lead/açan/yönetici).
 // WIP=1: iş basladi'dayken ikinci atananın "ben de başladım" işareti (409+cakisma dönebilir).
+// Fazlı işler: mevcut işten yeni faz (yeni brief + yeni thread; köke parent_id).
+app.post('/api/briefs/:id/faz', writeGuard, handleWrite(req => writes.createFaz(+req.params.id, req.body)));
+
 app.post('/api/briefs/:id/ben-basladim', writeGuard, handleWrite(req => writes.benBasladim(+req.params.id, req.body)));
 
 app.post('/api/briefs/:id/fatura-aksiyon', writeGuard, async (req, res) => {

@@ -1146,6 +1146,62 @@ async function applyTerminOneri(id, by, source) {
   return { ok: true, yeni_deadline: yeni };
 }
 
+// ── Fazlı işler: mevcut işten yeni faz aç (spec: 2026-07-10 toplu düzenlemeler C) ──
+// Yeni faz AYRI brief'tir (kendi thread/termin/statü); köke parent_id ile bağlanır.
+// Önceki fazın thread özeti yeni thread'e taşınır; iki thread çapraz linklenir.
+async function createFaz(parentId, raw) {
+  const by = raw && raw.by;
+  const parent = (await pool.query(
+    `SELECT b.*, br.name AS marka_adi FROM briefs b LEFT JOIN brands br ON br.id=b.marka_id
+     WHERE b.id=$1 AND b.deleted_at IS NULL`, [parentId])).rows[0];
+  if (!parent) { const e = new Error('kaynak iş bulunamadı'); e.status = 404; throw e; }
+  if (!raw || !raw.deadline) { const e = new Error('yeni faz için termin (deadline) gerekli'); e.status = 400; throw e; }
+  // Yetki: atanan/açan/yönetici (fatura aksiyonlarıyla aynı ruh; worker da faz açabilir)
+  const yetki = await pool.query(
+    `SELECT 1 FROM briefs b WHERE b.id=$1 AND (
+       b.created_by=$2
+       OR EXISTS (SELECT 1 FROM brief_assignees a WHERE a.brief_id=b.id AND a.user_id=$2)
+       OR EXISTS (SELECT 1 FROM users u WHERE u.id=$2 AND (u.rol='yonetici' OR u.yetki='yonetici')))`, [parentId, by]);
+  if (by && !yetki.rows.length) { const e = new Error('faz açmayı işin atananı, açanı ya da yönetici yapabilir'); e.status = 403; throw e; }
+  const kokId = parent.parent_id || parent.id;   // fazlar hep köke bağlanır (düz zincir)
+  const fazNo = ((await pool.query(
+    `SELECT COALESCE(MAX(faz_no),1) AS n FROM briefs WHERE (id=$1 OR parent_id=$1) AND deleted_at IS NULL`, [kokId])).rows[0].n | 0) + 1;
+  // Atananlar: verilmediyse önceki fazdan kopyala
+  const as = await pool.query(`SELECT user_id, role FROM brief_assignees WHERE brief_id=$1`, [parentId]);
+  const workerIds = (raw.worker_ids && raw.worker_ids.length) ? raw.worker_ids
+    : as.rows.filter(x => x.role === 'contributor').map(x => x.user_id);
+  const leadIds = as.rows.filter(x => x.role === 'lead').map(x => x.user_id);
+  const kokBaslik = String(parent.baslik || '').replace(/\s+—\s+Faz \d+$/, '');
+  const yeni = await createBrief({
+    marka: parent.marka_adi,
+    baslik: (raw.baslik && String(raw.baslik).trim()) || `${kokBaslik} — Faz ${fazNo}`,
+    deadline: raw.deadline,
+    worker_ids: workerIds.length ? workerIds : [by].filter(Boolean),
+    lead_ids: leadIds.length ? leadIds : undefined,
+    is_tipi: raw.is_tipi || parent.is_tipi || undefined,
+    ucret_tipi: raw.ucret_tipi || parent.ucret_tipi || undefined,
+    akis: parent.akis || 'paralel',
+    musteri_notu: parent.musteri_notu || undefined,
+    by, source: 'dashboard',   // yeni kanal thread'i açılır
+  });
+  await pool.query('UPDATE briefs SET parent_id=$1, faz_no=$2 WHERE id=$3', [kokId, fazNo, yeni.id]);
+  // Çapraz bağlam: yeni thread'e önceki fazın özeti; eski thread'e yeni faz linki (best-effort)
+  try {
+    if (yeni.slack && yeni.slack.channel && yeni.slack.ts) {
+      const ozet = (parent.thread_ozet || '').slice(0, 700);
+      await slack.postThread({ channel: yeni.slack.channel, thread_ts: yeni.slack.ts,
+        text: `🧩 *Faz ${fazNo}* — önceki faz: *#${parent.no}*${parent.slack_url ? ` (${parent.slack_url})` : ''}` +
+          (ozet ? `\n📎 Önceki faz özeti: ${ozet}` : '') });
+    }
+    if (parent.slack_channel && parent.slack_ts) {
+      await slack.postThread({ channel: parent.slack_channel, thread_ts: parent.slack_ts,
+        text: `🧩 *Faz ${fazNo} açıldı:* #${yeni.no}${yeni.slack && yeni.slack.permalink ? ` — ${yeni.slack.permalink}` : ''}` });
+    }
+  } catch (e) { console.error('[faz] çapraz not:', e.message); }
+  console.log(`[faz] #${parent.no} → Faz ${fazNo} = #${yeni.no}`);
+  return { ...yeni, faz_no: fazNo, parent_no: parent.no };
+}
+
 // ── WIP=1: "ben de başladım" — iş zaten basladi'dayken ikinci atananın 🚀'si ──
 // Durum değişmez; yalnız kişinin calisiyor işareti açılır (aynı tek-iş kapısından geçerek).
 async function benBasladim(id, raw) {
@@ -1214,4 +1270,4 @@ async function faturaAksiyon(id, raw) {
   return r.rows[0];
 }
 
-module.exports = { createBrief, patchBrief, setStatus, setFinancials, setBrandRetainer, upsertMarkaFaturaAy, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR, faturaAksiyon, benBasladim };
+module.exports = { createBrief, patchBrief, setStatus, setFinancials, setBrandRetainer, upsertMarkaFaturaAy, setQueue, setKanbanOrder, clearTerminOneri, applyTerminOneri, deleteBrief, restoreBrief, permanentDeleteBrief, noToId, tsToId, DURUMLAR, faturaAksiyon, benBasladim, createFaz };

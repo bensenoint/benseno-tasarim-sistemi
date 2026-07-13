@@ -546,6 +546,13 @@ defs.is_detay = {
       insight: done ? (b.insight || null) : null,
       is_tipi: b.is_tipi || null,
     };
+    // Fazlı iş: zincirdeki diğer fazlar (raporlama ilişkisi)
+    const kokId = b.parent_id || b.id;
+    const zincir = [...(ctx.ed.bns_briefs || []), ...(ctx.ed.bns_completed || [])]
+      .filter(x => (x.id === kokId || x.parent_id === kokId) && x.id !== b.id)
+      .sort((x, y) => (x.faz_no || 1) - (y.faz_no || 1));
+    if (zincir.length) out.fazlar = zincir.map(x => ({ no: x.no, faz_no: x.faz_no || 1, baslik: x.baslik, durum: x.durum || (x.bitis ? 'tamamlandi' : null) }));
+    if (b.faz_no && b.faz_no > 1) out.faz_no = b.faz_no;
     if (b.is_tipi) {
       const tk = calc.bnsTipikSure(b.is_tipi, b.marka, ctx.ed.bns_completed || []);
       if (tk.saat != null) out.tipik_sure = { saat: tk.saat, n: tk.n, kaynak: tk.kaynak };

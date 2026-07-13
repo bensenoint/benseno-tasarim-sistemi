@@ -1,5 +1,57 @@
 // app/BriefDrawer.jsx — interactive slide-in panel.
 
+// ─── Fazlar: zincir şeridi + yeni faz aç (yeni brief + yeni thread; köke bağlı) ───
+function FazBolumu({ b, onUpdate }) {
+  const [acik, setAcik] = React.useState(false);
+  const [dl, setDl] = React.useState("");
+  const [st, setSt] = React.useState(null);
+  const all = [...((window.BNS_DATA && window.BNS_DATA.briefs) || []), ...((window.BNS_DATA && window.BNS_DATA.completed) || [])];
+  const kokId = b.parent_id || b.id;
+  const zincir = all.filter(x => x.id === kokId || x.parent_id === kokId)
+    .sort((x, y) => (x.faz_no || 1) - (y.faz_no || 1));
+  const olustur = async () => {
+    if (!dl) { setSt("Termin seç."); return; }
+    setSt("açılıyor");
+    try {
+      const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
+      const tok = localStorage.getItem('bns_token');
+      const r = await fetch(`${apiBase}/api/briefs/${b.id}/faz`, {
+        method: 'POST', headers: { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) },
+        body: JSON.stringify({ deadline: new Date(dl + "T17:00:00+03:00").toISOString() }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { setSt(j.error || 'açılamadı'); return; }
+      setSt(null); setAcik(false); setDl("");
+      if (window.bnsToast) window.bnsToast(`🧩 Faz ${j.faz_no} açıldı: #${j.no} — başlığı drawer'dan düzenleyebilirsin`);
+      if (window.bnsRefresh) window.bnsRefresh();
+      onUpdate && onUpdate();
+    } catch (e) { setSt('bağlantı hatası'); }
+  };
+  return (
+    <div style={{ margin: "0 20px 12px", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <span style={{ font: "600 12px/1 var(--font-sans)", color: "var(--ink-2)" }}>🧩 Fazlar</span>
+      {zincir.length > 1 ? zincir.map(f => (
+        <span key={f.id} title={f.baslik} style={{ font: "500 11px var(--font-mono)", borderRadius: 999, padding: "3px 9px",
+          border: "1px solid " + (f.id === b.id ? "var(--ody)" : "var(--line)"),
+          color: f.id === b.id ? "var(--ody)" : "var(--ink-3)" }}>
+          #{f.no} · F{f.faz_no || 1}{f.durum === "tamamlandi" || f.bitis ? " ✓" : ""}</span>
+      )) : <span style={{ font: "400 11px var(--font-sans)", color: "var(--ink-4)" }}>tek faz</span>}
+      {!acik ? (
+        <button onClick={() => setAcik(true)} style={{ font: "600 11px var(--font-sans)", border: "1px solid var(--line-strong)",
+          background: "var(--surface)", color: "var(--ink-2)", borderRadius: 6, padding: "5px 10px", cursor: "pointer" }}>+ Faz ekle</button>
+      ) : (
+        <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+          <input type="date" value={dl} onChange={e => setDl(e.target.value)}
+            style={{ font: "400 12px var(--font-sans)", padding: "4px 8px", border: "1px solid var(--line-strong)", borderRadius: 6, background: "var(--surface)", color: "var(--ink)" }}/>
+          <button onClick={olustur} disabled={st === "açılıyor"} style={{ font: "600 11px var(--font-sans)", border: 0, background: "var(--ody)", color: "#fff", borderRadius: 6, padding: "6px 11px", cursor: "pointer" }}>Aç</button>
+          <button onClick={() => { setAcik(false); setSt(null); }} style={{ font: "400 11px var(--font-sans)", border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer" }}>vazgeç</button>
+        </span>
+      )}
+      {st && st !== "açılıyor" && <span style={{ font: "400 11px var(--font-sans)", color: "var(--prio-red, #c00)" }}>{st}</span>}
+    </div>
+  );
+}
+
 // ─── İş tipi (herkes görür/değiştirir; sunucu is_tipleri'nden doğrular) ───
 function TipBolumu({ b, onUpdate }) {
   const tipler = (window.BNS_DATA && window.BNS_DATA.IS_TIPLERI) || [];
@@ -536,6 +588,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
           </div>
         )}
         {/* Finans girişi (veri-girişi mini-fazı) — yalnız yönetici */}
+        <FazBolumu b={b} onUpdate={onUpdate}/>
         <TipBolumu b={b} onUpdate={onUpdate}/>
         {_isMgr && <FinansBolumu b={b} onUpdate={onUpdate}/>}
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",

@@ -52,7 +52,7 @@ function HelpScreen() {
       </Section>
 
       <Section title="📅 Tatil Takvimi" note="Resmî tatiller (hafta sonlarına ek) sistem genelinde iş günü matematiğine işlenir: kapasite bölünmesi, çalışma süresi ölçümü, kalan iş günü ve fatura takip günü tatilleri atlar.">
-        <Row left="Yönetim" right="Menü → Takvim (yalnız yönetici): tarih + ad + tam/yarım gün ekle-sil" sub="2026 resmî tatilleri yüklü geldi; dinî bayram tarihleri hilale göre ±1 gün oynayabilir — buradan düzeltilir."/>
+        <Row left="Yönetim" right="Menü → Takvim: HERKES görüntüler; ekleme/silme yönetici ve admin" sub="2026 resmî tatilleri yüklü geldi; dinî bayram tarihleri hilale göre ±1 gün oynayabilir — buradan düzeltilir."/>
         <Row left="Yarım gün" right="Arefe ve 31 Aralık gibi günlerde mesai 09:00-13:00 sayılır; kapasitede 0,5 iş günü"/>
       </Section>
 
@@ -61,6 +61,12 @@ function HelpScreen() {
         <Row left="Çok kişili işte" right="🚀'yi koyan kişi o işin aktif çalışanı olur; iş zaten başladıysa ikinci atanan da kendi 🚀'sini koyarak katılır (durum değişmez)" sub="Profilinde, başkasının çalıştığı ama senin girmediğin iş 'sen: beklemede' rozetiyle görünür."/>
         <Row left="Revizyonda" right="Revizyona dönen iş otomatik 'çalışılıyor' sayılmaz — fiilen başlarken 🚀 koy (süren doğru ölçülür)"/>
         <Row left="Sıralı işte" right="Kuyruk ilerlerken başka işte çalışıyorsan sıradaki iş otomatik BAŞLATILMAZ; plana alınır ve sana DM gelir — hazır olunca 🚀"/>
+      </Section>
+
+      <Section title="🧩 Fazlı İşler" note="Bir işin devamı (ör. tasarım → baskı) YENİ FAZ olarak açılır: ayrı thread, ayrı termin ve statüyle bağımsız ilerler; köke bağlı olduğu için raporlarda ilişkilidir.">
+        <Row left="Dashboard'dan" right="İş detayı (drawer) → 🧩 Fazlar → '+ Faz ekle' (termin seç) — atananlar/tip/faturalama önceki fazdan kopyalanır" sub="Başlık otomatik '… — Faz N' gelir; drawer'dan düzenlenebilir (ör. 'ABC işi — Baskı')."/>
+        <Row left="Slack'ten" right="İş thread'ine 'faz ekle' yaz → çıkan 🧩 butonuyla termin gir" sub="Yeni thread'in başına önceki fazın özeti ve linki düşer; eski thread'e de yeni fazın linki yazılır."/>
+        <Row left="Zincir" right="Drawer'da tüm fazlar şerit olarak görünür; Ody'ye '#128 nedir' sorunca fazları da listeler"/>
       </Section>
 
       <Section title="🧾 Faturalama & Takip" note="Tüm müşteriler aylık fee (retainer) ile çalışır; yalnız ek işler ayrıca faturalanır. Faturalama İŞ AÇILIRKEN seçilir (varsayılan: fee).">

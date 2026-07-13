@@ -589,6 +589,47 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
 // Sorun/öneri bildirimleri bu kişilere DM olarak düşer.
 const FEEDBACK_ADMINS = ['U030C48PL23', 'UD96GH76E'];   // Görkem, Reyhan
 
+// ── Fazlı işler: thread'de 'faz ekle' → kart → modal → POST /faz ──
+app.action('bns_faz_ac', async ({ ack, body, client, action }) => {
+  await ack();
+  let v = {}; try { v = JSON.parse(action.value || '{}'); } catch {}
+  try {
+    await client.views.open({
+      trigger_id: body.trigger_id,
+      view: {
+        type: 'modal', callback_id: 'bns_faz_modal',
+        private_metadata: JSON.stringify(v),
+        title: { type: 'plain_text', text: 'Yeni Faz Aç' },
+        submit: { type: 'plain_text', text: 'Faz Aç' }, close: { type: 'plain_text', text: 'İptal' },
+        blocks: [
+          { type: 'context', elements: [{ type: 'mrkdwn', text: `🧩 Kaynak iş: *#${v.no}* — atananlar ve ayarlar kopyalanır, faz kendi thread'iyle bağımsız ilerler.` }] },
+          { type: 'input', block_id: 'baslik_b', optional: true, label: { type: 'plain_text', text: 'Başlık (boş = otomatik "… — Faz N")' },
+            element: { type: 'plain_text_input', action_id: 'baslik' } },
+          { type: 'input', block_id: 'deadline_b', label: { type: 'plain_text', text: 'Termin — zorunlu' },
+            element: { type: 'datetimepicker', action_id: 'deadline' } },
+        ],
+      },
+    });
+  } catch (e) { log(`faz modal hata: ${e.message}`); }
+});
+app.view('bns_faz_modal', async ({ ack, body, view, client }) => {
+  const v = view.state.values;
+  const dtSec = v.deadline_b?.deadline?.selected_date_time || null;
+  if (!dtSec) { await ack({ response_action: 'errors', errors: { deadline_b: 'Termin seç.' } }); return; }
+  await ack();
+  let meta = {}; try { meta = JSON.parse(view.private_metadata || '{}'); } catch {}
+  const uid = body.user?.id;
+  const r = await sendWriteRaw('POST', `/api/briefs/${meta.id}/faz`, {
+    by: uid, deadline: new Date(dtSec * 1000).toISOString(),
+    baslik: (v.baslik_b?.baslik?.value || '').trim() || undefined,
+  });
+  const msg = r.ok
+    ? `🧩 Faz ${r.json.faz_no} açıldı: *#${r.json.no}*${r.json.slack && r.json.slack.permalink ? `\n${r.json.slack.permalink}` : ''}`
+    : `❌ Faz açılamadı: ${r.json.error || r.status}`;
+  try { await client.chat.postMessage({ channel: uid, text: msg, username: BOT_NAME }); } catch {}
+  log(`[faz] ${meta.id} by ${uid} → ${r.status}`);
+});
+
 // ── WIP=1: durum yazıcı — basladi'da çakışma (409) olursa thread'e onay kartı ──
 // Diğer durumlar/başarısızlıklar eski dbWrite yolundan (kuyruk semantiği) akar.
 async function wipStatusYaz(briefTs, kanal, body) {
@@ -1530,6 +1571,8 @@ app.event('message', async ({ event, client }) => {
       { key: 'yeniden aç',     type: 'durum',    value: 'calisiliyor' },
       { key: 'geri aç',        type: 'durum',    value: 'calisiliyor' },
       { key: 'bloke et',       type: 'durum',    value: 'blokeli'     },
+      { key: 'faz ekle',       type: 'faz' },
+      { key: 'yeni faz',       type: 'faz' },
       { key: 'müşteriye yollandı',  type: 'durum', value: 'musteride' },
       { key: 'müşteriye gönderildi', type: 'durum', value: 'musteride' },
       { key: 'musteriye yollandi',  type: 'durum', value: 'musteride' }, // ASCII varyant
@@ -1582,7 +1625,24 @@ app.event('message', async ({ event, client }) => {
     const kMatch = KEYWORD_MAP.find(({ key }) => norm === key);
     if (kMatch) {
       const briefTs = event.thread_ts;
-      if (kMatch.type === 'durum') {
+      if (kMatch.type === 'faz') {
+        // Yeni faz kartı — buton modal açar (mesaj event'inde trigger_id yok)
+        try {
+          const bi = await fetch(`${API_BASE}/api/embedded`, { headers: { 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' } })
+            .then(r => r.json()).then(ed => [...(ed.bns_briefs || []), ...(ed.bns_completed || [])].find(x => x.slack_ts === briefTs || x.thread_ozet_ts === briefTs));
+          const hedefBrief = bi || null;
+          await client.chat.postMessage({
+            channel: event.channel, thread_ts: briefTs, username: BOT_NAME,
+            text: 'Yeni faz açmak için butona bas.',
+            blocks: [
+              { type: 'section', text: { type: 'mrkdwn', text: `🧩 *Yeni faz* — bu işin devamı ayrı bir iş olarak (kendi thread ve terminiyle) açılır.` } },
+              { type: 'actions', elements: [{ type: 'button', style: 'primary', action_id: 'bns_faz_ac',
+                value: JSON.stringify({ id: hedefBrief ? hedefBrief.id : null, no: hedefBrief ? hedefBrief.no : '?' }),
+                text: { type: 'plain_text', text: '🧩 Faz aç' } }] },
+            ],
+          });
+        } catch (e) { log(`faz kart hata: ${e.message}`); }
+      } else if (kMatch.type === 'durum') {
         const chk = await statusYetki(event.user, briefTs);
         if (!chk.ok) { await statusYetkiRed(client, event.user, chk, kMatch.value); return; }
         log(`durum keyword: "${kMatch.key}" → ${kMatch.value} | ${briefTs} — ${event.user}`);
