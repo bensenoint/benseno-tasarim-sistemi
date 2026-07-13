@@ -718,9 +718,15 @@ try {
     if (Array.isArray(ed.bns_users) && ed.bns_users.length > 0) {
       // live-data'da alan adı "dept", mock'ta "rol" — normalize + kanonik isim overlay
       window.BNS_DATA.USERS = ed.bns_users.map(bnsMergeUser);
-      // ME varsa koru, yoksa Görkem'i bul, yoksa ilk yönetici
-      const meId = window.BNS_DATA.ME?.id;
-      const me = ed.bns_users.find(u => u.id === meId) ||
+      // ME = GİRİŞ YAPAN kullanıcı (bns_user) ESASTIR. Eski davranış mock ME'yi (Görkem sabiti)
+      // koruyordu → herkes başlıkta/karşılamada 'Görkem' görüyordu (Serra vakası). Görkem/yönetici
+      // fallback'i YALNIZ girişsiz (anon önizleme) durumda kalır.
+      let _giris = null;
+      try { _giris = JSON.parse(localStorage.getItem('bns_user') || 'null'); } catch (e) {}
+      const girisId = _giris && _giris.slack_id;
+      const me = (girisId && ed.bns_users.find(u => u.id === girisId)) ||
+                 (girisId ? { id: girisId, name: _giris.name || 'Kullanıcı', rol: _giris.role === 'admin' ? 'yonetici' : '' } : null) ||
+                 ed.bns_users.find(u => u.id === window.BNS_DATA.ME?.id) ||
                  ed.bns_users.find(u => u.id === 'U030C48PL23') ||
                  ed.bns_users.find(u => u.rol === 'yonetici') ||
                  ed.bns_users[0];
