@@ -395,6 +395,7 @@ async function statusYetki(userId, briefTs) {
     if (u && (u.rol === 'yonetici' || u.yetki === 'yonetici')) return { ok: true };
     if (b.created_by === userId) return { ok: true };
     const atanan = [...(b.workers || []), ...(b.leads || [])].some(p => p && p.id === userId);
+    if (!atanan) log(`statusYetki RED detay: ${userId} → #${b.no} | workers=${(b.workers || []).map(p => p && p.id).join(',')} leads=${(b.leads || []).map(p => p && p.id).join(',')} by=${b.created_by}`);
     return atanan ? { ok: true } : { ok: false, no: b.no, marka: b.marka || '' };
   } catch (e) { log(`statusYetki hata (fail-open): ${e.message}`); return { ok: true }; }
 }
