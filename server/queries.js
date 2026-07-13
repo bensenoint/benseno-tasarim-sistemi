@@ -27,7 +27,7 @@ async function allBriefsWithAssignees() {
     LEFT JOIN briefs pb ON pb.id = b.parent_id
     LEFT JOIN brief_assignees a ON a.brief_id = b.id
     LEFT JOIN users u ON u.id = a.user_id
-    GROUP BY b.id, br.name, br.color
+    GROUP BY b.id, br.name, br.color, pb.no
     ORDER BY b.no`);
   return r.rows.map(row => {
     const as = row.assignees || [];
