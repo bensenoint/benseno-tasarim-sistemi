@@ -156,7 +156,7 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, draggab
         background: hover ? "var(--paper-2)" : (stripe ? "var(--row-stripe)" : "transparent"),
         height: "var(--row-h)"
       }}>
-      <td style={cellStyle(true, "right")}>{brief.no}</td>
+      <td style={cellStyle(true, "right")} title={brief.parent_no ? "Faz " + (brief.faz_no || 1) + " · kök #" + brief.parent_no : undefined}>{(typeof bnsFazEtiket === 'function' ? bnsFazEtiket(brief).slice(1) : brief.no)}</td>
       <td style={cellStyle()}><PriorityBadge p={brief.oncelik || { code: "ylw", label: "NORMAL" }}/></td>
       <td style={cellStyle()}><PriorityBadge p={brief.priority} deltaH={brief.deltaH} compact/></td>
       <td style={cellStyle()}><BrandChip brand={brief.brand} size="sm"/></td>

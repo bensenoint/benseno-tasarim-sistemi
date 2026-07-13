@@ -109,7 +109,7 @@ function PeoplePicker({ label, users, selected, onChange, grouped }) {
 }
 
 // ── API modu: tam intake formu → POST /api/briefs ────────────
-function APIBriefForm({ apiBase, data, onClose }) {
+function APIBriefForm({ apiBase, data, onClose, prefill }) {
   const users = (data.USERS || []).filter(u => u.active !== false);
   const brands = data.BRANDS || [];
   // Açan kişi = GİRİŞ YAPAN kullanıcı (login). data.ME varsayılanı Görkem'e sabitti —
@@ -117,7 +117,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
   const logged = (() => { try { return JSON.parse(localStorage.getItem("bns_user") || "null"); } catch { return null; } })();
   const me = (logged && users.find(u => u.id === logged.slack_id)) || data.ME || {};
   const [f, setF] = React.useState({
-    marka: "", baslik: "", deadlineDate: "", deadlineTime: "17:00",
+    marka: (prefill && prefill.marka) || "", baslik: (prefill && prefill.baslik) || "", deadlineDate: "", deadlineTime: "17:00",
     workerIds: [], leadIds: [], gozlemciIds: [],   // lead boş → server işi vereni lead yapar
     musteri_notu: "", akis: "paralel", maliyet: "", satis: "", isTipi: "", ucretTipi: "",
   });
@@ -150,6 +150,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
       maliyet: f.ucretTipi === "ek" && f.maliyet !== "" ? Number(f.maliyet) : undefined,
       satis: f.ucretTipi === "ek" && f.satis !== "" ? Number(f.satis) : undefined,
       by: me.id || undefined,
+      parent_id: (prefill && prefill.parentId) || undefined,   // fazlı iş: zincire bağlanır
       source: "dashboard",
     };
     const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
@@ -188,9 +189,13 @@ function APIBriefForm({ apiBase, data, onClose }) {
 
   return (
     <div style={{ padding: "18px", maxHeight: "62vh", overflowY: "auto", display: "flex", flexDirection: "column", gap: 14 }}>
+      {prefill && prefill.parentId && (
+        <div style={{ padding: "9px 12px", background: "var(--paper-2)", borderRadius: 8, font: "500 12px/1.4 var(--font-sans)", color: "var(--ink-2)" }}>
+          🧩 <b>{prefill.kokEtiket || ""}</b> işine yeni faz açıyorsun — atananlar, iş tipi ve faturalama bu faz için yeniden seçilir; yeni thread açılır.</div>
+      )}
       <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <span style={FIELD_LABEL}>Marka *</span>
-        <select value={f.marka} onChange={e => set("marka", e.target.value)} style={FIELD_BOX}>
+        <select value={f.marka} onChange={e => set("marka", e.target.value)} disabled={!!(prefill && prefill.marka)} style={{ ...FIELD_BOX, opacity: prefill && prefill.marka ? .6 : 1 }}>
           <option value="">Marka seç…</option>
           {brands.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
         </select>
@@ -294,7 +299,7 @@ function APIBriefForm({ apiBase, data, onClose }) {
   );
 }
 
-function NewBriefModal({ open, onClose, data }) {
+function NewBriefModal({ open, onClose, data, prefill }) {
   const [marka, setMarka] = React.useState("");
   const isMobile = typeof useIsMobile === "function" ? useIsMobile() : false;
   React.useEffect(() => { if (open) setMarka(""); }, [open]);
@@ -349,7 +354,7 @@ function NewBriefModal({ open, onClose, data }) {
         </div>
 
         {apiBase ? (
-          <APIBriefForm apiBase={apiBase} data={data} onClose={onClose} />
+          <APIBriefForm apiBase={apiBase} data={data} onClose={onClose} prefill={prefill}/>
         ) : (
           <>
             <div style={{ padding: "20px 18px" }}>

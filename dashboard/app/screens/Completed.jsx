@@ -121,7 +121,7 @@ function CompletedScreen({ data, onOpenBrief, currentUser }) {
             {rows.map((c, idx) => (
               <tr key={c.id} onClick={() => onOpenBrief && onOpenBrief(c)} title="İşin akışını görüntüle"
                 style={{background: idx % 2 === 1 ? "var(--row-stripe)" : "transparent", cursor: onOpenBrief ? "pointer" : "default"}}>
-                <td style={cs(true, "right")}>{c.no}</td>
+                <td style={cs(true, "right")}>{(typeof bnsFazEtiket === 'function' ? bnsFazEtiket(c).slice(1) : c.no)}</td>
                 <td style={cs()}><BrandChip brand={c.brand} size="sm"/></td>
                 <td style={{...cs(), maxWidth: 240, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{c.baslik}</td>
                 <td className="bns-col-mobile-hide" style={cs()}><Avatar user={c.lead} size={20}/></td>

@@ -720,6 +720,13 @@ function bnsFaturaTopluGunu(nowMs) {
   return bnsKeyFromGun(g25);
 }
 
+// Faz etiketi: kök '#12'; fazlar '#12a', '#12b'… (faz_no 2 → a). Zincir tek kimlikte okunur.
+function bnsFazEtiket(b) {
+  if (!b) return '';
+  if (b.parent_no && (b.faz_no || 1) > 1) return '#' + b.parent_no + String.fromCharCode(95 + b.faz_no);
+  return '#' + (b.no != null ? b.no : '');
+}
+
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes, bnsFaturaEksikleri, bnsFaturaTopluGunu, bnsTatilYukle, bnsGunKatsayi, bnsEvdenGunMu, bnsMesaiSaatKesBolu, bnsNetIsSaatiBolu };
+  module.exports = { bnsCapPct, bnsDeptActive, bnsDeptCapPct, bnsDeptLoad, bnsBriefsAsOf, bnsPersonLoad, bnsBriefLoadWeight, bnsPersonCapLimit, bnsPersonCapPct, bnsSureH, bnsCycleSure, bnsGecikmeH, bnsIsRisk, bnsThroughput, bnsUzatmaCeza, bnsUzatmaCezaFromTimes, bnsRatingWithPenalty, bnsDeliveryStatus, BNS_H, BNS_RISK_H, bnsBriefActionPerms, BNS_NEXT_STATUS, bnsKarMarj, bnsFinansOzet, bnsSinyalKapasite, bnsSinyalGeciken, bnsSinyalMarkaRisk, bnsSinyalKisiKalite, bnsBaselineCycle, bnsGecikmeOngoru, bnsKisiPerformans, bnsSinyalGecikme, bnsSinyalBurnout, bnsKisiTrend, bnsGunKey, bnsIsGunuMu, bnsKalanIsGunu, bnsYayilimGunlukPay, bnsKisiGunDoluluk, bnsKisiGunlukSeri, bnsDeptGunDoluluk, bnsFirmaGunDoluluk, bnsNetIsSaati, bnsTipSureIstatistik, bnsTipikSure, bnsMesaiSaatKes, bnsFaturaEksikleri, bnsFaturaTopluGunu, bnsTatilYukle, bnsGunKatsayi, bnsEvdenGunMu, bnsMesaiSaatKesBolu, bnsNetIsSaatiBolu, bnsFazEtiket };
 }

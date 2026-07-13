@@ -2,30 +2,18 @@
 
 // ─── Fazlar: zincir şeridi + yeni faz aç (yeni brief + yeni thread; köke bağlı) ───
 function FazBolumu({ b, onUpdate }) {
-  const [acik, setAcik] = React.useState(false);
-  const [dl, setDl] = React.useState("");
-  const [st, setSt] = React.useState(null);
   const all = [...((window.BNS_DATA && window.BNS_DATA.briefs) || []), ...((window.BNS_DATA && window.BNS_DATA.completed) || [])];
   const kokId = b.parent_id || b.id;
   const zincir = all.filter(x => x.id === kokId || x.parent_id === kokId)
     .sort((x, y) => (x.faz_no || 1) - (y.faz_no || 1));
-  const olustur = async () => {
-    if (!dl) { setSt("Termin seç."); return; }
-    setSt("açılıyor");
-    try {
-      const apiBase = (window.bnsResolveApiBase && window.bnsResolveApiBase()) || 'https://benseno-api-production.up.railway.app';
-      const tok = localStorage.getItem('bns_token');
-      const r = await fetch(`${apiBase}/api/briefs/${b.id}/faz`, {
-        method: 'POST', headers: { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) },
-        body: JSON.stringify({ deadline: new Date(dl + "T17:00:00+03:00").toISOString() }),
-      });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) { setSt(j.error || 'açılamadı'); return; }
-      setSt(null); setAcik(false); setDl("");
-      if (window.bnsToast) window.bnsToast(`🧩 Faz ${j.faz_no} açıldı: #${j.no} — başlığı drawer'dan düzenleyebilirsin`);
-      if (window.bnsRefresh) window.bnsRefresh();
-      onUpdate && onUpdate();
-    } catch (e) { setSt('bağlantı hatası'); }
+  const kokBaslik = String((zincir[0] && zincir[0].baslik) || b.baslik || "").replace(/\s+—\s+Faz \d+$/, "");
+  const sonrakiFaz = Math.max(1, ...zincir.map(x => x.faz_no || 1)) + 1;
+  const fazAc = () => {
+    if (window.openNewBriefModal) window.openNewBriefModal({
+      marka: b.marka, parentId: b.id,
+      baslik: kokBaslik + " — Faz " + sonrakiFaz,
+      kokEtiket: (typeof bnsFazEtiket === "function" ? bnsFazEtiket(b) : "#" + b.no) + " " + kokBaslik,
+    });
   };
   return (
     <div style={{ margin: "0 20px 12px", display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
@@ -34,20 +22,10 @@ function FazBolumu({ b, onUpdate }) {
         <span key={f.id} title={f.baslik} style={{ font: "500 11px var(--font-mono)", borderRadius: 999, padding: "3px 9px",
           border: "1px solid " + (f.id === b.id ? "var(--ody)" : "var(--line)"),
           color: f.id === b.id ? "var(--ody)" : "var(--ink-3)" }}>
-          #{f.no} · F{f.faz_no || 1}{f.durum === "tamamlandi" || f.bitis ? " ✓" : ""}</span>
+          {typeof bnsFazEtiket === "function" ? bnsFazEtiket(f) : "#" + f.no}{f.durum === "tamamlandi" || f.bitis ? " ✓" : ""}</span>
       )) : <span style={{ font: "400 11px var(--font-sans)", color: "var(--ink-4)" }}>tek faz</span>}
-      {!acik ? (
-        <button onClick={() => setAcik(true)} style={{ font: "600 11px var(--font-sans)", border: "1px solid var(--line-strong)",
-          background: "var(--surface)", color: "var(--ink-2)", borderRadius: 6, padding: "5px 10px", cursor: "pointer" }}>+ Faz ekle</button>
-      ) : (
-        <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
-          <input type="date" value={dl} onChange={e => setDl(e.target.value)}
-            style={{ font: "400 12px var(--font-sans)", padding: "4px 8px", border: "1px solid var(--line-strong)", borderRadius: 6, background: "var(--surface)", color: "var(--ink)" }}/>
-          <button onClick={olustur} disabled={st === "açılıyor"} style={{ font: "600 11px var(--font-sans)", border: 0, background: "var(--ody)", color: "#fff", borderRadius: 6, padding: "6px 11px", cursor: "pointer" }}>Aç</button>
-          <button onClick={() => { setAcik(false); setSt(null); }} style={{ font: "400 11px var(--font-sans)", border: 0, background: "transparent", color: "var(--ink-4)", cursor: "pointer" }}>vazgeç</button>
-        </span>
-      )}
-      {st && st !== "açılıyor" && <span style={{ font: "400 11px var(--font-sans)", color: "var(--prio-red, #c00)" }}>{st}</span>}
+      <button onClick={fazAc} style={{ font: "600 11px var(--font-sans)", border: "1px solid var(--line-strong)",
+        background: "var(--surface)", color: "var(--ink-2)", borderRadius: 6, padding: "5px 10px", cursor: "pointer" }}>+ Faz ekle</button>
     </div>
   );
 }
@@ -304,7 +282,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
         <div {...(isMobile ? sheetDrag : {})} style={{padding: isMobile ? "6px 16px 14px" : "14px 20px", borderBottom:"1px solid var(--line)", display:"flex", alignItems:"center", justifyContent:"space-between", touchAction: isMobile ? "none" : "auto"}}>
           <div style={{display:"flex", alignItems:"center", gap:10}}>
             <BrandChip brand={b.brand}/>
-            <span style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-4)"}}>#{b.no}</span>
+            <span title={b.parent_no ? "Faz " + (b.faz_no || 1) + " · kök #" + b.parent_no : undefined} style={{font:"500 12px/1 var(--font-mono)", color:"var(--ink-4)"}}>{typeof bnsFazEtiket === "function" ? bnsFazEtiket(b) : "#" + b.no}</span>
           </div>
           <button onClick={onClose} style={{
             border:0, background:"transparent", cursor:"pointer", color:"var(--ink-3)",

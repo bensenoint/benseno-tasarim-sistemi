@@ -594,6 +594,7 @@ app.action('bns_faz_ac', async ({ ack, body, client, action }) => {
   await ack();
   let v = {}; try { v = JSON.parse(action.value || '{}'); } catch {}
   try {
+    const tipler = await isTipleriGetir();
     await client.views.open({
       trigger_id: body.trigger_id,
       view: {
@@ -602,11 +603,24 @@ app.action('bns_faz_ac', async ({ ack, body, client, action }) => {
         title: { type: 'plain_text', text: 'Yeni Faz Aç' },
         submit: { type: 'plain_text', text: 'Faz Aç' }, close: { type: 'plain_text', text: 'İptal' },
         blocks: [
-          { type: 'context', elements: [{ type: 'mrkdwn', text: `🧩 Kaynak iş: *#${v.no}* — atananlar ve ayarlar kopyalanır, faz kendi thread'iyle bağımsız ilerler.` }] },
+          { type: 'context', elements: [{ type: 'mrkdwn', text: `🧩 Kaynak iş: *#${v.no}* — faz AYRI iştir: atananlar, iş tipi ve faturalama bu form üzerinde yeniden seçilir; yeni thread açılır.` }] },
           { type: 'input', block_id: 'baslik_b', optional: true, label: { type: 'plain_text', text: 'Başlık (boş = otomatik "… — Faz N")' },
             element: { type: 'plain_text_input', action_id: 'baslik' } },
           { type: 'input', block_id: 'deadline_b', label: { type: 'plain_text', text: 'Termin — zorunlu' },
             element: { type: 'datetimepicker', action_id: 'deadline' } },
+          { type: 'input', block_id: 'workers_b', label: { type: 'plain_text', text: 'İşi yapan(lar) — zorunlu' },
+            element: { type: 'multi_users_select', action_id: 'workers' } },
+          ...(tipler.length ? [{ type: 'input', block_id: 'is_tipi_b', label: { type: 'plain_text', text: 'İş Tipi' },
+            element: { type: 'static_select', action_id: 'is_tipi', placeholder: { type: 'plain_text', text: 'Tip seç' },
+              option_groups: [...new Set(tipler.map(t => t.grup))].map(g => ({
+                label: { type: 'plain_text', text: g },
+                options: tipler.filter(t => t.grup === g).map(t => ({ text: { type: 'plain_text', text: t.ad }, value: t.kod })),
+              })) } }] : []),
+          { type: 'input', block_id: 'fatura_b', label: { type: 'plain_text', text: 'Faturalama' },
+            element: { type: 'radio_buttons', action_id: 'ucret_tipi', options: [
+              { text: { type: 'plain_text', text: '🔒 Aylık fee — retainer kapsamında' }, value: 'kapsamda' },
+              { text: { type: 'plain_text', text: '➕ Ek iş — ayrıca faturalanır' }, value: 'ek' },
+            ] } },
         ],
       },
     });
@@ -622,6 +636,9 @@ app.view('bns_faz_modal', async ({ ack, body, view, client }) => {
   const r = await sendWriteRaw('POST', `/api/briefs/${meta.id}/faz`, {
     by: uid, deadline: new Date(dtSec * 1000).toISOString(),
     baslik: (v.baslik_b?.baslik?.value || '').trim() || undefined,
+    worker_ids: v.workers_b?.workers?.selected_users || [],
+    is_tipi: v.is_tipi_b?.is_tipi?.selected_option?.value || undefined,
+    ucret_tipi: v.fatura_b?.ucret_tipi?.selected_option?.value || undefined,
   });
   const msg = r.ok
     ? `🧩 Faz ${r.json.faz_no} açıldı: *#${r.json.no}*${r.json.slack && r.json.slack.permalink ? `\n${r.json.slack.permalink}` : ''}`

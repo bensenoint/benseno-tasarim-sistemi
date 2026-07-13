@@ -250,7 +250,7 @@ function App({ currentUser, onLogout }) {
   const [newBrief, setNewBrief] = React.useState(false);
   // Global erişim: Department/diğer ekranlar buradan modal açabilir
   React.useEffect(() => {
-    window.openNewBriefModal = () => setNewBrief(true);
+    window.openNewBriefModal = (prefill) => setNewBrief(prefill ? { prefill } : true);
     window.bnsRefresh = () => setPollTick(x => x + 1);   // yazma sonrası anlık poll (NewBrief formu çağırır)
     // Bildirim popover'ından "detaya git": briefId ile o işin drawer'ını aç.
     window.bnsOpenBriefById = (id) => {
@@ -804,7 +804,7 @@ function App({ currentUser, onLogout }) {
         onNewBrief={() => setNewBrief(true)}/>
 
       <NewBriefModal
-        open={newBrief} onClose={() => setNewBrief(false)}
+        open={!!newBrief} prefill={(newBrief && newBrief.prefill) || null} onClose={() => setNewBrief(false)}
         data={data}
         onCreate={onCreateBrief}/>
 

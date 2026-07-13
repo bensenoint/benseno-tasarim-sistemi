@@ -13,7 +13,7 @@ async function allBriefsWithAssignees() {
            b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
            b.akis, b.stale, b.created_at, b.created_by, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.thread_ton, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
-           b.rating, b.rating_by, b.rating_sebep, b.ucret_tipi, b.is_tipi, b.parent_id, b.faz_no,
+           b.rating, b.rating_by, b.rating_sebep, b.ucret_tipi, b.is_tipi, b.parent_id, b.faz_no, pb.no AS parent_no,
            b.deadline_orig, b.uzatma_sayisi, b.uzatma_ceza, b.uzatma_muaf, b.deadline_history,
            b.termin_oneri_at, b.termin_oneri_ms,
            b.image_url, b.started_at, b.basladi_at,
@@ -24,6 +24,7 @@ async function allBriefsWithAssignees() {
            ) FILTER (WHERE u.id IS NOT NULL), '[]') AS assignees
     FROM briefs b
     LEFT JOIN brands br ON br.id = b.marka_id
+    LEFT JOIN briefs pb ON pb.id = b.parent_id
     LEFT JOIN brief_assignees a ON a.brief_id = b.id
     LEFT JOIN users u ON u.id = a.user_id
     GROUP BY b.id, br.name, br.color
@@ -166,7 +167,7 @@ async function getEmbedded({ sensitive = true } = {}) {
   for (const br of brands.rows) brandColor[br.name] = br.color;
 
   const bns_briefs = all.filter(b => !b.completed_at && !b.deleted_at).map(b => ({
-    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, is_tipi: b.is_tipi || null, parent_id: b.parent_id || null, faz_no: b.faz_no || 1, dept: b.dept || '',
+    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, is_tipi: b.is_tipi || null, parent_id: b.parent_id || null, faz_no: b.faz_no || 1, parent_no: b.parent_no || null, dept: b.dept || '',
     oncelik: b.priority || '🟡',   // manuel öncelik (🔴🟠🟡🟢) — girilmemişse NORMAL
     workers:   b.workers.map(w => ({ id: w.id, name: w.name, dept: w.dept || '', sira: w.sira ?? null, kisi_sira: w.kisi_sira ?? null, onay: !!w.onay_at, onay_by: w.onay_by || null, calisiyor: w.calisiyor === true })),
     akis: b.akis || 'paralel',
@@ -193,7 +194,7 @@ async function getEmbedded({ sensitive = true } = {}) {
   }));
 
   const bns_completed = all.filter(b => b.completed_at && !b.deleted_at).map(b => { const cyc = cycleOf(b); return ({
-    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, is_tipi: b.is_tipi || null, parent_id: b.parent_id || null, faz_no: b.faz_no || 1,
+    id: b.id, no: b.no, marka: b.marka, baslik: b.baslik, is_tipi: b.is_tipi || null, parent_id: b.parent_id || null, faz_no: b.faz_no || 1, parent_no: b.parent_no || null,
     leads:   b.leads.map(l => ({ id: l.id, name: l.name })),
     workers: b.workers.map(w => ({ id: w.id, name: w.name, sira: w.sira ?? null, kisi_sira: w.kisi_sira ?? null, onay: !!w.onay_at })),
     akis: b.akis || 'paralel',
@@ -220,7 +221,7 @@ async function getEmbedded({ sensitive = true } = {}) {
 
   const bns_deleted = all.filter(b => b.deleted_at).map(b => ({
     id: b.id, no: b.no, marka: b.marka, marka_color: brandColor[b.marka] || null,
-    baslik: b.baslik, is_tipi: b.is_tipi || null, parent_id: b.parent_id || null, faz_no: b.faz_no || 1, durum: b.durum,
+    baslik: b.baslik, is_tipi: b.is_tipi || null, parent_id: b.parent_id || null, faz_no: b.faz_no || 1, parent_no: b.parent_no || null, durum: b.durum,
     deleted_at: b.deleted_at, deleted_by: b.deleted_by,
   }));
 

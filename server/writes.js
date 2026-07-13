@@ -35,6 +35,7 @@ const briefCreate = z.object({
   satis: z.number().nullable().optional(),
   musteri_notu: z.string().optional(),
   is_tipi: z.string().max(40).optional(),      // iş tipi (is_tipleri.kod); yoksa başlıktan tahmin → 'diger'
+  parent_id: z.number().int().optional(),      // fazlı iş: kök/kaynak brief id — oluşum sonrası zincire bağlanır
   ucret_tipi: z.enum(['kapsamda', 'ek']).optional(),   // fatura-takip: girişte faturalama; yoksa marka varsayılanı
   tags: z.array(z.string()).optional(),
   no: z.number().int().optional(),
@@ -299,6 +300,10 @@ async function createBrief(raw) {
       console.error('[writes] slack post hata:', e.message);
       result.slack = { error: e.message };
     }
+  }
+  // Fazlı iş (dashboard formu yolu): parent_id verildiyse zincire bağla + çapraz notlar.
+  if (d.parent_id) {
+    try { await fazBagla(result.id, d.parent_id, result); } catch (e) { console.error('[faz] bağlama:', e.message); }
   }
   return result;
 }
@@ -983,8 +988,9 @@ async function reflectChange(briefId, summary, source, opts) {
   const dmAll = source !== 'slack' && (!opts || opts.dm !== false);
   try {
     const r = await pool.query(
-      `SELECT b.slack_ts, b.slack_channel, b.no, br.name AS marka
-       FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id WHERE b.id=$1`, [briefId]);
+      `SELECT b.slack_ts, b.slack_channel, b.no, b.baslik, b.faz_no, pb.no AS parent_no, br.name AS marka
+       FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id LEFT JOIN briefs pb ON pb.id = b.parent_id
+       WHERE b.id=$1`, [briefId]);
     const b = r.rows[0]; if (!b) return;
     // Güncellemeyi yapan kişi (dashboard veya Slack farketmez) — notun sonuna eklenir.
     let byName = '';
@@ -998,7 +1004,9 @@ async function reflectChange(briefId, summary, source, opts) {
     }
     // Çok satırlı özetlerde isim İLK satırın sonuna gelir (rol satırları altta kalır).
     const [ozet1, ...ozetRest] = String(summary).split('\n');
-    const text = `*#${b.no} ${b.marka || ''}* — ${ozet1}${byName}${ozetRest.length ? '\n' + ozetRest.join('\n') : ''}`;
+    // Bildirim düzeni (Görkem kuralı): İŞ ADI önce (ayırt edici), sonra olay; marka + faz-etiketli id sonda küçük.
+    const etiket = fazEtiketi(b.no, b.faz_no || 1, b.parent_no);
+    const text = `*${(b.baslik || '').slice(0, 90) || etiket}* — ${ozet1}${byName}\n${b.marka || ''} ${etiket}${ozetRest.length ? '\n' + ozetRest.join('\n') : ''}`;
     let replyTs = null;   // thread'e düşen notun ts'i — bildirim tam o mesaja gitsin
     if (b.slack_ts && b.slack_channel) {
       const tr = await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text });
@@ -1146,6 +1154,38 @@ async function applyTerminOneri(id, by, source) {
   return { ok: true, yeni_deadline: yeni };
 }
 
+// Faz etiketi: kök iş '#12'; fazlar '#12a', '#12b'… (faz_no 2 → a). Görsel kimlik — gerçek no ayrıdır.
+function fazEtiketi(no, fazNo, parentNo) {
+  if (parentNo && fazNo > 1) return '#' + parentNo + String.fromCharCode(95 + fazNo); // 2→a(97)
+  return '#' + no;
+}
+
+// Yeni brief'i faz zincirine bağlar: kök/faz_no hesabı + çapraz thread notları + önceki faz özeti.
+async function fazBagla(yeniId, parentId, yeniInfo) {
+  const parent = (await pool.query(
+    `SELECT b.*, br.name AS marka_adi FROM briefs b LEFT JOIN brands br ON br.id=b.marka_id WHERE b.id=$1`, [parentId])).rows[0];
+  if (!parent) return null;
+  const kokId = parent.parent_id || parent.id;
+  const fazNo = ((await pool.query(
+    `SELECT COALESCE(MAX(faz_no),1) AS n FROM briefs WHERE (id=$1 OR parent_id=$1) AND deleted_at IS NULL AND id<>$2`, [kokId, yeniId])).rows[0].n | 0) + 1;
+  await pool.query('UPDATE briefs SET parent_id=$1, faz_no=$2 WHERE id=$3', [kokId, fazNo, yeniId]);
+  try {
+    const yeni = yeniInfo || (await pool.query('SELECT no, slack_channel AS channel, slack_ts AS ts FROM briefs WHERE id=$1', [yeniId])).rows[0];
+    const ySlack = yeni.slack || { channel: yeni.channel, ts: yeni.ts, permalink: null };
+    if (ySlack.channel && ySlack.ts) {
+      const ozet = (parent.thread_ozet || '').slice(0, 700);
+      await slack.postThread({ channel: ySlack.channel, thread_ts: ySlack.ts,
+        text: `🧩 *Faz ${fazNo}* — önceki faz: *#${parent.no}*${parent.slack_url ? ` (${parent.slack_url})` : ''}` +
+          (ozet ? `\n📎 Önceki faz özeti: ${ozet}` : '') });
+    }
+    if (parent.slack_channel && parent.slack_ts) {
+      await slack.postThread({ channel: parent.slack_channel, thread_ts: parent.slack_ts,
+        text: `🧩 *Faz ${fazNo} açıldı:* #${yeni.no}${ySlack.permalink ? ` — ${ySlack.permalink}` : ''}` });
+    }
+  } catch (e) { console.error('[faz] çapraz not:', e.message); }
+  return fazNo;
+}
+
 // ── Fazlı işler: mevcut işten yeni faz aç (spec: 2026-07-10 toplu düzenlemeler C) ──
 // Yeni faz AYRI brief'tir (kendi thread/termin/statü); köke parent_id ile bağlanır.
 // Önceki fazın thread özeti yeni thread'e taşınır; iki thread çapraz linklenir.
@@ -1166,38 +1206,23 @@ async function createFaz(parentId, raw) {
   const kokId = parent.parent_id || parent.id;   // fazlar hep köke bağlanır (düz zincir)
   const fazNo = ((await pool.query(
     `SELECT COALESCE(MAX(faz_no),1) AS n FROM briefs WHERE (id=$1 OR parent_id=$1) AND deleted_at IS NULL`, [kokId])).rows[0].n | 0) + 1;
-  // Atananlar: verilmediyse önceki fazdan kopyala
-  const as = await pool.query(`SELECT user_id, role FROM brief_assignees WHERE brief_id=$1`, [parentId]);
-  const workerIds = (raw.worker_ids && raw.worker_ids.length) ? raw.worker_ids
-    : as.rows.filter(x => x.role === 'contributor').map(x => x.user_id);
-  const leadIds = as.rows.filter(x => x.role === 'lead').map(x => x.user_id);
+  // KOPYASIZ: atananlar/tip/faturalama fazın kendi formunda yeniden seçilir (Görkem kuralı).
+  if (!raw.worker_ids || !raw.worker_ids.length) { const e = new Error('yeni faz için işi yapan(lar) seçilmeli'); e.status = 400; throw e; }
   const kokBaslik = String(parent.baslik || '').replace(/\s+—\s+Faz \d+$/, '');
   const yeni = await createBrief({
     marka: parent.marka_adi,
     baslik: (raw.baslik && String(raw.baslik).trim()) || `${kokBaslik} — Faz ${fazNo}`,
     deadline: raw.deadline,
-    worker_ids: workerIds.length ? workerIds : [by].filter(Boolean),
-    lead_ids: leadIds.length ? leadIds : undefined,
-    is_tipi: raw.is_tipi || parent.is_tipi || undefined,
-    ucret_tipi: raw.ucret_tipi || parent.ucret_tipi || undefined,
-    akis: parent.akis || 'paralel',
-    musteri_notu: parent.musteri_notu || undefined,
+    worker_ids: raw.worker_ids,
+    lead_ids: raw.lead_ids && raw.lead_ids.length ? raw.lead_ids : undefined,
+    gozlemci_ids: raw.gozlemci_ids && raw.gozlemci_ids.length ? raw.gozlemci_ids : undefined,
+    is_tipi: raw.is_tipi || undefined,          // yoksa createBrief başlıktan tahmin eder
+    ucret_tipi: raw.ucret_tipi || undefined,    // yoksa marka varsayılanı
+    akis: raw.akis || 'paralel',
+    musteri_notu: raw.musteri_notu || undefined,
     by, source: 'dashboard',   // yeni kanal thread'i açılır
   });
-  await pool.query('UPDATE briefs SET parent_id=$1, faz_no=$2 WHERE id=$3', [kokId, fazNo, yeni.id]);
-  // Çapraz bağlam: yeni thread'e önceki fazın özeti; eski thread'e yeni faz linki (best-effort)
-  try {
-    if (yeni.slack && yeni.slack.channel && yeni.slack.ts) {
-      const ozet = (parent.thread_ozet || '').slice(0, 700);
-      await slack.postThread({ channel: yeni.slack.channel, thread_ts: yeni.slack.ts,
-        text: `🧩 *Faz ${fazNo}* — önceki faz: *#${parent.no}*${parent.slack_url ? ` (${parent.slack_url})` : ''}` +
-          (ozet ? `\n📎 Önceki faz özeti: ${ozet}` : '') });
-    }
-    if (parent.slack_channel && parent.slack_ts) {
-      await slack.postThread({ channel: parent.slack_channel, thread_ts: parent.slack_ts,
-        text: `🧩 *Faz ${fazNo} açıldı:* #${yeni.no}${yeni.slack && yeni.slack.permalink ? ` — ${yeni.slack.permalink}` : ''}` });
-    }
-  } catch (e) { console.error('[faz] çapraz not:', e.message); }
+  await fazBagla(yeni.id, parentId, yeni);
   console.log(`[faz] #${parent.no} → Faz ${fazNo} = #${yeni.no}`);
   return { ...yeni, faz_no: fazNo, parent_no: parent.no };
 }

@@ -1266,7 +1266,10 @@ function ChatBot({ currentUser, dateRange }) {
                     const bc = brandColor(m.marka);
                     const initials = (m.lead && m.lead.name || "").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase();
                     // Başlıktan "#no marka —" önekini çıkar → yalnız olay kalsın (üst satırda zaten var, tekrar olmasın)
-                    const titleText = (sel.text || "").replace(/^#\d+\s+[^—–-]*[—–-]\s*/, "").trim() || sel.text;
+                    // Yeni bildirim düzeni: 'Başlık — olay\nmarka #12a'. Başlık ilk ' — ' öncesi;
+                    // eski format (#no marka — olay) için geriye uyumlu önek temizliği korunur.
+                    const _ilkSatir = (sel.text || "").split("\n")[0];
+                    const titleText = _ilkSatir.replace(/^#\d+\s+[^—–-]*[—–-]\s*/, "").trim() || _ilkSatir;
                     return (
                       <div style={{ padding: "18px 20px 22px", display: "flex", flexDirection: "column", gap: 13 }}>
                         {isM && <button onClick={() => setSelId(null)} style={{ alignSelf: "flex-start", border: 0, background: "transparent", color: "var(--blue, #24479E)", cursor: "pointer", font: "600 13px/1 var(--font-sans)", padding: 0, display: "inline-flex", alignItems: "center", gap: 4 }}>‹ bildirimler</button>}
