@@ -1156,6 +1156,8 @@ app.event('reaction_added', async ({ event, client }) => {
   const DURUM_MAP = {
     art: 'calisiliyor', writing_hand: 'calisiliyor', robot_face: 'calisiliyor',
     rocket: 'basladi',
+    outbox_tray: 'kontrole', mailbox_with_mail: 'kontrole',   // 📤/📬 yapan işi kontrole yolladı
+    'bso-kontrole': 'kontrole',
     eyes: 'incelemede',
     double_vertical_bar: 'beklemede',
     pencil2: 'revizyon', pencil: 'revizyon',
@@ -1453,7 +1455,8 @@ app.event('message', async ({ event, client }) => {
       { emoji: '✍',  durum: 'calisiliyor' },   // VS-16 olmadan yazılabilir
       { emoji: ':writing_hand:', durum: 'calisiliyor' },
       { emoji: '🤖', durum: 'calisiliyor' }, { emoji: ':robot_face:', durum: 'calisiliyor' },
-      { emoji: '🚀', durum: 'basladi' }, { emoji: ':rocket:', durum: 'basladi' },
+      { emoji: '🚀', durum: 'basladi' },
+      { emoji: '📤', durum: 'kontrole' }, { emoji: ':outbox_tray:', durum: 'kontrole' }, { emoji: ':rocket:', durum: 'basladi' },
       { emoji: '✅', durum: 'tamamlandi'  }, { emoji: ':white_check_mark:', durum: 'tamamlandi' },
       { emoji: '⏸️', durum: 'beklemede'   },
       { emoji: '⏸',  durum: 'beklemede'   },   // VS-16 olmadan
@@ -1511,6 +1514,10 @@ app.event('message', async ({ event, client }) => {
       // Durum
       { key: 'devam et',       type: 'durum',    value: 'calisiliyor' },
       { key: 'devam ediyor',   type: 'durum',    value: 'calisiliyor' },
+      { key: 'kontrole yolladım',   type: 'durum', value: 'kontrole' },
+      { key: 'kontrole yolladim',   type: 'durum', value: 'kontrole' },
+      { key: 'incelemeye yolladım', type: 'durum', value: 'kontrole' },
+      { key: 'incelemeye yolladim', type: 'durum', value: 'kontrole' },
       { key: 'iş incelemede',   type: 'durum',    value: 'incelemede'  },
       { key: 'iş inceleme',     type: 'durum',    value: 'incelemede'  }, // sık yazılan kısa varyant
       { key: 'is incelemede',   type: 'durum',    value: 'incelemede'  }, // ASCII varyant

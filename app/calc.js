@@ -256,8 +256,8 @@ function bnsDeliveryStatus(bitisMs, deadlineMs, beklemeMs, uzatildi) {
 
 // ── "Bugün"/aksiyon katmanı — ileri statü haritası + yetki kararı (saf, UI için) ──
 var BNS_NEXT_STATUS = {
-  yeni: 'calisiliyor', calisiliyor: 'basladi', basladi: 'incelemede',
-  incelemede: 'tamamlandi', revizyon: 'incelemede', beklemede: 'basladi', blokeli: 'basladi'
+  yeni: 'calisiliyor', calisiliyor: 'basladi', basladi: 'kontrole', kontrole: 'incelemede',
+  incelemede: 'tamamlandi', revizyon: 'kontrole', beklemede: 'basladi', blokeli: 'basladi'
 };
 // Brief satırında hangi aksiyonlar gösterilsin? Salt-veri (window bağımlılığı yok → node'da test edilir).
 function bnsBriefActionPerms(b, u) {
@@ -450,7 +450,7 @@ function bnsKisiTrend(completed, now) {
 // Sınıflar: BASLANMAMIS pay biner R sabit · CALISAN pay biner R-=pay · DURAN/BITTI pay 0 R sabit.
 // Reopen (BITTI→aktif) R=V. Overdue kalan gün=1. İş günü: Pzt-Cum Europe/Istanbul.
 var BNS_V2_CALISAN = { basladi: 1, revizyon: 1, incelemede: 1 };
-var BNS_V2_DURAN = { beklemede: 1, musteride: 1, blokeli: 1 };
+var BNS_V2_DURAN = { beklemede: 1, musteride: 1, blokeli: 1, kontrole: 1 };   // kontrole: yapan boşta (kapasite düşer); İŞ süresi (bnsNetIsSaati) yine de akar — o motorun DURAN seti ayrı
 // PERFORMANS: İstanbul 2016'dan beri SABİT UTC+3 (DST yok) → gün matematiği saf aritmetik.
 // Eski sürüm hot-loop'ta toLocaleDateString (Intl) çağırıyordu → departman ekranı ~24sn'ye çıkmıştı.
 var BNS_TR_OFF = 3 * BNS_H, BNS_GUN_MS = 24 * BNS_H;

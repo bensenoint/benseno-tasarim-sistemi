@@ -15,7 +15,7 @@ const NOTIFY_V2 = process.env.BNS_NOTIFY_V2 === '1';
 const slack = require('./slack');
 const calc = require('./calc-penalty.js'); // deadline uzatma cezası (API kökü server/; dashboard calc.js imajda yok)
 
-const DURUMLAR = ['yeni', 'calisiliyor', 'basladi', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'musteride', 'tamamlandi'];
+const DURUMLAR = ['yeni', 'calisiliyor', 'basladi', 'kontrole', 'incelemede', 'beklemede', 'revizyon', 'blokeli', 'musteride', 'tamamlandi'];
 
 // ── Zod şemaları ─────────────────────────────────────────────
 // U... = Slack kullanıcısı, FR... = freelancer (Slack'te yok, sadece takip için sentetik id)
@@ -651,6 +651,8 @@ async function setStatus(id, raw, _depth = 0) {
     note = `✏️ revizyon kaydedildi — iç: *${res.rev_ic}* · müşteri: *${res.rev_musteri}*`;
     note += `\n🚀 revizyona fiilen başlarken thread'e 🚀 koy — çalışma süren doğru ölçülsün.`;
     if (zincirNote) note += `\n${zincirNote}`;
+  } else if (d.durum === 'kontrole') {
+    note = `📤 *kontrole gönderildi* — işi isteyenin 👀 incelemesi bekleniyor. (Yapanın süresi durdu; işin süresi kontrole dahil akar.)`;
   } else if (zincirNote) {
     note = zincirNote;
   } else if (d.source === 'system' && d.durum === 'basladi') {
@@ -667,6 +669,17 @@ async function setStatus(id, raw, _depth = 0) {
     note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin uzat\` yaz (bekleme kadar uzatır) ya da \`termin 15.06 17:00\` ile tarih ver; bu uzatma **gecikme sayılmaz**. (Dashboard'da da tek tıkla var.)`;
   }
   await reflectChange(id, note, d.source, { by: d.by });
+  // 📤 kontrole: işi isteyen (lead'ler + açan) DM ile dürtülür — inceleme bekletilmesin.
+  if (d.durum === 'kontrole') {
+    try {
+      const bi = (await pool.query('SELECT no, baslik, created_by, slack_url FROM briefs WHERE id=$1', [id])).rows[0] || {};
+      const ls = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND role='lead'`, [id]);
+      const alicilar = [...new Set([...ls.rows.map(x => x.user_id), bi.created_by].filter(u => u && u !== d.by))];
+      for (const uid of alicilar) {
+        await slack.dm(uid, `📤 *#${bi.no}* ${bi.baslik || ''} kontrolüne geldi — incelediğinde thread'e 👀 koy.${bi.slack_url ? `\n${bi.slack_url}` : ''}`);
+      }
+    } catch (e) { console.error('[kontrole] dürtü:', e.message); }
+  }
   // Fatura-takip kartı: tamamlanan EK işte eksik (satış yok / fatura yok) → thread'e butonlu kart.
   // Eski "finans dürtüsü" DM'inin yerine geçer. Reopen'da kart geçersiz kılınır (else dalı).
   if (d.durum === 'tamamlandi') {

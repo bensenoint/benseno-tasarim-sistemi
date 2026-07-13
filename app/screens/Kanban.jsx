@@ -135,7 +135,9 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
         minHeight: 540, overflowX:"auto", WebkitOverflowScrolling:"touch"
       }}>
         {cols.map(col => {
-          let items = col.id === "tamamlandi" ? completedAsBriefs : allBriefs.filter(b => b.durum === col.id);
+          let items = col.id === "tamamlandi" ? completedAsBriefs
+            : col.id === "incelemede" ? allBriefs.filter(b => b.durum === "incelemede" || b.durum === "kontrole")
+            : allBriefs.filter(b => b.durum === col.id);
           // İş-yapma sırası: müşteride/blokeli/tamamlandı dışındaki kolonlarda en üstte ilk yapılacak iş.
           // Brief sırası = işi yapanların en küçük kisi_sira'sı (profildeki kuyruk sırası ile aynı kaynak).
           if (!["musteride", "blokeli", "tamamlandi"].includes(col.id)) {

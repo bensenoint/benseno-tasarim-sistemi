@@ -45,7 +45,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
   const NOW = data.NOW || Date.now();
   const overlaps = (start, end) => start <= winTo && end >= winFrom;   // [start,end] aralığı pencereyle çakışıyor mu
   const evPool = mf([...(data._allBriefs || data.briefs || []), ...(data._allCompleted || data.completed || [])]);
-  const EV_STATUS = new Set(["calisiliyor", "basladi", "incelemede", "beklemede", "revizyon", "blokeli", "musteride"]);
+  const EV_STATUS = new Set(["calisiliyor", "basladi", "kontrole", "incelemede", "beklemede", "revizyon", "blokeli", "musteride"]);
   // Açılış anı: created_at (aktif) ya da en erken statü olayı (tamamlanan created_at taşımaz).
   const openTs = (b) => {
     if (typeof b.created_at === "number") return b.created_at;
@@ -79,7 +79,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
     return late && overlaps(b.deadline, end);
   };
   // Aktif işler = dönemde bir an AKTİF statüde bulunmuş iş (müşteride + tamamlanmış HARİÇ; onların kendi kartı var).
-  const ACTIVE_SET = new Set(["yeni", "calisiliyor", "basladi", "incelemede", "beklemede", "revizyon", "blokeli"]);
+  const ACTIVE_SET = new Set(["yeni", "calisiliyor", "basladi", "kontrole", "incelemede", "beklemede", "revizyon", "blokeli"]);
   const activeDuring = (b) => statusIntervals(b).some(iv => ACTIVE_SET.has(iv.durum) && overlaps(iv.start, iv.end));
   const cntStatus = (durum) => evPool.filter(b => inStatusDuring(b, durum)).length;
 
@@ -142,6 +142,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
     { key: "yeni",        label: "Yeni",         value: cntYeni,                 color: "var(--ink-3)" },
     { key: "calisiliyor", label: "İş planında",  value: cntStatus("calisiliyor"), color: "var(--info)" },
     { key: "basladi",     label: "İşe başlandı", value: cntStatus("basladi"),     color: "var(--ok, #2E8F66)" },
+    { key: "kontrole",    label: "Kontrolde",    value: cntStatus("kontrole"),    color: "var(--gold, #E2A100)" },
     { key: "incelemede",  label: "İncelemede",   value: cntStatus("incelemede"),  color: "var(--warning)" },
     { key: "beklemede",   label: "Bekliyor",     value: cntStatus("beklemede"),   color: "var(--ink-3)" },
     { key: "revizyon",    label: "Revizyon",     value: cntStatus("revizyon"),    color: "var(--warning)" },

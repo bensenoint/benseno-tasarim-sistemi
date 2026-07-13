@@ -119,6 +119,7 @@ function StatusPill({ status }) {
     yeni:        { color: "var(--ink-4)",    label: "Yeni",     full: "Yeni" },
     calisiliyor: { color: "var(--info)",     label: "İş planında", full: "İş planında" },
     basladi:     { color: "var(--ok, #2E8F66)", label: "Başladı", full: "İşe başlandı · şu an çalışılıyor" },
+    kontrole:    { color: "var(--gold, #E2A100)", label: "Kontrolde", full: "Kontrole gönderildi · isteyenin 👀 incelemesi bekleniyor" },
     incelemede:  { color: "var(--warning)",  label: "İnceleme",  full: "İncelemede" },
     beklemede:   { color: "var(--ink-3)",       label: "Bekliyor",  full: "Beklemede" },
     revizyon:    { color: "var(--prio-orange)", label: "Revizyon",  full: "Revizyon" },

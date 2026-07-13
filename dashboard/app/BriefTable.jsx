@@ -225,6 +225,7 @@ function StatusMenu({ current, onPick, onClose }) {
     ["yeni",        "Yeni"],
     ["calisiliyor", "İş planında"],
     ["basladi",     "İşe başlandı"],
+    ["kontrole",    "📤 Kontrole gönderildi"],
     ["incelemede",  "İncelemede"],
     ["blokeli",     "Blokeli"],
     ["tamamlandi",  "Tamamlandı"]

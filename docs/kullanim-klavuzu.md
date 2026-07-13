@@ -1280,3 +1280,8 @@ Canvas güncellemeleri yanlış yapılırsa veri bozulur. Kesinlikle uyulması g
 
 - Resmî tatiller **Menü → Takvim**'den yönetilir (yalnız yönetici). 2026 tatilleri yüklüdür; dinî bayramlar hilale göre ±1 gün düzeltilebilir.
 - Sistem genelinde iş günü matematiği tatil-bilinçlidir: kapasite bölünmesi, çalışma süresi ölçümü, kalan iş günü ve aylık fatura listesi günü tatilleri atlar. **Yarım gün** (arefe, 31 Aralık): mesai 09:00-13:00, kapasitede 0,5 gün.
+
+## 📤 Kontrole Gönderildi (yeni ara statü)
+
+- İşi yapan bitirince **📤** koyar → "kontrole gönderildi": yapanın süresi durur ve tek-aktif-iş kuralında serbest kalır; **işin süresi kontrol beklerken akmaya devam eder** (kontrol süreleri işe dahildir). İşi isteyene DM düşer.
+- İsteyen **👀** koyunca mevcut İncelemede akışı aynen devam eder. Kelime kısayolu: "kontrole yolladım". Kanban'da İncelemede kolonunda "Kontrolde" olarak görünür; filtre ve raporlarda ayrı statüdür.
