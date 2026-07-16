@@ -234,7 +234,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
     const hdr = { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) };
     try {
       if (action === 'uzat') {
-        // Backend bekleme kadar MUAF uzatır (gecikme/ceza sayılmaz) + hatırlatıcıyı kapatır.
+        // Backend, beklemeye girerken teslime KALAN süre kadar MUAF uzatır (dönüş anından itibaren) + hatırlatıcıyı kapatır.
         const res = await fetch(`${apiBase}/api/briefs/${b.id}/termin-oneri-uzat`, { method: 'POST', headers: hdr, body: JSON.stringify({ by: currentUser?.slack_id }) });
         if (!res.ok) { const j = await res.json().catch(() => ({})); return alert('Uzatma başarısız: ' + (j.error || res.status)); }
       } else {
@@ -384,7 +384,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
             <div style={{marginTop:12, padding:"12px 14px", background:"var(--ember-tint, rgba(194,74,44,0.08))", border:"1px solid var(--ember, #c24a2c)", borderRadius:10}}>
               <div style={{font:"600 13px/1.4 var(--font-sans)", color:"var(--ink)"}}>↩️ İşe geri dönüldü — termini uzatmak ister misin?</div>
               <div style={{marginTop:4, font:"400 12px/1.5 var(--font-sans)", color:"var(--ink-3)"}}>
-                Bu iş bir süre beklemede/müşterideydi. Uzatırsan <b>gecikme sayılmaz</b> (puanı etkilemez).
+                Bu iş beklemede/müşterideydi. Uzatırsan teslim, dönüşte kalan süre kadar ötelenir ve <b>gecikme sayılmaz</b> (puanı etkilemez).
               </div>
               <div style={{marginTop:10, display:"flex", gap:8, flexWrap:"wrap"}}>
                 <button onClick={() => terminOneri('uzat')} style={{font:"600 12px/1 var(--font-sans)", padding:"8px 12px", border:0, borderRadius:8, background:"var(--ember, #c24a2c)", color:"#fff", cursor:"pointer"}}>

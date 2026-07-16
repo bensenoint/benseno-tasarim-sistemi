@@ -1613,7 +1613,7 @@ app.event('message', async ({ event, client }) => {
       return;
     }
 
-    // "termin uzat" / "bekleme kadar uzat" — işe-dönüş hatırlatıcısı açıksa bekleme süresi kadar MUAF uzatır.
+    // "termin uzat" — işe-dönüş hatırlatıcısı açıksa, beklemeye girerken teslime KALAN süre kadar MUAF uzatır (dönüş anından itibaren).
     if (/^(?:termin(?:i|ı)?\s+uzat|bekleme\s+kadar\s+uzat)$/i.test(trimmed)) {
       const briefTs = event.thread_ts;
       log(`termin uzat (muaf): ${briefTs} — ${event.user}`);

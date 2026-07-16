@@ -616,10 +616,15 @@ async function setStatus(id, raw, _depth = 0) {
         `SELECT EXTRACT(EPOCH FROM max(ts)) * 1000 AS ts FROM events
          WHERE brief_id=$1 AND verb IN ('durum:beklemede','durum:musteride')`, [id]);
       const ps = pe.rows[0] && pe.rows[0].ts ? Math.round(+pe.rows[0].ts) : null;
-      const beklemeMs = ps ? Math.max(0, Date.now() - ps) : 0;
-      // ms=0 kilidi: bekleme süresi 0/falsy ise hatırlatıcıyı HİÇ açma — "açık ama çalışmaz" durumu oluşmasın (O6).
-      if (beklemeMs > 0) {
-        resumeMs = beklemeMs;
+      // KURAL (Görkem): uzatma = beklemeye/müşteriye GİRERKEN teslime KALAN süre.
+      // Örn. teslime 5 saat varken müşteriye gitti, 2 gün bekledi → dönüşte öneri 5 saattir
+      // (yeni teslim = dönüş anı + 5sa); bekleme süresi kadar uzatma YOK. Beklemeye girerken
+      // zaten gecikmişse (kalan ≤ 0) öneri hiç açılmaz — gecikme gerçektir.
+      const dlRow = await client.query('SELECT deadline FROM briefs WHERE id=$1', [id]);
+      const dlMs = dlRow.rows[0] && dlRow.rows[0].deadline ? new Date(dlRow.rows[0].deadline).getTime() : null;
+      const kalanMs = (ps && dlMs) ? dlMs - ps : 0;
+      if (kalanMs > 0) {
+        resumeMs = kalanMs;
         await client.query('UPDATE briefs SET termin_oneri_at = now(), termin_oneri_ms = $2 WHERE id=$1', [id, resumeMs]);
       }
     } else if (['tamamlandi', 'beklemede', 'musteride'].includes(durum)) {
@@ -671,7 +676,7 @@ async function setStatus(id, raw, _depth = 0) {
   }
   if (resumeMs != null) {
     const saat = Math.round(resumeMs / 3600000);
-    note += `\n↩️ *İşe geri dönüldü* — ${saat > 0 ? saat + ' saat' : 'bir süre'} beklemede/müşterideydi. Termini uzatman gerekiyorsa thread'e \`termin uzat\` yaz (bekleme kadar uzatır) ya da \`termin 15.06 17:00\` ile tarih ver; bu uzatma **gecikme sayılmaz**. (Dashboard'da da tek tıkla var.)`;
+    note += `\n↩️ *İşe geri dönüldü* — beklemeye girerken teslime *${saat > 0 ? saat + ' saat' : 'kısa bir süre'}* kalmıştı. Thread'e \`termin uzat\` yazarsan teslim, dönüş anından itibaren o kadar uzatılır ve **gecikme sayılmaz**; ya da \`termin 15.06 17:00\` ile tarih ver. (Dashboard'da da tek tıkla var.)`;
   }
   await reflectChange(id, note, d.source, { by: d.by });
   // 📤 kontrole: işi isteyen (lead'ler + açan) DM ile dürtülür — inceleme bekletilmesin.
@@ -1146,7 +1151,9 @@ async function applyTerminOneri(id, by, source) {
   const row = r.rows[0];
   if (!row) throw new Error('brief bulunamadı: ' + id);
   if (!row.termin_oneri_at || !row.termin_oneri_ms) throw new Error('uzatma hatırlatıcısı açık değil');
-  const base = row.deadline ? new Date(row.deadline).getTime() : Date.now();
+  // KURAL: termin_oneri_ms = beklemeye girerken teslime kalan süre. Yeni teslim = DÖNÜŞ ANI
+  // (termin_oneri_at) + kalan süre — eski deadline'a bekleme eklenmez.
+  const base = new Date(row.termin_oneri_at).getTime();
   const yeni = new Date(base + Number(row.termin_oneri_ms)).toISOString();
   await patchBrief(id, { deadline: yeni, by, source: source || 'system' });
   // Garanti kapanış: deadline NULL iken patchBrief'in temizlik dalı atlanabilir (oldMs yok) → hatırlatıcıyı burada idempotent kapat (O5, sonsuz uzatma önlenir).
