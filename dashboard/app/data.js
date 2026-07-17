@@ -365,7 +365,7 @@ window.BNS_DATA = {
 // Uzun durum açıklamalarını ("⏳ Yeni açıldı (Eda T...") kısa koda normalize eder
 function bnsNormalizeDurum(durum, status) {
   // Zaten kısa kod mu?
-  const SHORT = ["yeni","calisiliyor","basladi","incelemede","beklemede","revizyon","musteride","blokeli","tamamlandi","tamamlandı"];
+  const SHORT = ["yeni","calisiliyor","basladi","kontrole","incelemede","beklemede","revizyon","musteride","blokeli","tamamlandi","tamamlandı"];
   const raw = (durum || status || "").trim();
   const d = raw.toLowerCase();
   if (SHORT.includes(d)) return d === "tamamlandı" ? "tamamlandi" : d;
