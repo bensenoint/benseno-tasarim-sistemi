@@ -733,14 +733,13 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
 
     const convo = msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) }));
 
-    // ── NİYET-BAZLI MODEL SEÇİMİ ───────────────────────────────────────
-    // Rutin/sayısal sorular → Sonnet (hızlı/ucuz). Sentez-ağır (analiz/değerlendir/öneri/özet/
-    // karşılaştır/strateji/neden) → Opus (daha zengin yorum). Sayılar her iki halde de tool'dan = aynı doğruluk.
+    // ── MODEL SEÇİMİ ───────────────────────────────────────────────────
+    // Varsayılan HER ZAMAN Sonnet (hızlı/ucuz, sayılar tool'dan geldiği için doğruluk aynı).
+    // Opus YALNIZ kullanıcı açıkça isterse kullanılır ("opus ile cevapla", "opusu kullan" vb).
     const SONNET = 'claude-sonnet-4-6';
     const OPUS = process.env.ODY_OPUS_MODEL || 'claude-opus-4-7';   // thread-ozet.js'te kullanılan, hesapta erişilebilir Opus
     const lastUserMsg = String([...msgs].reverse().find(m => m.role !== 'assistant')?.content || '');
-    const SYNTH_RE = /(analiz|değerlendir|degerlendir|yorumla|\byorum\b|öner|oner|tavsiye|özetle|ozetle|\bözet\b|\bozet\b|strateji|karşılaştır|karsilastir|kıyas|kiyas|sentez|neden|niçin|nicin|niye|durumu.*(özetle|degerlendir|değerlendir|yorumla))/i;
-    let model = SYNTH_RE.test(lastUserMsg) ? OPUS : SONNET;
+    let model = /opus/i.test(lastUserMsg) ? OPUS : SONNET;
     let modelUsed = model;
 
     let final = '';
