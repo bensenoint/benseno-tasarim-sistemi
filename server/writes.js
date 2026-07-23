@@ -547,11 +547,17 @@ async function setStatus(id, raw, _depth = 0) {
     // basladi geçişinde tetikleyen worker (yoksa tek worker) kapıdan geçer; çakışmada
     // 409+cakisma (onay akışı) ya da zorla ile eski işten ayrılma. system kaynağında
     // çakışma → otomatik başlatma İPTAL, iş planda kalır (dışarıda DM).
+    // FREELANCER MUAF: kendi ekipleriyle aynı anda birden fazla iş yürütebilirler —
+    // calisiyor işareti yine açılır (görünürlük), ama çakışma kapısı işlemez.
     let wipAktifKisi = null, wipEskiIs = null, wipOtomatikEngel = null;
     if (durum === 'basladi') {
       const wq = await client.query(`SELECT user_id FROM brief_assignees WHERE brief_id=$1 AND role='contributor'`, [id]);
       const workers = wq.rows.map(x => x.user_id);
       wipAktifKisi = (d.by && workers.includes(d.by)) ? d.by : (workers.length === 1 ? workers[0] : null);
+      if (wipAktifKisi && await freelanceMi(client, wipAktifKisi)) {
+        await client.query(`UPDATE brief_assignees SET calisiyor=true WHERE brief_id=$1 AND user_id=$2 AND role='contributor'`, [id, wipAktifKisi]);
+        wipAktifKisi = null;   // kapı ve tekli-işaret mantığı atlanır
+      }
       if (wipAktifKisi) {
         const cq = await client.query(
           `SELECT b.id, b.no, b.baslik, br.name AS marka FROM brief_assignees a
@@ -1234,8 +1240,19 @@ async function createFaz(parentId, raw) {
   return { ...yeni, faz_no: fazNo, parent_no: parent.no };
 }
 
+// ── WIP=1: freelancer muafiyeti ──
+// FR* sentetik id'liler ve dept='freelance' kullanıcılar tek-iş kuralından muaftır
+// (kendi ekipleriyle paralel iş yürütürler). q: pool ya da tx client.
+async function freelanceMi(q, uid) {
+  if (!uid) return false;
+  if (/^FR/i.test(String(uid))) return true;
+  const r = await q.query(`SELECT 1 FROM users WHERE id=$1 AND dept='freelance'`, [uid]);
+  return !!r.rows.length;
+}
+
 // ── WIP=1: "ben de başladım" — iş zaten basladi'dayken ikinci atananın 🚀'si ──
 // Durum değişmez; yalnız kişinin calisiyor işareti açılır (aynı tek-iş kapısından geçerek).
+// Freelancer muaf: işaret açılır, çakışma kapısı işlemez.
 async function benBasladim(id, raw) {
   const by = raw && raw.by, zorla = !!(raw && raw.zorla);
   if (!by) { const e = new Error('kimlik gerekli'); e.status = 400; throw e; }
@@ -1244,6 +1261,10 @@ async function benBasladim(id, raw) {
   if (b.durum !== 'basladi') { const e = new Error('iş şu an başladı durumunda değil'); e.status = 400; throw e; }
   const w = await pool.query(`SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND user_id=$2 AND role='contributor'`, [id, by]);
   if (!w.rows.length) { const e = new Error('bu işin atananı değilsin'); e.status = 403; throw e; }
+  if (await freelanceMi(pool, by)) {
+    await pool.query(`UPDATE brief_assignees SET calisiyor=true WHERE brief_id=$1 AND user_id=$2 AND role='contributor'`, [id, by]);
+    return { ok: true, no: b.no };
+  }
   const cq = await pool.query(
     `SELECT b.id, b.no, b.baslik, br.name AS marka FROM brief_assignees a
      JOIN briefs b ON b.id = a.brief_id LEFT JOIN brands br ON br.id = b.marka_id
