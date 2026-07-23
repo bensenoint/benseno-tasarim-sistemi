@@ -212,6 +212,9 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
   };
   const myActive     = myAll.filter(b => b.durum !== "musteride")
     .sort((a, b) => (myKisiSira(a) - myKisiSira(b)) || ((a.no || 0) - (b.no || 0)));
+  // Ana liste görünümleri müşterideki işleri de İÇERİR (yük/kapasite KPI'ları myActive'de kalır)
+  const myListe      = [...myAll]
+    .sort((a, b) => (myKisiSira(a) - myKisiSira(b)) || ((a.no || 0) - (b.no || 0)));
   const asLead       = allBriefs.filter(b => window.bnsIsLead(b, u.id));
   const asContrib    = allBriefs.filter(b => Array.isArray(b.contributors) && b.contributors.some(c => c && c.id === u.id));
   const asReviewer   = allBriefs.filter(b => b.reviewer && b.reviewer.id === u.id);
@@ -297,15 +300,14 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
 
   // ─── Gözlemci olduğum aktif işler
   const asObserver = allBriefs.filter(b =>
-    b.durum !== "musteride" &&
     Array.isArray(b.observers) && b.observers.some(o => o && o.id === u.id)
   );
 
   // ─── Ana iş tablosu görünümleri (dropdown). "tamamlanan" zaman aralığına (hero'daki toggle) tabi.
   const JOB_VIEWS = [
-    { key: "aktif",      label: "Aktif işler",                rows: myActive,                                   note: "müşteride hariç aktif yük" },
-    { key: "lead",       label: "Lead olduğum işler",         rows: asLead.filter(b => b.durum !== "musteride"), note: "lead olduğum aktif işler" },
-    { key: "aldigim",    label: "Aldığım / yapacağım işler",  rows: asContrib.filter(b => b.durum !== "musteride"), note: "işi yapan olarak seçildiğim işler (lead ben olsam da)" },
+    { key: "aktif",      label: "Aktif işler",                rows: myListe,                                    note: "müşterideki işler dahil (✈️ yük sayılmaz)" },
+    { key: "lead",       label: "Lead olduğum işler",         rows: asLead,                                     note: "lead olduğum işler (müşteride dahil)" },
+    { key: "aldigim",    label: "Aldığım / yapacağım işler",  rows: asContrib,                                  note: "işi yapan olarak seçildiğim işler (lead ben olsam da)" },
     { key: "gozlemci",   label: "Gözlemci olduğum işler",     rows: asObserver,                                 note: "izlediğim işler" },
     { key: "tamamlanan", label: "Tamamlanan işler",           rows: myCompleted, completed: true,               note: "seçili aralıkta tamamlananlar" },
   ];
