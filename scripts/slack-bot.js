@@ -1506,6 +1506,32 @@ app.event('message', async ({ event, client }) => {
   // NOT: thread_ts = thread'in ANA mesajının ts'i (= brief slack_ts). Çözüm gerekmez.
   if (event.thread_ts && event.thread_ts !== event.ts && !event.bot_id) {
     const trimmed = (event.text || '').trim();
+
+    // ── "proje: <ad>" — arşiv klasörünü üst işe/kampanyaya taşı (F3 köprüsü) ──
+    // Sadece arşiv kaydı (arsiv_work_id) olan brief thread'lerinde yanıt verir;
+    // kayıt yoksa sessizce yoksayılır (başka botların/konuşmaların thread'i olabilir).
+    const projeMatch = trimmed.match(/^\s*proje\s*[:：]\s*(.+)/i);
+    if (projeMatch) {
+      const projeAd = projeMatch[1].trim();
+      const briefTs = event.thread_ts;
+      try {
+        const pool = dbPool();
+        const row = pool ? (await pool.query(
+          'SELECT no, arsiv_work_id FROM briefs WHERE slack_ts=$1', [briefTs])).rows[0] : null;
+        if (row && row.arsiv_work_id) {
+          log(`proje taşıma: "${projeAd}" → work ${row.arsiv_work_id} (#${row.no}) — ${event.user}`);
+          const arsiv = require('../server/arsiv.js');
+          const res = await arsiv.reassign(row.arsiv_work_id, projeAd);
+          const msg = !res ? '⚠️ Taşınamadı, Arşiv servisine ulaşılamadı.'
+            : res.already ? `ℹ️ Bu iş zaten *${projeAd}* altında.`
+            : (res.failed && res.failed.length && !(res.moved && res.moved.length))
+              ? '⚠️ Taşınamadı, Arşiv servisine ulaşılamadı.'
+              : `✅ *${projeAd}* üst işine taşındı.`;
+          await client.chat.postMessage({ channel: event.channel, thread_ts: briefTs, text: msg, username: BOT_NAME });
+        }
+      } catch (e) { log(`proje taşıma hata: ${e.message}`); }
+      return;
+    }
     // Her emoji için Unicode (VS-16 dahil/hariç) VE Slack shortcode formunu yakala —
     // Slack, yazıyla girilen emojiyi event.text'te ':eyes:' gibi shortcode olarak iletebilir.
     const EMOJI_DURUM = [

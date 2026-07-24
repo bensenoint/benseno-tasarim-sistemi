@@ -301,6 +301,40 @@ async function createBrief(raw) {
       result.slack = { error: e.message };
     }
   }
+  // Arşiv köprüsü (F3) — otomatik Drive klasörü aç + thread'e link ve üst-iş sorusu düş.
+  // Best-effort: hiçbir hata brief akışını bozmaz.
+  try {
+    const arsiv = require('./arsiv');
+    // Slack bilgisi: dashboard yolunda az önce post edildi; slack-kökenlide DB'de olabilir.
+    const bi = (await pool.query(
+      'SELECT slack_ts, slack_channel, deadline FROM briefs WHERE id=$1', [result.id])).rows[0] || {};
+    // Lead adı: gerçek isim varsa gönder (placeholder = Slack ID ise gönderme).
+    const leadIds = [...new Set([...(d.lead_ids || []), ...(d.by ? [d.by] : [])])];
+    let leadName;
+    if (leadIds.length) {
+      const lr = await pool.query('SELECT name FROM users WHERE id=$1', [leadIds[0]]);
+      const nm = lr.rows[0] && lr.rows[0].name;
+      if (nm && nm !== leadIds[0]) leadName = nm;
+    }
+    // brandCode: markalar tablosunda kod kolonu yok → adın ilk 3 harfi (büyük).
+    const brandCode = String(d.marka).replace(/\s+/g, '').slice(0, 3).toUpperCase();
+    const tarih = bi.deadline ? new Date(bi.deadline).toISOString().slice(0, 10)
+      : new Date().toISOString().slice(0, 10);
+    const folder = await arsiv.autoFolder({
+      no: result.no, marka: d.marka, brandCode, baslik: d.baslik, tarih,
+      slack_channel: bi.slack_channel || undefined, slack_ts: bi.slack_ts || undefined,
+      lead: leadName,
+    });
+    if (folder && folder.workId) {
+      await pool.query('UPDATE briefs SET arsiv_work_id=$1 WHERE id=$2', [folder.workId, result.id]);
+      // Thread'e klasör linki + üst-iş sorusu (kanal+ts varsa).
+      if (bi.slack_ts && bi.slack_channel && folder.links && folder.links.drive) {
+        const oneri = (folder.suggestedProject && folder.suggestedProject.name) || '—';
+        await slack.postThread({ channel: bi.slack_channel, thread_ts: bi.slack_ts,
+          text: `📁 Arşiv klasörü açıldı: ${folder.links.drive}\nBu iş bir üst işe/kampanyaya bağlı mı? Önerilen: *${oneri}* — bağlamak için bu thread'e \`proje: <ad>\` yaz; bağımsızsa yok say.` });
+      }
+    }
+  } catch (e) { console.error('[arsiv] brief köprüsü:', e.message); }
   // Fazlı iş (dashboard formu yolu): parent_id verildiyse zincire bağla + çapraz notlar.
   if (d.parent_id) {
     try { await fazBagla(result.id, d.parent_id, result); } catch (e) { console.error('[faz] bağlama:', e.message); }
