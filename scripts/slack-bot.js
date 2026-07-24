@@ -1445,9 +1445,10 @@ app.event('message', async ({ event, client }) => {
   if (event.channel_type === 'im' && !event.bot_id && !/^help$/i.test(event.text.trim())) {
     log(`ody-dm ← ${event.user}: ${String(event.text).slice(0, 80)}`);
     try {
-      const r = await fetch(`${API_BASE}/api/ody-dm`, {
+      const ODY_URL = process.env.ODY_URL || 'https://ody-core-production.up.railway.app';
+      const r = await fetch(`${ODY_URL}/dm`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-bns-token': process.env.BNS_WRITE_TOKEN || '' },
+        headers: { 'content-type': 'application/json', 'x-ody-token': process.env.ODY_SERVICE_TOKEN || '' },
         body: JSON.stringify({ slack_id: event.user, text: event.text }),
         signal: AbortSignal.timeout(90000),   // LLM + tool turları 30sn+ sürebilir
       });

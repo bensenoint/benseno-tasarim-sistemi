@@ -813,19 +813,10 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
     return reply;
 }
 
-app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
-  try {
-    const msgs = Array.isArray(req.body?.messages) ? req.body.messages.slice(-12) : [];
-    if (!msgs.length) return res.status(400).json({ error: 'messages gerekli' });
-    if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'asistan yapılandırılmamış' });
-    const rb = req.body?.range;
-    const range = (rb && typeof rb.from === 'number' && typeof rb.to === 'number') ? { from: rb.from, to: rb.to } : null;
-    const reply = await odyChatRun({ user: req.user, isAdmin: req.user.role === 'admin', msgs, range, kanal: 'dashboard' });
-    res.json({ reply });
-  } catch (e) {
-    console.error('[chat] hata:', e.message);
-    res.status(e.status || 500).json({ error: e.status === 502 ? 'asistan şu an yanıt veremiyor' : 'sunucu hatası' });
-  }
+// KESİM (2026-07-24): Ody bağımsız servise taşındı (ody-core). Eski uç 410 döner;
+// 1 hafta sonra odyChatRun ve bağımlı kod tamamen silinecek.
+app.post('/api/chat', auth.authGuard, (req, res) => {
+  res.status(410).json({ error: 'Ody taşındı — yeni adres: ody-core /chat', ody_url: process.env.ODY_URL || 'https://ody-core-production.up.railway.app' });
 });
 
 // ── ODY SLACK DM DİYALOĞU ───────────────────────────────────────────────────
@@ -833,27 +824,9 @@ app.post('/api/chat', auth.authGuard, llmLimiter, async (req, res) => {
 // yetki dahilinde aksiyon alır. Kimlik = Slack'in doğruladığı event.user.
 // Sunucu-bellek DM geçmişi: kişi başına son 10 mesaj, 2 saat TTL.
 const _dmGecmis = new Map();   // slackId → { msgs: [{role,content}], ts }
-app.post('/api/ody-dm', writeGuard, llmLimiter, async (req, res) => {
-  try {
-    const slackId = String(req.body?.slack_id || '');
-    const text = String(req.body?.text || '').trim().slice(0, 4000);
-    if (!/^U/.test(slackId) || !text) return res.status(400).json({ error: 'slack_id ve text gerekli' });
-    if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'asistan yapılandırılmamış' });
-    const ed = await getEmbedded();
-    const kisi = (ed.bns_users || []).find(x => x.id === slackId);
-    if (!kisi) return res.json({ reply: 'Merhaba! Seni sistemde tanıyamadım — Görkem ile iletişime geçebilirsin. 🙏' });
-    const isAdmin = kisi.rol === 'yonetici' || kisi.yetki === 'yonetici';
-    const user = { id: slackId, slack_id: slackId, name: kisi.name, role: isAdmin ? 'admin' : 'user' };
-    const g = _dmGecmis.get(slackId);
-    const gecmis = (g && Date.now() - g.ts < 2 * 60 * 60 * 1000) ? g.msgs : [];
-    const msgs = [...gecmis, { role: 'user', content: text }].slice(-10);
-    const reply = await odyChatRun({ user, isAdmin, msgs, range: null, kanal: 'slack-dm' });
-    _dmGecmis.set(slackId, { msgs: [...msgs, { role: 'assistant', content: reply }].slice(-10), ts: Date.now() });
-    res.json({ reply });
-  } catch (e) {
-    console.error('[ody-dm] hata:', e.message);
-    res.status(e.status || 500).json({ error: 'sunucu hatası' });
-  }
+// KESİM (2026-07-24): Ody DM köprüsü ody-core /dm'e taşındı. 410 döner.
+app.post('/api/ody-dm', writeGuard, (req, res) => {
+  res.status(410).json({ error: 'Ody taşındı — yeni adres: ody-core /dm', ody_url: process.env.ODY_URL || 'https://ody-core-production.up.railway.app' });
 });
 
 // ── Bildirimler (dashboard zili) ────────────────────────────────────────────

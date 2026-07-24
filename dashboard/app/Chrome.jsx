@@ -685,6 +685,8 @@ function ChatBot({ currentUser, dateRange }) {
   const panelLeft = Math.min(Math.max(8, pos.x), Math.max(8, vw - 392));
   const panelTop  = Math.min(Math.max(8, pos.y - 468), Math.max(8, vh - 532));
   const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+  // Ody artık bağımsız serviste (ody-core) — sohbet çağrıları oraya gider (JWT aynı).
+  const ODY = window.BNS_ODY_BASE || "https://ody-core-production.up.railway.app";
   const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
   const [unread, setUnread] = React.useState(false);   // balonda "Ody senin için özet hazırladı" işareti
   const [notifPeek, setNotifPeek] = React.useState(null); // kapalıyken gösterilen son bildirim (Ody'ye bağlı)
@@ -869,7 +871,7 @@ function ChatBot({ currentUser, dateRange }) {
       "4 kısa madde. Acil bir şey yoksa kısaca olumlu söyle.";
     (async () => {
       try {
-        const r = await fetch(`${API}/api/chat`, {
+        const r = await fetch(`${ODY}/chat`, {
           method: "POST",
           headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
           body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }], range: _range() }),
@@ -925,7 +927,7 @@ function ChatBot({ currentUser, dateRange }) {
       "tek kelime yaz: YOK — başka hiçbir şey ekleme. Gerçek, spesifik bir içgörün varsa maddeleri yaz.";
     (async () => {
       try {
-        const r = await fetch(`${API}/api/chat`, {
+        const r = await fetch(`${ODY}/chat`, {
           method: "POST",
           headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
           body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }], range: _range() }),
@@ -969,7 +971,7 @@ function ChatBot({ currentUser, dateRange }) {
     const next = [...msgs, { role: "user", content: q }];
     setMsgs(next); setInput(""); setBusy(true); setMood("dusunuyor");
     try {
-      const r = await fetch(`${API}/api/chat`, {
+      const r = await fetch(`${ODY}/chat`, {
         method: "POST",
         headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
         body: JSON.stringify({ messages: next.slice(-12), range: _range() }),
@@ -1026,7 +1028,7 @@ function ChatBot({ currentUser, dateRange }) {
       "Önerin hâlâ DOĞRU, spesifik ve veriye dayalıysa SADECE tek kelime yaz: DOĞRU. " +
       "Yanlış/eksik/genel ise DÜZELTİLMİŞ öneriyi yaz: EN FAZLA 3 madde (•), her madde tek kısa cümle, # numarası/markaya referans ver, giriş/selam yazma.";
     try {
-      const r = await fetch(`${API}/api/chat`, { method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + tok() }, body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }], range: _range() }) });
+      const r = await fetch(`${ODY}/chat`, { method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + tok() }, body: JSON.stringify({ messages: [{ role: "user", content: PROMPT }], range: _range() }) });
       const j = await r.json().catch(() => ({}));
       const rep = (r.ok && j.reply) ? String(j.reply).trim() : "";
       if (!rep) { setFbFor(n.id, { busy: false, note: "Yeniden değerlendirme alınamadı, tekrar dene." }); return; }
