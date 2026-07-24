@@ -40,9 +40,15 @@ function buildServer() {
   );
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: odyTools.TOOLS.map(t => ({
-      name: t.name, description: t.description, inputSchema: t.input_schema,
-    })),
+    tools: [
+      ...odyTools.TOOLS.map(t => ({
+        name: t.name, description: t.description, inputSchema: t.input_schema,
+      })),
+      // Ody-core'un Slack DM kimlik çözümü için (LLM'e görünmesi zararsız ama gereksiz;
+      // öncelikle ody-core /dm tarafı çağırır): slack_id → {name, rol, admin}
+      { name: '_kimlik', description: 'Slack kullanıcısını sistemde tanı (iç kullanım): slack_id → ad/rol',
+        inputSchema: { type: 'object', properties: { slack_id: { type: 'string' } }, required: ['slack_id'] } },
+    ],
   }));
 
   server.setRequestHandler(CallToolRequestSchema, async (req) => {
@@ -58,6 +64,15 @@ function buildServer() {
       onay: onayMi(meta.son_mesaj, user.slack_id),
     };
     try {
+      if (name === '_kimlik') {
+        const sid = String((args || {}).slack_id || '');
+        const kisi = (ed.bns_users || []).find(x => x.id === sid);
+        const out = kisi
+          ? { bulundu: true, name: kisi.name, rol: kisi.rol || null,
+              admin: kisi.rol === 'yonetici' || kisi.yetki === 'yonetici' }
+          : { bulundu: false };
+        return { content: [{ type: 'text', text: JSON.stringify(out) }] };
+      }
       const out = await odyTools.runTool(name, args || {}, ctx);
       return { content: [{ type: 'text', text: JSON.stringify(out) }] };
     } catch (e) {
