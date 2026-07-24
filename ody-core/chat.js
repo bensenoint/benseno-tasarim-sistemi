@@ -76,7 +76,8 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
     headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: mdl, max_tokens: 4000, system,
-      ...(think === false ? {} : { thinking: { type: 'adaptive' } }),
+      // Haiku adaptive thinking desteklemez — thinking yalnız Sonnet/Opus'ta açılır.
+      ...(think === false || /haiku/i.test(mdl) ? {} : { thinking: { type: 'adaptive' } }),
       ...(withTools ? { tools: TOOLS } : {}),
       messages: convo,
     }),
