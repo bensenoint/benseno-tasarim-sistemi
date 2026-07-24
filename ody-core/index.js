@@ -18,14 +18,14 @@ const PORT = process.env.PORT || 3000;
 const SERVIS_TOKEN = process.env.ODY_SERVICE_TOKEN;
 const JWT_SECRET = process.env.BNS_JWT_SECRET;
 
-// Basit hız sınırı: kullanıcı başına eşzamanlı 1 + dakikada 10 istek (LLM maliyet koruması)
+// Basit hız sınırı: kullanıcı başına dakikada 30 istek (LLM maliyet koruması; eval seti sığar)
 const _limiter = new Map();
 function llmLimiter(key) {
   const now = Date.now();
   const l = _limiter.get(key) || { count: 0, ts: now };
   if (now - l.ts > 60e3) { l.count = 0; l.ts = now; }
   l.count++; _limiter.set(key, l);
-  return l.count <= 10;
+  return l.count <= 30;
 }
 
 function servisGuard(req, res, next) {

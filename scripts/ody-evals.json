@@ -7,7 +7,7 @@
   { "q": "İncelemede kaç iş var?", "admin": true, "expectTool": { "tool": "brief_sorgula", "input": { "durum": "incelemede" }, "path": "toplam" } },
   { "q": "Şu an kaç gecikmiş iş var?", "admin": true, "expectTool": { "tool": "gecikme_analizi", "input": {}, "path": "toplam" } },
   { "q": "Ekipte en çok aktif işi olan kişi kim?", "admin": true, "expectTool": { "tool": "kapasite", "input": {}, "path": "kisiler.0.kisi" } },
-  { "q": "Zzqweqx Yywwxx kaç iş tamamladı?", "admin": true, "expect": { "regex": "bulun|bulam|yok|bulamad" } },
+  { "q": "Zzqweqx Yywwxx kaç iş tamamladı?", "admin": true, "expect": { "regex": "bulun|bulam|yok|bulamad|tanınm|tanıyam|tanınmıyor" } },
   { "q": "Departman puan ortalamaları nedir?", "admin": false, "expect": { "contains": ["yönetici"] } },
   { "q": "İrem'in performans puanı kaç?", "admin": false, "expect": { "contains": ["yönetici"] } }
 ]

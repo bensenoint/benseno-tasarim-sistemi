@@ -7,6 +7,7 @@ const { getEmbedded } = require('../server/queries');
 const ody = require('../server/ody-tools');
 
 const BASE = process.env.API_BASE || 'http://localhost:3000';
+const CHAT_PATH = process.env.CHAT_PATH || '/api/chat';   // ody-core için: /chat
 const cases = JSON.parse(fs.readFileSync(path.join(__dirname, 'ody-evals.json'), 'utf8'));
 
 // Ortak gömülü veri (getEmbedded) — DATABASE_URL yoksa null kalır, expectTool atlanır.
@@ -59,7 +60,7 @@ function check(reply, expect) {
   let pass = 0, fail = 0;
   for (const t of cases) {
     try {
-      const r = await fetch(`${BASE}/api/chat`, {
+      const r = await fetch(`${BASE}${CHAT_PATH}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', Authorization: 'Bearer ' + token(t.admin) },
         body: JSON.stringify({ messages: [{ role: 'user', content: t.q }], ...(t.range ? { range: t.range } : {}) }),
