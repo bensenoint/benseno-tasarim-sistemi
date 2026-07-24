@@ -1241,6 +1241,10 @@ app.get('/api/attachment/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
+// ── MCP sunucusu (/mcp) — Ody-core buradan tasarim.* araçlarını çeker ──
+try { require('./mcp').mountMcp(app, writeGuard); console.log('[api] mcp sunucusu /mcp'); }
+catch (e) { console.error('[api] mcp mount başarısız:', e.message); }
+
 let server;
 // Boot'ta bekleyen migration'ları uygula (idempotent). Başarısızsa DİNLEME — process çık;
 // Railway yeni container'ı sağlıksız sayıp ESKİ (çalışan) sürümü korur → prod kırılmaz.
