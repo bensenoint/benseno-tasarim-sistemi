@@ -14,6 +14,17 @@ const kaynaklar = require('./kaynaklar');
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
+
+// CORS — dashboard (GitHub Pages) tarayıcıdan çağırır; kimlik JWT ile zaten doğrulanıyor.
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+app.use((req, res, next) => {
+  res.set('Access-Control-Allow-Origin', CORS_ORIGIN);
+  res.set('Vary', 'Origin');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-ody-token');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') return res.status(204).end();
+  next();
+});
 const PORT = process.env.PORT || 3000;
 const SERVIS_TOKEN = process.env.ODY_SERVICE_TOKEN;
 const JWT_SECRET = process.env.BNS_JWT_SECRET;
