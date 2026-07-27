@@ -382,6 +382,12 @@ async function loadBriefs() {
 // (dashboard bnsBriefActionPerms / P3.4c ile aynı politika). Gerekçe: kanaldaki
 // herhangi birinin gündelik 🚀/✅ reaction'ı iş durumunu sessizce değiştiriyordu.
 // Hata/bulunamama → engelleme YAPMA (fail-open: meşru akış API hıçkırığına kurban gitmesin).
+// İş adı kuralı (2026-07-27): bildirimlerde yalın #numara YOK — adıyla birlikte.
+function isAd(no, baslik) {
+  const b = String(baslik || '').trim();
+  return `#${no}${b ? ` "${b.slice(0, 60)}"` : ''}`;
+}
+
 async function statusYetki(userId, briefTs) {
   if (MANAGER_IDS.has(userId)) return { ok: true };
   try {
@@ -396,7 +402,7 @@ async function statusYetki(userId, briefTs) {
     if (b.created_by === userId) return { ok: true };
     const atanan = [...(b.workers || []), ...(b.leads || [])].some(p => p && p.id === userId);
     if (!atanan) log(`statusYetki RED detay: ${userId} → #${b.no} | workers=${(b.workers || []).map(p => p && p.id).join(',')} leads=${(b.leads || []).map(p => p && p.id).join(',')} by=${b.created_by}`);
-    return atanan ? { ok: true } : { ok: false, no: b.no, marka: b.marka || '' };
+    return atanan ? { ok: true } : { ok: false, no: b.no, baslik: b.baslik || '', marka: b.marka || '' };
   } catch (e) { log(`statusYetki hata (fail-open): ${e.message}`); return { ok: true }; }
 }
 // Yetkisiz denemede kişiye kısa DM — sessiz kafa karışıklığı olmasın.
@@ -404,7 +410,7 @@ async function statusYetkiRed(client, userId, chk, durum) {
   log(`durum REDDEDİLDİ: ${userId} → #${chk.no} ${durum} (atanan/açan/yönetici değil)`);
   try {
     await client.chat.postMessage({ channel: userId, username: BOT_NAME,
-      text: `⛔ *#${chk.no} ${chk.marka}* işinin durumunu değiştirme yetkin yok — durumu yalnız işin atananı, açanı veya bir yönetici değiştirebilir. (Emoji/reaction'ın işleme alınmadı.)` });
+      text: `⛔ *${isAd(chk.no, chk.baslik)} ${chk.marka}* işinin durumunu değiştirme yetkin yok — durumu yalnız işin atananı, açanı veya bir yönetici değiştirebilir. (Emoji/reaction'ın işleme alınmadı.)` });
   } catch (e) { log(`yetki-red DM hatası: ${e.message}`); }
 }
 
@@ -573,11 +579,18 @@ app.view('maliyet_modal', async ({ ack, body, view, client }) => {
     await execFileAsync('node', [`${PROJECT_DIR}/scripts/set-financials.js`, 'set', no, by, JSON.stringify({ maliyet: maliyetRaw, satis: satisRaw })],
       { cwd: PROJECT_DIR, timeout: 120000 });
     log(`/maliyet → #${no} maliyet="${maliyetRaw}" satış="${satisRaw}" (by ${by})`);
-    // Girene özel onay DM'i
+    // Girene özel onay DM'i — iş adıyla (yalın numara kuralı)
+    let adEtiket = `#${no}`;
+    try {
+      const _wt = process.env.BNS_WRITE_TOKEN;
+      const ed = await (await fetch(`${API_BASE}/api/embedded`, { cache: 'no-store', headers: _wt ? { 'x-bns-token': _wt } : {} })).json();
+      const bb = [...(ed.bns_briefs || []), ...(ed.bns_completed || [])].find(x => String(x.no) === String(no));
+      if (bb) adEtiket = isAd(no, bb.baslik);
+    } catch {}
     try {
       const txt = (maliyetRaw === '' && satisRaw === '')
-        ? `✅ Brief #${no} maliyet/satış kaydı temizlendi.`
-        : `✅ Brief #${no} kaydedildi — maliyet: ${maliyetRaw || '—'}₺ · satış: ${satisRaw || '—'}₺. Birkaç dk içinde dashboard'da görünür.`;
+        ? `✅ ${adEtiket} maliyet/satış kaydı temizlendi.`
+        : `✅ ${adEtiket} kaydedildi — maliyet: ${maliyetRaw || '—'}₺ · satış: ${satisRaw || '—'}₺. Birkaç dk içinde dashboard'da görünür.`;
       await client.chat.postMessage({ channel: by, text: txt, username: BOT_NAME });
     } catch {}
   } catch (err) {
@@ -641,8 +654,9 @@ app.view('bns_faz_modal', async ({ ack, body, view, client }) => {
     is_tipi: v.is_tipi_b?.is_tipi?.selected_option?.value || undefined,
     ucret_tipi: v.fatura_b?.ucret_tipi?.selected_option?.value || undefined,
   });
+  const fazBaslik = (v.baslik_b?.baslik?.value || '').trim();
   const msg = r.ok
-    ? `🧩 Faz ${r.json.faz_no} açıldı: *#${r.json.no}*${r.json.slack && r.json.slack.permalink ? `\n${r.json.slack.permalink}` : ''}`
+    ? `🧩 Faz ${r.json.faz_no} açıldı: *${isAd(r.json.no, fazBaslik)}*${r.json.slack && r.json.slack.permalink ? `\n${r.json.slack.permalink}` : ''}`
     : `❌ Faz açılamadı: ${r.json.error || r.status}`;
   try { await client.chat.postMessage({ channel: uid, text: msg, username: BOT_NAME }); } catch {}
   log(`[faz] ${meta.id} by ${uid} → ${r.status}`);
@@ -658,10 +672,10 @@ async function wipStatusYaz(briefTs, kanal, body) {
     try {
       await app.client.chat.postMessage({
         channel: kanal, thread_ts: briefTs, username: BOT_NAME,
-        text: `⚠️ <@${body.by}> şu an #${c.no} üzerinde çalışıyorsun — bu işe başlarsan #${c.no} beklemeye alınacak.`,
+        text: `⚠️ <@${body.by}> şu an ${isAd(c.no, c.baslik)} üzerinde çalışıyorsun — bu işe başlarsan o beklemeye alınacak.`,
         blocks: [
           { type: 'section', text: { type: 'mrkdwn',
-            text: `⚠️ <@${body.by}> şu an *#${c.no} ${c.marka || ''}* işinde çalışıyorsun.\nBu işe başlarsan *#${c.no} beklemeye alınacak* (tek aktif iş kuralı).` } },
+            text: `⚠️ <@${body.by}> şu an *${isAd(c.no, c.baslik)}* (${c.marka || ''}) işinde çalışıyorsun.\nBu işe başlarsan *o iş beklemeye alınacak* (tek aktif iş kuralı).` } },
           { type: 'actions', elements: [
             { type: 'button', style: 'primary', action_id: 'bns_wip_onay',
               value: JSON.stringify({ ts: briefTs, by: body.by }), text: { type: 'plain_text', text: '✅ Onayla — başla' } },
@@ -733,7 +747,7 @@ app.action('bns_fatura_kesildi', async ({ ack, body, client, action }) => {
     return;
   }
   const tut = r.satis != null ? ` (${Number(r.satis).toLocaleString('tr-TR')}₺)` : '';
-  await faturaKartKapat(client, body.channel?.id, body.message?.ts, `✅ #${r.no} ek iş${tut} — fatura kesildi (<@${uid}>). Takip kapandı.`);
+  await faturaKartKapat(client, body.channel?.id, body.message?.ts, `✅ ${isAd(r.no, r.baslik)} ek iş${tut} — fatura kesildi (<@${uid}>). Takip kapandı.`);
   log(`[fatura] #${r.no} kesildi (by ${uid})`);
 });
 app.action('bns_fatura_tutar', async ({ ack, body, client, action }) => {
@@ -777,13 +791,13 @@ app.view('bns_fatura_tutar_modal', async ({ ack, body, view, client }) => {
   }
   const tutTxt = Number(r.satis).toLocaleString('tr-TR') + '₺';
   if (kesildi) {
-    await faturaKartKapat(client, meta.kanal, meta.ts, `✅ #${r.no} ek iş (${tutTxt}) — tutar girildi ve fatura kesildi (<@${uid}>). Takip kapandı.`);
+    await faturaKartKapat(client, meta.kanal, meta.ts, `✅ ${isAd(r.no, r.baslik)} ek iş (${tutTxt}) — tutar girildi ve fatura kesildi (<@${uid}>). Takip kapandı.`);
   } else {
     // Tutar girildi ama fatura yok → kartı 'fatura kesildi mi' haline çevir (takip sürer).
     await client.chat.update({ channel: meta.kanal, ts: meta.ts,
-      text: `➕ #${r.no} ek iş (${tutTxt}) — fatura kesildi mi?`,
+      text: `➕ ${isAd(r.no, r.baslik)} ek iş (${tutTxt}) — fatura kesildi mi?`,
       blocks: [
-        { type: 'section', text: { type: 'mrkdwn', text: `➕ #${r.no} ek iş (*${tutTxt}*) — tutar girildi (<@${uid}>). Fatura kesildi mi?` } },
+        { type: 'section', text: { type: 'mrkdwn', text: `➕ ${isAd(r.no, r.baslik)} ek iş (*${tutTxt}*) — tutar girildi (<@${uid}>). Fatura kesildi mi?` } },
         { type: 'actions', elements: [{ type: 'button', style: 'primary', action_id: 'bns_fatura_kesildi', value: String(meta.briefId), text: { type: 'plain_text', text: '✅ Fatura kesildi' } }] },
       ] }).catch(() => {});
   }

@@ -31,9 +31,11 @@ async function yoneticiler() {
   return r.rows.map(x => x.id);
 }
 function eksikMetni(b) {
+  // İş adı kuralı: yalın #numara yerine adıyla — "#12 "Katalog kapak" Marka"
+  const ad = `#${b.no}${b.baslik ? ` "${String(b.baslik).slice(0, 60)}"` : ''}`;
   return b.satis == null
-    ? `#${b.no} ${b.marka || ''} — *satış tutarı girilmedi*`
-    : `#${b.no} ${b.marka || ''} — *${Number(b.satis).toLocaleString('tr-TR')}₺ faturasız*`;
+    ? `${ad} ${b.marka || ''} — *satış tutarı girilmedi*`
+    : `${ad} ${b.marka || ''} — *${Number(b.satis).toLocaleString('tr-TR')}₺ faturasız*`;
 }
 
 (async () => {

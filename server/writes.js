@@ -605,7 +605,7 @@ async function setStatus(id, raw, _depth = 0) {
             wipOtomatikEngel = { kisi: wipAktifKisi, cakisma: cak };
             wipAktifKisi = null;
           } else {
-            const e = new Error(`şu an #${cak.no} üzerinde çalışıyorsun — bu işe başlarsan o beklemeye alınır`);
+            const e = new Error(`şu an ${isAd(cak.no, cak.baslik)} üzerinde çalışıyorsun — bu işe başlarsan o beklemeye alınır`);
             e.status = 409;
             e.cakisma = { id: cak.id, no: cak.no, baslik: cak.baslik, marka: cak.marka, kisi: wipAktifKisi };
             throw e;
@@ -678,10 +678,10 @@ async function setStatus(id, raw, _depth = 0) {
     // Eski iş beklemeye: ayrı setStatus (kendi tx'i) + Ody imzalı not reflectChange içinde genel
     try {
       await setStatus(wipEskiIsDis.id, { durum: 'beklemede', source: 'system' }, _depth + 1);
-      const yeni = await pool.query('SELECT no FROM briefs WHERE id=$1', [id]);
+      const yeni = (await pool.query('SELECT no, baslik FROM briefs WHERE id=$1', [id])).rows[0] || {};
       const ad = d.by ? ((await pool.query('SELECT name FROM users WHERE id=$1', [d.by])).rows[0] || {}).name : null;
       await reflectChange(wipEskiIsDis.id,
-        `🤖 *Ody:* ${ad || 'atanan'} #${(yeni.rows[0] || {}).no || ''} işine başladığı için bu iş *beklemeye* alındı (tek aktif iş kuralı).`,
+        `🤖 *Ody:* ${ad || 'atanan'} ${isAd(yeni.no || '?', yeni.baslik)} işine başladığı için bu iş *beklemeye* alındı (tek aktif iş kuralı).`,
         'system', {});
     } catch (e) { console.error('[wip] eski iş beklemeye alınamadı:', e.message); }
   }
@@ -712,7 +712,7 @@ async function setStatus(id, raw, _depth = 0) {
     note = `🔄 durum güncellendi: *${d.durum}*`;
   }
   if (wipOtomatikEngelDis) {
-    note = `🤖 *Ody:* önceki işin kapandı — sıradaki işin *plana alındı* (atanan şu an #${wipOtomatikEngelDis.cakisma.no} üzerinde çalıştığı için otomatik başlatılmadı; 🚀 ile başlar).`;
+    note = `🤖 *Ody:* önceki işin kapandı — sıradaki işin *plana alındı* (atanan şu an ${isAd(wipOtomatikEngelDis.cakisma.no, wipOtomatikEngelDis.cakisma.baslik)} üzerinde çalıştığı için otomatik başlatılmadı; 🚀 ile başlar).`;
   }
   if (resumeMs != null) {
     const saat = Math.round(resumeMs / 3600000);
@@ -735,14 +735,14 @@ async function setStatus(id, raw, _depth = 0) {
   if (d.durum === 'tamamlandi') {
     try {
       const fb = (await pool.query(
-        `SELECT b.no, b.satis, b.fatura, b.ucret_tipi, br.aylik_ucret, b.slack_channel, b.slack_ts
+        `SELECT b.no, b.baslik, b.satis, b.fatura, b.ucret_tipi, br.aylik_ucret, b.slack_channel, b.slack_ts
          FROM briefs b LEFT JOIN brands br ON br.id = b.marka_id WHERE b.id=$1`, [id])).rows[0];
       const ekIs = fb && (fb.ucret_tipi === 'ek' || (fb.ucret_tipi == null && fb.aylik_ucret == null));
       const tutarVar = fb && fb.satis != null;
       if (ekIs && (!tutarVar || !fb.fatura)) {
         const text = tutarVar
-          ? `➕ #${fb.no} ek iş (*${Number(fb.satis).toLocaleString('tr-TR')}₺*) tamamlandı — fatura kesildi mi?`
-          : `➕ #${fb.no} ek iş tamamlandı — *satış tutarı girilmedi*. Tutar girilmeden fatura takibi başlayamaz.`;
+          ? `➕ ${isAd(fb.no, fb.baslik)} ek iş (*${Number(fb.satis).toLocaleString('tr-TR')}₺*) tamamlandı — fatura kesildi mi?`
+          : `➕ ${isAd(fb.no, fb.baslik)} ek iş tamamlandı — *satış tutarı girilmedi*. Tutar girilmeden fatura takibi başlayamaz.`;
         const blocks = [
           { type: 'section', text: { type: 'mrkdwn', text } },
           { type: 'actions', elements: [tutarVar
@@ -997,12 +997,12 @@ async function setFinancials(id, raw) {
       }
     }
     vals.push(id);
-    const r = await client.query(`UPDATE briefs SET ${sets.join(',')} WHERE id=$${vals.length} RETURNING id`, vals);
+    const r = await client.query(`UPDATE briefs SET ${sets.join(',')} WHERE id=$${vals.length} RETURNING id, no, baslik`, vals);
     if (!r.rows[0]) throw new Error('brief bulunamadı: ' + id);
     await logEvent(client, { brief_id: id, user_id: d.by, verb: 'finans',
       detail: { maliyet: d.maliyet, satis: d.satis, fatura: d.fatura, odeme: d.odeme },
       source: d.source, slack_ts: d.slack_ts });
-    return { id };
+    return { id, no: r.rows[0].no, baslik: r.rows[0].baslik };
   });
   const fin = ['maliyet', 'satis', 'fatura', 'odeme'].filter(k => d[k] !== undefined).join(', ');
   // Thread'den girilen finansalda bot zaten detaylı onay yanıtı atıyor → notu atla (çift mesaj olmasın).
@@ -1114,7 +1114,7 @@ async function notifyRoleDiff(briefId, before, after, source) {
 async function deleteBrief(id, by) {
   const r = await pool.query(
     `UPDATE briefs SET deleted_at=NOW(), deleted_by=$1 WHERE id=$2 AND deleted_at IS NULL
-     RETURNING id, no, slack_ts, slack_channel`,
+     RETURNING id, no, baslik, slack_ts, slack_channel`,
     [by || null, id]
   );
   if (!r.rows[0]) throw new Error('brief bulunamadı veya zaten silindi: ' + id);
@@ -1133,7 +1133,7 @@ async function deleteBrief(id, by) {
         who = u.rows[0] ? ` (${u.rows[0].name} tarafından)` : '';
       }
       await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts,
-        text: `🗑️ *#${b.no}* silindi${who} — bu thread artık takip edilmiyor. Dashboard → Silinenler'den geri alınabilir.` });
+        text: `🗑️ *${isAd(b.no, b.baslik)}* silindi${who} — bu thread artık takip edilmiyor. Dashboard → Silinenler'den geri alınabilir.` });
     } catch (e) { console.error('[writes] silindi notu hata:', e.message); }
   }
   return { id, no: r.rows[0].no };
@@ -1158,7 +1158,7 @@ async function permanentDeleteBrief(id, by) {
 async function restoreBrief(id, by) {
   const r = await pool.query(
     `UPDATE briefs SET deleted_at=NULL, deleted_by=NULL WHERE id=$1 AND deleted_at IS NOT NULL
-     RETURNING id, no, slack_ts, slack_channel`,
+     RETURNING id, no, baslik, slack_ts, slack_channel`,
     [id]
   );
   if (!r.rows[0]) throw new Error('brief bulunamadı veya silinmiş değil: ' + id);
@@ -1172,7 +1172,7 @@ async function restoreBrief(id, by) {
   if (b.slack_ts && b.slack_channel) {
     try {
       await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts,
-        text: `↩️ *#${b.no}* geri alındı — takip devam ediyor.` });
+        text: `↩️ *${isAd(b.no, b.baslik)}* geri alındı — takip devam ediyor.` });
     } catch (e) { console.error('[writes] geri alındı notu hata:', e.message); }
   }
   return { id, no: r.rows[0].no };
@@ -1202,6 +1202,13 @@ async function applyTerminOneri(id, by, source) {
 }
 
 // Faz etiketi: kök iş '#12'; fazlar '#12a', '#12b'… (faz_no 2 → a). Görsel kimlik — gerçek no ayrıdır.
+// Bildirimlerde iş ASLA yalın numarayla anılmaz — adıyla birlikte: #12 "Katalog kapak".
+// (Kural: 2026-07-27, yalın numara okuyana bir şey söylemiyor.)
+function isAd(no, baslik) {
+  const b = String(baslik || '').trim();
+  return `#${no}${b ? ` "${b.slice(0, 60)}"` : ''}`;
+}
+
 function fazEtiketi(no, fazNo, parentNo) {
   if (parentNo && fazNo > 1) return '#' + parentNo + String.fromCharCode(95 + fazNo); // 2→a(97)
   return '#' + no;
@@ -1290,7 +1297,7 @@ async function freelanceMi(q, uid) {
 async function benBasladim(id, raw) {
   const by = raw && raw.by, zorla = !!(raw && raw.zorla);
   if (!by) { const e = new Error('kimlik gerekli'); e.status = 400; throw e; }
-  const b = (await pool.query('SELECT durum, no FROM briefs WHERE id=$1 AND deleted_at IS NULL', [id])).rows[0];
+  const b = (await pool.query('SELECT durum, no, baslik FROM briefs WHERE id=$1 AND deleted_at IS NULL', [id])).rows[0];
   if (!b) { const e = new Error('brief bulunamadı'); e.status = 404; throw e; }
   if (b.durum !== 'basladi') { const e = new Error('iş şu an başladı durumunda değil'); e.status = 400; throw e; }
   const w = await pool.query(`SELECT 1 FROM brief_assignees WHERE brief_id=$1 AND user_id=$2 AND role='contributor'`, [id, by]);
@@ -1305,7 +1312,7 @@ async function benBasladim(id, raw) {
      WHERE a.user_id=$1 AND a.calisiyor AND a.brief_id<>$2 AND b.deleted_at IS NULL LIMIT 1`, [by, id]);
   const cak = cq.rows[0];
   if (cak && !zorla) {
-    const e = new Error(`şu an #${cak.no} üzerinde çalışıyorsun`);
+    const e = new Error(`şu an ${isAd(cak.no, cak.baslik)} üzerinde çalışıyorsun`);
     e.status = 409; e.cakisma = { id: cak.id, no: cak.no, baslik: cak.baslik, marka: cak.marka, kisi: by };
     throw e;
   }
@@ -1316,7 +1323,7 @@ async function benBasladim(id, raw) {
       try {
         await setStatus(cak.id, { durum: 'beklemede', source: 'system' });
         const ad = ((await pool.query('SELECT name FROM users WHERE id=$1', [by])).rows[0] || {}).name;
-        await reflectChange(cak.id, `🤖 *Ody:* ${ad || 'atanan'} #${b.no} işine başladığı için bu iş *beklemeye* alındı (tek aktif iş kuralı).`, 'system', {});
+        await reflectChange(cak.id, `🤖 *Ody:* ${ad || 'atanan'} ${isAd(b.no, b.baslik)} işine başladığı için bu iş *beklemeye* alındı (tek aktif iş kuralı).`, 'system', {});
       } catch (e) { console.error('[wip] benBasladim eski iş:', e.message); }
     }
   }
@@ -1352,7 +1359,7 @@ async function faturaAksiyon(id, raw) {
   if (raw.fatura !== undefined) put('fatura', !!raw.fatura);
   if (!sets.length) { const e = new Error('alan yok'); e.status = 400; throw e; }
   vals.push(id);
-  const r = await pool.query(`UPDATE briefs SET ${sets.join(',')} WHERE id=$${vals.length} RETURNING no, satis, fatura, slack_channel, slack_ts, fatura_kart_ts`, vals);
+  const r = await pool.query(`UPDATE briefs SET ${sets.join(',')} WHERE id=$${vals.length} RETURNING no, baslik, satis, fatura, slack_channel, slack_ts, fatura_kart_ts`, vals);
   if (!r.rows[0]) { const e = new Error('brief bulunamadı'); e.status = 404; throw e; }
   return r.rows[0];
 }
