@@ -39,23 +39,38 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
     }
   } catch (e) { /* best-effort */ }
 
-  const system =
-    `BUGÜN: ${new Date().toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul', year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })} (${new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10)}). Tarih hesaplarında ('geçen Cuma', 'bu hafta') bunu baz al.\n\n` +
+  // PROMPT CACHE MİMARİSİ: system iki bloktur — (1) SABİT blok (kişilik + kurallar +
+  // kaynak sistem bilgileri; kullanıcıdan/günden bağımsız, cache_control taşır) ve
+  // (2) DEĞİŞKEN blok (tarih + kişi + hiyerarşi + kişisel hafıza). Araç listesi de
+  // cache'lenir. Böylece ~19k tokenlik tekrar eden girdi cache'ten okunur (~%90 indirim).
+  const sysSabit =
     `Senin adın Ody. Sadece bir yapay zekâ asistanı değil; Benseno'nun sistemlerine bağlı bir ÇALIŞAN ve DANIŞMANSIN. Birden fazla sisteme bağlısın; araç adları "sistem__arac" biçimindedir (örn. tasarim__genel_ozet). Soru hangi sistemi ilgilendiriyorsa o sistemin araçlarını kullan; gerektiğinde BİRDEN FAZLA sistemden veri çekip HARMANLA.\n` +
-    `Şu an seninle konuşan kişi: ${user.name}${isAdmin ? ' (yönetici)' : ''}. Ona ismiyle, sıcak ve yardımsever, Türkçe ve öz konuş; fırsat varsa proaktif öneri sun.\n\n` +
+    `Konuştuğun kişiye ismiyle, sıcak ve yardımsever, Türkçe ve öz konuş; fırsat varsa proaktif öneri sun.\n\n` +
     `## SAYILAR DAİMA VERİTABANINDAN\n` +
     `Sayısal her şey SADECE araçlardan gelir. Bir sayı/olgu söylemeden ÖNCE ilgili aracı çağır; sonucu BİREBİR kullan — asla kendin sayma, tahmin etme. Araç boş/0 dönerse açıkça "yok" de.\n\n` +
     `## YORUM/ÖNERİ İÇİN NİTEL VERİYİ HARMANLA\n` +
     `Özet/öneri/değerlendirme istendiğinde kuru sayı verme; nitel araçları çağırıp sayısal verilerle harmanla, neden-sonuç kur, somut öneri sun.\n\n` +
+    `## BELİRSİZLİK & YARDIM EDEMEME\n` +
+    `Araç {belirsiz:true, adaylar:[...]} dönerse kendin seçme — SOR. Karşılayamadığında nedenini söyle, alternatif öner.\n\n` +
+    `Kullanıcı Slack'e mesaj GÖNDERMENİ isterse ilgili gönderim aracını çağır; önizlemeyi AYNEN göster ve onay iste. Onaydan sonra YALNIZ onaylama aracını çağır — gönderim aracını tekrar çağırma, ikinci kez onay isteme.\n\n` +
+    sistemBilgi;
+  const sysDegisken =
+    `BUGÜN: ${new Date().toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul', year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })} (${new Date(Date.now() + 3 * 3600e3).toISOString().slice(0, 10)}). Tarih hesaplarında ('geçen Cuma', 'bu hafta') bunu baz al.\n\n` +
+    `Şu an seninle konuşan kişi: ${user.name}${isAdmin ? ' (yönetici)' : ''}.\n` +
     `## HİYERARŞİ AMA BİLGİSİZ BIRAKMA\n` +
     (isAdmin
       ? `Bu kişi yönetici: tüm kişi/departman/marka puanlarına ve kıyaslara erişebilir.\n`
       : `Bu kişi yönetici DEĞİL: başka kişilerin puanı/performans kıyası gibi yönetici-özel bilgileri PAYLAŞMA; kendi işlerini ve genel bilgileri serbestçe ver. Veremediğinde nedenini açıkla, alternatif öner.\n`) +
-    `Kişiye özel sorularda kisi olarak "${user.name}" ile araç çağır.\n\n` +
-    `## BELİRSİZLİK & YARDIM EDEMEME\n` +
-    `Araç {belirsiz:true, adaylar:[...]} dönerse kendin seçme — SOR. Karşılayamadığında nedenini söyle, alternatif öner.\n\n` +
-    `Kullanıcı Slack'e mesaj GÖNDERMENİ isterse ilgili gönderim aracını çağır; önizlemeyi AYNEN göster ve onay iste. Onaydan sonra YALNIZ onaylama aracını çağır — gönderim aracını tekrar çağırma, ikinci kez onay isteme.\n\n` +
-    sistemBilgi + userMemory;
+    `Kişiye özel sorularda kisi olarak "${user.name}" ile araç çağır.` +
+    userMemory;
+  const system = [
+    { type: 'text', text: sysSabit, cache_control: { type: 'ephemeral' } },
+    { type: 'text', text: sysDegisken },
+  ];
+  // Araç listesi cache'i: son araca breakpoint (prefix: tools → system → messages)
+  const TOOLS_C = TOOLS.length
+    ? [...TOOLS.slice(0, -1), { ...TOOLS[TOOLS.length - 1], cache_control: { type: 'ephemeral' } }]
+    : TOOLS;
 
   const convo = msgs.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content).slice(0, 4000) }));
 
@@ -64,7 +79,12 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
   const SONNET = 'claude-sonnet-4-6';
   const OPUS = process.env.ODY_OPUS_MODEL || 'claude-opus-4-7';
   const SYNTH_RE = /(analiz|değerlendir|degerlendir|yorumla|\byorum\b|öner|oner|tavsiye|özetle|ozetle|\bözet\b|\bozet\b|strateji|karşılaştır|karsilastir|kıyas|kiyas|sentez|neden|niçin|nicin|niye|nasıl gidiyor|nasil gidiyor|performans|risk|plan)/i;
-  let model = /opus/i.test(sonMesaj) ? OPUS : (SYNTH_RE.test(sonMesaj) ? SONNET : HAIKU);
+  // Bildirim danışman yorumları YÜKSEK HACİMLİ otomatik çağrılardır (günde ~100) —
+  // "değerlendir" içerse de Haiku'ya sabitlenir (bağlam prompt'ta hazır, sayı üretmez).
+  const BILDIRIM_RE = /^Şu bildirim geldi/i;
+  let model = /opus/i.test(sonMesaj) ? OPUS
+    : BILDIRIM_RE.test(sonMesaj) ? HAIKU
+    : (SYNTH_RE.test(sonMesaj) ? SONNET : HAIKU);
   let modelUsed = model;
 
   let final = '';
@@ -78,7 +98,7 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
       model: mdl, max_tokens: 4000, system,
       // Haiku adaptive thinking desteklemez — thinking yalnız Sonnet/Opus'ta açılır.
       ...(think === false || /haiku/i.test(mdl) ? {} : { thinking: { type: 'adaptive' } }),
-      ...(withTools ? { tools: TOOLS } : {}),
+      ...(withTools ? { tools: TOOLS_C } : {}),
       messages: convo,
     }),
   });
@@ -94,8 +114,9 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
       j = await r.json().catch(() => ({}));
     }
     if (!r.ok) { console.error('[chat] AI hata:', j.error?.message || r.status); const err = new Error('asistan şu an yanıt veremiyor'); err.status = 502; throw err; }
-    try { if (j.usage) pool.query(`INSERT INTO maliyet_log(model,girdi_tok,cikti_tok,kanal) VALUES($1,$2,$3,$4)`,
-      [model, j.usage.input_tokens || 0, j.usage.output_tokens || 0, kanal || 'dashboard']).catch(() => {}); } catch (e) {}
+    try { if (j.usage) pool.query(`INSERT INTO maliyet_log(model,girdi_tok,cikti_tok,kanal,cache_okuma,cache_yazma) VALUES($1,$2,$3,$4,$5,$6)`,
+      [model, j.usage.input_tokens || 0, j.usage.output_tokens || 0, kanal || 'dashboard',
+       j.usage.cache_read_input_tokens || 0, j.usage.cache_creation_input_tokens || 0]).catch(() => {}); } catch (e) {}
     const blocks = j.content || [];
     final = blocks.filter(c => c.type === 'text').map(c => c.text).join('').trim();
     if (j.stop_reason !== 'tool_use') break;

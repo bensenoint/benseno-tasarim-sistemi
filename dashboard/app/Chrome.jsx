@@ -897,8 +897,14 @@ function ChatBot({ currentUser, dateRange }) {
   // Bildirim için Ody'nin danışman önerisi — geçmiş thread/insight'lara göre ne yapılmalı/uyarı/yönlendirme.
   // /api/chat zaten sistem verisine (kişiye özel) erişiyor; bildirim metnini verip danışman gibi yorum istiyoruz.
   const adviceReqRef = React.useRef({});   // tekrar istek/loop önleme (id bazlı)
+  // Pencere-genel in-flight kilidi: panel kapanıp açılınca (remount) ref sıfırlanıyor,
+  // aynı bildirime İKİNCİ istek gidiyordu (2026-07-27 token dökümünde %25 israf).
+  // id + metin önekiyle kilitle — id değişse bile aynı metin ikinci kez sorulmaz.
+  const _adviceKilit = (window.__bnsAdviceInflight = window.__bnsAdviceInflight || {});
+  const _adviceKey = (n) => (n.id || "") + "|" + String(n.text || "").slice(0, 80);
   const fetchAdvice = (n) => {
     if (!n || adviceReqRef.current[n.id]) return;
+    if (_adviceKilit[_adviceKey(n)]) return;
     if (advice[n.id] && (advice[n.id].state === "done" || advice[n.id].state === "none")) return;
     const ck = "bns_ody_advice2_" + n.id;   // v2: yetersiz bağlamda "YOK" döner → öneri gizlenir
     try {
@@ -909,6 +915,7 @@ function ChatBot({ currentUser, dateRange }) {
     // Hiç bağlam yoksa öneri üretme — boş/dolgu mesaj yazma.
     if (c.weak) { try { localStorage.setItem(ck, "YOK"); } catch (e) {} setAdvice(a => ({ ...a, [n.id]: { state: "none", text: "" } })); return; }
     adviceReqRef.current[n.id] = true;
+    _adviceKilit[_adviceKey(n)] = true;
     setAdvice(a => ({ ...a, [n.id]: { state: "loading", text: "" } }));
     const PROMPT =
       "Şu bildirim geldi: \"" + (n.text || "") + "\".\n\n" +
@@ -945,10 +952,12 @@ function ChatBot({ currentUser, dateRange }) {
           }
         } else {
           adviceReqRef.current[n.id] = false;   // hata → tekrar denenebilir
+          _adviceKilit[_adviceKey(n)] = false;
           setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Öneri alınamadı, tekrar dene." } }));
         }
       } catch (e) {
         adviceReqRef.current[n.id] = false;
+        _adviceKilit[_adviceKey(n)] = false;
         setAdvice(a => ({ ...a, [n.id]: { state: "err", text: "Bağlantı hatası." } }));
       }
     })();
