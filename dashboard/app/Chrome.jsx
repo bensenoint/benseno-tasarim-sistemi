@@ -511,8 +511,8 @@ function bnsAdviceContext(n) {
   let jobCtx = "(bu işe dair kayıt yok)";
   if (job) {
     const p = [`#${job.no} ${clip(job.baslik, 80)} · durum: ${job.durum || job.delivery_status || "—"}` + (job.lead ? ` · atanan: ${job.lead.name}` : "")];
-    if (job.thread_ozet) p.push("thread özeti: " + clip(job.thread_ozet, 650));
-    if (job.insight) p.push("iş insight: " + clip(job.insight, 500));
+    if (job.thread_ozet) p.push("thread özeti: " + clip(job.thread_ozet, 400));
+    if (job.insight) p.push("iş insight: " + clip(job.insight, 300));
     if (job.rating_sebep) p.push("puan sebebi: " + clip(job.rating_sebep, 300));
     if (job.rating) p.push("iş puanı: " + job.rating + "/5");
     jobCtx = p.join("\n");
@@ -524,8 +524,8 @@ function bnsAdviceContext(n) {
   const bSebep = (typeof window.bnsSebep === "function") ? window.bnsSebep("marka", marka) : null;
   {
     const p = [];
-    if (bObj && bObj.son_insight) p.push("marka son insight: " + clip(bObj.son_insight, 420));
-    if (bObj && bObj.kanal_ozet) p.push("kanal özeti: " + clip(bObj.kanal_ozet, 380));
+    if (bObj && bObj.son_insight) p.push("marka son insight: " + clip(bObj.son_insight, 280));
+    if (bObj && bObj.kanal_ozet) p.push("kanal özeti: " + clip(bObj.kanal_ozet, 250));
     if (bSebep && bSebep.sebep) p.push(`marka değerlendirmesi (${bSebep.rating_avg || "?"}/5): ` + clip(bSebep.sebep, 380));
     if (p.length) brandCtx = p.join("\n");
   }
@@ -558,10 +558,10 @@ function bnsAdviceContext(n) {
       })
       .filter(x => x.score > 0)
       .sort((a, b) => (b.score - a.score) || ((b.c.rating || 0) - (a.c.rating || 0)))
-      .slice(0, 5);
+      .slice(0, 3);
     if (scored.length) {
       simCtx = (tType ? `bu işin tipi: ${tType}\n` : "") +
-        scored.map(x => `• ${x.c.marka} #${x.c.no} ${clip(x.c.baslik, 40)} (puan ${x.c.rating || "?"}): ` + clip(x.c.insight, 200)).join("\n");
+        scored.map(x => `• ${x.c.marka} #${x.c.no} ${clip(x.c.baslik, 40)} (puan ${x.c.rating || "?"}): ` + clip(x.c.insight, 150)).join("\n");
     }
   }
 

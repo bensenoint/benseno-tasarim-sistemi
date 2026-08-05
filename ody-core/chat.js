@@ -82,9 +82,15 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
   // Bildirim danışman yorumları YÜKSEK HACİMLİ otomatik çağrılardır (günde ~100) —
   // "değerlendir" içerse de Haiku'ya sabitlenir (bağlam prompt'ta hazır, sayı üretmez).
   const BILDIRIM_RE = /^Şu bildirim geldi/i;
+  // Günlük brief de yüksek hacimli otomatik çağrıdır (her panel açılışı) — sayılar
+  // araçtan geldiği için Haiku yeterli (2026-08-05 maliyet dökümü kararı).
+  const BRIEF_RE = /^Bugünkü kısa kişisel özet/i;
   let model = /opus/i.test(sonMesaj) ? OPUS
-    : BILDIRIM_RE.test(sonMesaj) ? HAIKU
+    : (BILDIRIM_RE.test(sonMesaj) || BRIEF_RE.test(sonMesaj)) ? HAIKU
     : (SYNTH_RE.test(sonMesaj) ? SONNET : HAIKU);
+  // Bildirim yorumunda ARAÇ YOK: gereken bağlam istemde hazır geliyor; Haiku'nun
+  // "bir de DB'ye bakayım" turları istek sayısını 2-3 katına çıkarıyordu.
+  const araclarKapali = BILDIRIM_RE.test(sonMesaj);
   let modelUsed = model;
 
   let final = '';
@@ -104,7 +110,7 @@ async function odyChatRun({ user, isAdmin, msgs, range, kanal }) {
   });
   for (let turn = 0; turn < MAX_TURNS; turn++) {
     turnsUsed = turn + 1;
-    const withTools = turn < MAX_TURNS - 1 && TOOLS.length > 0;
+    const withTools = !araclarKapali && turn < MAX_TURNS - 1 && TOOLS.length > 0;
     let r = await aiCall(model, withTools);
     let j = await r.json().catch(() => ({}));
     if (!r.ok && model !== SONNET) {
