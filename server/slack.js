@@ -12,7 +12,8 @@ const CHANNELS = {
   // "Benseno" markalardan bağımsız genel kanaldır: henüz anlaşılmamış müşteri
   // adayları ve örnek çalışmalar buradan brief açılarak yürütülür.
   "Benseno": "benseno",
-  "Bauhaus": "marka-bauhaus", "Beta": "marka-beta", "Cimporglobal": "marka-cimporglobal",
+  "Bauhaus": "marka-bauhaus", "Beta": "marka-beta", "Brox": "marka-brox",
+  "Cimporglobal": "marka-cimporglobal",
   "Cureffect": "marka-cureffect", "Egosport": "marka-egosport", "Gürsoy": "marka-gursoy",
   "Hasvet": "marka-hasvet", "JnJ": "marka-jnj",
   // "Hendex" kanalı bilinçli olarak haritada yok (bot davet edilmedi, kullanıcı talebi) —
