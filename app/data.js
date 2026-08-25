@@ -56,7 +56,24 @@ const USERS = [
 const BNS_CANON_USERS = USERS.reduce((m, u) => { m[u.id] = u; return m; }, {});
 try { window.bnsMergeUser = bnsMergeUser; window.BNS_CANON_USERS = BNS_CANON_USERS; } catch (e) {}
 
-const ME = USERS[0]; // Görkem default
+// ME: GİRİŞ YAPAN kullanıcı İLK ANDAN esas alınır (canlı hidrasyon beklemeden).
+// Görkem mock'u YALNIZ girişsiz (anon önizleme) fallback'idir — yeni kullanıcı
+// (mock listede olmayan) girişinde sentetik kayıt kurulur; canlı payload gelince
+// tam kayıtla değiştirilir. (2026-08: Alper ilk girişte Görkem profili görüyordu.)
+const ME = (() => {
+  try {
+    const g = JSON.parse(localStorage.getItem('bns_user') || 'null');
+    if (g && g.slack_id) {
+      return USERS.find(u => u.id === g.slack_id) || {
+        id: g.slack_id, name: g.name || 'Kullanıcı',
+        rol: g.role === 'admin' ? 'yonetici' : '', dept: '',
+        initials: String(g.name || 'K').split(' ').map(x => x[0]).join('').slice(0, 2).toLocaleUpperCase('tr'),
+        color: '#6366F1',
+      };
+    }
+  } catch (e) {}
+  return USERS[0]; // anon önizleme: Görkem mock
+})();
 
 // ─── BRANDS ─────────────────────────────────────────────────────────────────
 const BRAND_NAMES = [
