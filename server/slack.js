@@ -28,7 +28,7 @@ const CHANNELS = {
   "KZY Flamingo": "marka-kzy-flamingo", "KZY Simple Solution": "marka-kzy-simplesolution",
   "KZY Supreme": "marka-kzy-supreme", "KZY VetsBest": "marka-kzy-vetsbest",
   "Marmara Holding": "marka-marmaraholding", "Muffik": "marka-muffik", "Polisan": "marka-polisan",
-  "Şefika Store": "marka-sefikastore",
+  "Şefika Store": "marka-sefikastore", "Vodafone": "marka-vodafone",
   "Splenda": "marka-splenda", "TTA": "marka-tour2america", "VDM Petdent": "marka-vdm-petdent",
 };
 
