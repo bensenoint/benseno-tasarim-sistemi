@@ -206,9 +206,10 @@ async function getEmbedded({ sensitive = true, selfId = null } = {}) {
     sure_cycles: cyc.cycles, sureH: cyc.toplamH, sureH_son: cyc.sonH, sureH_toplam: cyc.toplamH,
     rev: b.rev || 0,
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
-    // SEC-4: finans + puan alanları yalnız admin/bot; diğer JWT kullanıcılar için çıkarılır.
+    // SEC-4 (2026-09-29): İŞ puanı + sebebi TÜM ekibe açık; finans ve rating_by yalnız yönetici/bot.
+    rating: b.rating || null, rating_sebep: b.rating_sebep || null,
     ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme, ucret_tipi: b.ucret_tipi || null,
-      rating: b.rating || null, rating_by: b.rating_by || null, rating_sebep: b.rating_sebep || null } : {}),
+      rating_by: b.rating_by || null } : {}),
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at ? ms(b.thread_ozet_at) : null,
