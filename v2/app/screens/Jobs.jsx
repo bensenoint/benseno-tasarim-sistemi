@@ -233,9 +233,12 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
     else if (code === "yesterday") setDateRange({ from: _today0 - DAY, to: _today0 - 1, preset: "yesterday" });
     else if (code === "7d")        setDateRange({ from: NOW - 7 * DAY, to: NOW, preset: "7d" });
     else if (code === "30d")       setDateRange({ from: NOW - 30 * DAY, to: NOW, preset: "30d" });
+    // Anlık: pencere TEK AN (from=to=NOW) → durum-aralığı çakışması yalnız ŞU AN o durumda
+    // olan işleri sayar; KPI'lar canlı durum fotoğrafına döner, dönemsel birikim sıfırlanır.
+    else if (code === "now")       setDateRange({ from: NOW, to: NOW, preset: "now" });
   };
   const curPreset = (data.dateRange || {}).preset;
-  const SHORTCUTS = [["today", "Bugün"], ["yesterday", "Dün"], ["7d", "7 gün"], ["30d", "30 gün"]];
+  const SHORTCUTS = [["now", "Anlık"], ["today", "Bugün"], ["yesterday", "Dün"], ["7d", "7 gün"], ["30d", "30 gün"]];
 
   return (
     <div className={hideHead ? "" : "bn-tab-in"}>
