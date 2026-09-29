@@ -89,22 +89,27 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     if (typeof onStatusChange === "function") onStatusChange(brief, colId);
   };
 
-  // Kolon içi iş-sırası: order = brief id dizisi. Backend kapsamı (departman) uygular.
-  const reorderKanban = (orderIds) => {
-    const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
-    const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
-    fetch(`${API}/api/kanban/reorder`, {
-      method: "POST",
-      headers: { "content-type": "application/json", Authorization: "Bearer " + tok },
-      body: JSON.stringify({ order: orderIds }),
-    }).then(r => { if (r.ok && typeof window.bnsRefresh === "function") window.bnsRefresh(); }).catch(() => {});
+  // Kolon içi iş-sırası — KİŞİSEL (v2, 2026-09-29): sürükleme SUNUCUYA YAZILMAZ,
+  // yalnız bu kullanıcının tarayıcısında saklanır. Ekipteki kimsenin kuyruk sırası
+  // (kisi_sira) ve kanban görünümü etkilenmez. Gerçek kuyruk Profil'den yönetilir.
+  const _kanbanUid = (() => { try { return (JSON.parse(localStorage.getItem("bns_user") || "null") || {}).slack_id || "anon"; } catch (e) { return "anon"; } })();
+  const _kanbanKey = "bns_kanban_kisisel_" + _kanbanUid;
+  const [kisiselSira, setKisiselSira] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem(_kanbanKey) || "{}"); } catch (e) { return {}; }
+  });
+  const reorderKanban = (colId, orderIds) => {
+    setKisiselSira(prev => {
+      const next = { ...prev, [colId]: orderIds };
+      try { localStorage.setItem(_kanbanKey, JSON.stringify(next)); } catch (e) {}
+      return next;
+    });
   };
 
   return (
     <div className="bn-tab-in">
       <PageHead
         title="Kanban"
-        subtitle="durum bazlı kolonlar · sürükle-bırak ile statü değiştir (mobilde karta dokun)"
+        subtitle="durum bazlı kolonlar · sürükle-bırak ile statü değiştir · kolon içi sıralaman yalnız SANA özeldir"
         actions={<>
           <select value={markaFilter} onChange={e => setMarkaFilter(e.target.value)} aria-label="Müşteri filtresi"
             style={{font:"500 13px/1 var(--font-sans)", color:"var(--ink)", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:6, padding:"7px 28px 7px 10px", cursor:"pointer", maxWidth:180}}>
@@ -146,6 +151,17 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
               return ks.length ? Math.min(...ks) : Infinity;
             };
             items = [...items].sort((a, b) => (rank(a) - rank(b)) || ((a.no || 0) - (b.no || 0)));
+            // Kişisel sıra varsa onu uygula: listedeki id'ler kişisel dizideki konumuna göre,
+            // dizide olmayanlar (yeni işler) mevcut kuyruk düzeniyle SONA eklenir.
+            const ks = kisiselSira[col.id];
+            if (Array.isArray(ks) && ks.length) {
+              const pos = new Map(ks.map((id, i) => [id, i]));
+              items = [...items].sort((a, b) => {
+                const pa = pos.has(a.id) ? pos.get(a.id) : Infinity;
+                const pb = pos.has(b.id) ? pos.get(b.id) : Infinity;
+                return pa - pb || 0;
+              });
+            }
           }
           return (
             <div key={col.id}
@@ -191,7 +207,7 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
                       const ids = items.map(x => x.id).filter(id => id !== dragId);
                       const ti = ids.indexOf(b.id);
                       ids.splice(ti < 0 ? ids.length : ti, 0, dragId);
-                      reorderKanban(ids);
+                      reorderKanban(col.id, ids);
                     }
                     setDragId(null); setDragOverCol(null);
                   } : undefined}
