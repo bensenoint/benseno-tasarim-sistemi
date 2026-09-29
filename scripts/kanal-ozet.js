@@ -79,7 +79,7 @@ async function haiku(system, content) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 400, system,
+    body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 1200,   // 400 kesik rapor üretiyordu (2026-09-29) system,
       messages: [{ role: 'user', content: content.slice(0, 14000) }] }),
   });
   const j = await r.json().catch(() => ({}));

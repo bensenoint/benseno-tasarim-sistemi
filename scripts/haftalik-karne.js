@@ -32,7 +32,7 @@ async function llm(prompt, maxTok) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: OPUS, max_tokens: maxTok || 350,
+    body: JSON.stringify({ model: OPUS, max_tokens: maxTok || 700,
       system: 'Benseno tasarım ajansının karne yazarısın. Türkçe, somut, veriye dayalı ve öz yaz; puan/sayı üretme (sayılar sana verilir), yalnız nitel değerlendirme yap. Selam/giriş yok, doğrudan değerlendirme.',
       messages: [{ role: 'user', content: prompt }] }),
   });
@@ -97,7 +97,7 @@ async function varlikKarne({ haftaTs, tip, kimlik, ad, isler, yGenel, oncekiGene
       `Önceki genel değerlendirme:\n${(oncekiGenel && oncekiGenel.ozet_genel) || '(ilk değerlendirme — yok)'}\n\n` +
       `Bu haftanın gelişmeleri:\n${ozetHafta}\n\n` +
       `Genel yıldız (tüm zaman): ${yGenel ? yGenel.avg + '/5 (' + yGenel.cnt + ' iş)' : 'veri yok'}. ` +
-      `Önceki değerlendirmenin doğrulanan yanlarını koru, bu haftayla değişen eğilimleri güncelle; tarih listesi değil bütüncül değerlendirme yaz.`, 450);
+      `Önceki değerlendirmenin doğrulanan yanlarını koru, bu haftayla değişen eğilimleri güncelle; tarih listesi değil bütüncül değerlendirme yaz.`, 900);
   } else {
     ozetHafta = 'Bu hafta tamamlanan iş yok.';
     // genel özet öncekinden aynen taşınır (LLM çağrısı yok)

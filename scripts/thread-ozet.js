@@ -47,7 +47,7 @@ async function summarize(messages, names, brief) {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5', max_tokens: 400,
+      model: 'claude-haiku-4-5', max_tokens: 1000,   // kesik özet düzeltmesi (2026-09-29)
       system: 'Bir tasarım ajansının iş takip thread\'ini özetliyorsun. Bot durum bildirimlerini ("durum güncellendi" vb.) sayma — insan yazışmasına odaklan. Mesajlarda OLMAYAN hiçbir şeyi uydurma. Yanıtı SADECE JSON ver: {"ozet":"...","ton":"notr|gergin|memnun|acil"} — ozet: 3-5 cümlelik, Türkçe, olgusal bir özet (ne istendi, ne konuşuldu, son durum ne, açık soru/bekleyen ne var; başlık/madde işareti kullanma, düz metin; insan mesajı yoksa "Henüz yazışma yok."). ton: thread\'in duygu tonu — gergin (sürtünme/şikayet/baskı), memnun (olumlu/teşekkür), acil (aciliyet/deadline baskısı), notr (nötr/sıradan); ton\'dan emin değilsen "notr".',
       messages: [{ role: 'user', content: `İş: #${brief.no} ${brief.marka} — ${brief.baslik}\n\nThread:\n${lines.slice(0, 12000)}` }],
     }),
@@ -108,7 +108,7 @@ async function generateInsight(messages, names, brief) {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
-      model: 'claude-opus-4-7', max_tokens: 450,   // insight+puan: Opus — karneler buna dayanıyor, kalite öncelikli
+      model: 'claude-opus-4-7', max_tokens: 1000,   // insight+puan: Opus — 450 kesik değerlendirme üretiyordu (2026-09-29)
       system: 'Bir tasarım ajansında TAMAMLANMIŞ bir işin thread\'inden değerlendirme insight\'ı çıkarıyorsun. Bu metin ileride marka ve iş performans analizlerinde kullanılacak — şu açılardan kısa, olgusal değerlendir: süreç nasıl aktı (pürüzsüz mü, revize/sürtünme oldu mu), müşteri/marka tarafı geri bildirimi neydi, gecikme yaşandıysa nedeni, bu marka/iş tipi için kayda değer öğrenim ne. Yalnızca mesajlardan kanıtlanabilir gözlem yaz, UYDURMA. Yeterli yazışma yoksa "Değerlendirme için yeterli yazışma yok." de. Düz metin, en fazla 5 cümle. SONDAN İKİNCİ SATIRA "SEBEP: ..." yaz (puanın tek cümlelik gerekçesi, en fazla 120 karakter, ör. "2 revize ve 1 gün gecikme yaşandı" ya da "Pürüzsüz ilerledi, zamanında teslim edildi"). SON SATIRA tek başına "PUAN: n" yaz (n = 1-5 iş kalite puanı: 5 = pürüzsüz/zamanında/revizesiz, 3 = normal sürtünme, 1 = ciddi sorun/gecikme/çok revize; yazışma yetersizse PUAN: 3 ve SEBEP: "Yazışma değerlendirme için yetersiz"). GECİKME KURALI (kesin): iş bilgilerinde verilen termin gecikmesini puana MUTLAKA yansıt — 24 saatten fazla geciken iş EN FAZLA 3, 48 saatten fazla geciken iş EN FAZLA 2 alabilir; zamanında/erken teslim puanı yükseltir. Gecikme varsa SEBEP satırında belirt. DEADLINE UZATMA: Termin uzatmalarının puana etkisini SİSTEM otomatik (deterministik) uygular — sen "deadline uzatıldı" diye AYRICA puan kırma; yalnız iş kalitesi, süreç/sürtünme ve yukarıda verilen NET teslim gecikmesini değerlendir.',
       messages: [{ role: 'user', content: `İş: #${brief.no} ${brief.marka} — ${brief.baslik} (rev: ${brief.rev || 0})\n${gecikmeSatiri(brief)}\nThread:\n${lines.slice(0, 12000)}` }],
     }),
@@ -120,7 +120,8 @@ async function generateInsight(messages, names, brief) {
   const m = raw.match(/PUAN:\s*([1-5])\s*$/i);
   const sm = raw.match(/SEBEP:\s*(.+)$/im);
   const text = raw.replace(/\n?PUAN:\s*[1-5]\s*$/i, '').replace(/\n?SEBEP:\s*.+$/im, '').trim();
-  return { text, puan: m ? +m[1] : null, sebep: sm ? sm[1].trim().slice(0, 300) : null };
+  // sebep tavanı 300→2000: eski sınır yarım cümle bırakıyordu (2026-09-29)
+  return { text, puan: m ? +m[1] : null, sebep: sm ? sm[1].trim().slice(0, 2000) : null };
 }
 
 // TR resmî tatilleri (tam gün) — yıl dönümünde güncelle. Dini bayramlar takvime göre kayar.

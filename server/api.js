@@ -243,7 +243,7 @@ app.get('/api/sebep-period', readGuard, llmLimiter, async (req, res) => {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6', max_tokens: 400,
+        model: 'claude-sonnet-4-6', max_tokens: 1000,
         system: 'Sen Benseno tasarım stüdyosunun veri-temelli değerlendirme yazarısın. Kısa, somut, abartısız yaz. Verilmeyen sayıyı kullanma. DÜZ METİN yaz: Markdown KULLANMA — başlık (#), kalın (**), madde işareti veya liste YOK; tek akıcı paragraf (2-3 cümle).',
         messages: [{ role: 'user', content: prompt }],
       }),
@@ -1048,7 +1048,7 @@ app.post('/api/rating-sebep', botGuard, async (req, res) => {  // SEC-3b: gün-s
   try {
     const { type, key, sebep, rating_avg, rating_count } = req.body || {};
     if (!type || !key || !sebep) return res.status(400).json({ error: 'type, key, sebep gerekli' });
-    const s = String(sebep).slice(0, 1000);
+    const s = String(sebep).slice(0, 4000);   // 1000 kesik değerlendirme saklıyordu (2026-09-29)
     // En güncel snapshot (geriye uyum).
     await pool.query(`
       INSERT INTO entity_sebep (type, key, sebep, rating_avg, rating_count, updated_at)
