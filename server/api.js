@@ -1214,6 +1214,25 @@ app.get('/api/attachment/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
+// ── Haftalık karneler (Pazartesi üretilir; dropdown geçmişiyle) ─────────────
+// Hiyerarşi: tip=kisi karneleri yalnız yönetici VE kişinin kendisi görür.
+app.get('/api/karne', auth.authGuard, async (req, res) => {
+  try {
+    const tip = String(req.query.tip || '');
+    const kimlik = String(req.query.kimlik || '');
+    if (!['kisi', 'marka', 'dept', 'benseno'].includes(tip)) return res.status(400).json({ error: 'tip geçersiz' });
+    if (tip === 'kisi' && req.user.role !== 'admin' && req.user.slack_id !== kimlik) {
+      return res.status(403).json({ error: 'kişi karneleri yöneticilere ve kişinin kendisine özeldir' });
+    }
+    const r = await pool.query(
+      `SELECT to_char(hafta,'YYYY-MM-DD') hafta, ad, yildiz_hafta::float, ozet_hafta, is_sayisi_hafta,
+              yildiz_genel::float, ozet_genel, is_sayisi_genel
+       FROM haftalik_karne WHERE tip=$1 AND kimlik=$2 ORDER BY hafta DESC LIMIT 60`,
+      [tip, tip === 'benseno' ? 'benseno' : kimlik]);
+    res.json({ karneler: r.rows });
+  } catch (e) { console.error('[karne] okuma:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+});
+
 // ── MCP sunucusu (/mcp) — Ody-core buradan tasarim.* araçlarını çeker ──
 try { require('./mcp').mountMcp(app, writeGuard); console.log('[api] mcp sunucusu /mcp'); }
 catch (e) { console.error('[api] mcp mount başarısız:', e.message); }

@@ -224,6 +224,11 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
 
       <BrandNotifAccordion brand={brand} briefs={[...active, ...musteride, ...done]} onOpenBrief={onOpenBrief}/>
 
+      {/* Haftalık karne — pazartesi güncellenir; hafta dropdown'ıyla geçmiş (v2) */}
+      <div style={{ marginBottom: "var(--section-gap)" }}>
+        <HaftalikKarne tip="marka" kimlik={brand}/>
+      </div>
+
       <div className="bns-kpi-4" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)" }}>
         <Kpi label="Aktif iş" value={active.length} color={stats.color}/>
         <Kpi label="Tamamlanan" value={done.length}/>

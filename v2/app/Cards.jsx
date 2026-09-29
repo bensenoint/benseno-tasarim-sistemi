@@ -481,3 +481,58 @@ function V2ArsivTrend({ scope, baslik }) {
   );
 }
 window.V2ArsivTrend = V2ArsivTrend;
+
+// ── HAFTALIK KARNE (v2, 2026-09-29) ─────────────────────────────────────────
+// Pazartesi üretilen çift değerlendirme: "Bu Hafta" (yalnız o haftanın işleri) +
+// "Genel" (bugüne kadar, son hafta dahil evrilen özet). Hafta dropdown'ı ile
+// geçmiş karneler gezilir (markalardaki günlük kanal takibi deseni).
+// tip: 'kisi' | 'marka' | 'dept' | 'benseno' · kimlik: slack_id / marka adı / dept kodu
+function HaftalikKarne({ tip, kimlik, compact }) {
+  const [rows, setRows] = React.useState(null);   // null=yükleniyor, []=yok
+  const [sel, setSel] = React.useState(0);
+  React.useEffect(() => {
+    let iptal = false;
+    setRows(null); setSel(0);
+    const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+    const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+    fetch(`${API}/api/karne?tip=${encodeURIComponent(tip)}&kimlik=${encodeURIComponent(kimlik || "benseno")}`,
+      { headers: { Authorization: "Bearer " + tok } })
+      .then(r => r.ok ? r.json() : { karneler: [] })
+      .then(j => { if (!iptal) setRows(j.karneler || []); })
+      .catch(() => { if (!iptal) setRows([]); });
+    return () => { iptal = true; };
+  }, [tip, kimlik]);
+  if (rows === null) return <Card style={{ padding: "14px 16px" }}><div style={{ font: "400 12px var(--font-sans)", color: "var(--ink-4)" }}>Haftalık karne yükleniyor…</div></Card>;
+  if (!rows.length) return <Card style={{ padding: "14px 16px" }}><div style={{ font: "400 12px var(--font-sans)", color: "var(--ink-4)" }}>Henüz haftalık karne yok — karneler her Pazartesi üretilir.</div></Card>;
+  const k = rows[Math.min(sel, rows.length - 1)];
+  const fmtHafta = (s) => { const d = new Date(s + "T12:00:00+03:00"); const AY = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"]; return `${d.getDate()} ${AY[d.getMonth()]} haftası`; };
+  const Yildiz = ({ v }) => v == null
+    ? <span style={{ font: "500 13px var(--font-sans)", color: "var(--ink-4)" }}>—</span>
+    : <span style={{ font: "600 20px/1 var(--font-display)", fontStyle: "italic", color: "var(--ink)" }}>{v}<span style={{ font: "500 11px var(--font-sans)", color: "var(--ink-4)" }}> /5</span></span>;
+  const Blok = ({ baslik, yildiz, ozet, alt }) => (
+    <div style={{ flex: 1, minWidth: 220 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 6 }}>
+        <span style={{ font: "600 10px/1 var(--font-sans)", letterSpacing: ".07em", textTransform: "uppercase", color: "var(--ink-4)" }}>{baslik}</span>
+        <Yildiz v={yildiz}/>
+      </div>
+      <div style={{ font: "400 12px/1.55 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap" }}>{ozet || "—"}</div>
+      {alt && <div style={{ font: "400 10px/1 var(--font-sans)", color: "var(--ink-4)", marginTop: 6 }}>{alt}</div>}
+    </div>
+  );
+  return (
+    <Card style={{ padding: "16px 18px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, gap: 10, flexWrap: "wrap" }}>
+        <span style={{ font: "italic 500 16px/1 var(--font-display)", color: "var(--ink)" }}>Haftalık Karne</span>
+        <select value={sel} onChange={e => setSel(+e.target.value)} aria-label="Karne haftası"
+          style={{ font: "500 12px/1 var(--font-sans)", color: "var(--ink)", background: "var(--paper-2)", border: "1px solid var(--line)", borderRadius: 6, padding: "6px 26px 6px 9px", cursor: "pointer" }}>
+          {rows.map((r, i) => <option key={r.hafta} value={i}>{fmtHafta(r.hafta)}{i === 0 ? " (son)" : ""}</option>)}
+        </select>
+      </div>
+      <div style={{ display: "flex", gap: 22, flexWrap: compact ? "wrap" : "nowrap" }}>
+        <Blok baslik="Bu Hafta" yildiz={k.yildiz_hafta} ozet={k.ozet_hafta} alt={`${k.is_sayisi_hafta} iş bitti`}/>
+        <div style={{ width: 1, background: "var(--line)", flexShrink: 0 }}/>
+        <Blok baslik="Genel · bugüne kadar" yildiz={k.yildiz_genel} ozet={k.ozet_genel} alt={`toplam ${k.is_sayisi_genel} puanlı iş`}/>
+      </div>
+    </Card>
+  );
+}

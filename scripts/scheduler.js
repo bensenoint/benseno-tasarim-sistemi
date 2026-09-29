@@ -77,6 +77,7 @@ if (NOTIFY_V2) {
   cron.schedule('0 15 * * 1-5', () => run('run-firma-sinyal.sh'), opts);
   // P3.3c: haftalık GM brifingi (Opus sentezi) — Pazartesi 08:00
   cron.schedule('0 8 * * 1', () => run('run-firma-brifing.sh'), opts);
+  cron.schedule('30 8 * * 1', () => run('run-haftalik-karne.sh'), opts);   // haftalık karneler (kişi/marka/dept/benseno)
 } else {
   cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
 }
