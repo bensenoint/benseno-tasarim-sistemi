@@ -40,5 +40,14 @@ fi
 echo "④ Formül tek-tanım güvencesi (iş metrikleri yalnız calc.js'te)"
 if ! bash scripts/magic-guard.sh; then FAIL=1; fi
 
+# ⑤ V2 sandbox tazelik uyarısı (bloklamaz): calc.js canlıdan saptıysa v2 yanlış rakam gösterebilir
+if [ -d "v2/app" ]; then
+  if ! diff -q "dashboard/app/calc.js" "v2/app/calc.js" >/dev/null 2>&1; then
+    echo "⚠️  v2/app/calc.js canlı calc.js'ten SAPMIŞ — v2 rakamları güncel olmayabilir (bilinçli değilse senkronla)"
+  else
+    echo "  ✅ v2 calc.js canlıyla aynı"
+  fi
+fi
+
 if [ "$FAIL" -eq 0 ]; then echo "🟢 CI KAPISI GEÇTİ"; else echo "🔴 CI KAPISI KALDI"; fi
 exit "$FAIL"
