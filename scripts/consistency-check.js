@@ -123,10 +123,12 @@ function check(name, ok, detail) {
     // data.js formülü: gecikmeH = (bitis-bek)>deadline ? round((bitis-bek-deadline)/H*10)/10 : 0
     if (bitis && dl) {
       const gh = (bitis - bek) > dl ? Math.round((bitis - bek - dl) / H * 10) / 10 : 0;
-      const late = (bitis - bek) > dl;
+      // 0.05 saatten (3 dk) kısa net gecikme 1-ondalığa 0.0 yuvarlanır — dashboard
+      // bunu zamanında gösterir; kontrol de öyle saysın (eskiden yanlış pozitifti).
+      const late = (bitis - bek) > dl + 0.05 * H;
       if (gh < 0 || isNaN(gh)) gecikmeBad++;       // formül negatif/NaN üretmemeli
       if (late && gh <= 0) gecikmeBad++;            // geç bitişte gecikme pozitif olmalı
-      if (!late && gh !== 0) gecikmeBad++;          // erken bitişte gecikme sıfır olmalı
+      if (!late && gh > 0.1) gecikmeBad++;          // zamanında bitişte gecikme (yuvarlama payı üstü) olmamalı
     }
     if (c.rating != null && (c.rating < 1 || c.rating > 5)) ratingBad++;
   }
@@ -135,15 +137,16 @@ function check(name, ok, detail) {
   check('puanlar 1–5 aralığında', ratingBad === 0, `${ratingBad} işte aralık dışı puan`);
 
   // ─────────────────────────────────────────────────────────────────────────
-  console.log('⑤ KİŞİ KAPASİTESİ — AĞIRLIKLI yük (dashboard ile aynı: işçi 5/lead 2/gözlemci 0)');
-  // DB'den ağırlıklı yük: her (kişi,brief) için EN YÜKSEK rol ağırlığı (işçi>lead>gözlemci),
+  console.log('⑤ KİŞİ KAPASİTESİ — AĞIRLIKLI yük (dashboard ile aynı: işçi 5/lead 1/gözlemci 0)');
+  // DB'den ağırlıklı yük: her (kişi,brief) için EN YÜKSEK rol ağırlığı (işçi>lead>gözlemci).
+  // Lead=1: kullanıcı kararı (c29493d) — calc.BNS_ROLE_W ile birebir aynı kalmalı.
   // aktif (completed_at yok) + müşteride hariç. Bu, calc.bnsPersonLoad'ın DB karşılığıdır.
   const capRows = sql(`
     SELECT u.id, u.dept, u.yetki, COALESCE(SUM(w.weight),0) AS wload
     FROM users u
     LEFT JOIN (
       SELECT a.user_id, a.brief_id,
-        MAX(CASE a.role WHEN 'contributor' THEN 5 WHEN 'lead' THEN 2 ELSE 0 END) AS weight
+        MAX(CASE a.role WHEN 'contributor' THEN 5 WHEN 'lead' THEN 1 ELSE 0 END) AS weight
       FROM brief_assignees a
       JOIN briefs b ON b.id=a.brief_id AND b.deleted_at IS NULL AND b.completed_at IS NULL AND b.durum<>'musteride'
       GROUP BY a.user_id, a.brief_id
