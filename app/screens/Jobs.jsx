@@ -333,6 +333,7 @@ function JobsScreen({ data, user, tableMode, initialScope, onOpenBrief, onOpenCo
        !isCompletedScope && view === "kanban" ? <KanbanView rows={pagedRows} onOpenBrief={onOpenBrief}/> :
        !isCompletedScope && (view === "cards" || view === "list") ? <CardsView rows={pagedRows} onOpenBrief={onOpenBrief}/> :
        <BriefTable rows={pagedRows}
+         ratingCol={isCompletedScope}
          onRowClick={isCompletedScope ? (onOpenCompleted || onOpenBrief)
            : (b => (b.bitis ? (onOpenCompleted || onOpenBrief) : onOpenBrief)(b))}
          onStatusChange={isCompletedScope ? undefined : onStatusChange}/>}

@@ -566,6 +566,25 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
           </div>
         )}
         {/* Finans girişi (veri-girişi mini-fazı) — yalnız yönetici */}
+        {/* ⭐ Değerlendirme — tamamlanan işin yıldızı + sebebi (görünürlük: iş puanı tüm ekibe) */}
+        {(b.bitis || b.durum === "tamamlandi") && b.rating != null && (
+          <div style={{marginTop:14, padding:"12px 14px", background:"var(--paper-2)", border:"1px solid var(--line)", borderRadius:10}}>
+            <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom: b.rating_sebep ? 8 : 0}}>
+              <span style={{font:"600 10px/1 var(--font-sans)", letterSpacing:".07em", textTransform:"uppercase", color:"var(--ink-4)"}}>Değerlendirme</span>
+              <span style={{display:"inline-flex", alignItems:"center", gap:2}} title={"puan " + b.rating + "/5"}>
+                {[1,2,3,4,5].map(i => {
+                  const dolu = i <= Math.floor(b.rating);
+                  const yarim = !dolu && (b.rating - Math.floor(b.rating)) >= 0.5 && i === Math.ceil(b.rating);
+                  return <span key={i} style={{display:"inline-flex", opacity: yarim ? 0.55 : 1}}>
+                    <I.StarFill size={13} color={(dolu || yarim) ? "var(--prio-yellow)" : "var(--line-strong)"}/></span>;
+                })}
+                <span style={{font:"600 12px var(--font-mono)", color:"var(--ink-2)", marginLeft:5}}>{b.rating}/5</span>
+              </span>
+            </div>
+            {b.rating_sebep && <div style={{font:"400 12px/1.55 var(--font-sans)", color:"var(--ink-2)", whiteSpace:"pre-wrap"}}>{b.rating_sebep}</div>}
+          </div>
+        )}
+
         <FazBolumu b={b} onUpdate={onUpdate}/>
         <TipBolumu b={b} onUpdate={onUpdate}/>
         {_isMgr && <FinansBolumu b={b} onUpdate={onUpdate}/>}

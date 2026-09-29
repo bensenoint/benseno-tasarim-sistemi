@@ -13,7 +13,7 @@ function FlagCell({ on, label }) {
     : <span style={{ color: "var(--ink-5)" }}>—</span>;
 }
 
-function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false, rowDraggable, onRowReorder }) {
+function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = "table", financeCols = false, ratingCol = false, rowDraggable, onRowReorder }) {
   const [dragId, setDragId] = React.useState(null);   // satır sürükle-bırak (opsiyonel; yalnız onRowReorder verilince)
   // Kuyruk modunda (onRowReorder) varsayılan = iş yapma sırası (col:null → gelen kisi_sira
   // sırası korunur). Diğer tablolarda varsayılan öncelik ("Kalan"). Başlık tıklamasıyla değişir.
@@ -53,6 +53,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
     { id: "rev",     label: "Rev#",     sort: false, align: "right", mobileHide: true },
     { id: "acilma",  label: "Açıldı",   sort: true,  align: "right", mobileHide: true },
     { id: "gecikme", label: "Gecikme",  sort: false, align: "right", mobileHide: true },
+    ...(ratingCol ? [{ id: "rating", label: "⭐", sort: false }] : []),
     { id: "link",    label: "🔗",       sort: false }
   ];
   if (financeCols) {
@@ -119,6 +120,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
               onClick={() => onRowClick && onRowClick(b)}
               onStatusChange={onStatusChange}
               financeCols={financeCols}
+              ratingCol={ratingCol}
               stripe={idx % 2 === 1}
               draggable={rowDraggable ? !!rowDraggable(b) : false}
               onDragStartRow={() => setDragId(b.id)}
@@ -142,7 +144,7 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
   );
 }
 
-function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, draggable, onDragStartRow, onDragOverRow, onDropRow }) {
+function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, ratingCol, draggable, onDragStartRow, onDragOverRow, onDropRow }) {
   const [hover, setHover] = React.useState(false);
   const [menu, setMenu] = React.useState(false);
   return (
@@ -203,6 +205,18 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, draggab
         {brief.acilma ? new Date(brief.acilma).toLocaleString("tr-TR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "—"}
       </td>
       <td className="bns-col-mobile-hide" style={cellStyle(true, "right")} title={brief.acilma ? "açılışından beri geçen süre" : ""}>{relTime(brief.acilma)}</td>
+      {ratingCol && <td style={cellStyle()} title={brief.rating_sebep || (brief.rating != null ? "puan " + brief.rating + "/5" : "henüz puanlanmadı")}>
+        {brief.rating != null ? (
+          <span style={{display:"inline-flex", alignItems:"center", gap:1, cursor:"default"}}>
+            {[1,2,3,4,5].map(i => {
+              const dolu = i <= Math.floor(brief.rating);
+              const yarim = !dolu && (brief.rating - Math.floor(brief.rating)) >= 0.5 && i === Math.ceil(brief.rating);
+              return <span key={i} style={{display:"inline-flex", opacity: yarim ? 0.55 : 1}}>
+                <I.StarFill size={10} color={(dolu || yarim) ? "var(--prio-yellow)" : "var(--line-strong)"}/></span>;
+            })}
+          </span>
+        ) : <span style={{color:"var(--ink-5)"}}>—</span>}
+      </td>}
       <td style={cellStyle()}>
         <a href={brief.slack_url && brief.slack_url !== "#" ? brief.slack_url : undefined}
            target="_blank" rel="noopener noreferrer"
