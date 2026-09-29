@@ -202,6 +202,10 @@ app.get('/api/sebep-period', readGuard, llmLimiter, async (req, res) => {
   try {
     const type = String(req.query.type || 'firma');
     const key = String(req.query.key || '');
+    // Kişi dönem-değerlendirmesi: yalnız yöneticiler + kişinin kendisi (2026-09-29 görünürlük kuralı).
+    if (type === 'kisi' && req.user && req.user.slack_id !== key && !(await canSeeSensitive(req))) {
+      return res.status(403).json({ error: 'kişi değerlendirmeleri yöneticilere ve kişinin kendisine özeldir' });
+    }
     const fromMs = Number(req.query.from) || 0;
     const toMs = Number(req.query.to) || Date.now();
     const ck = `${type}:${key}:${Math.floor(fromMs / 864e5)}:${Math.floor(toMs / 864e5)}`;
