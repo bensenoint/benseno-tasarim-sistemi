@@ -46,7 +46,24 @@ app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString
 // SEC-4: duyarlı veri (finans/puan) izni. KULLANICI KARARI (2026-07-07): girişli TÜM üyeler
 // finans/puanı görebilir — sakınca görülmedi. Süzgeç altyapısı (stripBriefSensitive + sensitive
 // parametresi) ileride kısıtlamak istenirse hazır durur; kimliksiz erişim zaten 401 (readGuard).
-async function canSeeSensitive(req) { return true; }
+// Görünürlük (2026-09-29, Görkem kararı): bot ve YÖNETİCİLER (users.rol/yetki='yonetici':
+// Görkem, Cansu, Reyhan, Erdem, İpek) tam veri görür (kişi puanları + finans dahil).
+// Diğer ekip: iş/marka/departman/benseno yıldız-değerlendirmeleri AÇIK, kişi puanları ve
+// finans KAPALI (kendi kişi kaydını selfId ile görür). 60 sn'lik rol cache'i.
+const _rolCache = { ts: 0, m: new Map() };
+async function canSeeSensitive(req) {
+  if (!req.user) return true;   // writeGuard bot yolu (x-bns-token) req.user set etmez → tam veri
+  if (req.user.role === 'admin') return true;
+  const sid = req.user.slack_id;
+  if (!sid) return false;
+  if (Date.now() - _rolCache.ts > 60e3) {
+    try {
+      const r = await pool.query(`SELECT id FROM users WHERE rol='yonetici' OR yetki='yonetici'`);
+      _rolCache.m = new Set(r.rows.map(x => x.id)); _rolCache.ts = Date.now();
+    } catch (e) { console.error('[auth] rol cache:', e.message); return false; }
+  }
+  return _rolCache.m.has(sid);
+}
 
 // SEC-10: LLM maliyet koruması — kullanıcı başına 10 dk'da en çok 20 istek (bellek içi, restart'ta sıfırlanır).
 const llmHits = new Map();
@@ -151,7 +168,9 @@ app.get('/api/embedded', readGuard, async (req, res) => {
   try {
     // SEC-4: bot/admin/yönetici tam veri; düz üyeler finans/puan görmez (UI ile hizalı).
     const sensitive = await canSeeSensitive(req);
-    res.json(await getEmbedded({ sensitive }));
+    // Kişi kendi yıldız/değerlendirmesini görebilsin (2026-09-29 görünürlük kararı)
+    const selfId = req.user && (req.user.slack_id || null);
+    res.json(await getEmbedded({ sensitive, selfId }));
   } catch (e) {
     console.error('[api] /api/embedded hata:', e.message);
     res.status(500).json({ error: 'sunucu hatası' });

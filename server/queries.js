@@ -46,10 +46,11 @@ async function allBriefsWithAssignees() {
   });
 }
 
-// SEC-4: sensitive=false ise brief'lerden finans (maliyet/satis/fatura/odeme) ve puan
-// (rating/rating_by/rating_sebep) alanlarını çıkar. Bot/admin (sensitive=true) tam veri alır.
+// SEC-4 (2026-09-29 revizyon): sensitive=false ise brief'lerden yalnız FİNANS
+// (maliyet/satis/fatura/odeme) ve rating_by (puanı kimin verdiği) çıkar. İş puanı ve
+// puan sebebi (rating/rating_sebep) TÜM ekibe açıktır — kişi-bazlı puanlar ayrıca süzülür.
 function stripBriefSensitive(b) {
-  const { maliyet, satis, fatura, odeme, rating, rating_by, rating_sebep, ...rest } = b;
+  const { maliyet, satis, fatura, odeme, rating_by, ...rest } = b;
   return rest;
 }
 
@@ -110,7 +111,7 @@ async function getState({ sensitive = true } = {}) {
 
 // DB → dashboard'ın HAM beklediği bns_* shape (index.html EMBEDDED_DATA + poll ile aynı).
 // Dashboard kendi bnsHydrate* hattından geçirir; biz sadece doğru ham alan adlarını üretiriz.
-async function getEmbedded({ sensitive = true } = {}) {
+async function getEmbedded({ sensitive = true, selfId = null } = {}) {
   const [all, brands, users, dept] = await Promise.all([
     allBriefsWithAssignees(),
     pool.query(`SELECT name, color, wheel_idx, aylik_ucret FROM brands ORDER BY name`),
@@ -241,10 +242,11 @@ async function getEmbedded({ sensitive = true } = {}) {
     no: e.no, baslik: e.baslik, marka: e.marka,
   }));
 
-  // ⭐ Yıldız karnesi — puanlı tamamlanan işlerden canlı ortalamalar (firma/dept/kişi/marka)
-  // SEC-4: puan/rating_sebep yalnız admin/bot; diğer JWT kullanıcılar için hiç sorgulanmaz/dönmez.
+  // ⭐ Yıldız karnesi (2026-09-29): firma/dept/marka ortalamaları ve İŞ puanları TÜM ekibe
+  // açık. KİŞİ ortalama/sebepleri yalnız admin/bot (sensitive) — bir de kişinin KENDİSİ
+  // (selfId) kendi kaydını görür. Görünürlük kararı: Görkem.
   let bns_ratings = null, bns_sebep = [], bns_sebep_history = [];
-  if (sensitive) try {
+  try {
     const [firma, deptR, userR, sebep] = await Promise.all([
       pool.query(`SELECT round(avg(rating)::numeric,1)::float avg, count(*)::int cnt FROM briefs WHERE rating IS NOT NULL`),
       // Dept ortalaması katılımcıların departmanından: çok departmanlı işte (örn. tasarım+editör)
@@ -260,19 +262,20 @@ async function getEmbedded({ sensitive = true } = {}) {
                   WHERE b.rating IS NOT NULL GROUP BY a.user_id`),
       pool.query(`SELECT type, key, sebep, rating_avg::float, rating_count, updated_at FROM entity_sebep`),
     ]);
+    const kisiFiltre = (id) => sensitive || (selfId && id === selfId);
     bns_ratings = {
       firma: firma.rows[0] || { avg: null, cnt: 0 },
       dept: Object.fromEntries(deptR.rows.map(r => [r.dept, { avg: r.avg, cnt: r.cnt }])),
-      users: Object.fromEntries(userR.rows.map(r => [r.id, { avg: r.avg, cnt: r.cnt }])),
+      users: Object.fromEntries(userR.rows.filter(r => kisiFiltre(r.id)).map(r => [r.id, { avg: r.avg, cnt: r.cnt }])),
     };
-    bns_sebep = sebep.rows;
+    bns_sebep = sebep.rows.filter(r => r.type !== 'kisi' || kisiFiltre(r.key));
   } catch (e) { console.error('[queries] ratings okunamadı:', e.message); }
   // Tarihli sebep arşivi AYRI try/catch — tablo henüz yoksa (migration uygulanmadıysa)
   // ratings/sebep akışını ÇÖKERTMESİN (regresyon koruması).
-  if (sensitive) try {
+  try {
     const sebepHist = await pool.query(`SELECT type, key, to_char(gun,'YYYY-MM-DD') AS gun, sebep, rating_avg::float, rating_count
                   FROM entity_sebep_history WHERE gun >= (now() - interval '1 year')::date ORDER BY gun`);
-    bns_sebep_history = sebepHist.rows;
+    bns_sebep_history = sebepHist.rows.filter(r => r.type !== 'kisi' || sensitive || (selfId && r.key === selfId));
   } catch (e) { /* entity_sebep_history yoksa sessiz geç — güncel sebep zaten bns_sebep'te */ }
 
   // KPI geçmişi (Overview spark grafikleri) — son 48 anlık görüntü, eskiden yeniye
