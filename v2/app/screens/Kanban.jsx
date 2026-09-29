@@ -74,6 +74,18 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     );
   }
 
+  // ── KİŞİ-BAZLI DURUM GÖRÜNÜMÜ (v2, 2026-09-29) ──────────────────────────
+  // Çok kişili işte biri 🚀 başlattığında işin GENEL durumu 'basladi' olur ve öyle
+  // KALIR; ama işi yapan DİĞER kişi kendi başlatana kadar işi kendi kanbanında
+  // eski yerinde (İş planında) görür. Kaynak: brief_assignees.calisiyor işareti.
+  // Atanan olmayanlar (yönetici vb.) her zaman genel durumu görür.
+  const efDurum = (b) => {
+    if (b.durum !== "basladi") return b.durum;
+    const me = (b.contributors || []).find(c => c && c.id === _kanbanUid);
+    if (!me) return b.durum;
+    return me.calisiyor ? "basladi" : "calisiliyor";
+  };
+
   // Sürükle-bırak: hedef kolon = yeni durum. Yan etkili kolonlarda (tamamlandi/musteride) onay sor.
   const SIDE_EFFECT = { tamamlandi: "Tamamlandı", musteride: "Müşteri Onayında" };
   const handleDrop = (colId, e) => {
@@ -84,9 +96,34 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     setDragOverCol(null); setDragId(null);
     if (id == null) return;
     const brief = allBriefs.find(b => b.id === id) || completedAsBriefs.find(c => c.id === id);
-    if (!brief || brief.durum === colId) return;   // bulunamadı veya aynı kolon → işlem yok
+    if (!brief) return;
+    // İş zaten genel 'basladi' ve BEN başlamamışım → durum değişmez, yalnız benim
+    // calisiyor işaretim açılır (ben-basladim; tek-aktif-iş kapısından geçer).
+    if (colId === "basladi" && brief.durum === "basladi") {
+      const me = (brief.contributors || []).find(c => c && c.id === _kanbanUid);
+      if (me && !me.calisiyor) { benBasladim(brief); }
+      return;
+    }
+    if (efDurum(brief) === colId || brief.durum === colId) return;   // aynı kolon → işlem yok
     if (SIDE_EFFECT[colId] && !window.confirm(`#${brief.no} işini '${SIDE_EFFECT[colId]}' olarak işaretle?`)) return;
     if (typeof onStatusChange === "function") onStatusChange(brief, colId);
+  };
+
+  const benBasladim = (brief, zorla) => {
+    const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+    const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+    fetch(`${API}/api/briefs/${brief.id}/ben-basladim`, {
+      method: "POST", headers: { "content-type": "application/json", Authorization: "Bearer " + tok },
+      body: JSON.stringify(zorla ? { zorla: true } : {}),
+    }).then(async r => {
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 409 && j.cakisma) {
+        if (window.confirm(`Şu an #${j.cakisma.no} "${j.cakisma.baslik || ""}" üzerinde çalışıyorsun — bu işe başlarsan o beklemeye alınır. Devam?`)) benBasladim(brief, true);
+        return;
+      }
+      if (r.ok && typeof window.bnsRefresh === "function") window.bnsRefresh();
+      if (!r.ok && j.error) alert("Başlatılamadı: " + j.error);
+    }).catch(() => {});
   };
 
   // Kolon içi iş-sırası — KİŞİSEL (v2, 2026-09-29): sürükleme SUNUCUYA YAZILMAZ,
@@ -141,8 +178,8 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
       }}>
         {cols.map(col => {
           let items = col.id === "tamamlandi" ? completedAsBriefs
-            : col.id === "incelemede" ? allBriefs.filter(b => b.durum === "incelemede" || b.durum === "kontrole")
-            : allBriefs.filter(b => b.durum === col.id);
+            : col.id === "incelemede" ? allBriefs.filter(b => { const d = efDurum(b); return d === "incelemede" || d === "kontrole"; })
+            : allBriefs.filter(b => efDurum(b) === col.id);
           // İş-yapma sırası: müşteride/blokeli/tamamlandı dışındaki kolonlarda en üstte ilk yapılacak iş.
           // Brief sırası = işi yapanların en küçük kisi_sira'sı (profildeki kuyruk sırası ile aynı kaynak).
           if (!["musteride", "blokeli", "tamamlandi"].includes(col.id)) {
