@@ -32,13 +32,16 @@ t('editor 4 iş = %50', C.bnsPersonCapPct({ dept: 'editor' }, 4), 50);
 t('100 üstü kırpılır', C.bnsPersonCapPct({ dept: 'ai' }, 20), 100); // 20/6 → %333 → %100
 t('0 iş = %0',         C.bnsPersonCapPct({ dept: 'ai' }, 0), 0);
 
-// ── Rol ağırlıklı iş yükü (işçi 5 / lead 1 / gözlemci 0) ──
+// ── Rol ağırlıklı iş yükü (işçi 5 / açan 0.5 / lead 0.25 / gözlemci 0 — 2026-09-29) ──
 const _wA = { id: 'A' }, _wB = { id: 'B' }, _wC = { id: 'C' };
 t('yük: işçi=5', C.bnsBriefLoadWeight({ workers: [_wA] }, 'A'), 5);
-t('yük: lead=1', C.bnsBriefLoadWeight({ leads: [_wB] }, 'B'), 1);
+t('yük: lead=0.25 (işçinin 1/20\'si)', C.bnsBriefLoadWeight({ leads: [_wB] }, 'B'), 0.25);
+t('yük: açan=0.5 (işçinin 1/10\'u)', C.bnsBriefLoadWeight({ created_by: 'B' }, 'B'), 0.5);
 t('yük: gözlemci=0 (kapasiteye katılmaz)', C.bnsBriefLoadWeight({ observers: [_wC] }, 'C'), 0);
 t('yük: rol yoksa 0', C.bnsBriefLoadWeight({ workers: [_wA] }, 'Z'), 0);
 t('yük: en yüksek rol (işçi>lead)', C.bnsBriefLoadWeight({ workers: [_wA], leads: [_wA] }, 'A'), 5);
+t('yük: açan=yapan → yalnız işçi (5)', C.bnsBriefLoadWeight({ workers: [_wA], created_by: 'A' }, 'A'), 5);
+t('yük: açan=lead → yalnız açan (0.5)', C.bnsBriefLoadWeight({ leads: [_wA], created_by: 'A' }, 'A'), 0.5);
 const _briefs = [
   { durum: 'devam', workers: [_wA], leads: [_wB] },
   { durum: 'devam', workers: [_wB], observers: [_wA] },
@@ -46,13 +49,13 @@ const _briefs = [
   { durum: 'musteride', workers: [_wA] },     // sayılmaz
 ];
 t('personLoad A = 5+0(gözlemci) = 5', C.bnsPersonLoad(_briefs, 'A'), 5);
-t('personLoad B = 1+5 = 6', C.bnsPersonLoad(_briefs, 'B'), 6);
+t('personLoad B = 0.25+5 = 5.25', C.bnsPersonLoad(_briefs, 'B'), 5.25);
 // kapasite %: işçi-eşdeğeri = yük/5. A: 5/5=1 iş-eşdeğeri, ai limiti 6 → %17
 t('capPct A (rol ağırlıklı, gözlemci hariç)', C.bnsPersonCapPct({ dept: 'ai' }, C.bnsPersonLoad(_briefs, 'A') / 5), 17);
 // dept yükü: tasarım üyeleri — A,B tasarımcı say → dept yük; capacity 6 → (yük/5)/6
 const _dBriefs = [{ durum: 'devam', workers: [{ id: 'A', dept: 'tasarim' }], leads: [{ id: 'B', dept: 'tasarim' }] }];
-t('deptLoad tasarim = 5+1 = 6', C.bnsDeptLoad(_dBriefs, 'tasarim'), 6);
-t('deptCapPct tasarim (6/5)/6=%20', C.bnsDeptCapPct(_dBriefs, { capacity: 6 }, 'tasarim'), 20);
+t('deptLoad tasarim = 5+0.25 = 5.25', C.bnsDeptLoad(_dBriefs, 'tasarim'), 5.25);
+t('deptCapPct tasarim (5.25/5)/6=%18', C.bnsDeptCapPct(_dBriefs, { capacity: 6 }, 'tasarim'), 18);
 
 // ── Tarihe duyarlı "o gün açık olan işler" (geri-hesaplama) ──
 const _asofBriefs = [
@@ -274,7 +277,7 @@ t('v2: overdue çalışan iş — haftalar sonra hâlâ biner', C.bnsYayilimGunl
 const u2 = { id: 'U9', dept: 'tasarim' };
 const bA = { ...bCalisan, workers: [{ id: 'U9' }], leads: [] };
 const bB2 = { ...bCalisan, workers: [], leads: [{ id: 'U9' }] };
-t('v2: kişi gün doluluk %20', C.bnsKisiGunDoluluk([bA, bB2], u2, K('2026-07-07')), 20);
+t('v2: kişi gün doluluk %18 (lead 0.25 sonrası)', C.bnsKisiGunDoluluk([bA, bB2], u2, K('2026-07-07')), 18);
 const seri = C.bnsKisiGunlukSeri([bA], u2, K('2026-07-06'), 5);
 t('v2: seri 5 eleman', seri.length, 5);
 t('v2: seri hafta sonunu atlar (Cum→Pzt)', seri[4].gun, '2026-07-10');

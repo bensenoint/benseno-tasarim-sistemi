@@ -137,19 +137,25 @@ function check(name, ok, detail) {
   check('puanlar 1–5 aralığında', ratingBad === 0, `${ratingBad} işte aralık dışı puan`);
 
   // ─────────────────────────────────────────────────────────────────────────
-  console.log('⑤ KİŞİ KAPASİTESİ — AĞIRLIKLI yük (dashboard ile aynı: işçi 5/lead 1/gözlemci 0)');
+  console.log('⑤ KİŞİ KAPASİTESİ — AĞIRLIKLI yük (dashboard ile aynı: işçi 5/açan 0.5/lead 0.25/gözlemci 0)');
   // DB'den ağırlıklı yük: her (kişi,brief) için EN YÜKSEK rol ağırlığı (işçi>lead>gözlemci).
   // Lead=1: kullanıcı kararı (c29493d) — calc.BNS_ROLE_W ile birebir aynı kalmalı.
   // aktif (completed_at yok) + müşteride hariç. Bu, calc.bnsPersonLoad'ın DB karşılığıdır.
+  // İşçi 5 · AÇAN 0.5 · lead 0.25 · gözlemci 0; kişi+brief başına EN AĞIR rol (calc.BNS_ROLE_W).
   const capRows = sql(`
     SELECT u.id, u.dept, u.yetki, COALESCE(SUM(w.weight),0) AS wload
     FROM users u
     LEFT JOIN (
-      SELECT a.user_id, a.brief_id,
-        MAX(CASE a.role WHEN 'contributor' THEN 5 WHEN 'lead' THEN 1 ELSE 0 END) AS weight
-      FROM brief_assignees a
-      JOIN briefs b ON b.id=a.brief_id AND b.deleted_at IS NULL AND b.completed_at IS NULL AND b.durum<>'musteride'
-      GROUP BY a.user_id, a.brief_id
+      SELECT user_id, brief_id, MAX(weight) AS weight FROM (
+        SELECT a.user_id, a.brief_id,
+          CASE a.role WHEN 'contributor' THEN 5 WHEN 'lead' THEN 0.25 ELSE 0 END AS weight
+        FROM brief_assignees a
+        JOIN briefs b ON b.id=a.brief_id AND b.deleted_at IS NULL AND b.completed_at IS NULL AND b.durum<>'musteride'
+        UNION ALL
+        SELECT b.created_by, b.id, 0.5
+        FROM briefs b
+        WHERE b.created_by IS NOT NULL AND b.deleted_at IS NULL AND b.completed_at IS NULL AND b.durum<>'musteride'
+      ) r GROUP BY user_id, brief_id
     ) w ON w.user_id=u.id
     WHERE u.active GROUP BY u.id, u.dept, u.yetki`);
   const limit = (dept, yetki) => yetki === 'yonetici' ? 10 : ({ tasarim: 6, editor: 8, ai: 6, freelance: 6 })[dept] || 6;

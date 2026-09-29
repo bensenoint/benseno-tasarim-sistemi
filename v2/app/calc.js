@@ -33,12 +33,15 @@ function bnsDeptActive(briefs, deptKey) {
 // gözlemcilik gözetimdir, ÜRETİM yükü değil → katsayı 0. Genel bakış/Departman
 // kapasitesi de gözlemcileri dışlar (bnsDeptActive + sunucu a.role<>'gozlemci'); kişi
 // kapasitesi de aynı olsun ki yöneticiler "her işe gözlemci" diye %100 görünmesin.
-var BNS_ROLE_W = { worker: 5, lead: 1, observer: 0 };
-// Bir kişinin tek bir briefteki rol ağırlığı (en yüksek rol geçerli: işçi > lead > gözlemci).
+// Rol ağırlıkları (2026-09-29 kullanıcı kararı): işçi 5 baz · işi AÇAN işçinin 1/10'u (0.5)
+// · lead işçinin 1/20'si (0.25) · gözlemci 0. Aynı kişi birden çok roldeyse (açan=yapan,
+// açan=lead vb.) yalnız EN AĞIR rolü sayılır: işçi > açan > lead > gözlemci.
+var BNS_ROLE_W = { worker: 5, creator: 0.5, lead: 0.25, observer: 0 };
 function bnsBriefLoadWeight(b, userId) {
   if (!b || !userId) return 0;
   var has = function (arr) { return Array.isArray(arr) && arr.some(function (p) { return p && p.id === userId; }); };
   if (has(b.workers || b.contributors)) return BNS_ROLE_W.worker;
+  if (b.created_by === userId) return BNS_ROLE_W.creator;
   if (has(b.leads) || (b.lead && b.lead.id === userId)) return BNS_ROLE_W.lead;
   if (has(b.observers)) return BNS_ROLE_W.observer;
   return 0;
@@ -55,7 +58,9 @@ function bnsPersonLoad(briefs, userId) {
   return sum;
 }
 // Departmanın AĞIRLIKLI yükü — her aktif briefte o departmana ait tüm atananların
-// rol ağırlıkları toplanır (işçi 5 + lead 1; gözlemci 0 = kapasiteye katılmaz).
+// rol ağırlıkları toplanır (işçi 5 + lead 0.25; gözlemci 0). İşi açan, kişi-bazlı
+// yükte sayılır (bnsBriefLoadWeight) — departman toplamına katılmaz (açanın departmanı
+// işin departmanı olmayabilir; bilinçli sadelik).
 function bnsDeptLoad(briefs, deptKey) {
   if (!Array.isArray(briefs) || !deptKey) return 0;
   var inDept = function (p) { return p && (p.dept || p.rol) === deptKey; };
