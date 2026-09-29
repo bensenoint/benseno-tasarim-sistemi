@@ -1433,9 +1433,12 @@ function DateRangeControl({ range, onChange, now, compact, disabled }) {
   const [open, setOpen] = React.useState(false);
   React.useEffect(() => { if (disabled) setOpen(false); }, [disabled]);
   const DAY = 86400000;
-  const PRESETS = [["today","Bugün",null],["yesterday","Dün",null],["7d","Son 7 gün",7],["30d","Son 30 gün",30],["90d","Son 90 gün",90],["year","Bu yıl",null],["all","Tümü",null]];
+  const PRESETS = [["now","Anlık",null],["today","Bugün",null],["yesterday","Dün",null],["7d","Son 7 gün",7],["30d","Son 30 gün",30],["90d","Son 90 gün",90],["year","Bu yıl",null],["all","Tümü",null]];
   function apply(code, days) {
     if (code === "all")  { onChange({ from: 0, to: 8.64e15, preset: "all" }); setOpen(false); return; }
+    // Anlık: şu anki durum fotoğrafı — dönem penceresi TEK AN (from=to=now).
+    // Dönem bazlı bölümler (tamamlanan/geçmiş) boşalır, aktif/anlık metrikler kalır.
+    if (code === "now")  { onChange({ from: now, to: now, preset: "now" }); setOpen(false); return; }
     if (code === "year") { const f = new Date(new Date(now).getFullYear(), 0, 1).getTime(); onChange({ from: f, to: now, preset: "year" }); setOpen(false); return; }
     if (code === "today")     { const d = new Date(now); const s = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); onChange({ from: s, to: now, preset: "today" }); setOpen(false); return; }
     if (code === "yesterday") { const d = new Date(now); const s = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); onChange({ from: s - DAY, to: s - 1, preset: "yesterday" }); setOpen(false); return; }
@@ -1447,7 +1450,8 @@ function DateRangeControl({ range, onChange, now, compact, disabled }) {
   // Çözülmüş aralık etiketi — "12 Haz – 26 Haz" (gerek varsa yıl). Kullanıcı tam ne seçtiğini görür.
   const AY = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
   const fmtG = (ms) => { const d = new Date(ms); const yıl = d.getFullYear() !== new Date(now).getFullYear() ? " " + d.getFullYear() : ""; return `${d.getDate()} ${AY[d.getMonth()]}${yıl}`; };
-  const span = range.preset === "all" ? "Tüm zamanlar"
+  const span = range.preset === "now" ? "şu anki durum"
+    : range.preset === "all" ? "Tüm zamanlar"
     : (typeof range.from === "number" && typeof range.to === "number" && range.to < 8e15)
       ? (toYMD(range.from) === toYMD(range.to) ? fmtG(range.from) : `${fmtG(range.from)} – ${fmtG(range.to)}`)
       : "";
