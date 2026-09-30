@@ -857,7 +857,7 @@ app.post('/api/ody-dm', writeGuard, (req, res) => {
 app.get('/api/notifications', auth.authGuard, async (req, res) => {
   try {
     const r = await pool.query(
-      `SELECT id, text, link, created_at, read_at FROM notifications
+      `SELECT id, text, link, tip, created_at, read_at FROM notifications
        WHERE user_id=$1 ORDER BY created_at DESC LIMIT 30`, [req.user.slack_id]);
     // unread: son-30 listesinden değil, tablodan tam sayı (LIMIT'ten bağımsız; okundu kolonu: read_at).
     const c = await pool.query(

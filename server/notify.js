@@ -65,4 +65,19 @@ async function notify(userId, { tip = 'genel', aciliyet = 'normal', text, link =
   }
 }
 
-module.exports = { notify, shouldPushNow, getPrefs, inQuiet, trParts };
+// ── Bildirim reformu (2026-09-30): statüye özel görsel/ton/ses haritası ──────
+// Dashboard (Ody) bildirim satırındaki `tip` alanı 'statu-<durum>' olur;
+// v2 arayüzü bu haritadaki `ses` anahtarıyla duruma özel ses efekti çalar.
+const DURUM_STIL = {
+  yeni:        { emoji: '🆕', ses: 'yeni',       ton: 'Yeni iş açıldı' },
+  basladi:     { emoji: '🎨', ses: 'basladi',    ton: 'İşe başlandı' },
+  calisiliyor: { emoji: '🎨', ses: 'basladi',    ton: 'Çalışma sürüyor' },
+  kontrole:    { emoji: '📤', ses: 'kontrole',   ton: 'Kontrole gönderildi' },
+  incelemede:  { emoji: '🔍', ses: 'kontrole',   ton: 'İncelemede' },
+  musteride:   { emoji: '✈️', ses: 'musteride',  ton: 'Müşteriye gönderildi' },
+  revizyon:    { emoji: '✏️', ses: 'revizyon',   ton: 'Revizyon geldi' },
+  beklemede:   { emoji: '⏸️', ses: 'beklemede',  ton: 'Beklemeye alındı' },
+  tamamlandi:  { emoji: '🎉', ses: 'tamamlandi', ton: 'İş tamamlandı — tebrikler!' },
+};
+
+module.exports = { notify, shouldPushNow, getPrefs, inQuiet, trParts, DURUM_STIL };

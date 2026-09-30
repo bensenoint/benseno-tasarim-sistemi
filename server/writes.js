@@ -252,7 +252,7 @@ async function createBrief(raw) {
       const yeniAtananlar = new Set([...(d.worker_ids || []), ...(d.lead_ids || []), ...(d.by ? [d.by] : [])]);
       const briefId = result.id;
       const bi = (await pool.query(`SELECT no, baslik, slack_url FROM briefs WHERE id=$1`, [briefId])).rows[0] || {};
-      for (const uid of yeniAtananlar) if (/^U/.test(uid)) await notify(uid, { tip: 'atama', aciliyet: 'acil', text: `📌 #${bi.no} ${bi.baslik || ''} işine atandın`, link: bi.slack_url, briefId });
+      for (const uid of yeniAtananlar) if (/^U/.test(uid) && uid !== d.by) await notify(uid, { tip: 'statu-yeni', aciliyet: 'acil', text: `🆕 Yeni iş açıldı — ${isAd(bi.no, bi.baslik)}: bu işte görevlisin`, link: bi.slack_url, briefId });
     } catch (e) { console.error('[writes] atama bildirimi:', e.message); }
   }
 
@@ -708,6 +708,12 @@ async function setStatus(id, raw, _depth = 0) {
   } else if (d.source === 'system' && d.durum === 'basladi') {
     // Otomatik kuyruk ilerlemesi — insan imzası yok, Ody imzalı (yanıltıcı atıf düzeltmesi).
     note = `🤖 *Ody:* önceki işin kapandı — sıradaki işin otomatik başlatıldı (kuyruk ilerlemesi).`;
+  } else if (d.durum === 'tamamlandi') {
+    note = `🎉 *iş tamamlandı!* Emeği geçen herkese teşekkürler — harika iş. 🥳`;
+  } else if (d.durum === 'basladi') {
+    note = `🎨 *işe başlandı* — kolay gelsin!`;
+  } else if (d.durum === 'beklemede') {
+    note = `⏸️ iş *beklemeye* alındı.`;
   } else {
     note = `🔄 durum güncellendi: *${d.durum}*`;
   }
@@ -718,7 +724,7 @@ async function setStatus(id, raw, _depth = 0) {
     const saat = Math.round(resumeMs / 3600000);
     note += `\n↩️ *İşe geri dönüldü* — beklemeye girerken teslime *${saat > 0 ? saat + ' saat' : 'kısa bir süre'}* kalmıştı. Thread'e \`termin uzat\` yazarsan teslim, dönüş anından itibaren o kadar uzatılır ve **gecikme sayılmaz**; ya da \`termin 15.06 17:00\` ile tarih ver. (Dashboard'da da tek tıkla var.)`;
   }
-  await reflectChange(id, note, d.source, { by: d.by });
+  await reflectChange(id, note, d.source, { by: d.by, durum: d.durum });
   // 📤 kontrole: işi isteyen (lead'ler + açan) DM ile dürtülür — inceleme bekletilmesin.
   if (d.durum === 'kontrole') {
     try {
@@ -1064,13 +1070,25 @@ async function reflectChange(briefId, summary, source, opts) {
     const threadLink = (b.slack_ts && b.slack_channel)
       ? `https://${ws}.slack.com/archives/${b.slack_channel}/p${String(msgTs).replace('.', '')}?thread_ts=${b.slack_ts}&cid=${b.slack_channel}`
       : null;
-    // DM YOK: thread notu zaten takipçilere Slack bildirimi üretiyor (çift bildirim önlenir).
-    // Dashboard çanı beslenmeye devam etsin diye yalnız notifications tablosuna yazılır.
-    const u = await pool.query(`SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1`, [briefId]);
+    // Bildirim reformu (2026-09-30): STATÜ değişimlerinde iş listesindeki herkese
+    // (GÖZCÜLER ve değişikliği yapan HARİÇ) statüye özel tip + anlık DM ('acil' → sessiz
+    // saat/prefs korumalı). Diğer değişikliklerde eski davranış (yalnız dashboard çanı).
+    const u = await pool.query(
+      `SELECT user_id, array_agg(role) AS roles FROM brief_assignees WHERE brief_id=$1 GROUP BY user_id`, [briefId]);
+    const durum = opts && opts.durum;
     for (const row of u.rows) {
       if (!/^U/.test(row.user_id || '')) continue;
-      if (NOTIFY_V2) await notify(row.user_id, { tip: 'statu', aciliyet: 'normal', text, link: threadLink, briefId });
-      else await slack.logNotification(row.user_id, text, threadLink);
+      const roles = row.roles || [];
+      const sadeceGozcu = roles.length && roles.every(r => r === 'gozlemci');
+      if (durum) {
+        if (sadeceGozcu) continue;                 // gözcülere statü bildirimi gitmez (kural)
+        if (byId && row.user_id === byId) continue; // değişikliği yapana kendi bildirimi gitmez
+        await notify(row.user_id, { tip: `statu-${durum}`, aciliyet: 'acil', text, link: threadLink, briefId });
+      } else if (NOTIFY_V2) {
+        await notify(row.user_id, { tip: 'statu', aciliyet: 'normal', text, link: threadLink, briefId });
+      } else {
+        await slack.logNotification(row.user_id, text, threadLink);
+      }
     }
   } catch (e) { console.error('[writes] reflect hata:', e.message); }
 }

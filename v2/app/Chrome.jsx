@@ -407,8 +407,26 @@ function odySesCal(mood) {
   } catch (e) { /* ses best-effort */ }
 }
 
-// Bildirim zili — yeni bildirim gelince nazik iki-notalı "ding" (aynı 🔊 tercihine bağlı).
-function odyBildirimSesi() {
+// Bildirim sesi — bildirim reformu (2026-09-30): statüye özel melodiler.
+// tip 'statu-<durum>' → duruma özel kısa motif; termin/gecikme → uyarı tonu;
+// diğerleri → klasik iki-notalı "ding". Aynı 🔊 tercihine bağlı, ofis-dostu hacim.
+var ODY_SES_MOTIF = {
+  // {t: başlangıç sn, f: frekans Hz, d?: süre} — sine osilatör dizisi
+  'statu-yeni':        [{ t: 0, f: 880 }, { t: 0.12, f: 1175 }],                                      // klasik ding
+  'statu-basladi':     [{ t: 0, f: 659 }, { t: 0.10, f: 784 }, { t: 0.20, f: 988 }],                  // yükselen "başladık"
+  'statu-calisiliyor': [{ t: 0, f: 659 }, { t: 0.10, f: 784 }, { t: 0.20, f: 988 }],
+  'statu-kontrole':    [{ t: 0, f: 1047 }, { t: 0.14, f: 1047 }],                                     // çift tık "kontrol"
+  'statu-incelemede':  [{ t: 0, f: 1047 }, { t: 0.14, f: 1047 }],
+  'statu-musteride':   [{ t: 0, f: 784 }, { t: 0.15, f: 659 }, { t: 0.30, f: 784 }],                  // "uçtu gitti"
+  'statu-revizyon':    [{ t: 0, f: 587 }, { t: 0.14, f: 523 }],                                       // inen "hımm"
+  'statu-beklemede':   [{ t: 0, f: 523, d: 0.4 }],                                                    // tek yumuşak nota
+  'statu-tamamlandi':  [{ t: 0, f: 523 }, { t: 0.10, f: 659 }, { t: 0.20, f: 784 }, { t: 0.30, f: 1047, d: 0.6 }], // kutlama arpeji 🎉
+  'termin':            [{ t: 0, f: 440 }, { t: 0.18, f: 440 }],                                       // düşük uyarı
+  'gecikme':           [{ t: 0, f: 392 }, { t: 0.16, f: 392 }, { t: 0.32, f: 330 }],                  // ciddi uyarı
+  'hareketsiz':        [{ t: 0, f: 494, d: 0.5 }],
+  'musteri-bekliyor':  [{ t: 0, f: 587 }, { t: 0.2, f: 587 }],
+};
+function odyBildirimSesi(tip) {
   if (!odySesAcik()) return;
   try {
     var AC = window.AudioContext || window.webkitAudioContext;
@@ -417,14 +435,16 @@ function odyBildirimSesi() {
     var ctx = _odyAudioCtx;
     if (ctx.state === 'suspended') { ctx.resume().catch(function () {}); if (ctx.state === 'suspended') return; }
     var t0 = ctx.currentTime + 0.02;
-    [{ t: 0, f: 880 }, { t: 0.12, f: 1175 }].forEach(function (n) {
+    var motif = ODY_SES_MOTIF[tip] || [{ t: 0, f: 880 }, { t: 0.12, f: 1175 }];
+    motif.forEach(function (n) {
       var o = ctx.createOscillator(), g = ctx.createGain();
+      var dur = n.d || 0.5;
       o.type = 'sine'; o.frequency.setValueAtTime(n.f, t0 + n.t);
       g.gain.setValueAtTime(0, t0 + n.t);
       g.gain.linearRampToValueAtTime(0.06, t0 + n.t + 0.015);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.t + 0.5);   // çan gibi uzun sönüm
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + n.t + dur);   // çan gibi sönüm
       o.connect(g); g.connect(ctx.destination);
-      o.start(t0 + n.t); o.stop(t0 + n.t + 0.55);
+      o.start(t0 + n.t); o.stop(t0 + n.t + dur + 0.05);
     });
   } catch (e) { /* best-effort */ }
 }
@@ -773,7 +793,12 @@ function ChatBot({ currentUser, dateRange }) {
           // Uyku sayacı: oturum içinde yeni bildirim geldiyse "son bildirim" anını güncelle.
           const maxId = items.reduce((m, n) => (n.id > m ? n.id : m), 0);
           if (newestIdRef.current === 0) newestIdRef.current = maxId;          // ilk yükleme — baz al
-          else if (maxId > newestIdRef.current) { lastNotifRef.current = Date.now(); newestIdRef.current = maxId; odyBildirimSesi(); }
+          else if (maxId > newestIdRef.current) {
+            lastNotifRef.current = Date.now(); newestIdRef.current = maxId;
+            // Statüye özel ses: en yeni bildirimin tip'i motifi seçer (yoksa klasik ding).
+            const enYeni = items.find(n => n.id === maxId);
+            odyBildirimSesi(enYeni && enYeni.tip);
+          }
           // Günlük tamamlanan iş sayısı: created_at bugünse, id-dedupe ile (yeni iş → düşünüyor mood'u zaten metinden).
           try {
             const todayStr = new Date().toISOString().slice(0, 10);

@@ -41,9 +41,9 @@ async function notifyFailure(script, code, dk) {
   }
 }
 
-function run(script) {
+function run(script, ...args) {
   const t0 = Date.now();
-  const child = spawn('bash', [path.join('scripts', script)], {
+  const child = spawn('bash', [path.join('scripts', script), ...args], {
     cwd: PROJ,
     env: process.env,
     detached: true,
@@ -62,46 +62,32 @@ function run(script) {
   console.log(`[scheduler] tetiklendi: ${script} @ ${new Date().toLocaleString('tr-TR', { timeZone: TZ })}`);
 }
 
-// Orchestrator KALDIRILDI (Cutover tamam, 4 Haz): canvas→live-data pipeline emekli;
-// raporlar /api/embedded (DB) okuyor, briefler /yeni-brief ile DB'ye düşüyor.
-const NOTIFY_V2 = process.env.BNS_NOTIFY_V2 === '1';
-// Sabah raporu — hafta içi 07:50
-cron.schedule('50 7 * * 1-5', () => run('run-sabah-raporu.sh'), opts);
-// Kişisel: V2'de dijest (08:30 sabah + 13:30 öğle), eski sistemde 07:55 kisisel rapor.
-if (NOTIFY_V2) {
-  cron.schedule('15 8 * * 1-5', () => run('run-ody-icgoru.sh'), opts);
-  cron.schedule('30 8 * * 1-5', () => run('run-dijest.sh'), opts);
-  cron.schedule('30 13 * * 1-5', () => run('run-dijest-ogle.sh'), opts);
-  // P3.3a: firma-seviyesi proaktif sinyaller (kapasite/geciken/marka-risk/kişi-kalite) — 09:00 + 15:00
-  cron.schedule('0 9 * * 1-5', () => run('run-firma-sinyal.sh'), opts);
-  cron.schedule('0 15 * * 1-5', () => run('run-firma-sinyal.sh'), opts);
-  // P3.3c: haftalık GM brifingi (Opus sentezi) — Pazartesi 08:00
-  cron.schedule('0 8 * * 1', () => run('run-firma-brifing.sh'), opts);
-  cron.schedule('30 8 * * 1', () => run('run-haftalik-karne.sh'), opts);   // haftalık karneler (kişi/marka/dept/benseno)
-} else {
-  cron.schedule('55 7 * * 1-5', () => run('run-kisisel-rapor.sh'), opts);
-}
-// Termin riski — hafta içi 09-19 SAAT BAŞI (:15), tüm aktif briefleri tarar; teslime ≤24sa
-// olanı thread'e uyarır. Idempotent (20sa): her saat kontrol eder ama aynı işi spam'lemez.
-cron.schedule('15 9-19 * * 1-5', () => run('run-termin-risk.sh'), opts);
-// Thread bakımı HER MODDA çalışır — hafta içi 09-19 saatte bir. Yalnız özet değil:
-// thread_ton (P3.2), kpi-snapshot (Overview spark), hareketsiz işaretleme ve 1h/2h
-// cevapsız uyarıları da bu script'te. V2'de yanlışlıkla kapalı kalmıştı (5 özellik ölüydü);
-// asıl gürültü kaynağı kanal-ozet'ti (kanala post) — o V2'de kapalı kalır.
+// ═══ BİLDİRİM REFORMU (2026-09-30) — Görkem kararı: eski rapor/bildirim akışının ═══
+// tamamı kapatıldı, yerine e-posta raporları + akıllı bildirimler kuruldu.
+// Kapatılanlar: sabah-raporu, kisisel-rapor, dijest (08:30+13:30), ody-icgoru,
+// firma-sinyal, firma-brifing, kanal-ozet(Slack), gunluk-ozet, haftalik-retro,
+// aylik-strateji, termin-risk (→ akilli-bildirim'e taşındı).
+// VERİ ÜRETEN işler bilinçli olarak KALDI: thread-ozet (iş puanları/ton/kpi + fatura
+// takibi), kanal-gunsonu (brand_daily arşivi), haftalik-karne, yedek/temizlik/PAT.
+
+// Akıllı bildirimler — hafta içi 09-19 saat başı (:15): termin riski, fiilî gecikme +
+// uzatma önerisi, hareketsiz iş, müşteride bekleyen. İdempotent (tip başına bastırma).
+cron.schedule('15 9-19 * * 1-5', () => run('run-akilli-bildirim.sh'), opts);
+
+// E-posta raporları (Resend) — kişi başına tek mail: kendisi → departmanı → firma.
+cron.schedule('0 8 * * 1-5', () => run('run-rapor-mail.sh', 'sabah'), opts);      // bugün yapılacaklar
+cron.schedule('30 18 * * 1-5', () => run('run-rapor-mail.sh', 'aksam'), opts);    // bugün yapılanlar
+cron.schedule('5 8 * * 1', () => run('run-rapor-mail.sh', 'hafta-plan'), opts);   // haftalık plan
+cron.schedule('30 17 * * 5', () => run('run-rapor-mail.sh', 'hafta-ozet'), opts); // haftalık özet
+cron.schedule('10 8 1 * *', () => run('run-rapor-mail.sh', 'ay-bas'), opts);      // ay planı
+cron.schedule('40 17 25-31 * *', () => run('run-rapor-mail.sh', 'ay-son'), opts); // ay özeti (script son gün kontrolü yapar)
+
+// Haftalık karneler (kişi/marka/dept/benseno) — Pazartesi 08:30 (veri, dashboard'a yazar)
+cron.schedule('30 8 * * 1', () => run('run-haftalik-karne.sh'), opts);
+// Thread bakımı (VERİ) — thread_ton, kpi-snapshot, iş puanı, fatura takibi — 09-19 saatte bir
 cron.schedule('0 9-19 * * 1-5', () => run('run-thread-ozet.sh'), opts);
-if (!NOTIFY_V2) {
-  // Marka kanal özeti — hafta içi 09-19 arası saatte bir, yarım saat kaydırmalı (xx:30)
-  cron.schedule('30 9-19 * * 1-5', () => run('run-kanal-ozet.sh'), opts);
-}
 // Marka gün-sonu insight — hafta içi 18:45 (brand_daily arşivine yazar)
 cron.schedule('45 18 * * 1-5', () => run('run-kanal-gunsonu.sh'), opts);
-// 17:00 raporları kaydırıldı (aynı anda spawn olmasın → çift-claude/push yarışı yok):
-// Günlük sistem özeti — hafta içi 17:05, sadece Görkem'e (P2.3)
-cron.schedule('5 17 * * 1-5', () => run('run-gunluk-ozet.sh'), opts);
-// Haftalık retro — Cuma 17:10
-cron.schedule('10 17 * * 5', () => run('run-haftalik-retro.sh'), opts);
-// Aylık strateji — ayın 25–31'i 17:15 (script "bugün ayın son günü mü?" kontrol eder)
-cron.schedule('15 17 25-31 * *', () => run('run-aylik-strateji.sh'), opts);
 // Log temizliği — her gece 03:30
 cron.schedule('30 3 * * *', () => run('run-log-temizle.sh'), opts);
 // PAT süre/geçerlilik kontrolü — Pazartesi 09:00 (P1.3; geçersizse kendi DM'ini atar)
