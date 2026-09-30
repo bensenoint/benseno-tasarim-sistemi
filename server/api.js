@@ -1244,7 +1244,9 @@ app.get('/api/karne', auth.authGuard, async (req, res) => {
     const tip = String(req.query.tip || '');
     const kimlik = String(req.query.kimlik || '');
     if (!['kisi', 'marka', 'dept', 'benseno'].includes(tip)) return res.status(400).json({ error: 'tip geçersiz' });
-    if (tip === 'kisi' && req.user.role !== 'admin' && req.user.slack_id !== kimlik) {
+    // Kişi karnesi görünürlüğü (Görkem kuralı 2026-09-29): kişinin KENDİSİ + TÜM yöneticiler.
+    // JWT role'ü yalnız Görkem'de 'admin'; diğer yöneticiler users.rol/yetki'den gelir → canSeeSensitive.
+    if (tip === 'kisi' && req.user.slack_id !== kimlik && !(await canSeeSensitive(req))) {
       return res.status(403).json({ error: 'kişi karneleri yöneticilere ve kişinin kendisine özeldir' });
     }
     const r = await pool.query(
