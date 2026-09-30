@@ -603,6 +603,8 @@ app.patch('/api/briefs/:id/thread-ozet', botGuard, async (req, res) => {  // SEC
       [String(ozet).slice(0, 4000), last_ts || null, ton_ok, +req.params.id]
     );
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
+    // Portal: müşteri-uyumlu özet versiyonunu üret (fire-and-forget, yanıtı bekletmez).
+    try { require('./portal').musteriMetinGuncelle(r.rows[0].id, { ozet: String(ozet) }); } catch {}
     res.json({ ok: true, id: r.rows[0].id });
   } catch (e) { console.error('[api] thread-ozet hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
@@ -636,6 +638,8 @@ app.patch('/api/briefs/:id/insight', botGuard, async (req, res) => {  // SEC-3b:
       [String(insight).slice(0, 4000), +req.params.id, p, sebep]
     );
     if (!r.rows[0]) return res.status(404).json({ error: 'brief bulunamadı: ' + req.params.id });
+    // Portal: sebep yazıldıysa müşteri-uyumlu versiyonunu üret (fire-and-forget).
+    if (sebep) { try { require('./portal').musteriMetinGuncelle(r.rows[0].id, { sebep }); } catch {} }
     res.json({ ok: true, id: r.rows[0].id });
   } catch (e) { console.error('[api] insight hata:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
 });
@@ -1285,6 +1289,8 @@ app.get('/api/karne', auth.authGuard, async (req, res) => {
 });
 
 // ── MCP sunucusu (/mcp) — Ody-core buradan tasarim.* araçlarını çeker ──
+try { require('./portal').mountPortal(app); console.log('[api] müşteri portalı /api/portal'); }
+catch (e) { console.error('[api] portal mount hata:', e.message); }
 try { require('./mcp').mountMcp(app, writeGuard); console.log('[api] mcp sunucusu /mcp'); }
 catch (e) { console.error('[api] mcp mount başarısız:', e.message); }
 

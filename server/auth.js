@@ -24,6 +24,24 @@ function authGuard(req, res, next) {
   if (!token) return res.status(401).json({ error: 'giriş gerekli' });
   try {
     req.user = verifyToken(token);
+    // SEC-P1 (portal, 30 Eyl): müşteri token'ları personel API'lerine GİREMEZ.
+    // Müşteriler yalnız /api/portal/* uçlarını kullanır (musteriGuard).
+    if (req.user && req.user.role === 'musteri') return res.status(403).json({ error: 'bu uç portal hesaplarına kapalı' });
+    next();
+  } catch {
+    res.status(401).json({ error: 'geçersiz veya süresi dolmuş token' });
+  }
+}
+
+// Portal (müşteri) guard — yalnız role='musteri' token kabul eder; marka kimliği token'dan gelir.
+function musteriGuard(req, res, next) {
+  const header = req.get('Authorization') || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) return res.status(401).json({ error: 'giriş gerekli' });
+  try {
+    const u = verifyToken(token);
+    if (u.role !== 'musteri' || !u.marka_id) return res.status(403).json({ error: 'portal hesabı gerekli' });
+    req.musteri = u;   // { role:'musteri', mid: hesap id, marka_id, email }
     next();
   } catch {
     res.status(401).json({ error: 'geçersiz veya süresi dolmuş token' });
@@ -35,4 +53,4 @@ function adminGuard(req, res, next) {
   next();
 }
 
-module.exports = { signToken, verifyToken, authGuard, adminGuard, bcrypt };
+module.exports = { signToken, verifyToken, authGuard, adminGuard, musteriGuard, bcrypt };

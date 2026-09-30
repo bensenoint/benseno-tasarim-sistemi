@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benseno · Müşteri Portalı</title>
+<!-- GÜVENLİK NOTU: Tüm dinamik değerler esc() ile HTML-escape edilir; onclick parametreleri
+     yalnız sunucudan gelen SAYISAL iş numarasıdır. Veri kaynağı yalnız kendi API'miz. -->
+<style>
+  :root{
+    --paper:#fdfcf9; --paper2:#f5f2ec; --ink:#1a1e2b; --ink3:#6b7080; --ink4:#9aa0b0;
+    --line:#e5e1d8; --mavi:#24479E; --ok:#1a8f5a; --warn:#b3701f; --kirmizi:#b3362a;
+    --font:-apple-system,"Segoe UI",Roboto,sans-serif; --serif:Georgia,"Times New Roman",serif;
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --paper:#141824; --paper2:#1c2130; --ink:#eceef4; --ink3:#a6acbd; --ink4:#767d90; --line:#2a3040; --mavi:#7d9bE0; } }
+  *{box-sizing:border-box} body{margin:0;background:var(--paper2);color:var(--ink);font:400 14px/1.5 var(--font)}
+  .wrap{max-width:860px;margin:0 auto;padding:20px 16px}
+  .kart{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px}
+  h1{font:700 22px/1.2 var(--serif);margin:0}
+  .logo{font:700 20px var(--serif);color:var(--mavi)}
+  input,button,select{font:inherit}
+  input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);margin:4px 0 14px}
+  .btn{width:100%;padding:11px;border:none;border-radius:8px;background:var(--mavi);color:#fff;font-weight:600;cursor:pointer}
+  .hata{color:var(--kirmizi);font-size:13px;margin:8px 0}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{font:600 11px var(--font);text-transform:uppercase;letter-spacing:.4px;color:var(--ink4);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+  td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr.satir{cursor:pointer} tr.satir:hover td{background:var(--paper2)}
+  .rozet{display:inline-block;font:600 11px var(--font);padding:3px 9px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+  .sekme{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:14px 0}
+  .sekme button{border:none;background:transparent;color:var(--ink3);padding:7px 16px;cursor:pointer;font-weight:600;font-size:13px}
+  .sekme button.acik{background:var(--paper);color:var(--ink)}
+  .geri{background:none;border:none;color:var(--mavi);cursor:pointer;font-weight:600;padding:0;margin-bottom:12px}
+  .etiket{font:600 11px var(--font);text-transform:uppercase;letter-spacing:.4px;color:var(--ink4);margin:16px 0 4px}
+  .yildiz{color:#d9a514;letter-spacing:2px}
+  .zaman{border-left:2px solid var(--line);margin:6px 0 0 6px;padding-left:14px}
+  .zaman div{margin:6px 0;font-size:13px}
+  .ust{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .cikis{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--ink3);cursor:pointer;font-size:12.5px}
+  @media(max-width:640px){ .gizle-m{display:none} td,th{padding:8px 6px} }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const API = "https://benseno-api-production.up.railway.app";
+const $ = (h) => { document.getElementById("app").innerHTML = h; };   // tüm dinamikler esc()'li
+const esc = (s) => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const tok = () => sessionStorage.getItem("portal_token");
+const trT = (ms) => ms ? new Date(ms).toLocaleDateString("tr-TR",{day:"numeric",month:"short",year:"numeric"}) : "—";
+const DURUM = { yeni:["Yeni","var(--ink3)"], calisiliyor:["İş planında","var(--mavi)"], basladi:["Çalışılıyor","var(--mavi)"],
+  incelemede:["İç kontrolde","var(--warn)"], kontrole:["İç kontrolde","var(--warn)"], beklemede:["Beklemede","var(--ink4)"],
+  revizyon:["Revizyonda","var(--warn)"], musteride:["Onayınızda","var(--mavi)"], tamamlandi:["Tamamlandı","var(--ok)"] };
+const durumRozet = (d) => { const [ad,renk] = DURUM[d] || [esc(d),"var(--ink3)"]; return `<span class="rozet" style="color:${renk}">${ad}</span>`; };
+const SIM = { USD:"$", EUR:"€" };
+const satisTxt = (b) => b.satis == null ? "—" :
+  (SIM[b.satis_doviz] ? `${SIM[b.satis_doviz]}${Number(b.satis_orij).toLocaleString("tr-TR")} <span style="color:var(--ink4);font-size:11px">≈${Number(b.satis).toLocaleString("tr-TR")}₺</span>`
+                      : Number(b.satis).toLocaleString("tr-TR") + "₺");
+const yildiz = (n) => n == null ? "" : `<span class="yildiz">${"★".repeat(Math.round(n))}${"☆".repeat(5-Math.round(n))}</span> <b>${Number(n)}</b>/5`;
+
+let STATE = { marka: sessionStorage.getItem("portal_marka") || "", isler: [], sekme: "aktif" };
+
+function loginEkrani(hata) {
+  $(`<div style="max-width:400px;margin:9vh auto 0">
+    <div class="kart" style="text-align:center">
+      <div class="logo">benseno</div>
+      <div style="font:600 12px var(--font);letter-spacing:2px;color:var(--ink4);margin:6px 0 22px">MÜŞTERİ PORTALI</div>
+      <form id="f" style="text-align:left">
+        <label class="etiket">E-posta</label><input id="em" type="email" autocomplete="username" required>
+        <label class="etiket">Şifre</label><input id="pw" type="password" autocomplete="current-password" required>
+        ${hata ? `<div class="hata">${esc(hata)}</div>` : ""}
+        <button class="btn">Giriş Yap</button>
+      </form>
+    </div></div>`);
+  document.getElementById("f").onsubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const r = await fetch(API + "/api/portal/login", { method:"POST", headers:{"content-type":"application/json"},
+        body: JSON.stringify({ email: document.getElementById("em").value, sifre: document.getElementById("pw").value }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) return loginEkrani(j.error || "giriş başarısız");
+      sessionStorage.setItem("portal_token", j.token);
+      sessionStorage.setItem("portal_marka", j.marka || "");
+      STATE.marka = j.marka || "";
+      j.sifre_degistir ? sifreEkrani() : listeYukle();
+    } catch { loginEkrani("bağlantı hatası"); }
+  };
+}
+
+function sifreEkrani(hata) {
+  $(`<div style="max-width:400px;margin:9vh auto 0"><div class="kart">
+    <h1 style="font-size:18px">Şifrenizi belirleyin</h1>
+    <p style="color:var(--ink3);font-size:13px">İlk girişte geçici şifrenizi değiştirmeniz gerekiyor.</p>
+    <form id="f"><label class="etiket">Yeni şifre (en az 8 karakter)</label>
+      <input id="p1" type="password" autocomplete="new-password" required minlength="8">
+      <label class="etiket">Tekrar</label><input id="p2" type="password" required>
+      ${hata ? `<div class="hata">${esc(hata)}</div>` : ""}
+      <button class="btn">Kaydet ve Devam Et</button></form></div></div>`);
+  document.getElementById("f").onsubmit = async (e) => {
+    e.preventDefault();
+    const p1 = document.getElementById("p1").value, p2 = document.getElementById("p2").value;
+    if (p1 !== p2) return sifreEkrani("şifreler eşleşmiyor");
+    const r = await fetch(API + "/api/portal/sifre", { method:"POST",
+      headers:{"content-type":"application/json", Authorization:"Bearer "+tok()}, body: JSON.stringify({ yeni: p1 }) });
+    const j = await r.json().catch(() => ({}));
+    r.ok ? listeYukle() : sifreEkrani(j.error || "kaydedilemedi");
+  };
+}
+
+async function listeYukle() {
+  const r = await fetch(API + "/api/portal/isler", { headers:{ Authorization:"Bearer "+tok() } });
+  if (r.status === 401 || r.status === 403) return loginEkrani();
+  const j = await r.json();
+  STATE.marka = j.marka || STATE.marka; STATE.isler = j.isler || [];
+  listeEkrani();
+}
+
+function listeEkrani() {
+  const aktifMi = STATE.sekme === "aktif";
+  const rows = STATE.isler.filter(b => aktifMi ? b.durum !== "tamamlandi" : b.durum === "tamamlandi");
+  $(`<div class="ust">
+      <div><div class="logo">benseno</div><h1 style="margin-top:2px">${esc(STATE.marka)}</h1></div>
+      <button class="cikis" id="cikisBtn">Çıkış</button></div>
+    <div class="sekme">
+      <button class="${aktifMi?"acik":""}" id="sekmeAktif">Devam Edenler (${STATE.isler.filter(b=>b.durum!=="tamamlandi").length})</button>
+      <button class="${aktifMi?"":"acik"}" id="sekmeTamam">Tamamlananlar (${STATE.isler.filter(b=>b.durum==="tamamlandi").length})</button>
+    </div>
+    <div class="kart" style="padding:6px 0;overflow-x:auto"><table>
+      <tr><th>#</th><th>İş</th><th>Durum</th><th class="gizle-m">${aktifMi?"Termin":"Teslim"}</th>${aktifMi?"":"<th class='gizle-m'>Puan</th>"}</tr>
+      ${rows.map(b => `<tr class="satir" data-no="${Number(b.no)}">
+        <td style="color:var(--ink4)">#${Number(b.no)}${b.faz_no>1?`<span style=\"font-size:10px\"> f${Number(b.faz_no)}</span>`:""}</td>
+        <td style="font-weight:500">${esc(b.baslik)}</td>
+        <td>${durumRozet(b.durum)}</td>
+        <td class="gizle-m" style="color:var(--ink3)">${trT(aktifMi?b.deadline:b.teslim)}</td>
+        ${aktifMi?"":`<td class="gizle-m">${yildiz(b.rating)||"—"}</td>`}
+      </tr>`).join("") || `<tr><td colspan="5" style="text-align:center;color:var(--ink4);padding:26px">Kayıt yok</td></tr>`}
+    </table></div>
+    <div style="font-size:11.5px;color:var(--ink4);margin-top:12px">Sorularınız için Benseno ekibinizle iletişime geçebilirsiniz.</div>`);
+  document.getElementById("cikisBtn").onclick = () => { sessionStorage.clear(); location.reload(); };
+  document.getElementById("sekmeAktif").onclick = () => { STATE.sekme = "aktif"; listeEkrani(); };
+  document.getElementById("sekmeTamam").onclick = () => { STATE.sekme = "tamam"; listeEkrani(); };
+  document.querySelectorAll("tr.satir").forEach(tr => { tr.onclick = () => detayAc(parseInt(tr.dataset.no, 10)); });
+}
+
+async function detayAc(no) {
+  if (!Number.isInteger(no)) return;
+  const r = await fetch(API + "/api/portal/isler/" + no, { headers:{ Authorization:"Bearer "+tok() } });
+  if (!r.ok) return;
+  const b = await r.json();
+  $(`<button class="geri" id="geriBtn">← ${esc(STATE.marka)} işlerine dön</button>
+    <div class="kart">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">
+        <h1>#${Number(b.no)} · ${esc(b.baslik)}</h1>${durumRozet(b.durum)}</div>
+      <div style="display:flex;gap:26px;flex-wrap:wrap;margin-top:14px">
+        <div><div class="etiket">Açılış</div>${trT(b.acilis)}</div>
+        <div><div class="etiket">Termin</div>${trT(b.deadline)}</div>
+        ${b.teslim ? `<div><div class="etiket">Teslim</div>${trT(b.teslim)}</div>` : ""}
+        <div><div class="etiket">Revizyon</div>${Number(b.rev) || 0}</div>
+        ${b.satis != null ? `<div><div class="etiket">Tutar</div>${satisTxt(b)}</div>` : ""}
+      </div>
+      ${b.musteri_notu ? `<div class="etiket">Brief notu</div><div>${esc(b.musteri_notu)}</div>` : ""}
+      ${b.atananlar && b.atananlar.length ? `<div class="etiket">Benseno ekibi</div>
+        <div>${b.atananlar.map(a => `${esc(a.ad)} <span style="color:var(--ink4)">(${esc(a.rol)})</span>`).join(" · ")}</div>` : ""}
+      ${b.ozet ? `<div class="etiket">Süreç özeti</div><div style="font-size:13.5px">${esc(b.ozet)}</div>` : ""}
+      ${b.rating != null ? `<div class="etiket">Değerlendirme</div><div>${yildiz(b.rating)}${b.rating_sebep ? `<div style="font-size:13px;color:var(--ink3);margin-top:3px">${esc(b.rating_sebep)}</div>` : ""}</div>` : ""}
+      ${b.gecmis && b.gecmis.length ? `<div class="etiket">Durum geçmişi</div><div class="zaman">
+        ${b.gecmis.map(g => `<div><span style="color:var(--ink4)">${trT(g.t)}</span> — ${(DURUM[g.durum]||[esc(g.durum)])[0]}</div>`).join("")}</div>` : ""}
+    </div>`);
+  document.getElementById("geriBtn").onclick = () => listeEkrani();
+}
+
+tok() ? listeYukle() : loginEkrani();
+</script>
+</body>
+</html>
