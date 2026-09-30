@@ -180,6 +180,19 @@ function APIBriefForm({ apiBase, data, onClose, prefill }) {
           body: JSON.stringify({ files: payloadFiles.filter(Boolean), by: me.id || undefined }),
         }).catch(() => {});
       }
+      // Müşteri talebinden çevrildiyse talebi bu brief'e bağla (portal 'Onaylandı ✓ #no' +
+      // brief thread'ine talep ek-linki notu sunucuda düşer). NOT: modal onCreate prop'unu
+      // kullanmadığı için bağlama BURADA yapılır (App.onCreateBrief çağrılmıyor).
+      const _tid = window.__bnsTalepId;
+      if (_tid) {
+        delete window.__bnsTalepId;
+        try {
+          const br = await fetch(apiBase + `/api/talepler/${_tid}/bagla`, {
+            method: "POST", headers: writeHeaders, body: JSON.stringify({ brief_id: j.id }) });
+          if (br.ok) { window.bnsToast && window.bnsToast(`✓ Müşteri talebi #${j.no} işine bağlandı`); window.bnsTaleplerYenile && window.bnsTaleplerYenile(); }
+          else window.bnsToast && window.bnsToast("⚠ Talep bağlanamadı — Talepler kartından tekrar dene");
+        } catch (e2) { window.bnsToast && window.bnsToast("⚠ Talep bağlanamadı"); }
+      }
       if (window.bnsRefresh) window.bnsRefresh();
       if (window.bnsToast) window.bnsToast(`✅ Brief #${j.no} oluşturuldu`);
       onClose();

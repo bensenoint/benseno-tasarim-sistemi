@@ -838,7 +838,8 @@ function App({ currentUser, onLogout }) {
         onNewBrief={() => setNewBrief(true)}/>}
 
       {!PORTAL && <NewBriefModal
-        open={!!newBrief} prefill={(newBrief && newBrief.prefill) || null} onClose={() => setNewBrief(false)}
+        open={!!newBrief} prefill={(newBrief && newBrief.prefill) || null}
+        onClose={() => { delete window.__bnsTalepId; setNewBrief(false); }}
         data={data}
         onCreate={onCreateBrief}/>}
 
