@@ -165,6 +165,11 @@ function DeptCompareScreen({ data }) {
         title="Departmanlar özet"
         subtitle={`tasarım · editör · AI · freelance · ${rangeLabel}`}/>
 
+      {/* Haftalık karne — Benseno geneli (v2) */}
+      <div style={{ marginBottom: "var(--section-gap)" }}>
+        <HaftalikKarne tip="benseno" kimlik="benseno"/>
+      </div>
+
       {/* ⭐ Yıldız Karnesi — tüm departmanlar (tarihe duyarlı) */}
       <StarReport data={data} depts={BNS_DEPTS}/>
 

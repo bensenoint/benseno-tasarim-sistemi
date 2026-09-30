@@ -167,6 +167,7 @@ function bnsLoadTab(u) {
 function bnsDeriveRange(preset, now) {
   const DAY = 86400000;
   if (preset === "all") return { from: 0, to: 8.64e15, preset: "all" };
+  if (preset === "now") return { from: now, to: now, preset: "now" };
   if (preset === "year") { const f = new Date(new Date(now).getFullYear(), 0, 1).getTime(); return { from: f, to: now, preset: "year" }; }
   if (preset === "today") { const d = new Date(now); const s = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); return { from: s, to: now, preset: "today" }; }
   if (preset === "yesterday") { const d = new Date(now); const s = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); return { from: s - DAY, to: s - 1, preset: "yesterday" }; }

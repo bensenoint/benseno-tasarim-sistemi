@@ -114,6 +114,11 @@ function DepartmentScreen({ data, role, onOpenBrief, onOpenCompleted, onStatusCh
         actions={null}
       />
 
+      {/* Haftalık karne (v2) */}
+      <div style={{ marginBottom: "var(--section-gap)" }}>
+        <HaftalikKarne tip="dept" kimlik={role}/>
+      </div>
+
       {/* Kapasite v2 arşiv trendi — departman doluluk tarihçesi (veri geldikçe dolar) */}
       <V2ArsivTrend scope={"dept:" + role} baslik="📈 Departman doluluk trendi"/>
 
