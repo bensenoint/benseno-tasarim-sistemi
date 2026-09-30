@@ -53,5 +53,12 @@ if [ -n "${BENSENO_GITHUB_PAT:-}" ]; then
   fi
 fi
 
+# Bağımlılık güvencesi: git sync package.json'ı güncelleyebilir ama node_modules imajda
+# donuk kalır (railway up bazen SKIPPED — snapshot dedup). Eksik paket varsa boot'ta kur.
+if ! node -e "require('nodemailer')" 2>/dev/null; then
+  echo "[entrypoint] eksik bağımlılık — npm install çalışıyor..."
+  npm install --no-audit --no-fund --omit=dev || echo "[entrypoint] ⚠️ npm install başarısız (mail gönderimi çalışmayabilir)"
+fi
+
 echo "[entrypoint] Scheduler + Slack bot başlatılıyor (TZ=$TZ)..."
 exec node scripts/scheduler.js
