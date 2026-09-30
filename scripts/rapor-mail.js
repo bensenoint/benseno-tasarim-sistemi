@@ -181,11 +181,12 @@ async function main() {
     const kritik = kritikSatirlar(f);
 
     // Anlatıyı 3 bölüme ayır (===KISI=== / ===DEPARTMAN=== / ===FIRMA===); ayraç yoksa tek bölüm.
-    const parca = (etiket) => {
-      const m = metin.match(new RegExp(`===${etiket}===\\s*([\\s\\S]*?)(?====[A-ZĞÜŞİÖÇ]+===|$)`));
+    // Ayraç toleransı: model "KISI" yerine "KİŞİ", "FIRMA" yerine "FİRMA" yazabiliyor.
+    const parca = (desen) => {
+      const m = metin.match(new RegExp(`===\\s*${desen}\\s*===\\s*([\\s\\S]*?)(?====|$)`));
       return m ? m[1].trim() : null;
     };
-    const pKisi = parca('KISI'), pDept = parca('DEPARTMAN'), pFirma = parca('FIRMA');
+    const pKisi = parca('K[Iİ][SŞ][Iİ]'), pDept = parca('DEPARTMAN'), pFirma = parca('F[Iİ]RMA');
     const bolumler = pKisi ? [
       { baslik: `👤 Senin ${ayar.yon === 'plan' ? 'günün' : 'değerlendirmen'}`, metin: pKisi },
       ...(pDept ? [{ baslik: `📁 Departmanın — ${u.dept || ''}`, metin: pDept }] : []),
