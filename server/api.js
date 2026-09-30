@@ -286,6 +286,9 @@ function writeGuard(req, res, next) {
   if (jwtTok) {
     try {
       req.user = auth.verifyToken(jwtTok);
+      // SEC-P1 (30 Eyl): MÜŞTERİ token'ları personel okuma/yazma uçlarına GİREMEZ —
+      // embedded tüm firmayı döndürür; müşteri yalnız /api/portal/* kullanır.
+      if (req.user.role === 'musteri') return res.status(403).json({ error: 'bu uç portal hesaplarına kapalı' });
       // SEC-7: dashboard yazımında 'by' spoof edilemez — kimliği JWT'den zorla ez.
       // (Bot yolu req.user set etmez → body.by olduğu gibi kalır; script meşru vekâleten yazar.)
       if (req.body && typeof req.body === 'object') req.body.by = req.user.slack_id;
