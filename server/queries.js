@@ -10,7 +10,7 @@ async function allBriefsWithAssignees() {
     SELECT b.id, b.no, b.slack_ts, b.slack_channel, b.slack_url,
            br.name AS marka, br.color AS marka_color,
            b.baslik, b.dept, b.deadline, b.saat, b.durum, b.priority, b.priority_label,
-           b.rev, b.maliyet, b.satis, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
+           b.rev, b.maliyet, b.satis, b.satis_doviz, b.satis_orij, b.satis_kur, b.fatura, b.odeme, b.musteri_notu, b.tahmini_sure_h,
            b.akis, b.stale, b.created_at, b.created_by, b.completed_at, b.updated_at, b.deleted_at, b.deleted_by,
            b.thread_ozet, b.thread_ozet_at, b.thread_ozet_ts, b.thread_ton, b.insight, b.insight_at, b.uyari_at, b.uyari2_at,
            b.rating, b.rating_by, b.rating_sebep, b.ucret_tipi, b.is_tipi, b.parent_id, b.faz_no, pb.no AS parent_no,
@@ -50,7 +50,7 @@ async function allBriefsWithAssignees() {
 // (maliyet/satis/fatura/odeme) ve rating_by (puanı kimin verdiği) çıkar. İş puanı ve
 // puan sebebi (rating/rating_sebep) TÜM ekibe açıktır — kişi-bazlı puanlar ayrıca süzülür.
 function stripBriefSensitive(b) {
-  const { maliyet, satis, fatura, odeme, rating_by, ...rest } = b;
+  const { maliyet, satis, satis_doviz, satis_orij, satis_kur, fatura, odeme, rating_by, ...rest } = b;
   return rest;
 }
 
@@ -183,7 +183,7 @@ async function getEmbedded({ sensitive = true, selfId = null } = {}) {
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     gonderim_sayisi: b.gonderim_sayisi || 0, son_gonderim_at: ms(b.son_gonderim_at), musteri_bekliyor: !!b.musteri_bekliyor,
     // SEC-4: finans yalnız admin/bot; diğer JWT kullanıcılar için çıkarılır.
-    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme, ucret_tipi: b.ucret_tipi || null } : {}),
+    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, satis_doviz: b.satis_doviz || 'TL', satis_orij: b.satis_orij, satis_kur: b.satis_kur, fatura: !!b.fatura, odeme: !!b.odeme, ucret_tipi: b.ucret_tipi || null } : {}),
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,
     thread_ozet: b.thread_ozet || null, thread_ozet_at: b.thread_ozet_at || null, thread_ozet_ts: b.thread_ozet_ts || null,
@@ -208,7 +208,7 @@ async function getEmbedded({ sensitive = true, selfId = null } = {}) {
     rev_ic: b.rev_ic || 0, rev_musteri: b.rev_musteri || 0,
     // SEC-4 (2026-09-29): İŞ puanı + sebebi TÜM ekibe açık; finans ve rating_by yalnız yönetici/bot.
     rating: b.rating || null, rating_sebep: b.rating_sebep || null,
-    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, fatura: !!b.fatura, odeme: !!b.odeme, ucret_tipi: b.ucret_tipi || null,
+    ...(sensitive ? { maliyet: b.maliyet, satis: b.satis, satis_doviz: b.satis_doviz || 'TL', satis_orij: b.satis_orij, satis_kur: b.satis_kur, fatura: !!b.fatura, odeme: !!b.odeme, ucret_tipi: b.ucret_tipi || null,
       rating_by: b.rating_by || null } : {}),
     slack_url: b.slack_url || '#',
     slack_ts: b.slack_ts || null, slack_channel: b.slack_channel || null,

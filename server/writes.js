@@ -72,6 +72,7 @@ const statusBody = z.object({
 const financialsBody = z.object({
   maliyet: z.number().nullable().optional(),
   satis: z.number().nullable().optional(),
+  satis_doviz: z.enum(['TL', 'USD', 'EUR']).optional(),
   fatura: z.boolean().optional(),
   odeme: z.boolean().optional(),
   ucret_tipi: z.enum(['kapsamda', 'ek']).optional(),   // fatura-v2: retainer kapsamı / ayrıca faturalanır
@@ -987,11 +988,29 @@ async function upsertMarkaFaturaAy(name, ay, patch) {
 
 async function setFinancials(id, raw) {
   const d = financialsBody.parse(raw);
+  // Döviz faturalama (30 Eyl): satış USD/EUR girilirse GİRİŞ GÜNÜNÜN TCMB döviz alış
+  // kuruyla TL'ye çevrilir; `satis` HER ZAMAN TL tutar (toplam/kâr formülleri değişmez).
+  // Orijinal tutar + kur ayrı kolonlarda saklanır (tabloda € / $ simgesiyle gösterim için).
+  let satisTL = d.satis, satisOrij = null, satisKur = null;
+  const doviz = d.satis !== undefined ? (d.satis_doviz || 'TL') : undefined;
+  if (d.satis != null && doviz && doviz !== 'TL') {
+    const { gununKuru } = require('./kur');
+    satisKur = await gununKuru(doviz);              // TCMB erişilemezse hata → 400 (yanlış kur yazılmaz)
+    satisOrij = d.satis;
+    satisTL = Math.round(d.satis * satisKur * 100) / 100;
+  } else if (d.satis != null) {
+    satisOrij = d.satis;                            // TL girişte orijinal = TL tutar, kur yok
+  }
   const res = await tx(async (client) => {
     const sets = [], vals = [];
     const put = (c, v) => { vals.push(v); sets.push(`${c}=$${vals.length}`); };
     if (d.maliyet !== undefined) put('maliyet', d.maliyet);
-    if (d.satis !== undefined) put('satis', d.satis);
+    if (d.satis !== undefined) {
+      put('satis', satisTL);
+      put('satis_doviz', d.satis == null ? 'TL' : doviz);
+      put('satis_orij', d.satis == null ? null : satisOrij);
+      put('satis_kur', satisKur);
+    }
     if (d.fatura !== undefined) put('fatura', d.fatura);
     if (d.odeme !== undefined) put('odeme', d.odeme);
     if (d.ucret_tipi !== undefined) {
@@ -999,7 +1018,8 @@ async function setFinancials(id, raw) {
       // kapsamda = retainer içi, ayrıca faturalanmaz → yanlışlıkla girilmiş satış/fatura/ödeme izi
       // ve varsa fatura hatırlatma zinciri temizlenir (yanlış "fatura kesildi"yi geri almanın yolu).
       if (d.ucret_tipi === 'kapsamda') {
-        sets.push('satis=NULL', 'fatura=false', 'odeme=false', 'fatura_hatirlatma_asama=0', 'fatura_kart_ts=NULL');
+        sets.push('satis=NULL', "satis_doviz='TL'", 'satis_orij=NULL', 'satis_kur=NULL',
+          'fatura=false', 'odeme=false', 'fatura_hatirlatma_asama=0', 'fatura_kart_ts=NULL');
       }
     }
     vals.push(id);
