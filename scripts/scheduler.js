@@ -76,11 +76,11 @@ cron.schedule('15 9-19 * * 1-5', () => run('run-akilli-bildirim.sh'), opts);
 
 // E-posta raporları (Resend) — kişi başına tek mail: kendisi → departmanı → firma.
 cron.schedule('0 8 * * 1-5', () => run('run-rapor-mail.sh', 'sabah'), opts);      // bugün yapılacaklar
-cron.schedule('30 18 * * 1-5', () => run('run-rapor-mail.sh', 'aksam'), opts);    // bugün yapılanlar
+cron.schedule('25 17 * * 1-5', () => run('run-rapor-mail.sh', 'aksam'), opts);    // bugün yapılanlar
 cron.schedule('5 8 * * 1', () => run('run-rapor-mail.sh', 'hafta-plan'), opts);   // haftalık plan
-cron.schedule('30 17 * * 5', () => run('run-rapor-mail.sh', 'hafta-ozet'), opts); // haftalık özet
+cron.schedule('26 17 * * 5', () => run('run-rapor-mail.sh', 'hafta-ozet'), opts); // haftalık özet
 cron.schedule('10 8 1 * *', () => run('run-rapor-mail.sh', 'ay-bas'), opts);      // ay planı
-cron.schedule('40 17 25-31 * *', () => run('run-rapor-mail.sh', 'ay-son'), opts); // ay özeti (script son gün kontrolü yapar)
+cron.schedule('27 17 25-31 * *', () => run('run-rapor-mail.sh', 'ay-son'), opts); // ay özeti (script son gün kontrolü yapar)
 
 // Haftalık karneler (kişi/marka/dept/benseno) — Pazartesi 08:30 (veri, dashboard'a yazar)
 cron.schedule('30 8 * * 1', () => run('run-haftalik-karne.sh'), opts);
