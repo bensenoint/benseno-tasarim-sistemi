@@ -472,6 +472,8 @@ function BrandNotifAccordion({ brand, briefs, onOpenBrief }) {
 // ── Marka günlük arşivi: kanal özeti + gün-sonu insight, tarih seçimiyle ──────
 // "Şu an (canlı)" = saatlik güncellenen güncel özet; geçmiş günler brand_daily arşivinden.
 function BrandDailyPanel({ brand }) {
+  // Portal: günlük kanal takibi İÇ yazışma özetidir — müşteriye kapalı (uç da 403 döner).
+  if (typeof window !== "undefined" && window.BNS_PORTAL) return null;
   const [daily, setDaily] = React.useState([]);     // [{tarih, ozet, insight}] yeni→eski
   const [sel, setSel] = React.useState("live");
   const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
