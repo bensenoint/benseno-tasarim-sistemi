@@ -1,25 +1,56 @@
 'use strict';
 
 /**
- * mail.js — Resend üzerinden e-posta gönderimi (bildirim reformu 2026-09-30).
- * - RESEND_API_KEY env yoksa sessizce atlar (best-effort; rapor akışını bozmaz).
- * - Gönderen: BNS_MAIL_FROM (varsayılan rapor@benseno.com.tr — Resend'de domain doğrulaması gerekir).
+ * mail.js — Rapor e-postaları (bildirim reformu 2026-09-30).
+ * Yöntem (Görkem kararı, 30 Eyl): DNS'e dokunmamak için Google Workspace SMTP
+ * (Gmail + uygulama şifresi). Resend desteği alternatif olarak duruyor.
+ *
+ * Env (bot servisi):
+ *   GMAIL_USER          — gönderen hesap (ör. gorkem@benseno.com.tr)
+ *   GMAIL_APP_PASSWORD  — Google "uygulama şifresi" (16 hane; 2 Adımlı Doğrulama şart)
+ *   BNS_MAIL_FROM       — görünen ad+adres (vars: "Benseno Sistem <GMAIL_USER>")
+ *   RESEND_API_KEY      — (alternatif) set edilirse ve Gmail yoksa Resend kullanılır
+ *
+ * Best-effort: anahtar yoksa sessizce atlar, rapor akışını bozmaz.
+ * Limit notu: Workspace SMTP ~2.000 mail/gün — mevcut hacmin çok üzerinde.
  */
 
-const FROM = process.env.BNS_MAIL_FROM || 'Benseno Sistem <rapor@benseno.com.tr>';
+function gmailVar() { return !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD); }
+function resendVar() { return !!process.env.RESEND_API_KEY; }
+function hasKey() { return gmailVar() || resendVar(); }
 
-function hasKey() { return !!process.env.RESEND_API_KEY; }
+const FROM = () => process.env.BNS_MAIL_FROM ||
+  (process.env.GMAIL_USER ? `Benseno Sistem <${process.env.GMAIL_USER}>` : 'Benseno Sistem <rapor@benseno.com.tr>');
+
+let _transport = null;
+function transport() {
+  if (_transport) return _transport;
+  const nodemailer = require('nodemailer');   // lazy: yalnız gönderim anında yüklenir
+  _transport = nodemailer.createTransport({
+    host: 'smtp.gmail.com', port: 465, secure: true,
+    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+  });
+  return _transport;
+}
 
 async function mailGonder({ to, subject, html }) {
-  if (!hasKey()) return { ok: false, skipped: true, error: 'RESEND_API_KEY yok' };
   if (!to || !subject || !html) return { ok: false, error: 'eksik alan' };
-  const r = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
-  });
-  const j = await r.json().catch(() => ({}));
-  return r.ok ? { ok: true, id: j.id } : { ok: false, error: j.message || `http_${r.status}` };
+  if (gmailVar()) {
+    try {
+      const info = await transport().sendMail({ from: FROM(), to, subject, html });
+      return { ok: true, id: info.messageId };
+    } catch (e) { return { ok: false, error: e.message }; }
+  }
+  if (resendVar()) {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ from: FROM(), to: [to], subject, html }),
+    });
+    const j = await r.json().catch(() => ({}));
+    return r.ok ? { ok: true, id: j.id } : { ok: false, error: j.message || `http_${r.status}` };
+  }
+  return { ok: false, skipped: true, error: 'GMAIL_USER/GMAIL_APP_PASSWORD (veya RESEND_API_KEY) yok' };
 }
 
 // Ortak rapor şablonu — bölümler: [{ baslik, satirlar: [string|{t,alt}] }]
