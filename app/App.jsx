@@ -764,7 +764,8 @@ function App({ currentUser, onLogout }) {
               font: "400 11px/1 var(--font-sans)", color: "var(--ink-5)"
             }}>
               <span>
-                {data.fmtTr ? data.fmtTr(data.lastSync ? Date.parse(data.lastSync) : data.NOW, {style:"footer"}) : "Son senkron · 21 May 2026 · 14:45 (Europe/Istanbul)"}
+                {/* last_sync API'den TR-formatlı metin gelebiliyor → Date.parse NaN; o zaman NOW'a düş (NaN footer bug'ı, 30 Eyl) */}
+                {data.fmtTr ? data.fmtTr(Number.isFinite(Date.parse(data.lastSync)) ? Date.parse(data.lastSync) : data.NOW, {style:"footer"}) : "Son senkron · 21 May 2026 · 14:45 (Europe/Istanbul)"}
                 {lastPollTime && (
                   <span style={{marginLeft:8, color:"var(--ink-4)"}}>
                     · <span style={{color:"var(--prio-green)", fontWeight:500}}>●</span> canlı
