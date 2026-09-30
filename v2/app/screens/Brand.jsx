@@ -119,6 +119,8 @@ function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel, currentUs
 
 // ── Tek marka detay sayfası ─────────────────────────────────────────────────
 function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpenCompleted, currentUser }) {
+  // Müşteri portalı: iç finans kolonları (Maliyet/Fatura/Ödeme) hiç ÇİZİLMEZ — yalnız Satış (karar 30 Eyl).
+  const PORTAL = typeof window !== "undefined" && !!window.BNS_PORTAL;
   const now = (window.BNS_DATA && window.BNS_DATA.NOW) || data.NOW || Date.now();
 
   // Marka brief'lerini birleşik satır modeline çevir (aktif + tamamlanan)
@@ -190,11 +192,15 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
   function exportCsv() {
     let head, lines;
     if (view === "active") {
-      head = ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev", "Maliyet", "Satış", "Fatura", "Ödeme"];
-      lines = filteredActive.map(b => [b.no, csvCell(brand), csvCell(b.baslik || b.is), csvCell(b.priority && b.priority.label || ""), csvCell(rowNames(b).join("; ")), csvCell(fmtDate(dlMs(b) ? new Date(dlMs(b)) : null)), csvCell(b.durum), b.revision || 0, b.maliyet != null ? b.maliyet : "", b.satis != null ? b.satis : "", b.fatura ? "Evet" : "Hayır", b.odeme ? "Evet" : "Hayır"].join(","));
+      head = PORTAL ? ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev", "Satış"]
+                    : ["No", "Marka", "İş", "Öncelik", "Atanan", "Deadline", "Durum", "Rev", "Maliyet", "Satış", "Fatura", "Ödeme"];
+      lines = filteredActive.map(b => [b.no, csvCell(brand), csvCell(b.baslik || b.is), csvCell(b.priority && b.priority.label || ""), csvCell(rowNames(b).join("; ")), csvCell(fmtDate(dlMs(b) ? new Date(dlMs(b)) : null)), csvCell(b.durum), b.revision || 0,
+        ...(PORTAL ? [b.satis != null ? b.satis : ""] : [b.maliyet != null ? b.maliyet : "", b.satis != null ? b.satis : "", b.fatura ? "Evet" : "Hayır", b.odeme ? "Evet" : "Hayır"])].join(","));
     } else {
-      head = ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma", "Rev", "Puan", "Maliyet", "Satış", "Fatura", "Ödeme"];
-      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell(rowNames(c).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : ""), c.revision || 0, c.rating != null ? c.rating : "", c.maliyet != null ? c.maliyet : "", c.satis != null ? c.satis : "", c.fatura ? "Evet" : "Hayır", c.odeme ? "Evet" : "Hayır"].join(","));
+      head = PORTAL ? ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma", "Rev", "Puan", "Satış"]
+                    : ["No", "Marka", "İş", "Atanan", "Deadline", "Tamamlanma", "Rev", "Puan", "Maliyet", "Satış", "Fatura", "Ödeme"];
+      lines = filteredDone.map(c => [c.no, csvCell(brand), csvCell(c.baslik || c.is), csvCell(rowNames(c).join("; ")), csvCell(c.deadline ? fmtDate(new Date(c.deadline)) : ""), csvCell(c.bitis ? fmtDate(new Date(c.bitis)) : ""), c.revision || 0, c.rating != null ? c.rating : "",
+        ...(PORTAL ? [c.satis != null ? c.satis : ""] : [c.maliyet != null ? c.maliyet : "", c.satis != null ? c.satis : "", c.fatura ? "Evet" : "Hayır", c.odeme ? "Evet" : "Hayır"])].join(","));
     }
     const blob = new Blob(["﻿" + [head.join(",")].concat(lines).join("\n")], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -304,7 +310,9 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
             <table style={{ width:"100%", minWidth:720, borderCollapse:"collapse", font:"400 13px/1.3 var(--font-sans)" }}>
               <thead>
                 <tr style={{ background:"var(--paper)" }}>
-                  {[["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["Maliyet","right"],["Satış","right"],["Fatura","center"],["Ödeme","center"],["🔗","center"]].map(([v, al], i) => (
+                  {(PORTAL
+                    ? [["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["Satış","right"],["🔗","center"]]
+                    : [["#","right"],["İş","left"],["Atanan","left"],["Teslim","left"],["Tamamlanma","left"],["Süre","right"],["Rev#","right"],["Puan","right"],["Maliyet","right"],["Satış","right"],["Fatura","center"],["Ödeme","center"],["🔗","center"]]).map(([v, al], i) => (
                     <th key={i} style={{ font:"600 11px/1 var(--font-sans)", color:"var(--ink-3)", letterSpacing:"0.04em", textTransform:"uppercase", padding:"10px 12px", borderBottom:"1px solid var(--line-strong)", textAlign: al, whiteSpace:"nowrap" }}>{v}</th>
                   ))}
                 </tr>
@@ -334,10 +342,10 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
                     <td style={bCs(true, "right")}>{c.sureH != null ? Math.round(c.sureH) + " sa" : "—"}</td>
                     <td style={bCs(true, "right", (c.revision || 0) > 0 ? "var(--prio-orange)" : undefined)}>{c.revision || 0}</td>
                     <td style={bCs(true, "right")}>{c.rating != null ? <span style={{ color:"var(--prio-yellow)" }}>★ {c.rating}</span> : "—"}</td>
-                    <td style={bCs(true, "right")}>{fmtTRY(c.maliyet)}</td>
+                    {!PORTAL && <td style={bCs(true, "right")}>{fmtTRY(c.maliyet)}</td>}
                     <td style={bCs(true, "right")}>{fmtSatisDoviz(c)}</td>
-                    <td style={bCs(false, "center")}>{c.fatura ? <span title="Fatura kesildi" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
-                    <td style={bCs(false, "center")}>{c.odeme ? <span title="Ödeme yapıldı" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
+                    {!PORTAL && <td style={bCs(false, "center")}>{c.fatura ? <span title="Fatura kesildi" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>}
+                    {!PORTAL && <td style={bCs(false, "center")}>{c.odeme ? <span title="Ödeme yapıldı" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>}
                     <td style={bCs(false, "center")}>{c.slack_url && c.slack_url !== "#" ? <a href={c.slack_url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ color:"var(--ember,#C24A2C)", textDecoration:"none" }}>↗</a> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                   </tr>
                 ))}
@@ -346,10 +354,10 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
                 <tfoot>
                   <tr style={{ background:"var(--paper)", borderTop:"2px solid var(--line-strong)" }}>
                     <td colSpan={8} style={{ ...bCs(), textAlign:"right", font:"700 11px/1 var(--font-sans)", letterSpacing:"0.04em", textTransform:"uppercase", color:"var(--ink-2)" }}>Toplam</td>
-                    <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink)" }}>{fmtTRY(sumDone.m)}</td>
+                    {!PORTAL && <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink)" }}>{fmtTRY(sumDone.m)}</td>}
                     <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink)" }}>{fmtTRY(sumDone.s)}</td>
-                    <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink-2)" }} title="Faturalanan tutar (Σ satış · fatura kesilmiş)">{fmtTRY(sumDone.fa)}</td>
-                    <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ok,#1a8f5a)" }} title="Tahsil edilen tutar (Σ satış · ödeme yapılmış)">{fmtTRY(sumDone.od)}</td>
+                    {!PORTAL && <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ink-2)" }} title="Faturalanan tutar (Σ satış · fatura kesilmiş)">{fmtTRY(sumDone.fa)}</td>}
+                    {!PORTAL && <td style={{ ...bCs(true, "right"), fontWeight:700, color:"var(--ok,#1a8f5a)" }} title="Tahsil edilen tutar (Σ satış · ödeme yapılmış)">{fmtTRY(sumDone.od)}</td>}
                     <td style={bCs()}></td>
                   </tr>
                 </tfoot>
