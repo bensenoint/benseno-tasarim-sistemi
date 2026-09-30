@@ -179,7 +179,9 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
     onTouchMove: (e) => { if (dragStartY.current == null) return; const dy = e.touches[0].clientY - dragStartY.current; if (dy > 0) setDragY(dy); },
     onTouchEnd: () => { setDragging(false); if (dragY > 110) { onClose && onClose(); } else { setDragY(0); } dragStartY.current = null; },
   } : {};
-  const ro = !!b._readOnly;   // tamamlanan iş: akış görünür, güncelleme kapalı
+  // ro: tamamlanan iş VEYA müşteri portalı — akış görünür, TÜM düzenleme kapalı (SEC-P).
+  const PORTAL_RO = typeof window !== "undefined" && !!window.BNS_PORTAL;
+  const ro = !!b._readOnly || PORTAL_RO;
 
   function set(patch) { if (ro) return; const next = { ...b, ...patch }; setB(next); setSaved(false); }
   function changeStatus(s) { set({ durum: s }); }
@@ -479,7 +481,8 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
 
           <Hr/>
 
-          <Eyebrow>Slack thread</Eyebrow>
+          {!PORTAL_RO && <Eyebrow>Slack thread</Eyebrow>}
+          {!PORTAL_RO && 
           <div style={{
             marginTop:10, padding:"10px 12px", background:"var(--paper-2)", borderRadius:8,
             display:"flex", alignItems:"center", gap:10,
@@ -489,7 +492,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
             #{b.brand && b.brand.name.toLowerCase().replace(/\s+/g,"-").substring(0,20)}
             <span style={{color:"var(--ink-4)"}}>· 22 mesaj</span>
             <span style={{marginLeft:"auto", color:"var(--ink-4)"}}>↗</span>
-          </div>
+          </div>}
 
           {b.thread_ozet && (
             <>
@@ -605,8 +608,8 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
 
         {typeof window !== "undefined" && window.BNS_PORTAL && window.PortalYorum &&
           React.createElement(window.PortalYorum, { brief: b })}
-        <FazBolumu b={b} onUpdate={onUpdate}/>
-        <TipBolumu b={b} onUpdate={onUpdate}/>
+        {!PORTAL_RO && <FazBolumu b={b} onUpdate={onUpdate}/>}
+        {!PORTAL_RO && <TipBolumu b={b} onUpdate={onUpdate}/>}
         {_isMgr && <FinansBolumu b={b} onUpdate={onUpdate}/>}
         <footer style={{padding:"12px 20px", borderTop:"1px solid var(--line)",
           display:"flex", justifyContent:"space-between", alignItems:"center"}}>
@@ -621,7 +624,7 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
             )}
           </div>
           <div style={{display:"flex", gap:8}}>
-            <Button kind="secondary" icon={<I.Slack size={13}/>} onClick={handleSlackOpen}>Slack'te aç</Button>
+            {!PORTAL_RO && <Button kind="secondary" icon={<I.Slack size={13}/>} onClick={handleSlackOpen}>Slack'te aç</Button>}
             {!ro && <Button kind="primary" icon={<I.Check size={13}/>}
               onClick={handleSave}
               style={{
