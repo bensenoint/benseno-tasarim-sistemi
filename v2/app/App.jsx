@@ -679,6 +679,14 @@ function App({ currentUser, onLogout }) {
   const onCreateBrief = (b) => {
     setBriefs(arr => [b, ...arr]);
     setToast(`Yeni brief oluşturuldu · #${b.no} ${b.marka}`);
+    // Müşteri talebinden çevrildiyse talebi brief'e bağla (portal listesinde 'Onaylandı ✓ #no' görünür)
+    const tid = window.__bnsTalepId;
+    if (tid) {
+      delete window.__bnsTalepId;
+      window.bnsApiPost && window.bnsApiPost(`/api/talepler/${tid}/bagla`, { brief_id: b.id })
+        .then(() => { setToast(`✓ Müşteri talebi #${b.no} işine bağlandı`); window.bnsTaleplerYenile && window.bnsTaleplerYenile(); })
+        .catch(() => setToast("⚠ Talep bağlanamadı — Talepler kartından tekrar deneyin"));
+    }
     setTab("jobs");
   };
 
@@ -980,6 +988,60 @@ function darken(hex, amt) {
   const f = (v) => Math.max(0, Math.min(255, Math.round(v * (1 - amt))));
   return "#" + [f(r), f(g), f(b)].map(x => x.toString(16).padStart(2, "0")).join("");
 }
+
+// ── Portal: iş yorumları (Faz 2) — drawer içinde; Slack thread + ekip bildirimi ──
+function PortalYorum({ brief }) {
+  const [yorumlar, setYorumlar] = React.useState(null);
+  const [metin, setMetin] = React.useState("");
+  const [st, setSt] = React.useState(null);
+  const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+  const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+  const yukle = React.useCallback(() => {
+    fetch(`${API}/api/portal/isler/${brief.no}/yorumlar`, { headers: { Authorization: "Bearer " + tok() } })
+      .then(r => r.ok ? r.json() : null).then(j => setYorumlar((j && j.yorumlar) || [])).catch(() => setYorumlar([]));
+  }, [brief.no]);
+  React.useEffect(() => { yukle(); }, [yukle]);
+  const gonder = async () => {
+    const m = metin.trim(); if (!m) return;
+    setSt("gonderiliyor");
+    try {
+      const r = await fetch(`${API}/api/portal/isler/${brief.no}/yorum`, { method: "POST",
+        headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
+        body: JSON.stringify({ metin: m }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { setSt(j.error || "gönderilemedi"); return; }
+      setMetin(""); setSt(null); yukle();
+    } catch (e) { setSt("bağlantı hatası"); }
+  };
+  return (
+    <div style={{ margin: "0 20px 14px", padding: 14, border: "1px solid var(--line)", borderRadius: 10, background: "var(--paper-2)" }}>
+      <div style={{ font: "600 11px var(--font-sans)", letterSpacing: ".06em", textTransform: "uppercase", color: "var(--ink-4)", marginBottom: 8 }}>💬 Yorumlarınız</div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <textarea value={metin} onChange={e => setMetin(e.target.value)} maxLength={1000}
+          placeholder="Bu işle ilgili ekibimize not/yorum bırakın…"
+          style={{ flex: 1, minHeight: 54, resize: "vertical", font: "400 13px var(--font-sans)", padding: "8px 10px",
+            border: "1px solid var(--line)", borderRadius: 8, background: "var(--paper)", color: "var(--ink)" }}/>
+        <button onClick={gonder} disabled={st === "gonderiliyor" || !metin.trim()}
+          style={{ alignSelf: "flex-end", font: "600 12.5px var(--font-sans)", color: "#fff",
+            background: "var(--ody, #24479E)", border: 0, borderRadius: 8, padding: "9px 14px", cursor: "pointer",
+            opacity: metin.trim() ? 1 : .5 }}>{st === "gonderiliyor" ? "…" : "Gönder"}</button>
+      </div>
+      {st && st !== "gonderiliyor" && <div style={{ color: "var(--prio-red)", font: "400 12px var(--font-sans)", marginTop: 6 }}>{st}</div>}
+      <div style={{ font: "400 11px var(--font-sans)", color: "var(--ink-4)", marginTop: 6 }}>Yorumunuz ekibin iş kanalına iletilir ve sorumlulara bildirim gider.</div>
+      {yorumlar && yorumlar.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          {yorumlar.map((y, i) => (
+            <div key={i} style={{ padding: "7px 0", borderTop: "1px dashed var(--line)" }}>
+              <div style={{ font: "600 11.5px var(--font-sans)", color: "var(--ink-3)" }}>{y.kim} <span style={{ fontWeight: 400, color: "var(--ink-4)" }}>· {y.tarih}</span></div>
+              <div style={{ font: "400 13px/1.5 var(--font-sans)", color: "var(--ink-2)", whiteSpace: "pre-wrap" }}>{y.metin}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+window.PortalYorum = PortalYorum;
 
 // ── Portal: Yeni Talep modalı (Faz 3, onaylı akış) ───────────────────────────
 // Müşteri form gönderir → talep kaydı + marka Slack kanalı + yöneticilere bildirim.

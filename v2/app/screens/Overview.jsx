@@ -164,6 +164,7 @@ function ManagerSection({ data, user, overdue, review, onOpenBrief, onSwitchTab,
 
   return (
     <div style={{marginTop:"var(--section-gap)"}}>
+      <BekleyenTalepler/>
       {/* Bölüm başlığı */}
       <div style={{
         display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -875,3 +876,56 @@ window.DeptRow_OV = DeptRow;
 window.ApprovalRow = ApprovalRow;
 window.WeekStat = WeekStat;
 window.StarOfTheWeek = StarOfTheWeek;
+
+
+// ─── Müşteri Portalı: bekleyen brief talepleri (yönetici) — Portal Faz 3 (30 Eyl) ───
+// "Brief'e çevir" mevcut Yeni Brief modalını talep bilgileriyle ön-doldurur; brief
+// oluşunca App.onCreateBrief talebi otomatik bağlar (portalda 'Onaylandı ✓ #no').
+function BekleyenTalepler() {
+  const [talepler, setTalepler] = React.useState(null);
+  const yukle = React.useCallback(() => {
+    if (typeof window.bnsApiGet !== "function") return;
+    window.bnsApiGet("/api/talepler").then(j => setTalepler((j && j.talepler) || [])).catch(() => setTalepler([]));
+  }, []);
+  React.useEffect(() => {
+    yukle();
+    window.bnsTaleplerYenile = yukle;
+    const t = setInterval(yukle, 120000);   // 2 dk'da bir tazele
+    return () => { clearInterval(t); delete window.bnsTaleplerYenile; };
+  }, [yukle]);
+  if (!talepler || !talepler.length) return null;   // yönetici değil (403) ya da bekleyen yok → görünmez
+  const cevir = (t) => {
+    window.__bnsTalepId = t.id;
+    window.openNewBriefModal && window.openNewBriefModal({
+      marka: t.marka, baslik: t.baslik, musteri_notu: t.aciklama || "", deadlineDate: t.istenen_tarih || "" });
+  };
+  const reddet = async (t) => {
+    if (!window.confirm(`"${t.baslik}" talebini reddetmek istediğine emin misin? Müşteri portalında "Uygun görülmedi" görünür.`)) return;
+    try { await window.bnsApiPost(`/api/talepler/${t.id}/reddet`, {}); yukle(); } catch (e) {}
+  };
+  return (
+    <div style={{ marginBottom: "var(--grid-gap)", border: "1px solid var(--ember, #C24A2C)", borderRadius: 12,
+      background: "var(--ember-tint, rgba(194,74,44,.08))", padding: "14px 16px" }}>
+      <div style={{ font: "600 12px var(--font-sans)", letterSpacing: ".04em", textTransform: "uppercase",
+        color: "var(--ember, #C24A2C)", marginBottom: 10 }}>📩 Bekleyen müşteri talepleri ({talepler.length})</div>
+      {talepler.map(t => (
+        <div key={t.id} style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "8px 0",
+          borderTop: "1px solid var(--line)", flexWrap: "wrap" }}>
+          <div style={{ flex: 1, minWidth: 240 }}>
+            <div style={{ font: "600 13.5px var(--font-sans)", color: "var(--ink)" }}>{t.marka} — {t.baslik}</div>
+            {t.aciklama && <div style={{ font: "400 12.5px/1.5 var(--font-sans)", color: "var(--ink-3)", marginTop: 2,
+              display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.aciklama}</div>}
+            <div style={{ font: "400 11px var(--font-sans)", color: "var(--ink-4)", marginTop: 3 }}>
+              {t.kim} · {t.tarih}{t.istenen_tarih ? ` · istenen teslim: ${t.istenen_tarih}` : ""}</div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+            <button onClick={() => cevir(t)} style={{ font: "600 12px var(--font-sans)", color: "#fff",
+              background: "var(--ember, #C24A2C)", border: 0, borderRadius: 8, padding: "7px 12px", cursor: "pointer" }}>Brief'e çevir</button>
+            <button onClick={() => reddet(t)} style={{ font: "600 12px var(--font-sans)", color: "var(--ink-3)",
+              background: "transparent", border: "1px solid var(--line)", borderRadius: 8, padding: "7px 12px", cursor: "pointer" }}>Reddet</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

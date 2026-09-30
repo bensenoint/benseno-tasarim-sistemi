@@ -117,9 +117,10 @@ function APIBriefForm({ apiBase, data, onClose, prefill }) {
   const logged = (() => { try { return JSON.parse(localStorage.getItem("bns_user") || "null"); } catch { return null; } })();
   const me = (logged && users.find(u => u.id === logged.slack_id)) || data.ME || {};
   const [f, setF] = React.useState({
-    marka: (prefill && prefill.marka) || "", baslik: (prefill && prefill.baslik) || "", deadlineDate: "", deadlineTime: "17:00",
+    marka: (prefill && prefill.marka) || "", baslik: (prefill && prefill.baslik) || "",
+    deadlineDate: (prefill && prefill.deadlineDate) || "", deadlineTime: "17:00",
     workerIds: [], leadIds: [], gozlemciIds: [],   // lead boş → server işi vereni lead yapar
-    musteri_notu: "", akis: "paralel", maliyet: "", satis: "", isTipi: "", ucretTipi: "",
+    musteri_notu: (prefill && prefill.musteri_notu) || "", akis: "paralel", maliyet: "", satis: "", isTipi: "", ucretTipi: "",
   });
   const tipler = (window.BNS_DATA && window.BNS_DATA.IS_TIPLERI) || data.IS_TIPLERI || [];
   const [files, setFiles] = React.useState([]);

@@ -425,6 +425,8 @@ var ODY_SES_MOTIF = {
   'gecikme':           [{ t: 0, f: 392 }, { t: 0.16, f: 392 }, { t: 0.32, f: 330 }],                  // ciddi uyarı
   'hareketsiz':        [{ t: 0, f: 494, d: 0.5 }],
   'musteri-bekliyor':  [{ t: 0, f: 587 }, { t: 0.2, f: 587 }],
+  'musteri-yorum':     [{ t: 0, f: 740 }, { t: 0.12, f: 880 }, { t: 0.24, f: 740 }],   // "müşteri konuştu"
+  'talep':             [{ t: 0, f: 659 }, { t: 0.14, f: 880 }, { t: 0.28, f: 1109, d: 0.55 }], // "yeni fırsat" fanfarı
 };
 function odyBildirimSesi(tip) {
   if (!odySesAcik()) return;

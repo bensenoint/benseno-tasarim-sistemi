@@ -1292,6 +1292,39 @@ app.get('/api/karne', auth.authGuard, async (req, res) => {
 });
 
 // ── MCP sunucusu (/mcp) — Ody-core buradan tasarim.* araçlarını çeker ──
+// ── Müşteri talepleri — PERSONEL tarafı (yönetici): bekleyenler + brief'e bağla/reddet ──
+app.get('/api/talepler', auth.authGuard, async (req, res) => {
+  try {
+    if (!(await canSeeSensitive(req))) return res.status(403).json({ error: 'yönetici yetkisi gerekli' });
+    const r = await pool.query(
+      `SELECT t.id, t.baslik, t.aciklama, to_char(t.istenen_tarih,'YYYY-MM-DD') istenen_tarih,
+              to_char(t.created_at,'DD.MM HH24:MI') tarih, br.name AS marka, m.ad, m.email
+       FROM musteri_talepler t JOIN brands br ON br.id=t.marka_id
+       JOIN musteri_kullanicilar m ON m.id=t.musteri_id
+       WHERE t.durum='bekliyor' ORDER BY t.id DESC LIMIT 50`);
+    res.json({ talepler: r.rows.map(x => ({ ...x, kim: x.ad || x.email })) });
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+});
+app.post('/api/talepler/:id/bagla', auth.authGuard, async (req, res) => {
+  try {
+    if (!(await canSeeSensitive(req))) return res.status(403).json({ error: 'yönetici yetkisi gerekli' });
+    const briefId = parseInt((req.body || {}).brief_id, 10);
+    if (!briefId) return res.status(400).json({ error: 'brief_id gerekli' });
+    const r = await pool.query(
+      `UPDATE musteri_talepler SET durum='onaylandi', brief_id=$2 WHERE id=$1 AND durum='bekliyor' RETURNING id`,
+      [+req.params.id, briefId]);
+    res.json({ ok: !!r.rows[0] });
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+});
+app.post('/api/talepler/:id/reddet', auth.authGuard, async (req, res) => {
+  try {
+    if (!(await canSeeSensitive(req))) return res.status(403).json({ error: 'yönetici yetkisi gerekli' });
+    const r = await pool.query(
+      `UPDATE musteri_talepler SET durum='reddedildi' WHERE id=$1 AND durum='bekliyor' RETURNING id`, [+req.params.id]);
+    res.json({ ok: !!r.rows[0] });
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+});
+
 try { require('./portal').mountPortal(app); console.log('[api] müşteri portalı /api/portal'); }
 catch (e) { console.error('[api] portal mount hata:', e.message); }
 try { require('./mcp').mountMcp(app, writeGuard); console.log('[api] mcp sunucusu /mcp'); }

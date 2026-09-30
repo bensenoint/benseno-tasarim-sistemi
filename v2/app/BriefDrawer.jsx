@@ -603,6 +603,8 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
           </div>
         )}
 
+        {typeof window !== "undefined" && window.BNS_PORTAL && window.PortalYorum &&
+          React.createElement(window.PortalYorum, { brief: b })}
         <FazBolumu b={b} onUpdate={onUpdate}/>
         <TipBolumu b={b} onUpdate={onUpdate}/>
         {_isMgr && <FinansBolumu b={b} onUpdate={onUpdate}/>}

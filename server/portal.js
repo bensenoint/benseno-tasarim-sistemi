@@ -196,6 +196,63 @@ function mountPortal(app) {
     } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
   });
 
+  // ── Faz 2: iş yorumları — müşteri yazar → Slack thread + sorumlulara bildirim ──
+  app.get('/api/portal/isler/:no/yorumlar', auth.musteriGuard, async (req, res) => {
+    try {
+      const b = await pool.query(`SELECT id FROM briefs WHERE no=$1 AND marka_id=$2 AND deleted_at IS NULL`,
+        [parseInt(req.params.no, 10), req.musteri.marka_id]);
+      if (!b.rows[0]) return res.status(404).json({ error: 'iş bulunamadı' });
+      const r = await pool.query(
+        `SELECT y.metin, m.ad, m.email, to_char(y.created_at,'DD.MM.YYYY HH24:MI') tarih
+         FROM musteri_yorumlar y JOIN musteri_kullanicilar m ON m.id=y.musteri_id
+         WHERE y.brief_id=$1 ORDER BY y.id DESC LIMIT 20`, [b.rows[0].id]);
+      res.json({ yorumlar: r.rows.map(x => ({ kim: x.ad || x.email, metin: x.metin, tarih: x.tarih })) });
+    } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+  });
+
+  app.post('/api/portal/isler/:no/yorum', auth.musteriGuard, async (req, res) => {
+    try {
+      const metin = String((req.body || {}).metin || '').trim().slice(0, 1000);
+      if (!metin) return res.status(400).json({ error: 'yorum boş olamaz' });
+      const b = await pool.query(
+        `SELECT b.id, b.no, b.baslik, b.slack_ts, b.slack_channel, br.name AS marka
+         FROM briefs b JOIN brands br ON br.id=b.marka_id
+         WHERE b.no=$1 AND b.marka_id=$2 AND b.deleted_at IS NULL`,
+        [parseInt(req.params.no, 10), req.musteri.marka_id]);
+      const brief = b.rows[0];
+      if (!brief) return res.status(404).json({ error: 'iş bulunamadı' });
+      // Taşkın koruması: hesap başına saatte 20 yorum
+      const say = await pool.query(
+        `SELECT count(*)::int c FROM musteri_yorumlar WHERE musteri_id=$1 AND created_at > now() - interval '1 hour'`,
+        [req.musteri.mid]);
+      if (say.rows[0].c >= 20) return res.status(429).json({ error: 'çok fazla yorum — biraz sonra tekrar deneyin' });
+      await pool.query(`INSERT INTO musteri_yorumlar (brief_id, musteri_id, metin) VALUES ($1,$2,$3)`,
+        [brief.id, req.musteri.mid, metin]);
+      // Slack thread'i + sorumlulara bildirim (best-effort)
+      try {
+        const mk = await pool.query('SELECT ad, email FROM musteri_kullanicilar WHERE id=$1', [req.musteri.mid]);
+        const kim = (mk.rows[0] && (mk.rows[0].ad || mk.rows[0].email)) || 'Müşteri';
+        const slack = require('./slack');
+        let threadLink = null;
+        if (brief.slack_ts && brief.slack_channel) {
+          const tr = await slack.postThread({ channel: brief.slack_channel, thread_ts: brief.slack_ts,
+            text: `💬 *Müşteri yorumu* — ${kim} (portal):\n${metin}` });
+          const ws = process.env.BNS_SLACK_WORKSPACE || 'benseno';
+          const ts = (tr && tr.ts) || brief.slack_ts;
+          threadLink = `https://${ws}.slack.com/archives/${brief.slack_channel}/p${String(ts).replace('.', '')}?thread_ts=${brief.slack_ts}&cid=${brief.slack_channel}`;
+        }
+        const { notify } = require('./notify');
+        const u = await pool.query(
+          `SELECT DISTINCT user_id FROM brief_assignees WHERE brief_id=$1 AND role IN ('contributor','lead')`, [brief.id]);
+        for (const row of u.rows) if (/^U/.test(row.user_id || ''))
+          await notify(row.user_id, { tip: 'musteri-yorum', aciliyet: 'acil',
+            text: `💬 Müşteri yorumu — #${brief.no} "${(brief.baslik || '').slice(0, 60)}" ${brief.marka}: ${metin.slice(0, 120)}`,
+            link: threadLink, briefId: brief.id });
+      } catch (e) { console.error('[portal] yorum bildirimi:', e.message); }
+      res.json({ ok: true });
+    } catch (e) { console.error('[portal] yorum:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+  });
+
   // ── İş listesi (yalnız kendi markası) ──
   app.get('/api/portal/isler', auth.musteriGuard, async (req, res) => {
     try {
