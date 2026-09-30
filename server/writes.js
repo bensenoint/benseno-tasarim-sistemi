@@ -1076,6 +1076,18 @@ async function reflectChange(briefId, summary, source, opts) {
     const u = await pool.query(
       `SELECT user_id, array_agg(role) AS roles FROM brief_assignees WHERE brief_id=$1 GROUP BY user_id`, [briefId]);
     const durum = opts && opts.durum;
+    // DM gürültü kontrolü (Görkem, 30 Eyl): (a) sistem-kaynaklı geçişler (WIP otomasyonu vb.)
+    // DM üretmez, yalnız çan; (b) aynı işe son 10 dk'da statü DM'i gittiyse (kanban'da hızlı
+    // kolon gezdirme) yenisi DM olarak GİTMEZ, çan yine yazılır. Çan kaydı her durumda garanti.
+    let dmYok = source === 'system';
+    if (durum && !dmYok) {
+      try {
+        const taze = await pool.query(
+          `SELECT 1 FROM notifications WHERE brief_id=$1 AND tip LIKE 'statu-%'
+             AND slack_at IS NOT NULL AND slack_at > now() - interval '10 minutes' LIMIT 1`, [briefId]);
+        if (taze.rows.length) dmYok = true;
+      } catch (e) { /* pencere kontrolü best-effort */ }
+    }
     for (const row of u.rows) {
       if (!/^U/.test(row.user_id || '')) continue;
       const roles = row.roles || [];
@@ -1083,7 +1095,7 @@ async function reflectChange(briefId, summary, source, opts) {
       if (durum) {
         if (sadeceGozcu) continue;                 // gözcülere statü bildirimi gitmez (kural)
         if (byId && row.user_id === byId) continue; // değişikliği yapana kendi bildirimi gitmez
-        await notify(row.user_id, { tip: `statu-${durum}`, aciliyet: 'acil', text, link: threadLink, briefId });
+        await notify(row.user_id, { tip: `statu-${durum}`, aciliyet: dmYok ? 'normal' : 'acil', text, link: threadLink, briefId });
       } else if (NOTIFY_V2) {
         await notify(row.user_id, { tip: 'statu', aciliyet: 'normal', text, link: threadLink, briefId });
       } else {
