@@ -21,6 +21,11 @@ const { pool } = require('../server/db');
 
 const MOD = (process.argv.find(a => a.startsWith('--mod=')) || '--mod=sabah').slice(6);
 const LIVE = process.env.BNS_REPORT_LIVE === '1';
+// Örnekleme: --ornek=U1,U2 → yalnız bu kişilerin maili üretilir; içerik stdout'a düz
+// metin basılır ve --ornek-alici=adres verilmişse HTML kopyası ORAYA gönderilir
+// (asıl sahibine GİTMEZ). İçerik onayı/denetimi için.
+const ORNEK = ((process.argv.find(a => a.startsWith('--ornek=')) || '').slice(8) || '').split(',').filter(Boolean);
+const ORNEK_ALICI = (process.argv.find(a => a.startsWith('--ornek-alici=')) || '').slice(14) || null;
 const TZ = 'Europe/Istanbul';
 
 const trNow = () => new Date(new Date().toLocaleString('en-US', { timeZone: TZ }));
@@ -87,6 +92,7 @@ async function main() {
 
   let sent = 0, skippedNoMail = 0; const preview = [];
   for (const u of users) {
+    if (ORNEK.length && !ORNEK.includes(u.id)) continue;
     const email = emails.get(u.id);
     const yonetici = u.rol === 'yonetici' || u.yetki === 'yonetici' || u.id === GORKEM;
     const deptUyeleri = new Set(users.filter(x => x.dept === u.dept).map(x => x.id));
@@ -118,6 +124,20 @@ async function main() {
       bolumler, dip: `Dashboard: ${DASHBOARD_URL}`,
     });
 
+    if (ORNEK.length) {
+      // Düz metin döküm: içerik denetimi
+      console.log(`\n════ ÖRNEK · ${ayar.baslik} · ${u.name} ════`);
+      for (const bo of bolumler) {
+        console.log(`\n${bo.baslik}`);
+        if (!bo.satirlar.length) console.log('  — kayıt yok —');
+        for (const s of bo.satirlar) console.log('  • ' + (typeof s === 'string' ? s : s.t));
+      }
+      if (ORNEK_ALICI) {
+        const r = await mailGonder({ to: ORNEK_ALICI, subject: `[ÖRNEK · ${u.name}] ${subject}`, html });
+        console.log(r.ok ? `\n(HTML kopya → ${ORNEK_ALICI})` : `\n(HTML kopya HATA: ${r.error})`);
+      }
+      sent++; continue;
+    }
     if (!LIVE) { preview.push(`### ${u.name} (${email || 'e-posta YOK'})\n${bolumler.map(b => b.baslik + ': ' + b.satirlar.length + ' satır').join(' | ')}`); sent++; continue; }
     if (!email) { skippedNoMail++; continue; }
     const r = await mailGonder({ to: email, subject, html });
