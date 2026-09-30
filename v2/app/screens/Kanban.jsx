@@ -126,18 +126,46 @@ function KanbanScreen({ data, onOpenBrief, onStatusChange }) {
     }).catch(() => {});
   };
 
-  // Kolon içi iş-sırası — KİŞİSEL (v2, 2026-09-29): sürükleme SUNUCUYA YAZILMAZ,
-  // yalnız bu kullanıcının tarayıcısında saklanır. Ekipteki kimsenin kuyruk sırası
-  // (kisi_sira) ve kanban görünümü etkilenmez. Gerçek kuyruk Profil'den yönetilir.
+  // Kolon içi iş-sırası — KİŞİSEL (v2, 2026-09-29; sunucu senkronu 2026-09-30):
+  // Ekipteki kimsenin kuyruk sırası (kisi_sira) ve kanban görünümü etkilenmez.
+  // Saklama: localStorage ANINDA (çevrimdışı dayanıklı) + user_ayar'a 2sn debounce ile
+  // yazılır → cihazdan bağımsız aynı sıra. Açılışta sunucudaki değer local'i günceller;
+  // sunucuya erişilemezse localStorage ile aynen çalışır (bozulma yok).
   const _kanbanUid = (() => { try { return (JSON.parse(localStorage.getItem("bns_user") || "null") || {}).slack_id || "anon"; } catch (e) { return "anon"; } })();
   const _kanbanKey = "bns_kanban_kisisel_" + _kanbanUid;
   const [kisiselSira, setKisiselSira] = React.useState(() => {
     try { return JSON.parse(localStorage.getItem(_kanbanKey) || "{}"); } catch (e) { return {}; }
   });
+  const _ayarTimer = React.useRef(null);
+  const _AYAR_API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+  const _ayarTok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+  React.useEffect(() => {   // açılışta sunucudan çek (varsa local'i ezer — en güncel kaynak)
+    if (_kanbanUid === "anon") return;
+    let iptal = false;
+    fetch(`${_AYAR_API}/api/ayar/kanban_sira`, { headers: { Authorization: "Bearer " + _ayarTok() } })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => {
+        if (iptal || !j || !j.deger) return;
+        setKisiselSira(j.deger);
+        try { localStorage.setItem(_kanbanKey, JSON.stringify(j.deger)); } catch (e) {}
+      }).catch(() => {});
+    return () => { iptal = true; };
+  }, []);
   const reorderKanban = (colId, orderIds) => {
     setKisiselSira(prev => {
       const next = { ...prev, [colId]: orderIds };
       try { localStorage.setItem(_kanbanKey, JSON.stringify(next)); } catch (e) {}
+      // Sunucuya debounce'lu yaz (art arda sürüklemede tek istek)
+      if (_kanbanUid !== "anon") {
+        clearTimeout(_ayarTimer.current);
+        _ayarTimer.current = setTimeout(() => {
+          fetch(`${_AYAR_API}/api/ayar/kanban_sira`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + _ayarTok() },
+            body: JSON.stringify({ deger: next }),
+          }).catch(() => {});
+        }, 2000);
+      }
       return next;
     });
   };

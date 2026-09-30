@@ -899,6 +899,32 @@ app.post('/api/notify-prefs', auth.authGuard, async (req, res) => {
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
+// ── Kişisel UI ayarları (user_ayar, 2026-09-30) — kişi YALNIZ kendi ayarını okur/yazar. ──
+// Kanban kolon sırası gibi tercihler cihazdan bağımsız saklanır. Anahtar: [a-z0-9_-], ≤64;
+// değer JSON, ≤10KB (şişme/kötüye kullanım koruması).
+const AYAR_ANAHTAR_RE = /^[a-z0-9_-]{1,64}$/;
+app.get('/api/ayar/:anahtar', auth.authGuard, async (req, res) => {
+  try {
+    if (!AYAR_ANAHTAR_RE.test(req.params.anahtar)) return res.status(400).json({ error: 'anahtar geçersiz' });
+    const r = await pool.query('SELECT deger FROM user_ayar WHERE user_id=$1 AND anahtar=$2',
+      [req.user.slack_id, req.params.anahtar]);
+    res.json({ deger: r.rows[0] ? r.rows[0].deger : null });
+  } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+});
+app.post('/api/ayar/:anahtar', auth.authGuard, async (req, res) => {
+  try {
+    if (!AYAR_ANAHTAR_RE.test(req.params.anahtar)) return res.status(400).json({ error: 'anahtar geçersiz' });
+    const deger = req.body && req.body.deger;
+    if (deger === undefined) return res.status(400).json({ error: 'deger gerekli' });
+    if (JSON.stringify(deger).length > 10240) return res.status(413).json({ error: 'deger çok büyük (≤10KB)' });
+    await pool.query(
+      `INSERT INTO user_ayar (user_id, anahtar, deger, updated_at) VALUES ($1,$2,$3,now())
+       ON CONFLICT (user_id, anahtar) DO UPDATE SET deger=$3, updated_at=now()`,
+      [req.user.slack_id, req.params.anahtar, JSON.stringify(deger)]);
+    res.json({ ok: true });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
 // İşe/markaya göre TEKİL bildirim sayıları — kişinin seen zamanından sonrası.
 app.get('/api/notif-counts', auth.authGuard, async (req, res) => {
   try {
