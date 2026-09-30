@@ -525,6 +525,9 @@ function bnsHydrateBrief(raw, idx) {
     gecmis:       typeof raw.gecmis === "string" ? raw.gecmis : "",   // boolean/null gelebilir → string garanti
     maliyet:      raw.maliyet != null ? raw.maliyet : null,   // ₺ — Slack thread ile girilir
     satis:        raw.satis != null ? raw.satis : null,       // ₺
+    satis_doviz:  raw.satis_doviz || "TL",                     // döviz faturalama (30 Eyl)
+    satis_orij:   raw.satis_orij != null ? raw.satis_orij : null,
+    satis_kur:    raw.satis_kur != null ? raw.satis_kur : null,
     fatura:       !!raw.fatura,   // fatura kesildi mi
     odeme:        !!raw.odeme,    // ödeme yapıldı mı
     thread_ozet:    raw.thread_ozet || null,     // AI thread özeti (thread-ozet.js yazar)
@@ -610,6 +613,9 @@ function bnsHydrateCompleted(raw, idx) {
     notes: raw.notes || "",
     maliyet: raw.maliyet != null ? raw.maliyet : null,   // ₺ — Slack thread ile girilir
     satis:   raw.satis != null ? raw.satis : null,       // ₺
+    satis_doviz: raw.satis_doviz || "TL",
+    satis_orij:  raw.satis_orij != null ? raw.satis_orij : null,
+    satis_kur:   raw.satis_kur != null ? raw.satis_kur : null,
     fatura:  !!raw.fatura,   // fatura kesildi mi
     odeme:   !!raw.odeme,    // ödeme yapıldı mı
     thread_ozet:    raw.thread_ozet || null,     // AI thread özeti (salt-okunur detayda görünür)

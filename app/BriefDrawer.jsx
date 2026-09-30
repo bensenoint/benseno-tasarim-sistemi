@@ -67,8 +67,14 @@ function TipBolumu({ b, onUpdate }) {
 
 // ─── Finans girişi (yönetici-only) — mevcut /financials endpoint'i; SEC-5: yalnız login-arkası API ───
 function FinansBolumu({ b, onUpdate }) {
+  // Döviz faturalama (30 Eyl): USD/EUR işte input ORİJİNAL tutarı gösterir (TL karşılığı
+  // sunucuda giriş günü TCMB kurundan hesaplanıp `satis`e yazılır; toplamlar hep TL).
+  const _dovizIlk = b.satis_doviz && b.satis_doviz !== "TL" ? b.satis_doviz : "TL";
   const [f, setF] = React.useState({
-    maliyet: b.maliyet ?? "", satis: b.satis ?? "", fatura: !!b.fatura, odeme: !!b.odeme,
+    maliyet: b.maliyet ?? "",
+    satis: (_dovizIlk !== "TL" ? (b.satis_orij ?? "") : (b.satis ?? "")),
+    satis_doviz: _dovizIlk,
+    fatura: !!b.fatura, odeme: !!b.odeme,
     ucret_tipi: b.ucret_tipi || "ek" });
   const [durum, setDurum] = React.useState(null); // null | 'kaydediliyor' | 'ok' | hata metni
   const kapsamda = f.ucret_tipi === "kapsamda";
@@ -81,7 +87,7 @@ function FinansBolumu({ b, onUpdate }) {
       const body = { ucret_tipi: f.ucret_tipi };
       if (!kapsamda) { body.fatura = f.fatura; body.odeme = f.odeme; }
       if (f.maliyet !== "") body.maliyet = +f.maliyet;
-      if (!kapsamda && f.satis !== "") body.satis = +f.satis;
+      if (!kapsamda && f.satis !== "") { body.satis = +f.satis; body.satis_doviz = f.satis_doviz || "TL"; }
       const res = await fetch(`${apiBase}/api/briefs/${b.id}/financials`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', ...(tok ? { Authorization: `Bearer ${tok}` } : {}) },
@@ -115,9 +121,21 @@ function FinansBolumu({ b, onUpdate }) {
         <div><span style={lbl}>Maliyet (₺)</span>
           <input type="number" min="0" style={inp} value={f.maliyet}
             onChange={e => setF({ ...f, maliyet: e.target.value })}/></div>
-        <div><span style={lbl}>Satış (₺)</span>
-          <input type="number" min="0" style={{...inp, opacity: kapsamda ? 0.4 : 1}} value={kapsamda ? "" : f.satis} disabled={kapsamda}
-            onChange={e => setF({ ...f, satis: e.target.value })}/></div>
+        <div><span style={lbl}>Satış ({({TL:"₺",USD:"$",EUR:"€"})[f.satis_doviz] || "₺"})</span>
+          <span style={{display:"inline-flex", gap:4, alignItems:"center"}}>
+            <input type="number" min="0" style={{...inp, opacity: kapsamda ? 0.4 : 1}} value={kapsamda ? "" : f.satis} disabled={kapsamda}
+              onChange={e => setF({ ...f, satis: e.target.value })}/>
+            <select value={f.satis_doviz} disabled={kapsamda}
+              onChange={e => setF({ ...f, satis_doviz: e.target.value })}
+              title="Fatura dövizi — USD/EUR girişte tutar, giriş günü TCMB kurundan TL'ye çevrilerek toplanır"
+              style={{...inp, width:52, padding:"5px 4px", opacity: kapsamda ? 0.4 : 1}}>
+              <option value="TL">₺</option><option value="USD">$</option><option value="EUR">€</option>
+            </select>
+          </span>
+          {f.satis_doviz !== "TL" && b.satis != null && b.satis_kur != null &&
+            <span style={{font:"400 10px var(--font-mono)", color:"var(--ink-4)", display:"block", marginTop:2}}>
+              ≈{Number(b.satis).toLocaleString("tr-TR")}₺ · kur {Number(b.satis_kur).toLocaleString("tr-TR")}</span>}
+        </div>
         <label style={{font: "400 12px var(--font-sans)", display: "flex", gap: 5, alignItems: "center", cursor: kapsamda ? "default" : "pointer", opacity: kapsamda ? 0.4 : 1}}>
           <input type="checkbox" disabled={kapsamda} checked={!kapsamda && f.fatura} onChange={e => setF({ ...f, fatura: e.target.checked })}/> fatura kesildi</label>
         <label style={{font: "400 12px var(--font-sans)", display: "flex", gap: 5, alignItems: "center", cursor: kapsamda ? "default" : "pointer", opacity: kapsamda ? 0.4 : 1}}>

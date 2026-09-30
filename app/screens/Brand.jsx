@@ -14,6 +14,22 @@ function fmtDate(d) {
 }
 function csvCell(s) { s = String(s == null ? "" : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
 
+// Döviz faturalama (30 Eyl): satış USD/EUR girildiyse hücrede orijinal tutar simgesiyle,
+// altında giriş günü kurundan çevrilen TL karşılığı gösterilir. TOPLAMLAR her zaman TL
+// `satis` kolonundan hesaplanır — döviz gösterimi yalnız bilgi amaçlıdır.
+const DOVIZ_SIMGE = { USD: "$", EUR: "€" };
+function fmtSatisDoviz(c) {
+  const sim = DOVIZ_SIMGE[c.satis_doviz];
+  if (!sim || c.satis_orij == null) return fmtTRY(c.satis);
+  return (
+    <span title={`Giriş günü TCMB kuru: ${c.satis_kur != null ? Number(c.satis_kur).toLocaleString("tr-TR") : "?"} ₺`}
+      style={{display:"inline-flex", flexDirection:"column", alignItems:"flex-end", lineHeight:1.25}}>
+      <span>{sim}{Number(c.satis_orij).toLocaleString("tr-TR")}</span>
+      <span style={{font:"400 10px var(--font-mono)", color:"var(--ink-4)"}}>≈{fmtTRY(c.satis)}</span>
+    </span>
+  );
+}
+
 function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel, currentUser }) {
   const [sel, setSel] = React.useState(initialSel ? initialSel.name : null);
   React.useEffect(() => { if (initialSel) setSel(initialSel.name); }, [initialSel]);
@@ -224,6 +240,11 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
 
       <BrandNotifAccordion brand={brand} briefs={[...active, ...musteride, ...done]} onOpenBrief={onOpenBrief}/>
 
+      {/* Haftalık karne — pazartesi güncellenir; hafta dropdown'ıyla geçmiş (v2) */}
+      <div style={{ marginBottom: "var(--section-gap)" }}>
+        <HaftalikKarne tip="marka" kimlik={brand}/>
+      </div>
+
       <div className="bns-kpi-4" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)" }}>
         <Kpi label="Aktif iş" value={active.length} color={stats.color}/>
         <Kpi label="Tamamlanan" value={done.length}/>
@@ -314,7 +335,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
                     <td style={bCs(true, "right", (c.revision || 0) > 0 ? "var(--prio-orange)" : undefined)}>{c.revision || 0}</td>
                     <td style={bCs(true, "right")}>{c.rating != null ? <span style={{ color:"var(--prio-yellow)" }}>★ {c.rating}</span> : "—"}</td>
                     <td style={bCs(true, "right")}>{fmtTRY(c.maliyet)}</td>
-                    <td style={bCs(true, "right")}>{fmtTRY(c.satis)}</td>
+                    <td style={bCs(true, "right")}>{fmtSatisDoviz(c)}</td>
                     <td style={bCs(false, "center")}>{c.fatura ? <span title="Fatura kesildi" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                     <td style={bCs(false, "center")}>{c.odeme ? <span title="Ödeme yapıldı" style={{ color:"var(--ok,#1a8f5a)", fontWeight:700 }}>✓</span> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>
                     <td style={bCs(false, "center")}>{c.slack_url && c.slack_url !== "#" ? <a href={c.slack_url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ color:"var(--ember,#C24A2C)", textDecoration:"none" }}>↗</a> : <span style={{ color:"var(--ink-4)" }}>—</span>}</td>

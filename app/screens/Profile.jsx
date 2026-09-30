@@ -463,19 +463,7 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
           <div style={{fontFamily:"var(--font-display)", fontStyle:"italic", fontSize: isMobile ? 13 : 17, color:"var(--ink-3)", marginTop: isMobile ? 2 : 6}}>
             {myActive.length} aktif{myMusteride.length > 0 ? ` · ${myMusteride.length} müşteride` : ""} · {myCompleted.length} tamamlandı · {totalRev} toplam revize
           </div>
-          {/* ⭐ Kişi yıldız karnesi — marka/departmandaki yapıyla AYNI (StarRow + dönem
-              değerlendirmesi). Görünürlük (2026-09-29): TÜM yöneticiler + kişinin kendisi. */}
-          {(() => {
-            if (!(isManager || u.id === (currentUser && currentUser.slack_id))) return null;
-            const R = window.BNS_DATA && window.BNS_DATA.ratings;
-            const my = R && R.users && R.users[u.id];
-            if (!my || !my.cnt) return null;
-            return (
-              <div style={{marginTop:8, maxWidth:560}}>
-                <StarRow label="Yıldız karnesi" avg={my.avg} cnt={my.cnt} stype="kisi" skey={u.id} range={data.dateRange} big/>
-              </div>
-            );
-          })()}
+
         </div>
 
         {/* Tarih aralığı — global başlık filtresinden (yerel toggle kaldırıldı) */}
@@ -526,6 +514,14 @@ function ProfileScreen({ data, user, onOpenBrief, onOpenCompleted, currentUser, 
       <div style={{height:16}}/>
 
       {/* ─── KPI şeridi ──────────────────────────────────────── */}
+      {/* Haftalık Karne — marka/departmandaki v2 yapısıyla AYNI kart (hafta dropdown +
+          Bu Hafta / Genel çift değerlendirme). Görünürlük: tüm yöneticiler + kişinin kendisi. */}
+      {(isManager || u.id === (currentUser && currentUser.slack_id)) && (
+        <div style={{ marginBottom: "var(--section-gap)" }}>
+          <HaftalikKarne tip="kisi" kimlik={u.id}/>
+        </div>
+      )}
+
       <div className="bns-kpi-8" style={{display:"grid", gridAutoFlow:"column", gridAutoColumns:"minmax(0,1fr)", gap:"var(--grid-gap)", marginBottom:"var(--section-gap)", overflowX:"auto"}}>
         <Kpi label="Aktif iş"      value={myActive.length} color={myActive.length > CAP_LIMIT ? "var(--prio-red)" : undefined}/>
         <Kpi label="Müşteride"     value={myMusteride.length} color={myMusteride.length > 0 ? "var(--musteride)" : undefined} sub="✈️ dönüş bekleniyor"/>
