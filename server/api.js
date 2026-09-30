@@ -1297,7 +1297,7 @@ app.get('/api/talepler', auth.authGuard, async (req, res) => {
   try {
     if (!(await canSeeSensitive(req))) return res.status(403).json({ error: 'yönetici yetkisi gerekli' });
     const r = await pool.query(
-      `SELECT t.id, t.baslik, t.aciklama, to_char(t.istenen_tarih,'YYYY-MM-DD') istenen_tarih,
+      `SELECT t.id, t.baslik, t.aciklama, t.dosyalar, to_char(t.istenen_tarih,'YYYY-MM-DD') istenen_tarih,
               to_char(t.created_at,'DD.MM HH24:MI') tarih, br.name AS marka, m.ad, m.email
        FROM musteri_talepler t JOIN brands br ON br.id=t.marka_id
        JOIN musteri_kullanicilar m ON m.id=t.musteri_id
@@ -1334,6 +1334,28 @@ app.post('/api/talepler/:id/bagla', auth.authGuard, async (req, res) => {
     res.json({ ok: !!r.rows[0] });
   } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });
+// Talep eki görüntüleme proxy'si (yönetici): bytes Slack'te — bot token'ıyla çekilip akıtılır.
+// Tarayıcı Authorization header'ıyla fetch eder (JS blob) → dashboard içinde önizleme.
+app.get('/api/talepler/:id/dosya/:idx', auth.authGuard, async (req, res) => {
+  try {
+    if (!(await canSeeSensitive(req))) return res.status(403).json({ error: 'yönetici yetkisi gerekli' });
+    const t = await pool.query('SELECT dosyalar FROM musteri_talepler WHERE id=$1', [+req.params.id]);
+    const d = t.rows[0] && Array.isArray(t.rows[0].dosyalar) ? t.rows[0].dosyalar[+req.params.idx] : null;
+    if (!d || !d.fid) return res.status(404).json({ error: 'dosya bulunamadı' });
+    const tok = process.env.SLACK_BOT_TOKEN;
+    const info = await fetch(`https://slack.com/api/files.info?file=${encodeURIComponent(d.fid)}`,
+      { headers: { authorization: `Bearer ${tok}` } }).then(r => r.json());
+    const url = info && info.ok && info.file && info.file.url_private;
+    if (!url) return res.status(404).json({ error: 'dosya slack\'te bulunamadı' });
+    const fr = await fetch(url, { headers: { authorization: `Bearer ${tok}` } });
+    if (!fr.ok) return res.status(502).json({ error: 'dosya alınamadı' });
+    res.setHeader('content-type', info.file.mimetype || 'application/octet-stream');
+    res.setHeader('content-disposition', `inline; filename="${encodeURIComponent(d.ad || 'dosya')}"`);
+    const buf = Buffer.from(await fr.arrayBuffer());
+    res.end(buf);
+  } catch (e) { console.error('[api] talep dosya proxy:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+});
+
 app.post('/api/talepler/:id/reddet', auth.authGuard, async (req, res) => {
   try {
     if (!(await canSeeSensitive(req))) return res.status(403).json({ error: 'yönetici yetkisi gerekli' });

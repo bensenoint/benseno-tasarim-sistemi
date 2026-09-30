@@ -169,15 +169,21 @@ function mountPortal(app) {
             await pool.query('UPDATE musteri_talepler SET slack_channel=$2, slack_ts=$3 WHERE id=$1',
               [ins.rows[0].id, pm.channel, pm.ts]);
           }
-          // Ekler talep mesajının thread'ine (best-effort; biri düşse diğerleri denenir)
+          // Ekler talep mesajının thread'ine (best-effort; biri düşse diğerleri denenir).
+          // Metadata (ad + slack file id + permalink) talep kaydına yazılır → yönetici
+          // kartında görünür ve /api/talepler/:id/dosya proxy'siyle dashboard'da açılır.
           if (pm && pm.ok && dosyalar.length) {
+            const meta = [];
             for (const d of dosyalar) {
               try {
                 const buf = Buffer.from(d.b64, 'base64');
-                await slack.uploadFile({ channel: pm.channel, thread_ts: pm.ts,
+                const up = await slack.uploadFile({ channel: pm.channel, thread_ts: pm.ts,
                   filename: String(d.ad).slice(0, 120).replace(/[\/\\]/g, '_'), buf, title: d.ad });
+                if (up && up.ok) meta.push({ ad: d.ad, tip: d.tip || null, fid: up.file_id, link: up.permalink || null });
               } catch (e) { console.error('[portal] talep eki yüklenemedi:', d.ad, e.message); }
             }
+            if (meta.length) await pool.query('UPDATE musteri_talepler SET dosyalar=$2 WHERE id=$1',
+              [ins.rows[0].id, JSON.stringify(meta)]);
           }
         }
         const { notify } = require('./notify');

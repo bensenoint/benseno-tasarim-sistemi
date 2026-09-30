@@ -881,6 +881,22 @@ window.StarOfTheWeek = StarOfTheWeek;
 // ─── Müşteri Portalı: bekleyen brief talepleri (yönetici) — Portal Faz 3 (30 Eyl) ───
 // "Brief'e çevir" mevcut Yeni Brief modalını talep bilgileriyle ön-doldurur; brief
 // oluşunca App.onCreateBrief talebi otomatik bağlar (portalda 'Onaylandı ✓ #no').
+// Talep ekini dashboard içinde aç: proxy'den Authorization'lı fetch → blob → yeni sekme.
+// (Slack'e gitmeden içerik görülür; görsel/PDF tarayıcıda inline açılır.)
+async function talepDosyaAc(talepId, idx, ad) {
+  try {
+    const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+    const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+    const r = await fetch(`${API}/api/talepler/${talepId}/dosya/${idx}`, { headers: { Authorization: "Bearer " + tok } });
+    if (!r.ok) { window.bnsToast && window.bnsToast("⚠ Dosya açılamadı"); return; }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url, "_blank");
+    if (!w) { const a = document.createElement("a"); a.href = url; a.download = ad || "dosya"; a.click(); }
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { window.bnsToast && window.bnsToast("⚠ Dosya açılamadı"); }
+}
+
 function BekleyenTalepler() {
   const [talepler, setTalepler] = React.useState(null);
   const yukle = React.useCallback(() => {
@@ -917,6 +933,19 @@ function BekleyenTalepler() {
               display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.aciklama}</div>}
             <div style={{ font: "400 11px var(--font-sans)", color: "var(--ink-4)", marginTop: 3 }}>
               {t.kim} · {t.tarih}{t.istenen_tarih ? ` · istenen teslim: ${t.istenen_tarih}` : ""}</div>
+            {Array.isArray(t.dosyalar) && t.dosyalar.length > 0 && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 6 }}>
+                {t.dosyalar.map((d, i) => (
+                  <button key={i} onClick={() => talepDosyaAc(t.id, i, d.ad)}
+                    title="Dosyayı görüntüle (yeni sekme)"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 5, font: "500 11.5px var(--font-sans)",
+                      border: "1px solid var(--line)", borderRadius: 999, padding: "4px 10px", cursor: "pointer",
+                      background: "var(--paper)", color: "var(--ink-2)" }}>
+                    📎 {d.ad}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
             <button onClick={() => cevir(t)} style={{ font: "600 12px var(--font-sans)", color: "#fff",
