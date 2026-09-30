@@ -56,10 +56,13 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
     ...(ratingCol ? [{ id: "rating", label: "⭐", sort: false }] : []),
     { id: "link",    label: "🔗",       sort: false }
   ];
+  // financeCols: true = tam finans seti (personel); "satis" = yalnız Satış (müşteri portalı,
+  // Görkem kararı 30 Eyl: satış görünür, maliyet/fatura/ödeme asla).
+  const finTam = financeCols === true;
   if (financeCols) {
-    cols.push(
-      { id: "maliyet", label: "Maliyet", sort: true, align: "right", mobileHide: true },
-      { id: "satis",   label: "Satış",   sort: true, align: "right", mobileHide: true },
+    if (finTam) cols.push({ id: "maliyet", label: "Maliyet", sort: true, align: "right", mobileHide: true });
+    cols.push({ id: "satis", label: "Satış", sort: true, align: "right", mobileHide: true });
+    if (finTam) cols.push(
       { id: "fatura",  label: "Fatura",  sort: false, align: "center", mobileHide: true },
       { id: "odeme",   label: "Ödeme",   sort: false, align: "center", mobileHide: true }
     );
@@ -131,11 +134,11 @@ function BriefTable({ rows, onRowClick, onStatusChange, sortable = true, view = 
         {financeCols && sorted.length > 0 && (
           <tfoot>
             <tr style={{ background: "var(--surface-sub)", borderTop: "2px solid var(--line-strong)" }}>
-              <td colSpan={cols.length - 4} style={{ ...cellStyle(), textAlign: "right", font: "700 11px/1 var(--font-sans)", letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--ink-2)" }}>Toplam</td>
-              <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ink)" }}>{fmtTRY(totals.m)}</td>
+              <td colSpan={cols.length - (finTam ? 4 : 1)} style={{ ...cellStyle(), textAlign: "right", font: "700 11px/1 var(--font-sans)", letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--ink-2)" }}>Toplam</td>
+              {finTam && <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ink)" }}>{fmtTRY(totals.m)}</td>}
               <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ink)" }}>{fmtTRY(totals.s)}</td>
-              <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ink-2)" }} title="Faturalanan tutar (Σ satış · fatura kesilmiş)">{fmtTRY(totals.fa)}</td>
-              <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ok,#1a8f5a)" }} title="Tahsil edilen tutar (Σ satış · ödeme yapılmış)">{fmtTRY(totals.od)}</td>
+              {finTam && <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ink-2)" }} title="Faturalanan tutar (Σ satış · fatura kesilmiş)">{fmtTRY(totals.fa)}</td>}
+              {finTam && <td className="bns-col-mobile-hide" style={{ ...cellStyle(true, "right"), fontWeight: 700, color: "var(--ok,#1a8f5a)" }} title="Tahsil edilen tutar (Σ satış · ödeme yapılmış)">{fmtTRY(totals.od)}</td>}
             </tr>
           </tfoot>
         )}
@@ -226,10 +229,10 @@ function BriefRow({ brief, onClick, onStatusChange, stripe, financeCols, ratingC
           <I.Link size={14}/>
         </a>
       </td>
-      {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{fmtTRY(brief.maliyet)}</td>}
+      {financeCols === true && <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{fmtTRY(brief.maliyet)}</td>}
       {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(true, "right")}>{fmtTRY(brief.satis)}</td>}
-      {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(false, "center")}><FlagCell on={brief.fatura} label="Fatura kesildi"/></td>}
-      {financeCols && <td className="bns-col-mobile-hide" style={cellStyle(false, "center")}><FlagCell on={brief.odeme} label="Ödeme yapıldı"/></td>}
+      {financeCols === true && <td className="bns-col-mobile-hide" style={cellStyle(false, "center")}><FlagCell on={brief.fatura} label="Fatura kesildi"/></td>}
+      {financeCols === true && <td className="bns-col-mobile-hide" style={cellStyle(false, "center")}><FlagCell on={brief.odeme} label="Ödeme yapıldı"/></td>}
     </tr>
   );
 }

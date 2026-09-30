@@ -300,7 +300,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
         // Aktif / Müşteri Onayında — Aktif İşler sayfasıyla birebir zengin tablo (BriefTable)
         <Card padding={0}>
           <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
-            <BriefTable rows={view === "musteride" ? filteredMusteride : filteredActive} onRowClick={onOpenBrief} financeCols/>
+            <BriefTable rows={view === "musteride" ? filteredMusteride : filteredActive} onRowClick={onOpenBrief} financeCols={PORTAL ? "satis" : true}/>
           </div>
         </Card>
       ) : (
