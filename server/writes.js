@@ -1063,7 +1063,11 @@ async function reflectChange(briefId, summary, source, opts) {
       const tr = await slack.postThread({ channel: b.slack_channel, thread_ts: b.slack_ts, text });
       if (tr && tr.ok) replyTs = tr.ts;
     }
-    if (!dmAll) return;
+    // Slack-kaynaklı DEĞİŞİKLİKLERDE eskiden tamamen dönülüyordu (çift-bildirim önlemi).
+    // Reform (30 Eyl): STATÜ değişimlerinde çan/ses HER kaynakta düşmeli — slack kaynağında
+    // DM atılmaz (thread zaten bildiriyor) ama dashboard bildirimi yazılır. Statü-dışı
+    // değişikliklerde eski davranış korunur (slack → hiç bildirim yok).
+    if (!dmAll && !(opts && opts.durum)) return;
     // Bildirim linki: thread içindeki İLGİLİ mesaj (p{replyTs}); not atılamadıysa thread kökü.
     const ws = process.env.BNS_SLACK_WORKSPACE || 'benseno';
     const msgTs = replyTs || b.slack_ts;
@@ -1079,7 +1083,7 @@ async function reflectChange(briefId, summary, source, opts) {
     // DM gürültü kontrolü (Görkem, 30 Eyl): (a) sistem-kaynaklı geçişler (WIP otomasyonu vb.)
     // DM üretmez, yalnız çan; (b) aynı işe son 10 dk'da statü DM'i gittiyse (kanban'da hızlı
     // kolon gezdirme) yenisi DM olarak GİTMEZ, çan yine yazılır. Çan kaydı her durumda garanti.
-    let dmYok = source === 'system';
+    let dmYok = source === 'system' || !dmAll;   // sistem geçişi ya da slack-kaynak → yalnız çan
     if (durum && !dmYok) {
       try {
         const taze = await pool.query(

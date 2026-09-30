@@ -47,11 +47,17 @@ async function gonder(b, tip, text, sayac) {
   const emb = await fetchEmbedded();
   const nowMs = Date.parse(emb.now) || Date.now();
   const briefs = emb.bns_briefs || [];
-  const events = emb.bns_events || [];
 
-  // İş başına son olay zamanı (events 'no' taşır)
-  const sonOlay = new Map();
-  for (const e of events) if (e.no != null && e.t) sonOlay.set(e.no, Math.max(sonOlay.get(e.no) || 0, e.t));
+  // İş başına son olay zamanı — DOĞRUDAN DB'den (embedded bns_events son-200 olayla
+  // sınırlı; yoğun günde eski işler pencere dışında kalıp sahte "hareketsiz" alarmı
+  // üretiyordu). Ayrıca müşteride-bekleme süresi için durum:musteride'nin zamanı ayrı.
+  const sonOlay = new Map(), musterideAt = new Map();
+  {
+    const r = await pool.query(`SELECT brief_id, EXTRACT(EPOCH FROM max(ts))*1000 AS t FROM events GROUP BY brief_id`);
+    for (const x of r.rows) sonOlay.set(x.brief_id, Math.round(+x.t));
+    const m = await pool.query(`SELECT brief_id, EXTRACT(EPOCH FROM max(ts))*1000 AS t FROM events WHERE verb='durum:musteride' GROUP BY brief_id`);
+    for (const x of m.rows) musterideAt.set(x.brief_id, Math.round(+x.t));
+  }
 
   const sayac = { n: 0 };
   for (const b of briefs) {
@@ -71,16 +77,17 @@ async function gonder(b, tip, text, sayac) {
     }
 
     // 3) Hareketsiz iş (aktif ama 48sa+ olay yok)
-    const son = sonOlay.get(b.no) || b.baslangic || null;
+    const son = sonOlay.get(b.id) || b.baslangic || null;
     if (AKTIF_CALISAN.has(b.durum) && son && nowMs - son > 2 * DAY) {
       if (!(await tazeMi(b.id, 'hareketsiz', 44)))
         await gonder(b, 'hareketsiz', `😴 *Hareketsiz iş* — ${isAd(b)}: ${Math.round((nowMs - son) / DAY)} gündür hiçbir hareket yok, durum *${b.durum}*. Durumu güncelleyin ya da beklemeye alın.`, sayac);
     }
 
-    // 4) Müşteri onayında 3+ gün
-    if (b.durum === 'musteride' && son && nowMs - son > 3 * DAY) {
+    // 4) Müşteri onayında 3+ gün — süre, müşteriye GÖNDERİM anından ölçülür
+    const mAt = b.durum === 'musteride' ? (musterideAt.get(b.id) || son) : null;
+    if (mAt && nowMs - mAt > 3 * DAY) {
       if (!(await tazeMi(b.id, 'musteri-bekliyor', 44)))
-        await gonder(b, 'musteri-bekliyor', `📮 *Müşteri dönüşü gecikti* — ${isAd(b)}: ${Math.round((nowMs - son) / DAY)} gündür müşteride. Müşteriye nazik bir hatırlatma zamanı olabilir.`, sayac);
+        await gonder(b, 'musteri-bekliyor', `📮 *Müşteri dönüşü gecikti* — ${isAd(b)}: ${Math.round((nowMs - mAt) / DAY)} gündür müşteride. Müşteriye nazik bir hatırlatma zamanı olabilir.`, sayac);
     }
   }
   console.log(`akilli-bildirim: ${sayac.n} sinyal${DRY ? ' (DRY)' : ''}`);
