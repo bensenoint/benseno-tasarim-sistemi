@@ -116,13 +116,14 @@ async function anlati(facts, ayar, yonetici) {
     `yük fazlaysa ("eyleme açık" iş sayısı 6+) zamanın yetişmeyebileceğini söyle ve önceliklendirme öner; ` +
     `(2) departmanının kısa resmi; (3) firma genelinin kısa resmi${yonetici ? ' — bu kişi YÖNETİCİ: firma bölümünü derinleştir, kritik gecikmişleri ve marka kırılımını yorumla, yönetsel aksiyon öner' : ''}. ` +
     `KESIN KURALLAR: Yalnız verilen olgulardaki sayı ve işleri kullan, HİÇBİR ŞEY uydurma. İş adlarını kısaltarak anabilirsin. ` +
-    `"musteride" = müşteri dönüşü bekliyor (kişinin suçu değil), "gecikmis" = termin geçti. Toplam 120-220 kelime.`;
+    `"musteride" = müşteri dönüşü bekliyor (kişinin suçu değil), "gecikmis" = termin geçti. ` +
+    `UZUNLUK: toplam EN FAZLA 200 kelime — kısa ve vurucu yaz, her cümleyi bitir, asla yarıda kesme.`;
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5', max_tokens: 700,
+        model: 'claude-sonnet-4-5', max_tokens: 1100,
         system: sys,
         messages: [{ role: 'user', content: `Tarih: ${trDate()}\nOlgular (JSON):\n` + JSON.stringify(facts, null, 1) }],
       }),
