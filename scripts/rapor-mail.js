@@ -111,10 +111,10 @@ async function anlati(facts, ayar, yonetici) {
     `Bir tasarım/reklam ajansının (Benseno) iş takip sisteminin kişisel rapor yazarısın. ` +
     `Kişiye adıyla ve "sen" diye hitap et; samimi, motive edici ama net ve dürüst bir ton kullan. ` +
     `Rapor türü: ${ayar.baslik} (${ayar.kapsam}, ${ayar.yon === 'plan' ? 'önündeki işlere bakış' : 'yapılanların değerlendirmesi'}). ` +
-    `3-5 KISA paragraf yaz (madde işareti/başlık KULLANMA, düz akıcı Türkçe): ` +
-    `(1) kişinin kendi durumu — iyi giden bir şeyi somut örnekle takdir et (puan/tamamlama varsa oradan), aksayan varsa açıkça söyle ve UYGULANABILIR bir öneri ver (örn. "şu işin termini geçmiş, uzatma iste ya da bugün kapat"); ` +
-    `yük fazlaysa ("eyleme açık" iş sayısı 6+) zamanın yetişmeyebileceğini söyle ve önceliklendirme öner; ` +
-    `(2) departmanının kısa resmi; (3) firma genelinin kısa resmi${yonetici ? ' — bu kişi YÖNETİCİ: firma bölümünü derinleştir, kritik gecikmişleri ve marka kırılımını yorumla, yönetsel aksiyon öner' : ''}. ` +
+    `ÇIKTIYI TAM OLARAK ŞU ÜÇ BÖLÜM AYRAÇLARIYLA yaz (ayraç satırları aynen, başka başlık/madde işareti YOK, her bölüm 1-2 kısa akıcı paragraf):\n` +
+    `===KISI===\nkişinin kendi durumu — iyi giden bir şeyi somut örnekle takdir et (puan/tamamlama varsa oradan), aksayan varsa açıkça söyle ve UYGULANABILIR bir öneri ver (örn. "şu işin termini geçmiş, uzatma iste ya da bugün kapat"); yük fazlaysa ("eyleme açık" iş sayısı 6+) zamanın yetişmeyebileceğini söyle ve önceliklendirme öner.\n` +
+    `===DEPARTMAN===\ndepartmanının kısa resmi ve varsa ekipçe yapılacak şey.\n` +
+    `===FIRMA===\nfirma genelinin kısa resmi${yonetici ? ' — bu kişi YÖNETİCİ: bu bölümü derinleştir, kritik gecikmişleri ve marka kırılımını yorumla, yönetsel aksiyon öner' : ''}.\n` +
     `KESIN KURALLAR: Yalnız verilen olgulardaki sayı ve işleri kullan, HİÇBİR ŞEY uydurma. İş adlarını kısaltarak anabilirsin. ` +
     `"musteride" = müşteri dönüşü bekliyor (kişinin suçu değil), "gecikmis" = termin geçti. ` +
     `UZUNLUK: toplam EN FAZLA 200 kelime — kısa ve vurucu yaz, her cümleyi bitir, asla yarıda kesme.`;
@@ -180,18 +180,30 @@ async function main() {
     const metin = (await anlati(f, ayar, yonetici)) || yedekMetin(f, ayar);
     const kritik = kritikSatirlar(f);
 
-    const bolumler = [
-      { baslik: `💬 ${ayar.baslik}`, metin },
+    // Anlatıyı 3 bölüme ayır (===KISI=== / ===DEPARTMAN=== / ===FIRMA===); ayraç yoksa tek bölüm.
+    const parca = (etiket) => {
+      const m = metin.match(new RegExp(`===${etiket}===\\s*([\\s\\S]*?)(?====[A-ZĞÜŞİÖÇ]+===|$)`));
+      return m ? m[1].trim() : null;
+    };
+    const pKisi = parca('KISI'), pDept = parca('DEPARTMAN'), pFirma = parca('FIRMA');
+    const bolumler = pKisi ? [
+      { baslik: `👤 Senin ${ayar.yon === 'plan' ? 'günün' : 'değerlendirmen'}`, metin: pKisi },
+      ...(pDept ? [{ baslik: `📁 Departmanın — ${u.dept || ''}`, metin: pDept }] : []),
+      ...(pFirma ? [{ baslik: '🏢 Firma geneli', metin: pFirma }] : []),
+    ] : [{ baslik: `💬 ${ayar.baslik}`, metin }];
+    bolumler.push(
       ...(kritik.length ? [{ baslik: '⏰ Gözden kaçmasın', satirlar: kritik }] : []),
-      { baslik: '🔗 Tüm işlerin ve detaylar', satirlar: [`Dashboard: ${DASHBOARD_URL}`] },
-    ];
+      { baslik: '🔗 Tüm işlerin ve detaylar', satirlar: [`Dashboard: ${DASHBOARD_URL}`] });
     const subject = `Benseno · ${ayar.baslik} — ${trDate()}`;
     const html = raporHtml({ baslik: ayar.baslik, tarih: `${u.name || u.id} · ${trDate()}`, bolumler, dip: `Dashboard: ${DASHBOARD_URL}` });
 
     if (ORNEK.length) {
-      console.log(`\n════ ÖRNEK · ${ayar.baslik} · ${u.name} ════\n`);
-      console.log(metin);
-      if (kritik.length) console.log('\nGözden kaçmasın:\n' + kritik.map(s => '  ' + s).join('\n'));
+      console.log(`\n════ ÖRNEK · ${ayar.baslik} · ${u.name} ════`);
+      for (const bo of bolumler) {
+        console.log(`\n${bo.baslik}`);
+        if (bo.metin) console.log(bo.metin);
+        for (const s of (bo.satirlar || [])) console.log('  ' + (typeof s === 'string' ? s : s.t));
+      }
       if (ORNEK_ALICI) {
         const r = await mailGonder({ to: ORNEK_ALICI, subject: `[ÖRNEK · ${u.name}] ${subject}`, html });
         console.log(r.ok ? `\n(HTML kopya → ${ORNEK_ALICI})` : `\n(HTML kopya HATA: ${r.error})`);
