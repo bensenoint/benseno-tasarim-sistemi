@@ -989,6 +989,40 @@ function PortalTalepModal() {
   const [f, setF] = React.useState({ baslik: "", aciklama: "", tarih: "" });
   const [st, setSt] = React.useState(null);   // null | 'gonderiliyor' | 'ok' | hata
   const [talepler, setTalepler] = React.useState(null);
+  const [dosyalar, setDosyalar] = React.useState([]);   // [{ad, tip, b64, boyut}]
+  const [dinliyor, setDinliyor] = React.useState(false);
+  const recRef = React.useRef(null);
+  const tabanRef = React.useRef("");
+  // 🎤 Dikte (tr-TR, Web Speech API) — Ody mikrofonuyla aynı yaklaşım; ses tarayıcıda işlenir.
+  const dikteDestek = typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition);
+  const dikte = () => {
+    if (dinliyor) { try { recRef.current && recRef.current.stop(); } catch (e) {} setDinliyor(false); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const rec = new SR(); recRef.current = rec;
+    rec.lang = "tr-TR"; rec.continuous = true; rec.interimResults = true;
+    tabanRef.current = f.aciklama ? f.aciklama.replace(/\s+$/, "") + " " : "";
+    rec.onresult = (e) => {
+      let m = "";
+      for (let i = 0; i < e.results.length; i++) m += e.results[i][0].transcript;
+      setF(prev => ({ ...prev, aciklama: (tabanRef.current + m).slice(0, 2000) }));
+    };
+    rec.onend = () => setDinliyor(false);
+    rec.onerror = () => setDinliyor(false);
+    try { rec.start(); setDinliyor(true); } catch (e) { setDinliyor(false); }
+  };
+  const dosyaSec = (e) => {
+    const fl = [...(e.target.files || [])].slice(0, 3 - dosyalar.length);
+    for (const file of fl) {
+      if (file.size > 5 * 1024 * 1024) { setSt(`dosya çok büyük (≤5MB): ${file.name}`); continue; }
+      const rd = new FileReader();
+      rd.onload = () => {
+        const b64 = String(rd.result).split(",")[1] || "";
+        setDosyalar(prev => prev.length >= 3 ? prev : [...prev, { ad: file.name, tip: file.type, b64, boyut: file.size }]);
+      };
+      rd.readAsDataURL(file);
+    }
+    e.target.value = "";
+  };
   const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
   const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
   React.useEffect(() => {
@@ -1004,10 +1038,12 @@ function PortalTalepModal() {
     try {
       const r = await fetch(`${API}/api/portal/talep`, { method: "POST",
         headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
-        body: JSON.stringify({ baslik: f.baslik, aciklama: f.aciklama, istenen_tarih: f.tarih || null }) });
+        body: JSON.stringify({ baslik: f.baslik, aciklama: f.aciklama, istenen_tarih: f.tarih || null,
+          dosyalar: dosyalar.map(d => ({ ad: d.ad, tip: d.tip, b64: d.b64 })) }) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) { setSt(j.error || "gönderilemedi"); return; }
-      setSt("ok"); setF({ baslik: "", aciklama: "", tarih: "" }); yukle();
+      setSt("ok"); setF({ baslik: "", aciklama: "", tarih: "" }); setDosyalar([]);
+      try { recRef.current && recRef.current.stop(); } catch (err2) {} setDinliyor(false); yukle();
     } catch (err) { setSt("bağlantı hatası"); }
   };
   if (!open) return null;
@@ -1035,8 +1071,34 @@ function PortalTalepModal() {
           <form onSubmit={gonder}>
             <label style={lbl}>İş başlığı *</label>
             <input style={inp} required maxLength={160} value={f.baslik} onChange={e => setF({ ...f, baslik: e.target.value })} placeholder="örn. Ekim kampanyası sosyal medya görselleri"/>
-            <label style={lbl}>Açıklama / brief</label>
-            <textarea style={{ ...inp, minHeight: 110, resize: "vertical" }} maxLength={2000} value={f.aciklama} onChange={e => setF({ ...f, aciklama: e.target.value })} placeholder="Ne yapılmasını istiyorsunuz? Hedef, format, boyutlar, referanslar…"/>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <label style={lbl}>Açıklama / brief</label>
+              {dikteDestek && <button type="button" onClick={dikte}
+                title={dinliyor ? "Dikteyi durdur" : "Sesle yaz (Türkçe)"}
+                style={{ border: "1px solid " + (dinliyor ? "var(--prio-red)" : "var(--line)"), background: dinliyor ? "rgba(229,72,77,.08)" : "transparent",
+                  borderRadius: 999, padding: "4px 10px", cursor: "pointer", font: "600 11px var(--font-sans)",
+                  color: dinliyor ? "var(--prio-red)" : "var(--ink-3)" }}>{dinliyor ? "⏹ Dinliyor… durdur" : "🎤 Dikte"}</button>}
+            </div>
+            <textarea style={{ ...inp, minHeight: 110, resize: "vertical" }} maxLength={2000} value={f.aciklama} onChange={e => setF({ ...f, aciklama: e.target.value })} placeholder="Ne yapılmasını istiyorsunuz? Hedef, format, boyutlar, referanslar… (🎤 ile sesle de yazabilirsiniz)"/>
+            <label style={lbl}>Dosya ekleri (en fazla 3 · dosya başına 5MB)</label>
+            <div style={{ marginBottom: 12 }}>
+              {dosyalar.map((d, i) => (
+                <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 6, font: "500 12px var(--font-sans)",
+                  border: "1px solid var(--line)", borderRadius: 999, padding: "4px 10px", margin: "0 6px 6px 0", color: "var(--ink-2)", background: "var(--paper-2)" }}>
+                  📎 {d.ad} <span style={{ color: "var(--ink-4)" }}>({Math.round(d.boyut / 1024)} KB)</span>
+                  <button type="button" onClick={() => setDosyalar(prev => prev.filter((_, x) => x !== i))}
+                    style={{ border: 0, background: "transparent", cursor: "pointer", color: "var(--ink-4)", padding: 0 }}>✕</button>
+                </span>
+              ))}
+              {dosyalar.length < 3 && (
+                <label style={{ display: "inline-flex", alignItems: "center", gap: 6, font: "600 12px var(--font-sans)",
+                  border: "1px dashed var(--line)", borderRadius: 999, padding: "5px 12px", cursor: "pointer", color: "var(--ink-3)" }}>
+                  ＋ Dosya ekle
+                  <input type="file" multiple onChange={dosyaSec} style={{ display: "none" }}
+                    accept="image/*,.pdf,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.ai,.psd,.mp4,.mov"/>
+                </label>
+              )}
+            </div>
             <label style={lbl}>İstenen teslim tarihi (opsiyonel)</label>
             <input style={inp} type="date" value={f.tarih} onChange={e => setF({ ...f, tarih: e.target.value })}/>
             {st && st !== "gonderiliyor" && <div style={{ color: "var(--prio-red)", font: "400 13px var(--font-sans)", marginBottom: 10 }}>{st}</div>}

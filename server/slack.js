@@ -129,7 +129,8 @@ async function logNotification(userId, text, explicitLink) {
 async function postChannel(channel, text) {
   if (!hasToken() || !channel) return { ok: false, skipped: true };
   const res = await slackCall("chat.postMessage", { channel, text, username: BOT_NAME, unfurl_links: false });
-  return res.ok ? { ok: true, ts: res.ts } : { ok: false, error: res.error };
+  // channel id de döner (dosya thread'e iliştirme — portal talep ekleri — için gerekir)
+  return res.ok ? { ok: true, ts: res.ts, channel: res.channel } : { ok: false, error: res.error };
 }
 
 async function dm(userId, text, link, skipLog = false) {

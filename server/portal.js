@@ -138,6 +138,13 @@ function mountPortal(app) {
         [req.musteri.mid]);
       if (say.rows[0].c >= 10) return res.status(429).json({ error: 'günlük talep sınırına ulaşıldı' });
       const tarih = b.istenen_tarih && /^\d{4}-\d{2}-\d{2}$/.test(b.istenen_tarih) ? b.istenen_tarih : null;
+      // Dosya ekleri (base64): en fazla 3 dosya, dosya başına ≤5MB — marka kanalındaki
+      // talep mesajının THREAD'ine yüklenir (sistemde ayrıca saklanmaz).
+      const dosyalar = Array.isArray(b.dosyalar) ? b.dosyalar.slice(0, 3) : [];
+      for (const d of dosyalar) {
+        if (!d || typeof d.b64 !== 'string' || typeof d.ad !== 'string') return res.status(400).json({ error: 'dosya biçimi geçersiz' });
+        if (d.b64.length > 7 * 1024 * 1024) return res.status(413).json({ error: `dosya çok büyük (≤5MB): ${d.ad}` });
+      }
       const ins = await pool.query(
         `INSERT INTO musteri_talepler (marka_id, musteri_id, baslik, aciklama, istenen_tarih)
          VALUES ($1,$2,$3,$4,$5) RETURNING id, created_at`,
@@ -155,7 +162,19 @@ function mountPortal(app) {
           `\n✍️ Talep eden: ${kim} (portal)\n_Onaylamak için dashboard'dan "Yeni brief" ile açın — talep #${ins.rows[0].id}_`;
         const slack = require('./slack');
         const ch = slack.channelForBrand(marka);
-        if (ch) await slack.postChannel(ch, txt);
+        if (ch) {
+          const pm = await slack.postChannel(ch, txt);
+          // Ekler talep mesajının thread'ine (best-effort; biri düşse diğerleri denenir)
+          if (pm && pm.ok && dosyalar.length) {
+            for (const d of dosyalar) {
+              try {
+                const buf = Buffer.from(d.b64, 'base64');
+                await slack.uploadFile({ channel: pm.channel, thread_ts: pm.ts,
+                  filename: String(d.ad).slice(0, 120).replace(/[\/\\]/g, '_'), buf, title: d.ad });
+              } catch (e) { console.error('[portal] talep eki yüklenemedi:', d.ad, e.message); }
+            }
+          }
+        }
         const { notify } = require('./notify');
         const mgr = await pool.query(`SELECT id FROM users WHERE (rol='yonetici' OR yetki='yonetici') AND active IS NOT FALSE`);
         for (const m of mgr.rows)
