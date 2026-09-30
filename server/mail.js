@@ -58,6 +58,10 @@ function raporHtml({ baslik, tarih, bolumler, dip }) {
   const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const bolumHtml = (bolumler || []).map(b => `
     <h2 style="font:600 15px/1.4 -apple-system,Segoe UI,sans-serif;color:#24479E;margin:22px 0 8px;border-bottom:1px solid #e5e9f2;padding-bottom:6px">${esc(b.baslik)}</h2>
+    ${b.metin
+      ? String(b.metin).split(/\n{2,}/).map(p =>
+          `<p style="font:400 14px/1.65 -apple-system,Segoe UI,sans-serif;color:#2b2f3a;margin:0 0 12px">${esc(p.trim()).replace(/\n/g, '<br>')}</p>`).join('')
+      : ''}
     ${b.satirlar && b.satirlar.length
       ? `<ul style="margin:0;padding-left:18px">${b.satirlar.map(s => {
           const t = typeof s === 'string' ? s : s.t;
