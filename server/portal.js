@@ -125,6 +125,58 @@ function mountPortal(app) {
     } catch (e) { console.error('[portal] karne:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
   });
 
+  // ── Brief talebi (Faz 3, ONAYLI akış): talep kaydı + marka kanalına Slack + yöneticilere bildirim ──
+  app.post('/api/portal/talep', auth.musteriGuard, async (req, res) => {
+    try {
+      const b = req.body || {};
+      const baslik = String(b.baslik || '').trim().slice(0, 160);
+      const aciklama = String(b.aciklama || '').trim().slice(0, 2000);
+      if (!baslik) return res.status(400).json({ error: 'başlık gerekli' });
+      // Taşkın koruması: hesap başına günde en fazla 10 talep
+      const say = await pool.query(
+        `SELECT count(*)::int c FROM musteri_talepler WHERE musteri_id=$1 AND created_at > now() - interval '24 hours'`,
+        [req.musteri.mid]);
+      if (say.rows[0].c >= 10) return res.status(429).json({ error: 'günlük talep sınırına ulaşıldı' });
+      const tarih = b.istenen_tarih && /^\d{4}-\d{2}-\d{2}$/.test(b.istenen_tarih) ? b.istenen_tarih : null;
+      const ins = await pool.query(
+        `INSERT INTO musteri_talepler (marka_id, musteri_id, baslik, aciklama, istenen_tarih)
+         VALUES ($1,$2,$3,$4,$5) RETURNING id, created_at`,
+        [req.musteri.marka_id, req.musteri.mid, baslik, aciklama || null, tarih]);
+      // Bildirimler (best-effort — talep kaydını bozmaz)
+      try {
+        const mk = await pool.query(
+          `SELECT br.name AS marka, m.ad, m.email FROM brands br, musteri_kullanicilar m
+           WHERE br.id=$1 AND m.id=$2`, [req.musteri.marka_id, req.musteri.mid]);
+        const { marka, ad, email } = mk.rows[0] || {};
+        const kim = ad || email;
+        const txt = `📩 *Müşteri brief talebi* — *${marka}*\n*${baslik}*` +
+          (aciklama ? `\n${aciklama.slice(0, 500)}` : '') +
+          (tarih ? `\n⏰ İstenen teslim: ${tarih}` : '') +
+          `\n✍️ Talep eden: ${kim} (portal)\n_Onaylamak için dashboard'dan "Yeni brief" ile açın — talep #${ins.rows[0].id}_`;
+        const slack = require('./slack');
+        const ch = slack.channelForBrand(marka);
+        if (ch) await slack.postChannel(ch, txt);
+        const { notify } = require('./notify');
+        const mgr = await pool.query(`SELECT id FROM users WHERE (rol='yonetici' OR yetki='yonetici') AND active IS NOT FALSE`);
+        for (const m of mgr.rows)
+          await notify(m.id, { tip: 'talep', aciliyet: 'acil', text: `📩 ${marka} — müşteri brief talebi: ${baslik}`, link: null });
+      } catch (e) { console.error('[portal] talep bildirimi:', e.message); }
+      res.json({ ok: true, id: ins.rows[0].id });
+    } catch (e) { console.error('[portal] talep:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+  });
+
+  // Müşterinin kendi talepleri (durum takibi)
+  app.get('/api/portal/talepler', auth.musteriGuard, async (req, res) => {
+    try {
+      const r = await pool.query(
+        `SELECT t.id, t.baslik, t.durum, t.brief_id, to_char(t.created_at,'DD.MM.YYYY') tarih,
+                to_char(t.istenen_tarih,'DD.MM.YYYY') istenen, b.no AS brief_no
+         FROM musteri_talepler t LEFT JOIN briefs b ON b.id=t.brief_id
+         WHERE t.marka_id=$1 ORDER BY t.id DESC LIMIT 30`, [req.musteri.marka_id]);
+      res.json({ talepler: r.rows });
+    } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
+  });
+
   // ── İş listesi (yalnız kendi markası) ──
   app.get('/api/portal/isler', auth.musteriGuard, async (req, res) => {
     try {

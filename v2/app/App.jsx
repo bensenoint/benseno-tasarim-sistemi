@@ -730,12 +730,14 @@ function App({ currentUser, onLogout }) {
       {!PORTAL && window.WelcomeTour && React.createElement(window.WelcomeTour, { open: tourOpen, onClose: () => { setTourOpen(false); setTourSeen(true); } })}
       {PORTAL ? (
         <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, padding:"10px 20px", borderBottom:"1px solid var(--line)", background:"var(--surface, var(--paper))"}}>
-          <div style={{display:"flex", alignItems:"baseline", gap:10}}>
-            <span style={{font:"700 19px var(--font-display, Georgia)", color:"var(--ody, #24479E)"}}>benseno</span>
+          <div style={{display:"flex", alignItems:"center", gap:10}}>
+            <img src="../v2/app/logo.png?v=2" alt="Benseno" style={{height:38, width:"auto", objectFit:"contain", mixBlendMode:"multiply", flexShrink:0}}/>
             <span style={{font:"600 10px var(--font-sans)", letterSpacing:"2px", color:"var(--ink-4)"}}>MÜŞTERİ PORTALI</span>
           </div>
           <div style={{display:"flex", alignItems:"center", gap:10}}>
-            <span style={{font:"600 13px var(--font-sans)", color:"var(--ink-2)"}}>{currentUser && currentUser.marka}</span>
+            <button onClick={() => window.bnsPortalTalep && window.bnsPortalTalep()}
+              style={{font:"600 12.5px var(--font-sans)", color:"#fff", background:"var(--ember, #C24A2C)", border:0, borderRadius:8, padding:"8px 14px", cursor:"pointer"}}>＋ Yeni Talep</button>
+            <span className="bns-hide-mobile" style={{font:"600 13px var(--font-sans)", color:"var(--ink-2)"}}>{currentUser && currentUser.marka}</span>
             <button onClick={() => setTweak("theme", t.theme === "dark" ? "light" : "dark")} title="Tema"
               style={{border:"1px solid var(--line)", background:"transparent", borderRadius:8, padding:"5px 9px", cursor:"pointer", color:"var(--ink-3)"}}>{t.theme === "dark" ? "☀️" : "🌙"}</button>
             <button onClick={onLogout} style={{border:"1px solid var(--line)", background:"transparent", borderRadius:8, padding:"6px 12px", cursor:"pointer", font:"600 12px var(--font-sans)", color:"var(--ink-3)"}}>Çıkış</button>
@@ -840,6 +842,7 @@ function App({ currentUser, onLogout }) {
       {!PORTAL && <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>}
 
       {!PORTAL && <BenseoTweaks t={t} setTweak={setTweak}/>}
+      {PORTAL && <PortalTalepModal/>}
     </div>
   );
 }
@@ -978,6 +981,87 @@ function darken(hex, amt) {
   return "#" + [f(r), f(g), f(b)].map(x => x.toString(16).padStart(2, "0")).join("");
 }
 
+// ── Portal: Yeni Talep modalı (Faz 3, onaylı akış) ───────────────────────────
+// Müşteri form gönderir → talep kaydı + marka Slack kanalı + yöneticilere bildirim.
+// Yönetici onaylayınca gerçek brief'e çevrilir; müşteri buradan taleplerinin durumunu izler.
+function PortalTalepModal() {
+  const [open, setOpen] = React.useState(false);
+  const [f, setF] = React.useState({ baslik: "", aciklama: "", tarih: "" });
+  const [st, setSt] = React.useState(null);   // null | 'gonderiliyor' | 'ok' | hata
+  const [talepler, setTalepler] = React.useState(null);
+  const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+  const tok = () => (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
+  React.useEffect(() => {
+    window.bnsPortalTalep = () => { setOpen(true); setSt(null); yukle(); };
+    return () => { delete window.bnsPortalTalep; };
+  }, []);
+  const yukle = () => {
+    fetch(`${API}/api/portal/talepler`, { headers: { Authorization: "Bearer " + tok() } })
+      .then(r => r.ok ? r.json() : null).then(j => j && setTalepler(j.talepler || [])).catch(() => {});
+  };
+  const gonder = async (e) => {
+    e.preventDefault(); setSt("gonderiliyor");
+    try {
+      const r = await fetch(`${API}/api/portal/talep`, { method: "POST",
+        headers: { "content-type": "application/json", Authorization: "Bearer " + tok() },
+        body: JSON.stringify({ baslik: f.baslik, aciklama: f.aciklama, istenen_tarih: f.tarih || null }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { setSt(j.error || "gönderilemedi"); return; }
+      setSt("ok"); setF({ baslik: "", aciklama: "", tarih: "" }); yukle();
+    } catch (err) { setSt("bağlantı hatası"); }
+  };
+  if (!open) return null;
+  const inp = { width: "100%", boxSizing: "border-box", font: "400 13.5px var(--font-sans)", padding: "10px 12px",
+    border: "1px solid var(--line)", borderRadius: 8, background: "var(--paper)", color: "var(--ink)", marginBottom: 12 };
+  const lbl = { font: "600 11px var(--font-sans)", letterSpacing: ".4px", textTransform: "uppercase", color: "var(--ink-4)", display: "block", marginBottom: 4 };
+  const DURUM_TR = { bekliyor: ["Değerlendiriliyor", "var(--warn, #b3701f)"], onaylandi: ["Onaylandı ✓", "var(--ok, #1a8f5a)"], reddedildi: ["Uygun görülmedi", "var(--ink-4)"] };
+  return (
+    <React.Fragment>
+      <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "var(--overlay, rgba(0,0,0,.4))", zIndex: 96, backdropFilter: "blur(3px)" }}/>
+      <div style={{ position: "fixed", left: "50%", top: "50%", transform: "translate(-50%,-50%)", zIndex: 97,
+        width: "min(520px, 94vw)", maxHeight: "88vh", overflowY: "auto", background: "var(--surface, var(--paper))",
+        border: "1px solid var(--line)", borderRadius: 14, padding: "22px 24px", boxShadow: "var(--shadow-2)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <div style={{ font: "700 17px var(--font-display, Georgia)", color: "var(--ink)" }}>Yeni İş Talebi</div>
+          <button onClick={() => setOpen(false)} style={{ border: 0, background: "transparent", cursor: "pointer", color: "var(--ink-3)", fontSize: 18 }}>✕</button>
+        </div>
+        {st === "ok" ? (
+          <div style={{ padding: "10px 0 4px" }}>
+            <div style={{ font: "600 14px var(--font-sans)", color: "var(--ok, #1a8f5a)", marginBottom: 6 }}>✓ Talebiniz ekibimize iletildi</div>
+            <div style={{ font: "400 13px/1.5 var(--font-sans)", color: "var(--ink-3)" }}>Değerlendirilip onaylandığında iş olarak listede görünecek. Durumunu aşağıdan takip edebilirsiniz.</div>
+            <button onClick={() => setSt(null)} style={{ marginTop: 12, font: "600 12px var(--font-sans)", border: "1px solid var(--line)", background: "transparent", borderRadius: 8, padding: "7px 12px", cursor: "pointer", color: "var(--ink-2)" }}>＋ Yeni talep daha</button>
+          </div>
+        ) : (
+          <form onSubmit={gonder}>
+            <label style={lbl}>İş başlığı *</label>
+            <input style={inp} required maxLength={160} value={f.baslik} onChange={e => setF({ ...f, baslik: e.target.value })} placeholder="örn. Ekim kampanyası sosyal medya görselleri"/>
+            <label style={lbl}>Açıklama / brief</label>
+            <textarea style={{ ...inp, minHeight: 110, resize: "vertical" }} maxLength={2000} value={f.aciklama} onChange={e => setF({ ...f, aciklama: e.target.value })} placeholder="Ne yapılmasını istiyorsunuz? Hedef, format, boyutlar, referanslar…"/>
+            <label style={lbl}>İstenen teslim tarihi (opsiyonel)</label>
+            <input style={inp} type="date" value={f.tarih} onChange={e => setF({ ...f, tarih: e.target.value })}/>
+            {st && st !== "gonderiliyor" && <div style={{ color: "var(--prio-red)", font: "400 13px var(--font-sans)", marginBottom: 10 }}>{st}</div>}
+            <button disabled={st === "gonderiliyor"} style={{ width: "100%", font: "600 14px var(--font-sans)", color: "#fff", background: "var(--ember, #C24A2C)", border: 0, borderRadius: 8, padding: 12, cursor: "pointer" }}>{st === "gonderiliyor" ? "Gönderiliyor…" : "Talebi Gönder"}</button>
+          </form>
+        )}
+        {talepler && talepler.length > 0 && (
+          <div style={{ marginTop: 18, borderTop: "1px solid var(--line)", paddingTop: 12 }}>
+            <div style={{ font: "600 11px var(--font-sans)", letterSpacing: ".4px", textTransform: "uppercase", color: "var(--ink-4)", marginBottom: 8 }}>Önceki talepleriniz</div>
+            {talepler.map(t => {
+              const [ad, renk] = DURUM_TR[t.durum] || [t.durum, "var(--ink-3)"];
+              return (
+                <div key={t.id} style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline", padding: "6px 0", borderBottom: "1px dashed var(--line)" }}>
+                  <span style={{ font: "400 13px var(--font-sans)", color: "var(--ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.baslik}</span>
+                  <span style={{ font: "600 11px var(--font-sans)", color: renk, flexShrink: 0 }}>{ad}{t.brief_no ? ` · #${t.brief_no}` : ""}<span style={{ color: "var(--ink-4)", fontWeight: 400 }}> · {t.tarih}</span></span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </React.Fragment>
+  );
+}
+
 // ── Müşteri Portalı girişi (BNS_PORTAL) — e-posta+şifre → /api/portal/login ──
 // Başarıda token bns_token'a yazılır (poll/karne fetch'leri aynı anahtarı kullanır);
 // bns_user sentetik 'musteri' kaydı olur. Personel girişinden tamamen ayrı uç/tablo.
@@ -1021,8 +1105,8 @@ function PortalLogin({ onLogin }) {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "flex-start", justifyContent: "center", background: "var(--paper-2)", paddingTop: "10vh" }}>
       <div style={{ width: "min(400px, 92vw)", background: "var(--surface, var(--paper))", border: "1px solid var(--line)", borderRadius: 14, padding: 28, boxShadow: "var(--shadow-2)" }}>
         <div style={{ textAlign: "center", marginBottom: 22 }}>
-          <div style={{ font: "700 24px var(--font-display, Georgia)", color: "var(--ody, #24479E)" }}>benseno</div>
-          <div style={{ font: "600 11px var(--font-sans)", letterSpacing: "2.5px", color: "var(--ink-4)", marginTop: 4 }}>MÜŞTERİ PORTALI</div>
+          <img src="../v2/app/logo.png?v=2" alt="Benseno" style={{ height: 52, width: "auto", objectFit: "contain", mixBlendMode: "multiply" }}/>
+          <div style={{ font: "600 11px var(--font-sans)", letterSpacing: "2.5px", color: "var(--ink-4)", marginTop: 6 }}>MÜŞTERİ PORTALI</div>
         </div>
         {!yeniSifre ? (
           <form onSubmit={giris}>
