@@ -320,6 +320,21 @@ function KanbanCard({ brief, onClick, draggable, dragging, onDragStartCard, onDr
         display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical",
         overflow:"hidden", wordBreak:"break-word"
       }}>{brief.baslik || "—"}</div>
+      {/* Kim çalışıyor rozeti (2026-09-30): iş genel 'basladi' iken fiilen çalışan(lar).
+          Kart, izleyenin perspektifiyle başka kolonda dursa bile kimin çalıştığı görünür. */}
+      {(() => {
+        if (brief.durum !== "basladi") return null;
+        const aktif = (brief.contributors || []).filter(c => c && c.calisiyor);
+        if (!aktif.length) return null;
+        const adlar = aktif.map(c => (c.name || c.ad || "").split(" ")[0] || "?").join(", ");
+        return (
+          <span title={`Bu işte fiilen çalışan: ${aktif.map(c => c.name || c.ad || c.id).join(", ")}`}
+            style={{display:"inline-flex", alignItems:"center", gap:4, alignSelf:"flex-start",
+              font:"600 10px/1 var(--font-sans)", color:"var(--ody)",
+              background:"var(--ember-tint)", border:"1px solid var(--line)",
+              borderRadius:99, padding:"3px 8px"}}>🚀 {adlar} çalışıyor</span>
+        );
+      })()}
       {/* Alt satır: öncelik + avatarlar */}
       <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:4, marginTop:2}}>
         <span style={{display:"flex", alignItems:"center", gap:6, minWidth:0}}>
