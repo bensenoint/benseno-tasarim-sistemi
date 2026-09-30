@@ -45,7 +45,7 @@ function BrandScreen({ data, onOpenBrief, onOpenCompleted, initialSel, currentUs
   let rows = data.brandStats;
   if (search.trim()) { const q = search.toLowerCase(); rows = rows.filter(b => b.name.toLowerCase().includes(q)); }
   rows = [...rows].sort((a, b) => {
-    if (sort === "name") return a.name.localeCompare(b.name, "tr");
+    if (sort === "name") return String(a.name || "").localeCompare(String(b.name || ""), "tr");
     if (sort === "medianH") return a.medianH - b.medianH;
     return b[sort] - a[sort];
   });
@@ -147,7 +147,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
     const seen = {};
     for (const b of active) { window.bnsLeadList(b).forEach(l => { if (l && l.id) seen[l.id] = l.name || l.id; }); (b.contributors || []).forEach(c => { if (c && c.id) seen[c.id] = c.name || c.id; }); }
     for (const c of done) { window.bnsLeadList(c).forEach(l => { if (l && l.id && !seen[l.id]) seen[l.id] = l.name || l.id; }); (c.contributors || []).forEach(x => { if (x && x.id && !seen[x.id]) seen[x.id] = x.name || x.id; }); }
-    return Object.entries(seen).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, "tr"));
+    return Object.entries(seen).map(([id, name]) => ({ id, name })).sort((a, b) => String(a.name || a.id || "").localeCompare(String(b.name || b.id || ""), "tr"));
   }, [active, done]);
 
   // "Yarın" (devam edecek): deadline'ı yarın 00:00 ve sonrası olan aktif işler.
@@ -224,7 +224,7 @@ function BrandDetail({ brand, stats, data, onBack, onSwitch, onOpenBrief, onOpen
           {onSwitch && (
             <select value={brand} onChange={(e) => onSwitch(e.target.value)} title="Başka markaya geç"
               style={{ ...fldStyle, cursor:"pointer", maxWidth:180 }}>
-              {[...(data.brandStats || [])].sort((a, b) => a.name.localeCompare(b.name, "tr")).map(b => (
+              {[...(data.brandStats || [])].sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "tr")).map(b => (
                 <option key={b.name} value={b.name}>{b.name}{b.active ? ` (${b.active})` : ""}</option>
               ))}
             </select>
