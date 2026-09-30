@@ -1311,8 +1311,26 @@ app.post('/api/talepler/:id/bagla', auth.authGuard, async (req, res) => {
     const briefId = parseInt((req.body || {}).brief_id, 10);
     if (!briefId) return res.status(400).json({ error: 'brief_id gerekli' });
     const r = await pool.query(
-      `UPDATE musteri_talepler SET durum='onaylandi', brief_id=$2 WHERE id=$1 AND durum='bekliyor' RETURNING id`,
+      `UPDATE musteri_talepler SET durum='onaylandi', brief_id=$2 WHERE id=$1 AND durum='bekliyor'
+       RETURNING id, slack_channel, slack_ts`,
       [+req.params.id, briefId]);
+    // Talep mesajı + EKLERİ brief thread'ine linklenir (dosyalar talep thread'inde durur).
+    if (r.rows[0] && r.rows[0].slack_ts) {
+      try {
+        const slack = require('./slack');
+        const b = await pool.query('SELECT slack_ts, slack_channel, no FROM briefs WHERE id=$1', [briefId]);
+        const bi = b.rows[0];
+        const ws = process.env.BNS_SLACK_WORKSPACE || 'benseno';
+        const tLink = `https://${ws}.slack.com/archives/${r.rows[0].slack_channel}/p${String(r.rows[0].slack_ts).replace('.', '')}`;
+        if (bi && bi.slack_ts && bi.slack_channel) {
+          await slack.postThread({ channel: bi.slack_channel, thread_ts: bi.slack_ts,
+            text: `📩 Bu iş, müşteri portal talebinden oluşturuldu — orijinal talep ve *dosya ekleri*: ${tLink}` });
+        }
+        // Talep mesajının thread'ine de kapanış notu (ekip görür)
+        await slack.postThread({ channel: r.rows[0].slack_channel, thread_ts: r.rows[0].slack_ts,
+          text: `✅ Bu talep işe çevrildi → #${bi ? bi.no : briefId}` });
+      } catch (e) { console.error('[api] talep-brief köprü notu:', e.message); }
+    }
     res.json({ ok: !!r.rows[0] });
   } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
 });

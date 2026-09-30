@@ -164,6 +164,11 @@ function mountPortal(app) {
         const ch = slack.channelForBrand(marka);
         if (ch) {
           const pm = await slack.postChannel(ch, txt);
+          // Talep mesajının konumu saklanır → brief'e çevrilince ekler linklenir
+          if (pm && pm.ok) {
+            await pool.query('UPDATE musteri_talepler SET slack_channel=$2, slack_ts=$3 WHERE id=$1',
+              [ins.rows[0].id, pm.channel, pm.ts]);
+          }
           // Ekler talep mesajının thread'ine (best-effort; biri düşse diğerleri denenir)
           if (pm && pm.ok && dosyalar.length) {
             for (const d of dosyalar) {

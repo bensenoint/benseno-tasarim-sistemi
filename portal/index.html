@@ -1337,7 +1337,16 @@ window.EMBEDDED_DATA = {
 </script>
 
 <!-- calc.js: saf hesap formülleri (data.js'ten ÖNCE — global olarak gelir) -->
-<script>window.BNS_PORTAL = true;</script>
+<script>
+window.BNS_PORTAL = true;
+(function(){
+  var MAP = { bns_token: "portal_bns_token", bns_user: "portal_bns_user" };
+  var g = Storage.prototype.getItem, st = Storage.prototype.setItem, rm = Storage.prototype.removeItem;
+  Storage.prototype.getItem    = function(k){ return g.call(this, MAP[k] || k); };
+  Storage.prototype.setItem    = function(k, v){ return st.call(this, MAP[k] || k, v); };
+  Storage.prototype.removeItem = function(k){ return rm.call(this, MAP[k] || k); };
+})();
+</script>
 <script src="../v2/app/calc.js?v=1790773613"></script>
 
 <!-- data.js: EMBEDDED_DATA → window.BNS_DATA bridge (plain script, no Babel) -->
