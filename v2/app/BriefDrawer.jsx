@@ -324,7 +324,11 @@ function BriefDrawer({ brief, onClose, onUpdate, allUsers, currentUser, onStatus
           <div style={{marginTop: 12, display:"flex", alignItems:"center", gap:8, flexWrap:"wrap"}}>
             {!ro && <PriorityBadge p={b.oncelik || { code: "ylw", label: "NORMAL" }}/>}
             {ro
-              ? <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--prio-green)", background:"var(--prio-green-bg, var(--paper-2))", padding:"5px 9px", borderRadius:999}}>✅ Tamamlandı</span>
+              ? (b.durum === "tamamlandi"
+                  ? <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--prio-green)", background:"var(--prio-green-bg, var(--paper-2))", padding:"5px 9px", borderRadius:999}}>✅ Tamamlandı</span>
+                  : <span style={{font:"600 11px/1 var(--font-sans)", letterSpacing:"0.05em", textTransform:"uppercase", color:"var(--ink-2)", background:"var(--paper-2)", border:"1px solid var(--line)", padding:"5px 9px", borderRadius:999}}>
+                      {({yeni:"Yeni", calisiliyor:"İş planında", basladi:"🎨 Çalışılıyor", incelemede:"İncelemede", kontrole:"İç kontrolde", beklemede:"Beklemede", revizyon:"Revizyonda", musteride:"✈️ Onayınızda", blokeli:"Blokeli"})[b.durum] || b.durum}
+                    </span>)
               : <StatusEditor current={b.durum} onPick={changeStatus}/>}
             <span style={{font:"500 12px/1 var(--font-sans)", color:"var(--ink-3)"}}
               title="İç revizyon: ✈️ öncesi düzeltmeler · Müşteri revizyonu: ✈️ sonrası ilk ✏️">
