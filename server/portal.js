@@ -119,7 +119,7 @@ function mountPortal(app) {
         }
       }
       // HAM özetler yanıtta YOK — yalnız müşteri versiyonları, /api/karne shape'iyle.
-      res.json({ karne: r.rows.map(x => ({ hafta: x.hafta, ad: x.ad,
+      res.json({ karneler: r.rows.map(x => ({ hafta: x.hafta, ad: x.ad,
         yildiz_hafta: x.yildiz_hafta, ozet_hafta: x.ozet_hafta_musteri || null, is_sayisi_hafta: x.is_sayisi_hafta,
         yildiz_genel: x.yildiz_genel, ozet_genel: x.ozet_genel_musteri || null, is_sayisi_genel: x.is_sayisi_genel })) });
     } catch (e) { console.error('[portal] karne:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
