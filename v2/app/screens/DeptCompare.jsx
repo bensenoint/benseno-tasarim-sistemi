@@ -19,6 +19,7 @@ function bnsCompletedInDept(c, role) {
 // Tarih aralığı değişirse açık accordion yeniden yükler; kapalıysa hiçbir maliyet yok.
 function PeriodSebep({ type, skey, range }) {
   const [open, setOpen] = React.useState(false);
+  if (typeof window !== "undefined" && window.BNS_PORTAL) return null;   // portal: iç dönem-değerlendirmesi müşteriye kapalı
   const [st, setSt] = React.useState({ loading: false, text: null, bos: false, err: null, loaded: false });
   const from = (range && typeof range.from === "number") ? range.from : 0;
   const to   = (range && typeof range.to   === "number") ? range.to   : Date.now();

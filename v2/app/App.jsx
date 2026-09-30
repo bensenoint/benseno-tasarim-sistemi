@@ -467,6 +467,7 @@ function App({ currentUser, onLogout }) {
     async function loadNotifCounts() {
       try {
         if (typeof window.bnsApiGet === "function") {
+          if (window.BNS_PORTAL) return;   // portalda bildirim rozeti yok (uç müşteriye kapalı)
           const c = await window.bnsApiGet("/api/notif-counts");
           if (c && !c.error) { window.BNS_NOTIF = c; if (!cancelled) setNotifTick(x => x + 1); }
         }
