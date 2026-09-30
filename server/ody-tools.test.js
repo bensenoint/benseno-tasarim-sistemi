@@ -61,9 +61,9 @@ test('brief_sorgula durum=tamamlandi + marka filtresi sayı döner', async () =>
   assert.ok(r.isler.every(x => x.marka.toLowerCase().includes('hasvet')));
 });
 
-test('kisi_dokumu İrem sayıları ed ile tutarlı', async () => {
+test('kisi_dokumu Melis sayıları ed ile tutarlı', async () => {
   const c = await ctx();
-  const id = 'U0AK8U7L57F';
+  const id = 'U08NQJ27G5S';   // Melis (İrem 30 Eyl'de pasife alındı)
   const expTamam = [...new Set((c.ed.bns_completed||[])
     .filter(x => [...(x.workers||[]),...(x.leads||[])].some(p => p.id===id))
     .map(x => x.no))].sort((a,b)=>a-b);
@@ -75,7 +75,7 @@ test('kisi_dokumu İrem sayıları ed ile tutarlı', async () => {
   assert.deepEqual(r.tamamlanan.nos, expTamam);
   assert.equal(r.aktif.say, expAktif.length);
   assert.deepEqual(r.aktif.nos, expAktif);
-  assert.ok(expTamam.length >= 1, 'İrem en az 1 tamamlanan işe sahip olmalı (veri sağlık kontrolü)');
+  assert.ok(expTamam.length >= 1, 'Melis en az 1 tamamlanan işe sahip olmalı (veri sağlık kontrolü)');
 });
 
 test('kisi_dokumu Pelin sayıları ed ile tutarlı', async () => {
