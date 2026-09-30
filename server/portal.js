@@ -90,6 +90,41 @@ function mountPortal(app) {
     } catch (e) { res.status(500).json({ error: 'sunucu hatası' }); }
   });
 
+  // ── Dashboard-uyumlu embedded (SEC-P2): marka sayfası portalda birebir çalışır ──
+  app.get('/api/portal/embedded', auth.musteriGuard, async (req, res) => {
+    try {
+      const { getPortalEmbedded } = require('./queries');
+      res.json(await getPortalEmbedded(req.musteri.marka_id));
+    } catch (e) { console.error('[portal] embedded:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+  });
+
+  // ── Marka karnesi (HaftalikKarne kartı) — özetler müşteri versiyonu (lazy Haiku + cache) ──
+  app.get('/api/portal/karne', auth.musteriGuard, async (req, res) => {
+    try {
+      const br = await pool.query('SELECT name FROM brands WHERE id=$1', [req.musteri.marka_id]);
+      const marka = br.rows[0] && br.rows[0].name;
+      const r = await pool.query(
+        `SELECT id, to_char(hafta,'YYYY-MM-DD') hafta, ad, yildiz_hafta::float, yildiz_genel::float,
+                is_sayisi_hafta, is_sayisi_genel, ozet_hafta, ozet_genel, ozet_hafta_musteri, ozet_genel_musteri
+         FROM haftalik_karne WHERE tip='marka' AND kimlik=$1 ORDER BY hafta DESC LIMIT 12`, [marka]);
+      // Eksik müşteri özetlerini lazy üret + önbelleğe yaz (yalnız ilk istekte maliyet).
+      for (const row of r.rows) {
+        if (row.ozet_hafta && !row.ozet_hafta_musteri) {
+          const m = await yumusat(row.ozet_hafta, 'ozet');
+          if (m) { await pool.query('UPDATE haftalik_karne SET ozet_hafta_musteri=$1 WHERE id=$2', [m.slice(0, 1500), row.id]); row.ozet_hafta_musteri = m; }
+        }
+        if (row.ozet_genel && !row.ozet_genel_musteri) {
+          const m = await yumusat(row.ozet_genel, 'ozet');
+          if (m) { await pool.query('UPDATE haftalik_karne SET ozet_genel_musteri=$1 WHERE id=$2', [m.slice(0, 1500), row.id]); row.ozet_genel_musteri = m; }
+        }
+      }
+      // HAM özetler yanıtta YOK — yalnız müşteri versiyonları, /api/karne shape'iyle.
+      res.json({ karne: r.rows.map(x => ({ hafta: x.hafta, ad: x.ad,
+        yildiz_hafta: x.yildiz_hafta, ozet_hafta: x.ozet_hafta_musteri || null, is_sayisi_hafta: x.is_sayisi_hafta,
+        yildiz_genel: x.yildiz_genel, ozet_genel: x.ozet_genel_musteri || null, is_sayisi_genel: x.is_sayisi_genel })) });
+    } catch (e) { console.error('[portal] karne:', e.message); res.status(500).json({ error: 'sunucu hatası' }); }
+  });
+
   // ── İş listesi (yalnız kendi markası) ──
   app.get('/api/portal/isler', auth.musteriGuard, async (req, res) => {
     try {

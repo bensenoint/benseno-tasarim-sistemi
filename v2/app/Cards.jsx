@@ -495,7 +495,9 @@ function HaftalikKarne({ tip, kimlik, compact }) {
     setRows(null); setSel(0);
     const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
     const tok = (typeof localStorage !== "undefined" && localStorage.getItem("bns_token")) || "";
-    fetch(`${API}/api/karne?tip=${encodeURIComponent(tip)}&kimlik=${encodeURIComponent(kimlik || "benseno")}`,
+    fetch(window.BNS_PORTAL
+        ? `${API}/api/portal/karne`   // portal: kendi markasının karnesi (özetler müşteri versiyonu)
+        : `${API}/api/karne?tip=${encodeURIComponent(tip)}&kimlik=${encodeURIComponent(kimlik || "benseno")}`,
       { headers: { Authorization: "Bearer " + tok } })
       .then(r => r.ok ? r.json() : { karneler: [] })
       .then(j => { if (!iptal) setRows(j.karneler || []); })

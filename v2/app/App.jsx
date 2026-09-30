@@ -196,7 +196,8 @@ function App({ currentUser, onLogout }) {
   // Varsayılan görünüm = giriş yapan kişi (slack_id eşleşmesi); bulunamazsa eski ME fallback'i
   const [user, setUser] = React.useState(
     () => data.USERS.find(u => u.id === currentUser?.slack_id) || data.ME);
-  const [tab, setTab] = React.useState(() => bnsLoadTab(currentUser) || "overview");
+  const PORTAL = typeof window !== "undefined" && !!window.BNS_PORTAL;   // müşteri portalı modu
+  const [tab, setTab] = React.useState(() => PORTAL ? "brand" : (bnsLoadTab(currentUser) || "overview"));
   // Aktif sekmeyi kullanıcı başına sakla → refresh'te son sayfadan devam.
   React.useEffect(() => {
     try { localStorage.setItem(bnsTabKey(currentUser), tab); } catch (e) {}
@@ -206,6 +207,7 @@ function App({ currentUser, onLogout }) {
   const jumpToJobs = (scope) => { setJobsScope(scope || "all"); setTab("jobs"); };
   // Normal navigasyon (sidebar/alt-nav/buton): Jobs'a giderken KPI deep-link filtresini sıfırla
   const navTo = (id) => {
+    if (PORTAL) return;   // portalda gezinme yok — tek ekran: kendi markası
     if (typeof navigator !== "undefined" && navigator.vibrate) { try { navigator.vibrate(6); } catch (e) {} }
     // Native: zaten açık sekmeye tekrar dokun → en üste yumuşak kaydır
     if (id === tab) {
@@ -219,14 +221,16 @@ function App({ currentUser, onLogout }) {
     if (id === "jobs") setJobsScope("all"); setTab(id);
   };
   // Marka chip'lerinden detay sayfasına gidiş (BrandChip → window.bnsOpenBrand)
-  const [brandSel, setBrandSel] = React.useState(null);
+  const [brandSel, setBrandSel] = React.useState(() => PORTAL ? { name: currentUser && currentUser.marka, t: 0 } : null);
   React.useEffect(() => {
+    if (PORTAL) return;   // portalda marka/profil gezinmesi kapalı (tek marka, kendi markası)
     window.bnsOpenBrand = (name) => { setBrandSel({ name, t: Date.now() }); setTab("brand"); };
     return () => { delete window.bnsOpenBrand; };
   }, []);
   // Kişi avatarlarından profil sayfasına gidiş (Avatar → window.bnsOpenUser)
   const [profileSel, setProfileSel] = React.useState(null);
   React.useEffect(() => {
+    if (PORTAL) return;   // portalda kişi profiline gidiş yok
     window.bnsOpenUser = (arg) => {
       const u = (arg && typeof arg === "object") ? arg : null;   // tam kullanıcı nesnesi de gelebilir (fallback için)
       setProfileSel({ id: u ? u.id : arg, user: u, t: Date.now() });
@@ -454,6 +458,8 @@ function App({ currentUser, onLogout }) {
         if (ls === "0") return "app/live-data.json?t=" + Date.now();
         if (ls && ls !== "1") return ls.replace(/\/+$/, "") + "/api/embedded?t=" + Date.now();
         const base = (window.BNS_API_BASE ? String(window.BNS_API_BASE).replace(/\/+$/, "") : DEFAULT_API);
+        // Müşteri portalı: marka-kilitli, arındırılmış embedded (SEC-P2).
+        if (window.BNS_PORTAL) return base + "/api/portal/embedded?t=" + Date.now();
         return base + "/api/embedded?t=" + Date.now();
       } catch (e) { return DEFAULT_API + "/api/embedded?t=" + Date.now(); }
     }
@@ -720,7 +726,21 @@ function App({ currentUser, onLogout }) {
 
   return (
     <div data-screen-label={tab} style={{display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden", position:"relative"}}>
-      {window.WelcomeTour && React.createElement(window.WelcomeTour, { open: tourOpen, onClose: () => { setTourOpen(false); setTourSeen(true); } })}
+      {!PORTAL && window.WelcomeTour && React.createElement(window.WelcomeTour, { open: tourOpen, onClose: () => { setTourOpen(false); setTourSeen(true); } })}
+      {PORTAL ? (
+        <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, padding:"10px 20px", borderBottom:"1px solid var(--line)", background:"var(--surface, var(--paper))"}}>
+          <div style={{display:"flex", alignItems:"baseline", gap:10}}>
+            <span style={{font:"700 19px var(--font-display, Georgia)", color:"var(--ody, #24479E)"}}>benseno</span>
+            <span style={{font:"600 10px var(--font-sans)", letterSpacing:"2px", color:"var(--ink-4)"}}>MÜŞTERİ PORTALI</span>
+          </div>
+          <div style={{display:"flex", alignItems:"center", gap:10}}>
+            <span style={{font:"600 13px var(--font-sans)", color:"var(--ink-2)"}}>{currentUser && currentUser.marka}</span>
+            <button onClick={() => setTweak("theme", t.theme === "dark" ? "light" : "dark")} title="Tema"
+              style={{border:"1px solid var(--line)", background:"transparent", borderRadius:8, padding:"5px 9px", cursor:"pointer", color:"var(--ink-3)"}}>{t.theme === "dark" ? "☀️" : "🌙"}</button>
+            <button onClick={onLogout} style={{border:"1px solid var(--line)", background:"transparent", borderRadius:8, padding:"6px 12px", cursor:"pointer", font:"600 12px var(--font-sans)", color:"var(--ink-3)"}}>Çıkış</button>
+          </div>
+        </div>
+      ) : (
       <Header
         user={user}
         tab={tab} onNav={navTo}
@@ -733,8 +753,9 @@ function App({ currentUser, onLogout }) {
         currentUser={currentUser}
         onLogout={onLogout}
       />
-      <div style={{display:"grid", gridTemplateColumns: isMobile ? "1fr" : `${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
-        {!isMobile && (
+      )}
+      <div style={{display:"grid", gridTemplateColumns: (isMobile || PORTAL) ? "1fr" : `${sidebarCollapsed?52:212}px 1fr`, flex:1, overflow:"hidden", transition:"grid-template-columns 200ms cubic-bezier(0.2,0,0,1)"}}>
+        {!isMobile && !PORTAL && (
           <div style={{position:"relative", zIndex:60}}>
             <Sidebar
               active={tab} onChange={navTo}
@@ -781,43 +802,43 @@ function App({ currentUser, onLogout }) {
 
       {/* MobileNav — always rendered, CSS controls visibility (display:none on desktop) */}
       <div className="bns-mobile-nav-wrap">
-        <MobileNav active={tab} onChange={navTo} data={liveData} menuOpen={mobileMenuOpen} setMenuOpen={setMobileMenuOpen}/>
+        {!PORTAL && <MobileNav active={tab} onChange={navTo} data={liveData} menuOpen={mobileMenuOpen} setMenuOpen={setMobileMenuOpen}/>}
       </div>
 
       {/* PWA "ana ekrana ekle" banner'ı (mobil) */}
-      <InstallBanner/>
+      {!PORTAL && <InstallBanner/>}
 
       {/* Aşağı çekerek yenile (mobil) */}
       <PullToRefresh/>
 
       {openBrief && (
         <BriefDrawer brief={openBrief} onClose={onCloseBrief}
-          onUpdate={onUpdateBrief} allUsers={data.USERS} currentUser={currentUser}
-          onStatusChange={onStatusChange} onRemind={onRemind}/>
+          onUpdate={PORTAL ? undefined : onUpdateBrief} allUsers={data.USERS} currentUser={PORTAL ? null : currentUser}
+          onStatusChange={PORTAL ? undefined : onStatusChange} onRemind={PORTAL ? undefined : onRemind}/>
       )}
 
-      <CommandPalette
+      {!PORTAL && <CommandPalette
         open={palette} onClose={() => setPalette(false)}
         data={data}
         currentTheme={t.theme}
         onOpenBrief={(b) => onOpenBrief(b)}
         onNavigate={(id) => setTab(id)}
         onTheme={(v) => setTweak("theme", v)}
-        onNewBrief={() => setNewBrief(true)}/>
+        onNewBrief={() => setNewBrief(true)}/>}
 
-      <NewBriefModal
+      {!PORTAL && <NewBriefModal
         open={!!newBrief} prefill={(newBrief && newBrief.prefill) || null} onClose={() => setNewBrief(false)}
         data={data}
-        onCreate={onCreateBrief}/>
+        onCreate={onCreateBrief}/>}
 
       {toast && <Toast msg={toast}/>}
       {/* 🤖 Sistem Asistanı — sağ alt yüzen sohbet */}
       {/* Ody — bir bottom-sheet/modal/menü açıkken gizle (üstüne binmesin, navigasyonu engellemesin) */}
-      {!(openBrief || newBrief || palette || mobileMenuOpen) && <ChatBot currentUser={currentUser} dateRange={dateRange}/>}
+      {!PORTAL && !(openBrief || newBrief || palette || mobileMenuOpen) && <ChatBot currentUser={currentUser} dateRange={dateRange}/>}
 
-      <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>
+      {!PORTAL && <ShortcutsHint collapsed={!isMobile && sidebarCollapsed && !sidebarHover}/>}
 
-      <BenseoTweaks t={t} setTweak={setTweak}/>
+      {!PORTAL && <BenseoTweaks t={t} setTweak={setTweak}/>}
     </div>
   );
 }
@@ -956,10 +977,87 @@ function darken(hex, amt) {
   return "#" + [f(r), f(g), f(b)].map(x => x.toString(16).padStart(2, "0")).join("");
 }
 
+// ── Müşteri Portalı girişi (BNS_PORTAL) — e-posta+şifre → /api/portal/login ──
+// Başarıda token bns_token'a yazılır (poll/karne fetch'leri aynı anahtarı kullanır);
+// bns_user sentetik 'musteri' kaydı olur. Personel girişinden tamamen ayrı uç/tablo.
+function PortalLogin({ onLogin }) {
+  const [f, setF] = React.useState({ email: "", sifre: "" });
+  const [hata, setHata] = React.useState(null);
+  const [yeniSifre, setYeniSifre] = React.useState(null);   // {token} → şifre belirleme adımı
+  const [busy, setBusy] = React.useState(false);
+  const API = window.BNS_API_BASE || "https://benseno-api-production.up.railway.app";
+  const bitir = (token, j) => {
+    const u = { slack_id: "PORTAL", name: j.ad || f.email, role: "musteri", marka: j.marka };
+    try { localStorage.setItem("bns_token", token); localStorage.setItem("bns_user", JSON.stringify(u)); } catch (e) {}
+    onLogin(u);
+  };
+  const giris = async (e) => {
+    e.preventDefault(); setBusy(true); setHata(null);
+    try {
+      const r = await fetch(API + "/api/portal/login", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: f.email, sifre: f.sifre }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { setHata(j.error || "giriş başarısız"); setBusy(false); return; }
+      if (j.sifre_degistir) { setYeniSifre({ token: j.token, j }); setBusy(false); return; }
+      bitir(j.token, j);
+    } catch (err) { setHata("bağlantı hatası"); setBusy(false); }
+  };
+  const sifreKaydet = async (e) => {
+    e.preventDefault(); setBusy(true);
+    const p1 = e.target.p1.value, p2 = e.target.p2.value;
+    if (p1 !== p2) { setHata("şifreler eşleşmiyor"); setBusy(false); return; }
+    const r = await fetch(API + "/api/portal/sifre", { method: "POST",
+      headers: { "content-type": "application/json", Authorization: "Bearer " + yeniSifre.token },
+      body: JSON.stringify({ yeni: p1 }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { setHata(j.error || "kaydedilemedi"); setBusy(false); return; }
+    bitir(yeniSifre.token, yeniSifre.j);
+  };
+  const inp = { width: "100%", boxSizing: "border-box", font: "400 14px var(--font-sans)", padding: "11px 12px",
+    border: "1px solid var(--line)", borderRadius: 8, background: "var(--paper)", color: "var(--ink)", marginBottom: 14 };
+  const lbl = { font: "600 11px var(--font-sans)", letterSpacing: ".4px", textTransform: "uppercase", color: "var(--ink-4)", display: "block", marginBottom: 4 };
+  return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "flex-start", justifyContent: "center", background: "var(--paper-2)", paddingTop: "10vh" }}>
+      <div style={{ width: "min(400px, 92vw)", background: "var(--surface, var(--paper))", border: "1px solid var(--line)", borderRadius: 14, padding: 28, boxShadow: "var(--shadow-2)" }}>
+        <div style={{ textAlign: "center", marginBottom: 22 }}>
+          <div style={{ font: "700 24px var(--font-display, Georgia)", color: "var(--ody, #24479E)" }}>benseno</div>
+          <div style={{ font: "600 11px var(--font-sans)", letterSpacing: "2.5px", color: "var(--ink-4)", marginTop: 4 }}>MÜŞTERİ PORTALI</div>
+        </div>
+        {!yeniSifre ? (
+          <form onSubmit={giris}>
+            <label style={lbl}>E-posta</label>
+            <input style={inp} type="email" autoComplete="username" required value={f.email} onChange={e => setF({ ...f, email: e.target.value })}/>
+            <label style={lbl}>Şifre</label>
+            <input style={inp} type="password" autoComplete="current-password" required value={f.sifre} onChange={e => setF({ ...f, sifre: e.target.value })}/>
+            {hata && <div style={{ color: "var(--prio-red)", font: "400 13px var(--font-sans)", marginBottom: 10 }}>{hata}</div>}
+            <button disabled={busy} style={{ width: "100%", font: "600 14px var(--font-sans)", color: "#fff", background: "var(--ody, #24479E)", border: 0, borderRadius: 8, padding: 12, cursor: "pointer" }}>{busy ? "…" : "Giriş Yap"}</button>
+          </form>
+        ) : (
+          <form onSubmit={sifreKaydet}>
+            <div style={{ font: "400 13px/1.5 var(--font-sans)", color: "var(--ink-3)", marginBottom: 14 }}>İlk girişte geçici şifrenizi değiştirmeniz gerekiyor.</div>
+            <label style={lbl}>Yeni şifre (en az 8 karakter)</label>
+            <input style={inp} name="p1" type="password" autoComplete="new-password" required minLength={8}/>
+            <label style={lbl}>Tekrar</label>
+            <input style={inp} name="p2" type="password" required/>
+            {hata && <div style={{ color: "var(--prio-red)", font: "400 13px var(--font-sans)", marginBottom: 10 }}>{hata}</div>}
+            <button disabled={busy} style={{ width: "100%", font: "600 14px var(--font-sans)", color: "#fff", background: "var(--ody, #24479E)", border: 0, borderRadius: 8, padding: 12, cursor: "pointer" }}>{busy ? "…" : "Kaydet ve Devam Et"}</button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── AppRoot — auth gate ───────────────────────────────────────────────────
 function AppRoot() {
   const [authUser, setAuthUser] = React.useState(() => bnsGetStoredUser());
+  if (window.BNS_PORTAL) {
+    // Portal: yalnız 'musteri' rolündeki saklı oturum geçerli; personel token'ı portalda kullanılmaz.
+    if (!authUser || authUser.role !== "musteri") return <PortalLogin onLogin={setAuthUser} />;
+    return <App currentUser={authUser} onLogout={bnsLogout} />;
+  }
   if (!authUser) return <LoginScreen onLogin={setAuthUser} />;
+  if (authUser.role === "musteri") { bnsLogout(); return null; }   // müşteri oturumu personel arayüzüne giremez
   return <App currentUser={authUser} onLogout={bnsLogout} />;
 }
 

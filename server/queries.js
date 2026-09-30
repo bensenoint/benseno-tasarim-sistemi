@@ -365,4 +365,51 @@ async function getEvents({ before, limit, archive, from, to } = {}) {
   return { events: rows, hasMore, oldestTs: rows.length ? rows[rows.length - 1].t : null, archive: !!archive };
 }
 
-module.exports = { getState, getEmbedded, allBriefsWithAssignees, getEvents };
+// ── Müşteri Portalı embedded'ı (SEC-P2, 30 Eyl) ─────────────────────────────
+// Dashboard'ın marka sayfası portalda BİREBİR çalışsın diye aynı shape döner, ama:
+//  - YALNIZ verilen markanın brief/completed/event kayıtları,
+//  - sensitive=false taban (finans/kişi-puanı zaten yok) + İÇ METİN DEĞİŞİMİ:
+//    thread_ozet → thread_ozet_musteri, rating_sebep → rating_sebep_musteri
+//    (müşteri versiyonu yoksa alan BOŞ gider — ham metin asla),
+//  - kanal_ozet / son_insight (iç günlük takip) ve ton/insight alanları ÇIKARILIR,
+//  - SATIŞ (TL + döviz) eklenir (Görkem kararı: satış görünür, maliyet asla).
+async function getPortalEmbedded(markaId) {
+  const br = await pool.query('SELECT name FROM brands WHERE id=$1', [markaId]);
+  const markaAd = br.rows[0] && br.rows[0].name;
+  if (!markaAd) throw new Error('marka bulunamadı');
+  const emb = await getEmbedded({ sensitive: false, selfId: null });
+  // Satış + müşteri metinleri tek sorguda (embedded sensitive=false bunları taşımaz)
+  const ek = await pool.query(
+    `SELECT no, satis, satis_doviz, satis_orij, thread_ozet_musteri, rating_sebep_musteri
+     FROM briefs WHERE marka_id=$1 AND deleted_at IS NULL`, [markaId]);
+  const ekByNo = new Map(ek.rows.map(r => [r.no, r]));
+  const donustur = (b) => {
+    const e = ekByNo.get(b.no) || {};
+    const { thread_ozet, thread_ozet_at, thread_ozet_ts, thread_ton, insight, insight_at,
+            rating_sebep, stale, uyari_at, uyari2_at, musteri_bekliyor, ...rest } = b;
+    return { ...rest,
+      thread_ozet: e.thread_ozet_musteri || null,          // yalnız yumuşatılmış
+      rating_sebep: e.rating_sebep_musteri || null,
+      satis: e.satis != null ? +e.satis : null,
+      satis_doviz: e.satis_doviz || 'TL',
+      satis_orij: e.satis_orij != null ? +e.satis_orij : null };
+  };
+  return {
+    now: emb.now,
+    bns_brands: emb.bns_brands.filter(x => x.name === markaAd)
+      .map(({ kanal_ozet, kanal_ozet_at, son_insight, son_insight_tarih, ...b }) =>
+        ({ ...b, kanal_ozet: null, kanal_ozet_at: null, son_insight: null, son_insight_tarih: null })),
+    bns_users: emb.bns_users,   // ekip adları/avatarlar görünür (karar: iş detayındaki her şey)
+    bns_briefs: emb.bns_briefs.filter(b => b.marka === markaAd).map(donustur),
+    bns_completed: emb.bns_completed.filter(b => b.marka === markaAd).map(donustur),
+    bns_deleted: [], bns_dept_stats: emb.bns_dept_stats,
+    bns_events: (emb.bns_events || []).filter(e => e.marka === markaAd),
+    bns_history: [],
+    bns_ratings: null, bns_sebep: [], bns_sebep_history: [],
+    bns_marka_fatura: [], bns_is_tipleri: emb.bns_is_tipleri, bns_tatiller: emb.bns_tatiller,
+    portal: true, marka: markaAd,
+    source: 'postgres', generated_at: emb.generated_at,
+  };
+}
+
+module.exports = { getState, getEmbedded, getPortalEmbedded, allBriefsWithAssignees, getEvents };
