@@ -26,6 +26,7 @@ const MARKA_KANAL = {
   "KZY Everclean":       "marka-kzy-everclean",
   "KZY Ferplast":        "marka-kzy-ferplast",
   "KZY Flamingo":        "marka-kzy-flamingo",
+  "KZY Me-O":            "marka-kzy-me-o",
   "KZY Simple Solution": "marka-kzy-simplesolution",
   "KZY Supreme":         "marka-kzy-supreme",
   "KZY Vet's Best":      "marka-kzy-vetsbest",
