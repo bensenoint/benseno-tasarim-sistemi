@@ -54,6 +54,25 @@ if [ "$do_dash" -eq 1 ]; then
   fi
 fi
 
+# Railway deploy'u SONUCU görülene dek bekle. "Tetiklendi" yetmez: 2026-10-22'de
+# hem API hem bot deploy'u sessizce FAILED kaldı ve prod 3 hafta eski kodla çalıştı.
+# Terminal durumu SUCCESS değilse script kırmızı uyarıyla DURUR.
+bekle_deploy() { # $1=servis adı
+  local svc="$1" st i
+  for i in $(seq 1 60); do   # ~15 dk tavan (15 sn aralık)
+    st="$(railway deployment list --service "$svc" --json 2>/dev/null \
+          | python3 -c 'import json,sys;print(json.load(sys.stdin)[0]["status"])' 2>/dev/null || echo '?')"
+    case "$st" in
+      SUCCESS) echo "  ✅ $svc deploy SUCCESS"; return 0 ;;
+      FAILED|CRASHED|REMOVED)
+        echo "  ❌ $svc deploy $st — PROD GÜNCELLENMEDİ! Build loglarına bak: railway logs --build --service $svc"
+        return 1 ;;
+    esac
+    sleep 15
+  done
+  echo "  ❌ $svc deploy 15 dk içinde sonuçlanmadı (son durum: $st)"; return 1
+}
+
 if [ "$do_api" -eq 1 ]; then
   echo "═══ 2/4 · API deploy (Railway benseno-api) ═══"
   D="$(mktemp -d /tmp/bns-api-XXXX)"
@@ -62,13 +81,16 @@ if [ "$do_api" -eq 1 ]; then
   ( cd "$D" \
     && railway link --project "$RAILWAY_PROJECT" --environment production --service benseno-api >/dev/null 2>&1 \
     && railway up --service benseno-api --detach 2>&1 | grep -c "Build Logs" >/dev/null \
-    && echo "  ✅ API deploy tetiklendi" )
+    && echo "  ⏳ API deploy tetiklendi, sonuç bekleniyor..." )
+  bekle_deploy benseno-api
 fi
 
 if [ "$do_bot" -eq 1 ]; then
   echo "═══ 3/4 · Bot/scheduler redeploy (benseno-tasarim-sistemi) ═══"
-  railway redeploy --service benseno-tasarim-sistemi -y >/dev/null 2>&1 || true
-  echo "  ✅ Bot redeploy tetiklendi (en güncel main'e senkronlanır)"
+  # redeploy SKIPPED/dedup tuzağına düşebiliyor → taze upload (railway up) daha güvenilir.
+  railway up --service benseno-tasarim-sistemi --detach 2>&1 | grep -c "Build Logs" >/dev/null \
+    && echo "  ⏳ Bot deploy tetiklendi, sonuç bekleniyor..."
+  bekle_deploy benseno-tasarim-sistemi
 fi
 
 echo "═══ 4/4 · Tutarlılık denetimi ═══"
